@@ -93,13 +93,10 @@ function generateDraw(element) {
     element.draw = (rc, context) => {
       const font = context.font;
       context.font = element.font;
-      const height =
-        element.measure.actualBoundingBoxAscent +
-        element.measure.actualBoundingBoxDescent;
       context.fillText(
         element.text,
         element.x,
-        element.y + 2 * element.measure.actualBoundingBoxAscent - height / 2
+        element.y + element.measure.actualBoundingBoxAscent
       );
       context.font = font;
     };
