@@ -248,7 +248,7 @@ class App extends React.Component {
                 this.setState({ draggingElement: selectedElement });
               }
 
-              isDraggingElements = elements.some(element => element.isSelected && isInsideAnElement(x, y));
+              isDraggingElements = elements.some(element => element.isSelected);
 
               if (isDraggingElements) {
                 document.documentElement.style.cursor = "move";
