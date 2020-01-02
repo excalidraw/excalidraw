@@ -39,30 +39,29 @@ function generateShape(element) {
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
-    const shape = generator.rectangle(
-      element.x,
-      element.y,
-      element.width,
-      element.height
-    );
+    const shape = generator.rectangle(0, 0, element.width, element.height);
     element.draw = (rc, context) => {
+      context.translate(element.x, element.y);
       rc.draw(shape);
+      context.translate(-element.x, -element.y);
     };
   } else if (element.type === "ellipse") {
     const shape = generator.ellipse(
-      element.x + element.width / 2,
-      element.y + element.height / 2,
+      element.width / 2,
+      element.height / 2,
       element.width,
       element.height
     );
     element.draw = (rc, context) => {
+      context.translate(element.x, element.y);
       rc.draw(shape);
+      context.translate(-element.x, -element.y);
     };
   } else if (element.type === "arrow") {
-    const x1 = element.x;
-    const y1 = element.y;
-    const x2 = element.x + element.width;
-    const y2 = element.y + element.height;
+    const x1 = 0;
+    const y1 = 0;
+    const x2 = element.width;
+    const y2 = element.height;
 
     const size = 30; // pixels
     const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -76,13 +75,18 @@ function generateShape(element) {
     const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
     const shapes = [
-      generator.line(x1, y1, x2, y2),
+      //    \
       generator.line(x3, y3, x2, y2),
+      // -----
+      generator.line(x1, y1, x2, y2),
+      //    /
       generator.line(x4, y4, x2, y2)
     ];
 
     element.draw = (rc, context) => {
+      context.translate(element.x, element.y);
       shapes.forEach(shape => rc.draw(shape));
+      context.translate(-element.x, -element.y);
     };
     return;
   } else if (element.type === "text") {
@@ -165,7 +169,6 @@ function App() {
           else if (event.key === "ArrowRight") element.x += step;
           else if (event.key === "ArrowUp") element.y -= step;
           else if (event.key === "ArrowDown") element.y += step;
-          generateShape(element);
         }
       });
       drawScene();
