@@ -359,6 +359,8 @@ function save() {
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
   }
+
+  window.removeEventListener("beforeunload", onUnload);
 }
 
 function restore() {
@@ -371,6 +373,18 @@ function restore() {
     }
     elements = [...items];
   }
+}
+
+function onUnload(event: BeforeUnloadEvent) {
+  event.preventDefault();
+
+  const confirmationMessage = "excalibur";
+  event.returnValue = confirmationMessage;
+  return confirmationMessage;
+}
+
+function addOnBeforeUnload() {
+  window.addEventListener("beforeunload", onUnload);
 }
 
 type AppState = {
@@ -388,6 +402,7 @@ class App extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.onKeyDown, false);
+    window.removeEventListener("beforeunload", onUnload);
   }
 
   public state: AppState = {
@@ -408,6 +423,7 @@ class App extends React.Component<{}, AppState> {
       drawScene();
       event.preventDefault();
     } else if (event.key === "Backspace") {
+      addOnBeforeUnload();
       deleteSelectedElements();
       drawScene();
       event.preventDefault();
@@ -417,6 +433,8 @@ class App extends React.Component<{}, AppState> {
       event.key === "ArrowUp" ||
       event.key === "ArrowDown"
     ) {
+      addOnBeforeUnload();
+
       const step = event.shiftKey ? 5 : 1;
       elements.forEach(element => {
         if (element.isSelected) {
@@ -547,6 +565,7 @@ class App extends React.Component<{}, AppState> {
                 parsedElement.y += 10;
                 generateDraw(parsedElement);
                 elements.push(parsedElement);
+                addOnBeforeUnload();
               });
               drawScene();
             }
@@ -598,6 +617,8 @@ class App extends React.Component<{}, AppState> {
                 if (isDraggingElements) {
                   document.documentElement.style.cursor = "move";
                 }
+              } else {
+                addOnBeforeUnload();
               }
 
               if (isTextElement(element)) {
@@ -658,6 +679,7 @@ class App extends React.Component<{}, AppState> {
                     lastX = x;
                     lastY = y;
                     drawScene();
+                    addOnBeforeUnload();
                     return;
                   }
                 }
