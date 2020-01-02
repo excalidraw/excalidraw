@@ -10,7 +10,7 @@ type ExcaliburTextElement = ExcaliburElement & {
   type: "text";
   font: string;
   text: string;
-  measure: TextMetrics;
+  actualBoundingBoxAscent: number;
 };
 
 var elements = Array.of<ExcaliburElement>();
@@ -205,7 +205,7 @@ function generateDraw(element: ExcaliburElement) {
       context.fillText(
         element.text,
         element.x,
-        element.y + element.measure.actualBoundingBoxAscent
+        element.y + element.actualBoundingBoxAscent
       );
       context.font = font;
     };
@@ -256,6 +256,14 @@ function clearSelection() {
   });
 }
 
+function deleteSelectedElements() {
+  for (var i = elements.length - 1; i >= 0; --i) {
+    if (elements[i].isSelected) {
+      elements.splice(i, 1);
+    }
+  }
+}
+
 type AppState = {
   draggingElement: ExcaliburElement | null;
   elementType: string;
@@ -286,11 +294,7 @@ class App extends React.Component<{}, AppState> {
       event.key === "Backspace" &&
       (event.target as HTMLElement).nodeName !== "INPUT"
     ) {
-      for (var i = elements.length - 1; i >= 0; --i) {
-        if (elements[i].isSelected) {
-          elements.splice(i, 1);
-        }
-      }
+      deleteSelectedElements();
       drawScene();
       event.preventDefault();
     } else if (
@@ -382,7 +386,46 @@ class App extends React.Component<{}, AppState> {
           />
           px)
         </div>
-        <div>
+        <div
+          onCut={e => {
+            e.clipboardData.setData(
+              "text/plain",
+              JSON.stringify(elements.filter(element => element.isSelected))
+            );
+            deleteSelectedElements();
+            drawScene();
+            e.preventDefault();
+          }}
+          onCopy={e => {
+            e.clipboardData.setData(
+              "text/plain",
+              JSON.stringify(elements.filter(element => element.isSelected))
+            );
+            e.preventDefault();
+          }}
+          onPaste={e => {
+            const paste = e.clipboardData.getData("text");
+            let parsedElements;
+            try {
+              parsedElements = JSON.parse(paste);
+            } catch (e) {}
+            if (
+              Array.isArray(parsedElements) &&
+              parsedElements.length > 0 &&
+              parsedElements[0].type // need to implement a better check here...
+            ) {
+              clearSelection();
+              parsedElements.forEach(parsedElement => {
+                parsedElement.x += 10;
+                parsedElement.y += 10;
+                generateDraw(parsedElement);
+                elements.push(parsedElement);
+              });
+              drawScene();
+            }
+            e.preventDefault();
+          }}
+        >
           {this.renderOption({ type: "rectangle", children: "Rectangle" })}
           {this.renderOption({ type: "ellipse", children: "Ellipse" })}
           {this.renderOption({ type: "arrow", children: "Arrow" })}
@@ -431,15 +474,19 @@ class App extends React.Component<{}, AppState> {
                 element.font = "20px Virgil";
                 const font = context.font;
                 context.font = element.font;
-                element.measure = context.measureText(element.text);
+                const {
+                  actualBoundingBoxAscent,
+                  actualBoundingBoxDescent,
+                  width
+                } = context.measureText(element.text);
+                element.actualBoundingBoxAscent = actualBoundingBoxAscent;
                 context.font = font;
                 const height =
-                  element.measure.actualBoundingBoxAscent +
-                  element.measure.actualBoundingBoxDescent;
+                  actualBoundingBoxAscent + actualBoundingBoxDescent;
                 // Center the text
-                element.x -= element.measure.width / 2;
-                element.y -= element.measure.actualBoundingBoxAscent;
-                element.width = element.measure.width;
+                element.x -= width / 2;
+                element.y -= actualBoundingBoxAscent;
+                element.width = width;
                 element.height = height;
               }
 
