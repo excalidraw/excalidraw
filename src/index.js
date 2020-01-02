@@ -29,9 +29,17 @@ function newElement(type, x, y, width = 0, height = 0) {
   return element;
 }
 
-function exportAsPNG({ background, visibleOnly, padding = 10 }) {
+function exportAsPNG({
+  exportBackground,
+  exportVisibleOnly,
+  exportPadding = 10
+}) {
+  // deselect & rerender
+
   clearSelection();
   drawScene();
+
+  // calculate visible-area coords
 
   let subCanvasX1 = Infinity;
   let subCanvasX2 = 0;
@@ -45,40 +53,54 @@ function exportAsPNG({ background, visibleOnly, padding = 10 }) {
     subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
   });
 
-  let targetCanvas = canvas;
+  // create temporary canvas from which we'll export
 
-  if ( visibleOnly ) {
-    targetCanvas = document.createElement('canvas');
-    targetCanvas.style.display = 'none';
-    document.body.appendChild(targetCanvas);
-    targetCanvas.width = subCanvasX2 - subCanvasX1 + padding * 2;
-    targetCanvas.height = subCanvasY2 - subCanvasY1 + padding * 2;
-    const targetCanvas_ctx = targetCanvas.getContext('2d');
+  const tempCanvas = document.createElement("canvas");
+  const tempCanvasCtx = tempCanvas.getContext("2d");
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  tempCanvas.width = exportVisibleOnly
+    ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+    : canvas.width;
+  tempCanvas.height = exportVisibleOnly
+    ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+    : canvas.height;
 
-    if ( background ) {
-      targetCanvas_ctx.fillStyle = "#FFF";
-      targetCanvas_ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    targetCanvas_ctx.drawImage(
-      canvas,
-      subCanvasX1 - padding, // x
-      subCanvasY1 - padding, // y
-      subCanvasX2 - subCanvasX1 + padding * 2, // width
-      subCanvasY2 - subCanvasY1 + padding * 2, // height
-      0,
-      0,
-      targetCanvas.width,
-      targetCanvas.height
-    );
+  if (exportBackground) {
+    tempCanvasCtx.fillStyle = "#FFF";
+    tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  const link = document.createElement('a');
-  link.setAttribute('download', 'excalibur.png');
-  link.setAttribute('href', targetCanvas.toDataURL("image/png"));
+  // copy our original canvas onto the temp canvas
+  tempCanvasCtx.drawImage(
+    canvas, // source
+    exportVisibleOnly // sx
+      ? subCanvasX1 - exportPadding
+      : 0,
+    exportVisibleOnly // sy
+      ? subCanvasY1 - exportPadding
+      : 0,
+    exportVisibleOnly // sWidth
+      ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+      : canvas.width,
+    exportVisibleOnly // sHeight
+      ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+      : canvas.height,
+    0, // dx
+    0, // dy
+    exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
+    exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
+  );
+
+  // create a temporary <a> elem which we'll use to download the image
+  const link = document.createElement("a");
+  link.setAttribute("download", "excalibur.png");
+  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
   link.click();
+
+  // clean up the DOM
   link.remove();
-  if ( targetCanvas !== canvas ) targetCanvas.remove();
+  if (tempCanvas !== canvas) tempCanvas.remove();
 }
 
 function rotate(x1, y1, x2, y2, angle) {
@@ -280,9 +302,9 @@ class App extends React.Component {
       <div className="exportWrapper">
         <button onClick={() => {
           exportAsPNG({
-            background: this.state.exportBackground,
-            visibleOnly: this.state.exportVisibleOnly,
-            padding: this.state.exportPadding
+            exportBackground: this.state.exportBackground,
+            exportVisibleOnly: this.state.exportVisibleOnly,
+            exportPadding: this.state.exportPadding
           })
         }}>Export to png</button>
         <label>
@@ -337,7 +359,7 @@ class App extends React.Component {
                   element.isSelected = true
                 }
                 return isSelected
-              }) 
+              })
 
               if (selectedElement) {
                 this.setState({ draggingElement: selectedElement });
@@ -350,7 +372,7 @@ class App extends React.Component {
               if (isDraggingElements) {
                 document.documentElement.style.cursor = "move";
               }
-            } 
+            }
 
             if (this.state.elementType === "text") {
               const text = prompt("What text do you want?");
@@ -441,7 +463,7 @@ class App extends React.Component {
               if (elementType === "selection") {
                 if (isDraggingElements) {
                   isDraggingElements = false;
-                } 
+                }
                 elements.pop()
               } else {
                 draggingElement.isSelected = true;
