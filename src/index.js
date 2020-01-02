@@ -34,6 +34,8 @@ function exportAsPNG({
   exportVisibleOnly,
   exportPadding = 10
 }) {
+  if ( !elements.length ) return window.alert("Cannot export empty canvas.");
+
   // deselect & rerender
 
   clearSelection();
