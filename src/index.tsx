@@ -530,21 +530,26 @@ class App extends React.Component<{}, AppState> {
               let isDraggingElements = false;
               const cursorStyle = document.documentElement.style.cursor;
               if (this.state.elementType === "selection") {
-                const selectedElement = elements.find(element => {
-                  const isSelected = hitTest(element, x, y);
-                  if (isSelected) {
-                    element.isSelected = true;
-                  }
-                  return isSelected;
+                const hitElement = elements.find(element => {
+                  return hitTest(element, x, y);
                 });
 
-                // deselect everything except target element to-be-selected
-                elements.forEach(element => {
-                  if (element === selectedElement) return;
-                  element.isSelected = false;
-                });
-                if (selectedElement) {
-                  this.setState({ draggingElement: selectedElement });
+                // If we click on something
+                if (hitElement) {
+                  if (hitElement.isSelected) {
+                    // If that element is not already selected, do nothing,
+                    // we're likely going to drag it
+                  } else {
+                    // We unselect every other elements unless shift is pressed
+                    if (!e.shiftKey) {
+                      clearSelection();
+                    }
+                    // No matter what, we select it
+                    hitElement.isSelected = true;
+                  }
+                } else {
+                  // If we don't click on anything, let's remove all the selected elements
+                  clearSelection();
                 }
 
                 isDraggingElements = elements.some(
