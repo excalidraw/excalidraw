@@ -327,6 +327,7 @@ class App extends React.Component {
           onMouseDown={e => {
             const x = e.clientX - e.target.offsetLeft;
             const y = e.clientY - e.target.offsetTop;
+            const element = newElement(this.state.elementType, x, y);
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
@@ -341,41 +342,39 @@ class App extends React.Component {
               if (isDraggingElements) {
                 document.documentElement.style.cursor = "move";
               }
+            } 
+
+            if (this.state.elementType === "text") {
+              const text = prompt("What text do you want?");
+              if (text === null) {
+                return;
+              }
+              element.text = text;
+              element.font = "20px Virgil";
+              const font = context.font;
+              context.font = element.font;
+              element.measure = context.measureText(element.text);
+              context.font = font;
+              const height =
+                element.measure.actualBoundingBoxAscent +
+                element.measure.actualBoundingBoxDescent;
+              // Center the text
+              element.x -= element.measure.width / 2;
+              element.y -= element.measure.actualBoundingBoxAscent;
+              element.width = element.measure.width;
+              element.height = height;
+            }
+
+            generateDraw(element);
+            elements.push(element);
+            if (this.state.elementType === "text") {
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              element.isSelected = true;
             } else {
-              const element = newElement(this.state.elementType, x, y);
-
-              if (this.state.elementType === "text") {
-                const text = prompt("What text do you want?");
-                if (text === null) {
-                  return;
-                }
-                element.text = text;
-                element.font = "20px Virgil";
-                const font = context.font;
-                context.font = element.font;
-                element.measure = context.measureText(element.text);
-                context.font = font;
-                const height =
-                  element.measure.actualBoundingBoxAscent +
-                  element.measure.actualBoundingBoxDescent;
-                // Center the text
-                element.x -= element.measure.width / 2;
-                element.y -= element.measure.actualBoundingBoxAscent;
-                element.width = element.measure.width;
-                element.height = height;
-              }
-
-              generateDraw(element);
-              elements.push(element);
-              if (this.state.elementType === "text") {
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-                element.isSelected = true;
-              } else {
-                this.setState({ draggingElement: element });
-              }
+              this.setState({ draggingElement: element });
             }
 
             let lastX = x;
@@ -417,22 +416,30 @@ class App extends React.Component {
             };
 
             const onMouseUp = e => {
+              const { draggingElement, elementType } = this.state
+
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
+
               document.documentElement.style.cursor = cursorStyle;
 
-              const draggingElement = this.state.draggingElement;
+              // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
-                return;
+                clearSelection()
+                drawScene();
+                return
               }
-              if (this.state.elementType === "selection") {
+
+              if (elementType === "selection") {
                 if (isDraggingElements) {
                   isDraggingElements = false;
                 } 
+                elements.pop()
                 setSelection(draggingElement);
               } else {
                 draggingElement.isSelected = true;
               }
+
               this.setState({
                 draggingElement: null,
                 elementType: "selection"
