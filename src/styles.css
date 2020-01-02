@@ -3,3 +3,24 @@
   font-family: "Virgil";
   src: url("https://uploads.codesandbox.io/uploads/user/ed077012-e728-4a42-8395-cbd299149d62/AflB-FG_Virgil.ttf");
 }
+
+.exportWrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+.exportWrapper label {
+  display: flex;
+  align-items: center;
+  margin: 0 5px;
+}
+
+.exportWrapper button {
+  margin-right: 10px;
+}
+
+.exportWrapper input[type="number"] {
+  width: 40px;
+  padding: 2px;
+  margin-left: 10px;
+}
