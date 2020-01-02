@@ -326,7 +326,7 @@ context.translate(0.5, 0.5);
 function drawScene() {
   ReactDOM.render(<App />, rootElement);
 
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
 
   elements.forEach(element => {
     element.draw(rc, context);
