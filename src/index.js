@@ -219,6 +219,9 @@ function App() {
         id="canvas"
         width={window.innerWidth}
         height={window.innerHeight}
+        onClick={e => {
+          console.log("click");
+        }}
         onMouseDown={e => {
           const x = e.clientX - e.target.offsetLeft;
           const y = e.clientY - e.target.offsetTop;
@@ -255,12 +258,14 @@ function App() {
           drawScene();
         }}
         onMouseUp={e => {
-          setDraggingElement(null);
           if (elementType === "selection") {
             // Remove actual selection element
             elements.pop();
             setSelection(draggingElement);
+          } else {
+            draggingElement.isSelected = true;
           }
+          setDraggingElement(null);
           setElementType("selection");
           drawScene();
         }}
