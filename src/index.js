@@ -148,11 +148,13 @@ function App() {
   }
   return (
     <div>
-      <ElementOption type="rectangle">Rectangle</ElementOption>
-      <ElementOption type="ellipse">Ellipse</ElementOption>
-      <ElementOption type="arrow">Arrow</ElementOption>
-      <ElementOption type="text">Text</ElementOption>
-      <ElementOption type="selection">Selection</ElementOption>
+      {/* If using a component, dragging on the canvas also selects the label text which is annoying.
+          Not sure why that's happening */}
+      {ElementOption({ type: "rectangle", children: "Rectangle" })}
+      {ElementOption({ type: "ellipse", children: "Ellipse" })}
+      {ElementOption({ type: "arrow", children: "Arrow" })}
+      {ElementOption({ type: "text", children: "Text" })}
+      {ElementOption({ type: "selection", children: "Selection" })}
       <canvas
         id="canvas"
         width={window.innerWidth}
