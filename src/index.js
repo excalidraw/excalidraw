@@ -105,12 +105,25 @@ function generateShape(element) {
 }
 
 function setSelection(selection) {
+  // Fix up negative width and height when dragging from right to left
+  // Note: it's a lot harder to do on mouse move because of rounding issues
+  let { x, y, width, height } = selection;
+  if (width < 0) {
+    x += width;
+    width = -width;
+  }
+  if (height < 0) {
+    y += height;
+    height = -height;
+  }
+
   elements.forEach(element => {
     element.isSelected =
-      selection.x < element.x &&
-      selection.y < element.y &&
-      selection.x + selection.width > element.x + element.width &&
-      selection.y + selection.height > element.y + element.height;
+      element.type !== "selection" &&
+      x <= element.x &&
+      y <= element.y &&
+      x + width >= element.x + element.width &&
+      y + height >= element.y + element.height;
   });
 }
 
@@ -148,8 +161,10 @@ function App() {
   }
   return (
     <div>
-      {/* If using a component, dragging on the canvas also selects the label text which is annoying.
-          Not sure why that's happening */}
+      {/* Can't use the <ElementOption> form because ElementOption is re-defined
+          on every render, which would blow up and re-create the entire DOM tree,
+          which in addition to being inneficient, messes up with browser text
+          selection */}
       {ElementOption({ type: "rectangle", children: "Rectangle" })}
       {ElementOption({ type: "ellipse", children: "Ellipse" })}
       {ElementOption({ type: "arrow", children: "Arrow" })}
@@ -196,6 +211,16 @@ function App() {
             // Remove actual selection element
             elements.pop();
             setSelection(draggingElement);
+          }
+          // Fix up negative width and height when dragging from right to left
+          // Note: it's a lot harder to do on mouse move because of rounding issues
+          if (draggingElement.width < 0) {
+            draggingElement.x += draggingElement.width;
+            draggingElement.width = -draggingElement.width;
+          }
+          if (draggingElement.height < 0) {
+            draggingElement.y += draggingElement.height;
+            draggingElement.height = -draggingElement.height;
           }
           drawScene();
         }}
