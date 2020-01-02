@@ -24,14 +24,14 @@ function distanceBetweenPointAndSegment(
   x2: number,
   y2: number
 ) {
-  var A = x - x1;
-  var B = y - y1;
-  var C = x2 - x1;
-  var D = y2 - y1;
+  const A = x - x1;
+  const B = y - y1;
+  const C = x2 - x1;
+  const D = y2 - y1;
 
-  var dot = A * C + B * D;
-  var lenSquare = C * C + D * D;
-  var param = -1;
+  const dot = A * C + B * D;
+  const lenSquare = C * C + D * D;
+  let param = -1;
   if (lenSquare !== 0) {
     // in case of 0 length line
     param = dot / lenSquare;
@@ -532,6 +532,12 @@ class App extends React.Component<{}, AppState> {
                     element.isSelected = true;
                   }
                   return isSelected;
+                });
+
+                // deselect everything except target element to-be-selected
+                elements.forEach(element => {
+                  if (element === selectedElement) return;
+                  element.isSelected = false;
                 });
 
                 if (selectedElement) {
