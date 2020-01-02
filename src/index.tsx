@@ -265,8 +265,7 @@ class App extends React.Component<{}, AppState> {
   clearSelection = () => {
     const newElements = [...this.state.elements];
     newElements.map(element => {
-      element.isSelected = false;
-      return element;
+      return { ...element, isSelected: false };
     });
     this.setState({ elements: newElements });
   };
@@ -281,13 +280,13 @@ class App extends React.Component<{}, AppState> {
       const elementX2 = getElementAbsoluteX2(element);
       const elementY1 = getElementAbsoluteY1(element);
       const elementY2 = getElementAbsoluteY2(element);
-      element.isSelected =
+      const isSelected =
         element.type !== "selection" &&
         selectionX1 <= elementX1 &&
         selectionY1 <= elementY1 &&
         selectionX2 >= elementX2 &&
         selectionY2 >= elementY2;
-      return element;
+      return { ...element, isSelected };
     });
     this.setState({ elements: newElements });
   };
@@ -527,10 +526,14 @@ class App extends React.Component<{}, AppState> {
                 generateDraw(parsedElement);
                 return parsedElement;
               });
-              this.setState({
-                elements: [...this.state.elements, ...parsedElements]
-              });
-              drawScene(this.state.elements);
+              this.setState(
+                {
+                  elements: [...this.state.elements, ...parsedElements]
+                },
+                () => {
+                  drawScene(this.state.elements);
+                }
+              );
             }
             e.preventDefault();
           }}
@@ -551,13 +554,14 @@ class App extends React.Component<{}, AppState> {
               let isDraggingElements = false;
               const cursorStyle = document.documentElement.style.cursor;
               if (this.state.elementType === "selection") {
-                const hitElement = this.state.elements.find(element => {
+                const hitElementIdx = this.state.elements.findIndex(element => {
                   return hitTest(element, x, y);
                 });
 
                 // If we click on something
-                if (hitElement) {
-                  if (hitElement.isSelected) {
+                if (hitElementIdx > -1) {
+                  const auxElement = { ...this.state.elements[hitElementIdx] };
+                  if (auxElement.isSelected) {
                     // If that element is not already selected, do nothing,
                     // we're likely going to drag it
                   } else {
@@ -566,9 +570,15 @@ class App extends React.Component<{}, AppState> {
                       this.clearSelection();
                     }
                     // No matter what, we select it
-                    hitElement.isSelected = true;
+                    auxElement.isSelected = true;
+                    // I think we need a better way to do this but...
+                    const newElements = [...this.state.elements];
+                    newElements.splice(hitElementIdx, 1, auxElement);
+
+                    this.setState({ elements: newElements });
                   }
                 } else {
+                  // If we don't click on anything, let's remove all the selected elements
                   this.clearSelection();
                 }
 
@@ -608,11 +618,11 @@ class App extends React.Component<{}, AppState> {
 
               generateDraw(element);
 
-              // generate new elements array
+              // Add the new element to our elements array
               this.setState({
                 elements: [...this.state.elements, element]
               });
-              // elements.push(element);
+
               if (this.state.elementType === "text") {
                 this.setState({
                   draggingElement: null,
@@ -687,7 +697,7 @@ class App extends React.Component<{}, AppState> {
                   if (isDraggingElements) {
                     isDraggingElements = false;
                   }
-                  const newElements = this.state.elements;
+                  const newElements = [...this.state.elements];
                   newElements.pop();
                   this.setState({ elements: newElements });
                 } else {
