@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import rough from "roughjs/dist/rough.umd.js";
+import rough from "roughjs/bin/wrappers/rough";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 import "./styles.css";
 
@@ -11,7 +12,6 @@ type ExcaliburTextElement = ExcaliburElement & {
   text: string;
   measure: TextMetrics;
 };
-type RoughCanvas = any;
 
 var elements = Array.of<ExcaliburElement>();
 
@@ -129,7 +129,9 @@ function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
   ];
 }
 
-var generator = rough.generator();
+// Casting second argument (DrawingSurface) to any,
+// because it is requred by TS definitions and not required at runtime
+var generator = rough.generator(null, null as any);
 
 function isTextElement(
   element: ExcaliburElement
