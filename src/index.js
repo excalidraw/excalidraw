@@ -138,6 +138,25 @@ function App() {
         }
       }
       drawScene();
+      event.preventDefault();
+    } else if (
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight" ||
+      event.key === "ArrowUp" ||
+      event.key === "ArrowDown"
+    ) {
+      const step = event.shiftKey ? 5 : 1;
+      elements.forEach(element => {
+        if (element.isSelected) {
+          if (event.key === "ArrowLeft") element.x -= step;
+          else if (event.key === "ArrowRight") element.x += step;
+          else if (event.key === "ArrowUp") element.y -= step;
+          else if (event.key === "ArrowDown") element.y += step;
+          generateShape(element);
+        }
+      });
+      drawScene();
+      event.preventDefault();
     }
   }, []);
   React.useEffect(() => {
