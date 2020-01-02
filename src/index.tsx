@@ -5,15 +5,15 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 
 import "./styles.css";
 
-type ExcaliburElement = ReturnType<typeof newElement>;
-type ExcaliburTextElement = ExcaliburElement & {
+export type ExcaliburElement = ReturnType<typeof newElement>;
+export type ExcaliburTextElement = ExcaliburElement & {
   type: "text";
   font: string;
   text: string;
   measure: TextMetrics;
 };
 
-var elements = Array.of<ExcaliburElement>();
+// var elements = Array.of<ExcaliburElement>();
 
 function isInsideAnElement(x: number, y: number) {
   return (element: ExcaliburElement) => {
@@ -37,86 +37,6 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
     draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
   };
   return element;
-}
-
-function exportAsPNG({
-  exportBackground,
-  exportVisibleOnly,
-  exportPadding = 10
-}: {
-  exportBackground: boolean;
-  exportVisibleOnly: boolean;
-  exportPadding?: number;
-}) {
-  if (!elements.length) return window.alert("Cannot export empty canvas.");
-
-  // deselect & rerender
-
-  clearSelection();
-  drawScene();
-
-  // calculate visible-area coords
-
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
-
-  elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-  });
-
-  // create temporary canvas from which we'll export
-
-  const tempCanvas = document.createElement("canvas");
-  const tempCanvasCtx = tempCanvas.getContext("2d")!;
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = exportVisibleOnly
-    ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-    : canvas.width;
-  tempCanvas.height = exportVisibleOnly
-    ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-    : canvas.height;
-
-  if (exportBackground) {
-    tempCanvasCtx.fillStyle = "#FFF";
-    tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // copy our original canvas onto the temp canvas
-  tempCanvasCtx.drawImage(
-    canvas, // source
-    exportVisibleOnly // sx
-      ? subCanvasX1 - exportPadding
-      : 0,
-    exportVisibleOnly // sy
-      ? subCanvasY1 - exportPadding
-      : 0,
-    exportVisibleOnly // sWidth
-      ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-      : canvas.width,
-    exportVisibleOnly // sHeight
-      ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-      : canvas.height,
-    0, // dx
-    0, // dy
-    exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
-    exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
-  );
-
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", "excalibur.png");
-  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-  link.click();
-
-  // clean up the DOM
-  link.remove();
-  if (tempCanvas !== canvas) tempCanvas.remove();
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -231,33 +151,9 @@ function getElementAbsoluteY2(element: ExcaliburElement) {
   return element.height >= 0 ? element.y + element.height : element.y;
 }
 
-function setSelection(selection: ExcaliburElement) {
-  const selectionX1 = getElementAbsoluteX1(selection);
-  const selectionX2 = getElementAbsoluteX2(selection);
-  const selectionY1 = getElementAbsoluteY1(selection);
-  const selectionY2 = getElementAbsoluteY2(selection);
-  elements.forEach(element => {
-    const elementX1 = getElementAbsoluteX1(element);
-    const elementX2 = getElementAbsoluteX2(element);
-    const elementY1 = getElementAbsoluteY1(element);
-    const elementY2 = getElementAbsoluteY2(element);
-    element.isSelected =
-      element.type !== "selection" &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2;
-  });
-}
-
-function clearSelection() {
-  elements.forEach(element => {
-    element.isSelected = false;
-  });
-}
-
 type AppState = {
   draggingElement: ExcaliburElement | null;
+  elements: ExcaliburElement[];
   elementType: string;
   exportBackground: boolean;
   exportVisibleOnly: boolean;
@@ -275,13 +171,45 @@ class App extends React.Component<{}, AppState> {
 
   public state: AppState = {
     draggingElement: null,
+    elements: [],
     elementType: "selection",
     exportBackground: false,
     exportVisibleOnly: true,
     exportPadding: 10
   };
 
+  clearSelection = () => {
+    const newElements = [...this.state.elements];
+    newElements.map(element => {
+      element.isSelected = false;
+      return element;
+    });
+    this.setState({ elements: newElements });
+  };
+
+  setSelection = (selection: ExcaliburElement) => {
+    const selectionX1 = getElementAbsoluteX1(selection);
+    const selectionX2 = getElementAbsoluteX2(selection);
+    const selectionY1 = getElementAbsoluteY1(selection);
+    const selectionY2 = getElementAbsoluteY2(selection);
+    const newElements = this.state.elements.map(element => {
+      const elementX1 = getElementAbsoluteX1(element);
+      const elementX2 = getElementAbsoluteX2(element);
+      const elementY1 = getElementAbsoluteY1(element);
+      const elementY2 = getElementAbsoluteY2(element);
+      element.isSelected =
+        element.type !== "selection" &&
+        selectionX1 <= elementX1 &&
+        selectionY1 <= elementY1 &&
+        selectionX2 >= elementX2 &&
+        selectionY2 >= elementY2;
+      return element;
+    });
+    this.setState({ elements: newElements });
+  };
+
   private onKeyDown = (event: KeyboardEvent) => {
+    const { elements } = this.state;
     if (
       event.key === "Backspace" &&
       (event.target as HTMLElement)?.nodeName !== "INPUT"
@@ -291,7 +219,7 @@ class App extends React.Component<{}, AppState> {
           elements.splice(i, 1);
         }
       }
-      drawScene();
+      drawScene(this.state.elements);
       event.preventDefault();
     } else if (
       event.key === "ArrowLeft" ||
@@ -308,7 +236,7 @@ class App extends React.Component<{}, AppState> {
           else if (event.key === "ArrowDown") element.y += step;
         }
       });
-      drawScene();
+      drawScene(this.state.elements);
       event.preventDefault();
     }
   };
@@ -327,8 +255,8 @@ class App extends React.Component<{}, AppState> {
           checked={this.state.elementType === type}
           onChange={() => {
             this.setState({ elementType: type });
-            clearSelection();
-            drawScene();
+            this.clearSelection();
+            drawScene(this.state.elements);
           }}
         />
         {children}
@@ -336,13 +264,95 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
+  exportAsPNG = ({
+    exportBackground,
+    exportVisibleOnly,
+    exportPadding = 10
+  }: {
+    exportBackground: boolean;
+    exportVisibleOnly: boolean;
+    exportPadding?: number;
+  }) => {
+    const { elements } = this.state;
+    if (!elements.length) return window.alert("Cannot export empty canvas.");
+
+    // deselect & rerender
+
+    this.clearSelection();
+
+    drawScene(elements);
+
+    // calculate visible-area coords
+
+    let subCanvasX1 = Infinity;
+    let subCanvasX2 = 0;
+    let subCanvasY1 = Infinity;
+    let subCanvasY2 = 0;
+
+    elements.forEach(element => {
+      subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
+      subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
+      subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
+      subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
+    });
+
+    // create temporary canvas from which we'll export
+
+    const tempCanvas = document.createElement("canvas");
+    const tempCanvasCtx = tempCanvas.getContext("2d")!;
+    tempCanvas.style.display = "none";
+    document.body.appendChild(tempCanvas);
+    tempCanvas.width = exportVisibleOnly
+      ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+      : canvas.width;
+    tempCanvas.height = exportVisibleOnly
+      ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+      : canvas.height;
+
+    if (exportBackground) {
+      tempCanvasCtx.fillStyle = "#FFF";
+      tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // copy our original canvas onto the temp canvas
+    tempCanvasCtx.drawImage(
+      canvas, // source
+      exportVisibleOnly // sx
+        ? subCanvasX1 - exportPadding
+        : 0,
+      exportVisibleOnly // sy
+        ? subCanvasY1 - exportPadding
+        : 0,
+      exportVisibleOnly // sWidth
+        ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+        : canvas.width,
+      exportVisibleOnly // sHeight
+        ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+        : canvas.height,
+      0, // dx
+      0, // dy
+      exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
+      exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
+    );
+
+    // create a temporary <a> elem which we'll use to download the image
+    const link = document.createElement("a");
+    link.setAttribute("download", "excalibur.png");
+    link.setAttribute("href", tempCanvas.toDataURL("image/png"));
+    link.click();
+
+    // clean up the DOM
+    link.remove();
+    if (tempCanvas !== canvas) tempCanvas.remove();
+  };
+
   public render() {
     return (
       <>
         <div className="exportWrapper">
           <button
             onClick={() => {
-              exportAsPNG({
+              this.exportAsPNG({
                 exportBackground: this.state.exportBackground,
                 exportVisibleOnly: this.state.exportVisibleOnly,
                 exportPadding: this.state.exportPadding
@@ -399,7 +409,7 @@ class App extends React.Component<{}, AppState> {
               let isDraggingElements = false;
               const cursorStyle = document.documentElement.style.cursor;
               if (this.state.elementType === "selection") {
-                const selectedElement = elements.find(element => {
+                const selectedElement = this.state.elements.find(element => {
                   const isSelected = isInsideAnElement(x, y)(element);
                   if (isSelected) {
                     element.isSelected = true;
@@ -410,10 +420,10 @@ class App extends React.Component<{}, AppState> {
                 if (selectedElement) {
                   this.setState({ draggingElement: selectedElement });
                 } else {
-                  clearSelection();
+                  this.clearSelection();
                 }
 
-                isDraggingElements = elements.some(
+                isDraggingElements = this.state.elements.some(
                   element => element.isSelected
                 );
 
@@ -444,7 +454,12 @@ class App extends React.Component<{}, AppState> {
               }
 
               generateDraw(element);
-              elements.push(element);
+
+              // generate new elements array
+              this.setState({
+                elements: [...this.state.elements, element]
+              });
+              // elements.push(element);
               if (this.state.elementType === "text") {
                 this.setState({
                   draggingElement: null,
@@ -465,7 +480,9 @@ class App extends React.Component<{}, AppState> {
                 }
 
                 if (isDraggingElements) {
-                  const selectedElements = elements.filter(el => el.isSelected);
+                  const selectedElements = this.state.elements.filter(
+                    el => el.isSelected
+                  );
                   if (selectedElements.length) {
                     const x = e.clientX - target.offsetLeft;
                     const y = e.clientY - target.offsetTop;
@@ -475,7 +492,7 @@ class App extends React.Component<{}, AppState> {
                     });
                     lastX = x;
                     lastY = y;
-                    drawScene();
+                    drawScene(this.state.elements);
                     return;
                   }
                 }
@@ -493,9 +510,9 @@ class App extends React.Component<{}, AppState> {
                 generateDraw(draggingElement);
 
                 if (this.state.elementType === "selection") {
-                  setSelection(draggingElement);
+                  this.setSelection(draggingElement);
                 }
-                drawScene();
+                drawScene(this.state.elements);
               };
 
               const onMouseUp = (e: MouseEvent) => {
@@ -508,8 +525,8 @@ class App extends React.Component<{}, AppState> {
 
                 // if no element is clicked, clear the selection and redraw
                 if (draggingElement === null) {
-                  clearSelection();
-                  drawScene();
+                  this.clearSelection();
+                  drawScene(this.state.elements);
                   return;
                 }
 
@@ -517,7 +534,9 @@ class App extends React.Component<{}, AppState> {
                   if (isDraggingElements) {
                     isDraggingElements = false;
                   }
-                  elements.pop();
+                  const newElements = this.state.elements;
+                  newElements.pop();
+                  this.setState({ elements: newElements });
                 } else {
                   draggingElement.isSelected = true;
                 }
@@ -526,13 +545,13 @@ class App extends React.Component<{}, AppState> {
                   draggingElement: null,
                   elementType: "selection"
                 });
-                drawScene();
+                drawScene(this.state.elements);
               };
 
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
 
-              drawScene();
+              drawScene(this.state.elements);
             }}
           />
         </div>
@@ -551,7 +570,7 @@ const context = canvas.getContext("2d")!;
 // https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
 context.translate(0.5, 0.5);
 
-function drawScene() {
+function drawScene(elements: ExcaliburElement[]) {
   ReactDOM.render(<App />, rootElement);
 
   context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
@@ -578,4 +597,4 @@ function drawScene() {
   });
 }
 
-drawScene();
+drawScene([]);
