@@ -257,7 +257,10 @@ class App extends React.Component {
             generateDraw(element);
             elements.push(element);
             if (this.state.elementType === "text") {
-              this.setState({ draggingElement: null });
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
               element.isSelected = true;
             } else {
               this.setState({ draggingElement: element });
@@ -297,8 +300,10 @@ class App extends React.Component {
               } else {
                 draggingElement.isSelected = true;
               }
-              this.setState({ draggingElement: null });
-              this.setState({ elementType: "selection" });
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
               drawScene();
             };
 
