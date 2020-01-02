@@ -13,6 +13,27 @@ type ExcaliburTextElement = ExcaliburElement & {
   actualBoundingBoxAscent: number;
 };
 
+const history: ExcaliburElement[] = [[]];
+function pushHistoryCurrentEntry() {
+  const newEntry = elements.map(element => ({ ...element }));
+  if (
+    history.length > 0 &&
+    JSON.stringify(history[history.length - 1]) === JSON.stringify(newEntry)
+  ) {
+    // If the last entry is the same as this one, ignore it
+    return;
+  }
+  history.push(newEntry);
+}
+function restoreHistoryEntry(entry: ExcaliburElement[]) {
+  const newElements = entry;
+  elements.splice(0, elements.length);
+  newElements.forEach((newElement: ExcaliburElement) => {
+    elements.push(newElement);
+  });
+  drawScene();
+}
+
 var elements = Array.of<ExcaliburElement>();
 
 // https://stackoverflow.com/a/6853926/232122
@@ -240,18 +261,18 @@ function getArrowPoints(element: ExcaliburElement) {
 
 function generateDraw(element: ExcaliburElement) {
   if (element.type === "selection") {
-    element.draw = (rc, context) => {
+    element.draw = function(rc, context) {
       const fillStyle = context.fillStyle;
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(element.x, element.y, element.width, element.height);
+      context.fillRect(this.x, this.y, this.width, this.height);
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
     const shape = generator.rectangle(0, 0, element.width, element.height);
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = function(rc, context) {
+      context.translate(this.x, this.y);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-this.x, -this.y);
     };
   } else if (element.type === "ellipse") {
     const shape = generator.ellipse(
@@ -260,10 +281,10 @@ function generateDraw(element: ExcaliburElement) {
       element.width,
       element.height
     );
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = function(rc, context) {
+      context.translate(this.x, this.y);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-this.x, -this.y);
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
@@ -276,20 +297,20 @@ function generateDraw(element: ExcaliburElement) {
       generator.line(x4, y4, x2, y2)
     ];
 
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = function(rc, context) {
+      context.translate(this.x, this.y);
       shapes.forEach(shape => rc.draw(shape));
-      context.translate(-element.x, -element.y);
+      context.translate(-this.x, -this.y);
     };
     return;
   } else if (isTextElement(element)) {
-    element.draw = (rc, context) => {
+    element.draw = function(rc, context) {
       const font = context.font;
-      context.font = element.font;
+      context.font = this.font;
       context.fillText(
-        element.text,
-        element.x,
-        element.y + element.actualBoundingBoxAscent
+        this.text,
+        this.x,
+        this.y + this.actualBoundingBoxAscent
       );
       context.font = font;
     };
@@ -403,10 +424,15 @@ class App extends React.Component<{}, AppState> {
       });
       drawScene();
       event.preventDefault();
-    } else if (event.key === "a" && event.metaKey) {
+    } else if (event.metaKey && event.key === "a") {
       elements.forEach(element => {
         element.isSelected = true;
       });
+      drawScene();
+      event.preventDefault();
+    } else if (event.metaKey && event.key === "z") {
+      const lastEntry = history.pop();
+      restoreHistoryEntry(lastEntry || []);
       drawScene();
       event.preventDefault();
     }
@@ -659,6 +685,7 @@ class App extends React.Component<{}, AppState> {
                 // if no element is clicked, clear the selection and redraw
                 if (draggingElement === null) {
                   clearSelection();
+                  pushHistoryCurrentEntry();
                   drawScene();
                   return;
                 }
@@ -676,6 +703,7 @@ class App extends React.Component<{}, AppState> {
                   draggingElement: null,
                   elementType: "selection"
                 });
+                pushHistoryCurrentEntry();
                 drawScene();
               };
 
