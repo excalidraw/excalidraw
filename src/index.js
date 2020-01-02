@@ -150,148 +150,169 @@ function clearSelection() {
   });
 }
 
-function App() {
-  const [draggingElement, setDraggingElement] = React.useState(null);
-  const [elementType, setElementType] = React.useState("selection");
-  const onKeyDown = React.useCallback(event => {
-    if (event.key === "Backspace") {
-      for (var i = elements.length - 1; i >= 0; --i) {
-        if (elements[i].isSelected) {
-          elements.splice(i, 1);
+class App extends React.Component {
+  componentDidMount() {
+    this.onKeyDown = event => {
+      if (event.key === "Backspace") {
+        for (var i = elements.length - 1; i >= 0; --i) {
+          if (elements[i].isSelected) {
+            elements.splice(i, 1);
+          }
         }
+        drawScene();
+        event.preventDefault();
+      } else if (
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      ) {
+        const step = event.shiftKey ? 5 : 1;
+        elements.forEach(element => {
+          if (element.isSelected) {
+            if (event.key === "ArrowLeft") element.x -= step;
+            else if (event.key === "ArrowRight") element.x += step;
+            else if (event.key === "ArrowUp") element.y -= step;
+            else if (event.key === "ArrowDown") element.y += step;
+          }
+        });
+        drawScene();
+        event.preventDefault();
       }
-      drawScene();
-      event.preventDefault();
-    } else if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowRight" ||
-      event.key === "ArrowUp" ||
-      event.key === "ArrowDown"
-    ) {
-      const step = event.shiftKey ? 5 : 1;
-      elements.forEach(element => {
-        if (element.isSelected) {
-          if (event.key === "ArrowLeft") element.x -= step;
-          else if (event.key === "ArrowRight") element.x += step;
-          else if (event.key === "ArrowUp") element.y -= step;
-          else if (event.key === "ArrowDown") element.y += step;
-        }
-      });
-      drawScene();
-      event.preventDefault();
-    }
-  }, []);
-  React.useEffect(() => {
-    document.addEventListener("keydown", onKeyDown, false);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown, false);
     };
-  }, [onKeyDown]);
-
-  function ElementOption({ type, children }) {
-    return (
-      <label>
-        <input
-          type="radio"
-          checked={elementType === type}
-          onChange={() => {
-            setElementType(type);
-            clearSelection();
-            drawScene();
-          }}
-        />
-        {children}
-      </label>
-    );
+    document.addEventListener("keydown", this.onKeyDown, false);
   }
-  return (
-    <div>
-      {/* Can't use the <ElementOption> form because ElementOption is re-defined
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.onKeyDown, false);
+  }
+
+  constructor() {
+    super();
+    this.state = {
+      draggingElement: null,
+      elementType: "selection"
+    };
+  }
+
+  render() {
+    const ElementOption = ({ type, children }) => {
+      return (
+        <label>
+          <input
+            type="radio"
+            checked={this.state.elementType === type}
+            onChange={() => {
+              this.setState({ elementType: type });
+              clearSelection();
+              drawScene();
+            }}
+          />
+          {children}
+        </label>
+      );
+    };
+
+    return (
+      <div>
+        {/* Can't use the <ElementOption> form because ElementOption is re-defined
           on every render, which would blow up and re-create the entire DOM tree,
           which in addition to being inneficient, messes up with browser text
           selection */}
-      {ElementOption({ type: "rectangle", children: "Rectangle" })}
-      {ElementOption({ type: "ellipse", children: "Ellipse" })}
-      {ElementOption({ type: "arrow", children: "Arrow" })}
-      {ElementOption({ type: "text", children: "Text" })}
-      {ElementOption({ type: "selection", children: "Selection" })}
-      <canvas
-        id="canvas"
-        width={window.innerWidth}
-        height={window.innerHeight}
-        onClick={e => {
-          console.log("click");
-        }}
-        onMouseDown={e => {
-          const x = e.clientX - e.target.offsetLeft;
-          const y = e.clientY - e.target.offsetTop;
-          const element = newElement(elementType, x, y);
+        {ElementOption({ type: "rectangle", children: "Rectangle" })}
+        {ElementOption({ type: "ellipse", children: "Ellipse" })}
+        {ElementOption({ type: "arrow", children: "Arrow" })}
+        {ElementOption({ type: "text", children: "Text" })}
+        {ElementOption({ type: "selection", children: "Selection" })}
+        <canvas
+          id="canvas"
+          width={window.innerWidth}
+          height={window.innerHeight}
+          onMouseDown={e => {
+            const x = e.clientX - e.target.offsetLeft;
+            const y = e.clientY - e.target.offsetTop;
+            const element = newElement(this.state.elementType, x, y);
 
-          if (elementType === "text") {
-            const text = prompt("What text do you want?");
-            if (text === null) {
-              return;
+            if (this.state.elementType === "text") {
+              const text = prompt("What text do you want?");
+              if (text === null) {
+                return;
+              }
+              element.text = text;
+              element.font = "20px Virgil";
+              const font = context.font;
+              context.font = element.font;
+              element.measure = context.measureText(element.text);
+              context.font = font;
+              const height =
+                element.measure.actualBoundingBoxAscent +
+                element.measure.actualBoundingBoxDescent;
+              // Center the text
+              element.x -= element.measure.width / 2;
+              element.y -= element.measure.actualBoundingBoxAscent;
+              element.width = element.measure.width;
+              element.height = height;
             }
-            element.text = text;
-            element.font = "20px Virgil";
-            const font = context.font;
-            context.font = element.font;
-            element.measure = context.measureText(element.text);
-            context.font = font;
-            const height =
-              element.measure.actualBoundingBoxAscent +
-              element.measure.actualBoundingBoxDescent;
-            // Center the text
-            element.x -= element.measure.width / 2;
-            element.y -= element.measure.actualBoundingBoxAscent;
-            element.width = element.measure.width;
-            element.height = height;
-          }
 
-          generateDraw(element);
-          elements.push(element);
-          if (elementType === "text") {
-            setDraggingElement(null);
-            element.isSelected = true;
-          } else {
-            setDraggingElement(element);
-          }
-          drawScene();
-        }}
-        onMouseUp={e => {
-          if (draggingElement === null) {
-            return;
-          }
-          if (elementType === "selection") {
-            // Remove actual selection element
-            elements.pop();
-            setSelection(draggingElement);
-          } else {
-            draggingElement.isSelected = true;
-          }
-          setDraggingElement(null);
-          setElementType("selection");
-          drawScene();
-        }}
-        onMouseMove={e => {
-          if (!draggingElement) return;
-          let width = e.clientX - e.target.offsetLeft - draggingElement.x;
-          let height = e.clientY - e.target.offsetTop - draggingElement.y;
-          draggingElement.width = width;
-          // Make a perfect square or circle when shift is enabled
-          draggingElement.height = e.shiftKey ? width : height;
+            generateDraw(element);
+            elements.push(element);
+            if (this.state.elementType === "text") {
+              this.setState({ draggingElement: null });
+              element.isSelected = true;
+            } else {
+              this.setState({ draggingElement: element });
+            }
 
-          generateDraw(draggingElement);
+            const onMouseMove = e => {
+              // It is very important to read this.state within each move event,
+              // otherwise we would read a stale one!
+              const draggingElement = this.state.draggingElement;
+              if (!draggingElement) return;
+              let width = e.clientX - e.target.offsetLeft - draggingElement.x;
+              let height = e.clientY - e.target.offsetTop - draggingElement.y;
+              draggingElement.width = width;
+              // Make a perfect square or circle when shift is enabled
+              draggingElement.height = e.shiftKey ? width : height;
 
-          if (elementType === "selection") {
-            setSelection(draggingElement);
-          }
-          drawScene();
-        }}
-      />
-    </div>
-  );
+              generateDraw(draggingElement);
+
+              if (this.state.elementType === "selection") {
+                setSelection(draggingElement);
+              }
+              drawScene();
+            };
+
+            const onMouseUp = e => {
+              window.removeEventListener("mousemove", onMouseMove);
+              window.removeEventListener("mouseup", onMouseUp);
+
+              const draggingElement = this.state.draggingElement;
+              if (draggingElement === null) {
+                return;
+              }
+              if (this.state.elementType === "selection") {
+                // Remove actual selection element
+                elements.pop();
+                setSelection(draggingElement);
+              } else {
+                draggingElement.isSelected = true;
+              }
+              this.setState({ draggingElement: null });
+              this.setState({ elementType: "selection" });
+              drawScene();
+            };
+
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
+
+            drawScene();
+          }}
+        />
+      </div>
+    );
+  }
 }
+
 const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
 const canvas = document.getElementById("canvas");
