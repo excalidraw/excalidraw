@@ -12,7 +12,8 @@ function newElement(type, x, y) {
     x: x,
     y: y,
     width: 0,
-    height: 0
+    height: 0,
+    isSelected: false
   };
   generateShape(element);
   return element;
@@ -142,6 +143,11 @@ function App() {
         }}
         onMouseUp={e => {
           setDraggingElement(null);
+          if (elementType === "selection") {
+            elements.forEach(element => {
+              element.isSelected = false;
+            });
+          }
           drawScene();
         }}
         onMouseMove={e => {
@@ -152,6 +158,18 @@ function App() {
           // Make a perfect square or circle when shift is enabled
           draggingElement.height = e.shiftKey ? width : height;
           generateShape(draggingElement);
+
+          if (elementType === "selection") {
+            elements.forEach(element => {
+              element.isSelected =
+                draggingElement.x <= element.x &&
+                draggingElement.y <= element.y &&
+                draggingElement.x + draggingElement.width >=
+                  element.x + element.width &&
+                draggingElement.y + draggingElement.height >=
+                  element.y + element.height;
+            });
+          }
           drawScene();
         }}
       />
@@ -170,7 +188,7 @@ function drawScene() {
 
   elements.forEach(element => {
     element.draw(rc, context);
-    if (true || element.isSelected) {
+    if (element.isSelected) {
       const margin = 4;
       context.setLineDash([8, 4]);
       context.strokeRect(
