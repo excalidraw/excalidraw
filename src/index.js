@@ -6,6 +6,17 @@ import "./styles.css";
 
 var elements = [];
 
+function isInsideAnElement(x, y) {
+  return (element) => {
+    const x1 = getElementAbsoluteX1(element)
+    const x2 = getElementAbsoluteX2(element)
+    const y1 = getElementAbsoluteY1(element)
+    const y2 = getElementAbsoluteY2(element)
+
+    return (x >= x1 && x <= x2) && (y >= y1 && y <= y2)
+  }
+}
+
 function newElement(type, x, y, width = 0, height = 0) {
   const element = {
     type: type,
@@ -317,23 +328,21 @@ class App extends React.Component {
             const x = e.clientX - e.target.offsetLeft;
             const y = e.clientY - e.target.offsetTop;
             const element = newElement(this.state.elementType, x, y);
-
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
-              isDraggingElements = elements.some(el => {
-                if (el.isSelected) {
-                  const minX = Math.min(el.x, el.x + el.width);
-                  const maxX = Math.max(el.x, el.x + el.width);
-                  const minY = Math.min(el.y, el.y + el.height);
-                  const maxY = Math.max(el.y, el.y + el.height);
-                  return minX <= x && x <= maxX && minY <= y && y <= maxY;
-                }
-              });
+              const selectedElement = elements.find(isInsideAnElement(x, y)) 
+
+              if (selectedElement) {
+                this.setState({ draggingElement: selectedElement });
+              }
+
+              isDraggingElements = elements.some(element => element.isSelected);
+
               if (isDraggingElements) {
                 document.documentElement.style.cursor = "move";
               }
-            }
+            } 
 
             if (this.state.elementType === "text") {
               const text = prompt("What text do you want?");
@@ -407,25 +416,30 @@ class App extends React.Component {
             };
 
             const onMouseUp = e => {
+              const { draggingElement, elementType } = this.state
+
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
+
               document.documentElement.style.cursor = cursorStyle;
 
-              const draggingElement = this.state.draggingElement;
+              // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
-                return;
+                clearSelection()
+                drawScene();
+                return
               }
-              if (this.state.elementType === "selection") {
+
+              if (elementType === "selection") {
                 if (isDraggingElements) {
                   isDraggingElements = false;
-                } else {
-                  // Remove actual selection element
-                  setSelection(draggingElement);
-                }
-                elements.pop();
+                } 
+                elements.pop()
+                setSelection(draggingElement);
               } else {
                 draggingElement.isSelected = true;
               }
+
               this.setState({
                 draggingElement: null,
                 elementType: "selection"
