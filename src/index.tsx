@@ -292,7 +292,7 @@ class App extends React.Component<{}, AppState> {
   private onKeyDown = (event: KeyboardEvent) => {
     if (
       event.key === "Backspace" &&
-      ((event.target as HTMLElement) || {}).nodeName !== "INPUT"
+      (event.target as HTMLElement).nodeName !== "INPUT"
     ) {
       deleteSelectedElements();
       drawScene();
