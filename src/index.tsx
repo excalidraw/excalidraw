@@ -539,11 +539,8 @@ class App extends React.Component<{}, AppState> {
                   if (element === selectedElement) return;
                   element.isSelected = false;
                 });
-
                 if (selectedElement) {
                   this.setState({ draggingElement: selectedElement });
-                } else {
-                  clearSelection();
                 }
 
                 isDraggingElements = elements.some(
