@@ -144,6 +144,12 @@ function setSelection(selection) {
   });
 }
 
+function clearSelection() {
+  elements.forEach(element => {
+    element.isSelected = false;
+  });
+}
+
 function App() {
   const [draggingElement, setDraggingElement] = React.useState(null);
   const [elementType, setElementType] = React.useState("selection");
@@ -188,7 +194,11 @@ function App() {
         <input
           type="radio"
           checked={elementType === type}
-          onChange={() => setElementType(type)}
+          onChange={() => {
+            setElementType(type);
+            clearSelection();
+            drawScene();
+          }}
         />
         {children}
       </label>
@@ -247,6 +257,7 @@ function App() {
             elements.pop();
             setSelection(draggingElement);
           }
+          setElementType("selection");
           drawScene();
         }}
         onMouseMove={e => {
