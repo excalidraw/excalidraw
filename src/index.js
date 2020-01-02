@@ -30,7 +30,7 @@ function rotate(x1, y1, x2, y2, angle) {
 
 var generator = rough.generator();
 
-function generateShape(element) {
+function generateDraw(element) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -225,7 +225,11 @@ function App() {
           const element = newElement(elementType, x, y);
 
           if (elementType === "text") {
-            element.text = prompt("What text do you want?");
+            const text = prompt("What text do you want?");
+            if (text === null) {
+              return;
+            }
+            element.text = text;
             element.font = "20px Virgil";
             const font = context.font;
             context.font = element.font;
@@ -241,7 +245,7 @@ function App() {
             element.height = height;
           }
 
-          generateShape(element);
+          generateDraw(element);
           elements.push(element);
           if (elementType === "text") {
             setDraggingElement(null);
@@ -268,7 +272,7 @@ function App() {
           // Make a perfect square or circle when shift is enabled
           draggingElement.height = e.shiftKey ? width : height;
 
-          generateShape(draggingElement);
+          generateDraw(draggingElement);
 
           if (elementType === "selection") {
             setSelection(draggingElement);
