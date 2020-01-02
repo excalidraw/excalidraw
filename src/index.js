@@ -252,12 +252,16 @@ function App() {
           elements.push(element);
           if (elementType === "text") {
             setDraggingElement(null);
+            element.isSelected = true;
           } else {
             setDraggingElement(element);
           }
           drawScene();
         }}
         onMouseUp={e => {
+          if (draggingElement === null) {
+            return;
+          }
           if (elementType === "selection") {
             // Remove actual selection element
             elements.pop();
