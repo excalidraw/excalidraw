@@ -117,6 +117,23 @@ function setSelection(selection) {
 function App() {
   const [draggingElement, setDraggingElement] = React.useState(null);
   const [elementType, setElementType] = React.useState("selection");
+  const onKeyDown = React.useCallback(event => {
+    if (event.key === "Backspace") {
+      for (var i = elements.length - 1; i >= 0; --i) {
+        if (elements[i].isSelected) {
+          elements.splice(i, 1);
+        }
+      }
+      drawScene();
+    }
+  }, []);
+  React.useEffect(() => {
+    document.addEventListener("keydown", onKeyDown, false);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, false);
+    };
+  }, [onKeyDown]);
+
   function ElementOption({ type, children }) {
     return (
       <label>
