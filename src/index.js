@@ -331,10 +331,18 @@ class App extends React.Component {
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
-              const selectedElement = elements.find(isInsideAnElement(x, y)) 
+              const selectedElement = elements.find(element => {
+                const isSelected = isInsideAnElement(x, y)(element)
+                if (isSelected) {
+                  element.isSelected = true
+                }
+                return isSelected
+              }) 
 
               if (selectedElement) {
                 this.setState({ draggingElement: selectedElement });
+              } else {
+                clearSelection()
               }
 
               isDraggingElements = elements.some(element => element.isSelected);
@@ -424,7 +432,7 @@ class App extends React.Component {
               document.documentElement.style.cursor = cursorStyle;
 
               // if no element is clicked, clear the selection and redraw
-              if (draggingElement === null) {
+              if (draggingElement === null ) {
                 clearSelection()
                 drawScene();
                 return
@@ -435,7 +443,6 @@ class App extends React.Component {
                   isDraggingElements = false;
                 } 
                 elements.pop()
-                setSelection(draggingElement);
               } else {
                 draggingElement.isSelected = true;
               }
