@@ -13,6 +13,8 @@ type ExcaliburTextElement = ExcaliburElement & {
   actualBoundingBoxAscent: number;
 };
 
+const LOCAL_STORAGE_KEY = "excalibur";
+
 var elements = Array.of<ExcaliburElement>();
 
 // https://stackoverflow.com/a/6853926/232122
@@ -348,6 +350,31 @@ function deleteSelectedElements() {
   }
 }
 
+function save() {
+  if (elements && elements.length > 0) {
+    const items = [...elements];
+    for (const item of items) {
+      item.isSelected = false;
+    }
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+  }
+}
+
+function restore() {
+  const el = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+  if (el) {
+    const items = JSON.parse(el);
+    for (let item of items) {
+      item = generateDraw(item);
+    }
+    elements = [...items];
+
+    drawScene();
+  }
+}
+
 type AppState = {
   draggingElement: ExcaliburElement | null;
   elementType: string;
@@ -436,50 +463,62 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
+    const hasSavedItems = !!localStorage.getItem(LOCAL_STORAGE_KEY);
+
     return (
       <>
-        <div className="exportWrapper">
-          <button
-            onClick={() => {
-              exportAsPNG({
-                exportBackground: this.state.exportBackground,
-                exportVisibleOnly: this.state.exportVisibleOnly,
-                exportPadding: this.state.exportPadding
-              });
-            }}
-          >
-            Export to png
-          </button>
-          <label>
-            <input
-              type="checkbox"
-              checked={this.state.exportBackground}
-              onChange={e => {
-                this.setState({ exportBackground: e.target.checked });
+        <div className="wrappers">
+          <div className="saveWrapper">
+            <button disabled={elements.length === 0} onClick={save}>
+              Save
+            </button>
+            <button disabled={!hasSavedItems} onClick={restore}>
+              Restore
+            </button>
+          </div>
+          <div className="exportWrapper">
+            <button
+              onClick={() => {
+                exportAsPNG({
+                  exportBackground: this.state.exportBackground,
+                  exportVisibleOnly: this.state.exportVisibleOnly,
+                  exportPadding: this.state.exportPadding
+                });
               }}
-            />{" "}
-            background
-          </label>
-          <label>
+            >
+              Export to png
+            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={this.state.exportBackground}
+                onChange={e => {
+                  this.setState({ exportBackground: e.target.checked });
+                }}
+              />{" "}
+              background
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={this.state.exportVisibleOnly}
+                onChange={e => {
+                  this.setState({ exportVisibleOnly: e.target.checked });
+                }}
+              />
+              visible area only
+            </label>
+            (padding:
             <input
-              type="checkbox"
-              checked={this.state.exportVisibleOnly}
+              type="number"
+              value={this.state.exportPadding}
               onChange={e => {
-                this.setState({ exportVisibleOnly: e.target.checked });
+                this.setState({ exportPadding: Number(e.target.value) });
               }}
+              disabled={!this.state.exportVisibleOnly}
             />
-            visible area only
-          </label>
-          (padding:
-          <input
-            type="number"
-            value={this.state.exportPadding}
-            onChange={e => {
-              this.setState({ exportPadding: Number(e.target.value) });
-            }}
-            disabled={!this.state.exportVisibleOnly}
-          />
-          px)
+            px)
+          </div>
         </div>
         <div
           onCut={e => {
