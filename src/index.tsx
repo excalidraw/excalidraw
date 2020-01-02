@@ -370,8 +370,6 @@ function restore() {
       item = generateDraw(item);
     }
     elements = [...items];
-
-    drawScene();
   }
 }
 
@@ -463,17 +461,12 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
-    const hasSavedItems = !!localStorage.getItem(LOCAL_STORAGE_KEY);
-
     return (
       <>
         <div className="wrappers">
           <div className="saveWrapper">
             <button disabled={elements.length === 0} onClick={save}>
               Save
-            </button>
-            <button disabled={!hasSavedItems} onClick={restore}>
-              Restore
             </button>
           </div>
           <div className="exportWrapper">
@@ -739,6 +732,8 @@ const context = canvas.getContext("2d")!;
 // Big hack to ensure that all the 1px lines are drawn at 1px instead of 2px
 // https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
 context.translate(0.5, 0.5);
+
+restore();
 
 function drawScene() {
   ReactDOM.render(<App />, rootElement);
