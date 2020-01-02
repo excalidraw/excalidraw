@@ -450,10 +450,13 @@ class App extends React.Component<{}, AppState> {
                   return isSelected;
                 });
 
+                // deselect everything except target element to-be-selected
+                elements.forEach(element => {
+                  if (element === selectedElement) return;
+                  element.isSelected = false;
+                });
                 if (selectedElement) {
                   this.setState({ draggingElement: selectedElement });
-                } else {
-                  clearSelection();
                 }
 
                 isDraggingElements = elements.some(
