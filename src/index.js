@@ -104,26 +104,39 @@ function generateShape(element) {
   }
 }
 
-function setSelection(selection) {
-  // Fix up negative width and height when dragging from right to left
-  // Note: it's a lot harder to do on mouse move because of rounding issues
-  let { x, y, width, height } = selection;
-  if (width < 0) {
-    x += width;
-    width = -width;
-  }
-  if (height < 0) {
-    y += height;
-    height = -height;
-  }
+// If the element is created from right to left, the width is going to be negative
+// This set of functions retrieves the absolute position of the 4 points.
+// We can't just always normalize it since we need to remember the fact that an arrow
+// is pointing left or right.
+function getElementAbsoluteX1(element) {
+  return element.width >= 0 ? element.x : element.x + element.width;
+}
+function getElementAbsoluteX2(element) {
+  return element.width >= 0 ? element.x + element.width : element.x;
+}
+function getElementAbsoluteY1(element) {
+  return element.height >= 0 ? element.y : element.y + element.height;
+}
+function getElementAbsoluteY2(element) {
+  return element.height >= 0 ? element.y + element.height : element.y;
+}
 
+function setSelection(selection) {
+  const selectionX1 = getElementAbsoluteX1(selection);
+  const selectionX2 = getElementAbsoluteX2(selection);
+  const selectionY1 = getElementAbsoluteY1(selection);
+  const selectionY2 = getElementAbsoluteY2(selection);
   elements.forEach(element => {
+    const elementX1 = getElementAbsoluteX1(element);
+    const elementX2 = getElementAbsoluteX2(element);
+    const elementY1 = getElementAbsoluteY1(element);
+    const elementY2 = getElementAbsoluteY2(element);
     element.isSelected =
       element.type !== "selection" &&
-      x <= element.x &&
-      y <= element.y &&
-      x + width >= element.x + element.width &&
-      y + height >= element.y + element.height;
+      selectionX1 <= elementX1 &&
+      selectionY1 <= elementY1 &&
+      selectionX2 >= elementX2 &&
+      selectionY2 >= elementY2;
   });
 }
 
@@ -231,16 +244,6 @@ function App() {
             elements.pop();
             setSelection(draggingElement);
           }
-          // Fix up negative width and height when dragging from right to left
-          // Note: it's a lot harder to do on mouse move because of rounding issues
-          if (draggingElement.width < 0) {
-            draggingElement.x += draggingElement.width;
-            draggingElement.width = -draggingElement.width;
-          }
-          if (draggingElement.height < 0) {
-            draggingElement.y += draggingElement.height;
-            draggingElement.height = -draggingElement.height;
-          }
           drawScene();
         }}
         onMouseMove={e => {
@@ -277,13 +280,18 @@ function drawScene() {
     element.draw(rc, context);
     if (element.isSelected) {
       const margin = 4;
+
+      const elementX1 = getElementAbsoluteX1(element);
+      const elementX2 = getElementAbsoluteX2(element);
+      const elementY1 = getElementAbsoluteY1(element);
+      const elementY2 = getElementAbsoluteY2(element);
       const lineDash = context.getLineDash();
       context.setLineDash([8, 4]);
       context.strokeRect(
-        element.x - margin,
-        element.y - margin,
-        element.width + margin * 2,
-        element.height + margin * 2
+        elementX1 - margin,
+        elementY1 - margin,
+        elementX2 - elementX1 + margin * 2,
+        elementY2 - elementY1 + margin * 2
       );
       context.setLineDash(lineDash);
     }
