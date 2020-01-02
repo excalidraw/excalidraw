@@ -304,6 +304,7 @@ class App extends React.Component<{}, AppState> {
     if (event.key === "Escape") {
       this.clearSelection();
       drawScene(this.state.elements);
+      event.preventDefault();
     } else if (event.key === "Backspace") {
       this.deleteSelectedElements();
       drawScene(this.state.elements);
@@ -322,6 +323,12 @@ class App extends React.Component<{}, AppState> {
           else if (event.key === "ArrowUp") element.y -= step;
           else if (event.key === "ArrowDown") element.y += step;
         }
+      });
+      drawScene(this.state.elements);
+      event.preventDefault();
+    } else if (event.key === "a" && event.metaKey) {
+      this.setState({
+        elements: this.state.elements.map(e => ({ ...e, isSelected: true }))
       });
       drawScene(this.state.elements);
       event.preventDefault();
