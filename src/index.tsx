@@ -5,18 +5,18 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 
 import "./styles.css";
 
-type ExcaliburElement = ReturnType<typeof newElement>;
-type ExcaliburTextElement = ExcaliburElement & {
+type ExcalidrawElement = ReturnType<typeof newElement>;
+type ExcalidrawTextElement = ExcalidrawElement & {
   type: "text";
   font: string;
   text: string;
   actualBoundingBoxAscent: number;
 };
 
-const LOCAL_STORAGE_KEY = "excalibur";
-const LOCAL_STORAGE_KEY_STATE = "excalibur-state";
+const LOCAL_STORAGE_KEY = "excalidraw";
+const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-var elements = Array.of<ExcaliburElement>();
+var elements = Array.of<ExcalidrawElement>();
 
 // https://stackoverflow.com/a/6853926/232122
 function distanceBetweenPointAndSegment(
@@ -57,7 +57,7 @@ function distanceBetweenPointAndSegment(
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function hitTest(element: ExcaliburElement, x: number, y: number): boolean {
+function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10;
@@ -248,7 +248,7 @@ function exportAsPNG({
 
     // create a temporary <a> elem which we'll use to download the image
     const link = document.createElement("a");
-    link.setAttribute("download", "excalibur.png");
+    link.setAttribute("download", "excalidraw.png");
     link.setAttribute("href", tempCanvas.toDataURL("image/png"));
     link.click();
 
@@ -273,12 +273,12 @@ function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
 var generator = rough.generator(null, null as any);
 
 function isTextElement(
-  element: ExcaliburElement
-): element is ExcaliburTextElement {
+  element: ExcalidrawElement
+): element is ExcalidrawTextElement {
   return element.type === "text";
 }
 
-function getArrowPoints(element: ExcaliburElement) {
+function getArrowPoints(element: ExcalidrawElement) {
   const x1 = 0;
   const y1 = 0;
   const x2 = element.width;
@@ -298,7 +298,7 @@ function getArrowPoints(element: ExcaliburElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-function generateDraw(element: ExcaliburElement) {
+function generateDraw(element: ExcalidrawElement) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -369,20 +369,20 @@ function generateDraw(element: ExcaliburElement) {
 // This set of functions retrieves the absolute position of the 4 points.
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
-function getElementAbsoluteX1(element: ExcaliburElement) {
+function getElementAbsoluteX1(element: ExcalidrawElement) {
   return element.width >= 0 ? element.x : element.x + element.width;
 }
-function getElementAbsoluteX2(element: ExcaliburElement) {
+function getElementAbsoluteX2(element: ExcalidrawElement) {
   return element.width >= 0 ? element.x + element.width : element.x;
 }
-function getElementAbsoluteY1(element: ExcaliburElement) {
+function getElementAbsoluteY1(element: ExcalidrawElement) {
   return element.height >= 0 ? element.y : element.y + element.height;
 }
-function getElementAbsoluteY2(element: ExcaliburElement) {
+function getElementAbsoluteY2(element: ExcalidrawElement) {
   return element.height >= 0 ? element.y + element.height : element.y;
 }
 
-function setSelection(selection: ExcaliburElement) {
+function setSelection(selection: ExcalidrawElement) {
   const selectionX1 = getElementAbsoluteX1(selection);
   const selectionX2 = getElementAbsoluteX2(selection);
   const selectionY1 = getElementAbsoluteY1(selection);
@@ -427,7 +427,7 @@ function restore() {
 
     if (savedElements) {
       elements = JSON.parse(savedElements);
-      elements.forEach((element: ExcaliburElement) => generateDraw(element));
+      elements.forEach((element: ExcalidrawElement) => generateDraw(element));
     }
 
     return savedState ? JSON.parse(savedState) : null;
@@ -438,7 +438,7 @@ function restore() {
 }
 
 type AppState = {
-  draggingElement: ExcaliburElement | null;
+  draggingElement: ExcalidrawElement | null;
   elementType: string;
   exportBackground: boolean;
   exportVisibleOnly: boolean;
