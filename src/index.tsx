@@ -356,6 +356,28 @@ type AppState = {
   exportPadding: number;
 };
 
+const KEYS = {
+  ARROW_LEFT: "ArrowLeft",
+  ARROW_RIGHT: "ArrowRight",
+  ARROW_DOWN: "ArrowDown",
+  ARROW_UP: "ArrowUp",
+  ESCAPE: "Escape",
+  DELETE: "Delete",
+  BACKSPACE: "Backspace"
+};
+
+function isArrowKey(keyCode: string) {
+  return (
+    keyCode === KEYS.ARROW_LEFT ||
+    keyCode === KEYS.ARROW_RIGHT ||
+    keyCode === KEYS.ARROW_DOWN ||
+    keyCode === KEYS.ARROW_UP
+  );
+}
+
+const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
+const ELEMENT_TRANSLATE_AMOUNT = 1;
+
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -378,27 +400,24 @@ class App extends React.Component<{}, AppState> {
       return;
     }
 
-    if (event.key === "Escape") {
+    if (event.key === KEYS.ESCAPE) {
       clearSelection();
       drawScene();
       event.preventDefault();
-    } else if (event.key === "Backspace") {
+    } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
       deleteSelectedElements();
       drawScene();
       event.preventDefault();
-    } else if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowRight" ||
-      event.key === "ArrowUp" ||
-      event.key === "ArrowDown"
-    ) {
-      const step = event.shiftKey ? 5 : 1;
+    } else if (isArrowKey(event.key)) {
+      const step = event.shiftKey
+        ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+        : ELEMENT_TRANSLATE_AMOUNT;
       elements.forEach(element => {
         if (element.isSelected) {
-          if (event.key === "ArrowLeft") element.x -= step;
-          else if (event.key === "ArrowRight") element.x += step;
-          else if (event.key === "ArrowUp") element.y -= step;
-          else if (event.key === "ArrowDown") element.y += step;
+          if (event.key === KEYS.ARROW_LEFT) element.x -= step;
+          else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
+          else if (event.key === KEYS.ARROW_UP) element.y -= step;
+          else if (event.key === KEYS.ARROW_DOWN) element.y += step;
         }
       });
       drawScene();
