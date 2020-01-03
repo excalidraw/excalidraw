@@ -1,5 +1,6 @@
 {
   "name": "react",
+  "homepage": "https://www.excalidraw.com",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -25,7 +26,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "deploy": "gh-pages -d docs"
+    "deploy": "react-scripts build && gh-pages -d build"
   },
   "browserslist": [
     ">0.2%",
