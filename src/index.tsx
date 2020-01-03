@@ -111,7 +111,6 @@ function newElement(
   y: number,
   strokeColor: string,
   backgroundColor: string,
-  textColor: string,
   width = 0,
   height = 0
 ) {
@@ -124,7 +123,6 @@ function newElement(
     isSelected: false,
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
-    textColor: textColor,
     draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
   };
   return element;
@@ -347,12 +345,14 @@ function generateDraw(element: ExcaliburElement) {
     element.draw = (rc, context) => {
       const font = context.font;
       context.font = element.font;
-      context.fillStyle = element.textColor;
+      const fillStyle = context.fillStyle;
+      context.fillStyle = element.strokeColor;
       context.fillText(
         element.text,
         element.x,
         element.y + element.actualBoundingBoxAscent
       );
+      context.fillStyle = fillStyle;
       context.font = font;
     };
   } else {
@@ -418,7 +418,6 @@ type AppState = {
   exportPadding: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
-  textColor: string;
   viewBackgroundColor: string;
 };
 
@@ -461,7 +460,6 @@ class App extends React.Component<{}, AppState> {
     exportPadding: 10,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
-    textColor: "#000000",
     viewBackgroundColor: "#ffffff"
   };
 
@@ -587,8 +585,7 @@ class App extends React.Component<{}, AppState> {
               x,
               y,
               this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor,
-              this.state.textColor
+              this.state.currentItemBackgroundColor
             );
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
@@ -769,16 +766,6 @@ class App extends React.Component<{}, AppState> {
               }}
             />
             Shape Background
-          </label>
-          <label>
-            <input
-              type="color"
-              value={this.state.textColor}
-              onChange={e => {
-                this.setState({ textColor: e.target.value });
-              }}
-            />
-            Text Color
           </label>
         </fieldset>
         <fieldset>
