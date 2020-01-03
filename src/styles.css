@@ -18,6 +18,14 @@ label {
   margin-right: 10px;
 }
 
+label span {
+  display: inline-block;
+}
+
+label span::first-letter {
+  text-decoration: underline;
+}
+
 input[type="number"] {
   width: 30px;
 }

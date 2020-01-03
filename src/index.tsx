@@ -118,6 +118,9 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
     const y2 = getElementAbsoluteY2(element);
 
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+  } else if (element.type === "selection") {
+    console.warn("This should not happen, we need to investigate why it does.");
+    return false;
   } else {
     throw new Error("Unimplemented type " + element.type);
   }
@@ -571,6 +574,40 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
+const SHAPES = [
+  {
+    label: "Rectange",
+    value: "rectangle"
+  },
+  {
+    label: "Ellipse",
+    value: "ellipse"
+  },
+  {
+    label: "Arrow",
+    value: "arrow"
+  },
+  {
+    label: "Text",
+    value: "text"
+  },
+  {
+    label: "Selection",
+    value: "selection"
+  }
+];
+
+const shapesShortcutKeys = SHAPES.map(shape => shape.label[0].toLowerCase());
+
+function findElementByKey(key: string) {
+  const defaultElement = "selection";
+  return SHAPES.reduce((element, shape) => {
+    if (shape.value[0] !== key) return element;
+
+    return shape.value;
+  }, defaultElement);
+}
+
 function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||
@@ -643,31 +680,10 @@ class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
       event.preventDefault();
+    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+      this.setState({ elementType: findElementByKey(event.key) });
     }
   };
-
-  private renderOption({
-    type,
-    children
-  }: {
-    type: string;
-    children: React.ReactNode;
-  }) {
-    return (
-      <label>
-        <input
-          type="radio"
-          checked={this.state.elementType === type}
-          onChange={() => {
-            this.setState({ elementType: type });
-            clearSelection();
-            this.forceUpdate();
-          }}
-        />
-        {children}
-      </label>
-    );
-  }
 
   public render() {
     return (
@@ -713,11 +729,20 @@ class App extends React.Component<{}, AppState> {
       >
         <fieldset>
           <legend>Shapes</legend>
-          {this.renderOption({ type: "rectangle", children: "Rectangle" })}
-          {this.renderOption({ type: "ellipse", children: "Ellipse" })}
-          {this.renderOption({ type: "arrow", children: "Arrow" })}
-          {this.renderOption({ type: "text", children: "Text" })}
-          {this.renderOption({ type: "selection", children: "Selection" })}
+          {SHAPES.map(({ value, label }) => (
+            <label>
+              <input
+                type="radio"
+                checked={this.state.elementType === value}
+                onChange={() => {
+                  this.setState({ elementType: value });
+                  clearSelection();
+                  this.forceUpdate();
+                }}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
         </fieldset>
 
         <canvas
