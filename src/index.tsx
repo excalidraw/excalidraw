@@ -119,6 +119,7 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
 
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
   } else if (element.type === "selection") {
+    console.warn("This should not happen, we need to investigate why it does.");
     return false;
   } else {
     throw new Error("Unimplemented type " + element.type);
