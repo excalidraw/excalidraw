@@ -14,6 +14,7 @@ type ExcaliburTextElement = ExcaliburElement & {
 };
 
 const LOCAL_STORAGE_KEY = "excalibur";
+const LOCAL_STORAGE_KEY_STATE = "excalibur-state";
 
 var elements = Array.of<ExcaliburElement>();
 
@@ -107,7 +108,15 @@ function hitTest(element: ExcaliburElement, x: number, y: number): boolean {
   }
 }
 
-function newElement(type: string, x: number, y: number, width = 0, height = 0) {
+function newElement(
+  type: string,
+  x: number,
+  y: number,
+  strokeColor: string,
+  backgroundColor: string,
+  width = 0,
+  height = 0
+) {
   const element = {
     type: type,
     x: x,
@@ -115,91 +124,138 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
     width: width,
     height: height,
     isSelected: false,
+    strokeColor: strokeColor,
+    backgroundColor: backgroundColor,
     draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
   };
   return element;
+}
+
+function renderScene(
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  // null indicates transparent bg
+  viewBackgroundColor: string | null
+) {
+  if (!context) return;
+
+  const fillStyle = context.fillStyle;
+  if (typeof viewBackgroundColor === "string") {
+    context.fillStyle = viewBackgroundColor;
+    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
+  } else {
+    context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
+  }
+  context.fillStyle = fillStyle;
+
+  elements.forEach(element => {
+    element.draw(rc, context);
+    if (element.isSelected) {
+      const margin = 4;
+
+      const elementX1 = getElementAbsoluteX1(element);
+      const elementX2 = getElementAbsoluteX2(element);
+      const elementY1 = getElementAbsoluteY1(element);
+      const elementY2 = getElementAbsoluteY2(element);
+      const lineDash = context.getLineDash();
+      context.setLineDash([8, 4]);
+      context.strokeRect(
+        elementX1 - margin,
+        elementY1 - margin,
+        elementX2 - elementX1 + margin * 2,
+        elementY2 - elementY1 + margin * 2
+      );
+      context.setLineDash(lineDash);
+    }
+  });
 }
 
 function exportAsPNG({
   exportBackground,
   exportVisibleOnly,
   exportPadding = 10,
-  viewBgColor
+  viewBackgroundColor
 }: {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding?: number;
-  viewBgColor: string;
+  viewBackgroundColor: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
   // deselect & rerender
 
   clearSelection();
-  drawScene();
+  ReactDOM.render(<App />, rootElement, () => {
+    // calculate visible-area coords
 
-  // calculate visible-area coords
+    let subCanvasX1 = Infinity;
+    let subCanvasX2 = 0;
+    let subCanvasY1 = Infinity;
+    let subCanvasY2 = 0;
 
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
+    elements.forEach(element => {
+      subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
+      subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
+      subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
+      subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
+    });
 
-  elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-  });
+    // create temporary canvas from which we'll export
 
-  // create temporary canvas from which we'll export
-
-  const tempCanvas = document.createElement("canvas");
-  const tempCanvasCtx = tempCanvas.getContext("2d")!;
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = exportVisibleOnly
-    ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-    : canvas.width;
-  tempCanvas.height = exportVisibleOnly
-    ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-    : canvas.height;
-
-  if (exportBackground) {
-    tempCanvasCtx.fillStyle = viewBgColor;
-    tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // copy our original canvas onto the temp canvas
-  tempCanvasCtx.drawImage(
-    canvas, // source
-    exportVisibleOnly // sx
-      ? subCanvasX1 - exportPadding
-      : 0,
-    exportVisibleOnly // sy
-      ? subCanvasY1 - exportPadding
-      : 0,
-    exportVisibleOnly // sWidth
+    const tempCanvas = document.createElement("canvas");
+    const tempCanvasCtx = tempCanvas.getContext("2d")!;
+    tempCanvas.style.display = "none";
+    document.body.appendChild(tempCanvas);
+    tempCanvas.width = exportVisibleOnly
       ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-      : canvas.width,
-    exportVisibleOnly // sHeight
+      : canvas.width;
+    tempCanvas.height = exportVisibleOnly
       ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-      : canvas.height,
-    0, // dx
-    0, // dy
-    exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
-    exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
-  );
+      : canvas.height;
 
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", "excalibur.png");
-  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-  link.click();
+    // if we're exporting without bg, we need to rerender the scene without it
+    //  (it's reset again, below)
+    if (!exportBackground) {
+      renderScene(rc, context, null);
+    }
 
-  // clean up the DOM
-  link.remove();
-  if (tempCanvas !== canvas) tempCanvas.remove();
+    // copy our original canvas onto the temp canvas
+    tempCanvasCtx.drawImage(
+      canvas, // source
+      exportVisibleOnly // sx
+        ? subCanvasX1 - exportPadding
+        : 0,
+      exportVisibleOnly // sy
+        ? subCanvasY1 - exportPadding
+        : 0,
+      exportVisibleOnly // sWidth
+        ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+        : canvas.width,
+      exportVisibleOnly // sHeight
+        ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+        : canvas.height,
+      0, // dx
+      0, // dy
+      exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
+      exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
+    );
+
+    // reset transparent bg back to original
+    if (!exportBackground) {
+      renderScene(rc, context, viewBackgroundColor);
+    }
+
+    // create a temporary <a> elem which we'll use to download the image
+    const link = document.createElement("a");
+    link.setAttribute("download", "excalibur.png");
+    link.setAttribute("href", tempCanvas.toDataURL("image/png"));
+    link.click();
+
+    // clean up the DOM
+    link.remove();
+    if (tempCanvas !== canvas) tempCanvas.remove();
+  });
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -242,11 +298,7 @@ function getArrowPoints(element: ExcaliburElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-function generateDraw(
-  element: ExcaliburElement,
-  itemStrokeColor: string,
-  itemBackgroundColorColor: string
-) {
+function generateDraw(element: ExcaliburElement) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -256,8 +308,8 @@ function generateDraw(
     };
   } else if (element.type === "rectangle") {
     const shape = generator.rectangle(0, 0, element.width, element.height, {
-      stroke: itemStrokeColor,
-      fill: itemBackgroundColorColor
+      stroke: element.strokeColor,
+      fill: element.backgroundColor
     });
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -270,7 +322,7 @@ function generateDraw(
       element.height / 2,
       element.width,
       element.height,
-      { stroke: itemStrokeColor, fill: itemBackgroundColorColor }
+      { stroke: element.strokeColor, fill: element.backgroundColor }
     );
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -281,11 +333,11 @@ function generateDraw(
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const shapes = [
       //    \
-      generator.line(x3, y3, x2, y2, { stroke: itemStrokeColor }),
+      generator.line(x3, y3, x2, y2, { stroke: element.strokeColor }),
       // -----
-      generator.line(x1, y1, x2, y2, { stroke: itemStrokeColor }),
+      generator.line(x1, y1, x2, y2, { stroke: element.strokeColor }),
       //    /
-      generator.line(x4, y4, x2, y2, { stroke: itemStrokeColor })
+      generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
     ];
 
     element.draw = (rc, context) => {
@@ -360,41 +412,26 @@ function deleteSelectedElements() {
   }
 }
 
-function save() {
-  if (elements && elements.length > 0) {
-    const items = [...elements];
-    for (const item of items) {
-      item.isSelected = false;
-    }
-
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
-  }
-
-  window.removeEventListener("beforeunload", onUnload);
+function save(state: AppState) {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
+  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
 }
 
 function restore() {
-  const el = localStorage.getItem(LOCAL_STORAGE_KEY);
+  try {
+    const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
 
-  if (el) {
-    const items = JSON.parse(el);
-    for (let item of items) {
-      item = generateDraw(item, "#000000", "#ffffff");
+    if (savedElements) {
+      elements = JSON.parse(savedElements);
+      elements.forEach((element: ExcaliburElement) => generateDraw(element));
     }
-    elements = [...items];
+
+    return savedState ? JSON.parse(savedState) : null;
+  } catch (e) {
+    elements = [];
+    return null;
   }
-}
-
-function onUnload(event: BeforeUnloadEvent) {
-  event.preventDefault();
-
-  const confirmationMessage = "excalibur";
-  event.returnValue = confirmationMessage;
-  return confirmationMessage;
-}
-
-function addOnBeforeUnload() {
-  window.addEventListener("beforeunload", onUnload);
 }
 
 type AppState = {
@@ -403,19 +440,45 @@ type AppState = {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding: number;
-  itemStrokeColor: string;
-  itemBackgroundColor: string;
-  viewBgColor: string;
+  currentItemStrokeColor: string;
+  currentItemBackgroundColor: string;
+  viewBackgroundColor: string;
 };
+
+const KEYS = {
+  ARROW_LEFT: "ArrowLeft",
+  ARROW_RIGHT: "ArrowRight",
+  ARROW_DOWN: "ArrowDown",
+  ARROW_UP: "ArrowUp",
+  ESCAPE: "Escape",
+  DELETE: "Delete",
+  BACKSPACE: "Backspace"
+};
+
+function isArrowKey(keyCode: string) {
+  return (
+    keyCode === KEYS.ARROW_LEFT ||
+    keyCode === KEYS.ARROW_RIGHT ||
+    keyCode === KEYS.ARROW_DOWN ||
+    keyCode === KEYS.ARROW_UP
+  );
+}
+
+const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
+const ELEMENT_TRANSLATE_AMOUNT = 1;
 
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
+
+    const savedState = restore();
+    if (savedState) {
+      this.setState(savedState);
+    }
   }
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.onKeyDown, false);
-    window.removeEventListener("beforeunload", onUnload);
   }
 
   public state: AppState = {
@@ -424,9 +487,9 @@ class App extends React.Component<{}, AppState> {
     exportBackground: false,
     exportVisibleOnly: true,
     exportPadding: 10,
-    itemStrokeColor: "#000000",
-    itemBackgroundColor: "#ffffff",
-    viewBgColor: "#ffffff"
+    currentItemStrokeColor: "#000000",
+    currentItemBackgroundColor: "#ffffff",
+    viewBackgroundColor: "#ffffff"
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -434,39 +497,33 @@ class App extends React.Component<{}, AppState> {
       return;
     }
 
-    if (event.key === "Escape") {
+    if (event.key === KEYS.ESCAPE) {
       clearSelection();
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
-    } else if (event.key === "Backspace") {
-      addOnBeforeUnload();
+    } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
       deleteSelectedElements();
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
-    } else if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowRight" ||
-      event.key === "ArrowUp" ||
-      event.key === "ArrowDown"
-    ) {
-      addOnBeforeUnload();
-
-      const step = event.shiftKey ? 5 : 1;
+    } else if (isArrowKey(event.key)) {
+      const step = event.shiftKey
+        ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+        : ELEMENT_TRANSLATE_AMOUNT;
       elements.forEach(element => {
         if (element.isSelected) {
-          if (event.key === "ArrowLeft") element.x -= step;
-          else if (event.key === "ArrowRight") element.x += step;
-          else if (event.key === "ArrowUp") element.y -= step;
-          else if (event.key === "ArrowDown") element.y += step;
+          if (event.key === KEYS.ARROW_LEFT) element.x -= step;
+          else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
+          else if (event.key === KEYS.ARROW_UP) element.y -= step;
+          else if (event.key === KEYS.ARROW_DOWN) element.y += step;
         }
       });
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     } else if (event.key === "a" && event.metaKey) {
       elements.forEach(element => {
         element.isSelected = true;
       });
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     }
   };
@@ -486,7 +543,7 @@ class App extends React.Component<{}, AppState> {
           onChange={() => {
             this.setState({ elementType: type });
             clearSelection();
-            drawScene();
+            this.forceUpdate();
           }}
         />
         {children}
@@ -496,58 +553,46 @@ class App extends React.Component<{}, AppState> {
 
   public render() {
     return (
-      <>
-        <div className="wrappers">
-          <div className="saveWrapper">
-            <button disabled={elements.length === 0} onClick={save}>
-              Save
-            </button>
-          </div>
-          <div className="exportWrapper">
-            <button
-              onClick={() => {
-                exportAsPNG({
-                  exportBackground: this.state.exportBackground,
-                  exportVisibleOnly: this.state.exportVisibleOnly,
-                  exportPadding: this.state.exportPadding,
-                  viewBgColor: this.state.viewBgColor
-                });
-              }}
-            >
-              Export to png
-            </button>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportBackground}
-                onChange={e => {
-                  this.setState({ exportBackground: e.target.checked });
-                }}
-              />{" "}
-              background
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportVisibleOnly}
-                onChange={e => {
-                  this.setState({ exportVisibleOnly: e.target.checked });
-                }}
-              />
-              visible area only
-            </label>
-            (padding:
-            <input
-              type="number"
-              value={this.state.exportPadding}
-              onChange={e => {
-                this.setState({ exportPadding: Number(e.target.value) });
-              }}
-              disabled={!this.state.exportVisibleOnly}
-            />
-            px)
-          </div>
-        </div>
+      <div
+        onCut={e => {
+          e.clipboardData.setData(
+            "text/plain",
+            JSON.stringify(elements.filter(element => element.isSelected))
+          );
+          deleteSelectedElements();
+          this.forceUpdate();
+          e.preventDefault();
+        }}
+        onCopy={e => {
+          e.clipboardData.setData(
+            "text/plain",
+            JSON.stringify(elements.filter(element => element.isSelected))
+          );
+          e.preventDefault();
+        }}
+        onPaste={e => {
+          const paste = e.clipboardData.getData("text");
+          let parsedElements;
+          try {
+            parsedElements = JSON.parse(paste);
+          } catch (e) {}
+          if (
+            Array.isArray(parsedElements) &&
+            parsedElements.length > 0 &&
+            parsedElements[0].type // need to implement a better check here...
+          ) {
+            clearSelection();
+            parsedElements.forEach(parsedElement => {
+              parsedElement.x += 10;
+              parsedElement.y += 10;
+              generateDraw(parsedElement);
+              elements.push(parsedElement);
+            });
+            this.forceUpdate();
+          }
+          e.preventDefault();
+        }}
+      >
         <fieldset>
           <legend>Shapes</legend>
           {this.renderOption({ type: "rectangle", children: "Rectangle" })}
@@ -556,230 +601,177 @@ class App extends React.Component<{}, AppState> {
           {this.renderOption({ type: "text", children: "Text" })}
           {this.renderOption({ type: "selection", children: "Selection" })}
         </fieldset>
-        <div
-          onCut={e => {
-            e.clipboardData.setData(
-              "text/plain",
-              JSON.stringify(elements.filter(element => element.isSelected))
+
+        <canvas
+          id="canvas"
+          width={window.innerWidth}
+          height={window.innerHeight - 200}
+          onMouseDown={e => {
+            const x = e.clientX - (e.target as HTMLElement).offsetLeft;
+            const y = e.clientY - (e.target as HTMLElement).offsetTop;
+            const element = newElement(
+              this.state.elementType,
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor
             );
-            deleteSelectedElements();
-            drawScene();
-            e.preventDefault();
-          }}
-          onCopy={e => {
-            e.clipboardData.setData(
-              "text/plain",
-              JSON.stringify(elements.filter(element => element.isSelected))
-            );
-            e.preventDefault();
-          }}
-          onPaste={e => {
-            const paste = e.clipboardData.getData("text");
-            let parsedElements;
-            try {
-              parsedElements = JSON.parse(paste);
-            } catch (e) {}
-            if (
-              Array.isArray(parsedElements) &&
-              parsedElements.length > 0 &&
-              parsedElements[0].type // need to implement a better check here...
-            ) {
-              clearSelection();
-              parsedElements.forEach(parsedElement => {
-                parsedElement.x += 10;
-                parsedElement.y += 10;
-                generateDraw(
-                  parsedElement,
-                  this.state.itemStrokeColor,
-                  this.state.itemBackgroundColor
-                );
-                elements.push(parsedElement);
-                addOnBeforeUnload();
+            let isDraggingElements = false;
+            const cursorStyle = document.documentElement.style.cursor;
+            if (this.state.elementType === "selection") {
+              const hitElement = elements.find(element => {
+                return hitTest(element, x, y);
               });
-              drawScene();
+
+              // If we click on something
+              if (hitElement) {
+                if (hitElement.isSelected) {
+                  // If that element is not already selected, do nothing,
+                  // we're likely going to drag it
+                } else {
+                  // We unselect every other elements unless shift is pressed
+                  if (!e.shiftKey) {
+                    clearSelection();
+                  }
+                  // No matter what, we select it
+                  hitElement.isSelected = true;
+                }
+              } else {
+                // If we don't click on anything, let's remove all the selected elements
+                clearSelection();
+              }
+
+              isDraggingElements = elements.some(element => element.isSelected);
+
+              if (isDraggingElements) {
+                document.documentElement.style.cursor = "move";
+              }
             }
-            e.preventDefault();
-          }}
-        >
-          <canvas
-            id="canvas"
-            width={window.innerWidth}
-            height={window.innerHeight - 200}
-            onMouseDown={e => {
-              const x = e.clientX - (e.target as HTMLElement).offsetLeft;
-              const y = e.clientY - (e.target as HTMLElement).offsetTop;
-              const element = newElement(this.state.elementType, x, y);
-              let isDraggingElements = false;
-              const cursorStyle = document.documentElement.style.cursor;
+
+            if (isTextElement(element)) {
+              const text = prompt("What text do you want?");
+              if (text === null) {
+                return;
+              }
+              element.text = text;
+              element.font = "20px Virgil";
+              const font = context.font;
+              context.font = element.font;
+              const {
+                actualBoundingBoxAscent,
+                actualBoundingBoxDescent,
+                width
+              } = context.measureText(element.text);
+              element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+              context.font = font;
+              const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+              // Center the text
+              element.x -= width / 2;
+              element.y -= actualBoundingBoxAscent;
+              element.width = width;
+              element.height = height;
+            }
+
+            generateDraw(element);
+            elements.push(element);
+            if (this.state.elementType === "text") {
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              element.isSelected = true;
+            } else {
+              this.setState({ draggingElement: element });
+            }
+
+            let lastX = x;
+            let lastY = y;
+
+            const onMouseMove = (e: MouseEvent) => {
+              const target = e.target;
+              if (!(target instanceof HTMLElement)) {
+                return;
+              }
+
+              if (isDraggingElements) {
+                const selectedElements = elements.filter(el => el.isSelected);
+                if (selectedElements.length) {
+                  const x = e.clientX - target.offsetLeft;
+                  const y = e.clientY - target.offsetTop;
+                  selectedElements.forEach(element => {
+                    element.x += x - lastX;
+                    element.y += y - lastY;
+                  });
+                  lastX = x;
+                  lastY = y;
+                  this.forceUpdate();
+                  return;
+                }
+              }
+
+              // It is very important to read this.state within each move event,
+              // otherwise we would read a stale one!
+              const draggingElement = this.state.draggingElement;
+              if (!draggingElement) return;
+              let width = e.clientX - target.offsetLeft - draggingElement.x;
+              let height = e.clientY - target.offsetTop - draggingElement.y;
+              draggingElement.width = width;
+              // Make a perfect square or circle when shift is enabled
+              draggingElement.height = e.shiftKey ? width : height;
+
+              generateDraw(draggingElement);
+
               if (this.state.elementType === "selection") {
-                const hitElement = elements.find(element => {
-                  return hitTest(element, x, y);
-                });
+                setSelection(draggingElement);
+              }
+              this.forceUpdate();
+            };
 
-                // If we click on something
-                if (hitElement) {
-                  if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
-                    // we're likely going to drag it
-                  } else {
-                    // We unselect every other elements unless shift is pressed
-                    if (!e.shiftKey) {
-                      clearSelection();
-                    }
-                    // No matter what, we select it
-                    hitElement.isSelected = true;
-                  }
-                } else {
-                  // If we don't click on anything, let's remove all the selected elements
-                  clearSelection();
-                }
+            const onMouseUp = (e: MouseEvent) => {
+              const { draggingElement, elementType } = this.state;
 
-                isDraggingElements = elements.some(
-                  element => element.isSelected
-                );
+              window.removeEventListener("mousemove", onMouseMove);
+              window.removeEventListener("mouseup", onMouseUp);
 
+              document.documentElement.style.cursor = cursorStyle;
+
+              // if no element is clicked, clear the selection and redraw
+              if (draggingElement === null) {
+                clearSelection();
+                this.forceUpdate();
+                return;
+              }
+
+              if (elementType === "selection") {
                 if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
+                  isDraggingElements = false;
                 }
+                elements.pop();
               } else {
-                addOnBeforeUnload();
+                draggingElement.isSelected = true;
               }
 
-              if (isTextElement(element)) {
-                const text = prompt("What text do you want?");
-                if (text === null) {
-                  return;
-                }
-                element.text = text;
-                element.font = "20px Virgil";
-                const font = context.font;
-                context.font = element.font;
-                const {
-                  actualBoundingBoxAscent,
-                  actualBoundingBoxDescent,
-                  width
-                } = context.measureText(element.text);
-                element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-                context.font = font;
-                const height =
-                  actualBoundingBoxAscent + actualBoundingBoxDescent;
-                // Center the text
-                element.x -= width / 2;
-                element.y -= actualBoundingBoxAscent;
-                element.width = width;
-                element.height = height;
-              }
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              this.forceUpdate();
+            };
 
-              generateDraw(
-                element,
-                this.state.itemStrokeColor,
-                this.state.itemBackgroundColor
-              );
-              elements.push(element);
-              if (this.state.elementType === "text") {
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-                element.isSelected = true;
-              } else {
-                this.setState({ draggingElement: element });
-              }
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
 
-              let lastX = x;
-              let lastY = y;
-
-              const onMouseMove = (e: MouseEvent) => {
-                const target = e.target;
-                if (!(target instanceof HTMLElement)) {
-                  return;
-                }
-
-                if (isDraggingElements) {
-                  const selectedElements = elements.filter(el => el.isSelected);
-                  if (selectedElements.length) {
-                    const x = e.clientX - target.offsetLeft;
-                    const y = e.clientY - target.offsetTop;
-                    selectedElements.forEach(element => {
-                      element.x += x - lastX;
-                      element.y += y - lastY;
-                    });
-                    lastX = x;
-                    lastY = y;
-                    drawScene();
-                    addOnBeforeUnload();
-                    return;
-                  }
-                }
-
-                // It is very important to read this.state within each move event,
-                // otherwise we would read a stale one!
-                const draggingElement = this.state.draggingElement;
-                if (!draggingElement) return;
-                let width = e.clientX - target.offsetLeft - draggingElement.x;
-                let height = e.clientY - target.offsetTop - draggingElement.y;
-                draggingElement.width = width;
-                // Make a perfect square or circle when shift is enabled
-                draggingElement.height = e.shiftKey ? width : height;
-
-                generateDraw(
-                  draggingElement,
-                  this.state.itemStrokeColor,
-                  this.state.itemBackgroundColor
-                );
-
-                if (this.state.elementType === "selection") {
-                  setSelection(draggingElement);
-                }
-                drawScene();
-              };
-
-              const onMouseUp = (e: MouseEvent) => {
-                const { draggingElement, elementType } = this.state;
-
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
-
-                document.documentElement.style.cursor = cursorStyle;
-
-                // if no element is clicked, clear the selection and redraw
-                if (draggingElement === null) {
-                  clearSelection();
-                  drawScene();
-                  return;
-                }
-
-                if (elementType === "selection") {
-                  if (isDraggingElements) {
-                    isDraggingElements = false;
-                  }
-                  elements.pop();
-                } else {
-                  draggingElement.isSelected = true;
-                }
-
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-                drawScene();
-              };
-
-              window.addEventListener("mousemove", onMouseMove);
-              window.addEventListener("mouseup", onMouseUp);
-
-              drawScene();
-            }}
-          />
-        </div>
+            this.forceUpdate();
+          }}
+        />
         <fieldset>
           <legend>Colors</legend>
           <label>
             <input
               type="color"
-              value={this.state.viewBgColor}
+              value={this.state.viewBackgroundColor}
               onChange={e => {
-                this.setState({ viewBgColor: e.target.value });
+                this.setState({ viewBackgroundColor: e.target.value });
               }}
             />
             Background
@@ -787,9 +779,9 @@ class App extends React.Component<{}, AppState> {
           <label>
             <input
               type="color"
-              value={this.state.itemStrokeColor}
+              value={this.state.currentItemStrokeColor}
               onChange={e => {
-                this.setState({ itemStrokeColor: e.target.value });
+                this.setState({ currentItemStrokeColor: e.target.value });
               }}
             />
             Shape Stroke
@@ -797,9 +789,9 @@ class App extends React.Component<{}, AppState> {
           <label>
             <input
               type="color"
-              value={this.state.itemBackgroundColor}
+              value={this.state.currentItemBackgroundColor}
               onChange={e => {
-                this.setState({ itemBackgroundColor: e.target.value });
+                this.setState({ currentItemBackgroundColor: e.target.value });
               }}
             />
             Shape Background
@@ -813,7 +805,7 @@ class App extends React.Component<{}, AppState> {
                 exportBackground: this.state.exportBackground,
                 exportVisibleOnly: this.state.exportVisibleOnly,
                 exportPadding: this.state.exportPadding,
-                viewBgColor: this.state.viewBgColor
+                viewBackgroundColor: this.state.viewBackgroundColor
               });
             }}
           >
@@ -850,35 +842,13 @@ class App extends React.Component<{}, AppState> {
           />
           px)
         </fieldset>
-      </>
+      </div>
     );
   }
+
   componentDidUpdate() {
-    const fillStyle = context.fillStyle;
-    context.fillStyle = this.state.viewBgColor;
-    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
-    context.fillStyle = fillStyle;
-
-    elements.forEach(element => {
-      element.draw(rc, context);
-      if (element.isSelected) {
-        const margin = 4;
-
-        const elementX1 = getElementAbsoluteX1(element);
-        const elementX2 = getElementAbsoluteX2(element);
-        const elementY1 = getElementAbsoluteY1(element);
-        const elementY2 = getElementAbsoluteY2(element);
-        const lineDash = context.getLineDash();
-        context.setLineDash([8, 4]);
-        context.strokeRect(
-          elementX1 - margin,
-          elementY1 - margin,
-          elementX2 - elementX1 + margin * 2,
-          elementY2 - elementY1 + margin * 2
-        );
-        context.setLineDash(lineDash);
-      }
-    });
+    renderScene(rc, context, this.state.viewBackgroundColor);
+    save(this.state);
   }
 }
 
@@ -892,10 +862,4 @@ const context = canvas.getContext("2d")!;
 // https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
 context.translate(0.5, 0.5);
 
-restore();
-
-function drawScene() {
-  ReactDOM.render(<App />, rootElement);
-}
-
-drawScene();
+ReactDOM.render(<App />, rootElement);
