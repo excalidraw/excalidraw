@@ -215,10 +215,10 @@ function renderScene(
   });
 
   // horizontal scrollbar
+  context.fillStyle = SCROLLBAR_COLOR;
   const sceneWidth = canvasWidth + Math.abs(sceneState.scrollX);
   const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
   const scrollBarX = sceneState.scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
-  context.fillStyle = SCROLLBAR_COLOR;
   context.fillRect(
     scrollBarX + SCROLLBAR_MARGIN,
     canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
@@ -231,13 +231,13 @@ function renderScene(
   const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
   const scrollBarY =
     sceneState.scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
-  context.fillStyle = SCROLLBAR_COLOR;
   context.fillRect(
     canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
     scrollBarY + SCROLLBAR_MARGIN,
     SCROLLBAR_WIDTH,
     scrollBarHeight - SCROLLBAR_WIDTH * 2
   );
+  context.fillStyle = fillStyle;
 }
 
 function exportAsPNG({
@@ -695,7 +695,7 @@ class App extends React.Component<{}, AppState> {
         <canvas
           id="canvas"
           width={window.innerWidth}
-          height={window.innerHeight - 200}
+          height={window.innerHeight - 210}
           onWheel={e => {
             e.preventDefault();
             const { deltaX, deltaY } = e;
