@@ -263,8 +263,7 @@ class App extends React.Component<{}, AppState> {
   };
 
   clearSelection = () => {
-    const newElements = [...this.state.elements];
-    newElements.map(element => {
+    const newElements = this.state.elements.map(element => {
       return { ...element, isSelected: false };
     });
     this.setState({ elements: newElements });
@@ -508,7 +507,6 @@ class App extends React.Component<{}, AppState> {
           }}
           onPaste={e => {
             const paste = e.clipboardData.getData("text");
-            console.log(paste);
             let parsedElements;
             try {
               parsedElements = JSON.parse(paste);
