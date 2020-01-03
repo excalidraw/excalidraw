@@ -608,7 +608,7 @@ class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
         />
-        {children}
+        <span>{children}</span>
       </label>
     );
   }
