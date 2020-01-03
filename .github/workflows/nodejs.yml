@@ -9,6 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    
     - name: Setup Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -20,14 +21,3 @@ jobs:
         npm test
       env:
         CI: true
-
-    - name: Build
-      run: |
-        npm run  build
-
-    - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@releases/v3
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: dist
