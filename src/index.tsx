@@ -590,29 +590,6 @@ class App extends React.Component<{}, AppState> {
     }
   };
 
-  private renderOption({
-    type,
-    children
-  }: {
-    type: string;
-    children: React.ReactNode;
-  }) {
-    return (
-      <label>
-        <input
-          type="radio"
-          checked={this.state.elementType === type}
-          onChange={() => {
-            this.setState({ elementType: type });
-            clearSelection();
-            this.forceUpdate();
-          }}
-        />
-        <span>{children}</span>
-      </label>
-    );
-  }
-
   public render() {
     return (
       <div
@@ -657,9 +634,20 @@ class App extends React.Component<{}, AppState> {
       >
         <fieldset>
           <legend>Shapes</legend>
-          {SHAPES.map(shape =>
-            this.renderOption({ type: shape.value, children: shape.label })
-          )}
+          {SHAPES.map(({ value, label }) => (
+            <label>
+              <input
+                type="radio"
+                checked={this.state.elementType === value}
+                onChange={() => {
+                  this.setState({ elementType: value });
+                  clearSelection();
+                  this.forceUpdate();
+                }}
+              />
+              <span>{label}</span>
+            </label>
+          ))}
         </fieldset>
 
         <canvas
