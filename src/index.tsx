@@ -118,6 +118,43 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
   return element;
 }
 
+function renderScene(
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  // null indicates transparent bg
+  viewBgColor: string | null
+) {
+  const fillStyle = context.fillStyle;
+  if (typeof viewBgColor === "string") {
+    context.fillStyle = viewBgColor;
+    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
+  } else {
+    context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
+  }
+  context.fillStyle = fillStyle;
+
+  elements.forEach(element => {
+    element.draw(rc, context);
+    if (element.isSelected) {
+      const margin = 4;
+
+      const elementX1 = getElementAbsoluteX1(element);
+      const elementX2 = getElementAbsoluteX2(element);
+      const elementY1 = getElementAbsoluteY1(element);
+      const elementY2 = getElementAbsoluteY2(element);
+      const lineDash = context.getLineDash();
+      context.setLineDash([8, 4]);
+      context.strokeRect(
+        elementX1 - margin,
+        elementY1 - margin,
+        elementX2 - elementX1 + margin * 2,
+        elementY2 - elementY1 + margin * 2
+      );
+      context.setLineDash(lineDash);
+    }
+  });
+}
+
 function exportAsPNG({
   exportBackground,
   exportVisibleOnly,
@@ -162,9 +199,10 @@ function exportAsPNG({
       ? subCanvasY2 - subCanvasY1 + exportPadding * 2
       : canvas.height;
 
-    if (exportBackground) {
-      tempCanvasCtx.fillStyle = viewBgColor;
-      tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    // if we're exporting without bg, we need to rerender the scene without it
+    //  (it's reset again, below)
+    if (!exportBackground) {
+      renderScene(rc, context, null);
     }
 
     // copy our original canvas onto the temp canvas
@@ -187,6 +225,11 @@ function exportAsPNG({
       exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
       exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
     );
+
+    // reset transparent bg back to original
+    if (!exportBackground) {
+      renderScene(rc, context, viewBgColor);
+    }
 
     // create a temporary <a> elem which we'll use to download the image
     const link = document.createElement("a");
@@ -753,31 +796,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
-    const fillStyle = context.fillStyle;
-    context.fillStyle = this.state.viewBgColor;
-    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
-    context.fillStyle = fillStyle;
-
-    elements.forEach(element => {
-      element.draw(rc, context);
-      if (element.isSelected) {
-        const margin = 4;
-
-        const elementX1 = getElementAbsoluteX1(element);
-        const elementX2 = getElementAbsoluteX2(element);
-        const elementY1 = getElementAbsoluteY1(element);
-        const elementY2 = getElementAbsoluteY2(element);
-        const lineDash = context.getLineDash();
-        context.setLineDash([8, 4]);
-        context.strokeRect(
-          elementX1 - margin,
-          elementY1 - margin,
-          elementX2 - elementX1 + margin * 2,
-          elementY2 - elementY1 + margin * 2
-        );
-        context.setLineDash(lineDash);
-      }
-    });
+    renderScene(rc, context, this.state.viewBgColor);
   }
 }
 
