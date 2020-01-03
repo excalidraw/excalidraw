@@ -502,6 +502,17 @@ const SHAPES = [
   }
 ];
 
+const shapesShortcutKeys = SHAPES.map(shape => shape.label[0].toLowerCase());
+
+function findElementByKey(key: string) {
+  const defaultElement = "selection";
+  return SHAPES.reduce((element, shape) => {
+    if (shape.value[0] !== key) return element;
+
+    return shape.value;
+  }, defaultElement);
+}
+
 function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||
@@ -572,6 +583,8 @@ class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
       event.preventDefault();
+    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+      this.setState({ elementType: findElementByKey(event.key) });
     }
   };
 
