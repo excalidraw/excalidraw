@@ -105,7 +105,15 @@ function hitTest(element: ExcaliburElement, x: number, y: number): boolean {
   }
 }
 
-function newElement(type: string, x: number, y: number, width = 0, height = 0) {
+function newElement(
+  type: string,
+  x: number,
+  y: number,
+  strokeColor: string,
+  backgroundColor: string,
+  width = 0,
+  height = 0
+) {
   const element = {
     type: type,
     x: x,
@@ -113,6 +121,8 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
     width: width,
     height: height,
     isSelected: false,
+    strokeColor: strokeColor,
+    backgroundColor: backgroundColor,
     draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
   };
   return element;
@@ -122,11 +132,11 @@ function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   // null indicates transparent bg
-  viewBgColor: string | null
+  viewBackgroundColor: string | null
 ) {
   const fillStyle = context.fillStyle;
-  if (typeof viewBgColor === "string") {
-    context.fillStyle = viewBgColor;
+  if (typeof viewBackgroundColor === "string") {
+    context.fillStyle = viewBackgroundColor;
     context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
   } else {
     context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
@@ -159,12 +169,12 @@ function exportAsPNG({
   exportBackground,
   exportVisibleOnly,
   exportPadding = 10,
-  viewBgColor
+  viewBackgroundColor
 }: {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding?: number;
-  viewBgColor: string;
+  viewBackgroundColor: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
@@ -228,7 +238,7 @@ function exportAsPNG({
 
     // reset transparent bg back to original
     if (!exportBackground) {
-      renderScene(rc, context, viewBgColor);
+      renderScene(rc, context, viewBackgroundColor);
     }
 
     // create a temporary <a> elem which we'll use to download the image
@@ -283,11 +293,7 @@ function getArrowPoints(element: ExcaliburElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-function generateDraw(
-  element: ExcaliburElement,
-  itemStrokeColor: string,
-  itemBackgroundColorColor: string
-) {
+function generateDraw(element: ExcaliburElement) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -297,8 +303,8 @@ function generateDraw(
     };
   } else if (element.type === "rectangle") {
     const shape = generator.rectangle(0, 0, element.width, element.height, {
-      stroke: itemStrokeColor,
-      fill: itemBackgroundColorColor
+      stroke: element.strokeColor,
+      fill: element.backgroundColor
     });
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -311,7 +317,7 @@ function generateDraw(
       element.height / 2,
       element.width,
       element.height,
-      { stroke: itemStrokeColor, fill: itemBackgroundColorColor }
+      { stroke: element.strokeColor, fill: element.backgroundColor }
     );
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -322,11 +328,11 @@ function generateDraw(
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const shapes = [
       //    \
-      generator.line(x3, y3, x2, y2, { stroke: itemStrokeColor }),
+      generator.line(x3, y3, x2, y2, { stroke: element.strokeColor }),
       // -----
-      generator.line(x1, y1, x2, y2, { stroke: itemStrokeColor }),
+      generator.line(x1, y1, x2, y2, { stroke: element.strokeColor }),
       //    /
-      generator.line(x4, y4, x2, y2, { stroke: itemStrokeColor })
+      generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
     ];
 
     element.draw = (rc, context) => {
@@ -407,9 +413,9 @@ type AppState = {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding: number;
-  itemStrokeColor: string;
-  itemBackgroundColor: string;
-  viewBgColor: string;
+  currentItemStrokeColor: string;
+  currentItemBackgroundColor: string;
+  viewBackgroundColor: string;
 };
 
 class App extends React.Component<{}, AppState> {
@@ -427,9 +433,9 @@ class App extends React.Component<{}, AppState> {
     exportBackground: false,
     exportVisibleOnly: true,
     exportPadding: 10,
-    itemStrokeColor: "#000000",
-    itemBackgroundColor: "#ffffff",
-    viewBgColor: "#ffffff"
+    currentItemStrokeColor: "#000000",
+    currentItemBackgroundColor: "#ffffff",
+    viewBackgroundColor: "#ffffff"
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -528,11 +534,7 @@ class App extends React.Component<{}, AppState> {
             parsedElements.forEach(parsedElement => {
               parsedElement.x += 10;
               parsedElement.y += 10;
-              generateDraw(
-                parsedElement,
-                this.state.itemStrokeColor,
-                this.state.itemBackgroundColor
-              );
+              generateDraw(parsedElement);
               elements.push(parsedElement);
             });
             this.forceUpdate();
@@ -556,7 +558,13 @@ class App extends React.Component<{}, AppState> {
           onMouseDown={e => {
             const x = e.clientX - (e.target as HTMLElement).offsetLeft;
             const y = e.clientY - (e.target as HTMLElement).offsetTop;
-            const element = newElement(this.state.elementType, x, y);
+            const element = newElement(
+              this.state.elementType,
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor
+            );
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
@@ -613,11 +621,7 @@ class App extends React.Component<{}, AppState> {
               element.height = height;
             }
 
-            generateDraw(
-              element,
-              this.state.itemStrokeColor,
-              this.state.itemBackgroundColor
-            );
+            generateDraw(element);
             elements.push(element);
             if (this.state.elementType === "text") {
               this.setState({
@@ -664,11 +668,7 @@ class App extends React.Component<{}, AppState> {
               // Make a perfect square or circle when shift is enabled
               draggingElement.height = e.shiftKey ? width : height;
 
-              generateDraw(
-                draggingElement,
-                this.state.itemStrokeColor,
-                this.state.itemBackgroundColor
-              );
+              generateDraw(draggingElement);
 
               if (this.state.elementType === "selection") {
                 setSelection(draggingElement);
@@ -718,9 +718,9 @@ class App extends React.Component<{}, AppState> {
           <label>
             <input
               type="color"
-              value={this.state.viewBgColor}
+              value={this.state.viewBackgroundColor}
               onChange={e => {
-                this.setState({ viewBgColor: e.target.value });
+                this.setState({ viewBackgroundColor: e.target.value });
               }}
             />
             Background
@@ -728,9 +728,9 @@ class App extends React.Component<{}, AppState> {
           <label>
             <input
               type="color"
-              value={this.state.itemStrokeColor}
+              value={this.state.currentItemStrokeColor}
               onChange={e => {
-                this.setState({ itemStrokeColor: e.target.value });
+                this.setState({ currentItemStrokeColor: e.target.value });
               }}
             />
             Shape Stroke
@@ -738,9 +738,9 @@ class App extends React.Component<{}, AppState> {
           <label>
             <input
               type="color"
-              value={this.state.itemBackgroundColor}
+              value={this.state.currentItemBackgroundColor}
               onChange={e => {
-                this.setState({ itemBackgroundColor: e.target.value });
+                this.setState({ currentItemBackgroundColor: e.target.value });
               }}
             />
             Shape Background
@@ -754,7 +754,7 @@ class App extends React.Component<{}, AppState> {
                 exportBackground: this.state.exportBackground,
                 exportVisibleOnly: this.state.exportVisibleOnly,
                 exportPadding: this.state.exportPadding,
-                viewBgColor: this.state.viewBgColor
+                viewBackgroundColor: this.state.viewBackgroundColor
               });
             }}
           >
@@ -796,7 +796,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
-    renderScene(rc, context, this.state.viewBgColor);
+    renderScene(rc, context, this.state.viewBackgroundColor);
   }
 }
 
