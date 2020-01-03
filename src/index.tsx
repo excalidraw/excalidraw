@@ -479,6 +479,29 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
+const SHAPES = [
+  {
+    label: "Rectange",
+    value: "rectangle"
+  },
+  {
+    label: "Ellipse",
+    value: "ellipse"
+  },
+  {
+    label: "Arrow",
+    value: "arrow"
+  },
+  {
+    label: "Text",
+    value: "text"
+  },
+  {
+    label: "Selection",
+    value: "selection"
+  }
+];
+
 function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||
@@ -619,11 +642,9 @@ class App extends React.Component<{}, AppState> {
       >
         <fieldset>
           <legend>Shapes</legend>
-          {this.renderOption({ type: "rectangle", children: "Rectangle" })}
-          {this.renderOption({ type: "ellipse", children: "Ellipse" })}
-          {this.renderOption({ type: "arrow", children: "Arrow" })}
-          {this.renderOption({ type: "text", children: "Text" })}
-          {this.renderOption({ type: "selection", children: "Selection" })}
+          {SHAPES.map(shape =>
+            this.renderOption({ type: shape.value, children: shape.label })
+          )}
         </fieldset>
 
         <canvas
