@@ -3,7 +3,7 @@ name: Node CI
 on: [push]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -12,10 +12,9 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: npm install, build, and test
+    - name: npm install and test
       run: |
         npm ci
-        npm run lint
         npm test
       env:
         CI: true
