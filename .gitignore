@@ -11,6 +11,9 @@ build
 # Dependency directories
 node_modules/
 
+# lock file
+yarn.lock
+
 # Editors
 .vscode/
 
