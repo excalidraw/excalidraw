@@ -15,7 +15,6 @@
   "devDependencies": {
     "@types/react": "16.9.17",
     "@types/react-dom": "16.9.4",
-    "gh-pages": "2.1.1",
     "husky": "3.1.0",
     "lint-staged": "9.5.0",
     "prettier": "1.19.1",
@@ -25,8 +24,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --passWithNoTests",
-    "eject": "react-scripts eject",
-    "deploy": "react-scripts build && gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "browserslist": [
     ">0.2%",
