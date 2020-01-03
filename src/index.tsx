@@ -121,11 +121,13 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
 function exportAsPNG({
   exportBackground,
   exportVisibleOnly,
-  exportPadding = 10
+  exportPadding = 10,
+  viewBgColor
 }: {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding?: number;
+  viewBgColor: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
@@ -162,7 +164,7 @@ function exportAsPNG({
     : canvas.height;
 
   if (exportBackground) {
-    tempCanvasCtx.fillStyle = "#FFF";
+    tempCanvasCtx.fillStyle = viewBgColor;
     tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -238,7 +240,11 @@ function getArrowPoints(element: ExcaliburElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-function generateDraw(element: ExcaliburElement) {
+function generateDraw(
+  element: ExcaliburElement,
+  itemStrokeColor: string,
+  itemBackgroundColorColor: string
+) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -247,7 +253,10 @@ function generateDraw(element: ExcaliburElement) {
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
-    const shape = generator.rectangle(0, 0, element.width, element.height);
+    const shape = generator.rectangle(0, 0, element.width, element.height, {
+      stroke: itemStrokeColor,
+      fill: itemBackgroundColorColor
+    });
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
       rc.draw(shape);
@@ -258,7 +267,8 @@ function generateDraw(element: ExcaliburElement) {
       element.width / 2,
       element.height / 2,
       element.width,
-      element.height
+      element.height,
+      { stroke: itemStrokeColor, fill: itemBackgroundColorColor }
     );
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -354,6 +364,9 @@ type AppState = {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding: number;
+  itemStrokeColor: string;
+  itemBackgroundColor: string;
+  viewBgColor: string;
 };
 
 class App extends React.Component<{}, AppState> {
@@ -370,7 +383,10 @@ class App extends React.Component<{}, AppState> {
     elementType: "selection",
     exportBackground: false,
     exportVisibleOnly: true,
-    exportPadding: 10
+    exportPadding: 10,
+    itemStrokeColor: "#000",
+    itemBackgroundColor: "#FFF",
+    viewBgColor: "#FFF"
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -444,7 +460,8 @@ class App extends React.Component<{}, AppState> {
               exportAsPNG({
                 exportBackground: this.state.exportBackground,
                 exportVisibleOnly: this.state.exportVisibleOnly,
-                exportPadding: this.state.exportPadding
+                exportPadding: this.state.exportPadding,
+                viewBgColor: this.state.viewBgColor
               });
             }}
           >
@@ -459,6 +476,36 @@ class App extends React.Component<{}, AppState> {
               }}
             />{" "}
             background
+          </label>
+          <label>
+            <input
+              type="color"
+              value={this.state.viewBgColor}
+              onChange={e => {
+                this.setState({ viewBgColor: e.target.value });
+              }}
+            />{" "}
+            view background color
+          </label>
+          <label>
+            <input
+              type="color"
+              value={this.state.itemStrokeColor}
+              onChange={e => {
+                this.setState({ itemStrokeColor: e.target.value });
+              }}
+            />{" "}
+            item stroke color
+          </label>
+          <label>
+            <input
+              type="color"
+              value={this.state.itemBackgroundColor}
+              onChange={e => {
+                this.setState({ itemBackgroundColor: e.target.value });
+              }}
+            />{" "}
+            item background color
           </label>
           <label>
             <input
@@ -482,6 +529,7 @@ class App extends React.Component<{}, AppState> {
           px)
         </div>
         <div
+          style={{ backgroundColor: this.state.viewBgColor }}
           onCut={e => {
             e.clipboardData.setData(
               "text/plain",
@@ -513,7 +561,11 @@ class App extends React.Component<{}, AppState> {
               parsedElements.forEach(parsedElement => {
                 parsedElement.x += 10;
                 parsedElement.y += 10;
-                generateDraw(parsedElement);
+                generateDraw(
+                  parsedElement,
+                  this.state.itemStrokeColor,
+                  this.state.itemBackgroundColor
+                );
                 elements.push(parsedElement);
               });
               drawScene();
@@ -593,7 +645,11 @@ class App extends React.Component<{}, AppState> {
                 element.height = height;
               }
 
-              generateDraw(element);
+              generateDraw(
+                element,
+                this.state.itemStrokeColor,
+                this.state.itemBackgroundColor
+              );
               elements.push(element);
               if (this.state.elementType === "text") {
                 this.setState({
@@ -640,7 +696,11 @@ class App extends React.Component<{}, AppState> {
                 // Make a perfect square or circle when shift is enabled
                 draggingElement.height = e.shiftKey ? width : height;
 
-                generateDraw(draggingElement);
+                generateDraw(
+                  draggingElement,
+                  this.state.itemStrokeColor,
+                  this.state.itemBackgroundColor
+                );
 
                 if (this.state.elementType === "selection") {
                   setSelection(draggingElement);
