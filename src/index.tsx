@@ -142,22 +142,70 @@ function newElement(
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
     seed: Math.floor(Math.random() * 2 ** 31),
-    draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
+    draw(
+      rc: RoughCanvas,
+      context: CanvasRenderingContext2D,
+      sceneState: SceneState
+    ) {}
   };
   return element;
+}
+
+type SceneState = {
+  scrollX: number;
+  scrollY: number;
+  // null indicates transparent bg
+  viewBackgroundColor: string | null;
+};
+
+const SCROLLBAR_WIDTH = 6;
+const SCROLLBAR_MARGIN = 4;
+const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
+
+function getScrollbars(
+  canvasWidth: number,
+  canvasHeight: number,
+  scrollX: number,
+  scrollY: number
+) {
+  // horizontal scrollbar
+  const sceneWidth = canvasWidth + Math.abs(scrollX);
+  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
+  const scrollBarX = scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
+  const horizontalScrollBar = {
+    x: scrollBarX + SCROLLBAR_MARGIN,
+    y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    width: scrollBarWidth - SCROLLBAR_MARGIN * 2,
+    height: SCROLLBAR_WIDTH
+  };
+
+  // vertical scrollbar
+  const sceneHeight = canvasHeight + Math.abs(scrollY);
+  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
+  const scrollBarY = scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
+  const verticalScrollBar = {
+    x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    y: scrollBarY + SCROLLBAR_MARGIN,
+    width: SCROLLBAR_WIDTH,
+    height: scrollBarHeight - SCROLLBAR_WIDTH * 2
+  };
+
+  return {
+    horizontal: horizontalScrollBar,
+    vertical: verticalScrollBar
+  };
 }
 
 function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  // null indicates transparent bg
-  viewBackgroundColor: string | null
+  sceneState: SceneState
 ) {
   if (!context) return;
 
   const fillStyle = context.fillStyle;
-  if (typeof viewBackgroundColor === "string") {
-    context.fillStyle = viewBackgroundColor;
+  if (typeof sceneState.viewBackgroundColor === "string") {
+    context.fillStyle = sceneState.viewBackgroundColor;
     context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
   } else {
     context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
@@ -165,7 +213,7 @@ function renderScene(
   context.fillStyle = fillStyle;
 
   elements.forEach(element => {
-    element.draw(rc, context);
+    element.draw(rc, context, sceneState);
     if (element.isSelected) {
       const margin = 4;
 
@@ -176,14 +224,48 @@ function renderScene(
       const lineDash = context.getLineDash();
       context.setLineDash([8, 4]);
       context.strokeRect(
-        elementX1 - margin,
-        elementY1 - margin,
+        elementX1 - margin + sceneState.scrollX,
+        elementY1 - margin + sceneState.scrollY,
         elementX2 - elementX1 + margin * 2,
         elementY2 - elementY1 + margin * 2
       );
       context.setLineDash(lineDash);
     }
   });
+
+  let minX = Infinity;
+  let maxX = 0;
+  let minY = Infinity;
+  let maxY = 0;
+
+  elements.forEach(element => {
+    minX = Math.min(minX, getElementAbsoluteX1(element));
+    maxX = Math.max(maxX, getElementAbsoluteX2(element));
+    minY = Math.min(minY, getElementAbsoluteY1(element));
+    maxY = Math.max(maxY, getElementAbsoluteY2(element));
+  });
+
+  const scrollBars = getScrollbars(
+    context.canvas.width,
+    context.canvas.height,
+    sceneState.scrollX,
+    sceneState.scrollY
+  );
+
+  context.fillStyle = SCROLLBAR_COLOR;
+  context.fillRect(
+    scrollBars.horizontal.x,
+    scrollBars.horizontal.y,
+    scrollBars.horizontal.width,
+    scrollBars.horizontal.height
+  );
+  context.fillRect(
+    scrollBars.vertical.x,
+    scrollBars.vertical.y,
+    scrollBars.vertical.width,
+    scrollBars.vertical.height
+  );
+  context.fillStyle = fillStyle;
 }
 
 function exportAsPNG({
@@ -233,7 +315,11 @@ function exportAsPNG({
     // if we're exporting without bg, we need to rerender the scene without it
     //  (it's reset again, below)
     if (!exportBackground) {
-      renderScene(rc, context, null);
+      renderScene(rc, context, {
+        viewBackgroundColor: null,
+        scrollX: 0,
+        scrollY: 0
+      });
     }
 
     // copy our original canvas onto the temp canvas
@@ -259,7 +345,7 @@ function exportAsPNG({
 
     // reset transparent bg back to original
     if (!exportBackground) {
-      renderScene(rc, context, viewBackgroundColor);
+      renderScene(rc, context, { viewBackgroundColor, scrollX: 0, scrollY: 0 });
     }
 
     // create a temporary <a> elem which we'll use to download the image
@@ -316,10 +402,15 @@ function getArrowPoints(element: ExcalidrawElement) {
 
 function generateDraw(element: ExcalidrawElement) {
   if (element.type === "selection") {
-    element.draw = (rc, context) => {
+    element.draw = (rc, context, { scrollX, scrollY }) => {
       const fillStyle = context.fillStyle;
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(element.x, element.y, element.width, element.height);
+      context.fillRect(
+        element.x + scrollX,
+        element.y + scrollY,
+        element.width,
+        element.height
+      );
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
@@ -329,11 +420,10 @@ function generateDraw(element: ExcalidrawElement) {
         fill: element.backgroundColor
       });
     });
-
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
   } else if (element.type === "ellipse") {
     const shape = withCustomMathRandom(element.seed, () =>
@@ -345,10 +435,10 @@ function generateDraw(element: ExcalidrawElement) {
         { stroke: element.strokeColor, fill: element.backgroundColor }
       )
     );
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, contex, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
@@ -361,22 +451,22 @@ function generateDraw(element: ExcalidrawElement) {
       generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
     ]);
 
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       shapes.forEach(shape => rc.draw(shape));
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
     return;
   } else if (isTextElement(element)) {
-    element.draw = (rc, context) => {
+    element.draw = (rc, context, { scrollX, scrollY }) => {
       const font = context.font;
       context.font = element.font;
       const fillStyle = context.fillStyle;
       context.fillStyle = element.strokeColor;
       context.fillText(
         element.text,
-        element.x,
-        element.y + element.actualBoundingBoxAscent
+        element.x + scrollX,
+        element.y + element.actualBoundingBoxAscent + scrollY
       );
       context.fillStyle = fillStyle;
       context.font = font;
@@ -467,6 +557,8 @@ type AppState = {
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   viewBackgroundColor: string;
+  scrollX: number;
+  scrollY: number;
 };
 
 const KEYS = {
@@ -513,7 +605,9 @@ class App extends React.Component<{}, AppState> {
     exportPadding: 10,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
-    viewBackgroundColor: "#ffffff"
+    viewBackgroundColor: "#ffffff",
+    scrollX: 0,
+    scrollY: 0
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -629,10 +723,24 @@ class App extends React.Component<{}, AppState> {
         <canvas
           id="canvas"
           width={window.innerWidth}
-          height={window.innerHeight - 200}
+          height={window.innerHeight - 210}
+          onWheel={e => {
+            e.preventDefault();
+            const { deltaX, deltaY } = e;
+            this.setState(state => ({
+              scrollX: state.scrollX - deltaX,
+              scrollY: state.scrollY - deltaY
+            }));
+          }}
           onMouseDown={e => {
-            const x = e.clientX - (e.target as HTMLElement).offsetLeft;
-            const y = e.clientY - (e.target as HTMLElement).offsetTop;
+            const x =
+              e.clientX -
+              (e.target as HTMLElement).offsetLeft -
+              this.state.scrollX;
+            const y =
+              e.clientY -
+              (e.target as HTMLElement).offsetTop -
+              this.state.scrollY;
             const element = newElement(
               this.state.elementType,
               x,
@@ -720,8 +828,8 @@ class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x = e.clientX - target.offsetLeft;
-                  const y = e.clientY - target.offsetTop;
+                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
+                  const y = e.clientY - target.offsetTop - this.state.scrollY;
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -737,8 +845,16 @@ class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
-              let width = e.clientX - target.offsetLeft - draggingElement.x;
-              let height = e.clientY - target.offsetTop - draggingElement.y;
+              let width =
+                e.clientX -
+                target.offsetLeft -
+                draggingElement.x -
+                this.state.scrollX;
+              let height =
+                e.clientY -
+                target.offsetTop -
+                draggingElement.y -
+                this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
               draggingElement.height = e.shiftKey ? width : height;
@@ -871,7 +987,11 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
-    renderScene(rc, context, this.state.viewBackgroundColor);
+    renderScene(rc, context, {
+      scrollX: this.state.scrollX,
+      scrollY: this.state.scrollY,
+      viewBackgroundColor: this.state.viewBackgroundColor
+    });
     save(this.state);
   }
 }
