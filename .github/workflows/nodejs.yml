@@ -15,6 +15,10 @@ jobs:
     - name: npm install, build, and test
       run: |
         npm ci
+<<<<<<< HEAD:.github/workflows/nodejs.yml
+=======
+        npm run build --if-present
+>>>>>>> 6599f97088dcda01d7b05abe9afc732165f0af62:.github/workflows/nodejs.yml
         npm run lint
         npm test
       env:
