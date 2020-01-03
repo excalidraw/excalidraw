@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Excalidraw</title>
+    <style>
+      :root {
+        --bg-color: #eee;
+        --text-color: black;
+      }
+
+      html {
+        height: 100%;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: sans-serif;
+      }
+
+      body {
+        margin: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .title {
+        font-size: 4em;
+        text-transform: uppercase;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          --bg-color: #333;
+          --text-color: white;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">
+      excalidraw
+    </h1>
+  </body>
+</html>
