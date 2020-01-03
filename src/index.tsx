@@ -16,7 +16,7 @@ type ExcalidrawTextElement = ExcalidrawElement & {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-var elements = Array.of<ExcalidrawElement>();
+let elements = Array.of<ExcalidrawElement>();
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 const LCG = (seed: number) => () =>
@@ -69,7 +69,7 @@ function distanceBetweenPointAndSegment(
 
   const dx = x - xx;
   const dy = y - yy;
-  return Math.sqrt(dx * dx + dy * dy);
+  return Math.hypot(dx, dy);
 }
 
 function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
@@ -233,18 +233,6 @@ function renderScene(
     }
   });
 
-  let minX = Infinity;
-  let maxX = 0;
-  let minY = Infinity;
-  let maxY = 0;
-
-  elements.forEach(element => {
-    minX = Math.min(minX, getElementAbsoluteX1(element));
-    maxX = Math.max(maxX, getElementAbsoluteX2(element));
-    minY = Math.min(minY, getElementAbsoluteY1(element));
-    maxY = Math.max(maxY, getElementAbsoluteY2(element));
-  });
-
   const scrollBars = getScrollbars(
     context.canvas.width,
     context.canvas.height,
@@ -372,7 +360,7 @@ function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
 
 // Casting second argument (DrawingSurface) to any,
 // because it is requred by TS definitions and not required at runtime
-var generator = rough.generator(null, null as any);
+const generator = rough.generator(null, null as any);
 
 function isTextElement(
   element: ExcalidrawElement
@@ -387,7 +375,7 @@ function getArrowPoints(element: ExcalidrawElement) {
   const y2 = element.height;
 
   const size = 30; // pixels
-  const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  const distance = Math.hypot(x2 - x1, y2 - y1);
   // Scale down the arrow until we hit a certain size so that it doesn't look weird
   const minSize = Math.min(size, distance / 2);
   const xs = x2 - ((x2 - x1) / distance) * minSize;
@@ -435,7 +423,7 @@ function generateDraw(element: ExcalidrawElement) {
         { stroke: element.strokeColor, fill: element.backgroundColor }
       )
     );
-    element.draw = (rc, contex, { scrollX, scrollY }) => {
+    element.draw = (rc, context, { scrollX, scrollY }) => {
       context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
@@ -519,7 +507,7 @@ function clearSelection() {
 }
 
 function deleteSelectedElements() {
-  for (var i = elements.length - 1; i >= 0; --i) {
+  for (let i = elements.length - 1; i >= 0; --i) {
     if (elements[i].isSelected) {
       elements.splice(i, 1);
     }
