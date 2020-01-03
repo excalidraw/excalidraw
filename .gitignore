@@ -5,6 +5,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Build artifacts
+build
+
 # Dependency directories
 node_modules/
+
+# Editors
 .vscode/
+
