@@ -2,6 +2,7 @@
 @font-face {
   font-family: "Virgil";
   src: url("https://uploads.codesandbox.io/uploads/user/ed077012-e728-4a42-8395-cbd299149d62/AflB-FG_Virgil.ttf");
+  font-display: swap;
 }
 
 body {
