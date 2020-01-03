@@ -142,22 +142,32 @@ function newElement(
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
     seed: Math.floor(Math.random() * 2 ** 31),
-    draw(rc: RoughCanvas, context: CanvasRenderingContext2D) {}
+    draw(
+      rc: RoughCanvas,
+      context: CanvasRenderingContext2D,
+      sceneState: SceneState
+    ) {}
   };
   return element;
 }
 
+type SceneState = {
+  scrollX: number;
+  scrollY: number;
+  // null indicates transparent bg
+  viewBackgroundColor: string | null;
+};
+
 function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  // null indicates transparent bg
-  viewBackgroundColor: string | null
+  sceneState: SceneState
 ) {
   if (!context) return;
 
   const fillStyle = context.fillStyle;
-  if (typeof viewBackgroundColor === "string") {
-    context.fillStyle = viewBackgroundColor;
+  if (typeof sceneState.viewBackgroundColor === "string") {
+    context.fillStyle = sceneState.viewBackgroundColor;
     context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
   } else {
     context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
@@ -165,7 +175,7 @@ function renderScene(
   context.fillStyle = fillStyle;
 
   elements.forEach(element => {
-    element.draw(rc, context);
+    element.draw(rc, context, sceneState);
     if (element.isSelected) {
       const margin = 4;
 
@@ -176,8 +186,8 @@ function renderScene(
       const lineDash = context.getLineDash();
       context.setLineDash([8, 4]);
       context.strokeRect(
-        elementX1 - margin,
-        elementY1 - margin,
+        elementX1 - margin + sceneState.scrollX,
+        elementY1 - margin + sceneState.scrollY,
         elementX2 - elementX1 + margin * 2,
         elementY2 - elementY1 + margin * 2
       );
@@ -233,7 +243,11 @@ function exportAsPNG({
     // if we're exporting without bg, we need to rerender the scene without it
     //  (it's reset again, below)
     if (!exportBackground) {
-      renderScene(rc, context, null);
+      renderScene(rc, context, {
+        viewBackgroundColor: null,
+        scrollX: 0,
+        scrollY: 0
+      });
     }
 
     // copy our original canvas onto the temp canvas
@@ -259,7 +273,7 @@ function exportAsPNG({
 
     // reset transparent bg back to original
     if (!exportBackground) {
-      renderScene(rc, context, viewBackgroundColor);
+      renderScene(rc, context, { viewBackgroundColor, scrollX: 0, scrollY: 0 });
     }
 
     // create a temporary <a> elem which we'll use to download the image
@@ -316,10 +330,15 @@ function getArrowPoints(element: ExcalidrawElement) {
 
 function generateDraw(element: ExcalidrawElement) {
   if (element.type === "selection") {
-    element.draw = (rc, context) => {
+    element.draw = (rc, context, { scrollX, scrollY }) => {
       const fillStyle = context.fillStyle;
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(element.x, element.y, element.width, element.height);
+      context.fillRect(
+        element.x + scrollX,
+        element.y + scrollY,
+        element.width,
+        element.height
+      );
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
@@ -329,11 +348,10 @@ function generateDraw(element: ExcalidrawElement) {
         fill: element.backgroundColor
       });
     });
-
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
   } else if (element.type === "ellipse") {
     const shape = withCustomMathRandom(element.seed, () =>
@@ -345,10 +363,10 @@ function generateDraw(element: ExcalidrawElement) {
         { stroke: element.strokeColor, fill: element.backgroundColor }
       )
     );
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, contex, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
@@ -361,22 +379,22 @@ function generateDraw(element: ExcalidrawElement) {
       generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
     ]);
 
-    element.draw = (rc, context) => {
-      context.translate(element.x, element.y);
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
       shapes.forEach(shape => rc.draw(shape));
-      context.translate(-element.x, -element.y);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
     };
     return;
   } else if (isTextElement(element)) {
-    element.draw = (rc, context) => {
+    element.draw = (rc, context, { scrollX, scrollY }) => {
       const font = context.font;
       context.font = element.font;
       const fillStyle = context.fillStyle;
       context.fillStyle = element.strokeColor;
       context.fillText(
         element.text,
-        element.x,
-        element.y + element.actualBoundingBoxAscent
+        element.x + scrollX,
+        element.y + element.actualBoundingBoxAscent + scrollY
       );
       context.fillStyle = fillStyle;
       context.font = font;
@@ -467,6 +485,8 @@ type AppState = {
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   viewBackgroundColor: string;
+  scrollX: number;
+  scrollY: number;
 };
 
 const KEYS = {
@@ -513,7 +533,9 @@ class App extends React.Component<{}, AppState> {
     exportPadding: 10,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
-    viewBackgroundColor: "#ffffff"
+    viewBackgroundColor: "#ffffff",
+    scrollX: 0,
+    scrollY: 0
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -630,6 +652,14 @@ class App extends React.Component<{}, AppState> {
           id="canvas"
           width={window.innerWidth}
           height={window.innerHeight - 200}
+          onWheel={e => {
+            e.preventDefault();
+            const { deltaX, deltaY } = e;
+            this.setState(state => ({
+              scrollX: state.scrollX - deltaX,
+              scrollY: state.scrollY - deltaY
+            }));
+          }}
           onMouseDown={e => {
             const x = e.clientX - (e.target as HTMLElement).offsetLeft;
             const y = e.clientY - (e.target as HTMLElement).offsetTop;
@@ -871,7 +901,11 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
-    renderScene(rc, context, this.state.viewBackgroundColor);
+    renderScene(rc, context, {
+      scrollX: this.state.scrollX,
+      scrollY: this.state.scrollY,
+      viewBackgroundColor: this.state.viewBackgroundColor
+    });
     save(this.state);
   }
 }
