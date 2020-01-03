@@ -24,8 +24,12 @@
   margin-right: 10px;
 }
 
-.exportWrapper input[type="number"] {
-  width: 40px;
-  padding: 2px;
-  margin-left: 10px;
+label {
+  margin-right: 10px;
+}
+input[type="number"] {
+  width: 30px;
+}
+input {
+  margin-right: 5px;
 }

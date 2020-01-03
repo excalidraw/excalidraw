@@ -123,11 +123,13 @@ function newElement(type: string, x: number, y: number, width = 0, height = 0) {
 function exportAsPNG({
   exportBackground,
   exportVisibleOnly,
-  exportPadding = 10
+  exportPadding = 10,
+  viewBgColor
 }: {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding?: number;
+  viewBgColor: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
@@ -164,7 +166,7 @@ function exportAsPNG({
     : canvas.height;
 
   if (exportBackground) {
-    tempCanvasCtx.fillStyle = "#FFF";
+    tempCanvasCtx.fillStyle = viewBgColor;
     tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -240,7 +242,11 @@ function getArrowPoints(element: ExcaliburElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-function generateDraw(element: ExcaliburElement) {
+function generateDraw(
+  element: ExcaliburElement,
+  itemStrokeColor: string,
+  itemBackgroundColorColor: string
+) {
   if (element.type === "selection") {
     element.draw = (rc, context) => {
       const fillStyle = context.fillStyle;
@@ -249,7 +255,10 @@ function generateDraw(element: ExcaliburElement) {
       context.fillStyle = fillStyle;
     };
   } else if (element.type === "rectangle") {
-    const shape = generator.rectangle(0, 0, element.width, element.height);
+    const shape = generator.rectangle(0, 0, element.width, element.height, {
+      stroke: itemStrokeColor,
+      fill: itemBackgroundColorColor
+    });
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
       rc.draw(shape);
@@ -260,7 +269,8 @@ function generateDraw(element: ExcaliburElement) {
       element.width / 2,
       element.height / 2,
       element.width,
-      element.height
+      element.height,
+      { stroke: itemStrokeColor, fill: itemBackgroundColorColor }
     );
     element.draw = (rc, context) => {
       context.translate(element.x, element.y);
@@ -271,11 +281,11 @@ function generateDraw(element: ExcaliburElement) {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const shapes = [
       //    \
-      generator.line(x3, y3, x2, y2),
+      generator.line(x3, y3, x2, y2, { stroke: itemStrokeColor }),
       // -----
-      generator.line(x1, y1, x2, y2),
+      generator.line(x1, y1, x2, y2, { stroke: itemStrokeColor }),
       //    /
-      generator.line(x4, y4, x2, y2)
+      generator.line(x4, y4, x2, y2, { stroke: itemStrokeColor })
     ];
 
     element.draw = (rc, context) => {
@@ -369,7 +379,7 @@ function restore() {
   if (el) {
     const items = JSON.parse(el);
     for (let item of items) {
-      item = generateDraw(item);
+      item = generateDraw(item, "#000000", "#ffffff");
     }
     elements = [...items];
   }
@@ -393,6 +403,9 @@ type AppState = {
   exportBackground: boolean;
   exportVisibleOnly: boolean;
   exportPadding: number;
+  itemStrokeColor: string;
+  itemBackgroundColor: string;
+  viewBgColor: string;
 };
 
 class App extends React.Component<{}, AppState> {
@@ -410,7 +423,10 @@ class App extends React.Component<{}, AppState> {
     elementType: "selection",
     exportBackground: false,
     exportVisibleOnly: true,
-    exportPadding: 10
+    exportPadding: 10,
+    itemStrokeColor: "#000000",
+    itemBackgroundColor: "#ffffff",
+    viewBgColor: "#ffffff"
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -493,7 +509,8 @@ class App extends React.Component<{}, AppState> {
                 exportAsPNG({
                   exportBackground: this.state.exportBackground,
                   exportVisibleOnly: this.state.exportVisibleOnly,
-                  exportPadding: this.state.exportPadding
+                  exportPadding: this.state.exportPadding,
+                  viewBgColor: this.state.viewBgColor
                 });
               }}
             >
@@ -531,6 +548,14 @@ class App extends React.Component<{}, AppState> {
             px)
           </div>
         </div>
+        <fieldset>
+          <legend>Shapes</legend>
+          {this.renderOption({ type: "rectangle", children: "Rectangle" })}
+          {this.renderOption({ type: "ellipse", children: "Ellipse" })}
+          {this.renderOption({ type: "arrow", children: "Arrow" })}
+          {this.renderOption({ type: "text", children: "Text" })}
+          {this.renderOption({ type: "selection", children: "Selection" })}
+        </fieldset>
         <div
           onCut={e => {
             e.clipboardData.setData(
@@ -563,7 +588,11 @@ class App extends React.Component<{}, AppState> {
               parsedElements.forEach(parsedElement => {
                 parsedElement.x += 10;
                 parsedElement.y += 10;
-                generateDraw(parsedElement);
+                generateDraw(
+                  parsedElement,
+                  this.state.itemStrokeColor,
+                  this.state.itemBackgroundColor
+                );
                 elements.push(parsedElement);
                 addOnBeforeUnload();
               });
@@ -572,15 +601,10 @@ class App extends React.Component<{}, AppState> {
             e.preventDefault();
           }}
         >
-          {this.renderOption({ type: "rectangle", children: "Rectangle" })}
-          {this.renderOption({ type: "ellipse", children: "Ellipse" })}
-          {this.renderOption({ type: "arrow", children: "Arrow" })}
-          {this.renderOption({ type: "text", children: "Text" })}
-          {this.renderOption({ type: "selection", children: "Selection" })}
           <canvas
             id="canvas"
             width={window.innerWidth}
-            height={window.innerHeight}
+            height={window.innerHeight - 200}
             onMouseDown={e => {
               const x = e.clientX - (e.target as HTMLElement).offsetLeft;
               const y = e.clientY - (e.target as HTMLElement).offsetTop;
@@ -646,7 +670,11 @@ class App extends React.Component<{}, AppState> {
                 element.height = height;
               }
 
-              generateDraw(element);
+              generateDraw(
+                element,
+                this.state.itemStrokeColor,
+                this.state.itemBackgroundColor
+              );
               elements.push(element);
               if (this.state.elementType === "text") {
                 this.setState({
@@ -694,7 +722,11 @@ class App extends React.Component<{}, AppState> {
                 // Make a perfect square or circle when shift is enabled
                 draggingElement.height = e.shiftKey ? width : height;
 
-                generateDraw(draggingElement);
+                generateDraw(
+                  draggingElement,
+                  this.state.itemStrokeColor,
+                  this.state.itemBackgroundColor
+                );
 
                 if (this.state.elementType === "selection") {
                   setSelection(draggingElement);
@@ -740,8 +772,113 @@ class App extends React.Component<{}, AppState> {
             }}
           />
         </div>
+        <fieldset>
+          <legend>Colors</legend>
+          <label>
+            <input
+              type="color"
+              value={this.state.viewBgColor}
+              onChange={e => {
+                this.setState({ viewBgColor: e.target.value });
+              }}
+            />
+            Background
+          </label>
+          <label>
+            <input
+              type="color"
+              value={this.state.itemStrokeColor}
+              onChange={e => {
+                this.setState({ itemStrokeColor: e.target.value });
+              }}
+            />
+            Shape Stroke
+          </label>
+          <label>
+            <input
+              type="color"
+              value={this.state.itemBackgroundColor}
+              onChange={e => {
+                this.setState({ itemBackgroundColor: e.target.value });
+              }}
+            />
+            Shape Background
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Export</legend>
+          <button
+            onClick={() => {
+              exportAsPNG({
+                exportBackground: this.state.exportBackground,
+                exportVisibleOnly: this.state.exportVisibleOnly,
+                exportPadding: this.state.exportPadding,
+                viewBgColor: this.state.viewBgColor
+              });
+            }}
+          >
+            Export to png
+          </button>
+          <label>
+            <input
+              type="checkbox"
+              checked={this.state.exportBackground}
+              onChange={e => {
+                this.setState({ exportBackground: e.target.checked });
+              }}
+            />
+            background
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={this.state.exportVisibleOnly}
+              onChange={e => {
+                this.setState({ exportVisibleOnly: e.target.checked });
+              }}
+            />
+            visible area only
+          </label>
+          (padding:
+          <input
+            type="number"
+            value={this.state.exportPadding}
+            onChange={e => {
+              this.setState({ exportPadding: Number(e.target.value) });
+            }}
+            disabled={!this.state.exportVisibleOnly}
+          />
+          px)
+        </fieldset>
       </>
     );
+  }
+  componentDidUpdate() {
+    const fillStyle = context.fillStyle;
+    context.fillStyle = this.state.viewBgColor;
+    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
+    context.fillStyle = fillStyle;
+
+    elements.forEach(element => {
+      element.draw(rc, context);
+      if (element.isSelected) {
+        const margin = 4;
+
+        const elementX1 = getElementAbsoluteX1(element);
+        const elementX2 = getElementAbsoluteX2(element);
+        const elementY1 = getElementAbsoluteY1(element);
+        const elementY2 = getElementAbsoluteY2(element);
+        const lineDash = context.getLineDash();
+        context.setLineDash([8, 4]);
+        context.strokeRect(
+          elementX1 - margin,
+          elementY1 - margin,
+          elementX2 - elementX1 + margin * 2,
+          elementY2 - elementY1 + margin * 2
+        );
+        context.setLineDash(lineDash);
+      }
+    });
   }
 }
 
@@ -759,29 +896,6 @@ restore();
 
 function drawScene() {
   ReactDOM.render(<App />, rootElement);
-
-  context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
-
-  elements.forEach(element => {
-    element.draw(rc, context);
-    if (element.isSelected) {
-      const margin = 4;
-
-      const elementX1 = getElementAbsoluteX1(element);
-      const elementX2 = getElementAbsoluteX2(element);
-      const elementY1 = getElementAbsoluteY1(element);
-      const elementY2 = getElementAbsoluteY2(element);
-      const lineDash = context.getLineDash();
-      context.setLineDash([8, 4]);
-      context.strokeRect(
-        elementX1 - margin,
-        elementY1 - margin,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2
-      );
-      context.setLineDash(lineDash);
-    }
-  });
 }
 
 drawScene();
