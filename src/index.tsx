@@ -162,15 +162,46 @@ const SCROLLBAR_WIDTH = 6;
 const SCROLLBAR_MARGIN = 4;
 const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 
+function getScrollbars(
+  canvasWidth: number,
+  canvasHeight: number,
+  scrollX: number,
+  scrollY: number
+) {
+  // horizontal scrollbar
+  const sceneWidth = canvasWidth + Math.abs(scrollX);
+  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
+  const scrollBarX = scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
+  const horizontalScrollBar = {
+    x: scrollBarX + SCROLLBAR_MARGIN,
+    y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    width: scrollBarWidth - SCROLLBAR_MARGIN * 2,
+    height: SCROLLBAR_WIDTH
+  };
+
+  // vertical scrollbar
+  const sceneHeight = canvasHeight + Math.abs(scrollY);
+  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
+  const scrollBarY = scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
+  const verticalScrollBar = {
+    x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    y: scrollBarY + SCROLLBAR_MARGIN,
+    width: SCROLLBAR_WIDTH,
+    height: scrollBarHeight - SCROLLBAR_WIDTH * 2
+  };
+
+  return {
+    horizontal: horizontalScrollBar,
+    vertical: verticalScrollBar
+  };
+}
+
 function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState
 ) {
   if (!context) return;
-
-  const canvasWidth = context.canvas.width;
-  const canvasHeight = context.canvas.height;
 
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -214,28 +245,25 @@ function renderScene(
     maxY = Math.max(maxY, getElementAbsoluteY2(element));
   });
 
-  // horizontal scrollbar
-  context.fillStyle = SCROLLBAR_COLOR;
-  const sceneWidth = canvasWidth + Math.abs(sceneState.scrollX);
-  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
-  const scrollBarX = sceneState.scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
-  context.fillRect(
-    scrollBarX + SCROLLBAR_MARGIN,
-    canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    scrollBarWidth - SCROLLBAR_MARGIN * 2,
-    SCROLLBAR_WIDTH
+  const scrollBars = getScrollbars(
+    context.canvas.width,
+    context.canvas.height,
+    sceneState.scrollX,
+    sceneState.scrollY
   );
 
-  // vertical scrollbar
-  const sceneHeight = canvasHeight + Math.abs(sceneState.scrollY);
-  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
-  const scrollBarY =
-    sceneState.scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
+  context.fillStyle = SCROLLBAR_COLOR;
   context.fillRect(
-    canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    scrollBarY + SCROLLBAR_MARGIN,
-    SCROLLBAR_WIDTH,
-    scrollBarHeight - SCROLLBAR_WIDTH * 2
+    scrollBars.horizontal.x,
+    scrollBars.horizontal.y,
+    scrollBars.horizontal.width,
+    scrollBars.horizontal.height
+  );
+  context.fillRect(
+    scrollBars.vertical.x,
+    scrollBars.vertical.y,
+    scrollBars.vertical.width,
+    scrollBars.vertical.height
   );
   context.fillStyle = fillStyle;
 }
