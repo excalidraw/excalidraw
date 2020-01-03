@@ -134,70 +134,70 @@ function exportAsPNG({
   // deselect & rerender
 
   clearSelection();
-  drawScene();
+  ReactDOM.render(<App />, rootElement, () => {
+    // calculate visible-area coords
 
-  // calculate visible-area coords
+    let subCanvasX1 = Infinity;
+    let subCanvasX2 = 0;
+    let subCanvasY1 = Infinity;
+    let subCanvasY2 = 0;
 
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
+    elements.forEach(element => {
+      subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
+      subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
+      subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
+      subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
+    });
 
-  elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-  });
+    // create temporary canvas from which we'll export
 
-  // create temporary canvas from which we'll export
-
-  const tempCanvas = document.createElement("canvas");
-  const tempCanvasCtx = tempCanvas.getContext("2d")!;
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = exportVisibleOnly
-    ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-    : canvas.width;
-  tempCanvas.height = exportVisibleOnly
-    ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-    : canvas.height;
-
-  if (exportBackground) {
-    tempCanvasCtx.fillStyle = viewBgColor;
-    tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // copy our original canvas onto the temp canvas
-  tempCanvasCtx.drawImage(
-    canvas, // source
-    exportVisibleOnly // sx
-      ? subCanvasX1 - exportPadding
-      : 0,
-    exportVisibleOnly // sy
-      ? subCanvasY1 - exportPadding
-      : 0,
-    exportVisibleOnly // sWidth
+    const tempCanvas = document.createElement("canvas");
+    const tempCanvasCtx = tempCanvas.getContext("2d")!;
+    tempCanvas.style.display = "none";
+    document.body.appendChild(tempCanvas);
+    tempCanvas.width = exportVisibleOnly
       ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-      : canvas.width,
-    exportVisibleOnly // sHeight
+      : canvas.width;
+    tempCanvas.height = exportVisibleOnly
       ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-      : canvas.height,
-    0, // dx
-    0, // dy
-    exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
-    exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
-  );
+      : canvas.height;
 
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", "excalibur.png");
-  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-  link.click();
+    if (exportBackground) {
+      tempCanvasCtx.fillStyle = viewBgColor;
+      tempCanvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
-  // clean up the DOM
-  link.remove();
-  if (tempCanvas !== canvas) tempCanvas.remove();
+    // copy our original canvas onto the temp canvas
+    tempCanvasCtx.drawImage(
+      canvas, // source
+      exportVisibleOnly // sx
+        ? subCanvasX1 - exportPadding
+        : 0,
+      exportVisibleOnly // sy
+        ? subCanvasY1 - exportPadding
+        : 0,
+      exportVisibleOnly // sWidth
+        ? subCanvasX2 - subCanvasX1 + exportPadding * 2
+        : canvas.width,
+      exportVisibleOnly // sHeight
+        ? subCanvasY2 - subCanvasY1 + exportPadding * 2
+        : canvas.height,
+      0, // dx
+      0, // dy
+      exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
+      exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
+    );
+
+    // create a temporary <a> elem which we'll use to download the image
+    const link = document.createElement("a");
+    link.setAttribute("download", "excalibur.png");
+    link.setAttribute("href", tempCanvas.toDataURL("image/png"));
+    link.click();
+
+    // clean up the DOM
+    link.remove();
+    if (tempCanvas !== canvas) tempCanvas.remove();
+  });
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -396,11 +396,11 @@ class App extends React.Component<{}, AppState> {
 
     if (event.key === "Escape") {
       clearSelection();
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     } else if (event.key === "Backspace") {
       deleteSelectedElements();
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     } else if (
       event.key === "ArrowLeft" ||
@@ -417,13 +417,13 @@ class App extends React.Component<{}, AppState> {
           else if (event.key === "ArrowDown") element.y += step;
         }
       });
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     } else if (event.key === "a" && event.metaKey) {
       elements.forEach(element => {
         element.isSelected = true;
       });
-      drawScene();
+      this.forceUpdate();
       event.preventDefault();
     }
   };
@@ -443,7 +443,7 @@ class App extends React.Component<{}, AppState> {
           onChange={() => {
             this.setState({ elementType: type });
             clearSelection();
-            drawScene();
+            this.forceUpdate();
           }}
         />
         {children}
@@ -453,7 +453,50 @@ class App extends React.Component<{}, AppState> {
 
   public render() {
     return (
-      <>
+      <div
+        onCut={e => {
+          e.clipboardData.setData(
+            "text/plain",
+            JSON.stringify(elements.filter(element => element.isSelected))
+          );
+          deleteSelectedElements();
+          this.forceUpdate();
+          e.preventDefault();
+        }}
+        onCopy={e => {
+          e.clipboardData.setData(
+            "text/plain",
+            JSON.stringify(elements.filter(element => element.isSelected))
+          );
+          e.preventDefault();
+        }}
+        onPaste={e => {
+          const paste = e.clipboardData.getData("text");
+          let parsedElements;
+          try {
+            parsedElements = JSON.parse(paste);
+          } catch (e) {}
+          if (
+            Array.isArray(parsedElements) &&
+            parsedElements.length > 0 &&
+            parsedElements[0].type // need to implement a better check here...
+          ) {
+            clearSelection();
+            parsedElements.forEach(parsedElement => {
+              parsedElement.x += 10;
+              parsedElement.y += 10;
+              generateDraw(
+                parsedElement,
+                this.state.itemStrokeColor,
+                this.state.itemBackgroundColor
+              );
+              elements.push(parsedElement);
+            });
+            this.forceUpdate();
+          }
+          e.preventDefault();
+        }}
+      >
         <fieldset>
           <legend>Shapes</legend>
           {this.renderOption({ type: "rectangle", children: "Rectangle" })}
@@ -462,218 +505,171 @@ class App extends React.Component<{}, AppState> {
           {this.renderOption({ type: "text", children: "Text" })}
           {this.renderOption({ type: "selection", children: "Selection" })}
         </fieldset>
-        <div
-          onCut={e => {
-            e.clipboardData.setData(
-              "text/plain",
-              JSON.stringify(elements.filter(element => element.isSelected))
-            );
-            deleteSelectedElements();
-            drawScene();
-            e.preventDefault();
-          }}
-          onCopy={e => {
-            e.clipboardData.setData(
-              "text/plain",
-              JSON.stringify(elements.filter(element => element.isSelected))
-            );
-            e.preventDefault();
-          }}
-          onPaste={e => {
-            const paste = e.clipboardData.getData("text");
-            let parsedElements;
-            try {
-              parsedElements = JSON.parse(paste);
-            } catch (e) {}
-            if (
-              Array.isArray(parsedElements) &&
-              parsedElements.length > 0 &&
-              parsedElements[0].type // need to implement a better check here...
-            ) {
-              clearSelection();
-              parsedElements.forEach(parsedElement => {
-                parsedElement.x += 10;
-                parsedElement.y += 10;
-                generateDraw(
-                  parsedElement,
-                  this.state.itemStrokeColor,
-                  this.state.itemBackgroundColor
-                );
-                elements.push(parsedElement);
+
+        <canvas
+          id="canvas"
+          width={window.innerWidth}
+          height={window.innerHeight - 200}
+          onMouseDown={e => {
+            const x = e.clientX - (e.target as HTMLElement).offsetLeft;
+            const y = e.clientY - (e.target as HTMLElement).offsetTop;
+            const element = newElement(this.state.elementType, x, y);
+            let isDraggingElements = false;
+            const cursorStyle = document.documentElement.style.cursor;
+            if (this.state.elementType === "selection") {
+              const hitElement = elements.find(element => {
+                return hitTest(element, x, y);
               });
-              drawScene();
-            }
-            e.preventDefault();
-          }}
-        >
-          <canvas
-            id="canvas"
-            width={window.innerWidth}
-            height={window.innerHeight - 200}
-            onMouseDown={e => {
-              const x = e.clientX - (e.target as HTMLElement).offsetLeft;
-              const y = e.clientY - (e.target as HTMLElement).offsetTop;
-              const element = newElement(this.state.elementType, x, y);
-              let isDraggingElements = false;
-              const cursorStyle = document.documentElement.style.cursor;
-              if (this.state.elementType === "selection") {
-                const hitElement = elements.find(element => {
-                  return hitTest(element, x, y);
-                });
 
-                // If we click on something
-                if (hitElement) {
-                  if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
-                    // we're likely going to drag it
-                  } else {
-                    // We unselect every other elements unless shift is pressed
-                    if (!e.shiftKey) {
-                      clearSelection();
-                    }
-                    // No matter what, we select it
-                    hitElement.isSelected = true;
-                  }
+              // If we click on something
+              if (hitElement) {
+                if (hitElement.isSelected) {
+                  // If that element is not already selected, do nothing,
+                  // we're likely going to drag it
                 } else {
-                  // If we don't click on anything, let's remove all the selected elements
-                  clearSelection();
+                  // We unselect every other elements unless shift is pressed
+                  if (!e.shiftKey) {
+                    clearSelection();
+                  }
+                  // No matter what, we select it
+                  hitElement.isSelected = true;
                 }
-
-                isDraggingElements = elements.some(
-                  element => element.isSelected
-                );
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
-                }
+              } else {
+                // If we don't click on anything, let's remove all the selected elements
+                clearSelection();
               }
 
-              if (isTextElement(element)) {
-                const text = prompt("What text do you want?");
-                if (text === null) {
+              isDraggingElements = elements.some(element => element.isSelected);
+
+              if (isDraggingElements) {
+                document.documentElement.style.cursor = "move";
+              }
+            }
+
+            if (isTextElement(element)) {
+              const text = prompt("What text do you want?");
+              if (text === null) {
+                return;
+              }
+              element.text = text;
+              element.font = "20px Virgil";
+              const font = context.font;
+              context.font = element.font;
+              const {
+                actualBoundingBoxAscent,
+                actualBoundingBoxDescent,
+                width
+              } = context.measureText(element.text);
+              element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+              context.font = font;
+              const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+              // Center the text
+              element.x -= width / 2;
+              element.y -= actualBoundingBoxAscent;
+              element.width = width;
+              element.height = height;
+            }
+
+            generateDraw(
+              element,
+              this.state.itemStrokeColor,
+              this.state.itemBackgroundColor
+            );
+            elements.push(element);
+            if (this.state.elementType === "text") {
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              element.isSelected = true;
+            } else {
+              this.setState({ draggingElement: element });
+            }
+
+            let lastX = x;
+            let lastY = y;
+
+            const onMouseMove = (e: MouseEvent) => {
+              const target = e.target;
+              if (!(target instanceof HTMLElement)) {
+                return;
+              }
+
+              if (isDraggingElements) {
+                const selectedElements = elements.filter(el => el.isSelected);
+                if (selectedElements.length) {
+                  const x = e.clientX - target.offsetLeft;
+                  const y = e.clientY - target.offsetTop;
+                  selectedElements.forEach(element => {
+                    element.x += x - lastX;
+                    element.y += y - lastY;
+                  });
+                  lastX = x;
+                  lastY = y;
+                  this.forceUpdate();
                   return;
                 }
-                element.text = text;
-                element.font = "20px Virgil";
-                const font = context.font;
-                context.font = element.font;
-                const {
-                  actualBoundingBoxAscent,
-                  actualBoundingBoxDescent,
-                  width
-                } = context.measureText(element.text);
-                element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-                context.font = font;
-                const height =
-                  actualBoundingBoxAscent + actualBoundingBoxDescent;
-                // Center the text
-                element.x -= width / 2;
-                element.y -= actualBoundingBoxAscent;
-                element.width = width;
-                element.height = height;
               }
 
+              // It is very important to read this.state within each move event,
+              // otherwise we would read a stale one!
+              const draggingElement = this.state.draggingElement;
+              if (!draggingElement) return;
+              let width = e.clientX - target.offsetLeft - draggingElement.x;
+              let height = e.clientY - target.offsetTop - draggingElement.y;
+              draggingElement.width = width;
+              // Make a perfect square or circle when shift is enabled
+              draggingElement.height = e.shiftKey ? width : height;
+
               generateDraw(
-                element,
+                draggingElement,
                 this.state.itemStrokeColor,
                 this.state.itemBackgroundColor
               );
-              elements.push(element);
-              if (this.state.elementType === "text") {
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-                element.isSelected = true;
-              } else {
-                this.setState({ draggingElement: element });
+
+              if (this.state.elementType === "selection") {
+                setSelection(draggingElement);
+              }
+              this.forceUpdate();
+            };
+
+            const onMouseUp = (e: MouseEvent) => {
+              const { draggingElement, elementType } = this.state;
+
+              window.removeEventListener("mousemove", onMouseMove);
+              window.removeEventListener("mouseup", onMouseUp);
+
+              document.documentElement.style.cursor = cursorStyle;
+
+              // if no element is clicked, clear the selection and redraw
+              if (draggingElement === null) {
+                clearSelection();
+                this.forceUpdate();
+                return;
               }
 
-              let lastX = x;
-              let lastY = y;
-
-              const onMouseMove = (e: MouseEvent) => {
-                const target = e.target;
-                if (!(target instanceof HTMLElement)) {
-                  return;
-                }
-
+              if (elementType === "selection") {
                 if (isDraggingElements) {
-                  const selectedElements = elements.filter(el => el.isSelected);
-                  if (selectedElements.length) {
-                    const x = e.clientX - target.offsetLeft;
-                    const y = e.clientY - target.offsetTop;
-                    selectedElements.forEach(element => {
-                      element.x += x - lastX;
-                      element.y += y - lastY;
-                    });
-                    lastX = x;
-                    lastY = y;
-                    drawScene();
-                    return;
-                  }
+                  isDraggingElements = false;
                 }
+                elements.pop();
+              } else {
+                draggingElement.isSelected = true;
+              }
 
-                // It is very important to read this.state within each move event,
-                // otherwise we would read a stale one!
-                const draggingElement = this.state.draggingElement;
-                if (!draggingElement) return;
-                let width = e.clientX - target.offsetLeft - draggingElement.x;
-                let height = e.clientY - target.offsetTop - draggingElement.y;
-                draggingElement.width = width;
-                // Make a perfect square or circle when shift is enabled
-                draggingElement.height = e.shiftKey ? width : height;
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              this.forceUpdate();
+            };
 
-                generateDraw(
-                  draggingElement,
-                  this.state.itemStrokeColor,
-                  this.state.itemBackgroundColor
-                );
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
 
-                if (this.state.elementType === "selection") {
-                  setSelection(draggingElement);
-                }
-                drawScene();
-              };
-
-              const onMouseUp = (e: MouseEvent) => {
-                const { draggingElement, elementType } = this.state;
-
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
-
-                document.documentElement.style.cursor = cursorStyle;
-
-                // if no element is clicked, clear the selection and redraw
-                if (draggingElement === null) {
-                  clearSelection();
-                  drawScene();
-                  return;
-                }
-
-                if (elementType === "selection") {
-                  if (isDraggingElements) {
-                    isDraggingElements = false;
-                  }
-                  elements.pop();
-                } else {
-                  draggingElement.isSelected = true;
-                }
-
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-                drawScene();
-              };
-
-              window.addEventListener("mousemove", onMouseMove);
-              window.addEventListener("mouseup", onMouseUp);
-
-              drawScene();
-            }}
-          />
-        </div>
+            this.forceUpdate();
+          }}
+        />
         <fieldset>
           <legend>Colors</legend>
           <label>
@@ -752,9 +748,10 @@ class App extends React.Component<{}, AppState> {
           />
           px)
         </fieldset>
-      </>
+      </div>
     );
   }
+
   componentDidUpdate() {
     const fillStyle = context.fillStyle;
     context.fillStyle = this.state.viewBgColor;
@@ -794,8 +791,4 @@ const context = canvas.getContext("2d")!;
 // https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
 context.translate(0.5, 0.5);
 
-function drawScene() {
-  ReactDOM.render(<App />, rootElement);
-}
-
-drawScene();
+ReactDOM.render(<App />, rootElement);
