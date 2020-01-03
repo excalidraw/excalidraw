@@ -158,12 +158,19 @@ type SceneState = {
   viewBackgroundColor: string | null;
 };
 
+const SCROLLBAR_WIDTH = 6;
+const SCROLLBAR_MARGIN = 4;
+const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
+
 function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState
 ) {
   if (!context) return;
+
+  const canvasWidth = context.canvas.width;
+  const canvasHeight = context.canvas.height;
 
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -194,6 +201,43 @@ function renderScene(
       context.setLineDash(lineDash);
     }
   });
+
+  let minX = Infinity;
+  let maxX = 0;
+  let minY = Infinity;
+  let maxY = 0;
+
+  elements.forEach(element => {
+    minX = Math.min(minX, getElementAbsoluteX1(element));
+    maxX = Math.max(maxX, getElementAbsoluteX2(element));
+    minY = Math.min(minY, getElementAbsoluteY1(element));
+    maxY = Math.max(maxY, getElementAbsoluteY2(element));
+  });
+
+  // horizontal scrollbar
+  const sceneWidth = canvasWidth + Math.abs(sceneState.scrollX);
+  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
+  const scrollBarX = sceneState.scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
+  context.fillStyle = SCROLLBAR_COLOR;
+  context.fillRect(
+    scrollBarX + SCROLLBAR_MARGIN,
+    canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    scrollBarWidth - SCROLLBAR_MARGIN * 2,
+    SCROLLBAR_WIDTH
+  );
+
+  // vertical scrollbar
+  const sceneHeight = canvasHeight + Math.abs(sceneState.scrollY);
+  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
+  const scrollBarY =
+    sceneState.scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
+  context.fillStyle = SCROLLBAR_COLOR;
+  context.fillRect(
+    canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+    scrollBarY + SCROLLBAR_MARGIN,
+    SCROLLBAR_WIDTH,
+    scrollBarHeight - SCROLLBAR_WIDTH * 2
+  );
 }
 
 function exportAsPNG({
@@ -661,8 +705,14 @@ class App extends React.Component<{}, AppState> {
             }));
           }}
           onMouseDown={e => {
-            const x = e.clientX - (e.target as HTMLElement).offsetLeft;
-            const y = e.clientY - (e.target as HTMLElement).offsetTop;
+            const x =
+              e.clientX -
+              (e.target as HTMLElement).offsetLeft -
+              this.state.scrollX;
+            const y =
+              e.clientY -
+              (e.target as HTMLElement).offsetTop -
+              this.state.scrollY;
             const element = newElement(
               this.state.elementType,
               x,
@@ -750,8 +800,8 @@ class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x = e.clientX - target.offsetLeft;
-                  const y = e.clientY - target.offsetTop;
+                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
+                  const y = e.clientY - target.offsetTop - this.state.scrollY;
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -767,8 +817,16 @@ class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
-              let width = e.clientX - target.offsetLeft - draggingElement.x;
-              let height = e.clientY - target.offsetTop - draggingElement.y;
+              let width =
+                e.clientX -
+                target.offsetLeft -
+                draggingElement.x -
+                this.state.scrollX;
+              let height =
+                e.clientY -
+                target.offsetTop -
+                draggingElement.y -
+                this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
               draggingElement.height = e.shiftKey ? width : height;
