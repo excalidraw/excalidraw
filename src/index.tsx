@@ -659,6 +659,9 @@ function getSelectedIndices() {
   return selectedIndices;
 }
 
+const someElementIsSelected = () =>
+  elements.some(element => element.isSelected);
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
@@ -730,14 +733,12 @@ class App extends React.Component<{}, AppState> {
       event.altKey &&
       event.code === "KeyB"
     ) {
-      moveOneLeft(elements, getSelectedIndices());
-      this.forceUpdate();
+      this.moveOneLeft();
       event.preventDefault();
 
       // Send to back: Cmd-Shift-B
     } else if (event.metaKey && event.shiftKey && event.code === "KeyB") {
-      moveAllLeft(elements, getSelectedIndices());
-      this.forceUpdate();
+      this.moveAllLeft();
       event.preventDefault();
 
       // Select all: Cmd-A
@@ -750,6 +751,21 @@ class App extends React.Component<{}, AppState> {
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findElementByKey(event.key) });
     }
+  };
+
+  private deleteSelectedElements = () => {
+    deleteSelectedElements();
+    this.forceUpdate();
+  };
+
+  private moveAllLeft = () => {
+    moveAllLeft(elements, getSelectedIndices());
+    this.forceUpdate();
+  };
+
+  private moveOneLeft = () => {
+    moveOneLeft(elements, getSelectedIndices());
+    this.forceUpdate();
   };
 
   public render() {
@@ -896,6 +912,17 @@ class App extends React.Component<{}, AppState> {
               px)
             </div>
           </div>
+          {someElementIsSelected() && (
+            <>
+              <h4>Shape options</h4>
+              <div className="panelColumn">
+                <button onClick={this.deleteSelectedElements}>Delete</button>
+                <button>Move to front</button>
+                <button onClick={this.moveOneLeft}>Send backwards</button>
+                <button onClick={this.moveAllLeft}>Send to back</button>
+              </div>
+            </>
+          )}
         </div>
         <canvas
           id="canvas"
@@ -950,7 +977,7 @@ class App extends React.Component<{}, AppState> {
                 clearSelection();
               }
 
-              isDraggingElements = elements.some(element => element.isSelected);
+              isDraggingElements = someElementIsSelected();
 
               if (isDraggingElements) {
                 document.documentElement.style.cursor = "move";
