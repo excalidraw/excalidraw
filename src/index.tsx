@@ -726,7 +726,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
 
-      // Send backwards: Cmd-Shift-Alt-B
+      // Send backward: Cmd-Shift-Alt-B
     } else if (
       event.metaKey &&
       event.shiftKey &&
@@ -741,7 +741,7 @@ class App extends React.Component<{}, AppState> {
       this.moveAllLeft();
       event.preventDefault();
 
-      // Move forward: Cmd-Shift-Alt-F
+      // Bring forward: Cmd-Shift-Alt-F
     } else if (
       event.metaKey &&
       event.shiftKey &&
@@ -751,7 +751,7 @@ class App extends React.Component<{}, AppState> {
       this.moveOneRight();
       event.preventDefault();
 
-      // Send to back: Cmd-Shift-F
+      // Bring to front: Cmd-Shift-F
     } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
@@ -942,9 +942,9 @@ class App extends React.Component<{}, AppState> {
               <h4>Shape options</h4>
               <div className="panelColumn">
                 <button onClick={this.deleteSelectedElements}>Delete</button>
-                <button onClick={this.moveOneRight}>Move forward</button>
-                <button onClick={this.moveAllRight}>Move to front</button>
-                <button onClick={this.moveOneLeft}>Send backwards</button>
+                <button onClick={this.moveOneRight}>Bring forward</button>
+                <button onClick={this.moveAllRight}>Bring to front</button>
+                <button onClick={this.moveOneLeft}>Send backward</button>
                 <button onClick={this.moveAllLeft}>Send to back</button>
               </div>
             </>
