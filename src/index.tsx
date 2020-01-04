@@ -351,10 +351,23 @@ function handlerRectangles(
 
 function renderScene(
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D,
-  sceneState: SceneState
+  canvas: HTMLCanvasElement,
+  sceneState: SceneState,
+  // extra options, currently passed by export helper
+  {
+    offsetX,
+    offsetY,
+    renderScrollbars = true,
+    renderSelection = true
+  }: {
+    offsetX?: number;
+    offsetY?: number;
+    renderScrollbars?: boolean;
+    renderSelection?: boolean;
+  } = {}
 ) {
-  if (!context) return;
+  if (!canvas) return;
+  const context = canvas.getContext("2d")!;
 
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -367,9 +380,15 @@ function renderScene(
 
   const selectedIndices = getSelectedIndices();
 
+  sceneState = {
+    ...sceneState,
+    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
+    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY
+  };
+
   elements.forEach(element => {
     element.draw(rc, context, sceneState);
-    if (element.isSelected) {
+    if (renderSelection && element.isSelected) {
       const margin = 4;
 
       const elementX1 = getElementAbsoluteX1(element);
@@ -405,119 +424,93 @@ function renderScene(
     }
   });
 
-  const scrollBars = getScrollbars(
-    context.canvas.width,
-    context.canvas.height,
-    sceneState.scrollX,
-    sceneState.scrollY
-  );
+  if (renderScrollbars) {
+    const scrollBars = getScrollbars(
+      context.canvas.width,
+      context.canvas.height,
+      sceneState.scrollX,
+      sceneState.scrollY
+    );
 
-  context.fillStyle = SCROLLBAR_COLOR;
-  context.fillRect(
-    scrollBars.horizontal.x,
-    scrollBars.horizontal.y,
-    scrollBars.horizontal.width,
-    scrollBars.horizontal.height
-  );
-  context.fillRect(
-    scrollBars.vertical.x,
-    scrollBars.vertical.y,
-    scrollBars.vertical.width,
-    scrollBars.vertical.height
-  );
-  context.fillStyle = fillStyle;
+    context.fillStyle = SCROLLBAR_COLOR;
+    context.fillRect(
+      scrollBars.horizontal.x,
+      scrollBars.horizontal.y,
+      scrollBars.horizontal.width,
+      scrollBars.horizontal.height
+    );
+    context.fillRect(
+      scrollBars.vertical.x,
+      scrollBars.vertical.y,
+      scrollBars.vertical.width,
+      scrollBars.vertical.height
+    );
+    context.fillStyle = fillStyle;
+  }
 }
 
 function exportAsPNG({
   exportBackground,
-  exportVisibleOnly,
   exportPadding = 10,
   viewBackgroundColor
 }: {
   exportBackground: boolean;
-  exportVisibleOnly: boolean;
   exportPadding?: number;
   viewBackgroundColor: string;
+  scrollX: number;
+  scrollY: number;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
-  // deselect & rerender
+  // calculate smallest area to fit the contents in
 
-  clearSelection();
-  ReactDOM.render(<App />, rootElement, () => {
-    // calculate visible-area coords
+  let subCanvasX1 = Infinity;
+  let subCanvasX2 = 0;
+  let subCanvasY1 = Infinity;
+  let subCanvasY2 = 0;
 
-    let subCanvasX1 = Infinity;
-    let subCanvasX2 = 0;
-    let subCanvasY1 = Infinity;
-    let subCanvasY2 = 0;
-
-    elements.forEach(element => {
-      subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-      subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-      subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-      subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-    });
-
-    // create temporary canvas from which we'll export
-
-    const tempCanvas = document.createElement("canvas");
-    const tempCanvasCtx = tempCanvas.getContext("2d")!;
-    tempCanvas.style.display = "none";
-    document.body.appendChild(tempCanvas);
-    tempCanvas.width = exportVisibleOnly
-      ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-      : canvas.width;
-    tempCanvas.height = exportVisibleOnly
-      ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-      : canvas.height;
-
-    // if we're exporting without bg, we need to rerender the scene without it
-    //  (it's reset again, below)
-    if (!exportBackground) {
-      renderScene(rc, context, {
-        viewBackgroundColor: null,
-        scrollX: 0,
-        scrollY: 0
-      });
-    }
-
-    // copy our original canvas onto the temp canvas
-    tempCanvasCtx.drawImage(
-      canvas, // source
-      exportVisibleOnly // sx
-        ? subCanvasX1 - exportPadding
-        : 0,
-      exportVisibleOnly // sy
-        ? subCanvasY1 - exportPadding
-        : 0,
-      exportVisibleOnly // sWidth
-        ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-        : canvas.width,
-      exportVisibleOnly // sHeight
-        ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-        : canvas.height,
-      0, // dx
-      0, // dy
-      exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
-      exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
-    );
-
-    // reset transparent bg back to original
-    if (!exportBackground) {
-      renderScene(rc, context, { viewBackgroundColor, scrollX: 0, scrollY: 0 });
-    }
-
-    // create a temporary <a> elem which we'll use to download the image
-    const link = document.createElement("a");
-    link.setAttribute("download", "excalidraw.png");
-    link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-    link.click();
-
-    // clean up the DOM
-    link.remove();
-    if (tempCanvas !== canvas) tempCanvas.remove();
+  elements.forEach(element => {
+    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
+    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
+    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
+    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
   });
+
+  function distance(x: number, y: number) {
+    return Math.abs(x > y ? x - y : y - x);
+  }
+
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
+  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
+
+  renderScene(
+    rough.canvas(tempCanvas),
+    tempCanvas,
+    {
+      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      scrollX: 0,
+      scrollY: 0
+    },
+    {
+      offsetX: -subCanvasX1 + exportPadding,
+      offsetY: -subCanvasY1 + exportPadding,
+      renderScrollbars: false,
+      renderSelection: false
+    }
+  );
+
+  // create a temporary <a> elem which we'll use to download the image
+  const link = document.createElement("a");
+  link.setAttribute("download", "excalidraw.png");
+  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
+  link.click();
+
+  // clean up the DOM
+  link.remove();
+  if (tempCanvas !== canvas) tempCanvas.remove();
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -723,8 +716,6 @@ type AppState = {
   resizingElement: ExcalidrawElement | null;
   elementType: string;
   exportBackground: boolean;
-  exportVisibleOnly: boolean;
-  exportPadding: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   viewBackgroundColor: string;
@@ -821,9 +812,7 @@ class App extends React.Component<{}, AppState> {
     draggingElement: null,
     resizingElement: null,
     elementType: "selection",
-    exportBackground: false,
-    exportVisibleOnly: true,
-    exportPadding: 10,
+    exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
     viewBackgroundColor: "#ffffff",
@@ -1052,12 +1041,7 @@ class App extends React.Component<{}, AppState> {
           <div className="panelColumn">
             <button
               onClick={() => {
-                exportAsPNG({
-                  exportBackground: this.state.exportBackground,
-                  exportVisibleOnly: this.state.exportVisibleOnly,
-                  exportPadding: this.state.exportPadding,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                exportAsPNG(this.state);
               }}
             >
               Export to png
@@ -1072,28 +1056,6 @@ class App extends React.Component<{}, AppState> {
               />
               background
             </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportVisibleOnly}
-                onChange={e => {
-                  this.setState({ exportVisibleOnly: e.target.checked });
-                }}
-              />
-              visible area only
-            </label>
-            <div>
-              (padding:
-              <input
-                type="number"
-                value={this.state.exportPadding}
-                onChange={e => {
-                  this.setState({ exportPadding: Number(e.target.value) });
-                }}
-                disabled={!this.state.exportVisibleOnly}
-              />
-              px)
-            </div>
           </div>
           {someElementIsSelected() && (
             <>
@@ -1411,7 +1373,7 @@ class App extends React.Component<{}, AppState> {
   };
 
   componentDidUpdate() {
-    renderScene(rc, context, {
+    renderScene(rc, canvas, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
