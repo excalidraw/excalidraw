@@ -13,7 +13,7 @@ import {
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
-import "./styles.css";
+import "./styles.scss";
 
 type ExcalidrawElement = ReturnType<typeof newElement>;
 type ExcalidrawTextElement = ExcalidrawElement & {
@@ -26,7 +26,7 @@ type ExcalidrawTextElement = ExcalidrawElement & {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-let elements = Array.of<ExcalidrawElement>();
+const elements = Array.of<ExcalidrawElement>();
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 const LCG = (seed: number) => () =>
@@ -170,6 +170,39 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
   }
 }
 
+function resizeTest(
+  element: ExcalidrawElement,
+  x: number,
+  y: number,
+  sceneState: SceneState
+): string | false {
+  if (element.type === "text" || element.type === "arrow") return false;
+
+  const x1 = getElementAbsoluteX1(element);
+  const x2 = getElementAbsoluteX2(element);
+  const y1 = getElementAbsoluteY1(element);
+  const y2 = getElementAbsoluteY2(element);
+
+  const handlers = handlerRectangles(x1, x2, y1, y2, sceneState);
+
+  const filter = Object.keys(handlers).filter(key => {
+    const handler = handlers[key];
+
+    return (
+      x + sceneState.scrollX >= handler[0] &&
+      x + sceneState.scrollX <= handler[0] + handler[2] &&
+      y + sceneState.scrollY >= handler[1] &&
+      y + sceneState.scrollY <= handler[1] + handler[3]
+    );
+  });
+
+  if (filter.length > 0) {
+    return filter[0];
+  }
+
+  return false;
+}
+
 function newElement(
   type: string,
   x: number,
@@ -245,6 +278,77 @@ function getScrollbars(
   };
 }
 
+function handlerRectangles(
+  elementX1: number,
+  elementX2: number,
+  elementY1: number,
+  elementY2: number,
+  sceneState: SceneState
+) {
+  const margin = 4;
+  const minimumSize = 40;
+  const handlers: { [handler: string]: number[] } = {};
+
+  if (elementX2 - elementX1 > minimumSize) {
+    handlers["n"] = [
+      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+      elementY1 - margin + sceneState.scrollY - 8,
+      8,
+      8
+    ];
+
+    handlers["s"] = [
+      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+      elementY2 - margin + sceneState.scrollY + 8,
+      8,
+      8
+    ];
+  }
+
+  if (elementY2 - elementY1 > minimumSize) {
+    handlers["w"] = [
+      elementX1 - margin + sceneState.scrollX - 8,
+      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+      8,
+      8
+    ];
+
+    handlers["e"] = [
+      elementX2 - margin + sceneState.scrollX + 8,
+      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+      8,
+      8
+    ];
+  }
+
+  handlers["nw"] = [
+    elementX1 - margin + sceneState.scrollX - 8,
+    elementY1 - margin + sceneState.scrollY - 8,
+    8,
+    8
+  ]; // nw
+  handlers["ne"] = [
+    elementX2 - margin + sceneState.scrollX + 8,
+    elementY1 - margin + sceneState.scrollY - 8,
+    8,
+    8
+  ]; // ne
+  handlers["sw"] = [
+    elementX1 - margin + sceneState.scrollX - 8,
+    elementY2 - margin + sceneState.scrollY + 8,
+    8,
+    8
+  ]; // sw
+  handlers["se"] = [
+    elementX2 - margin + sceneState.scrollX + 8,
+    elementY2 - margin + sceneState.scrollY + 8,
+    8,
+    8
+  ]; // se
+
+  return handlers;
+}
+
 function renderScene(
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
@@ -260,6 +364,8 @@ function renderScene(
     context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
   }
   context.fillStyle = fillStyle;
+
+  const selectedIndices = getSelectedIndices();
 
   elements.forEach(element => {
     element.draw(rc, context, sceneState);
@@ -279,6 +385,23 @@ function renderScene(
         elementY2 - elementY1 + margin * 2
       );
       context.setLineDash(lineDash);
+
+      if (
+        element.type !== "text" &&
+        element.type !== "arrow" &&
+        selectedIndices.length === 1
+      ) {
+        const handlers = handlerRectangles(
+          elementX1,
+          elementX2,
+          elementY1,
+          elementY2,
+          sceneState
+        );
+        Object.values(handlers).forEach(handler => {
+          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+        });
+      }
     }
   });
 
@@ -584,19 +707,20 @@ function restore() {
     const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
 
     if (savedElements) {
-      elements = JSON.parse(savedElements);
+      elements.splice(0, elements.length, ...JSON.parse(savedElements));
       elements.forEach((element: ExcalidrawElement) => generateDraw(element));
     }
 
     return savedState ? JSON.parse(savedState) : null;
   } catch (e) {
-    elements = [];
+    elements.splice(0, elements.length);
     return null;
   }
 }
 
 type AppState = {
   draggingElement: ExcalidrawElement | null;
+  resizingElement: ExcalidrawElement | null;
   elementType: string;
   exportBackground: boolean;
   exportVisibleOnly: boolean;
@@ -695,6 +819,7 @@ class App extends React.Component<{}, AppState> {
 
   public state: AppState = {
     draggingElement: null,
+    resizingElement: null,
     elementType: "selection",
     exportBackground: false,
     exportVisibleOnly: true,
@@ -785,7 +910,7 @@ class App extends React.Component<{}, AppState> {
 
   private clearCanvas = () => {
     if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements = [];
+      elements.splice(0, elements.length);
       this.setState({
         viewBackgroundColor: "#ffffff",
         scrollX: 0,
@@ -1020,35 +1145,65 @@ class App extends React.Component<{}, AppState> {
               this.state.currentItemStrokeColor,
               this.state.currentItemBackgroundColor
             );
+            let resizeHandle: string | false = false;
             let isDraggingElements = false;
+            let isResizingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
-              const hitElement = elements.find(element => {
-                return hitTest(element, x, y);
+              const resizeElement = elements.find(element => {
+                return resizeTest(element, x, y, {
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  viewBackgroundColor: this.state.viewBackgroundColor
+                });
               });
 
-              // If we click on something
-              if (hitElement) {
-                if (hitElement.isSelected) {
-                  // If that element is not already selected, do nothing,
-                  // we're likely going to drag it
-                } else {
-                  // We unselect every other elements unless shift is pressed
-                  if (!e.shiftKey) {
-                    clearSelection();
-                  }
-                  // No matter what, we select it
-                  hitElement.isSelected = true;
-                }
+              this.setState({
+                resizingElement: resizeElement ? resizeElement : null
+              });
+
+              if (resizeElement) {
+                resizeHandle = resizeTest(resizeElement, x, y, {
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  viewBackgroundColor: this.state.viewBackgroundColor
+                });
+                document.documentElement.style.cursor = `${resizeHandle}-resize`;
+                isResizingElements = true;
               } else {
-                // If we don't click on anything, let's remove all the selected elements
-                clearSelection();
-              }
+                let hitElement = null;
+                
+                // We need to to hit testing from front (end of the array) to back (beginning of the array)
+                for (let i = elements.length - 1; i >= 0; --i) {
+                  if (hitTest(elements[i], x, y)) {
+                    hitElement = elements[i];
+                    break;
+                  }
+                }
 
-              isDraggingElements = someElementIsSelected();
+                // If we click on something
+                if (hitElement) {
+                  if (hitElement.isSelected) {
+                    // If that element is not already selected, do nothing,
+                    // we're likely going to drag it
+                  } else {
+                    // We unselect every other elements unless shift is pressed
+                    if (!e.shiftKey) {
+                      clearSelection();
+                    }
+                    // No matter what, we select it
+                    hitElement.isSelected = true;
+                  }
+                } else {
+                  // If we don't click on anything, let's remove all the selected elements
+                  clearSelection();
+                }
 
-              if (isDraggingElements) {
-                document.documentElement.style.cursor = "move";
+                isDraggingElements = someElementIsSelected();
+
+                if (isDraggingElements) {
+                  document.documentElement.style.cursor = "move";
+                }
               }
             }
 
@@ -1095,6 +1250,65 @@ class App extends React.Component<{}, AppState> {
               const target = e.target;
               if (!(target instanceof HTMLElement)) {
                 return;
+              }
+
+              if (isResizingElements && this.state.resizingElement) {
+                const el = this.state.resizingElement;
+                const selectedElements = elements.filter(el => el.isSelected);
+                if (selectedElements.length === 1) {
+                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
+                  const y = e.clientY - target.offsetTop - this.state.scrollY;
+                  selectedElements.forEach(element => {
+                    switch (resizeHandle) {
+                      case "nw":
+                        element.width += element.x - lastX;
+                        element.height += element.y - lastY;
+                        element.x = lastX;
+                        element.y = lastY;
+                        break;
+                      case "ne":
+                        element.width = lastX - element.x;
+                        element.height += element.y - lastY;
+                        element.y = lastY;
+                        break;
+                      case "sw":
+                        element.width += element.x - lastX;
+                        element.x = lastX;
+                        element.height = lastY - element.y;
+                        break;
+                      case "se":
+                        element.width += x - lastX;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height += y - lastY;
+                        }
+                        break;
+                      case "n":
+                        element.height += element.y - lastY;
+                        element.y = lastY;
+                        break;
+                      case "w":
+                        element.width += element.x - lastX;
+                        element.x = lastX;
+                        break;
+                      case "s":
+                        element.height = lastY - element.y;
+                        break;
+                      case "e":
+                        element.width = lastX - element.x;
+                        break;
+                    }
+
+                    el.x = element.x;
+                    el.y = element.y;
+                    generateDraw(el);
+                  });
+                  lastX = x;
+                  lastY = y;
+                  this.forceUpdate();
+                  return;
+                }
               }
 
               if (isDraggingElements) {
