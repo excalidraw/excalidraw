@@ -645,6 +645,7 @@ const ELEMENT_TRANSLATE_AMOUNT = 1;
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
+    window.addEventListener("resize", this.onResize, false);
 
     const savedState = restore();
     if (savedState) {
@@ -654,6 +655,7 @@ class App extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.onKeyDown, false);
+    window.removeEventListener("resize", this.onResize, false);
   }
 
   public state: AppState = {
@@ -667,6 +669,10 @@ class App extends React.Component<{}, AppState> {
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0
+  };
+
+  private onResize = () => {
+    this.forceUpdate();
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
