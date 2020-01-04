@@ -22,6 +22,10 @@ let elements = Array.of<ExcalidrawElement>();
 const LCG = (seed: number) => () =>
   ((2 ** 31 - 1) & (seed = Math.imul(48271, seed))) / 2 ** 31;
 
+function randomSeed() {
+  return Math.floor(Math.random() * 2 ** 31);
+}
+
 // Unfortunately, roughjs doesn't support a seed attribute (https://github.com/pshihn/rough/issues/27).
 // We can achieve the same result by overriding the Math.random function with a
 // pseudo random generator that supports a random seed and swapping it back after.
@@ -174,7 +178,7 @@ function newElement(
     isSelected: false,
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
-    seed: Math.floor(Math.random() * 2 ** 31),
+    seed: randomSeed(),
     draw(
       rc: RoughCanvas,
       context: CanvasRenderingContext2D,
@@ -737,6 +741,7 @@ class App extends React.Component<{}, AppState> {
             parsedElements.forEach(parsedElement => {
               parsedElement.x += 10;
               parsedElement.y += 10;
+              parsedElement.seed = randomSeed();
               generateDraw(parsedElement);
               elements.push(parsedElement);
             });
