@@ -1,6 +1,9 @@
-# Excalidraw
-
-Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.
+<div align="center" style="display:flex;flex-direction:column;">
+    <a href="https://excalidraw.com">
+        <img src=".github/assets/logo.png" alt="" width="220px" height="202"/>
+    </a>
+    <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.</h3>
+</div>
 
 ## Try it now
 
