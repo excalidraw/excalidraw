@@ -12,6 +12,11 @@ body {
 
 .container {
   display: flex;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .sidePanel {
@@ -19,6 +24,7 @@ body {
   background-color: #eee;
 
   padding: 10px;
+  overflow-y: auto;
 }
 
 .sidePanel h4 {
@@ -27,6 +33,11 @@ body {
 
 .sidePanel .panelTools {
   display: flex;
+  justify-content: space-between;
+}
+
+.sidePanel .panelTools label {
+  margin: 0;
 }
 
 .sidePanel .panelColumn {
