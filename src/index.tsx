@@ -984,9 +984,11 @@ class App extends React.Component<{}, AppState> {
             }));
           }}
           onMouseDown={e => {
-            if (e.button !== 0) {
-              return;
-            }
+            // only handle left mouse button
+            if (e.button !== 0) return;
+            // fixes mousemove causing selection of UI texts #32
+            e.preventDefault();
+
             const x =
               e.clientX -
               (e.target as HTMLElement).offsetLeft -
