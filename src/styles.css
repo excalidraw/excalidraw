@@ -51,6 +51,9 @@ body {
   border-radius: 3px;
 }
 
+.tool input[type="radio"]:hover + .toolIcon {
+  background-color: #e7e5e5;
+}
 .tool input[type="radio"]:checked + .toolIcon {
   background-color: #bdbebc;
 }
@@ -67,6 +70,10 @@ input[type="number"] {
   width: 30px;
 }
 
+input[type="color"] {
+  margin: 2px;
+}
+
 input {
   margin-right: 5px;
 }
@@ -75,8 +82,19 @@ button {
   background-color: #ddd;
   border: 1px solid #ccc;
   border-radius: 4px;
-
+  margin: 2px 0;
   padding: 5px;
+  outline: none;
+}
+
+button:hover {
+  background-color: #e7e5e5;
+  border-color: #d6d4d4;
+}
+
+button:active {
+  background-color: #bdbebc;
+  border-color: #bdbebc;
 }
 
 button:disabled {
