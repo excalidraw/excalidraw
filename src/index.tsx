@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
+import { moveOneLeft, moveAllLeft } from "./zindex";
+
 import "./styles.css";
 
 type ExcalidrawElement = ReturnType<typeof newElement>;
@@ -442,7 +444,8 @@ function generateDraw(element: ExcalidrawElement) {
     const shape = withCustomMathRandom(element.seed, () => {
       return generator.rectangle(0, 0, element.width, element.height, {
         stroke: element.strokeColor,
-        fill: element.backgroundColor
+        fill: element.backgroundColor,
+        fillStyle: "solid"
       });
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
@@ -639,12 +642,23 @@ function isArrowKey(keyCode: string) {
   );
 }
 
+function getSelectedIndices() {
+  const selectedIndices: number[] = [];
+  elements.forEach((element, index) => {
+    if (element.isSelected) {
+      selectedIndices.push(index);
+    }
+  });
+  return selectedIndices;
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
+    window.addEventListener("resize", this.onResize, false);
 
     const savedState = restore();
     if (savedState) {
@@ -654,6 +668,7 @@ class App extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.onKeyDown, false);
+    window.removeEventListener("resize", this.onResize, false);
   }
 
   public state: AppState = {
@@ -667,6 +682,10 @@ class App extends React.Component<{}, AppState> {
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0
+  };
+
+  private onResize = () => {
+    this.forceUpdate();
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -696,7 +715,26 @@ class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
       event.preventDefault();
-    } else if (event.key === "a" && event.metaKey) {
+
+      // Send backwards: Cmd-Shift-Alt-B
+    } else if (
+      event.metaKey &&
+      event.shiftKey &&
+      event.altKey &&
+      event.code === "KeyB"
+    ) {
+      moveOneLeft(elements, getSelectedIndices());
+      this.forceUpdate();
+      event.preventDefault();
+
+      // Send to back: Cmd-Shift-B
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyB") {
+      moveAllLeft(elements, getSelectedIndices());
+      this.forceUpdate();
+      event.preventDefault();
+
+      // Select all: Cmd-A
+    } else if (event.metaKey && event.code === "KeyA") {
       elements.forEach(element => {
         element.isSelected = true;
       });
@@ -705,6 +743,14 @@ class App extends React.Component<{}, AppState> {
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findElementByKey(event.key) });
     }
+    console.log(
+      event,
+      event.altKey,
+      event.shiftKey,
+      event.metaKey,
+      event.ctrlKey,
+      event.key
+    );
   };
 
   public render() {
