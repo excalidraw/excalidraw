@@ -7,23 +7,60 @@
 
 body {
   margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Controls - Begin */
-fieldset {
-  margin: 5px;
+.container {
+  display: flex;
+}
+
+.sidePanel {
+  width: 230px;
+  background-color: #eee;
+
+  padding: 10px;
+}
+
+.sidePanel h4 {
+  margin: 10px 0 10px 0;
+}
+
+.sidePanel .panelTools {
+  display: flex;
+}
+
+.sidePanel .panelColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.tool input[type="radio"] {
+  display: none;
+}
+
+.tool input[type="radio"] + .toolIcon {
+  background-color: #ddd;
+
+  width: 41px;
+  height: 41px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 3px;
+}
+
+.tool input[type="radio"]:checked + .toolIcon {
+  background-color: #bdbebc;
 }
 
 label {
-  margin-right: 10px;
+  margin-right: 6px;
 }
 
 label span {
   display: inline-block;
-}
-
-label span::first-letter {
-  text-decoration: underline;
 }
 
 input[type="number"] {
@@ -33,4 +70,11 @@ input[type="number"] {
 input {
   margin-right: 5px;
 }
-/* Controls - End */
+
+button {
+  background-color: #ddd;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  padding: 5px;
+}

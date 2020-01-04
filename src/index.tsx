@@ -2,6 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMousePointer,
+  faSquare,
+  faCircle,
+  faLongArrowAltRight,
+  faFont
+} from "@fortawesome/free-solid-svg-icons";
 
 import "./styles.css";
 
@@ -598,28 +606,28 @@ const KEYS = {
 
 const SHAPES = [
   {
-    label: "Rectange",
+    icon: faMousePointer,
+    value: "selection"
+  },
+  {
+    icon: faSquare,
     value: "rectangle"
   },
   {
-    label: "Ellipse",
+    icon: faCircle,
     value: "ellipse"
   },
   {
-    label: "Arrow",
+    icon: faLongArrowAltRight,
     value: "arrow"
   },
   {
-    label: "Text",
+    icon: faFont,
     value: "text"
-  },
-  {
-    label: "Selection",
-    value: "selection"
   }
 ];
 
-const shapesShortcutKeys = SHAPES.map(shape => shape.label[0].toLowerCase());
+const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
 
 function findElementByKey(key: string) {
   const defaultElement = "selection";
@@ -716,6 +724,7 @@ class App extends React.Component<{}, AppState> {
   public render() {
     return (
       <div
+        className="container"
         onCut={e => {
           e.clipboardData.setData(
             "text/plain",
@@ -756,28 +765,111 @@ class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
       >
-        <fieldset>
-          <legend>Shapes</legend>
-          {SHAPES.map(({ value, label }) => (
-            <label key={value}>
+        <div className="sidePanel">
+          <h4>Shapes</h4>
+          <div className="panelTools">
+            {SHAPES.map(({ value, icon }) => (
+              <label key={value} className="tool">
+                <input
+                  type="radio"
+                  checked={this.state.elementType === value}
+                  onChange={() => {
+                    this.setState({ elementType: value });
+                    clearSelection();
+                    this.forceUpdate();
+                  }}
+                />
+                <div className="toolIcon">
+                  <FontAwesomeIcon icon={icon} />
+                </div>
+              </label>
+            ))}
+          </div>
+          <h4>Colors</h4>
+          <div className="panelColumn">
+            <label>
               <input
-                type="radio"
-                checked={this.state.elementType === value}
-                onChange={() => {
-                  this.setState({ elementType: value });
-                  clearSelection();
-                  this.forceUpdate();
+                type="color"
+                value={this.state.viewBackgroundColor}
+                onChange={e => {
+                  this.setState({ viewBackgroundColor: e.target.value });
                 }}
               />
-              <span>{label}</span>
+              Background
             </label>
-          ))}
-        </fieldset>
-
+            <label>
+              <input
+                type="color"
+                value={this.state.currentItemStrokeColor}
+                onChange={e => {
+                  this.setState({ currentItemStrokeColor: e.target.value });
+                }}
+              />
+              Shape Stroke
+            </label>
+            <label>
+              <input
+                type="color"
+                value={this.state.currentItemBackgroundColor}
+                onChange={e => {
+                  this.setState({ currentItemBackgroundColor: e.target.value });
+                }}
+              />
+              Shape Background
+            </label>
+          </div>
+          <h4>Export</h4>
+          <div className="panelColumn">
+            <button
+              onClick={() => {
+                exportAsPNG({
+                  exportBackground: this.state.exportBackground,
+                  exportVisibleOnly: this.state.exportVisibleOnly,
+                  exportPadding: this.state.exportPadding,
+                  viewBackgroundColor: this.state.viewBackgroundColor
+                });
+              }}
+            >
+              Export to png
+            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={this.state.exportBackground}
+                onChange={e => {
+                  this.setState({ exportBackground: e.target.checked });
+                }}
+              />
+              background
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={this.state.exportVisibleOnly}
+                onChange={e => {
+                  this.setState({ exportVisibleOnly: e.target.checked });
+                }}
+              />
+              visible area only
+            </label>
+            <div>
+              (padding:
+              <input
+                type="number"
+                value={this.state.exportPadding}
+                onChange={e => {
+                  this.setState({ exportPadding: Number(e.target.value) });
+                }}
+                disabled={!this.state.exportVisibleOnly}
+              />
+              px)
+            </div>
+          </div>
+        </div>
         <canvas
           id="canvas"
-          width={window.innerWidth}
-          height={window.innerHeight - 210}
+          width={window.innerWidth - 250}
+          height={window.innerHeight}
           onWheel={e => {
             e.preventDefault();
             const { deltaX, deltaY } = e;
@@ -958,84 +1050,6 @@ class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
         />
-        <fieldset>
-          <legend>Colors</legend>
-          <label>
-            <input
-              type="color"
-              value={this.state.viewBackgroundColor}
-              onChange={e => {
-                this.setState({ viewBackgroundColor: e.target.value });
-              }}
-            />
-            Background
-          </label>
-          <label>
-            <input
-              type="color"
-              value={this.state.currentItemStrokeColor}
-              onChange={e => {
-                this.setState({ currentItemStrokeColor: e.target.value });
-              }}
-            />
-            Shape Stroke
-          </label>
-          <label>
-            <input
-              type="color"
-              value={this.state.currentItemBackgroundColor}
-              onChange={e => {
-                this.setState({ currentItemBackgroundColor: e.target.value });
-              }}
-            />
-            Shape Background
-          </label>
-        </fieldset>
-        <fieldset>
-          <legend>Export</legend>
-          <button
-            onClick={() => {
-              exportAsPNG({
-                exportBackground: this.state.exportBackground,
-                exportVisibleOnly: this.state.exportVisibleOnly,
-                exportPadding: this.state.exportPadding,
-                viewBackgroundColor: this.state.viewBackgroundColor
-              });
-            }}
-          >
-            Export to png
-          </button>
-          <label>
-            <input
-              type="checkbox"
-              checked={this.state.exportBackground}
-              onChange={e => {
-                this.setState({ exportBackground: e.target.checked });
-              }}
-            />
-            background
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={this.state.exportVisibleOnly}
-              onChange={e => {
-                this.setState({ exportVisibleOnly: e.target.checked });
-              }}
-            />
-            visible area only
-          </label>
-          (padding:
-          <input
-            type="number"
-            value={this.state.exportPadding}
-            onChange={e => {
-              this.setState({ exportPadding: Number(e.target.value) });
-            }}
-            disabled={!this.state.exportVisibleOnly}
-          />
-          px)
-        </fieldset>
       </div>
     );
   }
