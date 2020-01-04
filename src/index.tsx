@@ -773,6 +773,18 @@ class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
+  private clearCanvas = () => {
+    if (window.confirm("This will clear the whole canvas. Are you sure?")) {
+      elements = [];
+      this.setState({
+        viewBackgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: 0
+      });
+      this.forceUpdate();
+    }
+  };
+
   private moveAllLeft = () => {
     moveAllLeft(elements, getSelectedIndices());
     this.forceUpdate();
@@ -889,6 +901,15 @@ class App extends React.Component<{}, AppState> {
               />
               Shape Background
             </label>
+          </div>
+          <h4>Canvas</h4>
+          <div className="panelColumn">
+            <button
+              onClick={this.clearCanvas}
+              title="Clear the canvas & reset background color"
+            >
+              Clear canvas
+            </button>
           </div>
           <h4>Export</h4>
           <div className="panelColumn">
