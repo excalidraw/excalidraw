@@ -415,6 +415,16 @@ function isTextElement(
   return element.type === "text";
 }
 
+function isInputLike(
+  target: Element | EventTarget | null
+): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
+  return (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  );
+}
+
 function getArrowPoints(element: ExcalidrawElement) {
   const x1 = 0;
   const y1 = 0;
@@ -699,9 +709,7 @@ class App extends React.Component<{}, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if ((event.target as HTMLElement).nodeName === "INPUT") {
-      return;
-    }
+    if (isInputLike(event.target)) return;
 
     if (event.key === KEYS.ESCAPE) {
       clearSelection();
@@ -988,6 +996,12 @@ class App extends React.Component<{}, AppState> {
             if (e.button !== 0) return;
             // fixes mousemove causing selection of UI texts #32
             e.preventDefault();
+            // Preventing the event above disables default behavior
+            //  of defocusing potentially focused input, which is what we want
+            //  when clicking inside the canvas.
+            if (isInputLike(document.activeElement)) {
+              document.activeElement.blur();
+            }
 
             const x =
               e.clientX -
