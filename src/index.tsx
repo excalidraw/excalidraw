@@ -1157,7 +1157,6 @@ class App extends React.Component<{}, AppState> {
                 isResizingElements = true;
               } else {
                 let hitElement = null;
-
                 // We need to to hit testing from front (end of the array) to back (beginning of the array)
                 for (let i = elements.length - 1; i >= 0; --i) {
                   if (hitTest(elements[i], x, y)) {
