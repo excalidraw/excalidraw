@@ -963,6 +963,9 @@ class App extends React.Component<{}, AppState> {
             }));
           }}
           onMouseDown={e => {
+            if (e.button !== 0) {
+              return;
+            }
             const x =
               e.clientX -
               (e.target as HTMLElement).offsetLeft -
