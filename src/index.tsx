@@ -7,7 +7,7 @@ import {
   faMousePointer,
   faSquare,
   faCircle,
-  faExpandAlt,
+  faLongArrowAltRight,
   faFont
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -618,7 +618,7 @@ const SHAPES = [
     value: "ellipse"
   },
   {
-    icon: faExpandAlt,
+    icon: faLongArrowAltRight,
     value: "arrow"
   },
   {
