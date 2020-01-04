@@ -13,7 +13,7 @@ import {
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
-import "./styles.css";
+import "./styles.scss";
 
 type ExcalidrawElement = ReturnType<typeof newElement>;
 type ExcalidrawTextElement = ExcalidrawElement & {
