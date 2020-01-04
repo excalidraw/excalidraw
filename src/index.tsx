@@ -11,7 +11,7 @@ import {
   faFont
 } from "@fortawesome/free-solid-svg-icons";
 
-import { moveOneLeft, moveAllLeft } from "./zindex";
+import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
 import "./styles.css";
 
@@ -741,6 +741,21 @@ class App extends React.Component<{}, AppState> {
       this.moveAllLeft();
       event.preventDefault();
 
+      // Move forward: Cmd-Shift-Alt-F
+    } else if (
+      event.metaKey &&
+      event.shiftKey &&
+      event.altKey &&
+      event.code === "KeyF"
+    ) {
+      this.moveOneRight();
+      event.preventDefault();
+
+      // Send to back: Cmd-Shift-F
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
+      this.moveAllRight();
+      event.preventDefault();
+
       // Select all: Cmd-A
     } else if (event.metaKey && event.code === "KeyA") {
       elements.forEach(element => {
@@ -765,6 +780,16 @@ class App extends React.Component<{}, AppState> {
 
   private moveOneLeft = () => {
     moveOneLeft(elements, getSelectedIndices());
+    this.forceUpdate();
+  };
+
+  private moveAllRight = () => {
+    moveAllRight(elements, getSelectedIndices());
+    this.forceUpdate();
+  };
+
+  private moveOneRight = () => {
+    moveOneRight(elements, getSelectedIndices());
     this.forceUpdate();
   };
 
@@ -917,7 +942,8 @@ class App extends React.Component<{}, AppState> {
               <h4>Shape options</h4>
               <div className="panelColumn">
                 <button onClick={this.deleteSelectedElements}>Delete</button>
-                <button>Move to front</button>
+                <button onClick={this.moveOneRight}>Move forward</button>
+                <button onClick={this.moveAllRight}>Move to front</button>
                 <button onClick={this.moveOneLeft}>Send backwards</button>
                 <button onClick={this.moveAllLeft}>Send to back</button>
               </div>
