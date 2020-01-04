@@ -940,6 +940,8 @@ class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
+  private removeWheelEventListener: (() => void) | undefined;
+
   public render() {
     return (
       <div
@@ -1111,10 +1113,16 @@ class App extends React.Component<{}, AppState> {
           width={window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT}
           height={window.innerHeight - CANVAS_WINDOW_OFFSET_TOP}
           ref={canvas => {
+            if (this.removeWheelEventListener) {
+              this.removeWheelEventListener();
+              this.removeWheelEventListener = undefined;
+            }
             if (canvas) {
               canvas.addEventListener("wheel", this.handleWheel, {
                 passive: false
               });
+              this.removeWheelEventListener = () =>
+                canvas.removeEventListener("wheel", this.handleWheel);
             }
           }}
           onMouseDown={e => {
