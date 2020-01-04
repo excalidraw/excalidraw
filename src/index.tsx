@@ -940,6 +940,8 @@ class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
+  private removeWheelEventListener: (() => void) | undefined;
+
   public render() {
     return (
       <div
@@ -1110,13 +1112,18 @@ class App extends React.Component<{}, AppState> {
           id="canvas"
           width={window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT}
           height={window.innerHeight - CANVAS_WINDOW_OFFSET_TOP}
-          onWheel={e => {
-            e.preventDefault();
-            const { deltaX, deltaY } = e;
-            this.setState(state => ({
-              scrollX: state.scrollX - deltaX,
-              scrollY: state.scrollY - deltaY
-            }));
+          ref={canvas => {
+            if (this.removeWheelEventListener) {
+              this.removeWheelEventListener();
+              this.removeWheelEventListener = undefined;
+            }
+            if (canvas) {
+              canvas.addEventListener("wheel", this.handleWheel, {
+                passive: false
+              });
+              this.removeWheelEventListener = () =>
+                canvas.removeEventListener("wheel", this.handleWheel);
+            }
           }}
           onMouseDown={e => {
             // only handle left mouse button
@@ -1172,7 +1179,7 @@ class App extends React.Component<{}, AppState> {
                 isResizingElements = true;
               } else {
                 let hitElement = null;
-                
+
                 // We need to to hit testing from front (end of the array) to back (beginning of the array)
                 for (let i = elements.length - 1; i >= 0; --i) {
                   if (hitTest(elements[i], x, y)) {
@@ -1393,6 +1400,15 @@ class App extends React.Component<{}, AppState> {
       </div>
     );
   }
+
+  private handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    const { deltaX, deltaY } = e;
+    this.setState(state => ({
+      scrollX: state.scrollX - deltaX,
+      scrollY: state.scrollY - deltaY
+    }));
+  };
 
   componentDidUpdate() {
     renderScene(rc, context, {
