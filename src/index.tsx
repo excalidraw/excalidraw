@@ -176,6 +176,8 @@ function resizeTest(
   y: number,
   sceneState: SceneState
 ): string | false {
+  if (element.type === "text" || element.type === "arrow") return false;
+
   const x1 = getElementAbsoluteX1(element);
   const x2 = getElementAbsoluteX2(element);
   const y1 = getElementAbsoluteY1(element);
@@ -353,6 +355,8 @@ function renderScene(
   }
   context.fillStyle = fillStyle;
 
+  const selectedIndices = getSelectedIndices();
+
   elements.forEach(element => {
     element.draw(rc, context, sceneState);
     if (element.isSelected) {
@@ -372,16 +376,22 @@ function renderScene(
       );
       context.setLineDash(lineDash);
 
-      const handlers = handlerRectangles(
-        elementX1,
-        elementX2,
-        elementY1,
-        elementY2,
-        sceneState
-      );
-      Object.values(handlers).forEach(handler => {
-        context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-      });
+      if (
+        element.type !== "text" &&
+        element.type !== "arrow" &&
+        selectedIndices.length === 1
+      ) {
+        const handlers = handlerRectangles(
+          elementX1,
+          elementX2,
+          elementY1,
+          elementY2,
+          sceneState
+        );
+        Object.values(handlers).forEach(handler => {
+          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+        });
+      }
     }
   });
 
@@ -1150,36 +1160,35 @@ class App extends React.Component<{}, AppState> {
                 });
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
-              }
-
-              let hitElement = null;
-              // We need to to hit testing from front (end of the array) to back (beginning of the array)
-              for (let i = elements.length - 1; i >= 0; --i) {
-                if (hitTest(elements[i], x, y)) {
-                  hitElement = elements[i];
-                  break;
-                }
-              }
-
-              // If we click on something
-              if (hitElement) {
-                if (hitElement.isSelected) {
-                  // If that element is not already selected, do nothing,
-                  // we're likely going to drag it
-                } else {
-                  // We unselect every other elements unless shift is pressed
-                  if (!e.shiftKey) {
-                    clearSelection();
-                  }
-                  // No matter what, we select it
-                  hitElement.isSelected = true;
-                }
               } else {
-                // If we don't click on anything, let's remove all the selected elements
-                clearSelection();
-              }
+                let hitElement = null;
+                
+                // We need to to hit testing from front (end of the array) to back (beginning of the array)
+                for (let i = elements.length - 1; i >= 0; --i) {
+                  if (hitTest(elements[i], x, y)) {
+                    hitElement = elements[i];
+                    break;
+                  }
+                }
 
-              if (!isResizingElements) {
+                // If we click on something
+                if (hitElement) {
+                  if (hitElement.isSelected) {
+                    // If that element is not already selected, do nothing,
+                    // we're likely going to drag it
+                  } else {
+                    // We unselect every other elements unless shift is pressed
+                    if (!e.shiftKey) {
+                      clearSelection();
+                    }
+                    // No matter what, we select it
+                    hitElement.isSelected = true;
+                  }
+                } else {
+                  // If we don't click on anything, let's remove all the selected elements
+                  clearSelection();
+                }
+
                 isDraggingElements = someElementIsSelected();
 
                 if (isDraggingElements) {
@@ -1236,7 +1245,7 @@ class App extends React.Component<{}, AppState> {
               if (isResizingElements && this.state.resizingElement) {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
-                if (selectedElements.length) {
+                if (selectedElements.length === 1) {
                   const x = e.clientX - target.offsetLeft - this.state.scrollX;
                   const y = e.clientY - target.offsetTop - this.state.scrollY;
                   selectedElements.forEach(element => {
