@@ -208,6 +208,8 @@ type SceneState = {
 const SCROLLBAR_WIDTH = 6;
 const SCROLLBAR_MARGIN = 4;
 const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
+const CANVAS_WINDOW_OFFSET_LEFT = 250;
+const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function getScrollbars(
   canvasWidth: number,
@@ -981,8 +983,8 @@ class App extends React.Component<{}, AppState> {
         </div>
         <canvas
           id="canvas"
-          width={window.innerWidth - 250}
-          height={window.innerHeight}
+          width={window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT}
+          height={window.innerHeight - CANVAS_WINDOW_OFFSET_TOP}
           onWheel={e => {
             e.preventDefault();
             const { deltaX, deltaY } = e;
@@ -1117,12 +1119,12 @@ class App extends React.Component<{}, AppState> {
               if (!draggingElement) return;
               let width =
                 e.clientX -
-                target.offsetLeft -
+                CANVAS_WINDOW_OFFSET_LEFT -
                 draggingElement.x -
                 this.state.scrollX;
               let height =
                 e.clientY -
-                target.offsetTop -
+                CANVAS_WINDOW_OFFSET_TOP -
                 draggingElement.y -
                 this.state.scrollY;
               draggingElement.width = width;
