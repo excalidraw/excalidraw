@@ -46,8 +46,13 @@ body {
 }
 
 .tool {
+  position: relative;
+
   input[type="radio"] {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
   }
 
   input[type="radio"] {
@@ -62,12 +67,19 @@ body {
       align-items: center;
 
       border-radius: 3px;
+
+      svg {
+        height: 1em;
+      }
     }
     &:hover + .toolIcon {
       background-color: #e7e5e5;
     }
     &:checked + .toolIcon {
       background-color: #bdbebc;
+    }
+    &:focus + .toolIcon {
+      box-shadow: 0 0 0 2px steelblue;
     }
   }
 }
@@ -89,6 +101,11 @@ input[type="color"] {
 
 input {
   margin-right: 5px;
+
+  &:focus {
+    outline: transparent;
+    box-shadow: 0 0 0 2px steelblue;
+  }
 }
 
 button {
@@ -97,7 +114,11 @@ button {
   border-radius: 4px;
   margin: 2px 0;
   padding: 5px;
-  outline: none;
+  outline: transparent;
+
+  &:focus {
+    box-shadow: 0 0 0 2px steelblue;
+  }
 
   &:hover {
     background-color: #e7e5e5;

@@ -2,14 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMousePointer,
-  faSquare,
-  faCircle,
-  faLongArrowAltRight,
-  faFont
-} from "@fortawesome/free-solid-svg-icons";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
@@ -351,10 +343,23 @@ function handlerRectangles(
 
 function renderScene(
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D,
-  sceneState: SceneState
+  canvas: HTMLCanvasElement,
+  sceneState: SceneState,
+  // extra options, currently passed by export helper
+  {
+    offsetX,
+    offsetY,
+    renderScrollbars = true,
+    renderSelection = true
+  }: {
+    offsetX?: number;
+    offsetY?: number;
+    renderScrollbars?: boolean;
+    renderSelection?: boolean;
+  } = {}
 ) {
-  if (!context) return;
+  if (!canvas) return;
+  const context = canvas.getContext("2d")!;
 
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -367,9 +372,15 @@ function renderScene(
 
   const selectedIndices = getSelectedIndices();
 
+  sceneState = {
+    ...sceneState,
+    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
+    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY
+  };
+
   elements.forEach(element => {
     element.draw(rc, context, sceneState);
-    if (element.isSelected) {
+    if (renderSelection && element.isSelected) {
       const margin = 4;
 
       const elementX1 = getElementAbsoluteX1(element);
@@ -405,119 +416,93 @@ function renderScene(
     }
   });
 
-  const scrollBars = getScrollbars(
-    context.canvas.width,
-    context.canvas.height,
-    sceneState.scrollX,
-    sceneState.scrollY
-  );
+  if (renderScrollbars) {
+    const scrollBars = getScrollbars(
+      context.canvas.width,
+      context.canvas.height,
+      sceneState.scrollX,
+      sceneState.scrollY
+    );
 
-  context.fillStyle = SCROLLBAR_COLOR;
-  context.fillRect(
-    scrollBars.horizontal.x,
-    scrollBars.horizontal.y,
-    scrollBars.horizontal.width,
-    scrollBars.horizontal.height
-  );
-  context.fillRect(
-    scrollBars.vertical.x,
-    scrollBars.vertical.y,
-    scrollBars.vertical.width,
-    scrollBars.vertical.height
-  );
-  context.fillStyle = fillStyle;
+    context.fillStyle = SCROLLBAR_COLOR;
+    context.fillRect(
+      scrollBars.horizontal.x,
+      scrollBars.horizontal.y,
+      scrollBars.horizontal.width,
+      scrollBars.horizontal.height
+    );
+    context.fillRect(
+      scrollBars.vertical.x,
+      scrollBars.vertical.y,
+      scrollBars.vertical.width,
+      scrollBars.vertical.height
+    );
+    context.fillStyle = fillStyle;
+  }
 }
 
 function exportAsPNG({
   exportBackground,
-  exportVisibleOnly,
   exportPadding = 10,
   viewBackgroundColor
 }: {
   exportBackground: boolean;
-  exportVisibleOnly: boolean;
   exportPadding?: number;
   viewBackgroundColor: string;
+  scrollX: number;
+  scrollY: number;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
-  // deselect & rerender
+  // calculate smallest area to fit the contents in
 
-  clearSelection();
-  ReactDOM.render(<App />, rootElement, () => {
-    // calculate visible-area coords
+  let subCanvasX1 = Infinity;
+  let subCanvasX2 = 0;
+  let subCanvasY1 = Infinity;
+  let subCanvasY2 = 0;
 
-    let subCanvasX1 = Infinity;
-    let subCanvasX2 = 0;
-    let subCanvasY1 = Infinity;
-    let subCanvasY2 = 0;
-
-    elements.forEach(element => {
-      subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-      subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-      subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-      subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-    });
-
-    // create temporary canvas from which we'll export
-
-    const tempCanvas = document.createElement("canvas");
-    const tempCanvasCtx = tempCanvas.getContext("2d")!;
-    tempCanvas.style.display = "none";
-    document.body.appendChild(tempCanvas);
-    tempCanvas.width = exportVisibleOnly
-      ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-      : canvas.width;
-    tempCanvas.height = exportVisibleOnly
-      ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-      : canvas.height;
-
-    // if we're exporting without bg, we need to rerender the scene without it
-    //  (it's reset again, below)
-    if (!exportBackground) {
-      renderScene(rc, context, {
-        viewBackgroundColor: null,
-        scrollX: 0,
-        scrollY: 0
-      });
-    }
-
-    // copy our original canvas onto the temp canvas
-    tempCanvasCtx.drawImage(
-      canvas, // source
-      exportVisibleOnly // sx
-        ? subCanvasX1 - exportPadding
-        : 0,
-      exportVisibleOnly // sy
-        ? subCanvasY1 - exportPadding
-        : 0,
-      exportVisibleOnly // sWidth
-        ? subCanvasX2 - subCanvasX1 + exportPadding * 2
-        : canvas.width,
-      exportVisibleOnly // sHeight
-        ? subCanvasY2 - subCanvasY1 + exportPadding * 2
-        : canvas.height,
-      0, // dx
-      0, // dy
-      exportVisibleOnly ? tempCanvas.width : canvas.width, // dWidth
-      exportVisibleOnly ? tempCanvas.height : canvas.height // dHeight
-    );
-
-    // reset transparent bg back to original
-    if (!exportBackground) {
-      renderScene(rc, context, { viewBackgroundColor, scrollX: 0, scrollY: 0 });
-    }
-
-    // create a temporary <a> elem which we'll use to download the image
-    const link = document.createElement("a");
-    link.setAttribute("download", "excalidraw.png");
-    link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-    link.click();
-
-    // clean up the DOM
-    link.remove();
-    if (tempCanvas !== canvas) tempCanvas.remove();
+  elements.forEach(element => {
+    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
+    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
+    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
+    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
   });
+
+  function distance(x: number, y: number) {
+    return Math.abs(x > y ? x - y : y - x);
+  }
+
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
+  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
+
+  renderScene(
+    rough.canvas(tempCanvas),
+    tempCanvas,
+    {
+      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      scrollX: 0,
+      scrollY: 0
+    },
+    {
+      offsetX: -subCanvasX1 + exportPadding,
+      offsetY: -subCanvasY1 + exportPadding,
+      renderScrollbars: false,
+      renderSelection: false
+    }
+  );
+
+  // create a temporary <a> elem which we'll use to download the image
+  const link = document.createElement("a");
+  link.setAttribute("download", "excalidraw.png");
+  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
+  link.click();
+
+  // clean up the DOM
+  link.remove();
+  if (tempCanvas !== canvas) tempCanvas.remove();
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -723,8 +708,6 @@ type AppState = {
   resizingElement: ExcalidrawElement | null;
   elementType: string;
   exportBackground: boolean;
-  exportVisibleOnly: boolean;
-  exportPadding: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   viewBackgroundColor: string;
@@ -742,25 +725,51 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
+// We inline font-awesome icons in order to save on js size rather than including the font awesome react library
 const SHAPES = [
   {
-    icon: faMousePointer,
+    icon: (
+      // fa-mouse-pointer
+      <svg viewBox="0 0 320 512">
+        <path d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z" />
+      </svg>
+    ),
     value: "selection"
   },
   {
-    icon: faSquare,
+    icon: (
+      // fa-square
+      <svg viewBox="0 0 448 512">
+        <path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z" />
+      </svg>
+    ),
     value: "rectangle"
   },
   {
-    icon: faCircle,
+    icon: (
+      // fa-circle
+      <svg viewBox="0 0 512 512">
+        <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z" />
+      </svg>
+    ),
     value: "ellipse"
   },
   {
-    icon: faLongArrowAltRight,
+    icon: (
+      // fa-long-arrow-alt-right
+      <svg viewBox="0 0 448 512">
+        <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+      </svg>
+    ),
     value: "arrow"
   },
   {
-    icon: faFont,
+    icon: (
+      // fa-font
+      <svg viewBox="0 0 448 512">
+        <path d="M432 416h-23.41L277.88 53.69A32 32 0 0 0 247.58 32h-47.16a32 32 0 0 0-30.3 21.69L39.41 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-19.58l23.3-64h152.56l23.3 64H304a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM176.85 272L224 142.51 271.15 272z" />
+      </svg>
+    ),
     value: "text"
   }
 ];
@@ -821,9 +830,7 @@ class App extends React.Component<{}, AppState> {
     draggingElement: null,
     resizingElement: null,
     elementType: "selection",
-    exportBackground: false,
-    exportVisibleOnly: true,
-    exportPadding: 10,
+    exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
     viewBackgroundColor: "#ffffff",
@@ -940,6 +947,8 @@ class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
+  private removeWheelEventListener: (() => void) | undefined;
+
   public render() {
     return (
       <div
@@ -998,9 +1007,7 @@ class App extends React.Component<{}, AppState> {
                     this.forceUpdate();
                   }}
                 />
-                <div className="toolIcon">
-                  <FontAwesomeIcon icon={icon} />
-                </div>
+                <div className="toolIcon">{icon}</div>
               </label>
             ))}
           </div>
@@ -1050,12 +1057,7 @@ class App extends React.Component<{}, AppState> {
           <div className="panelColumn">
             <button
               onClick={() => {
-                exportAsPNG({
-                  exportBackground: this.state.exportBackground,
-                  exportVisibleOnly: this.state.exportVisibleOnly,
-                  exportPadding: this.state.exportPadding,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                exportAsPNG(this.state);
               }}
             >
               Export to png
@@ -1070,28 +1072,6 @@ class App extends React.Component<{}, AppState> {
               />
               background
             </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportVisibleOnly}
-                onChange={e => {
-                  this.setState({ exportVisibleOnly: e.target.checked });
-                }}
-              />
-              visible area only
-            </label>
-            <div>
-              (padding:
-              <input
-                type="number"
-                value={this.state.exportPadding}
-                onChange={e => {
-                  this.setState({ exportPadding: Number(e.target.value) });
-                }}
-                disabled={!this.state.exportVisibleOnly}
-              />
-              px)
-            </div>
           </div>
           {someElementIsSelected() && (
             <>
@@ -1110,13 +1090,18 @@ class App extends React.Component<{}, AppState> {
           id="canvas"
           width={window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT}
           height={window.innerHeight - CANVAS_WINDOW_OFFSET_TOP}
-          onWheel={e => {
-            e.preventDefault();
-            const { deltaX, deltaY } = e;
-            this.setState(state => ({
-              scrollX: state.scrollX - deltaX,
-              scrollY: state.scrollY - deltaY
-            }));
+          ref={canvas => {
+            if (this.removeWheelEventListener) {
+              this.removeWheelEventListener();
+              this.removeWheelEventListener = undefined;
+            }
+            if (canvas) {
+              canvas.addEventListener("wheel", this.handleWheel, {
+                passive: false
+              });
+              this.removeWheelEventListener = () =>
+                canvas.removeEventListener("wheel", this.handleWheel);
+            }
           }}
           onMouseDown={e => {
             // only handle left mouse button
@@ -1172,7 +1157,7 @@ class App extends React.Component<{}, AppState> {
                 isResizingElements = true;
               } else {
                 let hitElement = null;
-                
+
                 // We need to to hit testing from front (end of the array) to back (beginning of the array)
                 for (let i = elements.length - 1; i >= 0; --i) {
                   if (hitTest(elements[i], x, y)) {
@@ -1394,8 +1379,17 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
+  private handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    const { deltaX, deltaY } = e;
+    this.setState(state => ({
+      scrollX: state.scrollX - deltaX,
+      scrollY: state.scrollY - deltaY
+    }));
+  };
+
   componentDidUpdate() {
-    renderScene(rc, context, {
+    renderScene(rc, canvas, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
