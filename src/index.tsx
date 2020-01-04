@@ -26,7 +26,7 @@ type ExcalidrawTextElement = ExcalidrawElement & {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-let elements = Array.of<ExcalidrawElement>();
+const elements = Array.of<ExcalidrawElement>();
 
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 const LCG = (seed: number) => () =>
@@ -582,13 +582,13 @@ function restore() {
     const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
 
     if (savedElements) {
-      elements = JSON.parse(savedElements);
+      elements.splice(0, elements.length, ...JSON.parse(savedElements));
       elements.forEach((element: ExcalidrawElement) => generateDraw(element));
     }
 
     return savedState ? JSON.parse(savedState) : null;
   } catch (e) {
-    elements = [];
+    elements.splice(0, elements.length);
     return null;
   }
 }
@@ -783,7 +783,7 @@ class App extends React.Component<{}, AppState> {
 
   private clearCanvas = () => {
     if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements = [];
+      elements.splice(0, elements.length);
       this.setState({
         viewBackgroundColor: "#ffffff",
         scrollX: 0,
