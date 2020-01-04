@@ -77,12 +77,42 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10;
 
-  if (
-    element.type === "rectangle" ||
-    // There doesn't seem to be a closed form solution for the distance between
-    // a point and an ellipse, let's assume it's a rectangle for now...
-    element.type === "ellipse"
-  ) {
+  if (element.type === "ellipse") {
+    // https://stackoverflow.com/a/46007540/232122
+    const px = Math.abs(x - element.x - element.width / 2);
+    const py = Math.abs(y - element.y - element.height / 2);
+
+    let tx = 0.707;
+    let ty = 0.707;
+
+    const a = element.width / 2;
+    const b = element.height / 2;
+
+    [0, 1, 2, 3].forEach(x => {
+      const xx = a * tx;
+      const yy = b * ty;
+
+      const ex = ((a * a - b * b) * tx ** 3) / a;
+      const ey = ((b * b - a * a) * ty ** 3) / b;
+
+      const rx = xx - ex;
+      const ry = yy - ey;
+
+      const qx = px - ex;
+      const qy = py - ey;
+
+      const r = Math.hypot(ry, rx);
+      const q = Math.hypot(qy, qx);
+
+      tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
+      ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
+      const t = Math.hypot(ty, tx);
+      tx /= t;
+      ty /= t;
+    });
+
+    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
+  } else if (element.type === "rectangle") {
     const x1 = getElementAbsoluteX1(element);
     const x2 = getElementAbsoluteX2(element);
     const y1 = getElementAbsoluteY1(element);
