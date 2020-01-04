@@ -1107,13 +1107,8 @@ class App extends React.Component<{}, AppState> {
             }
 
             const x =
-              e.clientX -
-              (e.target as HTMLElement).offsetLeft -
-              this.state.scrollX;
-            const y =
-              e.clientY -
-              (e.target as HTMLElement).offsetTop -
-              this.state.scrollY;
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
             const element = newElement(
               this.state.elementType,
               x,
@@ -1291,8 +1286,10 @@ class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
-                  const y = e.clientY - target.offsetTop - this.state.scrollY;
+                  const x =
+                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+                  const y =
+                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
