@@ -284,32 +284,40 @@ function handlerRectangles(
   sceneState: SceneState
 ) {
   const margin = 4;
+  const minimumSize = 40;
   const handlers: { [handler: string]: number[] } = {};
 
-  handlers["n"] = [
-    elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-    elementY1 - margin + sceneState.scrollY - 8,
-    8,
-    8
-  ]; // n
-  handlers["w"] = [
-    elementX1 - margin + sceneState.scrollX - 8,
-    elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-    8,
-    8
-  ]; // w
-  handlers["e"] = [
-    elementX2 - margin + sceneState.scrollX + 8,
-    elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-    8,
-    8
-  ]; // e
-  handlers["s"] = [
-    elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-    elementY2 - margin + sceneState.scrollY + 8,
-    8,
-    8
-  ]; // s
+  if (elementX2 - elementX1 > minimumSize) {
+    handlers["n"] = [
+      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+      elementY1 - margin + sceneState.scrollY - 8,
+      8,
+      8
+    ];
+
+    handlers["s"] = [
+      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+      elementY2 - margin + sceneState.scrollY + 8,
+      8,
+      8
+    ];
+  }
+
+  if (elementY2 - elementY1 > minimumSize) {
+    handlers["w"] = [
+      elementX1 - margin + sceneState.scrollX - 8,
+      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+      8,
+      8
+    ];
+
+    handlers["e"] = [
+      elementX2 - margin + sceneState.scrollX + 8,
+      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+      8,
+      8
+    ];
+  }
 
   handlers["nw"] = [
     elementX1 - margin + sceneState.scrollX - 8,
