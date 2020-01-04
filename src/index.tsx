@@ -170,6 +170,43 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
   }
 }
 
+function distance(x1: number, x2: number, y1: number, y2: number) {
+  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+}
+
+function resizeTest(
+  element: ExcalidrawElement,
+  x: number,
+  y: number
+): string | false {
+  // For shapes that are composed of lines, we only enable point-selection when the distance
+  // of the click is less than x pixels of any of the lines that the shape is composed of
+  const lineThreshold = 20;
+
+  const x1 = getElementAbsoluteX1(element);
+  const x2 = getElementAbsoluteX2(element);
+  const y1 = getElementAbsoluteY1(element);
+  const y2 = getElementAbsoluteY2(element);
+
+  const hx = x1 + (x2 - x1) / 2;
+  const hy = y1 + (y2 - y1) / 2;
+
+  // (x1, y1) --A-- (x2, y1)
+  //    |D             |B
+  // (x1, y2) --C-- (x2, y2)
+  if (distance(x, hx - 5, y, y1 - 5) < lineThreshold) return "n";
+  if (distance(x, x1 + 5, y, hy - 5) < lineThreshold) return "w";
+  if (distance(x, x2 + 5, y, hy + 5) < lineThreshold) return "e";
+  if (distance(x, hx + 5, y, y2 + 5) < lineThreshold) return "s";
+
+  if (distance(x, x1 - 5, y, y1 - 5) < lineThreshold) return "nw";
+  if (distance(x, x2 + 5, y, y1 - 5) < lineThreshold) return "ne";
+  if (distance(x, x1 + 5, y, y2 + 5) < lineThreshold) return "sw";
+  if (distance(x, x2 + 5, y, y2 + 5) < lineThreshold) return "se";
+
+  return false;
+}
+
 function newElement(
   type: string,
   x: number,
@@ -277,6 +314,56 @@ function renderScene(
         elementY2 - elementY1 + margin * 2
       );
       context.setLineDash(lineDash);
+
+      context.strokeRect(
+        elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+        elementY1 - margin + sceneState.scrollY - 8,
+        8,
+        8
+      ); // n
+      context.strokeRect(
+        elementX1 - margin + sceneState.scrollX - 8,
+        elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+        8,
+        8
+      ); // w
+      context.strokeRect(
+        elementX2 - margin + sceneState.scrollX + 8,
+        elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
+        8,
+        8
+      ); // e
+      context.strokeRect(
+        elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
+        elementY2 - margin + sceneState.scrollY + 8,
+        8,
+        8
+      ); // s
+
+      context.strokeRect(
+        elementX1 - margin + sceneState.scrollX - 8,
+        elementY1 - margin + sceneState.scrollY - 8,
+        8,
+        8
+      ); // nw
+      context.strokeRect(
+        elementX2 - margin + sceneState.scrollX + 8,
+        elementY1 - margin + sceneState.scrollY - 8,
+        8,
+        8
+      ); // ne
+      context.strokeRect(
+        elementX1 - margin + sceneState.scrollX - 8,
+        elementY2 - margin + sceneState.scrollY + 8,
+        8,
+        8
+      ); // sw
+      context.strokeRect(
+        elementX2 - margin + sceneState.scrollX + 8,
+        elementY2 - margin + sceneState.scrollY + 8,
+        8,
+        8
+      ); // se
     }
   });
 
@@ -595,6 +682,7 @@ function restore() {
 
 type AppState = {
   draggingElement: ExcalidrawElement | null;
+  resizingElement: ExcalidrawElement | null;
   elementType: string;
   exportBackground: boolean;
   exportVisibleOnly: boolean;
@@ -693,6 +781,7 @@ class App extends React.Component<{}, AppState> {
 
   public state: AppState = {
     draggingElement: null,
+    resizingElement: null,
     elementType: "selection",
     exportBackground: false,
     exportVisibleOnly: true,
@@ -1018,9 +1107,25 @@ class App extends React.Component<{}, AppState> {
               this.state.currentItemStrokeColor,
               this.state.currentItemBackgroundColor
             );
+            let resizeHandle: string | false = false;
             let isDraggingElements = false;
+            let isResizingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
+              const resizeElement = elements.find(element => {
+                return resizeTest(element, x, y);
+              });
+
+              this.setState({
+                resizingElement: resizeElement ? resizeElement : null
+              });
+
+              if (resizeElement) {
+                resizeHandle = resizeTest(resizeElement, x, y);
+                document.documentElement.style.cursor = `${resizeHandle}-resize`;
+                isResizingElements = true;
+              }
+
               let hitElement = null;
               // We need to to hit testing from front (end of the array) to back (beginning of the array)
               for (let i = elements.length - 1; i >= 0; --i) {
@@ -1048,10 +1153,12 @@ class App extends React.Component<{}, AppState> {
                 clearSelection();
               }
 
-              isDraggingElements = someElementIsSelected();
+              if (!isResizingElements) {
+                isDraggingElements = someElementIsSelected();
 
-              if (isDraggingElements) {
-                document.documentElement.style.cursor = "move";
+                if (isDraggingElements) {
+                  document.documentElement.style.cursor = "move";
+                }
               }
             }
 
@@ -1098,6 +1205,65 @@ class App extends React.Component<{}, AppState> {
               const target = e.target;
               if (!(target instanceof HTMLElement)) {
                 return;
+              }
+
+              if (isResizingElements && this.state.resizingElement) {
+                const el = this.state.resizingElement;
+                const selectedElements = elements.filter(el => el.isSelected);
+                if (selectedElements.length) {
+                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
+                  const y = e.clientY - target.offsetTop - this.state.scrollY;
+                  selectedElements.forEach(element => {
+                    switch (resizeHandle) {
+                      case "nw":
+                        element.width += element.x - lastX;
+                        element.height += element.y - lastY;
+                        element.x = lastX;
+                        element.y = lastY;
+                        break;
+                      case "ne":
+                        element.width = lastX - element.x;
+                        element.height += element.y - lastY;
+                        element.y = lastY;
+                        break;
+                      case "sw":
+                        element.width += element.x - lastX;
+                        element.x = lastX;
+                        element.height = lastY - element.y;
+                        break;
+                      case "se":
+                        element.width += x - lastX;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height += y - lastY;
+                        }
+                        break;
+                      case "n":
+                        element.height += element.y - lastY;
+                        element.y = lastY;
+                        break;
+                      case "w":
+                        element.width += element.x - lastX;
+                        element.x = lastX;
+                        break;
+                      case "s":
+                        element.height = lastY - element.y;
+                        break;
+                      case "e":
+                        element.width = lastX - element.x;
+                        break;
+                    }
+
+                    el.x = element.x;
+                    el.y = element.y;
+                    generateDraw(el);
+                  });
+                  lastX = x;
+                  lastY = y;
+                  this.forceUpdate();
+                  return;
+                }
               }
 
               if (isDraggingElements) {
