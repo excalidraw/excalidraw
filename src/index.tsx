@@ -753,7 +753,7 @@ class App extends React.Component<{}, AppState> {
         <fieldset>
           <legend>Shapes</legend>
           {SHAPES.map(({ value, label }) => (
-            <label>
+            <label key={value}>
               <input
                 type="radio"
                 checked={this.state.elementType === value}
