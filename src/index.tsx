@@ -559,6 +559,25 @@ function deleteSelectedElements() {
   }
 }
 
+function someElementIsSelected() {
+  return elements.some(e => e.isSelected);
+}
+
+function getSelectedElementsWithIndexes() {
+  const indexes: Array<{ element: ExcalidrawElement; index: number }> = [];
+
+  elements.forEach((element, index) => {
+    if (element.isSelected) {
+      indexes.push({
+        element,
+        index
+      });
+    }
+  });
+
+  return indexes.reverse();
+}
+
 function save(state: AppState) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
@@ -693,8 +712,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements();
-      this.forceUpdate();
+      this.deleteSelectedElements();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
       const step = event.shiftKey
@@ -721,6 +739,39 @@ class App extends React.Component<{}, AppState> {
     }
   };
 
+  private deleteSelectedElements = () => {
+    deleteSelectedElements();
+    this.forceUpdate();
+  };
+
+  private moveToFront = () => {
+    const elementsWithIndexes = getSelectedElementsWithIndexes();
+
+    elementsWithIndexes.forEach(elementWithIndex => {
+      elements.splice(elementWithIndex.index, 1);
+    });
+
+    elementsWithIndexes.forEach(elementWithIndex => {
+      elements.push(elementWithIndex.element);
+    });
+
+    this.forceUpdate();
+  };
+
+  private sendToBack = () => {
+    const elementsWithIndexes = getSelectedElementsWithIndexes();
+
+    elementsWithIndexes.forEach(elementWithIndex => {
+      elements.splice(elementWithIndex.index, 1);
+    });
+
+    elementsWithIndexes.forEach(elementWithIndex => {
+      elements.splice(0, 0, elementWithIndex.element);
+    });
+
+    this.forceUpdate();
+  };
+
   public render() {
     return (
       <div
@@ -730,8 +781,7 @@ class App extends React.Component<{}, AppState> {
             "text/plain",
             JSON.stringify(elements.filter(element => element.isSelected))
           );
-          deleteSelectedElements();
-          this.forceUpdate();
+          this.deleteSelectedElements();
           e.preventDefault();
         }}
         onCopy={e => {
@@ -865,6 +915,16 @@ class App extends React.Component<{}, AppState> {
               px)
             </div>
           </div>
+          {someElementIsSelected() && (
+            <>
+              <h4>Shape options</h4>
+              <div className="panelColumn">
+                <button onClick={this.deleteSelectedElements}>Delete</button>
+                <button onClick={this.moveToFront}>Move to front</button>
+                <button onClick={this.sendToBack}>Send to back</button>
+              </div>
+            </>
+          )}
         </div>
         <canvas
           id="canvas"
