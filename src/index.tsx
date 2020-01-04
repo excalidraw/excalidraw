@@ -1021,9 +1021,14 @@ class App extends React.Component<{}, AppState> {
             let isDraggingElements = false;
             const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
-              const hitElement = elements.find(element => {
-                return hitTest(element, x, y);
-              });
+              let hitElement = null;
+              // We need to to hit testing from front (end of the array) to back (beginning of the array)
+              for (let i = elements.length - 1; i >= 0; --i) {
+                if (hitTest(elements[i], x, y)) {
+                  hitElement = elements[i];
+                  break;
+                }
+              }
 
               // If we click on something
               if (hitElement) {
