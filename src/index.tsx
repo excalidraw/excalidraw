@@ -170,12 +170,7 @@ function resizeTest(
 ): string | false {
   if (element.type === "text" || element.type === "arrow") return false;
 
-  const x1 = getElementAbsoluteX1(element);
-  const x2 = getElementAbsoluteX2(element);
-  const y1 = getElementAbsoluteY1(element);
-  const y2 = getElementAbsoluteY2(element);
-
-  const handlers = handlerRectangles(x1, x2, y1, y2, sceneState);
+  const handlers = handlerRectangles(element, sceneState);
 
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key];
@@ -270,43 +265,45 @@ function getScrollbars(
   };
 }
 
-function handlerRectangles(
-  elementX1: number,
-  elementX2: number,
-  elementY1: number,
-  elementY2: number,
-  sceneState: SceneState
-) {
+function handlerRectangles(element: ExcalidrawElement, sceneState: SceneState) {
+  const elementX1 = element.x;
+  const elementX2 = element.x + element.width;
+  const elementY1 = element.y;
+  const elementY2 = element.y + element.height;
+
   const margin = 4;
   const minimumSize = 40;
   const handlers: { [handler: string]: number[] } = {};
 
-  if (elementX2 - elementX1 > minimumSize) {
+  const marginX = element.width < 0 ? 8 : -8;
+  const marginY = element.height < 0 ? 8 : -8;
+
+  if (Math.abs(elementX2 - elementX1) > minimumSize) {
     handlers["n"] = [
       elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY1 - margin + sceneState.scrollY - 8,
+      elementY1 - margin + sceneState.scrollY + marginY,
       8,
       8
     ];
 
     handlers["s"] = [
       elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY2 - margin + sceneState.scrollY + 8,
+      elementY2 - margin + sceneState.scrollY - marginY,
       8,
       8
     ];
   }
 
-  if (elementY2 - elementY1 > minimumSize) {
+  if (Math.abs(elementY2 - elementY1) > minimumSize) {
     handlers["w"] = [
-      elementX1 - margin + sceneState.scrollX - 8,
+      elementX1 - margin + sceneState.scrollX + marginX,
       elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
       8,
       8
     ];
 
     handlers["e"] = [
-      elementX2 - margin + sceneState.scrollX + 8,
+      elementX2 - margin + sceneState.scrollX - marginX,
       elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
       8,
       8
@@ -314,26 +311,26 @@ function handlerRectangles(
   }
 
   handlers["nw"] = [
-    elementX1 - margin + sceneState.scrollX - 8,
-    elementY1 - margin + sceneState.scrollY - 8,
+    elementX1 - margin + sceneState.scrollX + marginX,
+    elementY1 - margin + sceneState.scrollY + marginY,
     8,
     8
   ]; // nw
   handlers["ne"] = [
-    elementX2 - margin + sceneState.scrollX + 8,
-    elementY1 - margin + sceneState.scrollY - 8,
+    elementX2 - margin + sceneState.scrollX - marginX,
+    elementY1 - margin + sceneState.scrollY + marginY,
     8,
     8
   ]; // ne
   handlers["sw"] = [
-    elementX1 - margin + sceneState.scrollX - 8,
-    elementY2 - margin + sceneState.scrollY + 8,
+    elementX1 - margin + sceneState.scrollX + marginX,
+    elementY2 - margin + sceneState.scrollY - marginY,
     8,
     8
   ]; // sw
   handlers["se"] = [
-    elementX2 - margin + sceneState.scrollX + 8,
-    elementY2 - margin + sceneState.scrollY + 8,
+    elementX2 - margin + sceneState.scrollX - marginX,
+    elementY2 - margin + sceneState.scrollY - marginY,
     8,
     8
   ]; // se
@@ -402,13 +399,7 @@ function renderScene(
         element.type !== "arrow" &&
         selectedIndices.length === 1
       ) {
-        const handlers = handlerRectangles(
-          elementX1,
-          elementX2,
-          elementY1,
-          elementY2,
-          sceneState
-        );
+        const handlers = handlerRectangles(element, sceneState);
         Object.values(handlers).forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
@@ -1157,7 +1148,6 @@ class App extends React.Component<{}, AppState> {
                 isResizingElements = true;
               } else {
                 let hitElement = null;
-
                 // We need to to hit testing from front (end of the array) to back (beginning of the array)
                 for (let i = elements.length - 1; i >= 0; --i) {
                   if (hitTest(elements[i], x, y)) {
@@ -1241,8 +1231,10 @@ class App extends React.Component<{}, AppState> {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x = e.clientX - target.offsetLeft - this.state.scrollX;
-                  const y = e.clientY - target.offsetTop - this.state.scrollY;
+                  const x =
+                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+                  const y =
+                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
