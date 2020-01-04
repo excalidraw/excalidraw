@@ -67,6 +67,10 @@ body {
       align-items: center;
 
       border-radius: 3px;
+
+      svg {
+        height: 1em;
+      }
     }
     &:hover + .toolIcon {
       background-color: #e7e5e5;
