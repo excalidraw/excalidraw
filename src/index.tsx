@@ -6,6 +6,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
 import "./styles.scss";
+import { TestApp } from "./components/TestApp";
 
 type ExcalidrawElement = ReturnType<typeof newElement>;
 type ExcalidrawTextElement = ExcalidrawElement & {
@@ -1399,7 +1400,7 @@ class App extends React.Component<{}, AppState> {
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<TestApp />, rootElement);
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const rc = rough.canvas(canvas);
 const context = canvas.getContext("2d")!;
@@ -1408,4 +1409,4 @@ const context = canvas.getContext("2d")!;
 // https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
 context.translate(0.5, 0.5);
 
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<TestApp />, rootElement);
