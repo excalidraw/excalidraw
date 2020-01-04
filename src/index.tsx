@@ -491,7 +491,7 @@ function exportAsPNG({
   link.setAttribute("href", tempCanvas.toDataURL("image/png"));
   link.click();
 
-  // // clean up the DOM
+  // clean up the DOM
   link.remove();
   if (tempCanvas !== canvas) tempCanvas.remove();
 }
