@@ -1040,6 +1040,7 @@ class App extends React.Component<{}, AppState> {
                   onChange={() => {
                     this.setState({ elementType: value });
                     clearSelection();
+                    document.documentElement.style.cursor = "crosshair";
                     this.forceUpdate();
                   }}
                 />
@@ -1181,7 +1182,6 @@ class App extends React.Component<{}, AppState> {
             let resizeHandle: string | false = false;
             let isDraggingElements = false;
             let isResizingElements = false;
-            const cursorStyle = document.documentElement.style.cursor;
             if (this.state.elementType === "selection") {
               const resizeElement = elements.find(element => {
                 return resizeTest(element, x, y, {
@@ -1401,7 +1401,7 @@ class App extends React.Component<{}, AppState> {
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
-              document.documentElement.style.cursor = cursorStyle;
+              document.documentElement.style.cursor = "";
 
               // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
