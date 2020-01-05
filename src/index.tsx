@@ -692,6 +692,10 @@ function clearSelection() {
   });
 }
 
+function resetCursor() {
+  document.documentElement.style.cursor = "";
+}
+
 function deleteSelectedElements() {
   for (let i = elements.length - 1; i >= 0; --i) {
     if (elements[i].isSelected) {
@@ -1240,6 +1244,7 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
+              resetCursor();
               const text = prompt("What text do you want?");
               if (text === null) {
                 return;
@@ -1401,7 +1406,7 @@ class App extends React.Component<{}, AppState> {
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
-              document.documentElement.style.cursor = "";
+              resetCursor();
 
               // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
