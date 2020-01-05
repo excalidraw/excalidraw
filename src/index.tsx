@@ -254,6 +254,10 @@ function newElement(
   y: number,
   strokeColor: string,
   backgroundColor: string,
+  fillStyle: string,
+  strokeWidth: number,
+  roughness: number,
+  opacity: number,
   width = 0,
   height = 0
 ) {
@@ -266,6 +270,10 @@ function newElement(
     isSelected: false,
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
+    fillStyle: fillStyle,
+    strokeWidth: strokeWidth,
+    roughness: roughness,
+    opacity: opacity,
     seed: randomSeed(),
     draw(
       rc: RoughCanvas,
@@ -761,13 +769,18 @@ function generateDraw(element: ExcalidrawElement) {
     const shape = withCustomMathRandom(element.seed, () => {
       return generator.rectangle(0, 0, element.width, element.height, {
         stroke: element.strokeColor,
-        fill: element.backgroundColor
+        fill: element.backgroundColor,
+        fillStyle: element.fillStyle,
+        strokeWidth: element.strokeWidth,
+        roughness: element.roughness
       });
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
+      context.globalAlpha = 1;
     };
   } else if (element.type === "diamond") {
     const shape = withCustomMathRandom(element.seed, () => {
@@ -790,14 +803,19 @@ function generateDraw(element: ExcalidrawElement) {
         ],
         {
           stroke: element.strokeColor,
-          fill: element.backgroundColor
+          fill: element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness
         }
       );
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
+      context.globalAlpha = 1;
     };
   } else if (element.type === "ellipse") {
     const shape = withCustomMathRandom(element.seed, () =>
@@ -806,33 +824,56 @@ function generateDraw(element: ExcalidrawElement) {
         element.height / 2,
         element.width,
         element.height,
-        { stroke: element.strokeColor, fill: element.backgroundColor }
+        {
+          stroke: element.strokeColor,
+          fill: element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness
+        }
       )
     );
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
+      context.globalAlpha = 1;
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const shapes = withCustomMathRandom(element.seed, () => [
       //    \
-      generator.line(x3, y3, x2, y2, { stroke: element.strokeColor }),
+      generator.line(x3, y3, x2, y2, {
+        stroke: element.strokeColor,
+        strokeWidth: element.strokeWidth,
+        roughness: element.roughness
+      }),
       // -----
-      generator.line(x1, y1, x2, y2, { stroke: element.strokeColor }),
+      generator.line(x1, y1, x2, y2, {
+        stroke: element.strokeColor,
+        strokeWidth: element.strokeWidth,
+        roughness: element.roughness
+      }),
       //    /
-      generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
+      generator.line(x4, y4, x2, y2, {
+        stroke: element.strokeColor,
+        strokeWidth: element.strokeWidth,
+        roughness: element.roughness
+      })
     ]);
 
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       context.translate(element.x + scrollX, element.y + scrollY);
       shapes.forEach(shape => rc.draw(shape));
       context.translate(-element.x - scrollX, -element.y - scrollY);
+      context.globalAlpha = 1;
     };
     return;
   } else if (isTextElement(element)) {
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       const font = context.font;
       context.font = element.font;
       const fillStyle = context.fillStyle;
@@ -844,6 +885,7 @@ function generateDraw(element: ExcalidrawElement) {
       );
       context.fillStyle = fillStyle;
       context.font = font;
+      context.globalAlpha = 1;
     };
   } else {
     throw new Error("Unimplemented type " + element.type);
@@ -1064,6 +1106,91 @@ function getSelectedIndices() {
 const someElementIsSelected = () =>
   elements.some(element => element.isSelected);
 
+const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
+  elements.some(
+    element =>
+      element.isSelected &&
+      (element.type === "rectangle" ||
+        element.type === "ellipse" ||
+        element.type === "diamond")
+  );
+
+const someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow = () =>
+  elements.some(
+    element =>
+      element.isSelected &&
+      (element.type === "rectangle" ||
+        element.type === "ellipse" ||
+        element.type === "diamond" ||
+        element.type === "arrow")
+  );
+
+function getSelectedFillStyles() {
+  const fillStyles = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => element.fillStyle)
+    )
+  );
+  return fillStyles.length === 1 ? fillStyles[0] : "";
+}
+
+function getSelectedStrokeWidth() {
+  const strokeWidth = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => `${element.strokeWidth}`)
+    )
+  );
+  return strokeWidth.length === 1 ? +strokeWidth[0] : "";
+}
+
+function getSelectedRoughness() {
+  const roughness = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => `${element.roughness}`)
+    )
+  );
+  return roughness.length === 1 ? +roughness[0] : "";
+}
+
+function getSelectedOpacity() {
+  const opacity = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => `${element.opacity}`)
+    )
+  );
+  return opacity.length === 1 ? +opacity[0] : "";
+}
+
+function getSelectedStrokeColor() {
+  const strokeColors = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => element.strokeColor)
+    )
+  );
+  return strokeColors.length === 1 ? strokeColors[0] : null;
+}
+
+function getSelectedBackgroundColor() {
+  const backgroundColors = Array.from(
+    new Set(
+      elements
+        .filter(element => element.isSelected)
+        .map(element => element.backgroundColor)
+    )
+  );
+  return backgroundColors.length === 1 ? backgroundColors[0] : null;
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
@@ -1228,6 +1355,43 @@ class App extends React.Component<{}, AppState> {
     this.setState({ name });
   }
 
+  private changeProperty = (callback: (element: ExcalidrawElement) => void) => {
+    elements.forEach(element => {
+      if (element.isSelected) {
+        callback(element);
+        generateDraw(element);
+      }
+    });
+
+    this.forceUpdate();
+  };
+
+  private changeFillStyle = (style: string) => {
+    this.changeProperty(element => (element.fillStyle = style));
+  };
+
+  private changeStrokeWidth = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    this.changeProperty(element => (element.strokeWidth = +event.target.value));
+  };
+
+  private changeRoughness = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    this.changeProperty(element => (element.roughness = +event.target.value));
+  };
+
+  private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.changeProperty(element => (element.opacity = +event.target.value));
+  };
+
+  private changeStrokeColor = (color: string) => {
+    this.changeProperty(element => (element.strokeColor = color));
+    this.setState({ currentItemStrokeColor: color });
+  };
+
+  private changeBackgroundColor = (color: string) => {
+    this.changeProperty(element => (element.backgroundColor = color));
+    this.setState({ currentItemBackgroundColor: color });
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -1353,85 +1517,6 @@ class App extends React.Component<{}, AppState> {
                 }
               />
             </div>
-            <h5>Shape Stroke Color</h5>
-            <div>
-              <button
-                className="swatch"
-                style={{
-                  backgroundColor: this.state.currentItemStrokeColor
-                }}
-                onClick={() =>
-                  this.setState(s => ({
-                    currentColorPicker:
-                      s.currentColorPicker === ColorPicker.SHAPE_STROKE
-                        ? null
-                        : ColorPicker.SHAPE_STROKE
-                  }))
-                }
-              />
-              {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE ? (
-                <div className="popover">
-                  <div
-                    className="cover"
-                    onClick={() => this.setState({ currentColorPicker: null })}
-                  />
-                  <SketchPicker
-                    color={this.state.currentItemStrokeColor}
-                    onChange={color => {
-                      this.setState({ currentItemStrokeColor: color.hex });
-                    }}
-                  />
-                </div>
-              ) : null}
-              <input
-                type="text"
-                className="swatch-input"
-                value={this.state.currentItemStrokeColor}
-                onChange={e => {
-                  this.setState({ currentItemStrokeColor: e.target.value });
-                }}
-              />
-            </div>
-            <h5>Shape Background Color</h5>
-            <div>
-              <button
-                className="swatch"
-                style={{
-                  backgroundColor: this.state.currentItemBackgroundColor
-                }}
-                onClick={() =>
-                  this.setState(s => ({
-                    currentColorPicker:
-                      s.currentColorPicker === ColorPicker.SHAPE_BACKGROUND
-                        ? null
-                        : ColorPicker.SHAPE_BACKGROUND
-                  }))
-                }
-              />
-              {this.state.currentColorPicker ===
-              ColorPicker.SHAPE_BACKGROUND ? (
-                <div className="popover">
-                  <div
-                    className="cover"
-                    onClick={() => this.setState({ currentColorPicker: null })}
-                  />
-                  <SketchPicker
-                    color={this.state.currentItemBackgroundColor}
-                    onChange={color => {
-                      this.setState({ currentItemBackgroundColor: color.hex });
-                    }}
-                  />
-                </div>
-              ) : null}
-              <input
-                type="text"
-                className="swatch-input"
-                value={this.state.currentItemStrokeColor}
-                onChange={e => {
-                  this.setState({ currentItemStrokeColor: e.target.value });
-                }}
-              />
-            </div>
             <button
               onClick={this.clearCanvas}
               title="Clear the canvas & reset background color"
@@ -1482,6 +1567,231 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
+          {someElementIsSelected() && (
+            <>
+              <>
+                <h4>Colors</h4>
+                <div className="panelColumn">
+                  <h5>Shape Stroke Color</h5>
+                  <div>
+                    <button
+                      className="swatch"
+                      style={{
+                        backgroundColor:
+                          getSelectedStrokeColor() ||
+                          this.state.currentItemStrokeColor
+                      }}
+                      onClick={() =>
+                        this.setState(s => ({
+                          currentColorPicker:
+                            s.currentColorPicker === ColorPicker.SHAPE_STROKE
+                              ? null
+                              : ColorPicker.SHAPE_STROKE
+                        }))
+                      }
+                    />
+                    {this.state.currentColorPicker ===
+                      ColorPicker.SHAPE_STROKE && (
+                      <div className="popover">
+                        <div
+                          className="cover"
+                          onClick={() =>
+                            this.setState({ currentColorPicker: null })
+                          }
+                        />
+                        <SketchPicker
+                          color={this.state.currentItemStrokeColor}
+                          onChange={color => this.changeStrokeColor(color.hex)}
+                        />
+                      </div>
+                    )}
+                    <input
+                      type="text"
+                      className="swatch-input"
+                      value={
+                        getSelectedStrokeColor() ||
+                        this.state.currentItemStrokeColor
+                      }
+                      onChange={e => this.changeStrokeColor(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
+                  <div className="panelColumn">
+                    <h5>Shape Background Color</h5>
+                    <div>
+                      <button
+                        className="swatch"
+                        style={{
+                          backgroundColor:
+                            getSelectedBackgroundColor() ||
+                            this.state.currentItemBackgroundColor
+                        }}
+                        onClick={() =>
+                          this.setState(s => ({
+                            currentColorPicker:
+                              s.currentColorPicker ===
+                              ColorPicker.SHAPE_BACKGROUND
+                                ? null
+                                : ColorPicker.SHAPE_BACKGROUND
+                          }))
+                        }
+                      />
+                      {this.state.currentColorPicker ===
+                      ColorPicker.SHAPE_BACKGROUND ? (
+                        <div className="popover">
+                          <div
+                            className="cover"
+                            onClick={() =>
+                              this.setState({ currentColorPicker: null })
+                            }
+                          />
+                          <SketchPicker
+                            color={this.state.currentItemBackgroundColor}
+                            onChange={color =>
+                              this.changeBackgroundColor(color.hex)
+                            }
+                          />
+                        </div>
+                      ) : null}
+                      <input
+                        type="text"
+                        className="swatch-input"
+                        value={
+                          getSelectedBackgroundColor() ||
+                          this.state.currentItemBackgroundColor
+                        }
+                        onChange={e =>
+                          this.changeBackgroundColor(e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+
+              {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
+                <>
+                  <h4>Fill</h4>
+                  <div className="panelColumn">
+                    {/* <select onChange={this.changeFillStyle} value={getSelectedFillStyles()}> */}
+                    <button
+                      onClick={() => this.changeFillStyle("hachure")}
+                      className={
+                        getSelectedFillStyles() === "hachure" ? "active" : ""
+                      }
+                    >
+                      Hachure
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("solid")}
+                      className={
+                        getSelectedFillStyles() === "solid" ? "active" : ""
+                      }
+                    >
+                      Solid
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("zigzag")}
+                      className={
+                        getSelectedFillStyles() === "zigzag" ? "active" : ""
+                      }
+                    >
+                      Zigzag
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("cross-hatch")}
+                      className={
+                        getSelectedFillStyles() === "cross-hatch"
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      Cross-hatch
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("dots")}
+                      className={
+                        getSelectedFillStyles() === "dots" ? "active" : ""
+                      }
+                    >
+                      Dots
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("sunburst")}
+                      className={
+                        getSelectedFillStyles() === "sunburst" ? "active" : ""
+                      }
+                    >
+                      Sunburst
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("dashed")}
+                      className={
+                        getSelectedFillStyles() === "dashed" ? "active" : ""
+                      }
+                    >
+                      Dashed
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("zigzag-line")}
+                      className={
+                        getSelectedFillStyles() === "zigzag-line"
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      Zigzag-line
+                    </button>
+                    {/* </select> */}
+                  </div>
+                </>
+              )}
+
+              {someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow() && (
+                <>
+                  <h4>Stroke width</h4>
+                  <div className="panelColumn">
+                    <select
+                      onChange={this.changeStrokeWidth}
+                      value={getSelectedStrokeWidth()}
+                    >
+                      <option hidden disabled value=""></option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="4">4</option>
+                      <option value="8">8</option>
+                    </select>
+                  </div>
+
+                  <h4>Roughness</h4>
+                  <div className="panelColumn">
+                    <select
+                      onChange={this.changeRoughness}
+                      value={getSelectedRoughness()}
+                    >
+                      <option hidden disabled value=""></option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="4">4</option>
+                      <option value="8">8</option>
+                      <option value="10">10</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <h4>Opacity</h4>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                onChange={this.changeOpacity}
+                value={getSelectedOpacity()}
+              />
+            </>
+          )}
         </div>
         <canvas
           id="canvas"
@@ -1556,7 +1866,11 @@ class App extends React.Component<{}, AppState> {
               x,
               y,
               this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor
+              this.state.currentItemBackgroundColor,
+              "hachure",
+              1,
+              1,
+              100
             );
             let resizeHandle: string | false = false;
             let isDraggingElements = false;
