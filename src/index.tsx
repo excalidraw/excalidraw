@@ -171,52 +171,25 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
     y -= element.y;
 
     const [
-      topEdgeX,
-      topEdgeY,
-      rightEdgeX,
-      rightEdgeY,
-      bottomEdgeX,
-      bottomEdgeY,
-      leftEdgeX,
-      leftEdgeY
+      topX,
+      topY,
+      rightX,
+      rightY,
+      bottomX,
+      bottomY,
+      leftX,
+      leftY
     ] = getDiamondPoints(element);
-    // (x1, y1) --A-- (x2, y1)
-    //    |D             |B
-    // (x1, y2) --C-- (x2, y2)
 
     return (
-      distanceBetweenPointAndSegment(
-        x,
-        y,
-        topEdgeX,
-        topEdgeY,
-        rightEdgeX,
-        rightEdgeY
-      ) < lineThreshold || // A
-      distanceBetweenPointAndSegment(
-        x,
-        y,
-        rightEdgeX,
-        rightEdgeY,
-        bottomEdgeX,
-        bottomEdgeY
-      ) < lineThreshold || // B
-      distanceBetweenPointAndSegment(
-        x,
-        y,
-        bottomEdgeX,
-        bottomEdgeY,
-        leftEdgeX,
-        leftEdgeY
-      ) < lineThreshold || // C
-      distanceBetweenPointAndSegment(
-        x,
-        y,
-        leftEdgeX,
-        leftEdgeY,
-        topEdgeX,
-        topEdgeY
-      ) < lineThreshold // D ||
+      distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
+        lineThreshold
     );
   } else if (element.type === "arrow") {
     let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
@@ -759,25 +732,16 @@ function getArrowPoints(element: ExcalidrawElement) {
 }
 
 function getDiamondPoints(element: ExcalidrawElement) {
-  const topEdgeX = Math.PI + element.width / 2;
-  const topEdgeY = element.height - element.height;
-  const rightEdgeX = element.width;
-  const rightEdgeY = Math.PI + element.height / 2;
-  const bottomEdgeX = topEdgeX;
-  const bottomEdgeY = element.height;
-  const leftEdgeX = topEdgeY;
-  const leftEdgeY = rightEdgeY;
+  const topX = Math.PI + element.width / 2;
+  const topY = element.height - element.height;
+  const rightX = element.width;
+  const rightY = Math.PI + element.height / 2;
+  const bottomX = topX;
+  const bottomY = element.height;
+  const leftX = topY;
+  const leftY = rightY;
 
-  return [
-    topEdgeX,
-    topEdgeY,
-    rightEdgeX,
-    rightEdgeY,
-    bottomEdgeX,
-    bottomEdgeY,
-    leftEdgeX,
-    leftEdgeY
-  ];
+  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
 function generateDraw(element: ExcalidrawElement) {
@@ -808,21 +772,21 @@ function generateDraw(element: ExcalidrawElement) {
   } else if (element.type === "diamond") {
     const shape = withCustomMathRandom(element.seed, () => {
       const [
-        topEdgeX,
-        topEdgeY,
-        rightEdgeX,
-        rightEdgeY,
-        bottomEdgeX,
-        bottomEdgeY,
-        leftEdgeX,
-        leftEdgeY
+        topX,
+        topY,
+        rightX,
+        rightY,
+        bottomX,
+        bottomY,
+        leftX,
+        leftY
       ] = getDiamondPoints(element);
       return generator.polygon(
         [
-          [topEdgeX, topEdgeY],
-          [rightEdgeX, rightEdgeY],
-          [bottomEdgeX, bottomEdgeY],
-          [leftEdgeX, leftEdgeY]
+          [topX, topY],
+          [rightX, rightY],
+          [bottomX, bottomY],
+          [leftX, leftY]
         ],
         {
           stroke: element.strokeColor,
