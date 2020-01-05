@@ -9,7 +9,12 @@
 
 Go to https://excalidraw.com to start sketching
 
-## Getting started
+## Testimonials
+
+<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" alt="Screen Shot 2020-01-05 at 9 50 15 AM" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
+
+
+## Run the code
 
 ### Code Sandbox
 
@@ -49,4 +54,4 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 - [React](https://reactjs.org/)
 - [Rough.js](https://roughjs.com/)
 
-The project is at its early days, there are some key [features](https://github.com/excalidraw/excalidraw/milestone/1) that we need to implement in order to make the application very useful.
+And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
