@@ -196,7 +196,7 @@ function resizeTest(
   y: number,
   sceneState: SceneState
 ): string | false {
-  if (element.type === "text" || element.type === "arrow") return false;
+  if (element.type === "text") return false;
 
   const handlers = handlerRectangles(element, sceneState);
 
@@ -390,6 +390,13 @@ function handlerRectangles(element: ExcalidrawElement, sceneState: SceneState) {
     8
   ]; // se
 
+  if (element.type === "arrow") {
+    return {
+      nw: handlers.nw,
+      se: handlers.se
+    };
+  }
+
   return handlers;
 }
 
@@ -449,11 +456,7 @@ function renderScene(
       );
       context.setLineDash(lineDash);
 
-      if (
-        element.type !== "text" &&
-        element.type !== "arrow" &&
-        selectedIndices.length === 1
-      ) {
+      if (element.type !== "text" && selectedIndices.length === 1) {
         const handlers = handlerRectangles(element, sceneState);
         Object.values(handlers).forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
