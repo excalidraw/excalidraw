@@ -20,6 +20,34 @@ const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
 const elements = Array.of<ExcalidrawElement>();
 
+let skipHistory = false;
+const stateHistory: string[] = [];
+function generateHistoryCurrentEntry() {
+  return JSON.stringify(
+    elements.map(element => ({ ...element, isSelected: false }))
+  );
+}
+function pushHistoryEntry(newEntry: string) {
+  if (
+    stateHistory.length > 0 &&
+    stateHistory[stateHistory.length - 1] === newEntry
+  ) {
+    // If the last entry is the same as this one, ignore it
+    return;
+  }
+  stateHistory.push(newEntry);
+}
+function restoreHistoryEntry(entry: string) {
+  const newElements = JSON.parse(entry);
+  elements.splice(0, elements.length);
+  newElements.forEach((newElement: ExcalidrawElement) => {
+    generateDraw(newElement);
+    elements.push(newElement);
+  });
+  // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
+  skipHistory = true;
+}
+
 // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
 const LCG = (seed: number) => () =>
   ((2 ** 31 - 1) & (seed = Math.imul(48271, seed))) / 2 ** 31;
@@ -901,6 +929,17 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findElementByKey(event.key) });
+    } else if (event.metaKey && event.code === "KeyZ") {
+      let lastEntry = stateHistory.pop();
+      // If nothing was changed since last, take the previous one
+      if (generateHistoryCurrentEntry() === lastEntry) {
+        lastEntry = stateHistory.pop();
+      }
+      if (lastEntry !== undefined) {
+        restoreHistoryEntry(lastEntry);
+      }
+      this.forceUpdate();
+      event.preventDefault();
     }
   };
 
@@ -1301,6 +1340,8 @@ class App extends React.Component<{}, AppState> {
                   });
                   lastX = x;
                   lastY = y;
+                  // We don't want to save history when resizing an element
+                  skipHistory = true;
                   this.forceUpdate();
                   return;
                 }
@@ -1319,6 +1360,8 @@ class App extends React.Component<{}, AppState> {
                   });
                   lastX = x;
                   lastY = y;
+                  // We don't want to save history when dragging an element to initially size it
+                  skipHistory = true;
                   this.forceUpdate();
                   return;
                 }
@@ -1347,6 +1390,8 @@ class App extends React.Component<{}, AppState> {
               if (this.state.elementType === "selection") {
                 setSelection(draggingElement);
               }
+              // We don't want to save history when moving an element
+              skipHistory = true;
               this.forceUpdate();
             };
 
@@ -1384,6 +1429,8 @@ class App extends React.Component<{}, AppState> {
             window.addEventListener("mousemove", onMouseMove);
             window.addEventListener("mouseup", onMouseUp);
 
+            // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
+            skipHistory = true;
             this.forceUpdate();
           }}
         />
@@ -1407,6 +1454,10 @@ class App extends React.Component<{}, AppState> {
       viewBackgroundColor: this.state.viewBackgroundColor
     });
     save(this.state);
+    if (!skipHistory) {
+      pushHistoryEntry(generateHistoryCurrentEntry());
+    }
+    skipHistory = false;
   }
 }
 
