@@ -186,8 +186,8 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
 
     return (
       distanceBetweenPointAndSegment(
-        leftEdgeX,
-        topEdgeY,
+        x,
+        y,
         topEdgeX,
         topEdgeY,
         rightEdgeX,
@@ -195,7 +195,7 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
       ) < lineThreshold || // A
       distanceBetweenPointAndSegment(
         x,
-        rightEdgeY,
+        y,
         rightEdgeX,
         rightEdgeY,
         bottomEdgeX,
@@ -203,7 +203,7 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
       ) < lineThreshold || // B
       distanceBetweenPointAndSegment(
         x,
-        bottomEdgeY,
+        y,
         bottomEdgeX,
         bottomEdgeY,
         leftEdgeX,
@@ -211,7 +211,7 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
       ) < lineThreshold || // C
       distanceBetweenPointAndSegment(
         x,
-        leftEdgeY,
+        y,
         leftEdgeX,
         leftEdgeY,
         topEdgeX,
