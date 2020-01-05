@@ -7,7 +7,6 @@ import { SketchPicker } from "react-color";
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { roundRect } from "./roundRect";
 import EditableText from "./components/EditableText";
-import { getDateTime } from "./utils";
 
 import "./styles.scss";
 
@@ -655,6 +654,18 @@ function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
   ];
 }
 
+function getDateTime() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hr = date.getHours();
+  const min = date.getMinutes();
+  const secs = date.getSeconds();
+
+  return `${year}${month}${day}${hr}${min}${secs}`;
+}
+
 // Casting second argument (DrawingSurface) to any,
 // because it is requred by TS definitions and not required at runtime
 const generator = rough.generator(null, null as any);
@@ -1211,9 +1222,21 @@ class App extends React.Component<{}, AppState> {
               </label>
             ))}
           </div>
-          <h4>Colors</h4>
+          {someElementIsSelected() && (
+            <>
+              <h4>Selected Shapes</h4>
+              <div className="panelColumn">
+                <button onClick={this.deleteSelectedElements}>Delete</button>
+                <button onClick={this.moveOneRight}>Bring forward</button>
+                <button onClick={this.moveAllRight}>Bring to front</button>
+                <button onClick={this.moveOneLeft}>Send backward</button>
+                <button onClick={this.moveAllLeft}>Send to back</button>
+              </div>
+            </>
+          )}
+          <h4>Canvas</h4>
           <div className="panelColumn">
-            <h5>Canvas Background</h5>
+            <h5>Canvas Background Color</h5>
             <div>
               <button
                 className="swatch"
@@ -1228,13 +1251,14 @@ class App extends React.Component<{}, AppState> {
                         : ColorPicker.CANVAS_BACKGROUND
                   }))
                 }
-              ></button>
-              {this.state.currentColorPicker === ColorPicker.CANVAS_BACKGROUND ? (
+              />
+              {this.state.currentColorPicker ===
+              ColorPicker.CANVAS_BACKGROUND ? (
                 <div className="popover">
                   <div
                     className="cover"
                     onClick={() => this.setState({ currentColorPicker: null })}
-                  ></div>
+                  />
                   <SketchPicker
                     color={this.state.viewBackgroundColor}
                     onChange={color => {
@@ -1252,7 +1276,7 @@ class App extends React.Component<{}, AppState> {
                 }
               />
             </div>
-            <h5>Shape Stroke</h5>
+            <h5>Shape Stroke Color</h5>
             <div>
               <button
                 className="swatch"
@@ -1267,13 +1291,13 @@ class App extends React.Component<{}, AppState> {
                         : ColorPicker.SHAPE_STROKE
                   }))
                 }
-              ></button>
+              />
               {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE ? (
                 <div className="popover">
                   <div
                     className="cover"
                     onClick={() => this.setState({ currentColorPicker: null })}
-                  ></div>
+                  />
                   <SketchPicker
                     color={this.state.currentItemStrokeColor}
                     onChange={color => {
@@ -1291,7 +1315,7 @@ class App extends React.Component<{}, AppState> {
                 }}
               />
             </div>
-            <h5>Shape Background</h5>
+            <h5>Shape Background Color</h5>
             <div>
               <button
                 className="swatch"
@@ -1306,13 +1330,14 @@ class App extends React.Component<{}, AppState> {
                         : ColorPicker.SHAPE_BACKGROUND
                   }))
                 }
-              ></button>
-              {this.state.currentColorPicker === ColorPicker.SHAPE_BACKGROUND ? (
+              />
+              {this.state.currentColorPicker ===
+              ColorPicker.SHAPE_BACKGROUND ? (
                 <div className="popover">
                   <div
                     className="cover"
                     onClick={() => this.setState({ currentColorPicker: null })}
-                  ></div>
+                  />
                   <SketchPicker
                     color={this.state.currentItemBackgroundColor}
                     onChange={color => {
@@ -1330,9 +1355,6 @@ class App extends React.Component<{}, AppState> {
                 }}
               />
             </div>
-          </div>
-          <h4>Canvas</h4>
-          <div className="panelColumn">
             <button
               onClick={this.clearCanvas}
               title="Clear the canvas & reset background color"
@@ -1342,6 +1364,14 @@ class App extends React.Component<{}, AppState> {
           </div>
           <h4>Export</h4>
           <div className="panelColumn">
+            <h5>Name</h5>
+            {this.state.name && (
+              <EditableText
+                value={this.state.name}
+                onChange={(name: string) => this.updateProjectName(name)}
+              />
+            )}
+            <h5>Image</h5>
             <button
               onClick={() => {
                 exportAsPNG(this.state);
@@ -1359,18 +1389,7 @@ class App extends React.Component<{}, AppState> {
               />
               background
             </label>
-          </div>
-          <h4>Project name</h4>
-          <div className="panelColumn">
-            {this.state.name && (
-              <EditableText
-                value={this.state.name}
-                onChange={(name: string) => this.updateProjectName(name)}
-              />
-            )}
-          </div>
-          <h4>Save/Load</h4>
-          <div className="panelColumn">
+            <h5>Scene</h5>
             <button
               onClick={() => {
                 saveAsJSON(this.state.name);
@@ -1386,18 +1405,6 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
-          {someElementIsSelected() && (
-            <>
-              <h4>Shape options</h4>
-              <div className="panelColumn">
-                <button onClick={this.deleteSelectedElements}>Delete</button>
-                <button onClick={this.moveOneRight}>Bring forward</button>
-                <button onClick={this.moveAllRight}>Bring to front</button>
-                <button onClick={this.moveOneLeft}>Send backward</button>
-                <button onClick={this.moveAllLeft}>Send to back</button>
-              </div>
-            </>
-          )}
         </div>
         <canvas
           id="canvas"
