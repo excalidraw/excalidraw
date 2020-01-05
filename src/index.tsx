@@ -293,6 +293,33 @@ function getScrollbars(
   };
 }
 
+function isOverScrollBars(
+  x: number,
+  y: number,
+  canvasWidth: number,
+  canvasHeight: number,
+  scrollX: number,
+  scrollY: number
+) {
+  const scrollBars = getScrollbars(canvasWidth, canvasHeight, scrollX, scrollY);
+
+  const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
+    scrollBars.horizontal,
+    scrollBars.vertical
+  ].map(
+    scrollBar =>
+      scrollBar.x <= x &&
+      x <= scrollBar.x + scrollBar.width &&
+      scrollBar.y <= y &&
+      y <= scrollBar.y + scrollBar.height
+  );
+
+  return {
+    isOverHorizontalScrollBar,
+    isOverVerticalScrollBar
+  };
+}
+
 function handlerRectangles(element: ExcalidrawElement, sceneState: SceneState) {
   const elementX1 = element.x;
   const elementX2 = element.x + element.width;
@@ -1259,6 +1286,19 @@ class App extends React.Component<{}, AppState> {
               document.activeElement.blur();
             }
 
+            // Handle scrollbars dragging
+            const {
+              isOverHorizontalScrollBar,
+              isOverVerticalScrollBar
+            } = isOverScrollBars(
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
+              e.clientY - CANVAS_WINDOW_OFFSET_TOP,
+              canvasWidth,
+              canvasHeight,
+              this.state.scrollX,
+              this.state.scrollY
+            );
+
             const x =
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
@@ -1371,9 +1411,30 @@ class App extends React.Component<{}, AppState> {
             let lastX = x;
             let lastY = y;
 
+            if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
+              lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+              lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+            }
+
             const onMouseMove = (e: MouseEvent) => {
               const target = e.target;
               if (!(target instanceof HTMLElement)) {
+                return;
+              }
+
+              if (isOverHorizontalScrollBar) {
+                const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+                const dx = x - lastX;
+                this.setState(state => ({ scrollX: state.scrollX - dx }));
+                lastX = x;
+                return;
+              }
+
+              if (isOverVerticalScrollBar) {
+                const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                const dy = y - lastY;
+                this.setState(state => ({ scrollY: state.scrollY - dy }));
+                lastY = y;
                 return;
               }
 
