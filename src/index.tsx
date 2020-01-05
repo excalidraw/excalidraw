@@ -886,6 +886,11 @@ const SHAPES = [
 
 const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
 
+
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function findElementByKey(key: string) {
   const defaultElement = "selection";
   return SHAPES.reduce((element, shape) => {
@@ -1126,7 +1131,7 @@ class App extends React.Component<{}, AppState> {
           <h4>Shapes</h4>
           <div className="panelTools">
             {SHAPES.map(({ value, icon }) => (
-              <label key={value} className="tool">
+              <label key={value} className="tool" title={`${capitalize(value)} - ${capitalize(value)[0]}`}>
                 <input
                   type="radio"
                   checked={this.state.elementType === value}
