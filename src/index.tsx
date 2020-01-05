@@ -1346,7 +1346,7 @@ class App extends React.Component<{}, AppState> {
   private updateProjectName(name: string): void {
     this.setState({ name });
   }
-  
+
   private changeProperty = (callback: (element: ExcalidrawElement) => void) => {
     elements.forEach(element => {
       if (element.isSelected) {
@@ -1563,13 +1563,15 @@ class App extends React.Component<{}, AppState> {
             <>
               <>
                 <h4>Colors</h4>
-                <div  className='panelColumn'>
+                <div className="panelColumn">
                   <h5>Shape Stroke Color</h5>
                   <div>
                     <button
                       className="swatch"
                       style={{
-                        backgroundColor: getSelectedStrokeColor() || this.state.currentItemStrokeColor
+                        backgroundColor:
+                          getSelectedStrokeColor() ||
+                          this.state.currentItemStrokeColor
                       }}
                       onClick={() =>
                         this.setState(s => ({
@@ -1580,11 +1582,14 @@ class App extends React.Component<{}, AppState> {
                         }))
                       }
                     />
-                    {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE && (
+                    {this.state.currentColorPicker ===
+                      ColorPicker.SHAPE_STROKE && (
                       <div className="popover">
                         <div
                           className="cover"
-                          onClick={() => this.setState({ currentColorPicker: null })}
+                          onClick={() =>
+                            this.setState({ currentColorPicker: null })
+                          }
                         />
                         <SketchPicker
                           color={this.state.currentItemStrokeColor}
@@ -1595,25 +1600,31 @@ class App extends React.Component<{}, AppState> {
                     <input
                       type="text"
                       className="swatch-input"
-                      value={getSelectedStrokeColor() || this.state.currentItemStrokeColor}
+                      value={
+                        getSelectedStrokeColor() ||
+                        this.state.currentItemStrokeColor
+                      }
                       onChange={e => this.changeSrokeColor(e.target.value)}
                     />
                   </div>
                 </div>
 
                 {someElementIsSelectedIsRectangleOrEllipse() && (
-                  <div className='panelColumn'>
+                  <div className="panelColumn">
                     <h5>Shape Background Color</h5>
                     <div>
                       <button
                         className="swatch"
                         style={{
-                          backgroundColor: getSelectedBackgroundColor() || this.state.currentItemBackgroundColor
+                          backgroundColor:
+                            getSelectedBackgroundColor() ||
+                            this.state.currentItemBackgroundColor
                         }}
                         onClick={() =>
                           this.setState(s => ({
                             currentColorPicker:
-                              s.currentColorPicker === ColorPicker.SHAPE_BACKGROUND
+                              s.currentColorPicker ===
+                              ColorPicker.SHAPE_BACKGROUND
                                 ? null
                                 : ColorPicker.SHAPE_BACKGROUND
                           }))
@@ -1624,34 +1635,33 @@ class App extends React.Component<{}, AppState> {
                         <div className="popover">
                           <div
                             className="cover"
-                            onClick={() => this.setState({ currentColorPicker: null })}
+                            onClick={() =>
+                              this.setState({ currentColorPicker: null })
+                            }
                           />
                           <SketchPicker
                             color={this.state.currentItemBackgroundColor}
-                            onChange={color => this.changeBackgroundColor(color.hex)}
+                            onChange={color =>
+                              this.changeBackgroundColor(color.hex)
+                            }
                           />
                         </div>
                       ) : null}
                       <input
                         type="text"
                         className="swatch-input"
-                        value={getSelectedBackgroundColor() ||
-                          this.state.currentItemBackgroundColor}
-                          onChange={e => this.changeBackgroundColor(e.target.value)}
+                        value={
+                          getSelectedBackgroundColor() ||
+                          this.state.currentItemBackgroundColor
+                        }
+                        onChange={e =>
+                          this.changeBackgroundColor(e.target.value)
+                        }
                       />
                     </div>
                   </div>
                 )}
               </>
-
-              <h4>Shape options</h4>
-              <div className="panelColumn">
-                <button onClick={this.deleteSelectedElements}>Delete</button>
-                <button onClick={this.moveOneRight}>Bring forward</button>
-                <button onClick={this.moveAllRight}>Bring to front</button>
-                <button onClick={this.moveOneLeft}>Send backward</button>
-                <button onClick={this.moveAllLeft}>Send to back</button>
-              </div>
 
               {someElementIsSelectedIsRectangleOrEllipse() && (
                 <>
