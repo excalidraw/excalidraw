@@ -460,6 +460,47 @@ function renderScene(
   }
 }
 
+function saveAsJSON() {
+  const serialized = JSON.stringify({
+    version: 1,
+    source: window.location.origin,
+    elements
+  });
+
+  saveFile(
+    "excalidraw.json",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+  );
+}
+
+function loadFromJSON() {
+  const input = document.createElement("input");
+  const reader = new FileReader();
+  input.type = "file";
+  input.accept = ".json";
+
+  input.onchange = () => {
+    if (!input.files!.length) {
+      alert("A file was not selected.");
+      return;
+    }
+
+    reader.readAsText(input.files![0], "utf8");
+  };
+
+  input.click();
+
+  return new Promise(resolve => {
+    reader.onloadend = () => {
+      if (reader.readyState === FileReader.DONE) {
+        const data = JSON.parse(reader.result as string);
+        restore(data.elements, null);
+        resolve();
+      }
+    };
+  });
+}
+
 function exportAsPNG({
   exportBackground,
   exportPadding = 10,
@@ -513,15 +554,21 @@ function exportAsPNG({
     }
   );
 
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", "excalidraw.png");
-  link.setAttribute("href", tempCanvas.toDataURL("image/png"));
-  link.click();
+  saveFile("excalidraw.png", tempCanvas.toDataURL("image/png"));
 
   // clean up the DOM
-  link.remove();
   if (tempCanvas !== canvas) tempCanvas.remove();
+}
+
+function saveFile(name: string, data: string) {
+  // create a temporary <a> elem which we'll use to download the image
+  const link = document.createElement("a");
+  link.setAttribute("download", name);
+  link.setAttribute("href", data);
+  link.click();
+
+  // clean up
+  link.remove();
 }
 
 function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
@@ -709,13 +756,26 @@ function save(state: AppState) {
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
 }
 
-function restore() {
-  try {
-    const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
+function restoreFromLocalStorage() {
+  const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
 
+  return restore(savedElements, savedState);
+}
+
+function restore(
+  savedElements: string | ExcalidrawElement[] | null,
+  savedState: string | null
+) {
+  try {
     if (savedElements) {
-      elements.splice(0, elements.length, ...JSON.parse(savedElements));
+      elements.splice(
+        0,
+        elements.length,
+        ...(typeof savedElements === "string"
+          ? JSON.parse(savedElements)
+          : savedElements)
+      );
       elements.forEach((element: ExcalidrawElement) => generateDraw(element));
     }
 
@@ -843,7 +903,7 @@ class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restore();
+    const savedState = restoreFromLocalStorage();
     if (savedState) {
       this.setState(savedState);
     }
@@ -1116,6 +1176,23 @@ class App extends React.Component<{}, AppState> {
               />
               background
             </label>
+          </div>
+          <h4>Save/Load</h4>
+          <div className="panelColumn">
+            <button
+              onClick={() => {
+                saveAsJSON();
+              }}
+            >
+              Save as...
+            </button>
+            <button
+              onClick={() => {
+                loadFromJSON().then(() => this.forceUpdate());
+              }}
+            >
+              Load file...
+            </button>
           </div>
           {someElementIsSelected() && (
             <>
