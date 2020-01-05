@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -254,6 +254,7 @@ function newElement(
   y: number,
   strokeColor: string,
   backgroundColor: string,
+  fillStyle: string,
   width = 0,
   height = 0
 ) {
@@ -266,6 +267,7 @@ function newElement(
     isSelected: false,
     strokeColor: strokeColor,
     backgroundColor: backgroundColor,
+    fillStyle: fillStyle,
     seed: randomSeed(),
     draw(
       rc: RoughCanvas,
@@ -745,6 +747,7 @@ function getDiamondPoints(element: ExcalidrawElement) {
 }
 
 function generateDraw(element: ExcalidrawElement) {
+  console.log(element);
   if (element.type === "selection") {
     element.draw = (rc, context, { scrollX, scrollY }) => {
       const fillStyle = context.fillStyle;
@@ -761,7 +764,8 @@ function generateDraw(element: ExcalidrawElement) {
     const shape = withCustomMathRandom(element.seed, () => {
       return generator.rectangle(0, 0, element.width, element.height, {
         stroke: element.strokeColor,
-        fill: element.backgroundColor
+        fill: element.backgroundColor,
+        fillStyle: element.fillStyle
       });
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
@@ -1227,6 +1231,19 @@ class App extends React.Component<{}, AppState> {
   private updateProjectName(name: string): void {
     this.setState({ name });
   }
+  
+  private changeFillStyle = (event: ChangeEvent<HTMLSelectElement>) => {
+    console.log(event.target.value);
+    elements.forEach(element => {
+      console.log("forceUpdate");
+      if (element.isSelected) {
+        element.fillStyle = event.target.value;
+      }
+    });
+
+    console.log("forceUpdate");
+    this.forceUpdate();
+  };
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
@@ -1482,6 +1499,32 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
+          {someElementIsSelected() && (
+            <>
+              <h4>Shape options</h4>
+              <div className="panelColumn">
+                <button onClick={this.deleteSelectedElements}>Delete</button>
+                <button onClick={this.moveOneRight}>Bring forward</button>
+                <button onClick={this.moveAllRight}>Bring to front</button>
+                <button onClick={this.moveOneLeft}>Send backward</button>
+                <button onClick={this.moveAllLeft}>Send to back</button>
+              </div>
+
+              <h4>Fill</h4>
+              <div className="panelColumn">
+                <select onChange={this.changeFillStyle}>
+                  <option value="hachure">Hachure</option>
+                  <option value="solid">Solid</option>
+                  <option value="zigzag">Zigzag</option>
+                  <option value="cross-hatch">Cross-hatch</option>
+                  <option value="dots">Dots</option>
+                  <option value="sunburst">Sunburst</option>
+                  <option value="dashed">Dashed</option>
+                  <option value="zigzag-line">Zigzag-line</option>
+                </select>
+              </div>
+            </>
+          )}
         </div>
         <canvas
           id="canvas"
@@ -1556,7 +1599,8 @@ class App extends React.Component<{}, AppState> {
               x,
               y,
               this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor
+              this.state.currentItemBackgroundColor,
+              "hachure"
             );
             let resizeHandle: string | false = false;
             let isDraggingElements = false;
