@@ -533,7 +533,7 @@ function renderScene(
   }
 }
 
-function saveAsJSON() {
+function saveAsJSON(name: string) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
@@ -541,7 +541,7 @@ function saveAsJSON() {
   });
 
   saveFile(
-    "excalidraw.json",
+    `${name}.json`,
     "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
   );
 }
@@ -1188,13 +1188,6 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <div className="sidePanel">
-          <h4>Project name</h4>
-          {this.state.name && (
-            <EditableText
-              value={this.state.name}
-              onChange={(name: string) => this.updateProjectName(name)}
-            />
-          )}
           <h4>Shapes</h4>
           <div className="panelTools">
             {SHAPES.map(({ value, icon }) => (
@@ -1367,11 +1360,20 @@ class App extends React.Component<{}, AppState> {
               background
             </label>
           </div>
+          <h4>Project name</h4>
+          <div className="panelColumn">
+            {this.state.name && (
+              <EditableText
+                value={this.state.name}
+                onChange={(name: string) => this.updateProjectName(name)}
+              />
+            )}
+          </div>
           <h4>Save/Load</h4>
           <div className="panelColumn">
             <button
               onClick={() => {
-                saveAsJSON();
+                saveAsJSON(this.state.name);
               }}
             >
               Save as...
