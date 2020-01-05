@@ -11,7 +11,9 @@ Go to https://excalidraw.com to start sketching
 
 ## Testimonials
 
-<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" alt="Screen Shot 2020-01-05 at 9 50 15 AM" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
+<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
+
+<a href="https://twitter.com/dan_abramov/status/1213762494428262400"><img width="398" src="https://user-images.githubusercontent.com/197597/71783990-4d395880-2fa3-11ea-9ad7-186138db5003.png"></a>
 
 
 ## Run the code
