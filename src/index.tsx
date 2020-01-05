@@ -151,7 +151,7 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
     });
 
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
-  } else if (element.type === "rectangle") {
+  } else if (element.type === "rectangle" || element.type === "diamond") {
     const x1 = getElementAbsoluteX1(element);
     const x2 = getElementAbsoluteX2(element);
     const y1 = getElementAbsoluteY1(element);
@@ -731,6 +731,34 @@ function generateDraw(element: ExcalidrawElement) {
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
     };
+  } else if (element.type === "diamond") {
+    const shape = withCustomMathRandom(element.seed, () => {
+      const rightEdgeY = Math.PI + element.height / 2;
+      const rightEdgeX = element.width;
+      const topEdgeY = element.height - element.height;
+      const topEdgeX = Math.PI + element.width / 2;
+      const bottomEdgeX = topEdgeX;
+      const bottomEdgeY = element.height;
+      const leftEdgeX = topEdgeY;
+      const leftEdgeY = rightEdgeY;
+      return generator.polygon(
+        [
+          [topEdgeX, topEdgeY],
+          [rightEdgeX, rightEdgeY],
+          [bottomEdgeX, bottomEdgeY],
+          [leftEdgeX, leftEdgeY]
+        ],
+        {
+          stroke: element.strokeColor,
+          fill: element.backgroundColor
+        }
+      );
+    });
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
+      rc.draw(shape);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
+    };
   } else if (element.type === "ellipse") {
     const shape = withCustomMathRandom(element.seed, () =>
       generator.ellipse(
@@ -920,6 +948,15 @@ const SHAPES = [
       </svg>
     ),
     value: "rectangle"
+  },
+  {
+    icon: (
+      // custom
+      <svg viewBox="0 0 223.646 223.646">
+        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z"></path>
+      </svg>
+    ),
+    value: "diamond"
   },
   {
     icon: (

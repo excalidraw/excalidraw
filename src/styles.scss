@@ -31,10 +31,11 @@ body {
 
   .panelTools {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
 
     label {
-      margin: 0;
+      margin: 2px 0;
     }
   }
 
