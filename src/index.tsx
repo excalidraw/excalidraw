@@ -832,6 +832,8 @@ const ELEMENT_TRANSLATE_AMOUNT = 1;
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
+let lastMouseUp: ((e: any) => void) | null = null;
+
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -1157,6 +1159,12 @@ class App extends React.Component<{}, AppState> {
             }
           }}
           onMouseDown={e => {
+            if (lastMouseUp !== null) {
+              // Unfortunately, sometimes we don't get a mouseup after a mousedown,
+              // this can happen when a contextual menu or alert is triggered. In order to avoid
+              // being in a weird state, we clean up on the next mousedown
+              lastMouseUp(e);
+            }
             // only handle left mouse button
             if (e.button !== 0) return;
             // fixes mousemove causing selection of UI texts #32
@@ -1398,6 +1406,7 @@ class App extends React.Component<{}, AppState> {
             const onMouseUp = (e: MouseEvent) => {
               const { draggingElement, elementType } = this.state;
 
+              lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
@@ -1425,6 +1434,8 @@ class App extends React.Component<{}, AppState> {
               });
               this.forceUpdate();
             };
+
+            lastMouseUp = onMouseUp;
 
             window.addEventListener("mousemove", onMouseMove);
             window.addEventListener("mouseup", onMouseUp);
