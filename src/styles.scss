@@ -22,7 +22,6 @@ body {
 .sidePanel {
   width: 230px;
   background-color: #eee;
-
   padding: 10px;
   overflow-y: auto;
 
@@ -42,6 +41,17 @@ body {
   .panelColumn {
     display: flex;
     flex-direction: column;
+
+    h5 {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    h5:first-of-type {
+      margin-top: 0;
+    }
   }
 }
 
@@ -133,4 +143,33 @@ button {
   &:disabled {
     cursor: not-allowed;
   }
+}
+
+.popover {
+  position: absolute;
+  z-index: 2;
+
+  .cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.swatch {
+  height: 24px;
+  width: 24px;
+  display: inline;
+  margin-right: 4px;
+}
+
+.swatch-input {
+  font-size: 16px;
+  display: inline;
+  width: 100px;
+  border-radius: 2px;
+  padding: 2px 4px;
+  border: 1px solid #ddd;
 }

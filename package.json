@@ -7,12 +7,14 @@
   "main": "src/index.js",
   "dependencies": {
     "react": "16.12.0",
+    "react-color": "^2.17.3",
     "react-dom": "16.12.0",
     "react-scripts": "3.3.0",
     "roughjs": "3.1.0"
   },
   "devDependencies": {
     "@types/react": "16.9.17",
+    "@types/react-color": "^3.0.1",
     "@types/react-dom": "16.9.4",
     "husky": "3.1.0",
     "lint-staged": "9.5.0",
