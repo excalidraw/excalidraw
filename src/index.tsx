@@ -2,7 +2,7 @@ import React, { ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { SketchPicker, ColorResult } from "react-color";
+import { SketchPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { roundRect } from "./roundRect";
