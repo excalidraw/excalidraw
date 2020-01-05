@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { SketchPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 
@@ -816,9 +817,16 @@ function restore(
   }
 }
 
+enum ColorPicker {
+  CANVAS_BACKGROUND,
+  SHAPE_STROKE,
+  SHAPE_BACKGROUND
+}
+
 type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
+  currentColorPicker: ColorPicker | null;
   elementType: string;
   exportBackground: boolean;
   currentItemStrokeColor: string;
@@ -889,7 +897,6 @@ const SHAPES = [
 
 const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
 
-
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -953,6 +960,7 @@ class App extends React.Component<{}, AppState> {
     draggingElement: null,
     resizingElement: null,
     elementType: "selection",
+    currentColorPicker: null,
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
@@ -1134,7 +1142,11 @@ class App extends React.Component<{}, AppState> {
           <h4>Shapes</h4>
           <div className="panelTools">
             {SHAPES.map(({ value, icon }) => (
-              <label key={value} className="tool" title={`${capitalize(value)} - ${capitalize(value)[0]}`}>
+              <label
+                key={value}
+                className="tool"
+                title={`${capitalize(value)} - ${capitalize(value)[0]}`}
+              >
                 <input
                   type="radio"
                   checked={this.state.elementType === value}
@@ -1152,36 +1164,123 @@ class App extends React.Component<{}, AppState> {
           </div>
           <h4>Colors</h4>
           <div className="panelColumn">
-            <label>
-              <input
-                type="color"
-                value={this.state.viewBackgroundColor}
-                onChange={e => {
-                  this.setState({ viewBackgroundColor: e.target.value });
+            <h5>Canvas Background</h5>
+            <div>
+              <button
+                className="swatch"
+                style={{
+                  backgroundColor: this.state.viewBackgroundColor
                 }}
-              />
-              Background
-            </label>
-            <label>
+                onClick={() =>
+                  this.setState(s => ({
+                    currentColorPicker:
+                      s.currentColorPicker === ColorPicker.CANVAS_BACKGROUND
+                        ? null
+                        : ColorPicker.CANVAS_BACKGROUND
+                  }))
+                }
+              ></button>
+              {this.state.currentColorPicker === ColorPicker.CANVAS_BACKGROUND ? (
+                <div className="popover">
+                  <div
+                    className="cover"
+                    onClick={() => this.setState({ currentColorPicker: null })}
+                  ></div>
+                  <SketchPicker
+                    color={this.state.viewBackgroundColor}
+                    onChange={color => {
+                      this.setState({ viewBackgroundColor: color.hex });
+                    }}
+                  />
+                </div>
+              ) : null}
               <input
-                type="color"
+                type="text"
+                className="swatch-input"
+                value={this.state.viewBackgroundColor}
+                onChange={e =>
+                  this.setState({ viewBackgroundColor: e.target.value })
+                }
+              />
+            </div>
+            <h5>Shape Stroke</h5>
+            <div>
+              <button
+                className="swatch"
+                style={{
+                  backgroundColor: this.state.currentItemStrokeColor
+                }}
+                onClick={() =>
+                  this.setState(s => ({
+                    currentColorPicker:
+                      s.currentColorPicker === ColorPicker.SHAPE_STROKE
+                        ? null
+                        : ColorPicker.SHAPE_STROKE
+                  }))
+                }
+              ></button>
+              {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE ? (
+                <div className="popover">
+                  <div
+                    className="cover"
+                    onClick={() => this.setState({ currentColorPicker: null })}
+                  ></div>
+                  <SketchPicker
+                    color={this.state.currentItemStrokeColor}
+                    onChange={color => {
+                      this.setState({ currentItemStrokeColor: color.hex });
+                    }}
+                  />
+                </div>
+              ) : null}
+              <input
+                type="text"
+                className="swatch-input"
                 value={this.state.currentItemStrokeColor}
                 onChange={e => {
                   this.setState({ currentItemStrokeColor: e.target.value });
                 }}
               />
-              Shape Stroke
-            </label>
-            <label>
+            </div>
+            <h5>Shape Background</h5>
+            <div>
+              <button
+                className="swatch"
+                style={{
+                  backgroundColor: this.state.currentItemBackgroundColor
+                }}
+                onClick={() =>
+                  this.setState(s => ({
+                    currentColorPicker:
+                      s.currentColorPicker === ColorPicker.SHAPE_BACKGROUND
+                        ? null
+                        : ColorPicker.SHAPE_BACKGROUND
+                  }))
+                }
+              ></button>
+              {this.state.currentColorPicker === ColorPicker.SHAPE_BACKGROUND ? (
+                <div className="popover">
+                  <div
+                    className="cover"
+                    onClick={() => this.setState({ currentColorPicker: null })}
+                  ></div>
+                  <SketchPicker
+                    color={this.state.currentItemBackgroundColor}
+                    onChange={color => {
+                      this.setState({ currentItemBackgroundColor: color.hex });
+                    }}
+                  />
+                </div>
+              ) : null}
               <input
-                type="color"
-                value={this.state.currentItemBackgroundColor}
+                type="text"
+                className="swatch-input"
+                value={this.state.currentItemStrokeColor}
                 onChange={e => {
-                  this.setState({ currentItemBackgroundColor: e.target.value });
+                  this.setState({ currentItemStrokeColor: e.target.value });
                 }}
               />
-              Shape Background
-            </label>
+            </div>
           </div>
           <h4>Canvas</h4>
           <div className="panelColumn">
