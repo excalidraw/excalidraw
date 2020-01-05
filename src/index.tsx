@@ -1044,7 +1044,8 @@ class App extends React.Component<{}, AppState> {
                   onChange={() => {
                     this.setState({ elementType: value });
                     clearSelection();
-                    document.documentElement.style.cursor = "crosshair";
+                    document.documentElement.style.cursor =
+                      value === "text" ? "text" : "crosshair";
                     this.forceUpdate();
                   }}
                 />
