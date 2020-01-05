@@ -24,6 +24,8 @@ const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
 const elements = Array.of<ExcalidrawElement>();
 
+const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
+
 let skipHistory = false;
 const stateHistory: string[] = [];
 function generateHistoryCurrentEntry() {
@@ -991,12 +993,6 @@ class App extends React.Component<{}, AppState> {
     if (savedState) {
       this.setState(savedState);
     }
-
-    // set default name
-    if (!(savedState && savedState.name)) {
-      const name = `excalidraw-${getDateTime()}`;
-      this.setState({ name });
-    }
   }
 
   public componentWillUnmount() {
@@ -1015,7 +1011,7 @@ class App extends React.Component<{}, AppState> {
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
-    name: ""
+    name: DEFAULT_PROJECT_NAME
   };
 
   private onResize = () => {

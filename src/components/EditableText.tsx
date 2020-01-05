@@ -20,6 +20,10 @@ export default class EditableText extends Component<Props, InputState> {
     };
   }
 
+  componentWillReceiveProps(props: Props) {
+    this.setState({ value: props.value });
+  }
+
   private handleEdit(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ value: e.target.value });
   }
