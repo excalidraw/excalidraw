@@ -20,7 +20,7 @@ export default class EditableText extends Component<Props, InputState> {
     };
   }
 
-  componentWillReceiveProps(props: Props) {
+  UNSAFE_componentWillReceiveProps(props: Props) {
     this.setState({ value: props.value });
   }
 
@@ -52,6 +52,11 @@ export default class EditableText extends Component<Props, InputState> {
             value={value}
             onChange={e => this.handleEdit(e)}
             onBlur={() => this.handleBlur()}
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                this.handleBlur();
+              }
+            }}
             autoFocus
           />
         ) : (
