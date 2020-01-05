@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -12,6 +12,7 @@ import { roundRect } from "./roundRect";
 import EditableText from "./components/EditableText";
 
 import "./styles.scss";
+import ElementOption from "./components/ElementOption";
 
 type ExcalidrawElement = ReturnType<typeof newElement>;
 type ExcalidrawTextElement = ExcalidrawElement & {
@@ -742,12 +743,7 @@ function generateDraw(element: ExcalidrawElement) {
         leftY
       ] = getDiamondPoints(element);
       return generator.polygon(
-        [
-          [topX, topY],
-          [rightX, rightY],
-          [bottomX, bottomY],
-          [leftX, leftY]
-        ],
+        [[topX, topY], [rightX, rightY], [bottomX, bottomY], [leftX, leftY]],
         {
           stroke: element.strokeColor,
           fill: element.backgroundColor,
@@ -1397,9 +1393,70 @@ class App extends React.Component<{}, AppState> {
     this.setState({ currentItemBackgroundColor: color });
   };
 
+  private updateElement = (element: any, values: any) => {
+    /** Use of Object.assign instead spread because we want to keep ref to element for update is value in initial object */
+    Object.assign(element, values);
+    if (values.text || values.font) {
+      const fontSize = values.font
+        ? values.font.split("px")[0]
+        : element.font.split("px")[0];
+      context.font = `${fontSize}px Virgil`;
+      const textMeasure = context.measureText(values.text || element.text);
+      const width = textMeasure.width;
+      const actualBoundingBoxAscent =
+        textMeasure.actualBoundingBoxAscent || fontSize;
+      const actualBoundingBoxDescent =
+        textMeasure.actualBoundingBoxDescent || 0;
+      element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+      const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+      element.width = width;
+      element.height = height;
+    }
+    this.forceUpdate();
+  };
+
+  private updateFontSizeElement = (element: any, size: string) => {
+    if (size.match(/[^0-9.]/g)) {
+      return;
+    }
+    this.updateElement(element, { font: `${size}px Virgil` });
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    /** elementSelectedOptions is array of option for a selected element, ex in text : Input text, font size ... */
+    const elementSelectedOptions: Array<ReactNode> = [];
+    const selectedElement = elements.find(element => element.isSelected);
+
+    if (selectedElement) {
+      /** If the selected item is a Text so : */
+      if (isTextElement(selectedElement)) {
+        // Text value option
+        elementSelectedOptions.push(
+          <ElementOption
+            key="value"
+            label="Value"
+            value={selectedElement.text}
+            onChange={(text: string) =>
+              this.updateElement(selectedElement, { text })
+            }
+          />
+        );
+        // Font size option
+        elementSelectedOptions.push(
+          <ElementOption
+            key="size"
+            label="Size"
+            value={selectedElement.font.split("px")[0]}
+            onChange={(size: string) =>
+              this.updateFontSizeElement(selectedElement, size)
+            }
+          />
+        );
+      }
+      /** TODO: Do some option for other element's type */
+    }
 
     return (
       <div
@@ -1469,6 +1526,13 @@ class App extends React.Component<{}, AppState> {
             ))}
           </div>
           {someElementIsSelected() && (
+            <>
+              <h4>Element's options</h4>
+              <div className="panelColumn">
+                {elementSelectedOptions.length > 0
+                  ? elementSelectedOptions
+                  : "No options available"}
+              </div>
             <div className="panelColumn">
               <h4>Selection</h4>
               <div className="buttonList">
@@ -1617,6 +1681,7 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
+            </>
         </div>
         <canvas
           id="canvas"
