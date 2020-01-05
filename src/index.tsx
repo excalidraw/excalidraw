@@ -1537,7 +1537,9 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey ? width : height;
+              draggingElement.height = e.shiftKey
+                ? Math.abs(width) * Math.sign(height)
+                : height;
 
               generateDraw(draggingElement);
 
