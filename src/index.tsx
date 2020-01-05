@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -1370,19 +1370,19 @@ class App extends React.Component<{}, AppState> {
     this.changeProperty(element => (element.fillStyle = style));
   };
 
-  private changeStrokeWidth = (event: ChangeEvent<HTMLSelectElement>) => {
+  private changeStrokeWidth = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.changeProperty(element => (element.strokeWidth = +event.target.value));
   };
 
-  private changeRoughness = (event: ChangeEvent<HTMLSelectElement>) => {
+  private changeRoughness = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.changeProperty(element => (element.roughness = +event.target.value));
   };
 
-  private changeOpacity = (event: ChangeEvent<HTMLInputElement>) => {
+  private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.changeProperty(element => (element.opacity = +event.target.value));
   };
 
-  private changeSrokeColor = (color: string) => {
+  private changeStrokeColor = (color: string) => {
     this.changeProperty(element => (element.strokeColor = color));
     this.setState({ currentItemStrokeColor: color });
   };
@@ -1601,7 +1601,7 @@ class App extends React.Component<{}, AppState> {
                         />
                         <SketchPicker
                           color={this.state.currentItemStrokeColor}
-                          onChange={color => this.changeSrokeColor(color.hex)}
+                          onChange={color => this.changeStrokeColor(color.hex)}
                         />
                       </div>
                     )}
@@ -1612,7 +1612,7 @@ class App extends React.Component<{}, AppState> {
                         getSelectedStrokeColor() ||
                         this.state.currentItemStrokeColor
                       }
-                      onChange={e => this.changeSrokeColor(e.target.value)}
+                      onChange={e => this.changeStrokeColor(e.target.value)}
                     />
                   </div>
                 </div>
