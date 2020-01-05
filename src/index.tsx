@@ -1335,15 +1335,17 @@ class App extends React.Component<{}, AppState> {
               if (text === null) {
                 return;
               }
+              const fontSize = 20;
               element.text = text;
-              element.font = "20px Virgil";
+              element.font = `${fontSize}px Virgil`;
               const font = context.font;
               context.font = element.font;
-              const {
-                actualBoundingBoxAscent,
-                actualBoundingBoxDescent,
-                width
-              } = context.measureText(element.text);
+              const textMeasure = context.measureText(element.text);
+              const width = textMeasure.width;
+              const actualBoundingBoxAscent =
+                textMeasure.actualBoundingBoxAscent || fontSize;
+              const actualBoundingBoxDescent =
+                textMeasure.actualBoundingBoxDescent || 0;
               element.actualBoundingBoxAscent = actualBoundingBoxAscent;
               context.font = font;
               const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
