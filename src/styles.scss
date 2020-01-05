@@ -110,6 +110,10 @@ input[type="color"] {
   margin: 2px;
 }
 
+input[type="range"] {
+  width: 230px;
+}
+
 input {
   margin-right: 5px;
 
@@ -136,7 +140,7 @@ button {
     border-color: #d6d4d4;
   }
 
-  &:active {
+  &:active, &.active {
     background-color: #bdbebc;
     border-color: #bdbebc;
   }
