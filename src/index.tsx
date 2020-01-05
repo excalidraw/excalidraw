@@ -626,7 +626,7 @@ function exportAsPNG({
     }
   );
 
-  saveFile(name, tempCanvas.toDataURL("image/png"));
+  saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
 
   // clean up the DOM
   if (tempCanvas !== canvas) tempCanvas.remove();
@@ -992,6 +992,7 @@ class App extends React.Component<{}, AppState> {
       this.setState(savedState);
     }
 
+    // set default name
     if (!(savedState && savedState.name)) {
       const name = `excalidraw-${getDateTime()}`;
       this.setState({ name });
@@ -1147,8 +1148,6 @@ class App extends React.Component<{}, AppState> {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
-    const { name } = this.state;
-
     return (
       <div
         className="container"
@@ -1194,13 +1193,12 @@ class App extends React.Component<{}, AppState> {
       >
         <div className="sidePanel">
           <h4>Project name</h4>
-          {name && (
+          {this.state.name && (
             <EditableText
-              value={name}
-              updateName={(name: string) => this.updateProjectName(name)}
+              value={this.state.name}
+              onChange={(name: string) => this.updateProjectName(name)}
             />
           )}
-
           <h4>Shapes</h4>
           <div className="panelTools">
             {SHAPES.map(({ value, icon }) => (

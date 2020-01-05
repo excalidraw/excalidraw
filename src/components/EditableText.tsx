@@ -1,51 +1,38 @@
-import React, { createRef, Fragment, Component } from "react";
+import React, { Fragment, Component } from "react";
 
 type InputState = {
-  initialValue: string;
   value: string;
   edit: boolean;
 };
 
 type Props = {
   value: string;
-  updateName: (name: string) => void;
+  onChange: (value: string) => void;
 };
 
-export default class EditableInput extends Component<Props, InputState> {
+export default class EditableText extends Component<Props, InputState> {
   constructor(props: Props) {
     super(props);
-    const { value } = props;
 
     this.state = {
-      initialValue: value,
-      value,
+      value: props.value,
       edit: false
     };
   }
-
-  private inputRef = createRef<HTMLInputElement>();
 
   private handleEdit(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ value: e.target.value });
   }
 
   private handleBlur() {
-    const { value, initialValue } = this.state;
+    const { value } = this.state;
 
     if (!value) {
-      this.setState({ value: initialValue, edit: false });
+      this.setState({ value: this.props.value, edit: false });
       return;
     }
-    this.props.updateName(value);
-    this.setState({ edit: false, initialValue: value });
-  }
-
-  private focusInput() {
-    const input = this.inputRef.current;
-    if (input) {
-      input.focus();
-    }
-    this.setState({ edit: true });
+    this.props.onChange(value);
+    this.setState({ edit: false });
   }
 
   public render() {
@@ -61,10 +48,13 @@ export default class EditableInput extends Component<Props, InputState> {
             value={value}
             onChange={e => this.handleEdit(e)}
             onBlur={() => this.handleBlur()}
-            ref={this.inputRef}
+            autoFocus
           />
         ) : (
-          <span onClick={() => this.focusInput()} className="project-name">
+          <span
+            onClick={() => this.setState({ edit: true })}
+            className="project-name"
+          >
             {value}
           </span>
         )}
