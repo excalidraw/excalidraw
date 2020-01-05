@@ -33,3 +33,5 @@ export {
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+
+export { actionGroupElements, actionUngroupElements } from "./actionGrouping";

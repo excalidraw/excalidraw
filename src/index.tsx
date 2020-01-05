@@ -85,6 +85,8 @@ import {
   actionCopyStyles,
   actionPasteStyles,
   actionFinalize,
+  actionGroupElements,
+  actionUngroupElements
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -106,7 +108,7 @@ import {
   parseClipboardEvent,
 } from "./clipboard";
 
-let { elements } = createScene();
+let { elements, groups } = createScene();
 const { history } = createHistory();
 
 const CANVAS_WINDOW_OFFSET_LEFT = 0;
@@ -186,11 +188,12 @@ const LayerUI = React.memo(
             {actionManager.renderAction("saveScene")}
             <ExportDialog
               elements={elements}
+              groups={groups}
               appState={appState}
               actionManager={actionManager}
               onExportToPng={(exportedElements, scale) => {
                 if (canvas) {
-                  exportCanvas("png", exportedElements, canvas, {
+                  exportCanvas("png", exportedElements, groups, canvas, {
                     exportBackground: appState.exportBackground,
                     name: appState.name,
                     viewBackgroundColor: appState.viewBackgroundColor,
@@ -200,7 +203,7 @@ const LayerUI = React.memo(
               }}
               onExportToSvg={(exportedElements, scale) => {
                 if (canvas) {
-                  exportCanvas("svg", exportedElements, canvas, {
+                  exportCanvas("svg", exportedElements, groups, canvas, {
                     exportBackground: appState.exportBackground,
                     name: appState.name,
                     viewBackgroundColor: appState.viewBackgroundColor,
@@ -210,7 +213,7 @@ const LayerUI = React.memo(
               }}
               onExportToClipboard={(exportedElements, scale) => {
                 if (canvas) {
-                  exportCanvas("clipboard", exportedElements, canvas, {
+                  exportCanvas("clipboard", exportedElements, groups, canvas, {
                     exportBackground: appState.exportBackground,
                     name: appState.name,
                     viewBackgroundColor: appState.viewBackgroundColor,
@@ -225,7 +228,8 @@ const LayerUI = React.memo(
                     exportedElements.map(element => ({
                       ...element,
                       isSelected: false,
-                    })),
+                    })), 
+                    groups,
                     canvas,
                     appState,
                   );
@@ -414,6 +418,7 @@ export class App extends React.Component<any, AppState> {
       },
       () => this.state,
       () => elements,
+      () => groups,
     );
     this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
@@ -443,10 +448,13 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
 
+    this.actionManager.registerAction(actionGroupElements);
+    this.actionManager.registerAction(actionUngroupElements);
+
     this.canvasOnlyActions = [actionSelectAll];
   }
 
-  private syncActionResult = (res: ActionResult) => {
+  private syncActionResult = (res: ActionResult) => {    
     if (res.elements !== undefined) {
       elements = res.elements;
       this.setState({});
@@ -454,6 +462,11 @@ export class App extends React.Component<any, AppState> {
 
     if (res.appState !== undefined) {
       this.setState({ ...res.appState });
+    }
+
+    if (res.groups) {
+      groups = res.groups;
+      this.setState({});
     }
   };
 
@@ -546,6 +559,10 @@ export class App extends React.Component<any, AppState> {
       this.setState({ ...data.appState, selectedId });
     } else {
       this.setState({});
+    }
+
+    if (data.groups) {
+      groups = data.groups;
     }
   }
 
@@ -980,6 +997,19 @@ export class App extends React.Component<any, AppState> {
                       elements = elements.slice();
                       elementIsAddedToSelection = true;
                     }
+
+                    if (!e.ctrlKey) {
+                      const element = hitElement as ExcalidrawElement;
+                      const group = groups.find(group => group.children.find(e => e === element.id));
+                      if (group) {
+                        group.children.map(id => elements.find(e => e.id === id))
+                        .forEach(e => {
+                          if (e) {
+                            e.isSelected = true
+                          }
+                        });
+                      }
+                    }  
 
                     // We duplicate the selected element if alt is pressed on Mouse down
                     if (e.altKey) {
@@ -1428,8 +1458,10 @@ export class App extends React.Component<any, AppState> {
                   // Marking that click was used for dragging to check
                   // if elements should be deselected on mouseup
                   draggingOccurred = true;
-                  const selectedElements = elements.filter(el => el.isSelected);
-                  if (selectedElements.length) {
+                  const selectedElements = new Set<ExcalidrawElement>(
+                    elements.filter(el => el.isSelected)
+                  );
+                  if (selectedElements.size) {
                     const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
                     selectedElements.forEach(element => {
@@ -1928,6 +1960,7 @@ export class App extends React.Component<any, AppState> {
   private saveDebounced = debounce(() => {
     saveToLocalStorage(
       elements.filter(x => x.type !== "selection"),
+      groups,
       this.state,
     );
   }, 300);
@@ -1936,6 +1969,7 @@ export class App extends React.Component<any, AppState> {
     const atLeastOneVisibleElement = renderScene(
       elements,
       this.state.selectionElement,
+      groups,
       this.rc!,
       this.canvas!,
       {

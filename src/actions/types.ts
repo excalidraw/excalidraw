@@ -1,14 +1,16 @@
 import React from "react";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
   elements?: readonly ExcalidrawElement[];
+  groups?: readonly ExcalidrawGroupElement[];
   appState?: AppState;
 };
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   appState: AppState,
   formData: any,
 ) => ActionResult;

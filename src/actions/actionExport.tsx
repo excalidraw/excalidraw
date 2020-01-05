@@ -8,7 +8,7 @@ import { t } from "../i18n";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return { appState: { ...appState, name: value } };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -22,7 +22,7 @@ export const actionChangeProjectName: Action = {
 
 export const actionChangeExportBackground: Action = {
   name: "changeExportBackground",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return { appState: { ...appState, exportBackground: value } };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -41,8 +41,8 @@ export const actionChangeExportBackground: Action = {
 
 export const actionSaveScene: Action = {
   name: "saveScene",
-  perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState).catch(err => console.error(err));
+  perform: (elements, groups, appState, value) => {
+    saveAsJSON(elements, groups, appState).catch(err => console.error(err));
     return {};
   },
   PanelComponent: ({ updateData }) => (
@@ -60,6 +60,7 @@ export const actionLoadScene: Action = {
   name: "loadScene",
   perform: (
     elements,
+    groups,
     appState,
     { elements: loadedElements, appState: loadedAppState },
   ) => {

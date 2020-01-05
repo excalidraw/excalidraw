@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 
 import {
   getDefaultAppState,
@@ -19,10 +19,12 @@ import {
   copyTextToSystemClipboard,
   copyCanvasToClipboardAsPng,
 } from "../clipboard";
+import { newGroupElement } from "../element/newElement";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const LOCAL_STORAGE_KEY_GROUPS = "excalidraw-groups";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
@@ -39,11 +41,13 @@ interface DataState {
   source?: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState | null;
+  groups: ExcalidrawGroupElement[];
   selectedId?: number;
 }
 
 export function serializeAsJSON(
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   appState: AppState,
 ): string {
   return JSON.stringify(
@@ -53,6 +57,7 @@ export function serializeAsJSON(
       source: window.location.origin,
       elements: elements.map(({ shape, isSelected, ...el }) => el),
       appState: cleanAppStateForExport(appState),
+      groups: groupsToIds(groups),
     },
     null,
     2,
@@ -75,9 +80,10 @@ export function calculateScrollCenter(
 
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   appState: AppState,
 ) {
-  const serialized = serializeAsJSON(elements, appState);
+  const serialized = serializeAsJSON(elements, groups, appState);
 
   const name = `${appState.name}.json`;
   await fileSave(
@@ -102,6 +108,7 @@ export async function loadFromBlob(blob: any) {
   const updateAppState = (contents: string) => {
     const defaultAppState = getDefaultAppState();
     let elements = [];
+    let groups = [];
     let appState = defaultAppState;
     try {
       const data = JSON.parse(contents);
@@ -109,11 +116,12 @@ export async function loadFromBlob(blob: any) {
         throw new Error("Cannot load invalid json");
       }
       elements = data.elements || [];
+      groups = data.groups || [];
       appState = { ...defaultAppState, ...data.appState };
     } catch (e) {
       // Do nothing because elements array is already empty
     }
-    return { elements, appState };
+    return { elements, appState, groups };
   };
 
   if (blob.handle) {
@@ -135,20 +143,21 @@ export async function loadFromBlob(blob: any) {
       });
     })();
   }
-  const { elements, appState } = updateAppState(contents);
+  const { elements, appState, groups } = updateAppState(contents);
   if (!elements.length) {
     return Promise.reject("Cannot load invalid json");
   }
   return new Promise<DataState>(resolve => {
-    resolve(restore(elements, appState, { scrollToContent: true }));
+    resolve(restore(elements, appState, groups, { scrollToContent: true }));
   });
 }
 
 export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   appState: AppState,
 ) {
-  const json = serializeAsJSON(elements, appState);
+  const json = serializeAsJSON(elements, groups, appState);
   const encoded = new TextEncoder().encode(json);
 
   const key = await window.crypto.subtle.generateKey(
@@ -213,6 +222,7 @@ export async function importFromBackend(
   k: string | undefined,
 ) {
   let elements: readonly ExcalidrawElement[] = [];
+  let groups: ExcalidrawGroupElement[] = [];
   let appState: AppState = getDefaultAppState();
 
   try {
@@ -221,7 +231,7 @@ export async function importFromBackend(
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return restore(elements, appState, { scrollToContent: true });
+      return restore(elements, appState, groups, { scrollToContent: true });
     }
     let data;
     if (k) {
@@ -264,17 +274,28 @@ export async function importFromBackend(
 
     elements = data.elements || elements;
     appState = data.appState || appState;
+    groups = (data.groups || groups).map((ids: string[]) => {
+      const mapElements: ExcalidrawElement[] = [];
+      ids.map(id => elements.find(e => e.id === id))
+        .forEach(e => {
+          if (e) {
+            mapElements.push(e);
+          }
+        });
+      return newGroupElement(mapElements);
+    });
   } catch (error) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
   } finally {
-    return restore(elements, appState, { scrollToContent: true });
+    return restore(elements, appState, groups, { scrollToContent: true });
   }
 }
 
 export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   canvas: HTMLCanvasElement,
   {
     exportBackground,
@@ -307,7 +328,7 @@ export async function exportCanvas(
     return;
   }
 
-  const tempCanvas = exportToCanvas(elements, {
+  const tempCanvas = exportToCanvas(elements, groups, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
@@ -336,7 +357,7 @@ export async function exportCanvas(
     if (exportBackground) {
       appState.viewBackgroundColor = viewBackgroundColor;
     }
-    exportToBackend(elements, appState);
+    exportToBackend(elements, groups, appState);
   }
 
   // clean up the DOM
@@ -348,6 +369,7 @@ export async function exportCanvas(
 function restore(
   savedElements: readonly ExcalidrawElement[],
   savedState: AppState | null,
+  groups: ExcalidrawGroupElement[],
   opts?: { scrollToContent: boolean },
 ): DataState {
   const elements = savedElements.map(element => {
@@ -403,14 +425,16 @@ function restore(
   return {
     elements: elements,
     appState: savedState,
+    groups: groups,
   };
 }
 
 export function restoreFromLocalStorage() {
   const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
   const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
+  const savedGroups = localStorage.getItem(LOCAL_STORAGE_KEY_GROUPS);
 
-  let elements = [];
+  let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
       elements = JSON.parse(savedElements).map(
@@ -422,7 +446,7 @@ export function restoreFromLocalStorage() {
   }
 
   let appState = null;
-  if (savedState) {
+  if (savedState) {    
     try {
       appState = JSON.parse(savedState) as AppState;
     } catch (e) {
@@ -430,11 +454,35 @@ export function restoreFromLocalStorage() {
     }
   }
 
-  return restore(elements, appState);
+  let groups: ExcalidrawGroupElement[] = [];
+  if (appState && savedGroups) {
+    try {
+      JSON.parse(savedGroups).forEach(
+        (idArray: string[]) => {
+          const children: ExcalidrawElement[] = [];
+          idArray.map(id => elements.find(e => e.id === id))
+          .filter(el => el !== undefined)
+          .forEach(e => children.push(e as ExcalidrawElement));
+          if (children.length !== 0) {
+            groups.push(newGroupElement(children));
+          }
+        }
+      );
+    } catch (e) {
+      // Do nothing because groups array is already empty
+    }
+  }
+
+  return restore(elements, appState, groups);
+}
+
+function groupsToIds(groups: readonly ExcalidrawGroupElement[]) {
+  return groups.map(g => g.children);
 }
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   appState: AppState,
 ) {
   localStorage.setItem(
@@ -442,6 +490,10 @@ export function saveToLocalStorage(
     JSON.stringify(
       elements.map(({ shape, ...element }: ExcalidrawElement) => element),
     ),
+  );
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY_GROUPS,
+    JSON.stringify(groupsToIds(groups)),
   );
   localStorage.setItem(
     LOCAL_STORAGE_KEY_STATE,

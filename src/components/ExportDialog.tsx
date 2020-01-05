@@ -6,7 +6,7 @@ import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
 import { Island } from "./Island";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface } from "../actions/types";
@@ -27,6 +27,7 @@ type ExportCB = (
 
 function ExportModal({
   elements,
+  groups,
   appState,
   exportPadding = 10,
   actionManager,
@@ -38,6 +39,7 @@ function ExportModal({
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
+  groups: readonly ExcalidrawGroupElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -65,7 +67,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, groups, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -200,6 +202,7 @@ function ExportModal({
 
 export function ExportDialog({
   elements,
+  groups,
   appState,
   exportPadding = 10,
   actionManager,
@@ -210,6 +213,7 @@ export function ExportDialog({
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
+  groups: readonly ExcalidrawGroupElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -243,6 +247,7 @@ export function ExportDialog({
         >
           <ExportModal
             elements={elements}
+            groups={groups}
             appState={appState}
             exportPadding={exportPadding}
             actionManager={actionManager}

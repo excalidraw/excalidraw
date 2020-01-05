@@ -5,7 +5,7 @@ import { isInvisiblySmallElement } from "../element";
 
 export const actionFinalize: Action = {
   name: "finalize",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     let newElements = clearSelection(elements);
     if (window.document.activeElement instanceof HTMLElement) {
       window.document.activeElement.blur();

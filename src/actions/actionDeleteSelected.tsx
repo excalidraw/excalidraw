@@ -4,7 +4,7 @@ import { KEYS } from "../keys";
 
 export const actionDeleteSelected: Action = {
   name: "deleteSelectedElements",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     return {
       elements: deleteSelectedElements(elements),
       appState: { ...appState, elementType: "selection", multiElement: null },

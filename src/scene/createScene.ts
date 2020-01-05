@@ -1,6 +1,7 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 
 export const createScene = () => {
   const elements: readonly ExcalidrawElement[] = [];
-  return { elements };
+  const groups: readonly ExcalidrawGroupElement[] = [];
+  return { elements, groups };
 };

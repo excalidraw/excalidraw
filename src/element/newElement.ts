@@ -3,7 +3,11 @@ import nanoid from "nanoid";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawGroupElement,
+} from "../element/types";
 import { measureText } from "../utils";
 
 export function newElement(
@@ -60,6 +64,16 @@ export function newTextElement(
   };
 
   return textElement;
+}
+
+export function newGroupElement(
+  children: ExcalidrawElement[] = [],
+) {
+  const group: ExcalidrawGroupElement = {
+    type: "group",
+    children: children.map(e => e.id),
+  };
+  return group;
 }
 
 export function duplicateElement(element: ReturnType<typeof newElement>) {

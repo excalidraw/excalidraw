@@ -5,7 +5,7 @@ import {
   UpdaterFn,
   ActionFilterFn,
 } from "./types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
 
@@ -20,16 +20,20 @@ export class ActionManager implements ActionsManagerInterface {
 
   getElements: () => readonly ExcalidrawElement[];
 
+  getGroups: () => readonly ExcalidrawGroupElement[];
+
   constructor(
     updater: UpdaterFn,
     resumeHistoryRecording: () => void,
     getAppState: () => AppState,
     getElements: () => readonly ExcalidrawElement[],
+    getGroups: () => readonly ExcalidrawGroupElement[],
   ) {
     this.updater = updater;
     this.resumeHistoryRecording = resumeHistoryRecording;
     this.getAppState = getAppState;
     this.getElements = getElements;
+    this.getGroups = getGroups;
   }
 
   registerAction(action: Action) {
@@ -56,7 +60,7 @@ export class ActionManager implements ActionsManagerInterface {
     ) {
       this.resumeHistoryRecording();
     }
-    return data[0].perform(this.getElements(), this.getAppState(), null);
+    return data[0].perform(this.getElements(), this.getGroups(), this.getAppState(), null);
   }
 
   getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
@@ -78,7 +82,7 @@ export class ActionManager implements ActionsManagerInterface {
             this.resumeHistoryRecording();
           }
           this.updater(
-            action.perform(this.getElements(), this.getAppState(), null),
+            action.perform(this.getElements(), this.getGroups(), this.getAppState(), null),
           );
         },
       }));
@@ -97,7 +101,7 @@ export class ActionManager implements ActionsManagerInterface {
           this.resumeHistoryRecording();
         }
         this.updater(
-          action.perform(this.getElements(), this.getAppState(), formState),
+          action.perform(this.getElements(), this.getGroups(), this.getAppState(), formState),
         );
       };
 

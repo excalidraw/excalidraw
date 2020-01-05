@@ -1,7 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -14,9 +14,30 @@ import {
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 
+function drawLine(
+  x1: number,
+  x2: number,
+  y1: number,
+  y2: number,
+  sceneState: SceneState,
+  context: CanvasRenderingContext2D,
+) {
+  const margin = 4;
+  const lineDash = context.getLineDash();
+  context.setLineDash([8, 4]);
+  context.strokeRect(
+    x1 - margin + sceneState.scrollX,
+    y1 - margin + sceneState.scrollY,
+    x2 - x1 + margin * 2,
+    y2 - y1 + margin * 2,
+  );
+  context.setLineDash(lineDash);
+}
+
 export function renderScene(
   elements: readonly ExcalidrawElement[],
   selectionElement: ExcalidrawElement | null,
+  groups: readonly ExcalidrawGroupElement[],
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -100,35 +121,72 @@ export function renderScene(
   }
 
   if (renderSelection) {
-    const selectedElements = elements.filter(el => el.isSelected);
+    const selectedElements = new Set<ExcalidrawElement>();
+    const selectedGroups = new Set<ExcalidrawGroupElement>();
+
+    elements.forEach(element => {
+      if (element.isSelected) {
+        const index = groups.findIndex(g => g.children.find(e => e === element.id));
+        if (index !== -1) {
+          selectedGroups.add(groups[index]);
+        } else {
+          selectedElements.add(element);
+        }
+      }
+    });
 
     selectedElements.forEach(element => {
-      const margin = 4;
-
       const [
         elementX1,
         elementY1,
         elementX2,
         elementY2,
       ] = getElementAbsoluteCoords(element);
-      const lineDash = context.getLineDash();
-      context.setLineDash([8, 4]);
-      context.strokeRect(
-        elementX1 - margin + sceneState.scrollX,
-        elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2,
-      );
-      context.setLineDash(lineDash);
+      drawLine(elementX1, elementX2, elementY1, elementY2, sceneState, context);
+    });
+    
+    selectedGroups.forEach(group => {
+      let xmin = Number.MAX_VALUE;
+      let xmax = 0;
+      let ymin = Number.MAX_VALUE;
+      let ymax = 0;
+
+      group.children.forEach(id => {
+        const element = elements.find(e => e.id === id);
+        if (!element) {
+          return;
+        }
+ 
+        const [
+          elementX1,
+          elementY1,
+          elementX2,
+          elementY2,
+        ] = getElementAbsoluteCoords(element);
+        if (elementX1 < xmin) {
+          xmin = elementX1;
+        }
+        if (elementX2 > xmax) {
+          xmax = elementX2;
+        }
+        if (elementY1 < ymin) {
+          ymin = elementY1;
+        }
+        if (elementY2 > ymax) {
+          ymax = elementY2;
+        }
+      });
+      drawLine(xmin, xmax, ymin, ymax, sceneState, context);
     });
 
-    if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      const handlers = handlerRectangles(selectedElements[0], sceneState);
-      Object.values(handlers)
-        .filter(handler => handler !== undefined)
-        .forEach(handler => {
+    if (selectedElements.size === 1) {
+      const element = elements.find(el => el.isSelected);
+      if (element && element.type !== "text") {
+        const handlers = handlerRectangles(element, sceneState);
+        Object.values(handlers).forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
+      }
     }
   }
 

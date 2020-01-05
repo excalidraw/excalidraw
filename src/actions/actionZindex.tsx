@@ -10,7 +10,7 @@ import { KEYS } from "../keys";
 
 export const actionSendBackward: Action = {
   name: "sendBackward",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     return {
       elements: moveOneLeft([...elements], getSelectedIndices(elements)),
       appState,
@@ -24,7 +24,7 @@ export const actionSendBackward: Action = {
 
 export const actionBringForward: Action = {
   name: "bringForward",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     return {
       elements: moveOneRight([...elements], getSelectedIndices(elements)),
       appState,
@@ -38,7 +38,7 @@ export const actionBringForward: Action = {
 
 export const actionSendToBack: Action = {
   name: "sendToBack",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     return {
       elements: moveAllLeft([...elements], getSelectedIndices(elements)),
       appState,
@@ -51,7 +51,7 @@ export const actionSendToBack: Action = {
 
 export const actionBringToFront: Action = {
   name: "bringToFront",
-  perform: (elements, appState) => {
+  perform: (elements, _, appState) => {
     return {
       elements: moveAllRight([...elements], getSelectedIndices(elements)),
       appState,

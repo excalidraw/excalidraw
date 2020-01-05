@@ -1,5 +1,7 @@
 {
   "labels": {
+    "groupElements": "Group Elements",
+    "ungroupElements": "Ungroup Elements",
     "paste": "Paste",
     "selectAll": "Select All",
     "copy": "Copy",

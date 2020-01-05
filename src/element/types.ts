@@ -9,3 +9,7 @@ export type ExcalidrawTextElement = ExcalidrawElement & {
   actualBoundingBoxAscent?: number;
   baseline: number;
 };
+export type ExcalidrawGroupElement = {
+  type: "group";
+  children: string[];
+}

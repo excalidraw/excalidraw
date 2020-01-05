@@ -37,7 +37,7 @@ const getFormValue = function<T>(
 
 export const actionChangeStrokeColor: Action = {
   name: "changeStrokeColor",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -68,7 +68,7 @@ export const actionChangeStrokeColor: Action = {
 
 export const actionChangeBackgroundColor: Action = {
   name: "changeBackgroundColor",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -99,7 +99,7 @@ export const actionChangeBackgroundColor: Action = {
 
 export const actionChangeFillStyle: Action = {
   name: "changeFillStyle",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -136,7 +136,7 @@ export const actionChangeFillStyle: Action = {
 
 export const actionChangeStrokeWidth: Action = {
   name: "changeStrokeWidth",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -171,7 +171,7 @@ export const actionChangeStrokeWidth: Action = {
 
 export const actionChangeSloppiness: Action = {
   name: "changeSloppiness",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -206,7 +206,7 @@ export const actionChangeSloppiness: Action = {
 
 export const actionChangeOpacity: Action = {
   name: "changeOpacity",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
@@ -255,7 +255,7 @@ export const actionChangeOpacity: Action = {
 
 export const actionChangeFontSize: Action = {
   name: "changeFontSize",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => {
         if (isTextElement(el)) {
@@ -304,7 +304,7 @@ export const actionChangeFontSize: Action = {
 
 export const actionChangeFontFamily: Action = {
   name: "changeFontFamily",
-  perform: (elements, appState, value) => {
+  perform: (elements, _, appState, value) => {
     return {
       elements: changeProperty(elements, el => {
         if (isTextElement(el)) {

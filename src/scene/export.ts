@@ -1,11 +1,12 @@
 import rough from "roughjs/bin/rough";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGroupElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
+  groups: readonly ExcalidrawGroupElement[],
   {
     exportBackground,
     exportPadding = 10,
@@ -38,6 +39,7 @@ export function exportToCanvas(
   renderScene(
     elements,
     null,
+    groups,
     rough.canvas(tempCanvas),
     tempCanvas,
     {

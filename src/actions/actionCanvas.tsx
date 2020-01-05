@@ -8,7 +8,7 @@ import { t } from "../i18n";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
-  perform: (_, appState, value) => {
+  perform: (elements, groups, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
   PanelComponent: ({ appState, updateData }) => {
