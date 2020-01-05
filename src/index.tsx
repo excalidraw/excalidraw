@@ -583,6 +583,7 @@ function exportAsPNG({
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
 
+  const fileName = prompt("Enter name of project");
   // calculate smallest area to fit the contents in
 
   let subCanvasX1 = Infinity;
