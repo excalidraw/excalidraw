@@ -626,7 +626,7 @@ function exportAsPNG({
     }
   );
 
-  saveFile("excalidraw.png", tempCanvas.toDataURL("image/png"));
+  saveFile(name, tempCanvas.toDataURL("image/png"));
 
   // clean up the DOM
   if (tempCanvas !== canvas) tempCanvas.remove();
