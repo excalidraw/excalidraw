@@ -173,3 +173,12 @@ button {
   padding: 2px 4px;
   border: 1px solid #ddd;
 }
+.project-name {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.project-name-input {
+  width: 200px;
+  font: inherit;
+}

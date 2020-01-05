@@ -6,6 +6,8 @@ import { SketchPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { roundRect } from "./roundRect";
+import EditableText from "./components/EditableText";
+import { getDateTime } from "./utils";
 
 import "./styles.scss";
 
@@ -21,6 +23,8 @@ const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
 const elements = Array.of<ExcalidrawElement>();
+
+const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 let skipHistory = false;
 const stateHistory: string[] = [];
@@ -529,7 +533,7 @@ function renderScene(
   }
 }
 
-function saveAsJSON() {
+function saveAsJSON(name: string) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
@@ -537,7 +541,7 @@ function saveAsJSON() {
   });
 
   saveFile(
-    "excalidraw.json",
+    `${name}.json`,
     "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
   );
 }
@@ -573,16 +577,17 @@ function loadFromJSON() {
 function exportAsPNG({
   exportBackground,
   exportPadding = 10,
-  viewBackgroundColor
+  viewBackgroundColor,
+  name
 }: {
   exportBackground: boolean;
   exportPadding?: number;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  name: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
-
   // calculate smallest area to fit the contents in
 
   let subCanvasX1 = Infinity;
@@ -623,7 +628,7 @@ function exportAsPNG({
     }
   );
 
-  saveFile("excalidraw.png", tempCanvas.toDataURL("image/png"));
+  saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
 
   // clean up the DOM
   if (tempCanvas !== canvas) tempCanvas.remove();
@@ -872,6 +877,7 @@ type AppState = {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  name: string;
 };
 
 const KEYS = {
@@ -1004,7 +1010,8 @@ class App extends React.Component<{}, AppState> {
     currentItemBackgroundColor: "#ffffff",
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
-    scrollY: 0
+    scrollY: 0,
+    name: DEFAULT_PROJECT_NAME
   };
 
   private onResize = () => {
@@ -1128,6 +1135,10 @@ class App extends React.Component<{}, AppState> {
   };
 
   private removeWheelEventListener: (() => void) | undefined;
+
+  private updateProjectName(name: string): void {
+    this.setState({ name });
+  }
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
@@ -1349,11 +1360,20 @@ class App extends React.Component<{}, AppState> {
               background
             </label>
           </div>
+          <h4>Project name</h4>
+          <div className="panelColumn">
+            {this.state.name && (
+              <EditableText
+                value={this.state.name}
+                onChange={(name: string) => this.updateProjectName(name)}
+              />
+            )}
+          </div>
           <h4>Save/Load</h4>
           <div className="panelColumn">
             <button
               onClick={() => {
-                saveAsJSON();
+                saveAsJSON(this.state.name);
               }}
             >
               Save as...
