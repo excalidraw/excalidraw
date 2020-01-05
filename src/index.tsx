@@ -5,6 +5,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { SketchPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
+import { roundRect } from "./roundRect";
 
 import "./styles.scss";
 
@@ -255,38 +256,72 @@ type SceneState = {
 };
 
 const SCROLLBAR_WIDTH = 6;
+const SCROLLBAR_MIN_SIZE = 15;
 const SCROLLBAR_MARGIN = 4;
 const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-function getScrollbars(
+function getScrollBars(
   canvasWidth: number,
   canvasHeight: number,
   scrollX: number,
   scrollY: number
 ) {
+  let minX = Infinity;
+  let maxX = 0;
+  let minY = Infinity;
+  let maxY = 0;
+
+  elements.forEach(element => {
+    minX = Math.min(minX, getElementAbsoluteX1(element));
+    maxX = Math.max(maxX, getElementAbsoluteX2(element));
+    minY = Math.min(minY, getElementAbsoluteY1(element));
+    maxY = Math.max(maxY, getElementAbsoluteY2(element));
+  });
+
+  minX += scrollX;
+  maxX += scrollX;
+  minY += scrollY;
+  maxY += scrollY;
+  const leftOverflow = Math.max(-minX, 0);
+  const rightOverflow = Math.max(-(canvasWidth - maxX), 0);
+  const topOverflow = Math.max(-minY, 0);
+  const bottomOverflow = Math.max(-(canvasHeight - maxY), 0);
+
   // horizontal scrollbar
-  const sceneWidth = canvasWidth + Math.abs(scrollX);
-  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
-  const scrollBarX = scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
-  const horizontalScrollBar = {
-    x: scrollBarX + SCROLLBAR_MARGIN,
-    y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    width: scrollBarWidth - SCROLLBAR_MARGIN * 2,
-    height: SCROLLBAR_WIDTH
-  };
+  let horizontalScrollBar = null;
+  if (leftOverflow || rightOverflow) {
+    horizontalScrollBar = {
+      x: Math.min(
+        leftOverflow + SCROLLBAR_MARGIN,
+        canvasWidth - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
+      ),
+      y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+      width: Math.max(
+        canvasWidth - rightOverflow - leftOverflow - SCROLLBAR_MARGIN * 2,
+        SCROLLBAR_MIN_SIZE
+      ),
+      height: SCROLLBAR_WIDTH
+    };
+  }
 
   // vertical scrollbar
-  const sceneHeight = canvasHeight + Math.abs(scrollY);
-  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
-  const scrollBarY = scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
-  const verticalScrollBar = {
-    x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    y: scrollBarY + SCROLLBAR_MARGIN,
-    width: SCROLLBAR_WIDTH,
-    height: scrollBarHeight - SCROLLBAR_WIDTH * 2
-  };
+  let verticalScrollBar = null;
+  if (topOverflow || bottomOverflow) {
+    verticalScrollBar = {
+      x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+      y: Math.min(
+        topOverflow + SCROLLBAR_MARGIN,
+        canvasHeight - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
+      ),
+      width: SCROLLBAR_WIDTH,
+      height: Math.max(
+        canvasHeight - bottomOverflow - topOverflow - SCROLLBAR_WIDTH * 2,
+        SCROLLBAR_MIN_SIZE
+      )
+    };
+  }
 
   return {
     horizontal: horizontalScrollBar,
@@ -302,13 +337,14 @@ function isOverScrollBars(
   scrollX: number,
   scrollY: number
 ) {
-  const scrollBars = getScrollbars(canvasWidth, canvasHeight, scrollX, scrollY);
+  const scrollBars = getScrollBars(canvasWidth, canvasHeight, scrollX, scrollY);
 
   const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
     scrollBars.horizontal,
     scrollBars.vertical
   ].map(
     scrollBar =>
+      scrollBar &&
       scrollBar.x <= x &&
       x <= scrollBar.x + scrollBar.width &&
       scrollBar.y <= y &&
@@ -467,26 +503,28 @@ function renderScene(
   });
 
   if (renderScrollbars) {
-    const scrollBars = getScrollbars(
+    const scrollBars = getScrollBars(
       context.canvas.width / window.devicePixelRatio,
       context.canvas.height / window.devicePixelRatio,
       sceneState.scrollX,
       sceneState.scrollY
     );
 
+    const strokeStyle = context.strokeStyle;
     context.fillStyle = SCROLLBAR_COLOR;
-    context.fillRect(
-      scrollBars.horizontal.x,
-      scrollBars.horizontal.y,
-      scrollBars.horizontal.width,
-      scrollBars.horizontal.height
-    );
-    context.fillRect(
-      scrollBars.vertical.x,
-      scrollBars.vertical.y,
-      scrollBars.vertical.width,
-      scrollBars.vertical.height
-    );
+    context.strokeStyle = "rgba(255,255,255,0.8)";
+    [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
+      if (scrollBar)
+        roundRect(
+          context,
+          scrollBar.x,
+          scrollBar.y,
+          scrollBar.width,
+          scrollBar.height,
+          SCROLLBAR_WIDTH / 2
+        );
+    });
+    context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
   }
 }
