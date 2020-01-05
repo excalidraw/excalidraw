@@ -42,6 +42,8 @@ npm run start
 
 Pull requests are welcome. For major changes, please open an [issue](https://github.com/excalidraw/excalidraw/issues) first to discuss what you would like to change.
 
+You can also discuss the app on our [Gitter channel](https://gitter.im/excalidraw/community).
+
 ## Excalidraw is built using these awesome tools
 
 - [React](https://reactjs.org/)
