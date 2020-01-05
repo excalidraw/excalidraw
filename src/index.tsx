@@ -6,6 +6,8 @@ import { SketchPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { roundRect } from "./roundRect";
+import EditableText from "./components/EditableText";
+import { getDateTime } from "./utils";
 
 import "./styles.scss";
 
@@ -573,17 +575,17 @@ function loadFromJSON() {
 function exportAsPNG({
   exportBackground,
   exportPadding = 10,
-  viewBackgroundColor
+  viewBackgroundColor,
+  name
 }: {
   exportBackground: boolean;
   exportPadding?: number;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  name: string;
 }) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
-
-  const fileName = prompt("Enter name of project");
   // calculate smallest area to fit the contents in
 
   let subCanvasX1 = Infinity;
@@ -873,6 +875,7 @@ type AppState = {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  name: string;
 };
 
 const KEYS = {
@@ -988,6 +991,11 @@ class App extends React.Component<{}, AppState> {
     if (savedState) {
       this.setState(savedState);
     }
+
+    if (!(savedState && savedState.name)) {
+      const name = `excalidraw-${getDateTime()}`;
+      this.setState({ name });
+    }
   }
 
   public componentWillUnmount() {
@@ -1005,7 +1013,8 @@ class App extends React.Component<{}, AppState> {
     currentItemBackgroundColor: "#ffffff",
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
-    scrollY: 0
+    scrollY: 0,
+    name: ""
   };
 
   private onResize = () => {
@@ -1130,9 +1139,15 @@ class App extends React.Component<{}, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
+  private updateProjectName(name: string): void {
+    this.setState({ name });
+  }
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+
+    const { name } = this.state;
 
     return (
       <div
@@ -1178,6 +1193,14 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <div className="sidePanel">
+          <h4>Project name</h4>
+          {name && (
+            <EditableText
+              value={name}
+              updateName={(name: string) => this.updateProjectName(name)}
+            />
+          )}
+
           <h4>Shapes</h4>
           <div className="panelTools">
             {SHAPES.map(({ value, icon }) => (
