@@ -814,10 +814,16 @@ function restore(
   }
 }
 
+enum ColorPicker {
+  CANVAS_BACKGROUND,
+  SHAPE_STROKE,
+  SHAPE_BACKGROUND
+}
+
 type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  currentColorPicker: "Background" | "ShapeStroke" | "ShapeBackground" | null;
+  currentColorPicker: ColorPicker | null;
   elementType: string;
   exportBackground: boolean;
   currentItemStrokeColor: string;
@@ -1165,13 +1171,13 @@ class App extends React.Component<{}, AppState> {
                 onClick={() =>
                   this.setState(s => ({
                     currentColorPicker:
-                      s.currentColorPicker === "Background"
+                      s.currentColorPicker === ColorPicker.CANVAS_BACKGROUND
                         ? null
-                        : "Background"
+                        : ColorPicker.CANVAS_BACKGROUND
                   }))
                 }
               ></button>
-              {this.state.currentColorPicker === "Background" ? (
+              {this.state.currentColorPicker === ColorPicker.CANVAS_BACKGROUND ? (
                 <div className="popover">
                   <div
                     className="cover"
@@ -1204,13 +1210,13 @@ class App extends React.Component<{}, AppState> {
                 onClick={() =>
                   this.setState(s => ({
                     currentColorPicker:
-                      s.currentColorPicker === "ShapeStroke"
+                      s.currentColorPicker === ColorPicker.SHAPE_STROKE
                         ? null
-                        : "ShapeStroke"
+                        : ColorPicker.SHAPE_STROKE
                   }))
                 }
               ></button>
-              {this.state.currentColorPicker === "ShapeStroke" ? (
+              {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE ? (
                 <div className="popover">
                   <div
                     className="cover"
@@ -1243,13 +1249,13 @@ class App extends React.Component<{}, AppState> {
                 onClick={() =>
                   this.setState(s => ({
                     currentColorPicker:
-                      s.currentColorPicker === "ShapeBackground"
+                      s.currentColorPicker === ColorPicker.SHAPE_BACKGROUND
                         ? null
-                        : "ShapeBackground"
+                        : ColorPicker.SHAPE_BACKGROUND
                   }))
                 }
               ></button>
-              {this.state.currentColorPicker === "ShapeBackground" ? (
+              {this.state.currentColorPicker === ColorPicker.SHAPE_BACKGROUND ? (
                 <div className="popover">
                   <div
                     className="cover"
