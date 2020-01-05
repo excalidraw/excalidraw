@@ -817,7 +817,7 @@ function restore(
 type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  currentColorPicker: "Background" | null;
+  currentColorPicker: "Background" | "ShapeStroke" | "ShapeBackground" | null;
   elementType: string;
   exportBackground: boolean;
   currentItemStrokeColor: string;
@@ -1155,9 +1155,8 @@ class App extends React.Component<{}, AppState> {
           </div>
           <h4>Colors</h4>
           <div className="panelColumn">
+            <h5>Canvas Background</h5>
             <div>
-              <h5>Background</h5>
-
               <button
                 className="swatch"
                 style={{
@@ -1195,26 +1194,84 @@ class App extends React.Component<{}, AppState> {
                 }
               />
             </div>
-            <label>
+            <h5>Shape Stroke</h5>
+            <div>
+              <button
+                className="swatch"
+                style={{
+                  backgroundColor: this.state.currentItemStrokeColor
+                }}
+                onClick={() =>
+                  this.setState(s => ({
+                    currentColorPicker:
+                      s.currentColorPicker === "ShapeStroke"
+                        ? null
+                        : "ShapeStroke"
+                  }))
+                }
+              ></button>
+              {this.state.currentColorPicker === "ShapeStroke" ? (
+                <div className="popover">
+                  <div
+                    className="cover"
+                    onClick={() => this.setState({ currentColorPicker: null })}
+                  ></div>
+                  <SketchPicker
+                    color={this.state.currentItemStrokeColor}
+                    onChange={color => {
+                      this.setState({ currentItemStrokeColor: color.hex });
+                    }}
+                  />
+                </div>
+              ) : null}
               <input
-                type="color"
+                type="text"
+                className="swatch-input"
                 value={this.state.currentItemStrokeColor}
                 onChange={e => {
                   this.setState({ currentItemStrokeColor: e.target.value });
                 }}
               />
-              Shape Stroke
-            </label>
-            <label>
+            </div>
+            <h5>Shape Background</h5>
+            <div>
+              <button
+                className="swatch"
+                style={{
+                  backgroundColor: this.state.currentItemBackgroundColor
+                }}
+                onClick={() =>
+                  this.setState(s => ({
+                    currentColorPicker:
+                      s.currentColorPicker === "ShapeBackground"
+                        ? null
+                        : "ShapeBackground"
+                  }))
+                }
+              ></button>
+              {this.state.currentColorPicker === "ShapeBackground" ? (
+                <div className="popover">
+                  <div
+                    className="cover"
+                    onClick={() => this.setState({ currentColorPicker: null })}
+                  ></div>
+                  <SketchPicker
+                    color={this.state.currentItemBackgroundColor}
+                    onChange={color => {
+                      this.setState({ currentItemBackgroundColor: color.hex });
+                    }}
+                  />
+                </div>
+              ) : null}
               <input
-                type="color"
-                value={this.state.currentItemBackgroundColor}
+                type="text"
+                className="swatch-input"
+                value={this.state.currentItemStrokeColor}
                 onChange={e => {
-                  this.setState({ currentItemBackgroundColor: e.target.value });
+                  this.setState({ currentItemStrokeColor: e.target.value });
                 }}
               />
-              Shape Background
-            </label>
+            </div>
           </div>
           <h4>Canvas</h4>
           <div className="panelColumn">
