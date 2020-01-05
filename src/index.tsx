@@ -361,9 +361,9 @@ function renderScene(
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
     context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(-0.5, -0.5, canvas.width, canvas.height);
+    context.fillRect(0, 0, canvas.width, canvas.height);
   } else {
-    context.clearRect(-0.5, -0.5, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
   }
   context.fillStyle = fillStyle;
 
@@ -409,8 +409,8 @@ function renderScene(
 
   if (renderScrollbars) {
     const scrollBars = getScrollbars(
-      context.canvas.width,
-      context.canvas.height,
+      context.canvas.width / window.devicePixelRatio,
+      context.canvas.height / window.devicePixelRatio,
       sceneState.scrollX,
       sceneState.scrollY
     );
@@ -801,6 +801,9 @@ const someElementIsSelected = () =>
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
+let lastCanvasWidth = -1;
+let lastCanvasHeight = -1;
+
 class App extends React.Component<{}, AppState> {
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -941,6 +944,9 @@ class App extends React.Component<{}, AppState> {
   private removeWheelEventListener: (() => void) | undefined;
 
   public render() {
+    const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
+    const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+
     return (
       <div
         className="container"
@@ -1079,8 +1085,12 @@ class App extends React.Component<{}, AppState> {
         </div>
         <canvas
           id="canvas"
-          width={window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT}
-          height={window.innerHeight - CANVAS_WINDOW_OFFSET_TOP}
+          style={{
+            width: canvasWidth,
+            height: canvasHeight
+          }}
+          width={canvasWidth * window.devicePixelRatio}
+          height={canvasHeight * window.devicePixelRatio}
           ref={canvas => {
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
@@ -1092,6 +1102,19 @@ class App extends React.Component<{}, AppState> {
               });
               this.removeWheelEventListener = () =>
                 canvas.removeEventListener("wheel", this.handleWheel);
+
+              // Whenever React sets the width/height of the canvas element,
+              // the context loses the scale transform. We need to re-apply it
+              if (
+                canvasWidth !== lastCanvasWidth ||
+                canvasHeight !== lastCanvasHeight
+              ) {
+                lastCanvasWidth = canvasWidth;
+                lastCanvasHeight = canvasHeight;
+                canvas
+                  .getContext("2d")!
+                  .scale(window.devicePixelRatio, window.devicePixelRatio);
+              }
             }
           }}
           onMouseDown={e => {
@@ -1392,9 +1415,5 @@ ReactDOM.render(<App />, rootElement);
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const rc = rough.canvas(canvas);
 const context = canvas.getContext("2d")!;
-
-// Big hack to ensure that all the 1px lines are drawn at 1px instead of 2px
-// https://stackoverflow.com/questions/13879322/drawing-a-1px-thick-line-in-canvas-creates-a-2px-thick-line/13879402#comment90766599_13879402
-context.translate(0.5, 0.5);
 
 ReactDOM.render(<App />, rootElement);
