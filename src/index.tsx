@@ -166,6 +166,31 @@ function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
       distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
       distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
     );
+  } else if (element.type === "diamond") {
+    x -= element.x;
+    y -= element.y;
+
+    const [
+      topX,
+      topY,
+      rightX,
+      rightY,
+      bottomX,
+      bottomY,
+      leftX,
+      leftY
+    ] = getDiamondPoints(element);
+
+    return (
+      distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
+        lineThreshold
+    );
   } else if (element.type === "arrow") {
     let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     // The computation is done at the origin, we need to add a translation
@@ -706,6 +731,19 @@ function getArrowPoints(element: ExcalidrawElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
+function getDiamondPoints(element: ExcalidrawElement) {
+  const topX = Math.PI + element.width / 2;
+  const topY = element.height - element.height;
+  const rightX = element.width;
+  const rightY = Math.PI + element.height / 2;
+  const bottomX = topX;
+  const bottomY = element.height;
+  const leftX = topY;
+  const leftY = rightY;
+
+  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
+}
+
 function generateDraw(element: ExcalidrawElement) {
   if (element.type === "selection") {
     element.draw = (rc, context, { scrollX, scrollY }) => {
@@ -725,6 +763,36 @@ function generateDraw(element: ExcalidrawElement) {
         stroke: element.strokeColor,
         fill: element.backgroundColor
       });
+    });
+    element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.translate(element.x + scrollX, element.y + scrollY);
+      rc.draw(shape);
+      context.translate(-element.x - scrollX, -element.y - scrollY);
+    };
+  } else if (element.type === "diamond") {
+    const shape = withCustomMathRandom(element.seed, () => {
+      const [
+        topX,
+        topY,
+        rightX,
+        rightY,
+        bottomX,
+        bottomY,
+        leftX,
+        leftY
+      ] = getDiamondPoints(element);
+      return generator.polygon(
+        [
+          [topX, topY],
+          [rightX, rightY],
+          [bottomX, bottomY],
+          [leftX, leftY]
+        ],
+        {
+          stroke: element.strokeColor,
+          fill: element.backgroundColor
+        }
+      );
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
       context.translate(element.x + scrollX, element.y + scrollY);
@@ -920,6 +988,15 @@ const SHAPES = [
       </svg>
     ),
     value: "rectangle"
+  },
+  {
+    icon: (
+      // custom
+      <svg viewBox="0 0 223.646 223.646">
+        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z"></path>
+      </svg>
+    ),
+    value: "diamond"
   },
   {
     icon: (
