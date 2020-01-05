@@ -803,14 +803,19 @@ function generateDraw(element: ExcalidrawElement) {
         ],
         {
           stroke: element.strokeColor,
-          fill: element.backgroundColor
+          fill: element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness
         }
       );
     });
     element.draw = (rc, context, { scrollX, scrollY }) => {
+      context.globalAlpha = element.opacity / 100;
       context.translate(element.x + scrollX, element.y + scrollY);
       rc.draw(shape);
       context.translate(-element.x - scrollX, -element.y - scrollY);
+      context.globalAlpha = 1;
     };
   } else if (element.type === "ellipse") {
     const shape = withCustomMathRandom(element.seed, () =>
@@ -1101,19 +1106,22 @@ function getSelectedIndices() {
 const someElementIsSelected = () =>
   elements.some(element => element.isSelected);
 
-const someElementIsSelectedIsRectangleOrEllipse = () =>
-  elements.some(
-    element =>
-      element.isSelected &&
-      (element.type === "rectangle" || element.type === "ellipse")
-  );
-
-const someElementIsSelectedIsRectangleOrEllipseOrArrow = () =>
+const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
   elements.some(
     element =>
       element.isSelected &&
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
+        element.type === "diamond")
+  );
+
+const someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow = () =>
+  elements.some(
+    element =>
+      element.isSelected &&
+      (element.type === "rectangle" ||
+        element.type === "ellipse" ||
+        element.type === "diamond" ||
         element.type === "arrow")
   );
 
@@ -1609,7 +1617,7 @@ class App extends React.Component<{}, AppState> {
                   </div>
                 </div>
 
-                {someElementIsSelectedIsRectangleOrEllipse() && (
+                {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
                   <div className="panelColumn">
                     <h5>Shape Background Color</h5>
                     <div>
@@ -1663,7 +1671,7 @@ class App extends React.Component<{}, AppState> {
                 )}
               </>
 
-              {someElementIsSelectedIsRectangleOrEllipse() && (
+              {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
                 <>
                   <h4>Fill</h4>
                   <div className="panelColumn">
@@ -1741,7 +1749,7 @@ class App extends React.Component<{}, AppState> {
                 </>
               )}
 
-              {someElementIsSelectedIsRectangleOrEllipseOrArrow() && (
+              {someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow() && (
                 <>
                   <h4>Stroke width</h4>
                   <div className="panelColumn">
