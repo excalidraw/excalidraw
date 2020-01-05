@@ -520,9 +520,7 @@ function renderScene(
           scrollBar.y,
           scrollBar.width,
           scrollBar.height,
-          SCROLLBAR_WIDTH / 2,
-          true,
-          true
+          SCROLLBAR_WIDTH / 2
         );
     });
     context.strokeStyle = strokeStyle;
