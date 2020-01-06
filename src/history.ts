@@ -34,6 +34,29 @@ class SceneHistory {
     this.skipRecording();
   }
 
+  redoOnce(elements: ExcalidrawElement[]) {
+    const currentEntry = this.generateCurrentEntry(elements);
+    const entryToRestore = this.redoStack.pop();
+    if (entryToRestore !== undefined) {
+      this.restoreEntry(elements, entryToRestore);
+      this.stateHistory.push(currentEntry);
+    }
+  }
+
+  undoOnce(elements: ExcalidrawElement[]) {
+    const currentEntry = this.generateCurrentEntry(elements);
+    let entryToRestore = this.stateHistory.pop();
+
+    // If nothing was changed since last, take the previous one
+    if (currentEntry === entryToRestore) {
+      entryToRestore = this.stateHistory.pop();
+    }
+    if (entryToRestore !== undefined) {
+      this.restoreEntry(elements, entryToRestore);
+      this.redoStack.push(currentEntry);
+    }
+  }
+
   isRecording() {
     return this.recording;
   }

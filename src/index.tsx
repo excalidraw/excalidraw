@@ -206,22 +206,10 @@ class App extends React.Component<{}, AppState> {
       const currentEntry = history.generateCurrentEntry(elements);
       if (event.shiftKey) {
         // Redo action
-        const entryToRestore = history.redoStack.pop();
-        if (entryToRestore !== undefined) {
-          history.restoreEntry(elements, entryToRestore);
-          history.stateHistory.push(currentEntry);
-        }
+        history.redoOnce(elements);
       } else {
         // undo action
-        let lastEntry = history.stateHistory.pop();
-        // If nothing was changed since last, take the previous one
-        if (currentEntry === lastEntry) {
-          lastEntry = history.stateHistory.pop();
-        }
-        if (lastEntry !== undefined) {
-          history.restoreEntry(elements, lastEntry);
-          history.redoStack.push(currentEntry);
-        }
+        history.undoOnce(elements);
       }
       this.forceUpdate();
       event.preventDefault();
