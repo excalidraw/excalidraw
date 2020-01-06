@@ -999,6 +999,7 @@ type AppState = {
   scrollX: number;
   scrollY: number;
   name: string;
+  colorPickerPosition: "top" | "bottom";
 };
 
 const KEYS = {
@@ -1191,6 +1192,12 @@ function getSelectedBackgroundColor() {
   return backgroundColors.length === 1 ? backgroundColors[0] : null;
 }
 
+function getColorPickerPosition(y: number) {
+  // The SketchPicker has a height of 300 px. We determine
+  // if it should be rendered on top of the button or below it.
+  return window.innerHeight - y < 300 ? "top" : "bottom";
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
@@ -1226,7 +1233,8 @@ class App extends React.Component<{}, AppState> {
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
-    name: DEFAULT_PROJECT_NAME
+    name: DEFAULT_PROJECT_NAME,
+    colorPickerPosition: "bottom"
   };
 
   private onResize = () => {
@@ -1478,24 +1486,28 @@ class App extends React.Component<{}, AppState> {
           <h4>Canvas</h4>
           <div className="panelColumn">
             <h5>Canvas Background Color</h5>
-            <div>
+            <div className="swatch-container">
               <button
                 className="swatch"
                 style={{
                   backgroundColor: this.state.viewBackgroundColor
                 }}
-                onClick={() =>
+                onClick={e => {
+                  const y = e.clientY;
                   this.setState(s => ({
                     currentColorPicker:
                       s.currentColorPicker === ColorPicker.CANVAS_BACKGROUND
                         ? null
-                        : ColorPicker.CANVAS_BACKGROUND
-                  }))
-                }
+                        : ColorPicker.CANVAS_BACKGROUND,
+                    colorPickerPosition: getColorPickerPosition(y)
+                  }));
+                }}
               />
               {this.state.currentColorPicker ===
               ColorPicker.CANVAS_BACKGROUND ? (
-                <div className="popover">
+                <div
+                  className={`popover popover-${this.state.colorPickerPosition}`}
+                >
                   <div
                     className="cover"
                     onClick={() => this.setState({ currentColorPicker: null })}
@@ -1573,7 +1585,7 @@ class App extends React.Component<{}, AppState> {
                 <h4>Colors</h4>
                 <div className="panelColumn">
                   <h5>Shape Stroke Color</h5>
-                  <div>
+                  <div className="swatch-container">
                     <button
                       className="swatch"
                       style={{
@@ -1581,18 +1593,22 @@ class App extends React.Component<{}, AppState> {
                           getSelectedStrokeColor() ||
                           this.state.currentItemStrokeColor
                       }}
-                      onClick={() =>
+                      onClick={e => {
+                        const y = e.clientY;
                         this.setState(s => ({
                           currentColorPicker:
                             s.currentColorPicker === ColorPicker.SHAPE_STROKE
                               ? null
-                              : ColorPicker.SHAPE_STROKE
-                        }))
-                      }
+                              : ColorPicker.SHAPE_STROKE,
+                          colorPickerPosition: getColorPickerPosition(y)
+                        }));
+                      }}
                     />
                     {this.state.currentColorPicker ===
                       ColorPicker.SHAPE_STROKE && (
-                      <div className="popover">
+                      <div
+                        className={`popover popover-${this.state.colorPickerPosition}`}
+                      >
                         <div
                           className="cover"
                           onClick={() =>
@@ -1620,7 +1636,7 @@ class App extends React.Component<{}, AppState> {
                 {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
                   <div className="panelColumn">
                     <h5>Shape Background Color</h5>
-                    <div>
+                    <div className="swatch-container">
                       <button
                         className="swatch"
                         style={{
@@ -1628,19 +1644,23 @@ class App extends React.Component<{}, AppState> {
                             getSelectedBackgroundColor() ||
                             this.state.currentItemBackgroundColor
                         }}
-                        onClick={() =>
+                        onClick={e => {
+                          const y = e.clientY;
                           this.setState(s => ({
                             currentColorPicker:
                               s.currentColorPicker ===
                               ColorPicker.SHAPE_BACKGROUND
                                 ? null
-                                : ColorPicker.SHAPE_BACKGROUND
-                          }))
-                        }
+                                : ColorPicker.SHAPE_BACKGROUND,
+                            colorPickerPosition: getColorPickerPosition(y)
+                          }));
+                        }}
                       />
                       {this.state.currentColorPicker ===
                       ColorPicker.SHAPE_BACKGROUND ? (
-                        <div className="popover">
+                        <div
+                          className={`popover popover-${this.state.colorPickerPosition}`}
+                        >
                           <div
                             className="cover"
                             onClick={() =>
