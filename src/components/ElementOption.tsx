@@ -15,9 +15,9 @@ function ElementOption(props: PropsElementOption) {
     props.onChange(e.currentTarget.value);
   };
   return (
-    <>
-      <label style={{ display: 'flex', flexDirection: 'row' }}>
-        <span style={{ marginRight: 5, fontSize: 14, minWidth: 40 }}>{props.label}:</span>
+    <div style={{marginTop: 5, marginBottom: 5}}>
+      <label>
+        <h5>{props.label}</h5>
         {props.type === 'select' ? (
           <select onChange={handleChangeSelect} value={props.value} style={{ flex: 1 }}>
             {props.options?.map(option => (
@@ -27,10 +27,10 @@ function ElementOption(props: PropsElementOption) {
             ))}
           </select>
         ) : (
-          <input type={props.type || 'text'} onChange={handleChangeInput} value={props.value} style={{ flex: 1 }} />
+          <input type={props.type || 'text'} onChange={handleChangeInput} value={props.value} />
         )}
       </label>
-    </>
+    </div>
   );
 }
 

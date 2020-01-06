@@ -25,7 +25,7 @@ type ExcalidrawTextElement = ExcalidrawElement & {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-const listFonts = ["Virgil", "Arial", "Times New Roman", "Georgia", "Arial", "Helvetica", "Tahoma", "Courier"]
+const listFonts = ["Virgil", "Arial", "Times New Roman", "Georgia", "Helvetica", "Tahoma", "Courier"]
 
 const elements = Array.of<ExcalidrawElement>();
 
@@ -1447,7 +1447,7 @@ class App extends React.Component<{}, AppState> {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
     /** elementSelectedOptions is array of option for a selected element, ex in text : Input text, font size ... */
-    const elementSelectedOptions: Array<ReactNode> = [];
+    const elementSelectedTextOptions: Array<ReactNode> = [];
     const selectedElement = elements.find(element => element.isSelected);
 
     if (selectedElement) {
@@ -1455,10 +1455,10 @@ class App extends React.Component<{}, AppState> {
       if (isTextElement(selectedElement)) {
         // Text value option
         if(elements.filter(element => element.isSelected).length === 1) {
-          elementSelectedOptions.push(
+          elementSelectedTextOptions.push(
             <ElementOption
               key="value"
-              label="Value"
+              label="Text value"
               value={selectedElement.text}
               onChange={(text: string) =>
                 this.changeTextElement({ text })
@@ -1467,7 +1467,7 @@ class App extends React.Component<{}, AppState> {
           );
         }        
         // Font size option
-        elementSelectedOptions.push(
+        elementSelectedTextOptions.push(
           <ElementOption
             key="size"
             label="Size"
@@ -1478,7 +1478,7 @@ class App extends React.Component<{}, AppState> {
           />
         );
         // Font familly option
-        elementSelectedOptions.push(
+        elementSelectedTextOptions.push(
           <ElementOption
             key="fontFamilly"
             label="Font"
@@ -1491,7 +1491,6 @@ class App extends React.Component<{}, AppState> {
           />
         );
       }
-      /** TODO: Do some option for other element's type */
     }
 
     return (
@@ -1563,102 +1562,99 @@ class App extends React.Component<{}, AppState> {
           </div>
           {someElementIsSelected() && (
             <>
-              {elementSelectedOptions.length > 0 && (
-                <>
-                  <h4>Element's options</h4>
-                  <div className="panelColumn">{elementSelectedOptions}</div>
-                </>
-              )}
-            <div className="panelColumn">
-              <h4>Selection</h4>
-              <div className="buttonList">
-                <button onClick={this.moveOneRight}>Bring forward</button>
-                <button onClick={this.moveAllRight}>Bring to front</button>
-                <button onClick={this.moveOneLeft}>Send backward</button>
-                <button onClick={this.moveAllLeft}>Send to back</button>
+              
+              <div className="panelColumn">
+                <h4>Selection</h4>
+                <div className="buttonList">
+                  <button onClick={this.moveOneRight}>Bring forward</button>
+                  <button onClick={this.moveAllRight}>Bring to front</button>
+                  <button onClick={this.moveOneLeft}>Send backward</button>
+                  <button onClick={this.moveAllLeft}>Send to back</button>
+                </div>
+                {elementSelectedTextOptions.length > 0 && elementSelectedTextOptions}
+                <h5>Stroke Color</h5>
+                <ColorPicker
+                  color={getSelectedAttribute(element => element.strokeColor)}
+                  onChange={color => this.changeStrokeColor(color)}
+                />
+
+                {hasBackground() && (
+                  <>
+                    <h5>Background Color</h5>
+                    <ColorPicker
+                      color={getSelectedAttribute(
+                        element => element.backgroundColor
+                      )}
+                      onChange={color => this.changeBackgroundColor(color)}
+                    />
+                    <h5>Fill</h5>
+                    <ButtonSelect
+                      options={[
+                        { value: "solid", text: "Solid" },
+                        { value: "hachure", text: "Hachure" },
+                        { value: "cross-hatch", text: "Cross-hatch" }
+                      ]}
+                      value={getSelectedAttribute(element => element.fillStyle)}
+                      onChange={value => {
+                        this.changeProperty(element => {
+                          element.fillStyle = value;
+                        });
+                      }}
+                    />
+                  </>
+                )}
+
+                {hasStroke() && (
+                  <>
+                    <h5>Stroke Width</h5>
+                    <ButtonSelect
+                      options={[
+                        { value: 1, text: "Thin" },
+                        { value: 2, text: "Bold" },
+                        { value: 4, text: "Extra Bold" }
+                      ]}
+                      value={getSelectedAttribute(element => element.strokeWidth)}
+                      onChange={value => {
+                        this.changeProperty(element => {
+                          element.strokeWidth = value;
+                        });
+                      }}
+                    />
+
+                    <h5>Sloppiness</h5>
+                    <ButtonSelect
+                      options={[
+                        { value: 0, text: "Draftsman" },
+                        { value: 1, text: "Artist" },
+                        { value: 3, text: "Cartoonist" }
+                      ]}
+                      value={getSelectedAttribute(element => element.roughness)}
+                      onChange={value =>
+                        this.changeProperty(element => {
+                          element.roughness = value;
+                        })
+                      }
+                    />
+                  </>
+                )}
+
+                <h5>Opacity</h5>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  onChange={this.changeOpacity}
+                  value={
+                    getSelectedAttribute(element => element.opacity) ||
+                    0 /* Put the opacity at 0 if there are two conflicting ones */
+                  }
+                />
+
+                <button onClick={this.deleteSelectedElements}>
+                  Delete selected
+                </button>
               </div>
-              <h5>Stroke Color</h5>
-              <ColorPicker
-                color={getSelectedAttribute(element => element.strokeColor)}
-                onChange={color => this.changeStrokeColor(color)}
-              />
-
-              {hasBackground() && (
-                <>
-                  <h5>Background Color</h5>
-                  <ColorPicker
-                    color={getSelectedAttribute(
-                      element => element.backgroundColor
-                    )}
-                    onChange={color => this.changeBackgroundColor(color)}
-                  />
-                  <h5>Fill</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: "solid", text: "Solid" },
-                      { value: "hachure", text: "Hachure" },
-                      { value: "cross-hatch", text: "Cross-hatch" }
-                    ]}
-                    value={getSelectedAttribute(element => element.fillStyle)}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.fillStyle = value;
-                      });
-                    }}
-                  />
-                </>
-              )}
-
-              {hasStroke() && (
-                <>
-                  <h5>Stroke Width</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 1, text: "Thin" },
-                      { value: 2, text: "Bold" },
-                      { value: 4, text: "Extra Bold" }
-                    ]}
-                    value={getSelectedAttribute(element => element.strokeWidth)}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.strokeWidth = value;
-                      });
-                    }}
-                  />
-
-                  <h5>Sloppiness</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 0, text: "Draftsman" },
-                      { value: 1, text: "Artist" },
-                      { value: 3, text: "Cartoonist" }
-                    ]}
-                    value={getSelectedAttribute(element => element.roughness)}
-                    onChange={value =>
-                      this.changeProperty(element => {
-                        element.roughness = value;
-                      })
-                    }
-                  />
-                </>
-              )}
-
-              <h5>Opacity</h5>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                onChange={this.changeOpacity}
-                value={
-                  getSelectedAttribute(element => element.opacity) ||
-                  0 /* Put the opacity at 0 if there are two conflicting ones */
-                }
-              />
-
-              <button onClick={this.deleteSelectedElements}>
-                Delete selected
-              </button>
-            </div>
+            </>
           )}
           <h4>Canvas</h4>
           <div className="panelColumn">
@@ -1717,7 +1713,6 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
-            </>
         </div>
         <canvas
           id="canvas"
