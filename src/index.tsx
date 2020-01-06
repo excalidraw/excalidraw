@@ -1,35 +1,40 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
-import { RoughCanvas } from "roughjs/bin/canvas";
 import { TwitterPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { roundRect } from "./roundRect";
+import { newElement, resizeTest, generateDraw, isTextElement } from "./element";
 import {
-  newElement,
-  resizeTest,
-  generateDraw,
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2,
-  handlerRectangles,
-  hitTest,
-  isTextElement
-} from "./element";
-import { SceneState } from "./scene/types";
+  renderScene,
+  clearSelection,
+  getSelectedIndices,
+  deleteSelectedElements,
+  setSelection,
+  isOverScrollBars,
+  someElementIsSelected,
+  getSelectedAttribute,
+  loadFromJSON,
+  saveAsJSON,
+  exportAsPNG,
+  restoreFromLocalStorage,
+  saveToLocalStorage,
+  hasBackground,
+  hasStroke,
+  getElementAtPosition,
+  createScene
+} from "./scene";
+import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+
+import { getDateTime, capitalizeString, isInputLike } from "./utils";
 
 import EditableText from "./components/EditableText";
 
 import "./styles.scss";
 
-const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-
-const elements = Array.of<ExcalidrawElement>();
+const { elements } = createScene();
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
@@ -63,428 +68,8 @@ function restoreHistoryEntry(entry: string) {
   skipHistory = true;
 }
 
-const SCROLLBAR_WIDTH = 6;
-const SCROLLBAR_MIN_SIZE = 15;
-const SCROLLBAR_MARGIN = 4;
-const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-function getScrollBars(
-  canvasWidth: number,
-  canvasHeight: number,
-  scrollX: number,
-  scrollY: number
-) {
-  let minX = Infinity;
-  let maxX = 0;
-  let minY = Infinity;
-  let maxY = 0;
-
-  elements.forEach(element => {
-    minX = Math.min(minX, getElementAbsoluteX1(element));
-    maxX = Math.max(maxX, getElementAbsoluteX2(element));
-    minY = Math.min(minY, getElementAbsoluteY1(element));
-    maxY = Math.max(maxY, getElementAbsoluteY2(element));
-  });
-
-  minX += scrollX;
-  maxX += scrollX;
-  minY += scrollY;
-  maxY += scrollY;
-  const leftOverflow = Math.max(-minX, 0);
-  const rightOverflow = Math.max(-(canvasWidth - maxX), 0);
-  const topOverflow = Math.max(-minY, 0);
-  const bottomOverflow = Math.max(-(canvasHeight - maxY), 0);
-
-  // horizontal scrollbar
-  let horizontalScrollBar = null;
-  if (leftOverflow || rightOverflow) {
-    horizontalScrollBar = {
-      x: Math.min(
-        leftOverflow + SCROLLBAR_MARGIN,
-        canvasWidth - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
-      ),
-      y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-      width: Math.max(
-        canvasWidth - rightOverflow - leftOverflow - SCROLLBAR_MARGIN * 2,
-        SCROLLBAR_MIN_SIZE
-      ),
-      height: SCROLLBAR_WIDTH
-    };
-  }
-
-  // vertical scrollbar
-  let verticalScrollBar = null;
-  if (topOverflow || bottomOverflow) {
-    verticalScrollBar = {
-      x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-      y: Math.min(
-        topOverflow + SCROLLBAR_MARGIN,
-        canvasHeight - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
-      ),
-      width: SCROLLBAR_WIDTH,
-      height: Math.max(
-        canvasHeight - bottomOverflow - topOverflow - SCROLLBAR_WIDTH * 2,
-        SCROLLBAR_MIN_SIZE
-      )
-    };
-  }
-
-  return {
-    horizontal: horizontalScrollBar,
-    vertical: verticalScrollBar
-  };
-}
-
-function isOverScrollBars(
-  x: number,
-  y: number,
-  canvasWidth: number,
-  canvasHeight: number,
-  scrollX: number,
-  scrollY: number
-) {
-  const scrollBars = getScrollBars(canvasWidth, canvasHeight, scrollX, scrollY);
-
-  const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
-    scrollBars.horizontal,
-    scrollBars.vertical
-  ].map(
-    scrollBar =>
-      scrollBar &&
-      scrollBar.x <= x &&
-      x <= scrollBar.x + scrollBar.width &&
-      scrollBar.y <= y &&
-      y <= scrollBar.y + scrollBar.height
-  );
-
-  return {
-    isOverHorizontalScrollBar,
-    isOverVerticalScrollBar
-  };
-}
-
-function renderScene(
-  rc: RoughCanvas,
-  canvas: HTMLCanvasElement,
-  sceneState: SceneState,
-  // extra options, currently passed by export helper
-  {
-    offsetX,
-    offsetY,
-    renderScrollbars = true,
-    renderSelection = true
-  }: {
-    offsetX?: number;
-    offsetY?: number;
-    renderScrollbars?: boolean;
-    renderSelection?: boolean;
-  } = {}
-) {
-  if (!canvas) return;
-  const context = canvas.getContext("2d")!;
-
-  const fillStyle = context.fillStyle;
-  if (typeof sceneState.viewBackgroundColor === "string") {
-    context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  context.fillStyle = fillStyle;
-
-  const selectedIndices = getSelectedIndices();
-
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY
-  };
-
-  elements.forEach(element => {
-    element.draw(rc, context, sceneState);
-    if (renderSelection && element.isSelected) {
-      const margin = 4;
-
-      const elementX1 = getElementAbsoluteX1(element);
-      const elementX2 = getElementAbsoluteX2(element);
-      const elementY1 = getElementAbsoluteY1(element);
-      const elementY2 = getElementAbsoluteY2(element);
-      const lineDash = context.getLineDash();
-      context.setLineDash([8, 4]);
-      context.strokeRect(
-        elementX1 - margin + sceneState.scrollX,
-        elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2
-      );
-      context.setLineDash(lineDash);
-
-      if (element.type !== "text" && selectedIndices.length === 1) {
-        const handlers = handlerRectangles(element, sceneState);
-        Object.values(handlers).forEach(handler => {
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-        });
-      }
-    }
-  });
-
-  if (renderScrollbars) {
-    const scrollBars = getScrollBars(
-      context.canvas.width / window.devicePixelRatio,
-      context.canvas.height / window.devicePixelRatio,
-      sceneState.scrollX,
-      sceneState.scrollY
-    );
-
-    const strokeStyle = context.strokeStyle;
-    context.fillStyle = SCROLLBAR_COLOR;
-    context.strokeStyle = "rgba(255,255,255,0.8)";
-    [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
-      if (scrollBar)
-        roundRect(
-          context,
-          scrollBar.x,
-          scrollBar.y,
-          scrollBar.width,
-          scrollBar.height,
-          SCROLLBAR_WIDTH / 2
-        );
-    });
-    context.strokeStyle = strokeStyle;
-    context.fillStyle = fillStyle;
-  }
-}
-
-function saveAsJSON(name: string) {
-  const serialized = JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements
-  });
-
-  saveFile(
-    `${name}.json`,
-    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
-  );
-}
-
-function loadFromJSON() {
-  const input = document.createElement("input");
-  const reader = new FileReader();
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = () => {
-    if (!input.files!.length) {
-      alert("A file was not selected.");
-      return;
-    }
-
-    reader.readAsText(input.files![0], "utf8");
-  };
-
-  input.click();
-
-  return new Promise(resolve => {
-    reader.onloadend = () => {
-      if (reader.readyState === FileReader.DONE) {
-        const data = JSON.parse(reader.result as string);
-        restore(data.elements, null);
-        resolve();
-      }
-    };
-  });
-}
-
-function exportAsPNG({
-  exportBackground,
-  exportPadding = 10,
-  viewBackgroundColor,
-  name
-}: {
-  exportBackground: boolean;
-  exportPadding?: number;
-  viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
-  name: string;
-}) {
-  if (!elements.length) return window.alert("Cannot export empty canvas.");
-  // calculate smallest area to fit the contents in
-
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
-
-  elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-  });
-
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
-  }
-
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
-
-  renderScene(
-    rough.canvas(tempCanvas),
-    tempCanvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0
-    },
-    {
-      offsetX: -subCanvasX1 + exportPadding,
-      offsetY: -subCanvasY1 + exportPadding,
-      renderScrollbars: false,
-      renderSelection: false
-    }
-  );
-
-  saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
-
-  // clean up the DOM
-  if (tempCanvas !== canvas) tempCanvas.remove();
-}
-
-function saveFile(name: string, data: string) {
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", name);
-  link.setAttribute("href", data);
-  link.click();
-
-  // clean up
-  link.remove();
-}
-
-function getDateTime() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hr = date.getHours();
-  const min = date.getMinutes();
-  const secs = date.getSeconds();
-
-  return `${year}${month}${day}${hr}${min}${secs}`;
-}
-
-function isInputLike(
-  target: Element | EventTarget | null
-): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
-  return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  );
-}
-
-function setSelection(selection: ExcalidrawElement) {
-  const selectionX1 = getElementAbsoluteX1(selection);
-  const selectionX2 = getElementAbsoluteX2(selection);
-  const selectionY1 = getElementAbsoluteY1(selection);
-  const selectionY2 = getElementAbsoluteY2(selection);
-  elements.forEach(element => {
-    const elementX1 = getElementAbsoluteX1(element);
-    const elementX2 = getElementAbsoluteX2(element);
-    const elementY1 = getElementAbsoluteY1(element);
-    const elementY2 = getElementAbsoluteY2(element);
-    element.isSelected =
-      element.type !== "selection" &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2;
-  });
-}
-
-function clearSelection() {
-  elements.forEach(element => {
-    element.isSelected = false;
-  });
-}
-
-function resetCursor() {
-  document.documentElement.style.cursor = "";
-}
-
-function deleteSelectedElements() {
-  for (let i = elements.length - 1; i >= 0; --i) {
-    if (elements[i].isSelected) {
-      elements.splice(i, 1);
-    }
-  }
-}
-
-function save(state: AppState) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
-  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
-}
-
-function restoreFromLocalStorage() {
-  const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
-
-  return restore(savedElements, savedState);
-}
-
-function restore(
-  savedElements: string | ExcalidrawElement[] | null,
-  savedState: string | null
-) {
-  try {
-    if (savedElements) {
-      elements.splice(
-        0,
-        elements.length,
-        ...(typeof savedElements === "string"
-          ? JSON.parse(savedElements)
-          : savedElements)
-      );
-      elements.forEach((element: ExcalidrawElement) => {
-        element.fillStyle = element.fillStyle || "hachure";
-        element.strokeWidth = element.strokeWidth || 1;
-        element.roughness = element.roughness || 1;
-        element.opacity =
-          element.opacity === null || element.opacity === undefined
-            ? 100
-            : element.opacity;
-
-        generateDraw(element);
-      });
-    }
-
-    return savedState ? JSON.parse(savedState) : null;
-  } catch (e) {
-    elements.splice(0, elements.length);
-    return null;
-  }
-}
-
-type AppState = {
-  draggingElement: ExcalidrawElement | null;
-  resizingElement: ExcalidrawElement | null;
-  elementType: string;
-  exportBackground: boolean;
-  currentItemStrokeColor: string;
-  currentItemBackgroundColor: string;
-  viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
-  name: string;
-};
 
 const KEYS = {
   ARROW_LEFT: "ArrowLeft",
@@ -556,10 +141,6 @@ const SHAPES = [
 
 const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
 
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 function findElementByKey(key: string) {
   const defaultElement = "selection";
   return SHAPES.reduce((element, shape) => {
@@ -578,49 +159,8 @@ function isArrowKey(keyCode: string) {
   );
 }
 
-function getSelectedIndices() {
-  const selectedIndices: number[] = [];
-  elements.forEach((element, index) => {
-    if (element.isSelected) {
-      selectedIndices.push(index);
-    }
-  });
-  return selectedIndices;
-}
-
-const someElementIsSelected = () =>
-  elements.some(element => element.isSelected);
-
-const hasBackground = () =>
-  elements.some(
-    element =>
-      element.isSelected &&
-      (element.type === "rectangle" ||
-        element.type === "ellipse" ||
-        element.type === "diamond")
-  );
-
-const hasStroke = () =>
-  elements.some(
-    element =>
-      element.isSelected &&
-      (element.type === "rectangle" ||
-        element.type === "ellipse" ||
-        element.type === "diamond" ||
-        element.type === "arrow")
-  );
-
-function getSelectedAttribute<T>(
-  getAttribute: (element: ExcalidrawElement) => T
-): T | null {
-  const attributes = Array.from(
-    new Set(
-      elements
-        .filter(element => element.isSelected)
-        .map(element => getAttribute(element))
-    )
-  );
-  return attributes.length === 1 ? attributes[0] : null;
+function resetCursor() {
+  document.documentElement.style.cursor = "";
 }
 
 function addTextElement(element: ExcalidrawTextElement) {
@@ -649,19 +189,6 @@ function addTextElement(element: ExcalidrawTextElement) {
   element.height = height;
 
   return true;
-}
-
-function getElementAtPosition(x: number, y: number) {
-  let hitElement = null;
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let i = elements.length - 1; i >= 0; --i) {
-    if (hitTest(elements[i], x, y)) {
-      hitElement = elements[i];
-      break;
-    }
-  }
-
-  return hitElement;
 }
 
 function ButtonSelect<T>({
@@ -751,7 +278,7 @@ class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restoreFromLocalStorage();
+    const savedState = restoreFromLocalStorage(elements);
     if (savedState) {
       this.setState(savedState);
     }
@@ -783,11 +310,11 @@ class App extends React.Component<{}, AppState> {
     if (isInputLike(event.target)) return;
 
     if (event.key === KEYS.ESCAPE) {
-      clearSelection();
+      clearSelection(elements);
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements();
+      deleteSelectedElements(elements);
       this.forceUpdate();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
@@ -871,7 +398,7 @@ class App extends React.Component<{}, AppState> {
   };
 
   private deleteSelectedElements = () => {
-    deleteSelectedElements();
+    deleteSelectedElements(elements);
     this.forceUpdate();
   };
 
@@ -888,22 +415,22 @@ class App extends React.Component<{}, AppState> {
   };
 
   private moveAllLeft = () => {
-    moveAllLeft(elements, getSelectedIndices());
+    moveAllLeft(elements, getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveOneLeft = () => {
-    moveOneLeft(elements, getSelectedIndices());
+    moveOneLeft(elements, getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveAllRight = () => {
-    moveAllRight(elements, getSelectedIndices());
+    moveAllRight(elements, getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveOneRight = () => {
-    moveOneRight(elements, getSelectedIndices());
+    moveOneRight(elements, getSelectedIndices(elements));
     this.forceUpdate();
   };
 
@@ -950,7 +477,7 @@ class App extends React.Component<{}, AppState> {
             "text/plain",
             JSON.stringify(elements.filter(element => element.isSelected))
           );
-          deleteSelectedElements();
+          deleteSelectedElements(elements);
           this.forceUpdate();
           e.preventDefault();
         }}
@@ -972,7 +499,7 @@ class App extends React.Component<{}, AppState> {
             parsedElements.length > 0 &&
             parsedElements[0].type // need to implement a better check here...
           ) {
-            clearSelection();
+            clearSelection(elements);
             parsedElements.forEach(parsedElement => {
               parsedElement.x += 10;
               parsedElement.y += 10;
@@ -992,14 +519,16 @@ class App extends React.Component<{}, AppState> {
               <label
                 key={value}
                 className="tool"
-                title={`${capitalize(value)} - ${capitalize(value)[0]}`}
+                title={`${capitalizeString(value)} - ${
+                  capitalizeString(value)[0]
+                }`}
               >
                 <input
                   type="radio"
                   checked={this.state.elementType === value}
                   onChange={() => {
                     this.setState({ elementType: value });
-                    clearSelection();
+                    clearSelection(elements);
                     document.documentElement.style.cursor =
                       value === "text" ? "text" : "crosshair";
                     this.forceUpdate();
@@ -1009,7 +538,7 @@ class App extends React.Component<{}, AppState> {
               </label>
             ))}
           </div>
-          {someElementIsSelected() && (
+          {someElementIsSelected(elements) && (
             <div className="panelColumn">
               <h4>Selection</h4>
               <div className="buttonList">
@@ -1020,15 +549,19 @@ class App extends React.Component<{}, AppState> {
               </div>
               <h5>Stroke Color</h5>
               <ColorPicker
-                color={getSelectedAttribute(element => element.strokeColor)}
+                color={getSelectedAttribute(
+                  elements,
+                  element => element.strokeColor
+                )}
                 onChange={color => this.changeStrokeColor(color)}
               />
 
-              {hasBackground() && (
+              {hasBackground(elements) && (
                 <>
                   <h5>Background Color</h5>
                   <ColorPicker
                     color={getSelectedAttribute(
+                      elements,
                       element => element.backgroundColor
                     )}
                     onChange={color => this.changeBackgroundColor(color)}
@@ -1040,7 +573,10 @@ class App extends React.Component<{}, AppState> {
                       { value: "hachure", text: "Hachure" },
                       { value: "cross-hatch", text: "Cross-hatch" }
                     ]}
-                    value={getSelectedAttribute(element => element.fillStyle)}
+                    value={getSelectedAttribute(
+                      elements,
+                      element => element.fillStyle
+                    )}
                     onChange={value => {
                       this.changeProperty(element => {
                         element.fillStyle = value;
@@ -1050,7 +586,7 @@ class App extends React.Component<{}, AppState> {
                 </>
               )}
 
-              {hasStroke() && (
+              {hasStroke(elements) && (
                 <>
                   <h5>Stroke Width</h5>
                   <ButtonSelect
@@ -1059,7 +595,10 @@ class App extends React.Component<{}, AppState> {
                       { value: 2, text: "Bold" },
                       { value: 4, text: "Extra Bold" }
                     ]}
-                    value={getSelectedAttribute(element => element.strokeWidth)}
+                    value={getSelectedAttribute(
+                      elements,
+                      element => element.strokeWidth
+                    )}
                     onChange={value => {
                       this.changeProperty(element => {
                         element.strokeWidth = value;
@@ -1074,7 +613,10 @@ class App extends React.Component<{}, AppState> {
                       { value: 1, text: "Artist" },
                       { value: 3, text: "Cartoonist" }
                     ]}
-                    value={getSelectedAttribute(element => element.roughness)}
+                    value={getSelectedAttribute(
+                      elements,
+                      element => element.roughness
+                    )}
                     onChange={value =>
                       this.changeProperty(element => {
                         element.roughness = value;
@@ -1091,7 +633,7 @@ class App extends React.Component<{}, AppState> {
                 max="100"
                 onChange={this.changeOpacity}
                 value={
-                  getSelectedAttribute(element => element.opacity) ||
+                  getSelectedAttribute(elements, element => element.opacity) ||
                   0 /* Put the opacity at 0 if there are two conflicting ones */
                 }
               />
@@ -1127,7 +669,7 @@ class App extends React.Component<{}, AppState> {
             <h5>Image</h5>
             <button
               onClick={() => {
-                exportAsPNG(this.state);
+                exportAsPNG(elements, canvas, this.state);
               }}
             >
               Export to png
@@ -1145,14 +687,14 @@ class App extends React.Component<{}, AppState> {
             <h5>Scene</h5>
             <button
               onClick={() => {
-                saveAsJSON(this.state.name);
+                saveAsJSON(elements, this.state.name);
               }}
             >
               Save as...
             </button>
             <button
               onClick={() => {
-                loadFromJSON().then(() => this.forceUpdate());
+                loadFromJSON(elements).then(() => this.forceUpdate());
               }}
             >
               Load file...
@@ -1216,6 +758,7 @@ class App extends React.Component<{}, AppState> {
               isOverHorizontalScrollBar,
               isOverVerticalScrollBar
             } = isOverScrollBars(
+              elements,
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
               e.clientY - CANVAS_WINDOW_OFFSET_TOP,
               canvasWidth,
@@ -1263,7 +806,7 @@ class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const hitElement = getElementAtPosition(x, y);
+                const hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -1273,17 +816,17 @@ class App extends React.Component<{}, AppState> {
                   } else {
                     // We unselect every other elements unless shift is pressed
                     if (!e.shiftKey) {
-                      clearSelection();
+                      clearSelection(elements);
                     }
                     // No matter what, we select it
                     hitElement.isSelected = true;
                   }
                 } else {
                   // If we don't click on anything, let's remove all the selected elements
-                  clearSelection();
+                  clearSelection(elements);
                 }
 
-                isDraggingElements = someElementIsSelected();
+                isDraggingElements = someElementIsSelected(elements);
 
                 if (isDraggingElements) {
                   document.documentElement.style.cursor = "move";
@@ -1445,7 +988,7 @@ class App extends React.Component<{}, AppState> {
               generateDraw(draggingElement);
 
               if (this.state.elementType === "selection") {
-                setSelection(draggingElement);
+                setSelection(elements, draggingElement);
               }
               // We don't want to save history when moving an element
               skipHistory = true;
@@ -1463,7 +1006,7 @@ class App extends React.Component<{}, AppState> {
 
               // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
-                clearSelection();
+                clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
@@ -1498,7 +1041,7 @@ class App extends React.Component<{}, AppState> {
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
 
-            if (getElementAtPosition(x, y)) {
+            if (getElementAtPosition(elements, x, y)) {
               return;
             }
 
@@ -1544,12 +1087,12 @@ class App extends React.Component<{}, AppState> {
   };
 
   componentDidUpdate() {
-    renderScene(rc, canvas, {
+    renderScene(elements, rc, canvas, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    save(this.state);
+    saveToLocalStorage(elements, this.state);
     if (!skipHistory) {
       pushHistoryEntry(generateHistoryCurrentEntry());
       redoStack.splice(0, redoStack.length);
