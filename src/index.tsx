@@ -712,19 +712,33 @@ class App extends React.Component<{}, AppState> {
                     switch (resizeHandle) {
                       case "nw":
                         element.width += element.x - lastX;
-                        element.height += element.y - lastY;
                         element.x = lastX;
-                        element.y = lastY;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          element.height += element.y - lastY;
+                          element.y = lastY;
+                        }
                         break;
                       case "ne":
                         element.width = lastX - element.x;
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          element.height += element.y - lastY;
+                          element.y = lastY;
+                        }
                         break;
                       case "sw":
                         element.width += element.x - lastX;
                         element.x = lastX;
-                        element.height = lastY - element.y;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height = lastY - element.y;
+                        }
                         break;
                       case "se":
                         element.width += x - lastX;
