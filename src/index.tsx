@@ -55,6 +55,8 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
+let COPIED_STYLES: string = "{}";
+
 function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||
@@ -192,7 +194,6 @@ class App extends React.Component<{}, AppState> {
     } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
-
       // Select all: Cmd-A
     } else if (event.metaKey && event.code === "KeyA") {
       elements.forEach(element => {
@@ -209,6 +210,29 @@ class App extends React.Component<{}, AppState> {
       } else {
         // undo action
         history.undoOnce(elements);
+      }
+      this.forceUpdate();
+      event.preventDefault();
+      // Copy Styles: Cmd-Shift-C
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
+      const element = elements.find(el => el.isSelected);
+      if (element) {
+        COPIED_STYLES = JSON.stringify(element);
+      }
+      // Paste Styles: Cmd-Shift-V
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
+      const pastedElement = JSON.parse(COPIED_STYLES);
+      if (pastedElement.type) {
+        elements.forEach(element => {
+          if (element.isSelected) {
+            element.backgroundColor = pastedElement?.backgroundColor;
+            element.strokeWidth = pastedElement?.strokeWidth;
+            element.strokeColor = pastedElement?.strokeColor;
+            element.fillStyle = pastedElement?.fillStyle;
+            element.opacity = pastedElement?.opacity;
+            generateDraw(element);
+          }
+        });
       }
       this.forceUpdate();
       event.preventDefault();
