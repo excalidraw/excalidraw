@@ -842,25 +842,19 @@ function generateDraw(element: ExcalidrawElement) {
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+    const options = {
+      stroke: element.strokeColor,
+      strokeWidth: element.strokeWidth,
+      roughness: element.roughness
+    };
+
     const shapes = withCustomMathRandom(element.seed, () => [
       //    \
-      generator.line(x3, y3, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      }),
+      generator.line(x3, y3, x2, y2, options),
       // -----
-      generator.line(x1, y1, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      }),
+      generator.line(x1, y1, x2, y2, options),
       //    /
-      generator.line(x4, y4, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      })
+      generator.line(x4, y4, x2, y2, options)
     ]);
 
     element.draw = (rc, context, { scrollX, scrollY }) => {
@@ -1106,7 +1100,7 @@ function getSelectedIndices() {
 const someElementIsSelected = () =>
   elements.some(element => element.isSelected);
 
-const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
+const hasBackground = () =>
   elements.some(
     element =>
       element.isSelected &&
@@ -1115,7 +1109,7 @@ const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
         element.type === "diamond")
   );
 
-const someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow = () =>
+const hasStroke = () =>
   elements.some(
     element =>
       element.isSelected &&
@@ -1658,7 +1652,7 @@ class App extends React.Component<{}, AppState> {
                   </div>
                 </div>
 
-                {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
+                {hasBackground() && (
                   <div className="panelColumn">
                     <h5>Shape Background Color</h5>
                     <div>
@@ -1712,11 +1706,10 @@ class App extends React.Component<{}, AppState> {
                 )}
               </>
 
-              {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
+              {hasBackground() && (
                 <>
                   <h4>Fill</h4>
                   <div className="panelColumn">
-                    {/* <select onChange={this.changeFillStyle} value={getSelectedFillStyles()}> */}
                     <button
                       onClick={() => this.changeFillStyle("hachure")}
                       className={
@@ -1785,12 +1778,11 @@ class App extends React.Component<{}, AppState> {
                     >
                       Zigzag-line
                     </button>
-                    {/* </select> */}
                   </div>
                 </>
               )}
 
-              {someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow() && (
+              {hasStroke() && (
                 <>
                   <h4>Stroke width</h4>
                   <div className="panelColumn">
