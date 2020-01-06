@@ -192,7 +192,6 @@ class App extends React.Component<{}, AppState> {
     } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
-
       // Select all: Cmd-A
     } else if (event.metaKey && event.code === "KeyA") {
       elements.forEach(element => {
@@ -212,6 +211,47 @@ class App extends React.Component<{}, AppState> {
       }
       this.forceUpdate();
       event.preventDefault();
+      // Copy Styles: Cmd-Shift-C
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
+      const element = elements.find(el => el.isSelected);
+      if (element) {
+        if (!navigator.clipboard) return;
+        navigator.clipboard
+          .writeText(JSON.stringify(element))
+          .catch(err => alert("Failed to copy shape style!"));
+      }
+      // Paste Styles: Cmd-Shift-V
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
+      if (!navigator.clipboard) return;
+      navigator.clipboard
+        .readText()
+        .then(stringifiedPastedElement => {
+          const pastedElement = JSON.parse(stringifiedPastedElement);
+          if (pastedElement.type) {
+            const {
+              strokeColor,
+              strokeWidth,
+              backgroundColor,
+              fillStyle,
+              opacity
+            } = pastedElement;
+            elements.forEach(element => {
+              if (element.isSelected) {
+                element.backgroundColor = backgroundColor;
+                element.strokeWidth = strokeWidth;
+                element.strokeColor = strokeColor;
+                element.fillStyle = fillStyle;
+                element.opacity = opacity;
+                generateDraw(element);
+              }
+            });
+          }
+        })
+        .then(() => {
+          this.forceUpdate();
+          event.preventDefault();
+        })
+        .catch(err => alert("Failed to read shape style!"));
     }
   };
 
