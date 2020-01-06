@@ -5,7 +5,10 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { TwitterPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
+import { LCG, randomSeed, withCustomMathRandom } from "./random";
+import { distanceBetweenPointAndSegment } from "./math";
 import { roundRect } from "./roundRect";
+
 import EditableText from "./components/EditableText";
 
 import "./styles.scss";
@@ -53,64 +56,6 @@ function restoreHistoryEntry(entry: string) {
   });
   // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
   skipHistory = true;
-}
-
-// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
-const LCG = (seed: number) => () =>
-  ((2 ** 31 - 1) & (seed = Math.imul(48271, seed))) / 2 ** 31;
-
-function randomSeed() {
-  return Math.floor(Math.random() * 2 ** 31);
-}
-
-// Unfortunately, roughjs doesn't support a seed attribute (https://github.com/pshihn/rough/issues/27).
-// We can achieve the same result by overriding the Math.random function with a
-// pseudo random generator that supports a random seed and swapping it back after.
-function withCustomMathRandom<T>(seed: number, cb: () => T): T {
-  const random = Math.random;
-  Math.random = LCG(seed);
-  const result = cb();
-  Math.random = random;
-  return result;
-}
-
-// https://stackoverflow.com/a/6853926/232122
-function distanceBetweenPointAndSegment(
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-) {
-  const A = x - x1;
-  const B = y - y1;
-  const C = x2 - x1;
-  const D = y2 - y1;
-
-  const dot = A * C + B * D;
-  const lenSquare = C * C + D * D;
-  let param = -1;
-  if (lenSquare !== 0) {
-    // in case of 0 length line
-    param = dot / lenSquare;
-  }
-
-  let xx, yy;
-  if (param < 0) {
-    xx = x1;
-    yy = y1;
-  } else if (param > 1) {
-    xx = x2;
-    yy = y2;
-  } else {
-    xx = x1 + param * C;
-    yy = y1 + param * D;
-  }
-
-  const dx = x - xx;
-  const dy = y - yy;
-  return Math.hypot(dx, dy);
 }
 
 function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
