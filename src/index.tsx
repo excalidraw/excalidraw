@@ -1191,35 +1191,35 @@ function getSelectedBackgroundColor() {
   return backgroundColors.length === 1 ? backgroundColors[0] : null;
 }
 
-function addTextElement(element: ExcalidrawElement) {
-  if (isTextElement(element)) {
-    resetCursor();
-    const text = prompt("What text do you want?");
-    if (text === null) {
-      return;
-    }
-    const fontSize = 20;
-    element.text = text;
-    element.font = `${fontSize}px Virgil`;
-    const font = context.font;
-    context.font = element.font;
-    const textMeasure = context.measureText(element.text);
-    const width = textMeasure.width;
-    const actualBoundingBoxAscent =
-      textMeasure.actualBoundingBoxAscent || fontSize;
-    const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
-    element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-    context.font = font;
-    const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
-    // Center the text
-    element.x -= width / 2;
-    element.y -= actualBoundingBoxAscent;
-    element.width = width;
-    element.height = height;
+function addTextElement(element: ExcalidrawTextElement) {
+  resetCursor();
+  const text = prompt("What text do you want?");
+  if (text === null || text === "") {
+    return false;
   }
+  const fontSize = 20;
+  element.text = text;
+  element.font = `${fontSize}px Virgil`;
+  const font = context.font;
+  context.font = element.font;
+  const textMeasure = context.measureText(element.text);
+  const width = textMeasure.width;
+  const actualBoundingBoxAscent =
+    textMeasure.actualBoundingBoxAscent || fontSize;
+  const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
+  element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+  context.font = font;
+  const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+  // Center the text
+  element.x -= width / 2;
+  element.y -= actualBoundingBoxAscent;
+  element.width = width;
+  element.height = height;
+
+  return true;
 }
 
-function checkHitElement(x: number, y: number) {
+function getElementAtPosition(x: number, y: number) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
@@ -1938,7 +1938,7 @@ class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const hitElement = checkHitElement(x, y);
+                const hitElement = getElementAtPosition(x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -1966,7 +1966,11 @@ class App extends React.Component<{}, AppState> {
               }
             }
 
-            addTextElement(element);
+            if (isTextElement(element)) {
+              if (!addTextElement(element)) {
+                return;
+              }
+            }
 
             generateDraw(element);
             elements.push(element);
@@ -2169,9 +2173,7 @@ class App extends React.Component<{}, AppState> {
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
 
-            const hitElement = checkHitElement(x, y);
-
-            if (hitElement) {
+            if (getElementAtPosition(x, y)) {
               return;
             }
 
@@ -2187,7 +2189,12 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            addTextElement(element);
+            if (isTextElement(element)) {
+              if (!addTextElement(element)) {
+                return;
+              }
+            }
+
             generateDraw(element);
             elements.push(element);
 
