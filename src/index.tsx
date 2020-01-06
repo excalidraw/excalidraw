@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
-import { TwitterPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
@@ -30,7 +29,10 @@ import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { getDateTime, capitalizeString, isInputLike } from "./utils";
 
-import EditableText from "./components/EditableText";
+import { EditableText } from "./components/EditableText";
+import { ButtonSelect } from "./components/ButtonSelect";
+import { ColorPicker } from "./components/ColorPicker";
+import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
 
 import "./styles.scss";
 
@@ -81,75 +83,6 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
-// We inline font-awesome icons in order to save on js size rather than including the font awesome react library
-const SHAPES = [
-  {
-    icon: (
-      // fa-mouse-pointer
-      <svg viewBox="0 0 320 512">
-        <path d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z" />
-      </svg>
-    ),
-    value: "selection"
-  },
-  {
-    icon: (
-      // fa-square
-      <svg viewBox="0 0 448 512">
-        <path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z" />
-      </svg>
-    ),
-    value: "rectangle"
-  },
-  {
-    icon: (
-      // custom
-      <svg viewBox="0 0 223.646 223.646">
-        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z" />
-      </svg>
-    ),
-    value: "diamond"
-  },
-  {
-    icon: (
-      // fa-circle
-      <svg viewBox="0 0 512 512">
-        <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z" />
-      </svg>
-    ),
-    value: "ellipse"
-  },
-  {
-    icon: (
-      // fa-long-arrow-alt-right
-      <svg viewBox="0 0 448 512">
-        <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-      </svg>
-    ),
-    value: "arrow"
-  },
-  {
-    icon: (
-      // fa-font
-      <svg viewBox="0 0 448 512">
-        <path d="M432 416h-23.41L277.88 53.69A32 32 0 0 0 247.58 32h-47.16a32 32 0 0 0-30.3 21.69L39.41 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-19.58l23.3-64h152.56l23.3 64H304a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM176.85 272L224 142.51 271.15 272z" />
-      </svg>
-    ),
-    value: "text"
-  }
-];
-
-const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
-
-function findElementByKey(key: string) {
-  const defaultElement = "selection";
-  return SHAPES.reduce((element, shape) => {
-    if (shape.value[0] !== key) return element;
-
-    return shape.value;
-  }, defaultElement);
-}
-
 function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||
@@ -189,80 +122,6 @@ function addTextElement(element: ExcalidrawTextElement) {
   element.height = height;
 
   return true;
-}
-
-function ButtonSelect<T>({
-  options,
-  value,
-  onChange
-}: {
-  options: { value: T; text: string }[];
-  value: T | null;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className="buttonList">
-      {options.map(option => (
-        <button
-          key={option.text}
-          onClick={() => onChange(option.value)}
-          className={value === option.value ? "active" : ""}
-        >
-          {option.text}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function ColorPicker({
-  color,
-  onChange
-}: {
-  color: string | null;
-  onChange: (color: string) => void;
-}) {
-  const [isActive, setActive] = React.useState(false);
-  return (
-    <div>
-      <button
-        className="swatch"
-        style={color ? { backgroundColor: color } : undefined}
-        onClick={() => setActive(!isActive)}
-      />
-      {isActive ? (
-        <div className="popover">
-          <div className="cover" onClick={() => setActive(false)} />
-          <TwitterPicker
-            colors={[
-              "#000000",
-              "#ABB8C3",
-              "#FFFFFF",
-              "#FF6900",
-              "#FCB900",
-              "#00D084",
-              "#8ED1FC",
-              "#0693E3",
-              "#EB144C",
-              "#F78DA7",
-              "#9900EF"
-            ]}
-            width="205px"
-            color={color || undefined}
-            onChange={changedColor => {
-              onChange(changedColor.hex);
-            }}
-          />
-        </div>
-      ) : null}
-      <input
-        type="text"
-        className="swatch-input"
-        value={color || ""}
-        onChange={e => onChange(e.target.value)}
-      />
-    </div>
-  );
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -370,7 +229,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
-      this.setState({ elementType: findElementByKey(event.key) });
+      this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event.metaKey && event.code === "KeyZ") {
       const currentEntry = generateHistoryCurrentEntry();
       if (event.shiftKey) {
