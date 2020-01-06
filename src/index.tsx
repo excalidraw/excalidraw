@@ -27,6 +27,8 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 let skipHistory = false;
 const stateHistory: string[] = [];
+const redoStack: string[] = [];
+
 function generateHistoryCurrentEntry() {
   return JSON.stringify(
     elements.map(element => ({ ...element, isSelected: false }))
@@ -1351,13 +1353,25 @@ class App extends React.Component<{}, AppState> {
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findElementByKey(event.key) });
     } else if (event.metaKey && event.code === "KeyZ") {
-      let lastEntry = stateHistory.pop();
-      // If nothing was changed since last, take the previous one
-      if (generateHistoryCurrentEntry() === lastEntry) {
-        lastEntry = stateHistory.pop();
-      }
-      if (lastEntry !== undefined) {
-        restoreHistoryEntry(lastEntry);
+      const currentEntry = generateHistoryCurrentEntry();
+      if (event.shiftKey) {
+        // Redo action
+        const entryToRestore = redoStack.pop();
+        if (entryToRestore !== undefined) {
+          restoreHistoryEntry(entryToRestore);
+          stateHistory.push(currentEntry);
+        }
+      } else {
+        // undo action
+        let lastEntry = stateHistory.pop();
+        // If nothing was changed since last, take the previous one
+        if (currentEntry === lastEntry) {
+          lastEntry = stateHistory.pop();
+        }
+        if (lastEntry !== undefined) {
+          restoreHistoryEntry(lastEntry);
+          redoStack.push(currentEntry);
+        }
       }
       this.forceUpdate();
       event.preventDefault();
@@ -2046,6 +2060,7 @@ class App extends React.Component<{}, AppState> {
     save(this.state);
     if (!skipHistory) {
       pushHistoryEntry(generateHistoryCurrentEntry());
+      redoStack.splice(0, redoStack.length);
     }
     skipHistory = false;
   }
