@@ -203,7 +203,6 @@ class App extends React.Component<{}, AppState> {
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event.metaKey && event.code === "KeyZ") {
-      const currentEntry = history.generateCurrentEntry(elements);
       if (event.shiftKey) {
         // Redo action
         history.redoOnce(elements);
@@ -914,7 +913,7 @@ class App extends React.Component<{}, AppState> {
     saveToLocalStorage(elements, this.state);
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
-      history.redoStack.splice(0, history.redoStack.length);
+      history.clearRedoStack();
     }
     history.resumeRecording();
   }
