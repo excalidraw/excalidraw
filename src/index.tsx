@@ -742,10 +742,10 @@ function getArrowPoints(element: ExcalidrawElement) {
 }
 
 function getDiamondPoints(element: ExcalidrawElement) {
-  const topX = Math.PI + element.width / 2;
-  const topY = element.height - element.height;
+  const topX = Math.floor(element.width / 2) + 1;
+  const topY = 0;
   const rightX = element.width;
-  const rightY = Math.PI + element.height / 2;
+  const rightY = Math.floor(element.height / 2) + 1;
   const bottomX = topX;
   const bottomY = element.height;
   const leftX = topY;
@@ -797,7 +797,12 @@ function generateDraw(element: ExcalidrawElement) {
         leftY
       ] = getDiamondPoints(element);
       return generator.polygon(
-        [[topX, topY], [rightX, rightY], [bottomX, bottomY], [leftX, leftY]],
+        [
+          [topX, topY],
+          [rightX, rightY],
+          [bottomX, bottomY],
+          [leftX, leftY]
+        ],
         {
           stroke: element.strokeColor,
           fill: element.backgroundColor,
@@ -1186,6 +1191,7 @@ function ButtonSelect<T>({
     <div className="buttonList">
       {options.map(option => (
         <button
+          key={option.text}
           onClick={() => onChange(option.value)}
           className={value === option.value ? "active" : ""}
         >
