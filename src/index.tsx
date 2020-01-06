@@ -795,12 +795,7 @@ function generateDraw(element: ExcalidrawElement) {
         leftY
       ] = getDiamondPoints(element);
       return generator.polygon(
-        [
-          [topX, topY],
-          [rightX, rightY],
-          [bottomX, bottomY],
-          [leftX, leftY]
-        ],
+        [[topX, topY], [rightX, rightY], [bottomX, bottomY], [leftX, leftY]],
         {
           stroke: element.strokeColor,
           fill: element.backgroundColor,
@@ -1039,7 +1034,7 @@ const SHAPES = [
     icon: (
       // custom
       <svg viewBox="0 0 223.646 223.646">
-        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z"></path>
+        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z" />
       </svg>
     ),
     value: "diamond"
@@ -1137,7 +1132,7 @@ function getSelectedFillStyles() {
         .map(element => element.fillStyle)
     )
   );
-  return fillStyles.length === 1 ? fillStyles[0] : "";
+  return fillStyles.length === 1 ? fillStyles[0] : null;
 }
 
 function getSelectedStrokeWidth() {
@@ -1145,10 +1140,10 @@ function getSelectedStrokeWidth() {
     new Set(
       elements
         .filter(element => element.isSelected)
-        .map(element => `${element.strokeWidth}`)
+        .map(element => element.strokeWidth)
     )
   );
-  return strokeWidth.length === 1 ? +strokeWidth[0] : "";
+  return strokeWidth.length === 1 ? strokeWidth[0] : null;
 }
 
 function getSelectedRoughness() {
@@ -1156,10 +1151,10 @@ function getSelectedRoughness() {
     new Set(
       elements
         .filter(element => element.isSelected)
-        .map(element => `${element.roughness}`)
+        .map(element => element.roughness)
     )
   );
-  return roughness.length === 1 ? +roughness[0] : "";
+  return roughness.length === 1 ? roughness[0] : null;
 }
 
 function getSelectedOpacity() {
@@ -1167,10 +1162,10 @@ function getSelectedOpacity() {
     new Set(
       elements
         .filter(element => element.isSelected)
-        .map(element => `${element.opacity}`)
+        .map(element => element.opacity)
     )
   );
-  return opacity.length === 1 ? +opacity[0] : "";
+  return opacity.length === 1 ? opacity[0] : null;
 }
 
 function getSelectedStrokeColor() {
@@ -1234,6 +1229,29 @@ function getElementAtPosition(x: number, y: number) {
   }
 
   return hitElement;
+}
+
+function ButtonSelect<T>({
+  options,
+  value,
+  onChange
+}: {
+  options: { value: T; text: string }[];
+  value: T | null;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="buttonList">
+      {options.map(option => (
+        <button
+          onClick={() => onChange(option.value)}
+          className={value === option.value ? "active" : ""}
+        >
+          {option.text}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -1411,18 +1429,6 @@ class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
-  private changeFillStyle = (style: string) => {
-    this.changeProperty(element => (element.fillStyle = style));
-  };
-
-  private changeStrokeWidth = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.changeProperty(element => (element.strokeWidth = +event.target.value));
-  };
-
-  private changeRoughness = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.changeProperty(element => (element.roughness = +event.target.value));
-  };
-
   private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.changeProperty(element => (element.opacity = +event.target.value));
   };
@@ -1509,65 +1515,60 @@ class App extends React.Component<{}, AppState> {
             ))}
           </div>
           {someElementIsSelected() && (
-            <>
-              <h4>Selected Shapes</h4>
-              <div className="panelColumn">
-                <button onClick={this.deleteSelectedElements}>Delete</button>
+            <div className="panelColumn">
+              <h4>Selection</h4>
+              <div className="buttonList">
                 <button onClick={this.moveOneRight}>Bring forward</button>
                 <button onClick={this.moveAllRight}>Bring to front</button>
                 <button onClick={this.moveOneLeft}>Send backward</button>
                 <button onClick={this.moveAllLeft}>Send to back</button>
               </div>
-              <h4>Colors</h4>
-              <div className="panelColumn">
-                <h5>Shape Stroke Color</h5>
-                <div>
-                  <button
-                    className="swatch"
-                    style={{
-                      backgroundColor:
-                        getSelectedStrokeColor() ||
-                        this.state.currentItemStrokeColor
-                    }}
-                    onClick={() =>
-                      this.setState(s => ({
-                        currentColorPicker:
-                          s.currentColorPicker === ColorPicker.SHAPE_STROKE
-                            ? null
-                            : ColorPicker.SHAPE_STROKE
-                      }))
-                    }
-                  />
-                  {this.state.currentColorPicker ===
-                    ColorPicker.SHAPE_STROKE && (
-                    <div className="popover">
-                      <div
-                        className="cover"
-                        onClick={() =>
-                          this.setState({ currentColorPicker: null })
-                        }
-                      />
-                      <SketchPicker
-                        color={this.state.currentItemStrokeColor}
-                        onChange={color => this.changeStrokeColor(color.hex)}
-                      />
-                    </div>
-                  )}
-                  <input
-                    type="text"
-                    className="swatch-input"
-                    value={
+              <h5>Stroke Color</h5>
+              <div>
+                <button
+                  className="swatch"
+                  style={{
+                    backgroundColor:
                       getSelectedStrokeColor() ||
                       this.state.currentItemStrokeColor
-                    }
-                    onChange={e => this.changeStrokeColor(e.target.value)}
-                  />
-                </div>
+                  }}
+                  onClick={() =>
+                    this.setState(s => ({
+                      currentColorPicker:
+                        s.currentColorPicker === ColorPicker.SHAPE_STROKE
+                          ? null
+                          : ColorPicker.SHAPE_STROKE
+                    }))
+                  }
+                />
+                {this.state.currentColorPicker === ColorPicker.SHAPE_STROKE && (
+                  <div className="popover">
+                    <div
+                      className="cover"
+                      onClick={() =>
+                        this.setState({ currentColorPicker: null })
+                      }
+                    />
+                    <SketchPicker
+                      color={this.state.currentItemStrokeColor}
+                      onChange={color => this.changeStrokeColor(color.hex)}
+                    />
+                  </div>
+                )}
+                <input
+                  type="text"
+                  className="swatch-input"
+                  value={
+                    getSelectedStrokeColor() ||
+                    this.state.currentItemStrokeColor
+                  }
+                  onChange={e => this.changeStrokeColor(e.target.value)}
+                />
               </div>
 
               {hasBackground() && (
-                <div className="panelColumn">
-                  <h5>Shape Background Color</h5>
+                <>
+                  <h5>Background Color</h5>
                   <div>
                     <button
                       className="swatch"
@@ -1613,119 +1614,78 @@ class App extends React.Component<{}, AppState> {
                       onChange={e => this.changeBackgroundColor(e.target.value)}
                     />
                   </div>
-                </div>
+                </>
               )}
 
               {hasBackground() && (
                 <>
-                  <h4>Fill</h4>
-                  <div className="panelColumn">
-                    <button
-                      onClick={() => this.changeFillStyle("hachure")}
-                      className={
-                        getSelectedFillStyles() === "hachure" ? "active" : ""
-                      }
-                    >
-                      Hachure
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("solid")}
-                      className={
-                        getSelectedFillStyles() === "solid" ? "active" : ""
-                      }
-                    >
-                      Solid
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("zigzag")}
-                      className={
-                        getSelectedFillStyles() === "zigzag" ? "active" : ""
-                      }
-                    >
-                      Zigzag
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("cross-hatch")}
-                      className={
-                        getSelectedFillStyles() === "cross-hatch"
-                          ? "active"
-                          : ""
-                      }
-                    >
-                      Cross-hatch
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("sunburst")}
-                      className={
-                        getSelectedFillStyles() === "sunburst" ? "active" : ""
-                      }
-                    >
-                      Sunburst
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("dashed")}
-                      className={
-                        getSelectedFillStyles() === "dashed" ? "active" : ""
-                      }
-                    >
-                      Dashed
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("zigzag-line")}
-                      className={
-                        getSelectedFillStyles() === "zigzag-line"
-                          ? "active"
-                          : ""
-                      }
-                    >
-                      Zigzag-line
-                    </button>
-                  </div>
+                  <h5>Fill</h5>
+                  <ButtonSelect
+                    options={[
+                      { value: "solid", text: "Solid" },
+                      { value: "hachure", text: "Hachure" },
+                      { value: "cross-hatch", text: "Cross-hatch" }
+                    ]}
+                    value={getSelectedFillStyles()}
+                    onChange={value => {
+                      this.changeProperty(element => {
+                        element.fillStyle = value;
+                      });
+                    }}
+                  />
                 </>
               )}
 
               {hasStroke() && (
                 <>
-                  <h4>Stroke width</h4>
-                  <div className="panelColumn">
-                    <select
-                      onChange={this.changeStrokeWidth}
-                      value={getSelectedStrokeWidth()}
-                    >
-                      <option hidden disabled value=""></option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                      <option value="8">8</option>
-                    </select>
-                  </div>
+                  <h5>Stroke Width</h5>
+                  <ButtonSelect
+                    options={[
+                      { value: 1, text: "Thin" },
+                      { value: 2, text: "Bold" },
+                      { value: 4, text: "Extra Bold" }
+                    ]}
+                    value={getSelectedStrokeWidth()}
+                    onChange={value => {
+                      this.changeProperty(element => {
+                        element.strokeWidth = value;
+                      });
+                    }}
+                  />
 
-                  <h4>Roughness</h4>
-                  <div className="panelColumn">
-                    <select
-                      onChange={this.changeRoughness}
-                      value={getSelectedRoughness()}
-                    >
-                      <option hidden disabled value=""></option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                      <option value="8">8</option>
-                      <option value="10">10</option>
-                    </select>
-                  </div>
+                  <h5>Slopiness</h5>
+                  <ButtonSelect
+                    options={[
+                      { value: 0, text: "Draftsman" },
+                      { value: 1, text: "Artist" },
+                      { value: 3, text: "Cartoonist" }
+                    ]}
+                    value={getSelectedRoughness()}
+                    onChange={value =>
+                      this.changeProperty(element => {
+                        element.roughness = value;
+                      })
+                    }
+                  />
                 </>
               )}
 
-              <h4>Opacity</h4>
+              <h5>Opacity</h5>
               <input
                 type="range"
                 min="0"
                 max="100"
                 onChange={this.changeOpacity}
-                value={getSelectedOpacity()}
+                value={
+                  getSelectedOpacity() ||
+                  0 /* Put the opacity at 0 if there are two conflicting ones */
+                }
               />
-            </>
+
+              <button onClick={this.deleteSelectedElements}>
+                Delete selected
+              </button>
+            </div>
           )}
           <h4>Canvas</h4>
           <div className="panelColumn">
