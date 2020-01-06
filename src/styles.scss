@@ -24,6 +24,7 @@ body {
   background-color: #eee;
   padding: 10px;
   overflow-y: auto;
+  position: relative;
 
   h4 {
     margin: 10px 0 10px 0;
@@ -50,7 +51,7 @@ body {
       color: #333;
     }
 
-    h5:first-of-type {
+    h5:first-child {
       margin-top: 0;
     }
 
