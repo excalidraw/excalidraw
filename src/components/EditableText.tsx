@@ -10,7 +10,7 @@ type Props = {
   onChange: (value: string) => void;
 };
 
-export default class EditableText extends Component<Props, InputState> {
+export class EditableText extends Component<Props, InputState> {
   constructor(props: Props) {
     super(props);
 
