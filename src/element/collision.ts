@@ -27,8 +27,8 @@ export function hitTest(
     let tx = 0.707;
     let ty = 0.707;
 
-    const a = element.width / 2;
-    const b = element.height / 2;
+    const a = Math.abs(element.width) / 2;
+    const b = Math.abs(element.height) / 2;
 
     [0, 1, 2, 3].forEach(x => {
       const xx = a * tx;
