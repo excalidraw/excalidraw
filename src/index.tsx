@@ -5,21 +5,26 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { TwitterPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
-import { LCG, randomSeed, withCustomMathRandom } from "./random";
-import { distanceBetweenPointAndSegment } from "./math";
+import { randomSeed } from "./random";
 import { roundRect } from "./roundRect";
+import {
+  newElement,
+  resizeTest,
+  generateDraw,
+  getElementAbsoluteX1,
+  getElementAbsoluteX2,
+  getElementAbsoluteY1,
+  getElementAbsoluteY2,
+  handlerRectangles,
+  hitTest,
+  isTextElement
+} from "./element";
+import { SceneState } from "./scene/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import EditableText from "./components/EditableText";
 
 import "./styles.scss";
-
-type ExcalidrawElement = ReturnType<typeof newElement>;
-type ExcalidrawTextElement = ExcalidrawElement & {
-  type: "text";
-  font: string;
-  text: string;
-  actualBoundingBoxAscent: number;
-};
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
@@ -57,186 +62,6 @@ function restoreHistoryEntry(entry: string) {
   // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
   skipHistory = true;
 }
-
-function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
-  // For shapes that are composed of lines, we only enable point-selection when the distance
-  // of the click is less than x pixels of any of the lines that the shape is composed of
-  const lineThreshold = 10;
-
-  if (element.type === "ellipse") {
-    // https://stackoverflow.com/a/46007540/232122
-    const px = Math.abs(x - element.x - element.width / 2);
-    const py = Math.abs(y - element.y - element.height / 2);
-
-    let tx = 0.707;
-    let ty = 0.707;
-
-    const a = element.width / 2;
-    const b = element.height / 2;
-
-    [0, 1, 2, 3].forEach(x => {
-      const xx = a * tx;
-      const yy = b * ty;
-
-      const ex = ((a * a - b * b) * tx ** 3) / a;
-      const ey = ((b * b - a * a) * ty ** 3) / b;
-
-      const rx = xx - ex;
-      const ry = yy - ey;
-
-      const qx = px - ex;
-      const qy = py - ey;
-
-      const r = Math.hypot(ry, rx);
-      const q = Math.hypot(qy, qx);
-
-      tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-      ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-      const t = Math.hypot(ty, tx);
-      tx /= t;
-      ty /= t;
-    });
-
-    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
-  } else if (element.type === "rectangle") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
-
-    // (x1, y1) --A-- (x2, y1)
-    //    |D             |B
-    // (x1, y2) --C-- (x2, y2)
-    return (
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
-      distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
-      distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
-      distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
-    );
-  } else if (element.type === "diamond") {
-    x -= element.x;
-    y -= element.y;
-
-    const [
-      topX,
-      topY,
-      rightX,
-      rightY,
-      bottomX,
-      bottomY,
-      leftX,
-      leftY
-    ] = getDiamondPoints(element);
-
-    return (
-      distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
-        lineThreshold
-    );
-  } else if (element.type === "arrow") {
-    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
-
-    return (
-      //    \
-      distanceBetweenPointAndSegment(x, y, x3, y3, x2, y2) < lineThreshold ||
-      // -----
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold ||
-      //    /
-      distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
-    );
-  } else if (element.type === "text") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
-
-    return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-  } else if (element.type === "selection") {
-    console.warn("This should not happen, we need to investigate why it does.");
-    return false;
-  } else {
-    throw new Error("Unimplemented type " + element.type);
-  }
-}
-
-function resizeTest(
-  element: ExcalidrawElement,
-  x: number,
-  y: number,
-  sceneState: SceneState
-): string | false {
-  if (element.type === "text") return false;
-
-  const handlers = handlerRectangles(element, sceneState);
-
-  const filter = Object.keys(handlers).filter(key => {
-    const handler = handlers[key];
-
-    return (
-      x + sceneState.scrollX >= handler[0] &&
-      x + sceneState.scrollX <= handler[0] + handler[2] &&
-      y + sceneState.scrollY >= handler[1] &&
-      y + sceneState.scrollY <= handler[1] + handler[3]
-    );
-  });
-
-  if (filter.length > 0) {
-    return filter[0];
-  }
-
-  return false;
-}
-
-function newElement(
-  type: string,
-  x: number,
-  y: number,
-  strokeColor: string,
-  backgroundColor: string,
-  fillStyle: string,
-  strokeWidth: number,
-  roughness: number,
-  opacity: number,
-  width = 0,
-  height = 0
-) {
-  const element = {
-    type: type,
-    x: x,
-    y: y,
-    width: width,
-    height: height,
-    isSelected: false,
-    strokeColor: strokeColor,
-    backgroundColor: backgroundColor,
-    fillStyle: fillStyle,
-    strokeWidth: strokeWidth,
-    roughness: roughness,
-    opacity: opacity,
-    seed: randomSeed(),
-    draw(
-      rc: RoughCanvas,
-      context: CanvasRenderingContext2D,
-      sceneState: SceneState
-    ) {}
-  };
-  return element;
-}
-
-type SceneState = {
-  scrollX: number;
-  scrollY: number;
-  // null indicates transparent bg
-  viewBackgroundColor: string | null;
-};
 
 const SCROLLBAR_WIDTH = 6;
 const SCROLLBAR_MIN_SIZE = 15;
@@ -338,86 +163,6 @@ function isOverScrollBars(
     isOverHorizontalScrollBar,
     isOverVerticalScrollBar
   };
-}
-
-function handlerRectangles(element: ExcalidrawElement, sceneState: SceneState) {
-  const elementX1 = element.x;
-  const elementX2 = element.x + element.width;
-  const elementY1 = element.y;
-  const elementY2 = element.y + element.height;
-
-  const margin = 4;
-  const minimumSize = 40;
-  const handlers: { [handler: string]: number[] } = {};
-
-  const marginX = element.width < 0 ? 8 : -8;
-  const marginY = element.height < 0 ? 8 : -8;
-
-  if (Math.abs(elementX2 - elementX1) > minimumSize) {
-    handlers["n"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY1 - margin + sceneState.scrollY + marginY,
-      8,
-      8
-    ];
-
-    handlers["s"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY2 - margin + sceneState.scrollY - marginY,
-      8,
-      8
-    ];
-  }
-
-  if (Math.abs(elementY2 - elementY1) > minimumSize) {
-    handlers["w"] = [
-      elementX1 - margin + sceneState.scrollX + marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-      8,
-      8
-    ];
-
-    handlers["e"] = [
-      elementX2 - margin + sceneState.scrollX - marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-      8,
-      8
-    ];
-  }
-
-  handlers["nw"] = [
-    elementX1 - margin + sceneState.scrollX + marginX,
-    elementY1 - margin + sceneState.scrollY + marginY,
-    8,
-    8
-  ]; // nw
-  handlers["ne"] = [
-    elementX2 - margin + sceneState.scrollX - marginX,
-    elementY1 - margin + sceneState.scrollY + marginY,
-    8,
-    8
-  ]; // ne
-  handlers["sw"] = [
-    elementX1 - margin + sceneState.scrollX + marginX,
-    elementY2 - margin + sceneState.scrollY - marginY,
-    8,
-    8
-  ]; // sw
-  handlers["se"] = [
-    elementX2 - margin + sceneState.scrollX - marginX,
-    elementY2 - margin + sceneState.scrollY - marginY,
-    8,
-    8
-  ]; // se
-
-  if (element.type === "arrow") {
-    return {
-      nw: handlers.nw,
-      se: handlers.se
-    };
-  }
-
-  return handlers;
 }
 
 function renderScene(
@@ -624,16 +369,6 @@ function saveFile(name: string, data: string) {
   link.remove();
 }
 
-function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
-  // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
-  // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
-  // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
-  return [
-    (x1 - x2) * Math.cos(angle) - (y1 - y2) * Math.sin(angle) + x2,
-    (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2
-  ];
-}
-
 function getDateTime() {
   const date = new Date();
   const year = date.getFullYear();
@@ -646,16 +381,6 @@ function getDateTime() {
   return `${year}${month}${day}${hr}${min}${secs}`;
 }
 
-// Casting second argument (DrawingSurface) to any,
-// because it is requred by TS definitions and not required at runtime
-const generator = rough.generator(null, null as any);
-
-function isTextElement(
-  element: ExcalidrawElement
-): element is ExcalidrawTextElement {
-  return element.type === "text";
-}
-
 function isInputLike(
   target: Element | EventTarget | null
 ): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
@@ -664,190 +389,6 @@ function isInputLike(
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
   );
-}
-
-function getArrowPoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
-
-  const size = 30; // pixels
-  const distance = Math.hypot(x2 - x1, y2 - y1);
-  // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  const minSize = Math.min(size, distance / 2);
-  const xs = x2 - ((x2 - x1) / distance) * minSize;
-  const ys = y2 - ((y2 - y1) / distance) * minSize;
-
-  const angle = 20; // degrees
-  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
-  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
-
-  return [x1, y1, x2, y2, x3, y3, x4, y4];
-}
-
-function getDiamondPoints(element: ExcalidrawElement) {
-  const topX = Math.floor(element.width / 2) + 1;
-  const topY = 0;
-  const rightX = element.width;
-  const rightY = Math.floor(element.height / 2) + 1;
-  const bottomX = topX;
-  const bottomY = element.height;
-  const leftX = topY;
-  const leftY = rightY;
-
-  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
-}
-
-function generateDraw(element: ExcalidrawElement) {
-  if (element.type === "selection") {
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      const fillStyle = context.fillStyle;
-      context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(
-        element.x + scrollX,
-        element.y + scrollY,
-        element.width,
-        element.height
-      );
-      context.fillStyle = fillStyle;
-    };
-  } else if (element.type === "rectangle") {
-    const shape = withCustomMathRandom(element.seed, () => {
-      return generator.rectangle(0, 0, element.width, element.height, {
-        stroke: element.strokeColor,
-        fill: element.backgroundColor,
-        fillStyle: element.fillStyle,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      });
-    });
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.globalAlpha = element.opacity / 100;
-      context.translate(element.x + scrollX, element.y + scrollY);
-      rc.draw(shape);
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-      context.globalAlpha = 1;
-    };
-  } else if (element.type === "diamond") {
-    const shape = withCustomMathRandom(element.seed, () => {
-      const [
-        topX,
-        topY,
-        rightX,
-        rightY,
-        bottomX,
-        bottomY,
-        leftX,
-        leftY
-      ] = getDiamondPoints(element);
-      return generator.polygon(
-        [
-          [topX, topY],
-          [rightX, rightY],
-          [bottomX, bottomY],
-          [leftX, leftY]
-        ],
-        {
-          stroke: element.strokeColor,
-          fill: element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness
-        }
-      );
-    });
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.globalAlpha = element.opacity / 100;
-      context.translate(element.x + scrollX, element.y + scrollY);
-      rc.draw(shape);
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-      context.globalAlpha = 1;
-    };
-  } else if (element.type === "ellipse") {
-    const shape = withCustomMathRandom(element.seed, () =>
-      generator.ellipse(
-        element.width / 2,
-        element.height / 2,
-        element.width,
-        element.height,
-        {
-          stroke: element.strokeColor,
-          fill: element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness
-        }
-      )
-    );
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.globalAlpha = element.opacity / 100;
-      context.translate(element.x + scrollX, element.y + scrollY);
-      rc.draw(shape);
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-      context.globalAlpha = 1;
-    };
-  } else if (element.type === "arrow") {
-    const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-    const options = {
-      stroke: element.strokeColor,
-      strokeWidth: element.strokeWidth,
-      roughness: element.roughness
-    };
-
-    const shapes = withCustomMathRandom(element.seed, () => [
-      //    \
-      generator.line(x3, y3, x2, y2, options),
-      // -----
-      generator.line(x1, y1, x2, y2, options),
-      //    /
-      generator.line(x4, y4, x2, y2, options)
-    ]);
-
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.globalAlpha = element.opacity / 100;
-      context.translate(element.x + scrollX, element.y + scrollY);
-      shapes.forEach(shape => rc.draw(shape));
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-      context.globalAlpha = 1;
-    };
-    return;
-  } else if (isTextElement(element)) {
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.globalAlpha = element.opacity / 100;
-      const font = context.font;
-      context.font = element.font;
-      const fillStyle = context.fillStyle;
-      context.fillStyle = element.strokeColor;
-      context.fillText(
-        element.text,
-        element.x + scrollX,
-        element.y + element.actualBoundingBoxAscent + scrollY
-      );
-      context.fillStyle = fillStyle;
-      context.font = font;
-      context.globalAlpha = 1;
-    };
-  } else {
-    throw new Error("Unimplemented type " + element.type);
-  }
-}
-
-// If the element is created from right to left, the width is going to be negative
-// This set of functions retrieves the absolute position of the 4 points.
-// We can't just always normalize it since we need to remember the fact that an arrow
-// is pointing left or right.
-function getElementAbsoluteX1(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x : element.x + element.width;
-}
-function getElementAbsoluteX2(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x + element.width : element.x;
-}
-function getElementAbsoluteY1(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y : element.y + element.height;
-}
-function getElementAbsoluteY2(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y + element.height : element.y;
 }
 
 function setSelection(selection: ExcalidrawElement) {
