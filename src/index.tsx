@@ -19,6 +19,8 @@ import {
   exportAsPNG,
   restoreFromLocalStorage,
   saveToLocalStorage,
+  restoreFromURL,
+  saveToURL,
   hasBackground,
   hasStroke,
   getElementAtPosition,
@@ -109,7 +111,8 @@ class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restoreFromLocalStorage(elements);
+    const savedState =
+      restoreFromURL(elements) || restoreFromLocalStorage(elements);
     if (savedState) {
       this.setState(savedState);
     }
@@ -918,19 +921,32 @@ class App extends React.Component<{}, AppState> {
     }));
   };
 
+  private saveDebounced = debounce(() => {
+    saveToLocalStorage(elements, this.state);
+    saveToURL(elements, this.state);
+  }, 300);
+
   componentDidUpdate() {
     renderScene(elements, rc, canvas, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    saveToLocalStorage(elements, this.state);
+    this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
       history.clearRedoStack();
     }
     history.resumeRecording();
   }
+}
+
+function debounce<T extends any[]>(fn: (...args: T) => void, timeout: number) {
+  let handle = 0;
+  return (...args: T) => {
+    clearTimeout(handle);
+    handle = window.setTimeout(() => fn(...args), timeout);
+  };
 }
 
 const rootElement = document.getElementById("root");
