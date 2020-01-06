@@ -1191,6 +1191,47 @@ function getSelectedBackgroundColor() {
   return backgroundColors.length === 1 ? backgroundColors[0] : null;
 }
 
+function addTextElement(element: ExcalidrawTextElement) {
+  resetCursor();
+  const text = prompt("What text do you want?");
+  if (text === null || text === "") {
+    return false;
+  }
+  const fontSize = 20;
+  element.text = text;
+  element.font = `${fontSize}px Virgil`;
+  const font = context.font;
+  context.font = element.font;
+  const textMeasure = context.measureText(element.text);
+  const width = textMeasure.width;
+  const actualBoundingBoxAscent =
+    textMeasure.actualBoundingBoxAscent || fontSize;
+  const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
+  element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+  context.font = font;
+  const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+  // Center the text
+  element.x -= width / 2;
+  element.y -= actualBoundingBoxAscent;
+  element.width = width;
+  element.height = height;
+
+  return true;
+}
+
+function getElementAtPosition(x: number, y: number) {
+  let hitElement = null;
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  for (let i = elements.length - 1; i >= 0; --i) {
+    if (hitTest(elements[i], x, y)) {
+      hitElement = elements[i];
+      break;
+    }
+  }
+
+  return hitElement;
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
@@ -1897,14 +1938,7 @@ class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                let hitElement = null;
-                // We need to to hit testing from front (end of the array) to back (beginning of the array)
-                for (let i = elements.length - 1; i >= 0; --i) {
-                  if (hitTest(elements[i], x, y)) {
-                    hitElement = elements[i];
-                    break;
-                  }
-                }
+                const hitElement = getElementAtPosition(x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -1933,30 +1967,9 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              resetCursor();
-              const text = prompt("What text do you want?");
-              if (text === null) {
+              if (!addTextElement(element)) {
                 return;
               }
-              const fontSize = 20;
-              element.text = text;
-              element.font = `${fontSize}px Virgil`;
-              const font = context.font;
-              context.font = element.font;
-              const textMeasure = context.measureText(element.text);
-              const width = textMeasure.width;
-              const actualBoundingBoxAscent =
-                textMeasure.actualBoundingBoxAscent || fontSize;
-              const actualBoundingBoxDescent =
-                textMeasure.actualBoundingBoxDescent || 0;
-              element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-              context.font = font;
-              const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
-              // Center the text
-              element.x -= width / 2;
-              element.y -= actualBoundingBoxAscent;
-              element.width = width;
-              element.height = height;
             }
 
             generateDraw(element);
@@ -2153,6 +2166,42 @@ class App extends React.Component<{}, AppState> {
 
             // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
             skipHistory = true;
+            this.forceUpdate();
+          }}
+          onDoubleClick={e => {
+            const x =
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+
+            if (getElementAtPosition(x, y)) {
+              return;
+            }
+
+            const element = newElement(
+              "text",
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor,
+              "hachure",
+              1,
+              1,
+              100
+            );
+
+            if (!addTextElement(element as ExcalidrawTextElement)) {
+              return;
+            }
+
+            generateDraw(element);
+            elements.push(element);
+
+            this.setState({
+              draggingElement: null,
+              elementType: "selection"
+            });
+            element.isSelected = true;
+
             this.forceUpdate();
           }}
         />
