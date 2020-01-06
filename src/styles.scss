@@ -53,6 +53,14 @@ body {
     h5:first-of-type {
       margin-top: 0;
     }
+
+    .buttonList {
+      flex-wrap: wrap;
+
+      button {
+        margin-right: 4px;
+      }
+    }
   }
 }
 
