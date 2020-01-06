@@ -1401,7 +1401,6 @@ class App extends React.Component<{}, AppState> {
    */
   private changeTextElement = (values: any) => {
     /** Use of Object.assign instead spread because we want to keep ref to element for update is value in initial object */
-    console.log(values)
     this.changeProperty(element => isTextElement(element) && Object.assign(element, values));
     if (values.text || values.font) {
       elements.forEach(elm => {
@@ -1434,11 +1433,8 @@ class App extends React.Component<{}, AppState> {
   };
 
   private updateFontFamillyElement = (element: ExcalidrawElement, fontFamilly: string) => {
-    console.log("element", element)
-    console.log("isTextElement",  isTextElement(element))
     if(isTextElement(element)) {
       const size = element.font.split('px')[0];
-      console.log("size", size)
       this.changeTextElement({ font: `${size}px ${fontFamilly}` });
     }
   };
@@ -1446,20 +1442,19 @@ class App extends React.Component<{}, AppState> {
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
-    /** elementSelectedOptions is array of option for a selected element, ex in text : Input text, font size ... */
+    /** elementSelectedTextOptions is array of option for a selected text element, ex in text : Input text, font size ... */
     const elementSelectedTextOptions: Array<ReactNode> = [];
-    const selectedElement = elements.find(element => element.isSelected);
-
-    if (selectedElement) {
-      /** If the selected item is a Text so : */
-      if (isTextElement(selectedElement)) {
+    const selectedTextElements: Array<any> = elements?.filter(elm => elm.isSelected && isTextElement(elm));
+    
+    if (selectedTextElements.length > 0) {
+      /** If the selected items contain Text so : */
         // Text value option
-        if(elements.filter(element => element.isSelected).length === 1) {
+        if(selectedTextElements.length === 1) {
           elementSelectedTextOptions.push(
             <ElementOption
               key="value"
               label="Text value"
-              value={selectedElement.text}
+              value={selectedTextElements[0].text}
               onChange={(text: string) =>
                 this.changeTextElement({ text })
               }
@@ -1473,8 +1468,8 @@ class App extends React.Component<{}, AppState> {
             label="Size"
             type="select"
             options={['6', '8', '10', '12', '14', '16', '18', '20', '22', '26', '30', '34', '38', '40', '50', '60', '70']}
-            value={selectedElement.font.split('px')[0]}
-            onChange={(size: string) => this.updateFontSizeElement(selectedElement, size)}
+            value={selectedTextElements[0].font.split('px')[0]}
+            onChange={(size: string) => this.updateFontSizeElement(selectedTextElements[0], size)}
           />
         );
         // Font familly option
@@ -1484,13 +1479,12 @@ class App extends React.Component<{}, AppState> {
             label="Font"
             type="select"
             options={listFonts}
-            value={selectedElement.font.split("px ")[1]}
+            value={selectedTextElements[0].font.split("px ")[1]}
             onChange={(fontFamilly: string) =>
-              this.updateFontFamillyElement(selectedElement, fontFamilly)
+              this.updateFontFamillyElement(selectedTextElements[0], fontFamilly)
             }
           />
         );
-      }
     }
 
     return (
