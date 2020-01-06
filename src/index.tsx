@@ -2189,10 +2189,8 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            if (isTextElement(element)) {
-              if (!addTextElement(element)) {
-                return;
-              }
+            if (!addTextElement(element as ExcalidrawTextElement)) {
+              return;
             }
 
             generateDraw(element);
