@@ -33,42 +33,14 @@ import { EditableText } from "./components/EditableText";
 import { ButtonSelect } from "./components/ButtonSelect";
 import { ColorPicker } from "./components/ColorPicker";
 import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
+import { createHistory } from "./history";
 
 import "./styles.scss";
 
 const { elements } = createScene();
+const { history } = createHistory();
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
-
-let skipHistory = false;
-const stateHistory: string[] = [];
-const redoStack: string[] = [];
-
-function generateHistoryCurrentEntry() {
-  return JSON.stringify(
-    elements.map(element => ({ ...element, isSelected: false }))
-  );
-}
-function pushHistoryEntry(newEntry: string) {
-  if (
-    stateHistory.length > 0 &&
-    stateHistory[stateHistory.length - 1] === newEntry
-  ) {
-    // If the last entry is the same as this one, ignore it
-    return;
-  }
-  stateHistory.push(newEntry);
-}
-function restoreHistoryEntry(entry: string) {
-  const newElements = JSON.parse(entry);
-  elements.splice(0, elements.length);
-  newElements.forEach((newElement: ExcalidrawElement) => {
-    generateDraw(newElement);
-    elements.push(newElement);
-  });
-  // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
-  skipHistory = true;
-}
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
@@ -231,25 +203,12 @@ class App extends React.Component<{}, AppState> {
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event.metaKey && event.code === "KeyZ") {
-      const currentEntry = generateHistoryCurrentEntry();
       if (event.shiftKey) {
         // Redo action
-        const entryToRestore = redoStack.pop();
-        if (entryToRestore !== undefined) {
-          restoreHistoryEntry(entryToRestore);
-          stateHistory.push(currentEntry);
-        }
+        history.redoOnce(elements);
       } else {
         // undo action
-        let lastEntry = stateHistory.pop();
-        // If nothing was changed since last, take the previous one
-        if (currentEntry === lastEntry) {
-          lastEntry = stateHistory.pop();
-        }
-        if (lastEntry !== undefined) {
-          restoreHistoryEntry(lastEntry);
-          redoStack.push(currentEntry);
-        }
+        history.undoOnce(elements);
       }
       this.forceUpdate();
       event.preventDefault();
@@ -798,7 +757,7 @@ class App extends React.Component<{}, AppState> {
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
-                  skipHistory = true;
+                  history.skipRecording();
                   this.forceUpdate();
                   return;
                 }
@@ -818,7 +777,7 @@ class App extends React.Component<{}, AppState> {
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when dragging an element to initially size it
-                  skipHistory = true;
+                  history.skipRecording();
                   this.forceUpdate();
                   return;
                 }
@@ -850,7 +809,7 @@ class App extends React.Component<{}, AppState> {
                 setSelection(elements, draggingElement);
               }
               // We don't want to save history when moving an element
-              skipHistory = true;
+              history.skipRecording();
               this.forceUpdate();
             };
 
@@ -892,7 +851,7 @@ class App extends React.Component<{}, AppState> {
             window.addEventListener("mouseup", onMouseUp);
 
             // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-            skipHistory = true;
+            history.skipRecording();
             this.forceUpdate();
           }}
           onDoubleClick={e => {
@@ -952,11 +911,11 @@ class App extends React.Component<{}, AppState> {
       viewBackgroundColor: this.state.viewBackgroundColor
     });
     saveToLocalStorage(elements, this.state);
-    if (!skipHistory) {
-      pushHistoryEntry(generateHistoryCurrentEntry());
-      redoStack.splice(0, redoStack.length);
+    if (history.isRecording()) {
+      history.pushEntry(history.generateCurrentEntry(elements));
+      history.clearRedoStack();
     }
-    skipHistory = false;
+    history.resumeRecording();
   }
 }
 
