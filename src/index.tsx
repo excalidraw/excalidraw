@@ -25,6 +25,8 @@ type ExcalidrawTextElement = ExcalidrawElement & {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
+const listFonts = ["Virgil", "Arial", "Times New Roman", "Georgia", "Arial", "Helvetica", "Tahoma", "Courier"]
+
 const elements = Array.of<ExcalidrawElement>();
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
@@ -1393,33 +1395,52 @@ class App extends React.Component<{}, AppState> {
     this.setState({ currentItemBackgroundColor: color });
   };
 
-  private updateElement = (element: any, values: any) => {
+  /**
+   * Method for change a text element
+   * Change property and recompute bound
+   */
+  private changeTextElement = (values: any) => {
     /** Use of Object.assign instead spread because we want to keep ref to element for update is value in initial object */
-    Object.assign(element, values);
+    console.log(values)
+    this.changeProperty(element => isTextElement(element) && Object.assign(element, values));
     if (values.text || values.font) {
-      const fontSize = values.font
-        ? values.font.split("px")[0]
-        : element.font.split("px")[0];
-      context.font = `${fontSize}px Virgil`;
-      const textMeasure = context.measureText(values.text || element.text);
-      const width = textMeasure.width;
-      const actualBoundingBoxAscent =
-        textMeasure.actualBoundingBoxAscent || fontSize;
-      const actualBoundingBoxDescent =
-        textMeasure.actualBoundingBoxDescent || 0;
-      element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-      const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
-      element.width = width;
-      element.height = height;
+      elements.forEach(elm => {
+        if (elm.isSelected && isTextElement(elm)) {
+          const fontSize = values.font ? values.font.split('px')[0] : elm.font.split('px')[0];
+          const fontFamilly = values.font ? values.font.split('px ')[1] : elm.font.split('px ')[1];
+          context.font = `${fontSize}px ${fontFamilly}`;
+          const textMeasure = context.measureText(values.text || elm.text);
+          const width = textMeasure.width;
+          const actualBoundingBoxAscent = textMeasure.actualBoundingBoxAscent || fontSize;
+          const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
+          elm.actualBoundingBoxAscent = actualBoundingBoxAscent;
+          const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+          elm.width = width;
+          elm.height = height;
+        }
+      });
     }
     this.forceUpdate();
   };
 
-  private updateFontSizeElement = (element: any, size: string) => {
+  private updateFontSizeElement = (element: ExcalidrawElement, size: string) => {
     if (size.match(/[^0-9.]/g)) {
       return;
     }
-    this.updateElement(element, { font: `${size}px Virgil` });
+    if(isTextElement(element)) {
+      const fontFamilly = element.font.split('px ')[1];
+      this.changeTextElement({ font: `${size}px ${fontFamilly}` });
+    }
+  };
+
+  private updateFontFamillyElement = (element: ExcalidrawElement, fontFamilly: string) => {
+    console.log("element", element)
+    console.log("isTextElement",  isTextElement(element))
+    if(isTextElement(element)) {
+      const size = element.font.split('px')[0];
+      console.log("size", size)
+      this.changeTextElement({ font: `${size}px ${fontFamilly}` });
+    }
   };
 
   public render() {
@@ -1433,24 +1454,39 @@ class App extends React.Component<{}, AppState> {
       /** If the selected item is a Text so : */
       if (isTextElement(selectedElement)) {
         // Text value option
-        elementSelectedOptions.push(
-          <ElementOption
-            key="value"
-            label="Value"
-            value={selectedElement.text}
-            onChange={(text: string) =>
-              this.updateElement(selectedElement, { text })
-            }
-          />
-        );
+        if(elements.filter(element => element.isSelected).length === 1) {
+          elementSelectedOptions.push(
+            <ElementOption
+              key="value"
+              label="Value"
+              value={selectedElement.text}
+              onChange={(text: string) =>
+                this.changeTextElement({ text })
+              }
+            />
+          );
+        }        
         // Font size option
         elementSelectedOptions.push(
           <ElementOption
             key="size"
             label="Size"
-            value={selectedElement.font.split("px")[0]}
-            onChange={(size: string) =>
-              this.updateFontSizeElement(selectedElement, size)
+            type="select"
+            options={['6', '8', '10', '12', '14', '16', '18', '20', '22', '26', '30', '34', '38', '40', '50', '60', '70']}
+            value={selectedElement.font.split('px')[0]}
+            onChange={(size: string) => this.updateFontSizeElement(selectedElement, size)}
+          />
+        );
+        // Font familly option
+        elementSelectedOptions.push(
+          <ElementOption
+            key="fontFamilly"
+            label="Font"
+            type="select"
+            options={listFonts}
+            value={selectedElement.font.split("px ")[1]}
+            onChange={(fontFamilly: string) =>
+              this.updateFontFamillyElement(selectedElement, fontFamilly)
             }
           />
         );
@@ -1527,12 +1563,12 @@ class App extends React.Component<{}, AppState> {
           </div>
           {someElementIsSelected() && (
             <>
-              <h4>Element's options</h4>
-              <div className="panelColumn">
-                {elementSelectedOptions.length > 0
-                  ? elementSelectedOptions
-                  : "No options available"}
-              </div>
+              {elementSelectedOptions.length > 0 && (
+                <>
+                  <h4>Element's options</h4>
+                  <div className="panelColumn">{elementSelectedOptions}</div>
+                </>
+              )}
             <div className="panelColumn">
               <h4>Selection</h4>
               <div className="buttonList">
