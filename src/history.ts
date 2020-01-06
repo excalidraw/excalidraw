@@ -2,9 +2,9 @@ import { ExcalidrawElement } from "./element/types";
 import { generateDraw } from "./element";
 
 class SceneHistory {
-  recording: boolean = true;
-  stateHistory: string[] = [];
-  redoStack: string[] = [];
+  private recording: boolean = true;
+  private stateHistory: string[] = [];
+  private redoStack: string[] = [];
 
   generateCurrentEntry(elements: ExcalidrawElement[]) {
     return JSON.stringify(
