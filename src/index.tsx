@@ -842,25 +842,19 @@ function generateDraw(element: ExcalidrawElement) {
     };
   } else if (element.type === "arrow") {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+    const options = {
+      stroke: element.strokeColor,
+      strokeWidth: element.strokeWidth,
+      roughness: element.roughness
+    };
+
     const shapes = withCustomMathRandom(element.seed, () => [
       //    \
-      generator.line(x3, y3, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      }),
+      generator.line(x3, y3, x2, y2, options),
       // -----
-      generator.line(x1, y1, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      }),
+      generator.line(x1, y1, x2, y2, options),
       //    /
-      generator.line(x4, y4, x2, y2, {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness
-      })
+      generator.line(x4, y4, x2, y2, options)
     ]);
 
     element.draw = (rc, context, { scrollX, scrollY }) => {
@@ -971,7 +965,17 @@ function restore(
           ? JSON.parse(savedElements)
           : savedElements)
       );
-      elements.forEach((element: ExcalidrawElement) => generateDraw(element));
+      elements.forEach((element: ExcalidrawElement) => {
+        element.fillStyle = element.fillStyle || "hachure";
+        element.strokeWidth = element.strokeWidth || 1;
+        element.roughness = element.roughness || 1;
+        element.opacity =
+          element.opacity === null || element.opacity === undefined
+            ? 100
+            : element.opacity;
+
+        generateDraw(element);
+      });
     }
 
     return savedState ? JSON.parse(savedState) : null;
@@ -1106,7 +1110,7 @@ function getSelectedIndices() {
 const someElementIsSelected = () =>
   elements.some(element => element.isSelected);
 
-const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
+const hasBackground = () =>
   elements.some(
     element =>
       element.isSelected &&
@@ -1115,7 +1119,7 @@ const someElementIsSelectedIsRectangleOrEllipseOrDiamond = () =>
         element.type === "diamond")
   );
 
-const someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow = () =>
+const hasStroke = () =>
   elements.some(
     element =>
       element.isSelected &&
@@ -1514,6 +1518,213 @@ class App extends React.Component<{}, AppState> {
                 <button onClick={this.moveOneLeft}>Send backward</button>
                 <button onClick={this.moveAllLeft}>Send to back</button>
               </div>
+              <h4>Colors</h4>
+              <div className="panelColumn">
+                <h5>Shape Stroke Color</h5>
+                <div>
+                  <button
+                    className="swatch"
+                    style={{
+                      backgroundColor:
+                        getSelectedStrokeColor() ||
+                        this.state.currentItemStrokeColor
+                    }}
+                    onClick={() =>
+                      this.setState(s => ({
+                        currentColorPicker:
+                          s.currentColorPicker === ColorPicker.SHAPE_STROKE
+                            ? null
+                            : ColorPicker.SHAPE_STROKE
+                      }))
+                    }
+                  />
+                  {this.state.currentColorPicker ===
+                    ColorPicker.SHAPE_STROKE && (
+                    <div className="popover">
+                      <div
+                        className="cover"
+                        onClick={() =>
+                          this.setState({ currentColorPicker: null })
+                        }
+                      />
+                      <SketchPicker
+                        color={this.state.currentItemStrokeColor}
+                        onChange={color => this.changeStrokeColor(color.hex)}
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    className="swatch-input"
+                    value={
+                      getSelectedStrokeColor() ||
+                      this.state.currentItemStrokeColor
+                    }
+                    onChange={e => this.changeStrokeColor(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {hasBackground() && (
+                <div className="panelColumn">
+                  <h5>Shape Background Color</h5>
+                  <div>
+                    <button
+                      className="swatch"
+                      style={{
+                        backgroundColor:
+                          getSelectedBackgroundColor() ||
+                          this.state.currentItemBackgroundColor
+                      }}
+                      onClick={() =>
+                        this.setState(s => ({
+                          currentColorPicker:
+                            s.currentColorPicker ===
+                            ColorPicker.SHAPE_BACKGROUND
+                              ? null
+                              : ColorPicker.SHAPE_BACKGROUND
+                        }))
+                      }
+                    />
+                    {this.state.currentColorPicker ===
+                    ColorPicker.SHAPE_BACKGROUND ? (
+                      <div className="popover">
+                        <div
+                          className="cover"
+                          onClick={() =>
+                            this.setState({ currentColorPicker: null })
+                          }
+                        />
+                        <SketchPicker
+                          color={this.state.currentItemBackgroundColor}
+                          onChange={color =>
+                            this.changeBackgroundColor(color.hex)
+                          }
+                        />
+                      </div>
+                    ) : null}
+                    <input
+                      type="text"
+                      className="swatch-input"
+                      value={
+                        getSelectedBackgroundColor() ||
+                        this.state.currentItemBackgroundColor
+                      }
+                      onChange={e => this.changeBackgroundColor(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {hasBackground() && (
+                <>
+                  <h4>Fill</h4>
+                  <div className="panelColumn">
+                    <button
+                      onClick={() => this.changeFillStyle("hachure")}
+                      className={
+                        getSelectedFillStyles() === "hachure" ? "active" : ""
+                      }
+                    >
+                      Hachure
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("solid")}
+                      className={
+                        getSelectedFillStyles() === "solid" ? "active" : ""
+                      }
+                    >
+                      Solid
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("zigzag")}
+                      className={
+                        getSelectedFillStyles() === "zigzag" ? "active" : ""
+                      }
+                    >
+                      Zigzag
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("cross-hatch")}
+                      className={
+                        getSelectedFillStyles() === "cross-hatch"
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      Cross-hatch
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("sunburst")}
+                      className={
+                        getSelectedFillStyles() === "sunburst" ? "active" : ""
+                      }
+                    >
+                      Sunburst
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("dashed")}
+                      className={
+                        getSelectedFillStyles() === "dashed" ? "active" : ""
+                      }
+                    >
+                      Dashed
+                    </button>
+                    <button
+                      onClick={() => this.changeFillStyle("zigzag-line")}
+                      className={
+                        getSelectedFillStyles() === "zigzag-line"
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      Zigzag-line
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {hasStroke() && (
+                <>
+                  <h4>Stroke width</h4>
+                  <div className="panelColumn">
+                    <select
+                      onChange={this.changeStrokeWidth}
+                      value={getSelectedStrokeWidth()}
+                    >
+                      <option hidden disabled value=""></option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="4">4</option>
+                      <option value="8">8</option>
+                    </select>
+                  </div>
+
+                  <h4>Roughness</h4>
+                  <div className="panelColumn">
+                    <select
+                      onChange={this.changeRoughness}
+                      value={getSelectedRoughness()}
+                    >
+                      <option hidden disabled value=""></option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="4">4</option>
+                      <option value="8">8</option>
+                      <option value="10">10</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <h4>Opacity</h4>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                onChange={this.changeOpacity}
+                value={getSelectedOpacity()}
+              />
             </>
           )}
           <h4>Canvas</h4>
@@ -1608,231 +1819,6 @@ class App extends React.Component<{}, AppState> {
               Load file...
             </button>
           </div>
-          {someElementIsSelected() && (
-            <>
-              <>
-                <h4>Colors</h4>
-                <div className="panelColumn">
-                  <h5>Shape Stroke Color</h5>
-                  <div>
-                    <button
-                      className="swatch"
-                      style={{
-                        backgroundColor:
-                          getSelectedStrokeColor() ||
-                          this.state.currentItemStrokeColor
-                      }}
-                      onClick={() =>
-                        this.setState(s => ({
-                          currentColorPicker:
-                            s.currentColorPicker === ColorPicker.SHAPE_STROKE
-                              ? null
-                              : ColorPicker.SHAPE_STROKE
-                        }))
-                      }
-                    />
-                    {this.state.currentColorPicker ===
-                      ColorPicker.SHAPE_STROKE && (
-                      <div className="popover">
-                        <div
-                          className="cover"
-                          onClick={() =>
-                            this.setState({ currentColorPicker: null })
-                          }
-                        />
-                        <SketchPicker
-                          color={this.state.currentItemStrokeColor}
-                          onChange={color => this.changeStrokeColor(color.hex)}
-                        />
-                      </div>
-                    )}
-                    <input
-                      type="text"
-                      className="swatch-input"
-                      value={
-                        getSelectedStrokeColor() ||
-                        this.state.currentItemStrokeColor
-                      }
-                      onChange={e => this.changeStrokeColor(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
-                  <div className="panelColumn">
-                    <h5>Shape Background Color</h5>
-                    <div>
-                      <button
-                        className="swatch"
-                        style={{
-                          backgroundColor:
-                            getSelectedBackgroundColor() ||
-                            this.state.currentItemBackgroundColor
-                        }}
-                        onClick={() =>
-                          this.setState(s => ({
-                            currentColorPicker:
-                              s.currentColorPicker ===
-                              ColorPicker.SHAPE_BACKGROUND
-                                ? null
-                                : ColorPicker.SHAPE_BACKGROUND
-                          }))
-                        }
-                      />
-                      {this.state.currentColorPicker ===
-                      ColorPicker.SHAPE_BACKGROUND ? (
-                        <div className="popover">
-                          <div
-                            className="cover"
-                            onClick={() =>
-                              this.setState({ currentColorPicker: null })
-                            }
-                          />
-                          <SketchPicker
-                            color={this.state.currentItemBackgroundColor}
-                            onChange={color =>
-                              this.changeBackgroundColor(color.hex)
-                            }
-                          />
-                        </div>
-                      ) : null}
-                      <input
-                        type="text"
-                        className="swatch-input"
-                        value={
-                          getSelectedBackgroundColor() ||
-                          this.state.currentItemBackgroundColor
-                        }
-                        onChange={e =>
-                          this.changeBackgroundColor(e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-
-              {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
-                <>
-                  <h4>Fill</h4>
-                  <div className="panelColumn">
-                    {/* <select onChange={this.changeFillStyle} value={getSelectedFillStyles()}> */}
-                    <button
-                      onClick={() => this.changeFillStyle("hachure")}
-                      className={
-                        getSelectedFillStyles() === "hachure" ? "active" : ""
-                      }
-                    >
-                      Hachure
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("solid")}
-                      className={
-                        getSelectedFillStyles() === "solid" ? "active" : ""
-                      }
-                    >
-                      Solid
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("zigzag")}
-                      className={
-                        getSelectedFillStyles() === "zigzag" ? "active" : ""
-                      }
-                    >
-                      Zigzag
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("cross-hatch")}
-                      className={
-                        getSelectedFillStyles() === "cross-hatch"
-                          ? "active"
-                          : ""
-                      }
-                    >
-                      Cross-hatch
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("dots")}
-                      className={
-                        getSelectedFillStyles() === "dots" ? "active" : ""
-                      }
-                    >
-                      Dots
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("sunburst")}
-                      className={
-                        getSelectedFillStyles() === "sunburst" ? "active" : ""
-                      }
-                    >
-                      Sunburst
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("dashed")}
-                      className={
-                        getSelectedFillStyles() === "dashed" ? "active" : ""
-                      }
-                    >
-                      Dashed
-                    </button>
-                    <button
-                      onClick={() => this.changeFillStyle("zigzag-line")}
-                      className={
-                        getSelectedFillStyles() === "zigzag-line"
-                          ? "active"
-                          : ""
-                      }
-                    >
-                      Zigzag-line
-                    </button>
-                    {/* </select> */}
-                  </div>
-                </>
-              )}
-
-              {someElementIsSelectedIsRectangleOrEllipseOrDiamondOrArrow() && (
-                <>
-                  <h4>Stroke width</h4>
-                  <div className="panelColumn">
-                    <select
-                      onChange={this.changeStrokeWidth}
-                      value={getSelectedStrokeWidth()}
-                    >
-                      <option hidden disabled value=""></option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                      <option value="8">8</option>
-                    </select>
-                  </div>
-
-                  <h4>Roughness</h4>
-                  <div className="panelColumn">
-                    <select
-                      onChange={this.changeRoughness}
-                      value={getSelectedRoughness()}
-                    >
-                      <option hidden disabled value=""></option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                      <option value="8">8</option>
-                      <option value="10">10</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
-              <h4>Opacity</h4>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                onChange={this.changeOpacity}
-                value={getSelectedOpacity()}
-              />
-            </>
-          )}
         </div>
         <canvas
           id="canvas"
