@@ -2155,6 +2155,74 @@ class App extends React.Component<{}, AppState> {
             skipHistory = true;
             this.forceUpdate();
           }}
+          onDoubleClick={e => {
+            const x =
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+
+            let hitElement = null;
+            // We need to to hit testing from front (end of the array) to back (beginning of the array)
+            for (let i = elements.length - 1; i >= 0; --i) {
+              if (hitTest(elements[i], x, y)) {
+                hitElement = elements[i];
+                break;
+              }
+            }
+
+            if (hitElement) {
+              return;
+            }
+
+            const element = newElement(
+              "text",
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor,
+              "hachure",
+              1,
+              1,
+              100
+            );
+
+            if (isTextElement(element)) {
+              resetCursor();
+              const text = prompt("What text do you want?");
+              if (text === null) {
+                return;
+              }
+              const fontSize = 20;
+              element.text = text;
+              element.font = `${fontSize}px Virgil`;
+              const font = context.font;
+              context.font = element.font;
+              const textMeasure = context.measureText(element.text);
+              const width = textMeasure.width;
+              const actualBoundingBoxAscent =
+                textMeasure.actualBoundingBoxAscent || fontSize;
+              const actualBoundingBoxDescent =
+                textMeasure.actualBoundingBoxDescent || 0;
+              element.actualBoundingBoxAscent = actualBoundingBoxAscent;
+              context.font = font;
+              const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
+              // Center the text
+              element.x -= width / 2;
+              element.y -= actualBoundingBoxAscent;
+              element.width = width;
+              element.height = height;
+            }
+
+            generateDraw(element);
+            elements.push(element);
+
+            this.setState({
+              draggingElement: null,
+              elementType: "selection"
+            });
+            element.isSelected = true;
+
+            this.forceUpdate();
+          }}
         />
       </div>
     );
