@@ -149,7 +149,8 @@ button {
     border-color: #d6d4d4;
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     background-color: #bdbebc;
     border-color: #bdbebc;
   }
