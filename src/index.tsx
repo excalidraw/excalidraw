@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { SketchPicker } from "react-color";
+import { TwitterPicker } from "react-color";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { roundRect } from "./roundRect";
@@ -795,12 +795,7 @@ function generateDraw(element: ExcalidrawElement) {
         leftY
       ] = getDiamondPoints(element);
       return generator.polygon(
-        [
-          [topX, topY],
-          [rightX, rightY],
-          [bottomX, bottomY],
-          [leftX, leftY]
-        ],
+        [[topX, topY], [rightX, rightY], [bottomX, bottomY], [leftX, leftY]],
         {
           stroke: element.strokeColor,
           fill: element.backgroundColor,
@@ -981,16 +976,9 @@ function restore(
   }
 }
 
-enum ColorPicker {
-  CANVAS_BACKGROUND,
-  SHAPE_STROKE,
-  SHAPE_BACKGROUND
-}
-
 type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  currentColorPicker: ColorPicker | null;
   elementType: string;
   exportBackground: boolean;
   currentItemStrokeColor: string;
@@ -1035,7 +1023,7 @@ const SHAPES = [
     icon: (
       // custom
       <svg viewBox="0 0 223.646 223.646">
-        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z"></path>
+        <path d="M111.823 0L16.622 111.823 111.823 223.646 207.025 111.823z" />
       </svg>
     ),
     value: "diamond"
@@ -1232,6 +1220,56 @@ function getElementAtPosition(x: number, y: number) {
   return hitElement;
 }
 
+function ColorPicker({
+  color,
+  onChange
+}: {
+  color: string;
+  onChange: (color: string) => void;
+}) {
+  const [isActive, setActive] = React.useState(false);
+  return (
+    <div>
+      <button
+        className="swatch"
+        style={{ backgroundColor: color }}
+        onClick={() => setActive(!isActive)}
+      />
+      {isActive ? (
+        <div className="popover">
+          <div className="cover" onClick={() => setActive(false)} />
+          <TwitterPicker
+            colors={[
+              "#000000",
+              "#ABB8C3",
+              "#FFFFFF",
+              "#FF6900",
+              "#FCB900",
+              "#00D084",
+              "#8ED1FC",
+              "#0693E3",
+              "#EB144C",
+              "#F78DA7",
+              "#9900EF"
+            ]}
+            width="205px"
+            color={color}
+            onChange={changedColor => {
+              onChange(changedColor.hex);
+            }}
+          />
+        </div>
+      ) : null}
+      <input
+        type="text"
+        className="swatch-input"
+        value={color}
+        onChange={e => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 
@@ -1260,7 +1298,6 @@ class App extends React.Component<{}, AppState> {
     draggingElement: null,
     resizingElement: null,
     elementType: "selection",
-    currentColorPicker: null,
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
@@ -1519,45 +1556,10 @@ class App extends React.Component<{}, AppState> {
           <h4>Canvas</h4>
           <div className="panelColumn">
             <h5>Canvas Background Color</h5>
-            <div>
-              <button
-                className="swatch"
-                style={{
-                  backgroundColor: this.state.viewBackgroundColor
-                }}
-                onClick={() =>
-                  this.setState(s => ({
-                    currentColorPicker:
-                      s.currentColorPicker === ColorPicker.CANVAS_BACKGROUND
-                        ? null
-                        : ColorPicker.CANVAS_BACKGROUND
-                  }))
-                }
-              />
-              {this.state.currentColorPicker ===
-              ColorPicker.CANVAS_BACKGROUND ? (
-                <div className="popover">
-                  <div
-                    className="cover"
-                    onClick={() => this.setState({ currentColorPicker: null })}
-                  />
-                  <SketchPicker
-                    color={this.state.viewBackgroundColor}
-                    onChange={color => {
-                      this.setState({ viewBackgroundColor: color.hex });
-                    }}
-                  />
-                </div>
-              ) : null}
-              <input
-                type="text"
-                className="swatch-input"
-                value={this.state.viewBackgroundColor}
-                onChange={e =>
-                  this.setState({ viewBackgroundColor: e.target.value })
-                }
-              />
-            </div>
+            <ColorPicker
+              color={this.state.viewBackgroundColor}
+              onChange={color => this.setState({ viewBackgroundColor: color })}
+            />
             <button
               onClick={this.clearCanvas}
               title="Clear the canvas & reset background color"
@@ -1614,100 +1616,22 @@ class App extends React.Component<{}, AppState> {
                 <h4>Colors</h4>
                 <div className="panelColumn">
                   <h5>Shape Stroke Color</h5>
-                  <div>
-                    <button
-                      className="swatch"
-                      style={{
-                        backgroundColor:
-                          getSelectedStrokeColor() ||
-                          this.state.currentItemStrokeColor
-                      }}
-                      onClick={() =>
-                        this.setState(s => ({
-                          currentColorPicker:
-                            s.currentColorPicker === ColorPicker.SHAPE_STROKE
-                              ? null
-                              : ColorPicker.SHAPE_STROKE
-                        }))
-                      }
-                    />
-                    {this.state.currentColorPicker ===
-                      ColorPicker.SHAPE_STROKE && (
-                      <div className="popover">
-                        <div
-                          className="cover"
-                          onClick={() =>
-                            this.setState({ currentColorPicker: null })
-                          }
-                        />
-                        <SketchPicker
-                          color={this.state.currentItemStrokeColor}
-                          onChange={color => this.changeStrokeColor(color.hex)}
-                        />
-                      </div>
-                    )}
-                    <input
-                      type="text"
-                      className="swatch-input"
-                      value={
-                        getSelectedStrokeColor() ||
-                        this.state.currentItemStrokeColor
-                      }
-                      onChange={e => this.changeStrokeColor(e.target.value)}
-                    />
-                  </div>
+                  <ColorPicker
+                    color={
+                      getSelectedStrokeColor() ||
+                      this.state.currentItemStrokeColor
+                    }
+                    onChange={color => this.changeStrokeColor(color)}
+                  />
                 </div>
 
                 {someElementIsSelectedIsRectangleOrEllipseOrDiamond() && (
                   <div className="panelColumn">
                     <h5>Shape Background Color</h5>
-                    <div>
-                      <button
-                        className="swatch"
-                        style={{
-                          backgroundColor:
-                            getSelectedBackgroundColor() ||
-                            this.state.currentItemBackgroundColor
-                        }}
-                        onClick={() =>
-                          this.setState(s => ({
-                            currentColorPicker:
-                              s.currentColorPicker ===
-                              ColorPicker.SHAPE_BACKGROUND
-                                ? null
-                                : ColorPicker.SHAPE_BACKGROUND
-                          }))
-                        }
-                      />
-                      {this.state.currentColorPicker ===
-                      ColorPicker.SHAPE_BACKGROUND ? (
-                        <div className="popover">
-                          <div
-                            className="cover"
-                            onClick={() =>
-                              this.setState({ currentColorPicker: null })
-                            }
-                          />
-                          <SketchPicker
-                            color={this.state.currentItemBackgroundColor}
-                            onChange={color =>
-                              this.changeBackgroundColor(color.hex)
-                            }
-                          />
-                        </div>
-                      ) : null}
-                      <input
-                        type="text"
-                        className="swatch-input"
-                        value={
-                          getSelectedBackgroundColor() ||
-                          this.state.currentItemBackgroundColor
-                        }
-                        onChange={e =>
-                          this.changeBackgroundColor(e.target.value)
-                        }
-                      />
-                    </div>
+                    <ColorPicker
+                      color={this.state.currentItemBackgroundColor}
+                      onChange={color => this.changeBackgroundColor(color)}
+                    />
                   </div>
                 )}
               </>
@@ -1798,7 +1722,7 @@ class App extends React.Component<{}, AppState> {
                       onChange={this.changeStrokeWidth}
                       value={getSelectedStrokeWidth()}
                     >
-                      <option hidden disabled value=""></option>
+                      <option hidden disabled value="" />
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="4">4</option>
@@ -1812,7 +1736,7 @@ class App extends React.Component<{}, AppState> {
                       onChange={this.changeRoughness}
                       value={getSelectedRoughness()}
                     >
-                      <option hidden disabled value=""></option>
+                      <option hidden disabled value="" />
                       <option value="1">1</option>
                       <option value="2">2</option>
                       <option value="4">4</option>
