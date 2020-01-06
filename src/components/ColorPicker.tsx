@@ -45,6 +45,7 @@ export function ColorPicker({
         type="text"
         className="swatch-input"
         value={color || ""}
+        onPaste={e => onChange(e.clipboardData.getData("text"))}
         onChange={e => onChange(e.target.value)}
       />
     </div>
