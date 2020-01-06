@@ -319,8 +319,8 @@ class App extends React.Component<{}, AppState> {
           ) {
             clearSelection(elements);
             parsedElements.forEach(parsedElement => {
-              parsedElement.x += 10;
-              parsedElement.y += 10;
+              parsedElement.x = 10 - this.state.scrollX;
+              parsedElement.y = 10 - this.state.scrollY;
               parsedElement.seed = randomSeed();
               generateDraw(parsedElement);
               elements.push(parsedElement);
