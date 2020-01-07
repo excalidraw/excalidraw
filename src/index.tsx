@@ -1009,9 +1009,8 @@ class App extends React.Component<{}, AppState> {
       parsedElements[0].type // need to implement a better check here...
     ) {
       clearSelection(elements);
-
-      if (x == null) x = 10 - this.state.scrollX;
-      if (y == null) y = 10 - this.state.scrollY;
+      if (x == null) x = window.innerWidth / 2 - this.state.scrollX - 10;
+      if (y == null) y = window.innerHeight / 2 - this.state.scrollY - 10;
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));
       const dx = x - minX;
