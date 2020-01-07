@@ -1,6 +1,3 @@
-import { RoughCanvas } from "roughjs/bin/canvas";
-
-import { SceneState } from "../scene/types";
 import { randomSeed } from "../random";
 
 export function newElement(
@@ -17,24 +14,19 @@ export function newElement(
   height = 0
 ) {
   const element = {
-    type: type,
-    x: x,
-    y: y,
-    width: width,
-    height: height,
+    type,
+    x,
+    y,
+    width,
+    height,
+    strokeColor,
+    backgroundColor,
+    fillStyle,
+    strokeWidth,
+    roughness,
+    opacity,
     isSelected: false,
-    strokeColor: strokeColor,
-    backgroundColor: backgroundColor,
-    fillStyle: fillStyle,
-    strokeWidth: strokeWidth,
-    roughness: roughness,
-    opacity: opacity,
-    seed: randomSeed(),
-    draw(
-      rc: RoughCanvas,
-      context: CanvasRenderingContext2D,
-      sceneState: SceneState
-    ) {}
+    seed: randomSeed()
   };
   return element;
 }

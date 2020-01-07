@@ -4,9 +4,8 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, generateDraw, isTextElement } from "./element";
+import { newElement, resizeTest, isTextElement } from "./element";
 import {
-  renderScene,
   clearSelection,
   getSelectedIndices,
   deleteSelectedElements,
@@ -26,6 +25,8 @@ import {
   getElementAtPosition,
   createScene
 } from "./scene";
+
+import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
@@ -267,7 +268,6 @@ class App extends React.Component<{}, AppState> {
         element.fillStyle = pastedElement?.fillStyle;
         element.opacity = pastedElement?.opacity;
         element.roughness = pastedElement?.roughness;
-        generateDraw(element);
       }
     });
     this.forceUpdate();
@@ -303,7 +303,6 @@ class App extends React.Component<{}, AppState> {
     elements.forEach(element => {
       if (element.isSelected) {
         callback(element);
-        generateDraw(element);
       }
     });
 
@@ -697,7 +696,6 @@ class App extends React.Component<{}, AppState> {
               }
             }
 
-            generateDraw(element);
             elements.push(element);
             if (this.state.elementType === "text") {
               this.setState({
@@ -805,7 +803,6 @@ class App extends React.Component<{}, AppState> {
 
                     el.x = element.x;
                     el.y = element.y;
-                    generateDraw(el);
                   });
                   lastX = x;
                   lastY = y;
@@ -855,8 +852,6 @@ class App extends React.Component<{}, AppState> {
               draggingElement.height = e.shiftKey
                 ? Math.abs(width) * Math.sign(height)
                 : height;
-
-              generateDraw(draggingElement);
 
               if (this.state.elementType === "selection") {
                 setSelection(elements, draggingElement);
@@ -932,7 +927,6 @@ class App extends React.Component<{}, AppState> {
               return;
             }
 
-            generateDraw(element);
             elements.push(element);
 
             this.setState({
@@ -989,7 +983,6 @@ class App extends React.Component<{}, AppState> {
         parsedElement.x = dx ? parsedElement.x + dx : 10 - this.state.scrollX;
         parsedElement.y = dy ? parsedElement.y + dy : 10 - this.state.scrollY;
         parsedElement.seed = randomSeed();
-        generateDraw(parsedElement);
         elements.push(parsedElement);
       });
       this.forceUpdate();

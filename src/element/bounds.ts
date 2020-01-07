@@ -5,17 +5,13 @@ import { rotate } from "../math";
 // This set of functions retrieves the absolute position of the 4 points.
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
-export function getElementAbsoluteX1(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x : element.x + element.width;
-}
-export function getElementAbsoluteX2(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x + element.width : element.x;
-}
-export function getElementAbsoluteY1(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y : element.y + element.height;
-}
-export function getElementAbsoluteY2(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y + element.height : element.y;
+export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+  return [
+    element.width >= 0 ? element.x : element.x + element.width, // x1
+    element.height >= 0 ? element.y : element.y + element.height, // y1
+    element.width >= 0 ? element.x + element.width : element.x, // x2
+    element.height >= 0 ? element.y + element.height : element.y // y2
+  ];
 }
 
 export function getDiamondPoints(element: ExcalidrawElement) {

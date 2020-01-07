@@ -2,15 +2,9 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { ExcalidrawElement } from "../element/types";
 
-import {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2,
-  generateDraw
-} from "../element";
+import { getElementAbsoluteCoords } from "../element";
 
-import { renderScene } from "./render";
+import { renderScene } from "../renderer";
 import { AppState } from "../types";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -94,10 +88,11 @@ export function exportAsPNG(
   let subCanvasY2 = 0;
 
   elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    subCanvasX1 = Math.min(subCanvasX1, x1);
+    subCanvasY1 = Math.min(subCanvasY1, y1);
+    subCanvasX2 = Math.max(subCanvasX2, x2);
+    subCanvasY2 = Math.max(subCanvasY2, y2);
   });
 
   function distance(x: number, y: number) {
@@ -155,8 +150,6 @@ function restore(
           element.opacity === null || element.opacity === undefined
             ? 100
             : element.opacity;
-
-        generateDraw(element);
       });
     }
 

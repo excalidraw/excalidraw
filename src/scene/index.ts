@@ -1,5 +1,4 @@
 export { isOverScrollBars } from "./scrollbars";
-export { renderScene } from "./render";
 export {
   clearSelection,
   getSelectedIndices,
