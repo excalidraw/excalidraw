@@ -4,7 +4,7 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, isTextElement } from "./element";
+import { newElement, resizeTest, isTextElement, textWysiwyg } from "./element";
 import {
   clearSelection,
   getSelectedIndices,
@@ -50,11 +50,12 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-const KEYS = {
+export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
+  ENTER: "Enter",
   ESCAPE: "Escape",
   DELETE: "Delete",
   BACKSPACE: "Backspace"
@@ -79,24 +80,26 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function addTextElement(element: ExcalidrawTextElement) {
+function addTextElement(
+  element: ExcalidrawTextElement,
+  text: string,
+  font: string
+) {
   resetCursor();
-  const text = prompt("What text do you want?");
   if (text === null || text === "") {
     return false;
   }
-  const fontSize = 20;
   element.text = text;
-  element.font = `${fontSize}px Virgil`;
-  const font = context.font;
+  element.font = font;
+  const currentFont = context.font;
   context.font = element.font;
   const textMeasure = context.measureText(element.text);
   const width = textMeasure.width;
   const actualBoundingBoxAscent =
-    textMeasure.actualBoundingBoxAscent || fontSize;
+    textMeasure.actualBoundingBoxAscent || parseInt(font);
   const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
   element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-  context.font = font;
+  context.font = currentFont;
   const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
   // Center the text
   element.x -= width / 2;
@@ -138,6 +141,7 @@ class App extends React.Component<{}, AppState> {
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
+    currentItemFont: "20px Virgil",
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
@@ -688,9 +692,23 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              if (!addTextElement(element)) {
-                return;
-              }
+              textWysiwyg({
+                initText: "",
+                x: e.clientX,
+                y: e.clientY,
+                strokeColor: this.state.currentItemStrokeColor,
+                font: this.state.currentItemFont,
+                onSubmit: text => {
+                  addTextElement(element, text, this.state.currentItemFont);
+                  elements.push(element);
+                  element.isSelected = true;
+                  this.setState({
+                    draggingElement: null,
+                    elementType: "selection"
+                  });
+                }
+              });
+              return;
             }
 
             elements.push(element);
@@ -903,9 +921,12 @@ class App extends React.Component<{}, AppState> {
             const x =
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
-
-            if (getElementAtPosition(elements, x, y)) {
+            const elementAtPosition = getElementAtPosition(elements, x, y);
+            if (elementAtPosition && !isTextElement(elementAtPosition)) {
               return;
+            } else if (elementAtPosition) {
+              elements.splice(elements.indexOf(elementAtPosition), 1);
+              this.forceUpdate();
             }
 
             const element = newElement(
@@ -918,21 +939,50 @@ class App extends React.Component<{}, AppState> {
               1,
               1,
               100
-            );
+            ) as ExcalidrawTextElement;
 
-            if (!addTextElement(element as ExcalidrawTextElement)) {
-              return;
+            let initText = "";
+            let textX = e.clientX;
+            let textY = e.clientY;
+            if (elementAtPosition) {
+              Object.assign(element, elementAtPosition);
+              // x and y will change after calling addTextElement function
+              element.x = elementAtPosition.x + elementAtPosition.width / 2;
+              element.y =
+                elementAtPosition.y + elementAtPosition.actualBoundingBoxAscent;
+              initText = elementAtPosition.text;
+              textX =
+                this.state.scrollX +
+                elementAtPosition.x +
+                CANVAS_WINDOW_OFFSET_LEFT +
+                elementAtPosition.width / 2;
+              textY =
+                this.state.scrollY +
+                elementAtPosition.y +
+                CANVAS_WINDOW_OFFSET_TOP +
+                elementAtPosition.actualBoundingBoxAscent;
             }
 
-            elements.push(element);
-
-            this.setState({
-              draggingElement: null,
-              elementType: "selection"
+            textWysiwyg({
+              initText,
+              x: textX,
+              y: textY,
+              strokeColor: element.strokeColor,
+              font: element.font || this.state.currentItemFont,
+              onSubmit: text => {
+                addTextElement(
+                  element,
+                  text,
+                  element.font || this.state.currentItemFont
+                );
+                elements.push(element);
+                element.isSelected = true;
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
             });
-            element.isSelected = true;
-
-            this.forceUpdate();
           }}
         />
       </div>
