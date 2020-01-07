@@ -13,7 +13,9 @@ export {
   loadFromJSON,
   saveAsJSON,
   restoreFromLocalStorage,
-  saveToLocalStorage
+  saveToLocalStorage,
+  restoreFromURL,
+  saveToURL
 } from "./data";
 export { hasBackground, hasStroke, getElementAtPosition } from "./comparisons";
 export { createScene } from "./createScene";
