@@ -6,6 +6,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "nanoid": "^2.1.9",
     "react": "16.12.0",
     "react-color": "^2.17.3",
     "react-dom": "16.12.0",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.25",
+    "@types/nanoid": "^2.1.0",
     "@types/react": "16.9.17",
     "@types/react-color": "^3.0.1",
     "@types/react-dom": "16.9.4",

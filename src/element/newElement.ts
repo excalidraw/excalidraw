@@ -1,4 +1,5 @@
 import { randomSeed } from "../random";
+import nanoid from "nanoid";
 
 export function newElement(
   type: string,
@@ -14,7 +15,7 @@ export function newElement(
   height = 0
 ) {
   const element = {
-    id: new Date().getTime(),
+    id: nanoid(),
     type,
     x,
     y,
