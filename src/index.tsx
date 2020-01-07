@@ -56,6 +56,10 @@ const KEYS = {
   BACKSPACE: "Backspace"
 };
 
+const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+  ? "metaKey"
+  : "ctrlKey";
+
 let COPIED_STYLES: string = "{}";
 
 function isArrowKey(keyCode: string) {
@@ -167,7 +171,7 @@ class App extends React.Component<{}, AppState> {
 
       // Send backward: Cmd-Shift-Alt-B
     } else if (
-      event.metaKey &&
+      event[META_KEY] &&
       event.shiftKey &&
       event.altKey &&
       event.code === "KeyB"
@@ -176,13 +180,13 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
 
       // Send to back: Cmd-Shift-B
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyB") {
+    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyB") {
       this.moveAllLeft();
       event.preventDefault();
 
       // Bring forward: Cmd-Shift-Alt-F
     } else if (
-      event.metaKey &&
+      event[META_KEY] &&
       event.shiftKey &&
       event.altKey &&
       event.code === "KeyF"
@@ -191,11 +195,11 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
 
       // Bring to front: Cmd-Shift-F
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
+    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
       // Select all: Cmd-A
-    } else if (event.metaKey && event.code === "KeyA") {
+    } else if (event[META_KEY] && event.code === "KeyA") {
       elements.forEach(element => {
         element.isSelected = true;
       });
@@ -203,7 +207,7 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findShapeByKey(event.key) });
-    } else if (event.metaKey && event.code === "KeyZ") {
+    } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
         history.redoOnce(elements);
