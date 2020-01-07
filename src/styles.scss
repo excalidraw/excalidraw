@@ -30,6 +30,17 @@ body {
     margin: 10px 0 10px 0;
   }
 
+  .panel {
+    position: relative;
+    .btn-panel-collapse {
+      position: absolute;
+      top: -2px;
+      right: 5px;
+      background: none;
+      margin: 0px;
+    }
+  }
+
   .panelTools {
     display: flex;
     flex-wrap: wrap;

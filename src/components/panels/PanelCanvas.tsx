@@ -1,6 +1,7 @@
 import React from "react";
 
 import { ColorPicker } from "../ColorPicker";
+import { Panel } from "../Panel";
 
 interface PanelCanvasProps {
   viewBackgroundColor: string;
@@ -14,8 +15,7 @@ export const PanelCanvas: React.FC<PanelCanvasProps> = ({
   onClearCanvas
 }) => {
   return (
-    <>
-      <h4>Canvas</h4>
+    <Panel title="Canvas">
       <div className="panelColumn">
         <h5>Canvas Background Color</h5>
         <ColorPicker
@@ -30,6 +30,6 @@ export const PanelCanvas: React.FC<PanelCanvasProps> = ({
           Clear canvas
         </button>
       </div>
-    </>
+    </Panel>
   );
 };

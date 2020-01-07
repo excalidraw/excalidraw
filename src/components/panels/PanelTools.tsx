@@ -2,6 +2,7 @@ import React from "react";
 
 import { SHAPES } from "../../shapes";
 import { capitalizeString } from "../../utils";
+import { Panel } from "../Panel";
 
 interface PanelToolsProps {
   activeTool: string;
@@ -13,8 +14,7 @@ export const PanelTools: React.FC<PanelToolsProps> = ({
   onToolChange
 }) => {
   return (
-    <>
-      <h4>Shapes</h4>
+    <Panel title="Shapes">
       <div className="panelTools">
         {SHAPES.map(({ value, icon }) => (
           <label
@@ -33,6 +33,6 @@ export const PanelTools: React.FC<PanelToolsProps> = ({
           </label>
         ))}
       </div>
-    </>
+    </Panel>
   );
 };

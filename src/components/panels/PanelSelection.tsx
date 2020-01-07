@@ -1,4 +1,5 @@
 import React from "react";
+import { Panel } from "../Panel";
 
 interface PanelSelectionProps {
   onBringForward: React.MouseEventHandler;
@@ -14,8 +15,7 @@ export const PanelSelection: React.FC<PanelSelectionProps> = ({
   onSendToBack
 }) => {
   return (
-    <>
-      <h4>Selection</h4>
+    <div>
       <div className="buttonList">
         <button type="button" onClick={onBringForward}>
           Bring forward
@@ -30,6 +30,6 @@ export const PanelSelection: React.FC<PanelSelectionProps> = ({
           Send to back
         </button>
       </div>
-    </>
+    </div>
   );
 };

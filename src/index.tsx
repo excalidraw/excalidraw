@@ -43,6 +43,7 @@ import { PanelSelection } from "./components/panels/PanelSelection";
 import { PanelColor } from "./components/panels/PanelColor";
 import { PanelExport } from "./components/panels/PanelExport";
 import { PanelCanvas } from "./components/panels/PanelCanvas";
+import { Panel } from "./components/Panel";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -381,7 +382,7 @@ class App extends React.Component<{}, AppState> {
             }}
           />
           {someElementIsSelected(elements) && (
-            <div className="panelColumn">
+            <Panel title="Selection">
               <PanelSelection
                 onBringForward={this.moveOneRight}
                 onBringToFront={this.moveAllRight}
@@ -484,7 +485,7 @@ class App extends React.Component<{}, AppState> {
               <button onClick={this.deleteSelectedElements}>
                 Delete selected
               </button>
-            </div>
+            </Panel>
           )}
           <PanelCanvas
             onClearCanvas={this.clearCanvas}
