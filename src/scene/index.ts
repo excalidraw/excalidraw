@@ -12,9 +12,7 @@ export {
   loadFromJSON,
   saveAsJSON,
   restoreFromLocalStorage,
-  saveToLocalStorage,
-  restoreFromURL,
-  saveToURL
+  saveToLocalStorage
 } from "./data";
 export { hasBackground, hasStroke, getElementAtPosition } from "./comparisons";
 export { createScene } from "./createScene";
