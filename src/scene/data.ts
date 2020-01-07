@@ -181,3 +181,22 @@ export function saveToLocalStorage(
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
 }
+
+export function restoreFromURL(elements: ExcalidrawElement[]) {
+  try {
+    const [savedElements, savedState] = document.location.hash
+      .slice(1)
+      .split(":")
+      .map(atob);
+    return restore(elements, savedElements, savedState);
+  } catch (ex) {
+    return null;
+  }
+}
+
+export function saveToURL(elements: ExcalidrawElement[], state: AppState) {
+  const hash = [JSON.stringify(elements), JSON.stringify(state)]
+    .map(btoa)
+    .join(":");
+  document.location.replace("#" + hash);
+}
