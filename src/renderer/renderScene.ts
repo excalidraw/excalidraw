@@ -1,13 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 import { ExcalidrawElement } from "../element/types";
-import {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2,
-  handlerRectangles
-} from "../element";
+import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
 import { roundRect } from "../scene/roundRect";
 import { SceneState } from "../scene/types";
@@ -65,10 +59,12 @@ export function renderScene(
     selectedElements.forEach(element => {
       const margin = 4;
 
-      const elementX1 = getElementAbsoluteX1(element);
-      const elementX2 = getElementAbsoluteX2(element);
-      const elementY1 = getElementAbsoluteY1(element);
-      const elementY2 = getElementAbsoluteY2(element);
+      const [
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2
+      ] = getElementAbsoluteCoords(element);
       const lineDash = context.getLineDash();
       context.setLineDash([8, 4]);
       context.strokeRect(

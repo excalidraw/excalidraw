@@ -1,9 +1,6 @@
 export { newElement } from "./newElement";
 export {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2,
+  getElementAbsoluteCoords,
   getDiamondPoints,
   getArrowPoints
 } from "./bounds";
