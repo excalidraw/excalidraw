@@ -9,10 +9,15 @@ import {
   handlerRectangles
 } from "../element";
 
-import { roundRect } from "./roundRect";
-import { SceneState } from "./types";
-import { getScrollBars, SCROLLBAR_COLOR, SCROLLBAR_WIDTH } from "./scrollbars";
-import { getSelectedIndices } from "./selection";
+import { roundRect } from "../scene/roundRect";
+import { SceneState } from "../scene/types";
+import {
+  getScrollBars,
+  SCROLLBAR_COLOR,
+  SCROLLBAR_WIDTH
+} from "../scene/scrollbars";
+
+import { renderElement } from "./renderElement";
 
 export function renderScene(
   elements: ExcalidrawElement[],
@@ -44,8 +49,6 @@ export function renderScene(
   }
   context.fillStyle = fillStyle;
 
-  const selectedIndices = getSelectedIndices(elements);
-
   sceneState = {
     ...sceneState,
     scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
@@ -53,8 +56,13 @@ export function renderScene(
   };
 
   elements.forEach(element => {
-    element.draw(rc, context, sceneState);
-    if (renderSelection && element.isSelected) {
+    renderElement(element, rc, context, sceneState);
+  });
+
+  if (renderSelection) {
+    const selectedElements = elements.filter(el => el.isSelected);
+
+    selectedElements.forEach(element => {
       const margin = 4;
 
       const elementX1 = getElementAbsoluteX1(element);
@@ -70,15 +78,15 @@ export function renderScene(
         elementY2 - elementY1 + margin * 2
       );
       context.setLineDash(lineDash);
+    });
 
-      if (element.type !== "text" && selectedIndices.length === 1) {
-        const handlers = handlerRectangles(element, sceneState);
-        Object.values(handlers).forEach(handler => {
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-        });
-      }
+    if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
+      const handlers = handlerRectangles(selectedElements[0], sceneState);
+      Object.values(handlers).forEach(handler => {
+        context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+      });
     }
-  });
+  }
 
   if (renderScrollbars) {
     const scrollBars = getScrollBars(

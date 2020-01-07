@@ -11,5 +11,4 @@ export {
 export { handlerRectangles } from "./handlerRectangles";
 export { hitTest } from "./collision";
 export { resizeTest } from "./resizeTest";
-export { generateDraw } from "./generateDraw";
 export { isTextElement } from "./typeChecks";

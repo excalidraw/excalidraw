@@ -6,11 +6,10 @@ import {
   getElementAbsoluteX1,
   getElementAbsoluteX2,
   getElementAbsoluteY1,
-  getElementAbsoluteY2,
-  generateDraw
+  getElementAbsoluteY2
 } from "../element";
 
-import { renderScene } from "./render";
+import { renderScene } from "../renderer";
 import { AppState } from "../types";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -155,8 +154,6 @@ function restore(
           element.opacity === null || element.opacity === undefined
             ? 100
             : element.opacity;
-
-        generateDraw(element);
       });
     }
 
