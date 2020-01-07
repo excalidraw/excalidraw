@@ -15,6 +15,8 @@ export function getElementAbsoluteCoords(element: ExcalidrawElement) {
 }
 
 export function getDiamondPoints(element: ExcalidrawElement) {
+  // Here we add +1 to avoid these numbers to be 0
+  // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
   const topY = 0;
   const rightX = element.width;
