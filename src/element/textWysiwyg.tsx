@@ -5,8 +5,7 @@ type TextWysiwygParams = {
   x: number;
   y: number;
   strokeColor: string;
-  fontSize: number;
-  fontFamily: string;
+  font: string;
   onSubmit: (text: string) => void;
 };
 
@@ -15,8 +14,7 @@ export function textWysiwyg({
   x,
   y,
   strokeColor,
-  fontSize,
-  fontFamily,
+  font,
   onSubmit
 }: TextWysiwygParams) {
   const input = document.createElement("input");
@@ -30,8 +28,7 @@ export function textWysiwyg({
     boxShadow: "none",
     textAlign: "center",
     width: (window.innerWidth - x) * 2 + "px",
-    fontSize: fontSize + "px",
-    fontFamily,
+    font: font,
     border: "none",
     background: "transparent"
   });

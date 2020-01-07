@@ -83,24 +83,23 @@ function resetCursor() {
 function addTextElement(
   element: ExcalidrawTextElement,
   text: string,
-  fontSize: number,
-  fontFamily: string
+  font: string
 ) {
   resetCursor();
   if (text === null || text === "") {
     return false;
   }
   element.text = text;
-  element.font = `${fontSize}px ${fontFamily}`;
-  const font = context.font;
+  element.font = font;
+  const currentFont = context.font;
   context.font = element.font;
   const textMeasure = context.measureText(element.text);
   const width = textMeasure.width;
   const actualBoundingBoxAscent =
-    textMeasure.actualBoundingBoxAscent || fontSize;
+    textMeasure.actualBoundingBoxAscent || parseInt(font);
   const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
   element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-  context.font = font;
+  context.font = currentFont;
   const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
   // Center the text
   element.x -= width / 2;
@@ -142,8 +141,7 @@ class App extends React.Component<{}, AppState> {
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
-    currentItemFontFamily: "Virgil",
-    currentItemFontSize: 20,
+    currentItemFont: "20px Virgil",
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
@@ -699,15 +697,9 @@ class App extends React.Component<{}, AppState> {
                 x: e.clientX,
                 y: e.clientY,
                 strokeColor: this.state.currentItemStrokeColor,
-                fontSize: this.state.currentItemFontSize,
-                fontFamily: this.state.currentItemFontFamily,
+                font: this.state.currentItemFont,
                 onSubmit: text => {
-                  addTextElement(
-                    element,
-                    text,
-                    this.state.currentItemFontSize,
-                    this.state.currentItemFontFamily
-                  );
+                  addTextElement(element, text, this.state.currentItemFont);
                   elements.push(element);
                   element.isSelected = true;
                   this.setState({
@@ -947,7 +939,7 @@ class App extends React.Component<{}, AppState> {
               1,
               1,
               100
-            );
+            ) as ExcalidrawTextElement;
 
             let initText = "";
             let textX = e.clientX;
@@ -975,15 +967,13 @@ class App extends React.Component<{}, AppState> {
               initText,
               x: textX,
               y: textY,
-              strokeColor: this.state.currentItemStrokeColor,
-              fontSize: this.state.currentItemFontSize,
-              fontFamily: this.state.currentItemFontFamily,
+              strokeColor: element.strokeColor,
+              font: element.font || this.state.currentItemFont,
               onSubmit: text => {
                 addTextElement(
-                  element as ExcalidrawTextElement,
+                  element,
                   text,
-                  this.state.currentItemFontSize,
-                  this.state.currentItemFontFamily
+                  element.font || this.state.currentItemFont
                 );
                 elements.push(element);
                 element.isSelected = true;
