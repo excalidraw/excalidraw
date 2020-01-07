@@ -36,6 +36,7 @@ import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import "./styles.scss";
+import ContextMenu from "./components/ContextMenu";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -147,8 +148,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements(elements);
-      this.forceUpdate();
+      this.deleteSelectedElements();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
       const step = event.shiftKey
@@ -307,6 +307,23 @@ class App extends React.Component<{}, AppState> {
     this.setState({ currentItemBackgroundColor: color });
   };
 
+  private copyToClipboard = () => {
+    if (navigator.clipboard) {
+      const text = JSON.stringify(
+        elements.filter(element => element.isSelected)
+      );
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  private pasteFromClipboard = (x?: number, y?: number) => {
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .readText()
+        .then(text => this.addElementsFromPaste(text, x, y));
+    }
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -332,25 +349,7 @@ class App extends React.Component<{}, AppState> {
         }}
         onPaste={e => {
           const paste = e.clipboardData.getData("text");
-          let parsedElements;
-          try {
-            parsedElements = JSON.parse(paste);
-          } catch (e) {}
-          if (
-            Array.isArray(parsedElements) &&
-            parsedElements.length > 0 &&
-            parsedElements[0].type // need to implement a better check here...
-          ) {
-            clearSelection(elements);
-            parsedElements.forEach(parsedElement => {
-              parsedElement.x = 10 - this.state.scrollX;
-              parsedElement.y = 10 - this.state.scrollY;
-              parsedElement.seed = randomSeed();
-              generateDraw(parsedElement);
-              elements.push(parsedElement);
-            });
-            this.forceUpdate();
-          }
+          this.addElementsFromPaste(paste);
           e.preventDefault();
         }}
       >
@@ -576,6 +575,54 @@ class App extends React.Component<{}, AppState> {
                   .scale(window.devicePixelRatio, window.devicePixelRatio);
               }
             }
+          }}
+          onContextMenu={e => {
+            e.preventDefault();
+
+            const x =
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+
+            const element = getElementAtPosition(elements, x, y);
+            if (!element) {
+              ContextMenu.push({
+                options: [
+                  navigator.clipboard && {
+                    label: "Paste",
+                    action: () => this.pasteFromClipboard(x, y)
+                  }
+                ],
+                top: e.clientY,
+                left: e.clientX
+              });
+              return;
+            }
+
+            if (!element.isSelected) {
+              clearSelection(elements);
+              element.isSelected = true;
+              this.forceUpdate();
+            }
+
+            ContextMenu.push({
+              options: [
+                navigator.clipboard && {
+                  label: "Copy",
+                  action: this.copyToClipboard
+                },
+                navigator.clipboard && {
+                  label: "Paste",
+                  action: () => this.pasteFromClipboard(x, y)
+                },
+                { label: "Delete", action: this.deleteSelectedElements },
+                { label: "Move Forward", action: this.moveOneRight },
+                { label: "Send to Front", action: this.moveAllRight },
+                { label: "Move Backwards", action: this.moveOneLeft },
+                { label: "Send to Back", action: this.moveAllLeft }
+              ],
+              top: e.clientY,
+              left: e.clientX
+            });
           }}
           onMouseDown={e => {
             if (lastMouseUp !== null) {
@@ -940,6 +987,40 @@ class App extends React.Component<{}, AppState> {
       scrollX: state.scrollX - deltaX,
       scrollY: state.scrollY - deltaY
     }));
+  };
+
+  private addElementsFromPaste = (paste: string, x?: number, y?: number) => {
+    let parsedElements;
+    try {
+      parsedElements = JSON.parse(paste);
+    } catch (e) {}
+    if (
+      Array.isArray(parsedElements) &&
+      parsedElements.length > 0 &&
+      parsedElements[0].type // need to implement a better check here...
+    ) {
+      clearSelection(elements);
+
+      let dx: number;
+      let dy: number;
+      if (x) {
+        let minX = Math.min(...parsedElements.map(element => element.x));
+        dx = x - minX;
+      }
+      if (y) {
+        let minY = Math.min(...parsedElements.map(element => element.y));
+        dy = y - minY;
+      }
+
+      parsedElements.forEach(parsedElement => {
+        parsedElement.x = dx ? parsedElement.x + dx : 10 - this.state.scrollX;
+        parsedElement.y = dy ? parsedElement.y + dy : 10 - this.state.scrollY;
+        parsedElement.seed = randomSeed();
+        generateDraw(parsedElement);
+        elements.push(parsedElement);
+      });
+      this.forceUpdate();
+    }
   };
 
   componentDidUpdate() {
