@@ -4,7 +4,13 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, generateDraw, isTextElement } from "./element";
+import {
+  newElement,
+  resizeTest,
+  generateDraw,
+  isTextElement,
+  textWysiwyg
+} from "./element";
 import {
   renderScene,
   clearSelection,
@@ -38,6 +44,7 @@ import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import "./styles.scss";
+import ContextMenu from "./components/ContextMenu";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -47,15 +54,22 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-const KEYS = {
+export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
   ESCAPE: "Escape",
+  ENTER: "Enter",
   DELETE: "Delete",
   BACKSPACE: "Backspace"
 };
+
+const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+  ? "metaKey"
+  : "ctrlKey";
+
+let COPIED_STYLES: string = "{}";
 
 function isArrowKey(keyCode: string) {
   return (
@@ -70,9 +84,8 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function addTextElement(element: ExcalidrawTextElement) {
+function addTextElement(element: ExcalidrawTextElement, text = "") {
   resetCursor();
-  const text = prompt("What text do you want?");
   if (text === null || text === "") {
     return false;
   }
@@ -148,8 +161,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements(elements);
-      this.forceUpdate();
+      this.deleteSelectedElements();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
       const step = event.shiftKey
@@ -168,7 +180,7 @@ class App extends React.Component<{}, AppState> {
 
       // Send backward: Cmd-Shift-Alt-B
     } else if (
-      event.metaKey &&
+      event[META_KEY] &&
       event.shiftKey &&
       event.altKey &&
       event.code === "KeyB"
@@ -177,13 +189,13 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
 
       // Send to back: Cmd-Shift-B
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyB") {
+    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyB") {
       this.moveAllLeft();
       event.preventDefault();
 
       // Bring forward: Cmd-Shift-Alt-F
     } else if (
-      event.metaKey &&
+      event[META_KEY] &&
       event.shiftKey &&
       event.altKey &&
       event.code === "KeyF"
@@ -192,12 +204,11 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
 
       // Bring to front: Cmd-Shift-F
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
+    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
-
       // Select all: Cmd-A
-    } else if (event.metaKey && event.code === "KeyA") {
+    } else if (event[META_KEY] && event.code === "KeyA") {
       elements.forEach(element => {
         element.isSelected = true;
       });
@@ -205,13 +216,36 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findShapeByKey(event.key) });
-    } else if (event.metaKey && event.code === "KeyZ") {
+    } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
         history.redoOnce(elements);
       } else {
         // undo action
         history.undoOnce(elements);
+      }
+      this.forceUpdate();
+      event.preventDefault();
+      // Copy Styles: Cmd-Shift-C
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
+      const element = elements.find(el => el.isSelected);
+      if (element) {
+        COPIED_STYLES = JSON.stringify(element);
+      }
+      // Paste Styles: Cmd-Shift-V
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
+      const pastedElement = JSON.parse(COPIED_STYLES);
+      if (pastedElement.type) {
+        elements.forEach(element => {
+          if (element.isSelected) {
+            element.backgroundColor = pastedElement?.backgroundColor;
+            element.strokeWidth = pastedElement?.strokeWidth;
+            element.strokeColor = pastedElement?.strokeColor;
+            element.fillStyle = pastedElement?.fillStyle;
+            element.opacity = pastedElement?.opacity;
+            generateDraw(element);
+          }
+        });
       }
       this.forceUpdate();
       event.preventDefault();
@@ -286,6 +320,23 @@ class App extends React.Component<{}, AppState> {
     this.setState({ currentItemBackgroundColor: color });
   };
 
+  private copyToClipboard = () => {
+    if (navigator.clipboard) {
+      const text = JSON.stringify(
+        elements.filter(element => element.isSelected)
+      );
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  private pasteFromClipboard = (x?: number, y?: number) => {
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .readText()
+        .then(text => this.addElementsFromPaste(text, x, y));
+    }
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -311,25 +362,7 @@ class App extends React.Component<{}, AppState> {
         }}
         onPaste={e => {
           const paste = e.clipboardData.getData("text");
-          let parsedElements;
-          try {
-            parsedElements = JSON.parse(paste);
-          } catch (e) {}
-          if (
-            Array.isArray(parsedElements) &&
-            parsedElements.length > 0 &&
-            parsedElements[0].type // need to implement a better check here...
-          ) {
-            clearSelection(elements);
-            parsedElements.forEach(parsedElement => {
-              parsedElement.x = 10 - this.state.scrollX;
-              parsedElement.y = 10 - this.state.scrollY;
-              parsedElement.seed = randomSeed();
-              generateDraw(parsedElement);
-              elements.push(parsedElement);
-            });
-            this.forceUpdate();
-          }
+          this.addElementsFromPaste(paste);
           e.preventDefault();
         }}
       >
@@ -556,6 +589,54 @@ class App extends React.Component<{}, AppState> {
               }
             }
           }}
+          onContextMenu={e => {
+            e.preventDefault();
+
+            const x =
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+
+            const element = getElementAtPosition(elements, x, y);
+            if (!element) {
+              ContextMenu.push({
+                options: [
+                  navigator.clipboard && {
+                    label: "Paste",
+                    action: () => this.pasteFromClipboard(x, y)
+                  }
+                ],
+                top: e.clientY,
+                left: e.clientX
+              });
+              return;
+            }
+
+            if (!element.isSelected) {
+              clearSelection(elements);
+              element.isSelected = true;
+              this.forceUpdate();
+            }
+
+            ContextMenu.push({
+              options: [
+                navigator.clipboard && {
+                  label: "Copy",
+                  action: this.copyToClipboard
+                },
+                navigator.clipboard && {
+                  label: "Paste",
+                  action: () => this.pasteFromClipboard(x, y)
+                },
+                { label: "Delete", action: this.deleteSelectedElements },
+                { label: "Move Forward", action: this.moveOneRight },
+                { label: "Send to Front", action: this.moveAllRight },
+                { label: "Move Backwards", action: this.moveOneLeft },
+                { label: "Send to Back", action: this.moveAllLeft }
+              ],
+              top: e.clientY,
+              left: e.clientX
+            });
+          }}
           onMouseDown={e => {
             if (lastMouseUp !== null) {
               // Unfortunately, sometimes we don't get a mouseup after a mousedown,
@@ -656,22 +737,23 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              if (!addTextElement(element)) {
-                return;
-              }
+              textWysiwyg(e.clientX, e.clientY, text => {
+                addTextElement(element, text);
+                generateDraw(element);
+                elements.push(element);
+                element.isSelected = true;
+
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              });
+              return;
             }
 
             generateDraw(element);
             elements.push(element);
-            if (this.state.elementType === "text") {
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
-              element.isSelected = true;
-            } else {
-              this.setState({ draggingElement: element });
-            }
+            this.setState({ draggingElement: element });
 
             let lastX = x;
             let lastY = y;
@@ -892,20 +974,17 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            if (!addTextElement(element as ExcalidrawTextElement)) {
-              return;
-            }
+            textWysiwyg(e.clientX, e.clientY, text => {
+              addTextElement(element as ExcalidrawTextElement, text);
+              generateDraw(element);
+              elements.push(element);
+              element.isSelected = true;
 
-            generateDraw(element);
-            elements.push(element);
-
-            this.setState({
-              draggingElement: null,
-              elementType: "selection"
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
             });
-            element.isSelected = true;
-
-            this.forceUpdate();
           }}
         />
       </div>
@@ -925,6 +1004,40 @@ class App extends React.Component<{}, AppState> {
     saveToLocalStorage(elements, this.state);
     saveToURL(elements, this.state);
   }, 300);
+
+  private addElementsFromPaste = (paste: string, x?: number, y?: number) => {
+    let parsedElements;
+    try {
+      parsedElements = JSON.parse(paste);
+    } catch (e) {}
+    if (
+      Array.isArray(parsedElements) &&
+      parsedElements.length > 0 &&
+      parsedElements[0].type // need to implement a better check here...
+    ) {
+      clearSelection(elements);
+
+      let dx: number;
+      let dy: number;
+      if (x) {
+        let minX = Math.min(...parsedElements.map(element => element.x));
+        dx = x - minX;
+      }
+      if (y) {
+        let minY = Math.min(...parsedElements.map(element => element.y));
+        dy = y - minY;
+      }
+
+      parsedElements.forEach(parsedElement => {
+        parsedElement.x = dx ? parsedElement.x + dx : 10 - this.state.scrollX;
+        parsedElement.y = dy ? parsedElement.y + dy : 10 - this.state.scrollY;
+        parsedElement.seed = randomSeed();
+        generateDraw(parsedElement);
+        elements.push(parsedElement);
+      });
+      this.forceUpdate();
+    }
+  };
 
   componentDidUpdate() {
     renderScene(elements, rc, canvas, {
