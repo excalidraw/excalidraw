@@ -36,6 +36,7 @@ import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import "./styles.scss";
+import ContextMenu from "./components/ContextMenu";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -58,6 +59,8 @@ const KEYS = {
 const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
   ? "metaKey"
   : "ctrlKey";
+
+let COPIED_STYLES: string = "{}";
 
 function isArrowKey(keyCode: string) {
   return (
@@ -149,8 +152,7 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements(elements);
-      this.forceUpdate();
+      this.deleteSelectedElements();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
       const step = event.shiftKey
@@ -196,7 +198,6 @@ class App extends React.Component<{}, AppState> {
     } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
       this.moveAllRight();
       event.preventDefault();
-
       // Select all: Cmd-A
     } else if (event[META_KEY] && event.code === "KeyA") {
       elements.forEach(element => {
@@ -213,6 +214,29 @@ class App extends React.Component<{}, AppState> {
       } else {
         // undo action
         history.undoOnce(elements);
+      }
+      this.forceUpdate();
+      event.preventDefault();
+      // Copy Styles: Cmd-Shift-C
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
+      const element = elements.find(el => el.isSelected);
+      if (element) {
+        COPIED_STYLES = JSON.stringify(element);
+      }
+      // Paste Styles: Cmd-Shift-V
+    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
+      const pastedElement = JSON.parse(COPIED_STYLES);
+      if (pastedElement.type) {
+        elements.forEach(element => {
+          if (element.isSelected) {
+            element.backgroundColor = pastedElement?.backgroundColor;
+            element.strokeWidth = pastedElement?.strokeWidth;
+            element.strokeColor = pastedElement?.strokeColor;
+            element.fillStyle = pastedElement?.fillStyle;
+            element.opacity = pastedElement?.opacity;
+            generateDraw(element);
+          }
+        });
       }
       this.forceUpdate();
       event.preventDefault();
@@ -287,6 +311,23 @@ class App extends React.Component<{}, AppState> {
     this.setState({ currentItemBackgroundColor: color });
   };
 
+  private copyToClipboard = () => {
+    if (navigator.clipboard) {
+      const text = JSON.stringify(
+        elements.filter(element => element.isSelected)
+      );
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  private pasteFromClipboard = (x?: number, y?: number) => {
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .readText()
+        .then(text => this.addElementsFromPaste(text, x, y));
+    }
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -312,25 +353,7 @@ class App extends React.Component<{}, AppState> {
         }}
         onPaste={e => {
           const paste = e.clipboardData.getData("text");
-          let parsedElements;
-          try {
-            parsedElements = JSON.parse(paste);
-          } catch (e) {}
-          if (
-            Array.isArray(parsedElements) &&
-            parsedElements.length > 0 &&
-            parsedElements[0].type // need to implement a better check here...
-          ) {
-            clearSelection(elements);
-            parsedElements.forEach(parsedElement => {
-              parsedElement.x += 10;
-              parsedElement.y += 10;
-              parsedElement.seed = randomSeed();
-              generateDraw(parsedElement);
-              elements.push(parsedElement);
-            });
-            this.forceUpdate();
-          }
+          this.addElementsFromPaste(paste);
           e.preventDefault();
         }}
       >
@@ -557,6 +580,54 @@ class App extends React.Component<{}, AppState> {
               }
             }
           }}
+          onContextMenu={e => {
+            e.preventDefault();
+
+            const x =
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
+            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+
+            const element = getElementAtPosition(elements, x, y);
+            if (!element) {
+              ContextMenu.push({
+                options: [
+                  navigator.clipboard && {
+                    label: "Paste",
+                    action: () => this.pasteFromClipboard(x, y)
+                  }
+                ],
+                top: e.clientY,
+                left: e.clientX
+              });
+              return;
+            }
+
+            if (!element.isSelected) {
+              clearSelection(elements);
+              element.isSelected = true;
+              this.forceUpdate();
+            }
+
+            ContextMenu.push({
+              options: [
+                navigator.clipboard && {
+                  label: "Copy",
+                  action: this.copyToClipboard
+                },
+                navigator.clipboard && {
+                  label: "Paste",
+                  action: () => this.pasteFromClipboard(x, y)
+                },
+                { label: "Delete", action: this.deleteSelectedElements },
+                { label: "Move Forward", action: this.moveOneRight },
+                { label: "Send to Front", action: this.moveAllRight },
+                { label: "Move Backwards", action: this.moveOneLeft },
+                { label: "Send to Back", action: this.moveAllLeft }
+              ],
+              top: e.clientY,
+              left: e.clientX
+            });
+          }}
           onMouseDown={e => {
             if (lastMouseUp !== null) {
               // Unfortunately, sometimes we don't get a mouseup after a mousedown,
@@ -716,19 +787,33 @@ class App extends React.Component<{}, AppState> {
                     switch (resizeHandle) {
                       case "nw":
                         element.width += element.x - lastX;
-                        element.height += element.y - lastY;
                         element.x = lastX;
-                        element.y = lastY;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          element.height += element.y - lastY;
+                          element.y = lastY;
+                        }
                         break;
                       case "ne":
                         element.width = lastX - element.x;
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          element.height += element.y - lastY;
+                          element.y = lastY;
+                        }
                         break;
                       case "sw":
                         element.width += element.x - lastX;
                         element.x = lastX;
-                        element.height = lastY - element.y;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height = lastY - element.y;
+                        }
                         break;
                       case "se":
                         element.width += x - lastX;
@@ -906,6 +991,40 @@ class App extends React.Component<{}, AppState> {
       scrollX: state.scrollX - deltaX,
       scrollY: state.scrollY - deltaY
     }));
+  };
+
+  private addElementsFromPaste = (paste: string, x?: number, y?: number) => {
+    let parsedElements;
+    try {
+      parsedElements = JSON.parse(paste);
+    } catch (e) {}
+    if (
+      Array.isArray(parsedElements) &&
+      parsedElements.length > 0 &&
+      parsedElements[0].type // need to implement a better check here...
+    ) {
+      clearSelection(elements);
+
+      let dx: number;
+      let dy: number;
+      if (x) {
+        let minX = Math.min(...parsedElements.map(element => element.x));
+        dx = x - minX;
+      }
+      if (y) {
+        let minY = Math.min(...parsedElements.map(element => element.y));
+        dy = y - minY;
+      }
+
+      parsedElements.forEach(parsedElement => {
+        parsedElement.x = dx ? parsedElement.x + dx : 10 - this.state.scrollX;
+        parsedElement.y = dy ? parsedElement.y + dy : 10 - this.state.scrollY;
+        parsedElement.seed = randomSeed();
+        generateDraw(parsedElement);
+        elements.push(parsedElement);
+      });
+      this.forceUpdate();
+    }
   };
 
   componentDidUpdate() {

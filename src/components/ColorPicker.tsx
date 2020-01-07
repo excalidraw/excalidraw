@@ -1,5 +1,6 @@
 import React from "react";
 import { TwitterPicker } from "react-color";
+import { Popover } from "./Popover";
 
 export function ColorPicker({
   color,
@@ -17,8 +18,7 @@ export function ColorPicker({
         onClick={() => setActive(!isActive)}
       />
       {isActive ? (
-        <div className="popover">
-          <div className="cover" onClick={() => setActive(false)} />
+        <Popover onCloseRequest={() => setActive(false)}>
           <TwitterPicker
             colors={[
               "#000000",
@@ -39,12 +39,13 @@ export function ColorPicker({
               onChange(changedColor.hex);
             }}
           />
-        </div>
+        </Popover>
       ) : null}
       <input
         type="text"
         className="swatch-input"
         value={color || ""}
+        onPaste={e => onChange(e.clipboardData.getData("text"))}
         onChange={e => onChange(e.target.value)}
       />
     </div>
