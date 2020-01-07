@@ -4,7 +4,7 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, isTextElement } from "./element";
+import { newElement, resizeTest, isTextElement, textWysiwyg } from "./element";
 import {
   clearSelection,
   getSelectedIndices,
@@ -50,11 +50,12 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-const KEYS = {
+export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
+  ENTER: "Enter",
   ESCAPE: "Escape",
   DELETE: "Delete",
   BACKSPACE: "Backspace"
@@ -79,9 +80,8 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function addTextElement(element: ExcalidrawTextElement) {
+function addTextElement(element: ExcalidrawTextElement, text: string) {
   resetCursor();
-  const text = prompt("What text do you want?");
   if (text === null || text === "") {
     return false;
   }
@@ -688,9 +688,22 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              if (!addTextElement(element)) {
-                return;
-              }
+              textWysiwyg(
+                e.clientX,
+                e.clientY,
+                this.state.currentItemStrokeColor,
+                text => {
+                  addTextElement(element, text);
+                  elements.push(element);
+                  element.isSelected = true;
+
+                  this.setState({
+                    draggingElement: null,
+                    elementType: "selection"
+                  });
+                }
+              );
+              return;
             }
 
             elements.push(element);
@@ -920,19 +933,21 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            if (!addTextElement(element as ExcalidrawTextElement)) {
-              return;
-            }
+            textWysiwyg(
+              e.clientX,
+              e.clientY,
+              this.state.currentItemStrokeColor,
+              text => {
+                addTextElement(element as ExcalidrawTextElement, text);
+                elements.push(element);
+                element.isSelected = true;
 
-            elements.push(element);
-
-            this.setState({
-              draggingElement: null,
-              elementType: "selection"
-            });
-            element.isSelected = true;
-
-            this.forceUpdate();
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
+            );
           }}
         />
       </div>
