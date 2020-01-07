@@ -13,4 +13,3 @@ export { hitTest } from "./collision";
 export { resizeTest } from "./resizeTest";
 export { generateDraw } from "./generateDraw";
 export { isTextElement } from "./typeChecks";
-export { textWysiwyg } from "./textWysiwyg";

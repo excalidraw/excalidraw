@@ -4,13 +4,7 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import {
-  newElement,
-  resizeTest,
-  generateDraw,
-  isTextElement,
-  textWysiwyg
-} from "./element";
+import { newElement, resizeTest, generateDraw, isTextElement } from "./element";
 import {
   renderScene,
   clearSelection,
@@ -54,13 +48,12 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-export const KEYS = {
+const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
   ESCAPE: "Escape",
-  ENTER: "Enter",
   DELETE: "Delete",
   BACKSPACE: "Backspace"
 };
@@ -84,8 +77,9 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function addTextElement(element: ExcalidrawTextElement, text = "") {
+function addTextElement(element: ExcalidrawTextElement) {
   resetCursor();
+  const text = prompt("What text do you want?");
   if (text === null || text === "") {
     return false;
   }
@@ -737,23 +731,22 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              textWysiwyg(e.clientX, e.clientY, text => {
-                addTextElement(element, text);
-                generateDraw(element);
-                elements.push(element);
-                element.isSelected = true;
-
-                this.setState({
-                  draggingElement: null,
-                  elementType: "selection"
-                });
-              });
-              return;
+              if (!addTextElement(element)) {
+                return;
+              }
             }
 
             generateDraw(element);
             elements.push(element);
-            this.setState({ draggingElement: element });
+            if (this.state.elementType === "text") {
+              this.setState({
+                draggingElement: null,
+                elementType: "selection"
+              });
+              element.isSelected = true;
+            } else {
+              this.setState({ draggingElement: element });
+            }
 
             let lastX = x;
             let lastY = y;
@@ -974,17 +967,20 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            textWysiwyg(e.clientX, e.clientY, text => {
-              addTextElement(element as ExcalidrawTextElement, text);
-              generateDraw(element);
-              elements.push(element);
-              element.isSelected = true;
+            if (!addTextElement(element as ExcalidrawTextElement)) {
+              return;
+            }
 
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
+            generateDraw(element);
+            elements.push(element);
+
+            this.setState({
+              draggingElement: null,
+              elementType: "selection"
             });
+            element.isSelected = true;
+
+            this.forceUpdate();
           }}
         />
       </div>
