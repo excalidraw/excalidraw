@@ -16,20 +16,18 @@ export const PanelCanvas: React.FC<PanelCanvasProps> = ({
 }) => {
   return (
     <Panel title="Canvas">
-      <div className="panelColumn">
-        <h5>Canvas Background Color</h5>
-        <ColorPicker
-          color={viewBackgroundColor}
-          onChange={color => onViewBackgroundColorChange(color)}
-        />
-        <button
-          type="button"
-          onClick={onClearCanvas}
-          title="Clear the canvas & reset background color"
-        >
-          Clear canvas
-        </button>
-      </div>
+      <h5>Canvas Background Color</h5>
+      <ColorPicker
+        color={viewBackgroundColor}
+        onChange={color => onViewBackgroundColorChange(color)}
+      />
+      <button
+        type="button"
+        onClick={onClearCanvas}
+        title="Clear the canvas & reset background color"
+      >
+        Clear canvas
+      </button>
     </Panel>
   );
 };
