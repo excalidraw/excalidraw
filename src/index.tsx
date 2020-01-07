@@ -80,14 +80,18 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function addTextElement(element: ExcalidrawTextElement, text: string) {
+function addTextElement(
+  element: ExcalidrawTextElement,
+  text: string,
+  fontSize: number,
+  fontFamily: string
+) {
   resetCursor();
   if (text === null || text === "") {
     return false;
   }
-  const fontSize = 20;
   element.text = text;
-  element.font = `${fontSize}px Virgil`;
+  element.font = `${fontSize}px ${fontFamily}`;
   const font = context.font;
   context.font = element.font;
   const textMeasure = context.measureText(element.text);
@@ -138,6 +142,8 @@ class App extends React.Component<{}, AppState> {
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "#ffffff",
+    currentItemFontFamily: "Virgil",
+    currentItemFontSize: 20,
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
@@ -688,21 +694,28 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
-              textWysiwyg(
-                e.clientX,
-                e.clientY,
-                this.state.currentItemStrokeColor,
-                text => {
-                  addTextElement(element, text);
+              textWysiwyg({
+                initText: "",
+                x: e.clientX,
+                y: e.clientY,
+                strokeColor: this.state.currentItemStrokeColor,
+                fontSize: this.state.currentItemFontSize,
+                fontFamily: this.state.currentItemFontFamily,
+                onSubmit: text => {
+                  addTextElement(
+                    element,
+                    text,
+                    this.state.currentItemFontSize,
+                    this.state.currentItemFontFamily
+                  );
                   elements.push(element);
                   element.isSelected = true;
-
                   this.setState({
                     draggingElement: null,
                     elementType: "selection"
                   });
                 }
-              );
+              });
               return;
             }
 
@@ -916,9 +929,12 @@ class App extends React.Component<{}, AppState> {
             const x =
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
-
-            if (getElementAtPosition(elements, x, y)) {
+            const elementAtPosition = getElementAtPosition(elements, x, y);
+            if (elementAtPosition && !isTextElement(elementAtPosition)) {
               return;
+            } else if (elementAtPosition) {
+              elements.splice(elements.indexOf(elementAtPosition), 1);
+              this.forceUpdate();
             }
 
             const element = newElement(
@@ -933,21 +949,50 @@ class App extends React.Component<{}, AppState> {
               100
             );
 
-            textWysiwyg(
-              e.clientX,
-              e.clientY,
-              this.state.currentItemStrokeColor,
-              text => {
-                addTextElement(element as ExcalidrawTextElement, text);
+            let initText = "";
+            let textX = e.clientX;
+            let textY = e.clientY;
+            if (elementAtPosition) {
+              Object.assign(element, elementAtPosition);
+              // x and y will change after calling addTextElement function
+              element.x = elementAtPosition.x + elementAtPosition.width / 2;
+              element.y =
+                elementAtPosition.y + elementAtPosition.actualBoundingBoxAscent;
+              initText = elementAtPosition.text;
+              textX =
+                this.state.scrollX +
+                elementAtPosition.x +
+                CANVAS_WINDOW_OFFSET_LEFT +
+                elementAtPosition.width / 2;
+              textY =
+                this.state.scrollY +
+                elementAtPosition.y +
+                CANVAS_WINDOW_OFFSET_TOP +
+                elementAtPosition.actualBoundingBoxAscent;
+            }
+
+            textWysiwyg({
+              initText,
+              x: textX,
+              y: textY,
+              strokeColor: this.state.currentItemStrokeColor,
+              fontSize: this.state.currentItemFontSize,
+              fontFamily: this.state.currentItemFontFamily,
+              onSubmit: text => {
+                addTextElement(
+                  element as ExcalidrawTextElement,
+                  text,
+                  this.state.currentItemFontSize,
+                  this.state.currentItemFontFamily
+                );
                 elements.push(element);
                 element.isSelected = true;
-
                 this.setState({
                   draggingElement: null,
                   elementType: "selection"
                 });
               }
-            );
+            });
           }}
         />
       </div>

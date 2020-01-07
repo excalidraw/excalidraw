@@ -7,6 +7,8 @@ export type AppState = {
   exportBackground: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
+  currentItemFontSize: number;
+  currentItemFontFamily: string;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

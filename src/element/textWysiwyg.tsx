@@ -1,13 +1,26 @@
 import { KEYS } from "../index";
 
-export function textWysiwyg(
-  x: number,
-  y: number,
-  strokeColor: string,
-  onSubmit: (text: string) => void
-) {
-  const input = document.createElement("input");
+type TextWysiwygParams = {
+  initText: string;
+  x: number;
+  y: number;
+  strokeColor: string;
+  fontSize: number;
+  fontFamily: string;
+  onSubmit: (text: string) => void;
+};
 
+export function textWysiwyg({
+  initText,
+  x,
+  y,
+  strokeColor,
+  fontSize,
+  fontFamily,
+  onSubmit
+}: TextWysiwygParams) {
+  const input = document.createElement("input");
+  input.value = initText;
   Object.assign(input.style, {
     color: strokeColor,
     position: "absolute",
@@ -17,8 +30,8 @@ export function textWysiwyg(
     boxShadow: "none",
     textAlign: "center",
     width: (window.innerWidth - x) * 2 + "px",
-    fontSize: "20px",
-    fontFamily: "Virgil",
+    fontSize: fontSize + "px",
+    fontFamily,
     border: "none",
     background: "transparent"
   });
@@ -57,4 +70,5 @@ export function textWysiwyg(
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(input);
   input.focus();
+  input.select();
 }
