@@ -1010,20 +1010,16 @@ class App extends React.Component<{}, AppState> {
     ) {
       clearSelection(elements);
 
-      let dx: number;
-      let dy: number;
-      if (x) {
-        let minX = Math.min(...parsedElements.map(element => element.x));
-        dx = x - minX;
-      }
-      if (y) {
-        let minY = Math.min(...parsedElements.map(element => element.y));
-        dy = y - minY;
-      }
+      if (x == null) x = 10 - this.state.scrollX;
+      if (y == null) y = 10 - this.state.scrollY;
+      const minX = Math.min(...parsedElements.map(element => element.x));
+      const minY = Math.min(...parsedElements.map(element => element.y));
+      const dx = x - minX;
+      const dy = y - minY;
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x = dx ? parsedElement.x + dx : 10 - this.state.scrollX;
-        parsedElement.y = dy ? parsedElement.y + dy : 10 - this.state.scrollY;
+        parsedElement.x += dx;
+        parsedElement.y += dy;
         parsedElement.seed = randomSeed();
         elements.push(parsedElement);
       });
