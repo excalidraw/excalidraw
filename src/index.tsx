@@ -62,7 +62,7 @@ const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
   ? "metaKey"
   : "ctrlKey";
 
-let COPIED_STYLES: string = "{}";
+let copiedStyles: string = "{}";
 
 function isArrowKey(keyCode: string) {
   return (
@@ -222,26 +222,10 @@ class App extends React.Component<{}, AppState> {
       event.preventDefault();
       // Copy Styles: Cmd-Shift-C
     } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
-      const element = elements.find(el => el.isSelected);
-      if (element) {
-        COPIED_STYLES = JSON.stringify(element);
-      }
+      this.copyStyles();
       // Paste Styles: Cmd-Shift-V
     } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
-      const pastedElement = JSON.parse(COPIED_STYLES);
-      if (pastedElement.type) {
-        elements.forEach(element => {
-          if (element.isSelected) {
-            element.backgroundColor = pastedElement?.backgroundColor;
-            element.strokeWidth = pastedElement?.strokeWidth;
-            element.strokeColor = pastedElement?.strokeColor;
-            element.fillStyle = pastedElement?.fillStyle;
-            element.opacity = pastedElement?.opacity;
-            generateDraw(element);
-          }
-        });
-      }
-      this.forceUpdate();
+      this.pasteStyles();
       event.preventDefault();
     }
   };
@@ -261,6 +245,29 @@ class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
     }
+  };
+
+  private copyStyles = () => {
+    const element = elements.find(el => el.isSelected);
+    if (element) {
+      copiedStyles = JSON.stringify(element);
+    }
+  };
+
+  private pasteStyles = () => {
+    const pastedElement = JSON.parse(copiedStyles);
+    elements.forEach(element => {
+      if (element.isSelected) {
+        element.backgroundColor = pastedElement?.backgroundColor;
+        element.strokeWidth = pastedElement?.strokeWidth;
+        element.strokeColor = pastedElement?.strokeColor;
+        element.fillStyle = pastedElement?.fillStyle;
+        element.opacity = pastedElement?.opacity;
+        element.roughness = pastedElement?.roughness;
+        generateDraw(element);
+      }
+    });
+    this.forceUpdate();
   };
 
   private moveAllLeft = () => {
@@ -621,6 +628,8 @@ class App extends React.Component<{}, AppState> {
                   label: "Paste",
                   action: () => this.pasteFromClipboard(x, y)
                 },
+                { label: "Copy Styles", action: this.copyStyles },
+                { label: "Paste Styles", action: this.pasteStyles },
                 { label: "Delete", action: this.deleteSelectedElements },
                 { label: "Move Forward", action: this.moveOneRight },
                 { label: "Send to Front", action: this.moveAllRight },
