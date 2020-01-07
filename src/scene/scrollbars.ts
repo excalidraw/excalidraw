@@ -1,10 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2
-} from "../element";
+import { getElementAbsoluteCoords } from "../element";
 
 const SCROLLBAR_MIN_SIZE = 15;
 const SCROLLBAR_MARGIN = 4;
@@ -24,10 +19,11 @@ export function getScrollBars(
   let maxY = 0;
 
   elements.forEach(element => {
-    minX = Math.min(minX, getElementAbsoluteX1(element));
-    maxX = Math.max(maxX, getElementAbsoluteX2(element));
-    minY = Math.min(minY, getElementAbsoluteY1(element));
-    maxY = Math.max(maxY, getElementAbsoluteY2(element));
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    minX = Math.min(minX, x1);
+    minY = Math.min(minY, y1);
+    maxX = Math.max(maxX, x2);
+    maxY = Math.max(maxY, y2);
   });
 
   minX += scrollX;

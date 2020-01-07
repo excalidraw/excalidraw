@@ -2,12 +2,9 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 import {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2,
   getArrowPoints,
-  getDiamondPoints
+  getDiamondPoints,
+  getElementAbsoluteCoords
 } from "./bounds";
 
 export function hitTest(
@@ -55,10 +52,7 @@ export function hitTest(
 
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     // (x1, y1) --A-- (x2, y1)
     //    |D             |B
@@ -109,10 +103,7 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
     );
   } else if (element.type === "text") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
   } else if (element.type === "selection") {

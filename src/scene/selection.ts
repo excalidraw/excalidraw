@@ -1,24 +1,23 @@
 import { ExcalidrawElement } from "../element/types";
-import {
-  getElementAbsoluteX1,
-  getElementAbsoluteX2,
-  getElementAbsoluteY1,
-  getElementAbsoluteY2
-} from "../element";
+import { getElementAbsoluteCoords } from "../element";
 
 export function setSelection(
   elements: ExcalidrawElement[],
   selection: ExcalidrawElement
 ) {
-  const selectionX1 = getElementAbsoluteX1(selection);
-  const selectionX2 = getElementAbsoluteX2(selection);
-  const selectionY1 = getElementAbsoluteY1(selection);
-  const selectionY2 = getElementAbsoluteY2(selection);
+  const [
+    selectionX1,
+    selectionY1,
+    selectionX2,
+    selectionY2
+  ] = getElementAbsoluteCoords(selection);
   elements.forEach(element => {
-    const elementX1 = getElementAbsoluteX1(element);
-    const elementX2 = getElementAbsoluteX2(element);
-    const elementY1 = getElementAbsoluteY1(element);
-    const elementY2 = getElementAbsoluteY2(element);
+    const [
+      elementX1,
+      elementY1,
+      elementX2,
+      elementY2
+    ] = getElementAbsoluteCoords(element);
     element.isSelected =
       element.type !== "selection" &&
       selectionX1 <= elementX1 &&

@@ -1,5 +1,4 @@
 import { ExcalidrawElement } from "./element/types";
-import { generateDraw } from "./element";
 
 class SceneHistory {
   private recording: boolean = true;
@@ -27,7 +26,6 @@ class SceneHistory {
     const newElements = JSON.parse(entry);
     elements.splice(0, elements.length);
     newElements.forEach((newElement: ExcalidrawElement) => {
-      generateDraw(newElement);
       elements.push(newElement);
     });
     // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
