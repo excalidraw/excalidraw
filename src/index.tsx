@@ -29,16 +29,19 @@ import {
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, capitalizeString, isInputLike } from "./utils";
+import { getDateTime, isInputLike } from "./utils";
 
-import { EditableText } from "./components/EditableText";
 import { ButtonSelect } from "./components/ButtonSelect";
-import { ColorPicker } from "./components/ColorPicker";
-import { SHAPES, findShapeByKey, shapesShortcutKeys } from "./shapes";
+import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import "./styles.scss";
 import ContextMenu from "./components/ContextMenu";
+import { PanelTools } from "./components/panels/PanelTools";
+import { PanelSelection } from "./components/panels/PanelSelection";
+import { PanelColor } from "./components/panels/PanelColor";
+import { PanelExport } from "./components/panels/PanelExport";
+import { PanelCanvas } from "./components/panels/PanelCanvas";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -368,59 +371,45 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <div className="sidePanel">
-          <h4>Shapes</h4>
-          <div className="panelTools">
-            {SHAPES.map(({ value, icon }) => (
-              <label
-                key={value}
-                className="tool"
-                title={`${capitalizeString(value)} - ${
-                  capitalizeString(value)[0]
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={this.state.elementType === value}
-                  onChange={() => {
-                    this.setState({ elementType: value });
-                    clearSelection(elements);
-                    document.documentElement.style.cursor =
-                      value === "text" ? "text" : "crosshair";
-                    this.forceUpdate();
-                  }}
-                />
-                <div className="toolIcon">{icon}</div>
-              </label>
-            ))}
-          </div>
+          <PanelTools
+            activeTool={this.state.elementType}
+            onToolChange={value => {
+              this.setState({ elementType: value });
+              clearSelection(elements);
+              document.documentElement.style.cursor =
+                value === "text" ? "text" : "crosshair";
+              this.forceUpdate();
+            }}
+          />
           {someElementIsSelected(elements) && (
             <div className="panelColumn">
-              <h4>Selection</h4>
-              <div className="buttonList">
-                <button onClick={this.moveOneRight}>Bring forward</button>
-                <button onClick={this.moveAllRight}>Bring to front</button>
-                <button onClick={this.moveOneLeft}>Send backward</button>
-                <button onClick={this.moveAllLeft}>Send to back</button>
-              </div>
-              <h5>Stroke Color</h5>
-              <ColorPicker
-                color={getSelectedAttribute(
+              <PanelSelection
+                onBringForward={this.moveOneRight}
+                onBringToFront={this.moveAllRight}
+                onSendBackward={this.moveOneLeft}
+                onSendToBack={this.moveAllLeft}
+              />
+
+              <PanelColor
+                title="Stroke Color"
+                onColorChange={this.changeStrokeColor}
+                colorValue={getSelectedAttribute(
                   elements,
                   element => element.strokeColor
                 )}
-                onChange={color => this.changeStrokeColor(color)}
               />
 
               {hasBackground(elements) && (
                 <>
-                  <h5>Background Color</h5>
-                  <ColorPicker
-                    color={getSelectedAttribute(
+                  <PanelColor
+                    title="Background Color"
+                    onColorChange={this.changeBackgroundColor}
+                    colorValue={getSelectedAttribute(
                       elements,
                       element => element.backgroundColor
                     )}
-                    onChange={color => this.changeBackgroundColor(color)}
                   />
+
                   <h5>Fill</h5>
                   <ButtonSelect
                     options={[
@@ -498,63 +487,26 @@ class App extends React.Component<{}, AppState> {
               </button>
             </div>
           )}
-          <h4>Canvas</h4>
-          <div className="panelColumn">
-            <h5>Canvas Background Color</h5>
-            <ColorPicker
-              color={this.state.viewBackgroundColor}
-              onChange={color => this.setState({ viewBackgroundColor: color })}
-            />
-            <button
-              onClick={this.clearCanvas}
-              title="Clear the canvas & reset background color"
-            >
-              Clear canvas
-            </button>
-          </div>
-          <h4>Export</h4>
-          <div className="panelColumn">
-            <h5>Name</h5>
-            {this.state.name && (
-              <EditableText
-                value={this.state.name}
-                onChange={(name: string) => this.updateProjectName(name)}
-              />
-            )}
-            <h5>Image</h5>
-            <button
-              onClick={() => {
-                exportAsPNG(elements, canvas, this.state);
-              }}
-            >
-              Export to png
-            </button>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportBackground}
-                onChange={e => {
-                  this.setState({ exportBackground: e.target.checked });
-                }}
-              />
-              background
-            </label>
-            <h5>Scene</h5>
-            <button
-              onClick={() => {
-                saveAsJSON(elements, this.state.name);
-              }}
-            >
-              Save as...
-            </button>
-            <button
-              onClick={() => {
-                loadFromJSON(elements).then(() => this.forceUpdate());
-              }}
-            >
-              Load file...
-            </button>
-          </div>
+          <PanelCanvas
+            onClearCanvas={this.clearCanvas}
+            onViewBackgroundColorChange={val =>
+              this.setState({ viewBackgroundColor: val })
+            }
+            viewBackgroundColor={this.state.viewBackgroundColor}
+          />
+          <PanelExport
+            projectName={this.state.name}
+            onProjectNameChange={this.updateProjectName}
+            onExportAsPNG={() => exportAsPNG(elements, canvas, this.state)}
+            exportBackground={this.state.exportBackground}
+            onExportBackgroundChange={val =>
+              this.setState({ exportBackground: val })
+            }
+            onSaveScene={() => saveAsJSON(elements, this.state.name)}
+            onLoadScene={() =>
+              loadFromJSON(elements).then(() => this.forceUpdate())
+            }
+          />
         </div>
         <canvas
           id="canvas"
