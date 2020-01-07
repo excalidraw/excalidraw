@@ -1,6 +1,11 @@
-import React from "react";
-import { TwitterPicker } from "react-color";
+import React, { lazy } from "react";
 import { Popover } from "./Popover";
+
+const TwitterPicker = lazy(() =>
+  import(
+    /* webpackPrefetch: true */ "react-color/lib/components/twitter/Twitter"
+  )
+);
 
 export function ColorPicker({
   color,
@@ -17,30 +22,32 @@ export function ColorPicker({
         style={color ? { backgroundColor: color } : undefined}
         onClick={() => setActive(!isActive)}
       />
-      {isActive ? (
-        <Popover onCloseRequest={() => setActive(false)}>
-          <TwitterPicker
-            colors={[
-              "#000000",
-              "#ABB8C3",
-              "#FFFFFF",
-              "#FF6900",
-              "#FCB900",
-              "#00D084",
-              "#8ED1FC",
-              "#0693E3",
-              "#EB144C",
-              "#F78DA7",
-              "#9900EF"
-            ]}
-            width="205px"
-            color={color || undefined}
-            onChange={changedColor => {
-              onChange(changedColor.hex);
-            }}
-          />
-        </Popover>
-      ) : null}
+      <React.Suspense fallback="">
+        {isActive ? (
+          <Popover onCloseRequest={() => setActive(false)}>
+            <TwitterPicker
+              colors={[
+                "#000000",
+                "#ABB8C3",
+                "#FFFFFF",
+                "#FF6900",
+                "#FCB900",
+                "#00D084",
+                "#8ED1FC",
+                "#0693E3",
+                "#EB144C",
+                "#F78DA7",
+                "#9900EF"
+              ]}
+              width="205px"
+              color={color || undefined}
+              onChange={changedColor => {
+                onChange(changedColor.hex);
+              }}
+            />
+          </Popover>
+        ) : null}
+      </React.Suspense>
       <input
         type="text"
         className="swatch-input"
