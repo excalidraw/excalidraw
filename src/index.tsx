@@ -1018,8 +1018,12 @@ class App extends React.Component<{}, AppState> {
       const dy = y - minY;
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x += dx;
-        parsedElement.y += dy;
+        parsedElement.x = dx
+          ? parsedElement.x + dx
+          : window.innerWidth / 2 - this.state.scrollX - parsedElement.width;
+        parsedElement.y = dy
+          ? parsedElement.y + dy
+          : window.innerHeight / 2 - this.state.scrollY - parsedElement.height;
         parsedElement.seed = randomSeed();
         elements.push(parsedElement);
       });
