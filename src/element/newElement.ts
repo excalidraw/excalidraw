@@ -14,6 +14,7 @@ export function newElement(
   height = 0
 ) {
   const element = {
+    id: new Date().getTime(),
     type,
     x,
     y,
