@@ -35,6 +35,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { getDateTime, isInputLike, measureText } from "./utils";
+import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
@@ -57,31 +58,7 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-export const KEYS = {
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-  ARROW_UP: "ArrowUp",
-  ENTER: "Enter",
-  ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace"
-};
-
-const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  ? "metaKey"
-  : "ctrlKey";
-
 let copiedStyles: string = "{}";
-
-function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
