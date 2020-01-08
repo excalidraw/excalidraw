@@ -671,7 +671,7 @@ class App extends React.Component<{}, AppState> {
                     if (!e.shiftKey) {
                       clearSelection(elements);
                     }
-                    // No matter what, we select it
+                    // We duplicate the selected element if alt is pressed on Mouse down
                     if (e.altKey) {
                       const element = newElement(
                         hitElement.type,
@@ -689,6 +689,7 @@ class App extends React.Component<{}, AppState> {
 
                       elements.push(element);
                     }
+                    // No matter what, we select it
                     hitElement.isSelected = true;
                   }
                 } else {
