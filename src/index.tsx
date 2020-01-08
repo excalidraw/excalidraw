@@ -638,7 +638,7 @@ class App extends React.Component<{}, AppState> {
               1,
               100
             );
-            let resizeHandle: string | false = false;
+            let resizeHandle: ReturnType<typeof resizeTest> = false;
             let isDraggingElements = false;
             let isResizingElements = false;
             if (this.state.elementType === "selection") {
