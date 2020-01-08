@@ -111,7 +111,7 @@ function addTextElement(
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
-const TEXT_TO_CENTER_SNAP_THRESHOLD = 60;
+const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
