@@ -5,5 +5,7 @@ export type ExcalidrawTextElement = ExcalidrawElement & {
   type: "text";
   font: string;
   text: string;
-  actualBoundingBoxAscent: number;
+  // for backward compatibility
+  actualBoundingBoxAscent?: number;
+  baseline: number;
 };

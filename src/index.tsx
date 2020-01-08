@@ -34,19 +34,20 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike } from "./utils";
+import { getDateTime, isInputLike, measureText } from "./utils";
 
 import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
-import "./styles.scss";
 import ContextMenu from "./components/ContextMenu";
 import { PanelTools } from "./components/panels/PanelTools";
 import { PanelSelection } from "./components/panels/PanelSelection";
 import { PanelColor } from "./components/panels/PanelColor";
 import { PanelExport } from "./components/panels/PanelExport";
 import { PanelCanvas } from "./components/panels/PanelCanvas";
+
+import "./styles.scss";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -94,23 +95,16 @@ function addTextElement(
   if (text === null || text === "") {
     return false;
   }
+
+  const metrics = measureText(text, font);
   element.text = text;
   element.font = font;
-  const currentFont = context.font;
-  context.font = element.font;
-  const textMeasure = context.measureText(element.text);
-  const width = textMeasure.width;
-  const actualBoundingBoxAscent =
-    textMeasure.actualBoundingBoxAscent || parseInt(font);
-  const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
-  element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-  context.font = currentFont;
-  const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
   // Center the text
-  element.x -= width / 2;
-  element.y -= actualBoundingBoxAscent;
-  element.width = width;
-  element.height = height;
+  element.x -= metrics.width / 2;
+  element.y -= metrics.height / 2;
+  element.width = metrics.width;
+  element.height = metrics.height;
+  element.baseline = metrics.baseline;
 
   return true;
 }
@@ -965,8 +959,7 @@ class App extends React.Component<{}, AppState> {
               Object.assign(element, elementAtPosition);
               // x and y will change after calling addTextElement function
               element.x = elementAtPosition.x + elementAtPosition.width / 2;
-              element.y =
-                elementAtPosition.y + elementAtPosition.actualBoundingBoxAscent;
+              element.y = elementAtPosition.y + elementAtPosition.height / 2;
               initText = elementAtPosition.text;
               textX =
                 this.state.scrollX +
@@ -977,7 +970,7 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY +
                 elementAtPosition.y +
                 CANVAS_WINDOW_OFFSET_TOP +
-                elementAtPosition.actualBoundingBoxAscent;
+                elementAtPosition.height / 2;
             }
 
             textWysiwyg({
@@ -1063,6 +1056,5 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const rc = rough.canvas(canvas);
-const context = canvas.getContext("2d")!;
 
 ReactDOM.render(<App />, rootElement);

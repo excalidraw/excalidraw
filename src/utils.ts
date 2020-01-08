@@ -23,3 +23,30 @@ export function isInputLike(
     target instanceof HTMLSelectElement
   );
 }
+
+// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
+export function measureText(text: string, font: string) {
+  const line = document.createElement("div");
+  const body = document.body;
+  line.style.position = "absolute";
+  line.style.whiteSpace = "nowrap";
+  line.style.font = font;
+  body.appendChild(line);
+  // Now we can measure width and height of the letter
+  line.innerHTML = text;
+  const width = line.offsetWidth;
+  const height = line.offsetHeight;
+  // Now creating 1px sized item that will be aligned to baseline
+  // to calculate baseline shift
+  const span = document.createElement("span");
+  span.style.display = "inline-block";
+  span.style.overflow = "hidden";
+  span.style.width = "1px";
+  span.style.height = "1px";
+  line.appendChild(span);
+  // Baseline is important for positioning text on canvas
+  const baseline = span.offsetTop + span.offsetHeight;
+  document.body.removeChild(line);
+
+  return { width, height, baseline };
+}

@@ -22,7 +22,7 @@ export function textWysiwyg({
   Object.assign(input.style, {
     color: strokeColor,
     position: "absolute",
-    top: y - 8 + "px",
+    top: y + "px",
     left: x + "px",
     transform: "translate(-50%, -50%)",
     boxShadow: "none",
@@ -36,6 +36,11 @@ export function textWysiwyg({
   input.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
+      if (initText) {
+        input.value = initText;
+        handleSubmit();
+        return;
+      }
       cleanup();
       return;
     }
