@@ -51,7 +51,7 @@
       "git add"
     ],
     "*.{js,ts,tsx}": [
-      "eslint"
+      "eslint --max-warnings 0"
     ]
   }
 }
