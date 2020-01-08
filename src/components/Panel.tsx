@@ -27,7 +27,15 @@ export const Panel: React.FC<PanelProps> = ({
           setCollapsed(collapsed => !collapsed);
         }}
       >
-        {collapsed ? "▲" : "▼"}
+        {
+          <span
+            className={`btn-panel-collapse-icon ${
+              collapsed ? "btn-panel-collapse-icon-closed" : ""
+            }`}
+          >
+            ▼
+          </span>
+        }
       </button>
       {!collapsed && <div className="panelColumn">{children}</div>}
     </div>
