@@ -4,7 +4,13 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, isTextElement, textWysiwyg } from "./element";
+import {
+  newElement,
+  duplicateElement,
+  resizeTest,
+  isTextElement,
+  textWysiwyg
+} from "./element";
 import {
   clearSelection,
   getSelectedIndices,
@@ -44,7 +50,6 @@ import { PanelCanvas } from "./components/panels/PanelCanvas";
 
 const { elements } = createScene();
 const { history } = createHistory();
-
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
@@ -683,7 +688,7 @@ class App extends React.Component<{}, AppState> {
                     elements.push(
                       ...elements.reduce((duplicates, element) => {
                         if (element.isSelected) {
-                          duplicates.push({ ...element });
+                          duplicates.push(duplicateElement(element));
                           element.isSelected = false;
                         }
                         return duplicates;
@@ -1030,10 +1035,10 @@ class App extends React.Component<{}, AppState> {
       const dy = y - minY;
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x += dx;
-        parsedElement.y += dy;
-        parsedElement.seed = randomSeed();
-        elements.push(parsedElement);
+        const duplicate = duplicateElement(parsedElement);
+        duplicate.x += dx;
+        duplicate.y += dy;
+        elements.push(duplicate);
       });
       this.forceUpdate();
     }
