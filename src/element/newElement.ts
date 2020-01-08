@@ -32,3 +32,10 @@ export function newElement(
   };
   return element;
 }
+
+export function duplicateElement(element: ReturnType<typeof newElement>) {
+  const copy = { ...element };
+  copy.id = nanoid();
+  copy.seed = randomSeed();
+  return copy;
+}
