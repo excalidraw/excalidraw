@@ -470,15 +470,10 @@ export class App extends React.Component<{}, AppState> {
                 <h5>Font size</h5>
                 <ButtonSelect
                   options={[
-                    { value: 16, text: "16 px" },
-                    { value: 20, text: "20 px" },
-                    { value: 24, text: "24 px" },
-                    { value: 28, text: "28 px" },
-                    { value: 32, text: "32 px" },
-                    { value: 36, text: "36 px" },
-                    { value: 40, text: "40 px" },
-                    { value: 50, text: "50 px" },
-                    { value: 60, text: "60 px" }
+                    { value: 16, text: "Small" },                    
+                    { value: 20, text: "Medium" },
+                    { value: 28, text: "Large" },
+                    { value: 36, text: "Very Large" }
                   ]}
                   value={getSelectedAttribute(
                     elements,
@@ -497,10 +492,7 @@ export class App extends React.Component<{}, AppState> {
                 <ButtonSelect 
                   options={[
                     {value: "Virgil", text: "Virgil"},
-                    {value: "Arial", text: "Arial"},
-                    {value: "Times New Roman", text: "Times New Roman"},
                     {value: "Helvetica", text: "Helvetica"},
-                    {value: "Tahoma", text: "Tahoma"},
                     {value: "Courier", text: "Courier"},
                   ]}
                   value={getSelectedAttribute(
