@@ -1,5 +1,4 @@
 import React from "react";
-import { Panel } from "../Panel";
 
 interface PanelSelectionProps {
   onBringForward: React.MouseEventHandler;
