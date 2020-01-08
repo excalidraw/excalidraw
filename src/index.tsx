@@ -46,6 +46,7 @@ import { PanelSelection } from "./components/panels/PanelSelection";
 import { PanelColor } from "./components/panels/PanelColor";
 import { PanelExport } from "./components/panels/PanelExport";
 import { PanelCanvas } from "./components/panels/PanelCanvas";
+import { Panel } from "./components/Panel";
 
 import "./styles.scss";
 
@@ -381,112 +382,110 @@ class App extends React.Component<{}, AppState> {
               this.forceUpdate();
             }}
           />
-          {someElementIsSelected(elements) && (
-            <div className="panelColumn">
-              <PanelSelection
-                onBringForward={this.moveOneRight}
-                onBringToFront={this.moveAllRight}
-                onSendBackward={this.moveOneLeft}
-                onSendToBack={this.moveAllLeft}
-              />
+          <Panel title="Selection" hide={!someElementIsSelected(elements)}>
+            <PanelSelection
+              onBringForward={this.moveOneRight}
+              onBringToFront={this.moveAllRight}
+              onSendBackward={this.moveOneLeft}
+              onSendToBack={this.moveAllLeft}
+            />
 
-              <PanelColor
-                title="Stroke Color"
-                onColorChange={this.changeStrokeColor}
-                colorValue={getSelectedAttribute(
-                  elements,
-                  element => element.strokeColor
-                )}
-              />
-
-              {hasBackground(elements) && (
-                <>
-                  <PanelColor
-                    title="Background Color"
-                    onColorChange={this.changeBackgroundColor}
-                    colorValue={getSelectedAttribute(
-                      elements,
-                      element => element.backgroundColor
-                    )}
-                  />
-
-                  <h5>Fill</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: "solid", text: "Solid" },
-                      { value: "hachure", text: "Hachure" },
-                      { value: "cross-hatch", text: "Cross-hatch" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.fillStyle
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.fillStyle = value;
-                      });
-                    }}
-                  />
-                </>
+            <PanelColor
+              title="Stroke Color"
+              onColorChange={this.changeStrokeColor}
+              colorValue={getSelectedAttribute(
+                elements,
+                element => element.strokeColor
               )}
+            />
 
-              {hasStroke(elements) && (
-                <>
-                  <h5>Stroke Width</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 1, text: "Thin" },
-                      { value: 2, text: "Bold" },
-                      { value: 4, text: "Extra Bold" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.strokeWidth
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.strokeWidth = value;
-                      });
-                    }}
-                  />
+            {hasBackground(elements) && (
+              <>
+                <PanelColor
+                  title="Background Color"
+                  onColorChange={this.changeBackgroundColor}
+                  colorValue={getSelectedAttribute(
+                    elements,
+                    element => element.backgroundColor
+                  )}
+                />
 
-                  <h5>Sloppiness</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 0, text: "Draftsman" },
-                      { value: 1, text: "Artist" },
-                      { value: 3, text: "Cartoonist" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.roughness
-                    )}
-                    onChange={value =>
-                      this.changeProperty(element => {
-                        element.roughness = value;
-                      })
-                    }
-                  />
-                </>
-              )}
+                <h5>Fill</h5>
+                <ButtonSelect
+                  options={[
+                    { value: "solid", text: "Solid" },
+                    { value: "hachure", text: "Hachure" },
+                    { value: "cross-hatch", text: "Cross-hatch" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.fillStyle
+                  )}
+                  onChange={value => {
+                    this.changeProperty(element => {
+                      element.fillStyle = value;
+                    });
+                  }}
+                />
+              </>
+            )}
 
-              <h5>Opacity</h5>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                onChange={this.changeOpacity}
-                value={
-                  getSelectedAttribute(elements, element => element.opacity) ||
-                  0 /* Put the opacity at 0 if there are two conflicting ones */
-                }
-              />
+            {hasStroke(elements) && (
+              <>
+                <h5>Stroke Width</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 1, text: "Thin" },
+                    { value: 2, text: "Bold" },
+                    { value: 4, text: "Extra Bold" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.strokeWidth
+                  )}
+                  onChange={value => {
+                    this.changeProperty(element => {
+                      element.strokeWidth = value;
+                    });
+                  }}
+                />
 
-              <button onClick={this.deleteSelectedElements}>
-                Delete selected
-              </button>
-            </div>
-          )}
+                <h5>Sloppiness</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 0, text: "Draftsman" },
+                    { value: 1, text: "Artist" },
+                    { value: 3, text: "Cartoonist" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.roughness
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      element.roughness = value;
+                    })
+                  }
+                />
+              </>
+            )}
+
+            <h5>Opacity</h5>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              onChange={this.changeOpacity}
+              value={
+                getSelectedAttribute(elements, element => element.opacity) ||
+                0 /* Put the opacity at 0 if there are two conflicting ones */
+              }
+            />
+
+            <button onClick={this.deleteSelectedElements}>
+              Delete selected
+            </button>
+          </Panel>
           <PanelCanvas
             onClearCanvas={this.clearCanvas}
             onViewBackgroundColorChange={val =>

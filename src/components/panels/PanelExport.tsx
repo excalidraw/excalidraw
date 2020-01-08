@@ -1,5 +1,6 @@
 import React from "react";
 import { EditableText } from "../EditableText";
+import { Panel } from "../Panel";
 
 interface PanelExportProps {
   projectName: string;
@@ -21,8 +22,7 @@ export const PanelExport: React.FC<PanelExportProps> = ({
   onExportAsPNG
 }) => {
   return (
-    <>
-      <h4>Export</h4>
+    <Panel title="Export">
       <div className="panelColumn">
         <h5>Name</h5>
         {projectName && (
@@ -47,6 +47,6 @@ export const PanelExport: React.FC<PanelExportProps> = ({
         <button onClick={onSaveScene}>Save as...</button>
         <button onClick={onLoadScene}>Load file...</button>
       </div>
-    </>
+    </Panel>
   );
 };
