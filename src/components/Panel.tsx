@@ -3,14 +3,19 @@ import React, { useState } from "react";
 interface PanelProps {
   title: string;
   defaultCollapsed?: boolean;
+  hide?: boolean;
 }
 
 export const Panel: React.FC<PanelProps> = ({
   title,
   children,
-  defaultCollapsed = false
+  defaultCollapsed = false,
+  hide = false
 }) => {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+
+  if (hide) return null;
+
   return (
     <div className="panel">
       <h4>{title}</h4>
