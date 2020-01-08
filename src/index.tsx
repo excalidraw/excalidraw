@@ -672,6 +672,23 @@ class App extends React.Component<{}, AppState> {
                       clearSelection(elements);
                     }
                     // No matter what, we select it
+                    if (e.altKey) {
+                      const element = newElement(
+                        hitElement.type,
+                        hitElement.x,
+                        hitElement.y,
+                        hitElement.strokeColor,
+                        hitElement.backgroundColor,
+                        hitElement.fillStyle,
+                        hitElement.strokeWidth,
+                        hitElement.roughness,
+                        hitElement.opacity,
+                        hitElement.width,
+                        hitElement.height
+                      );
+
+                      elements.push(element);
+                    }
                     hitElement.isSelected = true;
                   }
                 } else {
