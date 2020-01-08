@@ -8,8 +8,7 @@ import {
   duplicateElement,
   resizeTest,
   isTextElement,
-  textWysiwyg,
-  getElementAbsoluteCoords
+  textWysiwyg
 } from "./element";
 import {
   clearSelection,
@@ -27,7 +26,8 @@ import {
   hasBackground,
   hasStroke,
   getElementAtPosition,
-  createScene
+  createScene,
+  getElementContainingPosition
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -704,10 +704,25 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
+              let textX = e.clientX;
+              let textY = e.clientY;
+              if (!e.altKey) {
+                const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                  x,
+                  y
+                );
+                if (snappedToCenterPosition) {
+                  element.x = snappedToCenterPosition.elementCenterX;
+                  element.y = snappedToCenterPosition.elementCenterY;
+                  textX = snappedToCenterPosition.wysiwygX;
+                  textY = snappedToCenterPosition.wysiwygY;
+                }
+              }
+
               textWysiwyg({
                 initText: "",
-                x: e.clientX,
-                y: e.clientY,
+                x: textX,
+                y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
@@ -971,39 +986,16 @@ class App extends React.Component<{}, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP +
                 elementAtPosition.height / 2;
             } else if (!e.altKey) {
-              // Element must be searched from the end
-              // to pick element with the highest z-index
-              const elementClickedInside = elements
-                .slice()
-                .reverse()
-                .find(element => {
-                  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-                  return x1 < x && x < x2 && y1 < y && y < y2;
-                });
+              const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                x,
+                y
+              );
 
-              if (elementClickedInside) {
-                const elementCenterX =
-                  elementClickedInside.x + elementClickedInside.width / 2;
-                const elementCenterY =
-                  elementClickedInside.y + elementClickedInside.height / 2;
-                const distanceToCenter = Math.hypot(
-                  x - elementCenterX,
-                  y - elementCenterY
-                );
-                if (distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD) {
-                  element.x = elementCenterX;
-                  element.y = elementCenterY;
-                  textX =
-                    this.state.scrollX +
-                    elementClickedInside.x +
-                    CANVAS_WINDOW_OFFSET_LEFT +
-                    elementClickedInside.width / 2;
-                  textY =
-                    this.state.scrollY +
-                    elementClickedInside.y +
-                    CANVAS_WINDOW_OFFSET_TOP +
-                    elementClickedInside.height / 2;
-                }
+              if (snappedToCenterPosition) {
+                element.x = snappedToCenterPosition.elementCenterX;
+                element.y = snappedToCenterPosition.elementCenterY;
+                textX = snappedToCenterPosition.wysiwygX;
+                textY = snappedToCenterPosition.wysiwygY;
               }
             }
 
@@ -1070,6 +1062,35 @@ class App extends React.Component<{}, AppState> {
       this.forceUpdate();
     }
   };
+
+  private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
+    const elementClickedInside = getElementContainingPosition(elements, x, y);
+    if (elementClickedInside) {
+      const elementCenterX =
+        elementClickedInside.x + elementClickedInside.width / 2;
+      const elementCenterY =
+        elementClickedInside.y + elementClickedInside.height / 2;
+      const distanceToCenter = Math.hypot(
+        x - elementCenterX,
+        y - elementCenterY
+      );
+      const isSnappedToCenter =
+        distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
+      if (isSnappedToCenter) {
+        const wysiwygX =
+          this.state.scrollX +
+          elementClickedInside.x +
+          CANVAS_WINDOW_OFFSET_LEFT +
+          elementClickedInside.width / 2;
+        const wysiwygY =
+          this.state.scrollY +
+          elementClickedInside.y +
+          CANVAS_WINDOW_OFFSET_TOP +
+          elementClickedInside.height / 2;
+        return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
+      }
+    }
+  }
 
   componentDidUpdate() {
     renderScene(elements, rc, canvas, {
