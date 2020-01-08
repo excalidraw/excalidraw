@@ -11,7 +11,7 @@ export function resizeTest(
   y: number,
   sceneState: SceneState
 ): HandlerRectanglesRet | false {
-  if (element.type === "text") return false;
+  if (!element.isSelected || element.type === "text") return false;
 
   const handlers = handlerRectangles(element, sceneState);
 
