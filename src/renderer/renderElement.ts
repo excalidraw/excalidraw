@@ -138,7 +138,6 @@ export function renderElement(
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;
-    console.log(element);
   } else {
     throw new Error("Unimplemented type " + element.type);
   }

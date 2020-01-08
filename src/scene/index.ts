@@ -14,5 +14,10 @@ export {
   restoreFromLocalStorage,
   saveToLocalStorage
 } from "./data";
-export { hasBackground, hasStroke, getElementAtPosition } from "./comparisons";
+export {
+  hasBackground,
+  hasStroke,
+  getElementAtPosition,
+  getElementContainingPosition
+} from "./comparisons";
 export { createScene } from "./createScene";
