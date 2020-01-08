@@ -17,27 +17,34 @@ export function textWysiwyg({
   font,
   onSubmit
 }: TextWysiwygParams) {
-  const input = document.createElement("input");
-  input.value = initText;
-  Object.assign(input.style, {
+  // Using contenteditable here as it has dynamic width.
+  // But this solution has an issue — it allows to paste
+  // multiline text, which is not currently supported
+  const editable = document.createElement("div");
+  editable.contentEditable = "plaintext-only";
+  editable.tabIndex = 0;
+  editable.innerText = initText;
+  editable.dataset.type = "wysiwyg";
+
+  Object.assign(editable.style, {
     color: strokeColor,
     position: "absolute",
     top: y + "px",
     left: x + "px",
     transform: "translate(-50%, -50%)",
-    boxShadow: "none",
     textAlign: "center",
-    width: (window.innerWidth - x) * 2 + "px",
+    display: "inline-block",
     font: font,
-    border: "none",
-    background: "transparent"
+    padding: "4px",
+    outline: "transparent",
+    whiteSpace: "nowrap"
   });
 
-  input.onkeydown = ev => {
+  editable.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
       if (initText) {
-        input.value = initText;
+        editable.innerText = initText;
         handleSubmit();
         return;
       }
@@ -49,28 +56,34 @@ export function textWysiwyg({
       handleSubmit();
     }
   };
-  input.onblur = handleSubmit;
+  editable.onblur = handleSubmit;
 
   function stopEvent(ev: Event) {
     ev.stopPropagation();
   }
 
   function handleSubmit() {
-    if (input.value) {
-      onSubmit(input.value);
+    if (editable.innerText) {
+      onSubmit(editable.innerText);
     }
     cleanup();
   }
 
   function cleanup() {
-    input.onblur = null;
-    input.onkeydown = null;
+    editable.onblur = null;
+    editable.onkeydown = null;
     window.removeEventListener("wheel", stopEvent, true);
-    document.body.removeChild(input);
+    document.body.removeChild(editable);
   }
 
   window.addEventListener("wheel", stopEvent, true);
-  document.body.appendChild(input);
-  input.focus();
-  input.select();
+  document.body.appendChild(editable);
+  editable.focus();
+  const selection = window.getSelection();
+  if (selection) {
+    const range = document.createRange();
+    range.selectNodeContents(editable);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
 }
