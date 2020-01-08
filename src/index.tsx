@@ -971,6 +971,8 @@ class App extends React.Component<{}, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP +
                 elementAtPosition.height / 2;
             } else {
+              // Element must be searched from the end
+              // to pick element with the highest z-index
               const elementClickedInside = elements
                 .slice()
                 .reverse()
