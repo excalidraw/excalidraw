@@ -8,7 +8,8 @@ import {
   duplicateElement,
   resizeTest,
   isTextElement,
-  textWysiwyg
+  textWysiwyg,
+  getElementAbsoluteCoords
 } from "./element";
 import {
   clearSelection,
@@ -110,6 +111,7 @@ function addTextElement(
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
+const TEXT_TO_CENTER_SNAP_THRASHOLD = 60;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
@@ -932,12 +934,6 @@ class App extends React.Component<{}, AppState> {
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
             const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
             const elementAtPosition = getElementAtPosition(elements, x, y);
-            if (elementAtPosition && !isTextElement(elementAtPosition)) {
-              return;
-            } else if (elementAtPosition) {
-              elements.splice(elements.indexOf(elementAtPosition), 1);
-              this.forceUpdate();
-            }
 
             const element = newElement(
               "text",
@@ -954,7 +950,11 @@ class App extends React.Component<{}, AppState> {
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
-            if (elementAtPosition) {
+
+            if (elementAtPosition && isTextElement(elementAtPosition)) {
+              elements.splice(elements.indexOf(elementAtPosition), 1);
+              this.forceUpdate();
+
               Object.assign(element, elementAtPosition);
               // x and y will change after calling addTextElement function
               element.x = elementAtPosition.x + elementAtPosition.width / 2;
@@ -970,6 +970,39 @@ class App extends React.Component<{}, AppState> {
                 elementAtPosition.y +
                 CANVAS_WINDOW_OFFSET_TOP +
                 elementAtPosition.height / 2;
+            } else {
+              const elementClickedInside = elements
+                .slice()
+                .reverse()
+                .find(element => {
+                  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+                  return x1 < x && x < x2 && y1 < y && y < y2;
+                });
+
+              if (elementClickedInside) {
+                const elementCenterX =
+                  elementClickedInside.x + elementClickedInside.width / 2;
+                const elementCenterY =
+                  elementClickedInside.y + elementClickedInside.height / 2;
+                const distanceToCenter = Math.hypot(
+                  x - elementCenterX,
+                  y - elementCenterY
+                );
+                if (distanceToCenter < TEXT_TO_CENTER_SNAP_THRASHOLD) {
+                  element.x = elementCenterX;
+                  element.y = elementCenterY;
+                  textX =
+                    this.state.scrollX +
+                    elementClickedInside.x +
+                    CANVAS_WINDOW_OFFSET_LEFT +
+                    elementClickedInside.width / 2;
+                  textY =
+                    this.state.scrollY +
+                    elementClickedInside.y +
+                    CANVAS_WINDOW_OFFSET_TOP +
+                    elementClickedInside.height / 2;
+                }
+              }
             }
 
             textWysiwyg({
