@@ -131,11 +131,14 @@ export function renderElement(
     context.fillText(
       element.text,
       element.x + scrollX,
-      element.y + element.actualBoundingBoxAscent + scrollY
+      element.y +
+        scrollY +
+        (element.baseline || element.actualBoundingBoxAscent || 0)
     );
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;
+    console.log(element);
   } else {
     throw new Error("Unimplemented type " + element.type);
   }
