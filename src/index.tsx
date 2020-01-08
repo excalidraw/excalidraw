@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import rough from "roughjs/bin/wrappers/rough";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import {
@@ -35,6 +37,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { getDateTime, isInputLike, measureText } from "./utils";
+import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
@@ -57,31 +60,7 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-export const KEYS = {
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-  ARROW_UP: "ArrowUp",
-  ENTER: "Enter",
-  ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace"
-};
-
-const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  ? "metaKey"
-  : "ctrlKey";
-
 let copiedStyles: string = "{}";
-
-function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -119,7 +98,10 @@ let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
-class App extends React.Component<{}, AppState> {
+export class App extends React.Component<{}, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
     window.addEventListener("resize", this.onResize, false);
@@ -496,7 +478,9 @@ class App extends React.Component<{}, AppState> {
           <PanelExport
             projectName={this.state.name}
             onProjectNameChange={this.updateProjectName}
-            onExportAsPNG={() => exportAsPNG(elements, canvas, this.state)}
+            onExportAsPNG={() =>
+              exportAsPNG(elements, this.canvas!, this.state)
+            }
             exportBackground={this.state.exportBackground}
             onExportBackgroundChange={val =>
               this.setState({ exportBackground: val })
@@ -516,6 +500,10 @@ class App extends React.Component<{}, AppState> {
           width={canvasWidth * window.devicePixelRatio}
           height={canvasHeight * window.devicePixelRatio}
           ref={canvas => {
+            if (this.canvas === null) {
+              this.canvas = canvas;
+              this.rc = rough.canvas(this.canvas!);
+            }
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
               this.removeWheelEventListener = undefined;
@@ -1092,7 +1080,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
-    renderScene(elements, rc, canvas, {
+    renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
@@ -1107,8 +1095,4 @@ class App extends React.Component<{}, AppState> {
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const rc = rough.canvas(canvas);
-
 ReactDOM.render(<App />, rootElement);

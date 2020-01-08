@@ -1,4 +1,4 @@
-import { KEYS } from "../index";
+import { KEYS } from "../keys";
 
 type TextWysiwygParams = {
   initText: string;
