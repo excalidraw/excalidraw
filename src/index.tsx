@@ -111,7 +111,7 @@ function addTextElement(
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
-const TEXT_TO_CENTER_SNAP_THRASHOLD = 60;
+const TEXT_TO_CENTER_SNAP_THRESHOLD = 60;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
@@ -988,7 +988,7 @@ class App extends React.Component<{}, AppState> {
                   x - elementCenterX,
                   y - elementCenterY
                 );
-                if (distanceToCenter < TEXT_TO_CENTER_SNAP_THRASHOLD) {
+                if (distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD) {
                   element.x = elementCenterX;
                   element.y = elementCenterY;
                   textX =
