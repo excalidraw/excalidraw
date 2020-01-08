@@ -36,6 +36,11 @@ export function textWysiwyg({
   input.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
+      if (initText) {
+        input.value = initText;
+        handleSubmit();
+        return;
+      }
       cleanup();
       return;
     }
