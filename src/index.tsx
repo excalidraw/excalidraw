@@ -253,6 +253,10 @@ export class App extends React.Component<{}, AppState> {
         element.fillStyle = pastedElement?.fillStyle;
         element.opacity = pastedElement?.opacity;
         element.roughness = pastedElement?.roughness;
+        if(isTextElement(element)) {
+          element.font = pastedElement?.font;
+          this.redrawBoundingBox(element);
+        }
       }
     });
     this.forceUpdate();
