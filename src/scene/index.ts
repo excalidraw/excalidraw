@@ -18,6 +18,7 @@ export {
   hasBackground,
   hasStroke,
   getElementAtPosition,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasText
 } from "./comparisons";
 export { createScene } from "./createScene";
