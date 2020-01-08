@@ -17,6 +17,9 @@ export function textWysiwyg({
   font,
   onSubmit
 }: TextWysiwygParams) {
+  // Using contenteditable here as it has dynamic width.
+  // But this solution has an issue — it allows to paste
+  // multiline text, which is not currently supported
   const editable = document.createElement("div");
   editable.contentEditable = "plaintext-only";
   editable.tabIndex = 0;
