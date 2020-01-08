@@ -255,7 +255,7 @@ export class App extends React.Component<{}, AppState> {
         element.roughness = pastedElement?.roughness;
         if(isTextElement(element)) {
           element.font = pastedElement?.font;
-          this.redrawBoundingBox(element);
+          this.redrawTextBoundingBox(element);
         }
       }
     });
@@ -329,7 +329,7 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private redrawBoundingBox = (element: ExcalidrawTextElement) => {
+  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
     const metrics = measureText(element.text, element.font);
     element.width = metrics.width;
     element.height = metrics.height;
@@ -488,7 +488,7 @@ export class App extends React.Component<{}, AppState> {
                     this.changeProperty(element => {
                       if(isTextElement(element)) {
                         element.font = `${value}px ${element.font.split("px ")[1]}`;
-                        this.redrawBoundingBox(element);
+                        this.redrawTextBoundingBox(element);
                       }
                     })
                   }
@@ -511,7 +511,7 @@ export class App extends React.Component<{}, AppState> {
                     this.changeProperty(element => {
                       if(isTextElement(element)) {
                         element.font = `${element.font.split("px ")[0]}px ${value}`;
-                        this.redrawBoundingBox(element);
+                        this.redrawTextBoundingBox(element);
                       }
                     })
                   }
