@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
-import { randomSeed } from "./random";
 import {
   newElement,
   duplicateElement,
