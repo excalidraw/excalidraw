@@ -671,26 +671,26 @@ class App extends React.Component<{}, AppState> {
                     if (!e.shiftKey) {
                       clearSelection(elements);
                     }
-                    // We duplicate the selected element if alt is pressed on Mouse down
-                    if (e.altKey) {
-                      const element = newElement(
-                        hitElement.type,
-                        hitElement.x,
-                        hitElement.y,
-                        hitElement.strokeColor,
-                        hitElement.backgroundColor,
-                        hitElement.fillStyle,
-                        hitElement.strokeWidth,
-                        hitElement.roughness,
-                        hitElement.opacity,
-                        hitElement.width,
-                        hitElement.height
-                      );
+                  }
+                  // No matter what, we select it
+                  hitElement.isSelected = true;
+                  // We duplicate the selected element if alt is pressed on Mouse down
+                  if (e.altKey) {
+                    const element = newElement(
+                      hitElement.type,
+                      hitElement.x,
+                      hitElement.y,
+                      hitElement.strokeColor,
+                      hitElement.backgroundColor,
+                      hitElement.fillStyle,
+                      hitElement.strokeWidth,
+                      hitElement.roughness,
+                      hitElement.opacity,
+                      hitElement.width,
+                      hitElement.height
+                    );
 
-                      elements.push(element);
-                    }
-                    // No matter what, we select it
-                    hitElement.isSelected = true;
+                    elements.push(element);
                   }
                 } else {
                   // If we don't click on anything, let's remove all the selected elements
