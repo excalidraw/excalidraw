@@ -3,18 +3,20 @@ import { SceneState } from "../scene/types";
 
 import { handlerRectangles } from "./handlerRectangles";
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+
 export function resizeTest(
   element: ExcalidrawElement,
   x: number,
   y: number,
   sceneState: SceneState
-): string | false {
+): HandlerRectanglesRet | false {
   if (element.type === "text") return false;
 
   const handlers = handlerRectangles(element, sceneState);
 
   const filter = Object.keys(handlers).filter(key => {
-    const handler = handlers[key];
+    const handler = handlers[key as HandlerRectanglesRet]!;
 
     return (
       x + sceneState.scrollX >= handler[0] &&
@@ -25,7 +27,7 @@ export function resizeTest(
   });
 
   if (filter.length > 0) {
-    return filter[0];
+    return filter[0] as HandlerRectanglesRet;
   }
 
   return false;

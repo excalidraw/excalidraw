@@ -1,6 +1,8 @@
 import { SceneState } from "../scene/types";
 import { ExcalidrawElement } from "./types";
 
+type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
+
 export function handlerRectangles(
   element: ExcalidrawElement,
   sceneState: SceneState
@@ -12,7 +14,7 @@ export function handlerRectangles(
 
   const margin = 4;
   const minimumSize = 40;
-  const handlers: { [handler: string]: number[] } = {};
+  const handlers = {} as { [T in Sides]: number[] };
 
   const marginX = element.width < 0 ? 8 : -8;
   const marginY = element.height < 0 ? 8 : -8;
@@ -78,7 +80,7 @@ export function handlerRectangles(
     return {
       nw: handlers.nw,
       se: handlers.se
-    };
+    } as typeof handlers;
   }
 
   return handlers;
