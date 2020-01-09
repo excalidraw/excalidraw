@@ -98,6 +98,15 @@ let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+) {
+  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
+  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  return { x, y };
+}
+
 export class App extends React.Component<{}, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -611,9 +620,8 @@ export class App extends React.Component<{}, AppState> {
               this.state.scrollY
             );
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const element = newElement(
               this.state.elementType,
               x,
@@ -655,7 +663,7 @@ export class App extends React.Component<{}, AppState> {
                 // If we click on something
                 if (hitElement) {
                   if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
+                    // If that element is already selected, do nothing,
                     // we're likely going to drag it
                   } else {
                     // We unselect every other elements unless shift is pressed
@@ -932,9 +940,8 @@ export class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const elementAtPosition = getElementAtPosition(elements, x, y);
 
             const element = newElement(
@@ -1006,6 +1013,19 @@ export class App extends React.Component<{}, AppState> {
                 });
               }
             });
+          }}
+          onMouseMove={e => {
+            const hasDeselectedButton = Boolean(e.buttons);
+            if (hasDeselectedButton || this.state.elementType !== "selection") {
+              return;
+            }
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const hitElement = getElementAtPosition(elements, x, y);
+            if (hitElement) {
+              document.documentElement.style.cursor = `move`;
+            } else {
+              document.documentElement.style.cursor = ``;
+            }
           }}
         />
       </div>
