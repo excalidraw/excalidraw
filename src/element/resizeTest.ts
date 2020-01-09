@@ -34,7 +34,7 @@ export function resizeTest(
 }
 
 export function getElementWithResizeHandler(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   { x, y }: { x: number; y: number },
   { scrollX, scrollY }: SceneScroll
 ) {

@@ -1,6 +1,5 @@
 # Contributing
 
-
 ## Setup
 
 ### Option 1 - Manual
@@ -17,7 +16,6 @@
 > git fetch upstream
 > git branch --set-upstream-to=upstream/master master
 > ```
->
 
 ### Option 2 - Codesandbox
 

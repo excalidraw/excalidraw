@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 import { hitTest } from "../element/collision";
 import { getElementAbsoluteCoords } from "../element";
 
-export const hasBackground = (elements: ExcalidrawElement[]) =>
+export const hasBackground = (elements: readonly ExcalidrawElement[]) =>
   elements.some(
     element =>
       element.isSelected &&
@@ -11,7 +11,7 @@ export const hasBackground = (elements: ExcalidrawElement[]) =>
         element.type === "diamond")
   );
 
-export const hasStroke = (elements: ExcalidrawElement[]) =>
+export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
   elements.some(
     element =>
       element.isSelected &&
@@ -21,11 +21,11 @@ export const hasStroke = (elements: ExcalidrawElement[]) =>
         element.type === "arrow")
   );
 
-export const hasText = (elements: ExcalidrawElement[]) =>
+export const hasText = (elements: readonly ExcalidrawElement[]) =>
   elements.some(element => element.isSelected && element.type === "text");
 
 export function getElementAtPosition(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   x: number,
   y: number
 ) {
@@ -42,7 +42,7 @@ export function getElementAtPosition(
 }
 
 export function getElementContainingPosition(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   x: number,
   y: number
 ) {
