@@ -29,7 +29,8 @@ import {
   hasStroke,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasText
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -52,6 +53,7 @@ import { PanelCanvas } from "./components/panels/PanelCanvas";
 import { Panel } from "./components/Panel";
 
 import "./styles.scss";
+import { getElementWithResizeHandler } from "./element/resizeTest";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -97,6 +99,15 @@ let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
+
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+) {
+  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
+  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  return { x, y };
+}
 
 export class App extends React.Component<{}, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -265,7 +276,7 @@ export class App extends React.Component<{}, AppState> {
     const pastedElement = JSON.parse(copiedStyles);
     elements = elements.map(element => {
       if (element.isSelected) {
-        return {
+        const newElement = {
           ...element,
           backgroundColor: pastedElement?.backgroundColor,
           strokeWidth: pastedElement?.strokeWidth,
@@ -274,6 +285,11 @@ export class App extends React.Component<{}, AppState> {
           opacity: pastedElement?.opacity,
           roughness: pastedElement?.roughness
         };
+        if (isTextElement(newElement)) {
+          newElement.font = pastedElement?.font;
+          this.redrawTextBoundingBox(newElement);
+        }
+        return newElement;
       }
       return element;
     });
@@ -357,6 +373,13 @@ export class App extends React.Component<{}, AppState> {
         .readText()
         .then(text => this.addElementsFromPaste(text, x, y));
     }
+  };
+
+  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
+    const metrics = measureText(element.text, element.font);
+    element.width = metrics.width;
+    element.height = metrics.height;
+    element.baseline = metrics.baseline;
   };
 
   public render() {
@@ -490,6 +513,62 @@ export class App extends React.Component<{}, AppState> {
               </>
             )}
 
+            {hasText(elements) && (
+              <>
+                <h5>Font size</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 16, text: "Small" },
+                    { value: 20, text: "Medium" },
+                    { value: 28, text: "Large" },
+                    { value: 36, text: "Very Large" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element =>
+                      isTextElement(element) && +element.font.split("px ")[0]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if (isTextElement(element)) {
+                        element.font = `${value}px ${
+                          element.font.split("px ")[1]
+                        }`;
+                        this.redrawTextBoundingBox(element);
+                      }
+
+                      return element;
+                    })
+                  }
+                />
+                <h5>Font familly</h5>
+                <ButtonSelect
+                  options={[
+                    { value: "Virgil", text: "Virgil" },
+                    { value: "Helvetica", text: "Helvetica" },
+                    { value: "Courier", text: "Courier" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element =>
+                      isTextElement(element) && element.font.split("px ")[1]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if (isTextElement(element)) {
+                        element.font = `${
+                          element.font.split("px ")[0]
+                        }px ${value}`;
+                        this.redrawTextBoundingBox(element);
+                      }
+
+                      return element;
+                    })
+                  }
+                />
+              </>
+            )}
+
             <h5>Opacity</h5>
             <input
               type="range"
@@ -573,9 +652,7 @@ export class App extends React.Component<{}, AppState> {
           onContextMenu={e => {
             e.preventDefault();
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const element = getElementAtPosition(elements, x, y);
             if (!element) {
@@ -652,9 +729,8 @@ export class App extends React.Component<{}, AppState> {
               this.state.scrollY
             );
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const element = newElement(
               this.state.elementType,
               x,
@@ -666,28 +742,23 @@ export class App extends React.Component<{}, AppState> {
               1,
               100
             );
-            let resizeHandle: ReturnType<typeof resizeTest> = false;
+            type ResizeTestType = ReturnType<typeof resizeTest>;
+            let resizeHandle: ResizeTestType = false;
             let isDraggingElements = false;
             let isResizingElements = false;
             if (this.state.elementType === "selection") {
-              const resizeElement = elements.find(element => {
-                return resizeTest(element, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
-              });
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
 
               this.setState({
-                resizingElement: resizeElement ? resizeElement : null
+                resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
-                resizeHandle = resizeTest(resizeElement, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
@@ -696,7 +767,7 @@ export class App extends React.Component<{}, AppState> {
                 // If we click on something
                 if (hitElement) {
                   if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
+                    // If that element is already selected, do nothing,
                     // we're likely going to drag it
                   } else {
                     // We unselect every other elements unless shift is pressed
@@ -811,10 +882,8 @@ export class App extends React.Component<{}, AppState> {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
@@ -886,10 +955,8 @@ export class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -973,9 +1040,8 @@ export class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const elementAtPosition = getElementAtPosition(elements, x, y);
 
             const element = newElement(
@@ -1046,6 +1112,34 @@ export class App extends React.Component<{}, AppState> {
                 });
               }
             });
+          }}
+          onMouseMove={e => {
+            const hasDeselectedButton = Boolean(e.buttons);
+            if (hasDeselectedButton || this.state.elementType !== "selection") {
+              return;
+            }
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const resizeElement = getElementWithResizeHandler(
+              elements,
+              { x, y },
+              this.state
+            );
+            if (resizeElement && resizeElement.resizeHandle) {
+              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+              return;
+            }
+            const hitElement = getElementAtPosition(elements, x, y);
+            if (hitElement) {
+              const resizeHandle = resizeTest(hitElement, x, y, {
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY
+              });
+              document.documentElement.style.cursor = resizeHandle
+                ? `${resizeHandle}-resize`
+                : `move`;
+            } else {
+              document.documentElement.style.cursor = ``;
+            }
           }}
         />
       </div>
