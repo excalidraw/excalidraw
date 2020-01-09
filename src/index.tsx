@@ -1156,19 +1156,19 @@ export class App extends React.Component<{}, AppState> {
         subCanvasY2 = Math.max(subCanvasY2, y2);
       });
 
-      const elementsWidth = distance(subCanvasX1, subCanvasX2) / 2;
-      const elementsHeight = distance(subCanvasY1, subCanvasY2) / 2;
+      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
+      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
 
       const dx =
         this.state.cursorX -
         this.state.scrollX -
         CANVAS_WINDOW_OFFSET_LEFT -
-        elementsWidth;
+        elementsCenterX;
       const dy =
         this.state.cursorY -
         this.state.scrollY -
         CANVAS_WINDOW_OFFSET_TOP -
-        elementsHeight;
+        elementsCenterY;
 
       parsedElements.forEach(parsedElement => {
         const duplicate = duplicateElement(parsedElement);
