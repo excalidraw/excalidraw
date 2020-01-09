@@ -11,5 +11,7 @@ export type AppState = {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  cursorX: number;
+  cursorY: number;
   name: string;
 };

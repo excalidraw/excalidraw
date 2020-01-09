@@ -22,9 +22,7 @@ export const hasStroke = (elements: ExcalidrawElement[]) =>
   );
 
 export const hasText = (elements: ExcalidrawElement[]) =>
-  elements.some(
-    element => element.isSelected && element.type === "text"
-  );
+  elements.some(element => element.isSelected && element.type === "text");
 
 export function getElementAtPosition(
   elements: ExcalidrawElement[],
