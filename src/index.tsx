@@ -150,7 +150,6 @@ export class App extends React.Component<{}, AppState> {
     if (event.key === KEYS.ESCAPE) {
       clearSelection(elements);
       this.forceUpdate();
-      console.log('selection')
       this.setState({ elementType: 'selection' });
       if (window.document.activeElement instanceof HTMLElement) {
         window.document.activeElement.blur()
