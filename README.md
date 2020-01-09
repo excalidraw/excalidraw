@@ -21,7 +21,6 @@ Go to https://www.excalidraw.com to start sketching
 
 <a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
 
-
 ## Run the code
 
 ### Code Sandbox
