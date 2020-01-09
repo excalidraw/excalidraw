@@ -309,11 +309,12 @@ export class App extends React.Component<{}, AppState> {
   private changeProperty = (
     callback: (element: ExcalidrawElement) => ExcalidrawElement
   ) => {
-    elements = elements
-      .filter(el => el.isSelected)
-      .map(element => {
+    elements = elements.map(element => {
+      if (element.isSelected) {
         return callback(element);
-      });
+      }
+      return element;
+    });
 
     this.forceUpdate();
   };
