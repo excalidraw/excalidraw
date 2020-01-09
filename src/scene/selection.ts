@@ -30,11 +30,13 @@ export function setSelection(
 }
 
 export function clearSelection(elements: readonly ExcalidrawElement[]) {
-  elements.forEach(element => {
+  const newElements = [...elements];
+
+  newElements.forEach(element => {
     element.isSelected = false;
   });
 
-  return elements;
+  return newElements;
 }
 
 export function deleteSelectedElements(elements: readonly ExcalidrawElement[]) {
