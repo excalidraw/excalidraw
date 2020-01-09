@@ -4,7 +4,13 @@ import rough from "roughjs/bin/wrappers/rough";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import { randomSeed } from "./random";
-import { newElement, resizeTest, isTextElement, textWysiwyg } from "./element";
+import {
+  newElement,
+  resizeTest,
+  isTextElement,
+  textWysiwyg,
+  getElementAbsoluteCoords
+} from "./element";
 import {
   clearSelection,
   getSelectedIndices,
@@ -1024,15 +1030,45 @@ class App extends React.Component<{}, AppState> {
 
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));
-      const dx = this.state.cursorX - this.state.scrollX - minX;
-      const dy = this.state.cursorY - this.state.scrollY - minY;
+
+      let subCanvasX1 = Infinity;
+      let subCanvasX2 = 0;
+      let subCanvasY1 = Infinity;
+      let subCanvasY2 = 0;
+
+      const distance = (x: number, y: number) => {
+        return Math.abs(x > y ? x - y : y - x);
+      };
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x += dx;
-        parsedElement.y += dy;
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
+        subCanvasX1 = Math.min(subCanvasX1, x1);
+        subCanvasY1 = Math.min(subCanvasY1, y1);
+        subCanvasX2 = Math.max(subCanvasX2, x2);
+        subCanvasY2 = Math.max(subCanvasY2, y2);
+      });
+
+      const elementsWidth = distance(subCanvasX1, subCanvasX2) / 2;
+      const elementsHeight = distance(subCanvasY1, subCanvasY2) / 2;
+
+      const dx =
+        this.state.cursorX -
+        this.state.scrollX -
+        canvas.offsetLeft -
+        elementsWidth;
+      const dy =
+        this.state.cursorY -
+        this.state.scrollY -
+        canvas.offsetTop -
+        elementsHeight;
+
+      parsedElements.forEach(parsedElement => {
+        parsedElement.x += dx - minX;
+        parsedElement.y += dy - minY;
         parsedElement.seed = randomSeed();
         elements.push(parsedElement);
       });
+
       this.forceUpdate();
     }
   };
