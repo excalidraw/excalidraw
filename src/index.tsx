@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import rough from "roughjs/bin/wrappers/rough";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
-import { randomSeed } from "./random";
 import {
   newElement,
+  duplicateElement,
   resizeTest,
   isTextElement,
   textWysiwyg,
@@ -27,60 +29,41 @@ import {
   hasBackground,
   hasStroke,
   getElementAtPosition,
-  createScene
+  createScene,
+  getElementContainingPosition,
+  hasText
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike } from "./utils";
+import { getDateTime, isInputLike, measureText } from "./utils";
+import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
-import "./styles.scss";
 import ContextMenu from "./components/ContextMenu";
 import { PanelTools } from "./components/panels/PanelTools";
 import { PanelSelection } from "./components/panels/PanelSelection";
 import { PanelColor } from "./components/panels/PanelColor";
 import { PanelExport } from "./components/panels/PanelExport";
 import { PanelCanvas } from "./components/panels/PanelCanvas";
+import { Panel } from "./components/Panel";
+
+import "./styles.scss";
+import { getElementWithResizeHandler } from "./element/resizeTest";
 
 const { elements } = createScene();
 const { history } = createHistory();
-
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
-export const KEYS = {
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-  ARROW_UP: "ArrowUp",
-  ENTER: "Enter",
-  ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace"
-};
-
-const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  ? "metaKey"
-  : "ctrlKey";
-
 let copiedStyles: string = "{}";
-
-function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -95,36 +78,42 @@ function addTextElement(
   if (text === null || text === "") {
     return false;
   }
+
+  const metrics = measureText(text, font);
   element.text = text;
   element.font = font;
-  const currentFont = context.font;
-  context.font = element.font;
-  const textMeasure = context.measureText(element.text);
-  const width = textMeasure.width;
-  const actualBoundingBoxAscent =
-    textMeasure.actualBoundingBoxAscent || parseInt(font);
-  const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
-  element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-  context.font = currentFont;
-  const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
   // Center the text
-  element.x -= width / 2;
-  element.y -= actualBoundingBoxAscent;
-  element.width = width;
-  element.height = height;
+  element.x -= metrics.width / 2;
+  element.y -= metrics.height / 2;
+  element.width = metrics.width;
+  element.height = metrics.height;
+  element.baseline = metrics.baseline;
 
   return true;
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
+const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
-class App extends React.Component<{}, AppState> {
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+) {
+  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
+  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  return { x, y };
+}
+
+export class App extends React.Component<{}, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
@@ -287,6 +276,10 @@ class App extends React.Component<{}, AppState> {
         element.fillStyle = pastedElement?.fillStyle;
         element.opacity = pastedElement?.opacity;
         element.roughness = pastedElement?.roughness;
+        if (isTextElement(element)) {
+          element.font = pastedElement?.font;
+          this.redrawTextBoundingBox(element);
+        }
       }
     });
     this.forceUpdate();
@@ -359,6 +352,14 @@ class App extends React.Component<{}, AppState> {
     }
   };
 
+  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
+    const metrics = measureText(element.text, element.font);
+    element.width = metrics.width;
+    element.height = metrics.height;
+    element.baseline = metrics.baseline;
+    this.forceUpdate();
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -399,112 +400,162 @@ class App extends React.Component<{}, AppState> {
               this.forceUpdate();
             }}
           />
-          {someElementIsSelected(elements) && (
-            <div className="panelColumn">
-              <PanelSelection
-                onBringForward={this.moveOneRight}
-                onBringToFront={this.moveAllRight}
-                onSendBackward={this.moveOneLeft}
-                onSendToBack={this.moveAllLeft}
-              />
+          <Panel title="Selection" hide={!someElementIsSelected(elements)}>
+            <PanelSelection
+              onBringForward={this.moveOneRight}
+              onBringToFront={this.moveAllRight}
+              onSendBackward={this.moveOneLeft}
+              onSendToBack={this.moveAllLeft}
+            />
 
-              <PanelColor
-                title="Stroke Color"
-                onColorChange={this.changeStrokeColor}
-                colorValue={getSelectedAttribute(
-                  elements,
-                  element => element.strokeColor
-                )}
-              />
-
-              {hasBackground(elements) && (
-                <>
-                  <PanelColor
-                    title="Background Color"
-                    onColorChange={this.changeBackgroundColor}
-                    colorValue={getSelectedAttribute(
-                      elements,
-                      element => element.backgroundColor
-                    )}
-                  />
-
-                  <h5>Fill</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: "solid", text: "Solid" },
-                      { value: "hachure", text: "Hachure" },
-                      { value: "cross-hatch", text: "Cross-hatch" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.fillStyle
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.fillStyle = value;
-                      });
-                    }}
-                  />
-                </>
+            <PanelColor
+              title="Stroke Color"
+              onColorChange={this.changeStrokeColor}
+              colorValue={getSelectedAttribute(
+                elements,
+                element => element.strokeColor
               )}
+            />
 
-              {hasStroke(elements) && (
-                <>
-                  <h5>Stroke Width</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 1, text: "Thin" },
-                      { value: 2, text: "Bold" },
-                      { value: 4, text: "Extra Bold" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.strokeWidth
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.strokeWidth = value;
-                      });
-                    }}
-                  />
+            {hasBackground(elements) && (
+              <>
+                <PanelColor
+                  title="Background Color"
+                  onColorChange={this.changeBackgroundColor}
+                  colorValue={getSelectedAttribute(
+                    elements,
+                    element => element.backgroundColor
+                  )}
+                />
 
-                  <h5>Sloppiness</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 0, text: "Draftsman" },
-                      { value: 1, text: "Artist" },
-                      { value: 3, text: "Cartoonist" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.roughness
-                    )}
-                    onChange={value =>
-                      this.changeProperty(element => {
-                        element.roughness = value;
-                      })
-                    }
-                  />
-                </>
-              )}
+                <h5>Fill</h5>
+                <ButtonSelect
+                  options={[
+                    { value: "solid", text: "Solid" },
+                    { value: "hachure", text: "Hachure" },
+                    { value: "cross-hatch", text: "Cross-hatch" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.fillStyle
+                  )}
+                  onChange={value => {
+                    this.changeProperty(element => {
+                      element.fillStyle = value;
+                    });
+                  }}
+                />
+              </>
+            )}
 
-              <h5>Opacity</h5>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                onChange={this.changeOpacity}
-                value={
-                  getSelectedAttribute(elements, element => element.opacity) ||
-                  0 /* Put the opacity at 0 if there are two conflicting ones */
-                }
-              />
+            {hasStroke(elements) && (
+              <>
+                <h5>Stroke Width</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 1, text: "Thin" },
+                    { value: 2, text: "Bold" },
+                    { value: 4, text: "Extra Bold" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.strokeWidth
+                  )}
+                  onChange={value => {
+                    this.changeProperty(element => {
+                      element.strokeWidth = value;
+                    });
+                  }}
+                />
 
-              <button onClick={this.deleteSelectedElements}>
-                Delete selected
-              </button>
-            </div>
-          )}
+                <h5>Sloppiness</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 0, text: "Draftsman" },
+                    { value: 1, text: "Artist" },
+                    { value: 3, text: "Cartoonist" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => element.roughness
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      element.roughness = value;
+                    })
+                  }
+                />
+              </>
+            )}
+
+            {hasText(elements) && (
+              <>
+                <h5>Font size</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 16, text: "Small" },
+                    { value: 20, text: "Medium" },
+                    { value: 28, text: "Large" },
+                    { value: 36, text: "Very Large" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element =>
+                      isTextElement(element) && +element.font.split("px ")[0]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if (isTextElement(element)) {
+                        element.font = `${value}px ${
+                          element.font.split("px ")[1]
+                        }`;
+                        this.redrawTextBoundingBox(element);
+                      }
+                    })
+                  }
+                />
+                <h5>Font familly</h5>
+                <ButtonSelect
+                  options={[
+                    { value: "Virgil", text: "Virgil" },
+                    { value: "Helvetica", text: "Helvetica" },
+                    { value: "Courier", text: "Courier" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element =>
+                      isTextElement(element) && element.font.split("px ")[1]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if (isTextElement(element)) {
+                        element.font = `${
+                          element.font.split("px ")[0]
+                        }px ${value}`;
+                        this.redrawTextBoundingBox(element);
+                      }
+                    })
+                  }
+                />
+              </>
+            )}
+
+            <h5>Opacity</h5>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              onChange={this.changeOpacity}
+              value={
+                getSelectedAttribute(elements, element => element.opacity) ||
+                0 /* Put the opacity at 0 if there are two conflicting ones */
+              }
+            />
+
+            <button onClick={this.deleteSelectedElements}>
+              Delete selected
+            </button>
+          </Panel>
           <PanelCanvas
             onClearCanvas={this.clearCanvas}
             onViewBackgroundColorChange={val =>
@@ -515,7 +566,9 @@ class App extends React.Component<{}, AppState> {
           <PanelExport
             projectName={this.state.name}
             onProjectNameChange={this.updateProjectName}
-            onExportAsPNG={() => exportAsPNG(elements, canvas, this.state)}
+            onExportAsPNG={() =>
+              exportAsPNG(elements, this.canvas!, this.state)
+            }
             exportBackground={this.state.exportBackground}
             onExportBackgroundChange={val =>
               this.setState({ exportBackground: val })
@@ -535,6 +588,10 @@ class App extends React.Component<{}, AppState> {
           width={canvasWidth * window.devicePixelRatio}
           height={canvasHeight * window.devicePixelRatio}
           ref={canvas => {
+            if (this.canvas === null) {
+              this.canvas = canvas;
+              this.rc = rough.canvas(this.canvas!);
+            }
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
               this.removeWheelEventListener = undefined;
@@ -563,9 +620,7 @@ class App extends React.Component<{}, AppState> {
           onContextMenu={e => {
             e.preventDefault();
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const element = getElementAtPosition(elements, x, y);
             if (!element) {
@@ -642,9 +697,8 @@ class App extends React.Component<{}, AppState> {
               this.state.scrollY
             );
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const element = newElement(
               this.state.elementType,
               x,
@@ -656,28 +710,23 @@ class App extends React.Component<{}, AppState> {
               1,
               100
             );
-            let resizeHandle: string | false = false;
+            type ResizeTestType = ReturnType<typeof resizeTest>;
+            let resizeHandle: ResizeTestType = false;
             let isDraggingElements = false;
             let isResizingElements = false;
             if (this.state.elementType === "selection") {
-              const resizeElement = elements.find(element => {
-                return resizeTest(element, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
-              });
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
 
               this.setState({
-                resizingElement: resizeElement ? resizeElement : null
+                resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
-                resizeHandle = resizeTest(resizeElement, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
@@ -686,15 +735,27 @@ class App extends React.Component<{}, AppState> {
                 // If we click on something
                 if (hitElement) {
                   if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
+                    // If that element is already selected, do nothing,
                     // we're likely going to drag it
                   } else {
                     // We unselect every other elements unless shift is pressed
                     if (!e.shiftKey) {
                       clearSelection(elements);
                     }
-                    // No matter what, we select it
-                    hitElement.isSelected = true;
+                  }
+                  // No matter what, we select it
+                  hitElement.isSelected = true;
+                  // We duplicate the selected element if alt is pressed on Mouse down
+                  if (e.altKey) {
+                    elements.push(
+                      ...elements.reduce((duplicates, element) => {
+                        if (element.isSelected) {
+                          duplicates.push(duplicateElement(element));
+                          element.isSelected = false;
+                        }
+                        return duplicates;
+                      }, [] as typeof elements)
+                    );
                   }
                 } else {
                   // If we don't click on anything, let's remove all the selected elements
@@ -710,10 +771,25 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (isTextElement(element)) {
+              let textX = e.clientX;
+              let textY = e.clientY;
+              if (!e.altKey) {
+                const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                  x,
+                  y
+                );
+                if (snappedToCenterPosition) {
+                  element.x = snappedToCenterPosition.elementCenterX;
+                  element.y = snappedToCenterPosition.elementCenterY;
+                  textX = snappedToCenterPosition.wysiwygX;
+                  textY = snappedToCenterPosition.wysiwygY;
+                }
+              }
+
               textWysiwyg({
                 initText: "",
-                x: e.clientX,
-                y: e.clientY,
+                x: textX,
+                y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
@@ -774,10 +850,8 @@ class App extends React.Component<{}, AppState> {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
@@ -849,10 +923,8 @@ class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -936,16 +1008,9 @@ class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const elementAtPosition = getElementAtPosition(elements, x, y);
-            if (elementAtPosition && !isTextElement(elementAtPosition)) {
-              return;
-            } else if (elementAtPosition) {
-              elements.splice(elements.indexOf(elementAtPosition), 1);
-              this.forceUpdate();
-            }
 
             const element = newElement(
               "text",
@@ -962,12 +1027,15 @@ class App extends React.Component<{}, AppState> {
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
-            if (elementAtPosition) {
+
+            if (elementAtPosition && isTextElement(elementAtPosition)) {
+              elements.splice(elements.indexOf(elementAtPosition), 1);
+              this.forceUpdate();
+
               Object.assign(element, elementAtPosition);
               // x and y will change after calling addTextElement function
               element.x = elementAtPosition.x + elementAtPosition.width / 2;
-              element.y =
-                elementAtPosition.y + elementAtPosition.actualBoundingBoxAscent;
+              element.y = elementAtPosition.y + elementAtPosition.height / 2;
               initText = elementAtPosition.text;
               textX =
                 this.state.scrollX +
@@ -978,7 +1046,19 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY +
                 elementAtPosition.y +
                 CANVAS_WINDOW_OFFSET_TOP +
-                elementAtPosition.actualBoundingBoxAscent;
+                elementAtPosition.height / 2;
+            } else if (!e.altKey) {
+              const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                x,
+                y
+              );
+
+              if (snappedToCenterPosition) {
+                element.x = snappedToCenterPosition.elementCenterX;
+                element.y = snappedToCenterPosition.elementCenterY;
+                textX = snappedToCenterPosition.wysiwygX;
+                textY = snappedToCenterPosition.wysiwygY;
+              }
             }
 
             textWysiwyg({
@@ -1001,6 +1081,34 @@ class App extends React.Component<{}, AppState> {
                 });
               }
             });
+          }}
+          onMouseMove={e => {
+            const hasDeselectedButton = Boolean(e.buttons);
+            if (hasDeselectedButton || this.state.elementType !== "selection") {
+              return;
+            }
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const resizeElement = getElementWithResizeHandler(
+              elements,
+              { x, y },
+              this.state
+            );
+            if (resizeElement && resizeElement.resizeHandle) {
+              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+              return;
+            }
+            const hitElement = getElementAtPosition(elements, x, y);
+            if (hitElement) {
+              const resizeHandle = resizeTest(hitElement, x, y, {
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY
+              });
+              document.documentElement.style.cursor = resizeHandle
+                ? `${resizeHandle}-resize`
+                : `move`;
+            } else {
+              document.documentElement.style.cursor = ``;
+            }
           }}
         />
       </div>
@@ -1028,13 +1136,13 @@ class App extends React.Component<{}, AppState> {
     ) {
       clearSelection(elements);
 
-      const minX = Math.min(...parsedElements.map(element => element.x));
-      const minY = Math.min(...parsedElements.map(element => element.y));
-
       let subCanvasX1 = Infinity;
       let subCanvasX2 = 0;
       let subCanvasY1 = Infinity;
       let subCanvasY2 = 0;
+
+      const minX = Math.min(...parsedElements.map(element => element.x));
+      const minY = Math.min(...parsedElements.map(element => element.y));
 
       const distance = (x: number, y: number) => {
         return Math.abs(x > y ? x - y : y - x);
@@ -1054,27 +1162,56 @@ class App extends React.Component<{}, AppState> {
       const dx =
         this.state.cursorX -
         this.state.scrollX -
-        canvas.offsetLeft -
+        CANVAS_WINDOW_OFFSET_LEFT -
         elementsWidth;
       const dy =
         this.state.cursorY -
         this.state.scrollY -
-        canvas.offsetTop -
+        CANVAS_WINDOW_OFFSET_TOP -
         elementsHeight;
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x += dx - minX;
-        parsedElement.y += dy - minY;
-        parsedElement.seed = randomSeed();
-        elements.push(parsedElement);
+        const duplicate = duplicateElement(parsedElement);
+        duplicate.x += dx - minX;
+        duplicate.y += dy - minY;
+        elements.push(duplicate);
       });
 
       this.forceUpdate();
     }
   };
 
+  private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
+    const elementClickedInside = getElementContainingPosition(elements, x, y);
+    if (elementClickedInside) {
+      const elementCenterX =
+        elementClickedInside.x + elementClickedInside.width / 2;
+      const elementCenterY =
+        elementClickedInside.y + elementClickedInside.height / 2;
+      const distanceToCenter = Math.hypot(
+        x - elementCenterX,
+        y - elementCenterY
+      );
+      const isSnappedToCenter =
+        distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
+      if (isSnappedToCenter) {
+        const wysiwygX =
+          this.state.scrollX +
+          elementClickedInside.x +
+          CANVAS_WINDOW_OFFSET_LEFT +
+          elementClickedInside.width / 2;
+        const wysiwygY =
+          this.state.scrollY +
+          elementClickedInside.y +
+          CANVAS_WINDOW_OFFSET_TOP +
+          elementClickedInside.height / 2;
+        return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
+      }
+    }
+  }
+
   componentDidUpdate() {
-    renderScene(elements, rc, canvas, {
+    renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
@@ -1089,9 +1226,4 @@ class App extends React.Component<{}, AppState> {
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const rc = rough.canvas(canvas);
-const context = canvas.getContext("2d")!;
-
 ReactDOM.render(<App />, rootElement);

@@ -6,6 +6,7 @@ import { getElementAbsoluteCoords } from "../element";
 
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
+import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
@@ -143,6 +144,7 @@ function restore(
           : savedElements)
       );
       elements.forEach((element: ExcalidrawElement) => {
+        element.id = element.id || nanoid();
         element.fillStyle = element.fillStyle || "hachure";
         element.strokeWidth = element.strokeWidth || 1;
         element.roughness = element.roughness || 1;

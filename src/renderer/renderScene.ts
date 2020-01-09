@@ -3,7 +3,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
-import { roundRect } from "../scene/roundRect";
+import { roundRect } from "./roundRect";
 import { SceneState } from "../scene/types";
 import {
   getScrollBars,

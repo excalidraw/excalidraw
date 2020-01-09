@@ -131,7 +131,9 @@ export function renderElement(
     context.fillText(
       element.text,
       element.x + scrollX,
-      element.y + element.actualBoundingBoxAscent + scrollY
+      element.y +
+        scrollY +
+        (element.baseline || element.actualBoundingBoxAscent || 0)
     );
     context.fillStyle = fillStyle;
     context.font = font;

@@ -1,4 +1,5 @@
 import { randomSeed } from "../random";
+import nanoid from "nanoid";
 
 export function newElement(
   type: string,
@@ -14,6 +15,7 @@ export function newElement(
   height = 0
 ) {
   const element = {
+    id: nanoid(),
     type,
     x,
     y,
@@ -29,4 +31,11 @@ export function newElement(
     seed: randomSeed()
   };
   return element;
+}
+
+export function duplicateElement(element: ReturnType<typeof newElement>) {
+  const copy = { ...element };
+  copy.id = nanoid();
+  copy.seed = randomSeed();
+  return copy;
 }

@@ -1,4 +1,4 @@
-export { newElement } from "./newElement";
+export { newElement, duplicateElement } from "./newElement";
 export {
   getElementAbsoluteCoords,
   getDiamondPoints,
