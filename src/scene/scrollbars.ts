@@ -7,7 +7,7 @@ export const SCROLLBAR_WIDTH = 6;
 export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 
 export function getScrollBars(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   canvasWidth: number,
   canvasHeight: number,
   scrollX: number,
@@ -76,7 +76,7 @@ export function getScrollBars(
 }
 
 export function isOverScrollBars(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   x: number,
   y: number,
   canvasWidth: number,

@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 
 export const createScene = () => {
-  const elements = Array.of<ExcalidrawElement>();
+  const elements: readonly ExcalidrawElement[] = [];
   return { elements };
 };

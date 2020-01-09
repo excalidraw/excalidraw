@@ -56,7 +56,7 @@ import { Panel } from "./components/Panel";
 import "./styles.scss";
 import { getElementWithResizeHandler } from "./element/resizeTest";
 
-const { elements } = createScene();
+let { elements } = createScene();
 const { history } = createHistory();
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
@@ -119,9 +119,16 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restoreFromLocalStorage(elements);
-    if (savedState) {
-      this.setState(savedState);
+    const { elements: newElements, appState } = restoreFromLocalStorage();
+
+    if (newElements) {
+      elements = newElements;
+    }
+
+    if (appState) {
+      this.setState(appState);
+    } else {
+      this.forceUpdate();
     }
   }
 
@@ -163,7 +170,7 @@ export class App extends React.Component<{}, AppState> {
     if (isInputLike(event.target)) return;
 
     if (event.key === KEYS.ESCAPE) {
-      clearSelection(elements);
+      elements = clearSelection(elements);
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
@@ -173,13 +180,16 @@ export class App extends React.Component<{}, AppState> {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
-      elements.forEach(element => {
-        if (element.isSelected) {
+      elements = elements.map(el => {
+        if (el.isSelected) {
+          const element = { ...el };
           if (event.key === KEYS.ARROW_LEFT) element.x -= step;
           else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
           else if (event.key === KEYS.ARROW_UP) element.y -= step;
           else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          return element;
         }
+        return el;
       });
       this.forceUpdate();
       event.preventDefault();
@@ -215,9 +225,12 @@ export class App extends React.Component<{}, AppState> {
       event.preventDefault();
       // Select all: Cmd-A
     } else if (event[META_KEY] && event.code === "KeyA") {
-      elements.forEach(element => {
+      let newElements = [...elements];
+      newElements.forEach(element => {
         element.isSelected = true;
       });
+
+      elements = newElements;
       this.forceUpdate();
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
@@ -225,10 +238,16 @@ export class App extends React.Component<{}, AppState> {
     } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
-        history.redoOnce(elements);
+        const data = history.redoOnce(elements);
+        if (data !== null) {
+          elements = data;
+        }
       } else {
         // undo action
-        history.undoOnce(elements);
+        const data = history.undoOnce(elements);
+        if (data !== null) {
+          elements = data;
+        }
       }
       this.forceUpdate();
       event.preventDefault();
@@ -243,13 +262,13 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private deleteSelectedElements = () => {
-    deleteSelectedElements(elements);
+    elements = deleteSelectedElements(elements);
     this.forceUpdate();
   };
 
   private clearCanvas = () => {
     if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements.splice(0, elements.length);
+      elements = [];
       this.setState({
         viewBackgroundColor: "#ffffff",
         scrollX: 0,
@@ -268,40 +287,45 @@ export class App extends React.Component<{}, AppState> {
 
   private pasteStyles = () => {
     const pastedElement = JSON.parse(copiedStyles);
-    elements.forEach(element => {
+    elements = elements.map(element => {
       if (element.isSelected) {
-        element.backgroundColor = pastedElement?.backgroundColor;
-        element.strokeWidth = pastedElement?.strokeWidth;
-        element.strokeColor = pastedElement?.strokeColor;
-        element.fillStyle = pastedElement?.fillStyle;
-        element.opacity = pastedElement?.opacity;
-        element.roughness = pastedElement?.roughness;
-        if (isTextElement(element)) {
-          element.font = pastedElement?.font;
-          this.redrawTextBoundingBox(element);
+        const newElement = {
+          ...element,
+          backgroundColor: pastedElement?.backgroundColor,
+          strokeWidth: pastedElement?.strokeWidth,
+          strokeColor: pastedElement?.strokeColor,
+          fillStyle: pastedElement?.fillStyle,
+          opacity: pastedElement?.opacity,
+          roughness: pastedElement?.roughness
+        };
+        if (isTextElement(newElement)) {
+          newElement.font = pastedElement?.font;
+          this.redrawTextBoundingBox(newElement);
         }
+        return newElement;
       }
+      return element;
     });
     this.forceUpdate();
   };
 
   private moveAllLeft = () => {
-    moveAllLeft(elements, getSelectedIndices(elements));
+    elements = moveAllLeft([...elements], getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveOneLeft = () => {
-    moveOneLeft(elements, getSelectedIndices(elements));
+    elements = moveOneLeft([...elements], getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveAllRight = () => {
-    moveAllRight(elements, getSelectedIndices(elements));
+    elements = moveAllRight([...elements], getSelectedIndices(elements));
     this.forceUpdate();
   };
 
   private moveOneRight = () => {
-    moveOneRight(elements, getSelectedIndices(elements));
+    elements = moveOneRight([...elements], getSelectedIndices(elements));
     this.forceUpdate();
   };
 
@@ -311,27 +335,39 @@ export class App extends React.Component<{}, AppState> {
     this.setState({ name });
   }
 
-  private changeProperty = (callback: (element: ExcalidrawElement) => void) => {
-    elements.forEach(element => {
+  private changeProperty = (
+    callback: (element: ExcalidrawElement) => ExcalidrawElement
+  ) => {
+    elements = elements.map(element => {
       if (element.isSelected) {
-        callback(element);
+        return callback(element);
       }
+      return element;
     });
 
     this.forceUpdate();
   };
 
   private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.changeProperty(element => (element.opacity = +event.target.value));
+    this.changeProperty(element => ({
+      ...element,
+      opacity: +event.target.value
+    }));
   };
 
   private changeStrokeColor = (color: string) => {
-    this.changeProperty(element => (element.strokeColor = color));
+    this.changeProperty(element => ({
+      ...element,
+      strokeColor: color
+    }));
     this.setState({ currentItemStrokeColor: color });
   };
 
   private changeBackgroundColor = (color: string) => {
-    this.changeProperty(element => (element.backgroundColor = color));
+    this.changeProperty(element => ({
+      ...element,
+      backgroundColor: color
+    }));
     this.setState({ currentItemBackgroundColor: color });
   };
 
@@ -357,7 +393,6 @@ export class App extends React.Component<{}, AppState> {
     element.width = metrics.width;
     element.height = metrics.height;
     element.baseline = metrics.baseline;
-    this.forceUpdate();
   };
 
   public render() {
@@ -372,7 +407,7 @@ export class App extends React.Component<{}, AppState> {
             "text/plain",
             JSON.stringify(elements.filter(element => element.isSelected))
           );
-          deleteSelectedElements(elements);
+          elements = deleteSelectedElements(elements);
           this.forceUpdate();
           e.preventDefault();
         }}
@@ -394,7 +429,7 @@ export class App extends React.Component<{}, AppState> {
             activeTool={this.state.elementType}
             onToolChange={value => {
               this.setState({ elementType: value });
-              clearSelection(elements);
+              elements = clearSelection(elements);
               document.documentElement.style.cursor =
                 value === "text" ? "text" : "crosshair";
               this.forceUpdate();
@@ -440,9 +475,10 @@ export class App extends React.Component<{}, AppState> {
                     element => element.fillStyle
                   )}
                   onChange={value => {
-                    this.changeProperty(element => {
-                      element.fillStyle = value;
-                    });
+                    this.changeProperty(element => ({
+                      ...element,
+                      fillStyle: value
+                    }));
                   }}
                 />
               </>
@@ -462,9 +498,10 @@ export class App extends React.Component<{}, AppState> {
                     element => element.strokeWidth
                   )}
                   onChange={value => {
-                    this.changeProperty(element => {
-                      element.strokeWidth = value;
-                    });
+                    this.changeProperty(element => ({
+                      ...element,
+                      strokeWidth: value
+                    }));
                   }}
                 />
 
@@ -480,9 +517,10 @@ export class App extends React.Component<{}, AppState> {
                     element => element.roughness
                   )}
                   onChange={value =>
-                    this.changeProperty(element => {
-                      element.roughness = value;
-                    })
+                    this.changeProperty(element => ({
+                      ...element,
+                      roughness: value
+                    }))
                   }
                 />
               </>
@@ -511,6 +549,8 @@ export class App extends React.Component<{}, AppState> {
                         }`;
                         this.redrawTextBoundingBox(element);
                       }
+
+                      return element;
                     })
                   }
                 />
@@ -534,6 +574,8 @@ export class App extends React.Component<{}, AppState> {
                         }px ${value}`;
                         this.redrawTextBoundingBox(element);
                       }
+
+                      return element;
                     })
                   }
                 />
@@ -575,7 +617,10 @@ export class App extends React.Component<{}, AppState> {
             }
             onSaveScene={() => saveAsJSON(elements, this.state.name)}
             onLoadScene={() =>
-              loadFromJSON(elements).then(() => this.forceUpdate())
+              loadFromJSON().then(({ elements: newElements }) => {
+                elements = newElements;
+                this.forceUpdate();
+              })
             }
           />
         </div>
@@ -638,7 +683,7 @@ export class App extends React.Component<{}, AppState> {
             }
 
             if (!element.isSelected) {
-              clearSelection(elements);
+              elements = clearSelection(elements);
               element.isSelected = true;
               this.forceUpdate();
             }
@@ -730,36 +775,41 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
+                const selected = getElementAtPosition(
+                  elements.filter(el => el.isSelected),
+                  x,
+                  y
+                );
+                // clear selection if shift is not clicked
+                if (!selected && !e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
                 const hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
-                  if (hitElement.isSelected) {
-                    // If that element is already selected, do nothing,
-                    // we're likely going to drag it
-                  } else {
-                    // We unselect every other elements unless shift is pressed
-                    if (!e.shiftKey) {
-                      clearSelection(elements);
-                    }
-                  }
-                  // No matter what, we select it
+                  // deselect if item is selected
+                  // if shift is not clicked, this will always return true
+                  // otherwise, it will trigger selection based on current
+                  // state of the box
                   hitElement.isSelected = true;
+
+                  // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
                   if (e.altKey) {
-                    elements.push(
+                    elements = [
+                      ...elements,
                       ...elements.reduce((duplicates, element) => {
                         if (element.isSelected) {
-                          duplicates.push(duplicateElement(element));
+                          duplicates = duplicates.concat(
+                            duplicateElement(element)
+                          );
                           element.isSelected = false;
                         }
                         return duplicates;
                       }, [] as typeof elements)
-                    );
+                    ];
                   }
-                } else {
-                  // If we don't click on anything, let's remove all the selected elements
-                  clearSelection(elements);
                 }
 
                 isDraggingElements = someElementIsSelected(elements);
@@ -794,8 +844,7 @@ export class App extends React.Component<{}, AppState> {
                 font: this.state.currentItemFont,
                 onSubmit: text => {
                   addTextElement(element, text, this.state.currentItemFont);
-                  elements.push(element);
-                  element.isSelected = true;
+                  elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
                     elementType: "selection"
@@ -805,14 +854,14 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
 
-            elements.push(element);
             if (this.state.elementType === "text") {
+              elements = [...elements, { ...element, isSelected: true }];
               this.setState({
                 draggingElement: null,
                 elementType: "selection"
               });
-              element.isSelected = true;
             } else {
+              elements = [...elements, element];
               this.setState({ draggingElement: element });
             }
 
@@ -959,7 +1008,7 @@ export class App extends React.Component<{}, AppState> {
                 : height;
 
               if (this.state.elementType === "selection") {
-                setSelection(elements, draggingElement);
+                elements = setSelection(elements, draggingElement);
               }
               // We don't want to save history when moving an element
               history.skipRecording();
@@ -977,7 +1026,7 @@ export class App extends React.Component<{}, AppState> {
 
               // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
-                clearSelection(elements);
+                elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
@@ -986,7 +1035,7 @@ export class App extends React.Component<{}, AppState> {
                 if (isDraggingElements) {
                   isDraggingElements = false;
                 }
-                elements.pop();
+                elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
               }
@@ -1029,7 +1078,9 @@ export class App extends React.Component<{}, AppState> {
             let textY = e.clientY;
 
             if (elementAtPosition && isTextElement(elementAtPosition)) {
-              elements.splice(elements.indexOf(elementAtPosition), 1);
+              elements = elements.filter(
+                element => element.id !== elementAtPosition.id
+              );
               this.forceUpdate();
 
               Object.assign(element, elementAtPosition);
@@ -1073,8 +1124,7 @@ export class App extends React.Component<{}, AppState> {
                   text,
                   element.font || this.state.currentItemFont
                 );
-                elements.push(element);
-                element.isSelected = true;
+                elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
                   elementType: "selection"
@@ -1134,15 +1184,15 @@ export class App extends React.Component<{}, AppState> {
       parsedElements.length > 0 &&
       parsedElements[0].type // need to implement a better check here...
     ) {
-      clearSelection(elements);
+      elements = clearSelection(elements);
 
       let subCanvasX1 = Infinity;
       let subCanvasX2 = 0;
       let subCanvasY1 = Infinity;
       let subCanvasY2 = 0;
 
-      const minX = Math.min(...parsedElements.map(element => element.x));
-      const minY = Math.min(...parsedElements.map(element => element.y));
+      //const minX = Math.min(parsedElements.map(element => element.x));
+      //const minY = Math.min(parsedElements.map(element => element.y));
 
       const distance = (x: number, y: number) => {
         return Math.abs(x > y ? x - y : y - x);
@@ -1170,13 +1220,15 @@ export class App extends React.Component<{}, AppState> {
         CANVAS_WINDOW_OFFSET_TOP -
         elementsCenterY;
 
-      parsedElements.forEach(parsedElement => {
-        const duplicate = duplicateElement(parsedElement);
-        duplicate.x += dx - minX;
-        duplicate.y += dy - minY;
-        elements.push(duplicate);
-      });
-
+      elements = [
+        ...elements,
+        ...parsedElements.map(parsedElement => {
+          const duplicate = duplicateElement(parsedElement);
+          duplicate.x += dx;
+          duplicate.y += dy;
+          return duplicate;
+        })
+      ];
       this.forceUpdate();
     }
   };

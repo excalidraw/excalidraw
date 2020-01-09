@@ -5,7 +5,7 @@ class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(elements: ExcalidrawElement[]) {
+  generateCurrentEntry(elements: readonly ExcalidrawElement[]) {
     return JSON.stringify(
       elements.map(element => ({ ...element, isSelected: false }))
     );
@@ -22,30 +22,33 @@ class SceneHistory {
     this.stateHistory.push(newEntry);
   }
 
-  restoreEntry(elements: ExcalidrawElement[], entry: string) {
-    const newElements = JSON.parse(entry);
-    elements.splice(0, elements.length);
-    newElements.forEach((newElement: ExcalidrawElement) => {
-      elements.push(newElement);
-    });
+  restoreEntry(entry: string) {
     // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
     this.skipRecording();
+
+    try {
+      return JSON.parse(entry);
+    } catch {
+      return null;
+    }
   }
 
   clearRedoStack() {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(elements: ExcalidrawElement[]) {
+  redoOnce(elements: readonly ExcalidrawElement[]) {
     const currentEntry = this.generateCurrentEntry(elements);
     const entryToRestore = this.redoStack.pop();
     if (entryToRestore !== undefined) {
-      this.restoreEntry(elements, entryToRestore);
       this.stateHistory.push(currentEntry);
+      return this.restoreEntry(entryToRestore);
     }
+
+    return null;
   }
 
-  undoOnce(elements: ExcalidrawElement[]) {
+  undoOnce(elements: readonly ExcalidrawElement[]) {
     const currentEntry = this.generateCurrentEntry(elements);
     let entryToRestore = this.stateHistory.pop();
 
@@ -54,9 +57,11 @@ class SceneHistory {
       entryToRestore = this.stateHistory.pop();
     }
     if (entryToRestore !== undefined) {
-      this.restoreEntry(elements, entryToRestore);
       this.redoStack.push(currentEntry);
+      return this.restoreEntry(entryToRestore);
     }
+
+    return null;
   }
 
   isRecording() {
