@@ -775,8 +775,13 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
+                const selected = getElementAtPosition(
+                  elements.filter(el => el.isSelected),
+                  x,
+                  y
+                );
                 // clear selection if shift is not clicked
-                if (!e.shiftKey) {
+                if (!selected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
                 const hitElement = getElementAtPosition(elements, x, y);
@@ -787,7 +792,7 @@ export class App extends React.Component<{}, AppState> {
                   // if shift is not clicked, this will always return true
                   // otherwise, it will trigger selection based on current
                   // state of the box
-                  hitElement.isSelected = !hitElement.isSelected;
+                  hitElement.isSelected = true;
 
                   // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
