@@ -29,7 +29,8 @@ import {
   hasStroke,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasText
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -252,6 +253,10 @@ export class App extends React.Component<{}, AppState> {
         element.fillStyle = pastedElement?.fillStyle;
         element.opacity = pastedElement?.opacity;
         element.roughness = pastedElement?.roughness;
+        if(isTextElement(element)) {
+          element.font = pastedElement?.font;
+          this.redrawTextBoundingBox(element);
+        }
       }
     });
     this.forceUpdate();
@@ -323,6 +328,14 @@ export class App extends React.Component<{}, AppState> {
         .then(text => this.addElementsFromPaste(text, x, y));
     }
   };
+
+  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
+    const metrics = measureText(element.text, element.font);
+    element.width = metrics.width;
+    element.height = metrics.height;
+    element.baseline = metrics.baseline;
+    this.forceUpdate();
+  }
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
@@ -446,6 +459,52 @@ export class App extends React.Component<{}, AppState> {
                   onChange={value =>
                     this.changeProperty(element => {
                       element.roughness = value;
+                    })
+                  }
+                />
+              </>
+            )}
+
+            {hasText(elements) && (
+              <>
+                <h5>Font size</h5>
+                <ButtonSelect
+                  options={[
+                    { value: 16, text: "Small" },                    
+                    { value: 20, text: "Medium" },
+                    { value: 28, text: "Large" },
+                    { value: 36, text: "Very Large" }
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => isTextElement(element) && +element.font.split("px ")[0]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if(isTextElement(element)) {
+                        element.font = `${value}px ${element.font.split("px ")[1]}`;
+                        this.redrawTextBoundingBox(element);
+                      }
+                    })
+                  }
+                />
+                <h5>Font familly</h5>
+                <ButtonSelect 
+                  options={[
+                    {value: "Virgil", text: "Virgil"},
+                    {value: "Helvetica", text: "Helvetica"},
+                    {value: "Courier", text: "Courier"},
+                  ]}
+                  value={getSelectedAttribute(
+                    elements,
+                    element => isTextElement(element) && element.font.split("px ")[1]
+                  )}
+                  onChange={value =>
+                    this.changeProperty(element => {
+                      if(isTextElement(element)) {
+                        element.font = `${element.font.split("px ")[0]}px ${value}`;
+                        this.redrawTextBoundingBox(element);
+                      }
                     })
                   }
                 />
