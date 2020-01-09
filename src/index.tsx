@@ -106,10 +106,16 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     window.addEventListener("resize", this.onResize, false);
 
-    const appState = restoreFromLocalStorage(elements);
+    const { elements: newElements, appState } = restoreFromLocalStorage();
+
+    if (newElements) {
+      elements = newElements;
+    }
 
     if (appState) {
       this.setState(appState);
+    } else {
+      this.forceUpdate();
     }
   }
 
@@ -512,7 +518,10 @@ export class App extends React.Component<{}, AppState> {
             }
             onSaveScene={() => saveAsJSON(elements, this.state.name)}
             onLoadScene={() =>
-              loadFromJSON(elements).then(() => this.forceUpdate())
+              loadFromJSON().then(({ elements: newElements }) => {
+                elements = newElements;
+                this.forceUpdate();
+              })
             }
           />
         </div>
