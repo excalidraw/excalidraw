@@ -1198,8 +1198,8 @@ export class App extends React.Component<{}, AppState> {
       let subCanvasY1 = Infinity;
       let subCanvasY2 = 0;
 
-      //const minX = Math.min(parsedElements.map(element => element.x));
-      //const minY = Math.min(parsedElements.map(element => element.y));
+      const minX = Math.min(...parsedElements.map(element => element.x));
+      const minY = Math.min(...parsedElements.map(element => element.y));
 
       const distance = (x: number, y: number) => {
         return Math.abs(x > y ? x - y : y - x);
@@ -1231,8 +1231,8 @@ export class App extends React.Component<{}, AppState> {
         ...elements,
         ...parsedElements.map(parsedElement => {
           const duplicate = duplicateElement(parsedElement);
-          duplicate.x += dx;
-          duplicate.y += dy;
+          duplicate.x += dx - minX;
+          duplicate.y += dy - minY;
           return duplicate;
         })
       ];
