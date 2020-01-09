@@ -52,6 +52,7 @@ import { PanelCanvas } from "./components/panels/PanelCanvas";
 import { Panel } from "./components/Panel";
 
 import "./styles.scss";
+import { getElementWithResizeHandler } from "./element/resizeTest";
 
 const { elements } = createScene();
 const { history } = createHistory();
@@ -541,9 +542,7 @@ export class App extends React.Component<{}, AppState> {
           onContextMenu={e => {
             e.preventDefault();
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const element = getElementAtPosition(elements, x, y);
             if (!element) {
@@ -633,28 +632,23 @@ export class App extends React.Component<{}, AppState> {
               1,
               100
             );
-            let resizeHandle: ReturnType<typeof resizeTest> = false;
+            type ResizeTestType = ReturnType<typeof resizeTest>;
+            let resizeHandle: ResizeTestType = false;
             let isDraggingElements = false;
             let isResizingElements = false;
             if (this.state.elementType === "selection") {
-              const resizeElement = elements.find(element => {
-                return resizeTest(element, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
-              });
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
 
               this.setState({
-                resizingElement: resizeElement ? resizeElement : null
+                resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
-                resizeHandle = resizeTest(resizeElement, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
@@ -778,10 +772,8 @@ export class App extends React.Component<{}, AppState> {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
@@ -853,10 +845,8 @@ export class App extends React.Component<{}, AppState> {
               if (isDraggingElements) {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -1020,9 +1010,24 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const resizeElement = getElementWithResizeHandler(
+              elements,
+              { x, y },
+              this.state
+            );
+            if (resizeElement && resizeElement.resizeHandle) {
+              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+              return;
+            }
             const hitElement = getElementAtPosition(elements, x, y);
             if (hitElement) {
-              document.documentElement.style.cursor = `move`;
+              const resizeHandle = resizeTest(hitElement, x, y, {
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY
+              });
+              document.documentElement.style.cursor = resizeHandle
+                ? `${resizeHandle}-resize`
+                : `move`;
             } else {
               document.documentElement.style.cursor = ``;
             }
