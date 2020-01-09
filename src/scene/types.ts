@@ -15,3 +15,5 @@ export type SceneScroll = {
 export interface Scene {
   elements: ExcalidrawTextElement[];
 }
+
+export type ExportType = "png" | "clipboard";

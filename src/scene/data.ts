@@ -6,6 +6,7 @@ import { getElementAbsoluteCoords } from "../element";
 
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
+import { ExportType } from "./types";
 import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -76,7 +77,8 @@ export function loadFromJSON() {
   });
 }
 
-export function exportAsPNG(
+export function exportCanvas(
+  type: ExportType,
   elements: readonly ExcalidrawElement[],
   canvas: HTMLCanvasElement,
   {
@@ -136,7 +138,23 @@ export function exportAsPNG(
     }
   );
 
-  saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+  if (type === "png") {
+    saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+  } else if (type === "clipboard") {
+    try {
+      tempCanvas.toBlob(async function(blob) {
+        try {
+          await navigator.clipboard.write([
+            new window.ClipboardItem({ "image/png": blob })
+          ]);
+        } catch (err) {
+          window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+        }
+      });
+    } catch (err) {
+      window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+    }
+  }
 
   // clean up the DOM
   if (tempCanvas !== canvas) tempCanvas.remove();

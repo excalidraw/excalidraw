@@ -23,7 +23,7 @@ import {
   getSelectedAttribute,
   loadFromJSON,
   saveAsJSON,
-  exportAsPNG,
+  exportCanvas,
   restoreFromLocalStorage,
   saveToLocalStorage,
   hasBackground,
@@ -37,6 +37,7 @@ import {
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+import { ExportType } from "./scene/types";
 
 import { getDateTime, isInputLike, measureText } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
@@ -170,9 +171,9 @@ export class App extends React.Component<{}, AppState> {
     if (event.key === KEYS.ESCAPE) {
       elements = clearSelection(elements);
       this.forceUpdate();
-      this.setState({ elementType: 'selection' });
+      this.setState({ elementType: "selection" });
       if (window.document.activeElement instanceof HTMLElement) {
-        window.document.activeElement.blur()
+        window.document.activeElement.blur();
       }
       event.preventDefault();
       return;
@@ -614,8 +615,8 @@ export class App extends React.Component<{}, AppState> {
           <PanelExport
             projectName={this.state.name}
             onProjectNameChange={this.updateProjectName}
-            onExportAsPNG={() =>
-              exportAsPNG(elements, this.canvas!, this.state)
+            onExportCanvas={(type: ExportType) =>
+              exportCanvas(type, elements, this.canvas!, this.state)
             }
             exportBackground={this.state.exportBackground}
             onExportBackgroundChange={val =>
