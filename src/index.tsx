@@ -10,7 +10,8 @@ import {
   duplicateElement,
   resizeTest,
   isTextElement,
-  textWysiwyg
+  textWysiwyg,
+  getElementAbsoluteCoords
 } from "./element";
 import {
   clearSelection,
@@ -115,6 +116,7 @@ export class App extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
     const { elements: newElements, appState } = restoreFromLocalStorage();
@@ -132,6 +134,11 @@ export class App extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     document.removeEventListener("keydown", this.onKeyDown, false);
+    document.removeEventListener(
+      "mousemove",
+      this.getCurrentCursorPosition,
+      false
+    );
     window.removeEventListener("resize", this.onResize, false);
   }
 
@@ -146,11 +153,17 @@ export class App extends React.Component<{}, AppState> {
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
+    cursorX: 0,
+    cursorY: 0,
     name: DEFAULT_PROJECT_NAME
   };
 
   private onResize = () => {
     this.forceUpdate();
+  };
+
+  private getCurrentCursorPosition = (e: MouseEvent) => {
+    this.setState({ cursorX: e.x, cursorY: e.y });
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -367,11 +380,11 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private pasteFromClipboard = (x?: number, y?: number) => {
+  private pasteFromClipboard = () => {
     if (navigator.clipboard) {
       navigator.clipboard
         .readText()
-        .then(text => this.addElementsFromPaste(text, x, y));
+        .then(text => this.addElementsFromPaste(text));
     }
   };
 
@@ -660,7 +673,7 @@ export class App extends React.Component<{}, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: "Paste",
-                    action: () => this.pasteFromClipboard(x, y)
+                    action: () => this.pasteFromClipboard()
                   }
                 ],
                 top: e.clientY,
@@ -683,7 +696,7 @@ export class App extends React.Component<{}, AppState> {
                 },
                 navigator.clipboard && {
                   label: "Paste",
-                  action: () => this.pasteFromClipboard(x, y)
+                  action: () => this.pasteFromClipboard()
                 },
                 { label: "Copy Styles", action: this.copyStyles },
                 { label: "Paste Styles", action: this.pasteStyles },
@@ -1159,7 +1172,7 @@ export class App extends React.Component<{}, AppState> {
     }));
   };
 
-  private addElementsFromPaste = (paste: string, x?: number, y?: number) => {
+  private addElementsFromPaste = (paste: string) => {
     let parsedElements;
     try {
       parsedElements = JSON.parse(paste);
@@ -1171,12 +1184,39 @@ export class App extends React.Component<{}, AppState> {
     ) {
       elements = clearSelection(elements);
 
-      if (x == null) x = 10 - this.state.scrollX;
-      if (y == null) y = 10 - this.state.scrollY;
-      const minX = Math.min(...parsedElements.map(element => element.x));
-      const minY = Math.min(...parsedElements.map(element => element.y));
-      const dx = x - minX;
-      const dy = y - minY;
+      let subCanvasX1 = Infinity;
+      let subCanvasX2 = 0;
+      let subCanvasY1 = Infinity;
+      let subCanvasY2 = 0;
+
+      //const minX = Math.min(parsedElements.map(element => element.x));
+      //const minY = Math.min(parsedElements.map(element => element.y));
+
+      const distance = (x: number, y: number) => {
+        return Math.abs(x > y ? x - y : y - x);
+      };
+
+      parsedElements.forEach(parsedElement => {
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
+        subCanvasX1 = Math.min(subCanvasX1, x1);
+        subCanvasY1 = Math.min(subCanvasY1, y1);
+        subCanvasX2 = Math.max(subCanvasX2, x2);
+        subCanvasY2 = Math.max(subCanvasY2, y2);
+      });
+
+      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
+      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
+
+      const dx =
+        this.state.cursorX -
+        this.state.scrollX -
+        CANVAS_WINDOW_OFFSET_LEFT -
+        elementsCenterX;
+      const dy =
+        this.state.cursorY -
+        this.state.scrollY -
+        CANVAS_WINDOW_OFFSET_TOP -
+        elementsCenterY;
 
       elements = [
         ...elements,
