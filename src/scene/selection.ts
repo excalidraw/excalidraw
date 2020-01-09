@@ -25,20 +25,20 @@ export function setSelection(
       selectionX2 >= elementX2 &&
       selectionY2 >= elementY2;
   });
+
+  return elements;
 }
 
 export function clearSelection(elements: ExcalidrawElement[]) {
   elements.forEach(element => {
     element.isSelected = false;
   });
+
+  return elements;
 }
 
 export function deleteSelectedElements(elements: ExcalidrawElement[]) {
-  for (let i = elements.length - 1; i >= 0; --i) {
-    if (elements[i].isSelected) {
-      elements.splice(i, 1);
-    }
-  }
+  return elements.filter(el => !el.isSelected);
 }
 
 export function getSelectedIndices(elements: ExcalidrawElement[]) {
