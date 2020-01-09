@@ -5,7 +5,7 @@ class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(elements: ExcalidrawElement[]) {
+  generateCurrentEntry(elements: readonly ExcalidrawElement[]) {
     return JSON.stringify(
       elements.map(element => ({ ...element, isSelected: false }))
     );
@@ -37,7 +37,7 @@ class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(elements: ExcalidrawElement[]) {
+  redoOnce(elements: readonly ExcalidrawElement[]) {
     const currentEntry = this.generateCurrentEntry(elements);
     const entryToRestore = this.redoStack.pop();
     if (entryToRestore !== undefined) {
@@ -48,7 +48,7 @@ class SceneHistory {
     return null;
   }
 
-  undoOnce(elements: ExcalidrawElement[]) {
+  undoOnce(elements: readonly ExcalidrawElement[]) {
     const currentEntry = this.generateCurrentEntry(elements);
     let entryToRestore = this.stateHistory.pop();
 

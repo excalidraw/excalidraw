@@ -157,7 +157,7 @@ export class App extends React.Component<{}, AppState> {
     if (isInputLike(event.target)) return;
 
     if (event.key === KEYS.ESCAPE) {
-      elements = clearSelection([...elements]);
+      elements = clearSelection(elements);
       this.forceUpdate();
       event.preventDefault();
     } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
@@ -416,7 +416,7 @@ export class App extends React.Component<{}, AppState> {
             activeTool={this.state.elementType}
             onToolChange={value => {
               this.setState({ elementType: value });
-              elements = clearSelection([...elements]);
+              elements = clearSelection(elements);
               document.documentElement.style.cursor =
                 value === "text" ? "text" : "crosshair";
               this.forceUpdate();
@@ -670,7 +670,7 @@ export class App extends React.Component<{}, AppState> {
             }
 
             if (!element.isSelected) {
-              elements = clearSelection([...elements]);
+              elements = clearSelection(elements);
               element.isSelected = true;
               this.forceUpdate();
             }
@@ -772,7 +772,7 @@ export class App extends React.Component<{}, AppState> {
                   } else {
                     // We unselect every other elements unless shift is pressed
                     if (!e.shiftKey) {
-                      elements = clearSelection([...elements]);
+                      elements = clearSelection(elements);
                     }
                   }
                   // No matter what, we select it
@@ -783,7 +783,9 @@ export class App extends React.Component<{}, AppState> {
                       ...elements,
                       ...elements.reduce((duplicates, element) => {
                         if (element.isSelected) {
-                          duplicates.push(duplicateElement(element));
+                          duplicates = duplicates.concat(
+                            duplicateElement(element)
+                          );
                           element.isSelected = false;
                         }
                         return duplicates;
@@ -792,7 +794,7 @@ export class App extends React.Component<{}, AppState> {
                   }
                 } else {
                   // If we don't click on anything, let's remove all the selected elements
-                  elements = clearSelection([...elements]);
+                  elements = clearSelection(elements);
                 }
 
                 isDraggingElements = someElementIsSelected(elements);
@@ -991,7 +993,7 @@ export class App extends React.Component<{}, AppState> {
                 : height;
 
               if (this.state.elementType === "selection") {
-                elements = setSelection([...elements], draggingElement);
+                elements = setSelection(elements, draggingElement);
               }
               // We don't want to save history when moving an element
               history.skipRecording();
@@ -1009,7 +1011,7 @@ export class App extends React.Component<{}, AppState> {
 
               // if no element is clicked, clear the selection and redraw
               if (draggingElement === null) {
-                elements = clearSelection([...elements]);
+                elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
@@ -1061,7 +1063,9 @@ export class App extends React.Component<{}, AppState> {
             let textY = e.clientY;
 
             if (elementAtPosition && isTextElement(elementAtPosition)) {
-              elements.splice(elements.indexOf(elementAtPosition), 1);
+              elements = elements.filter(
+                element => element !== elementAtPosition
+              );
               this.forceUpdate();
 
               Object.assign(element, elementAtPosition);
@@ -1165,7 +1169,7 @@ export class App extends React.Component<{}, AppState> {
       parsedElements.length > 0 &&
       parsedElements[0].type // need to implement a better check here...
     ) {
-      elements = clearSelection([...elements]);
+      elements = clearSelection(elements);
 
       if (x == null) x = 10 - this.state.scrollX;
       if (y == null) y = 10 - this.state.scrollY;

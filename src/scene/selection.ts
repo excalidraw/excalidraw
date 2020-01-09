@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element";
 
 export function setSelection(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   selection: ExcalidrawElement
 ) {
   const [
@@ -29,7 +29,7 @@ export function setSelection(
   return elements;
 }
 
-export function clearSelection(elements: ExcalidrawElement[]) {
+export function clearSelection(elements: readonly ExcalidrawElement[]) {
   elements.forEach(element => {
     element.isSelected = false;
   });
@@ -37,11 +37,11 @@ export function clearSelection(elements: ExcalidrawElement[]) {
   return elements;
 }
 
-export function deleteSelectedElements(elements: ExcalidrawElement[]) {
+export function deleteSelectedElements(elements: readonly ExcalidrawElement[]) {
   return elements.filter(el => !el.isSelected);
 }
 
-export function getSelectedIndices(elements: ExcalidrawElement[]) {
+export function getSelectedIndices(elements: readonly ExcalidrawElement[]) {
   const selectedIndices: number[] = [];
   elements.forEach((element, index) => {
     if (element.isSelected) {
@@ -51,11 +51,11 @@ export function getSelectedIndices(elements: ExcalidrawElement[]) {
   return selectedIndices;
 }
 
-export const someElementIsSelected = (elements: ExcalidrawElement[]) =>
+export const someElementIsSelected = (elements: readonly ExcalidrawElement[]) =>
   elements.some(element => element.isSelected);
 
 export function getSelectedAttribute<T>(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   getAttribute: (element: ExcalidrawElement) => T
 ): T | null {
   const attributes = Array.from(
