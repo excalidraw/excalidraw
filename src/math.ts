@@ -52,3 +52,45 @@ export function rotate(
     (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2
   ];
 }
+
+interface Line {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+const vcp = (a: Point, b: Point) => {
+  return a.x * b.y - a.y * b.x;
+};
+
+//https://stackoverflow.com/a/565282/816116
+export const testLineSegmentIntersect = (l1: Line, l2: Line) => {
+  const r: Point = { x: l1.x2 - l1.x1, y: l1.y2 - l1.y1 };
+  const s: Point = { x: l2.x2 - l2.x1, y: l2.y2 - l2.y1 };
+
+  // r x s
+  const div = vcp(r, s);
+
+  // q - p
+  const sub = { x: l2.x1 - l1.x1, y: l2.y1 - l1.y1 };
+
+  // t = (q - p) x s / (r x s)
+  const t = vcp(sub, s) / div;
+
+  // u = (q - p) x r / (r x s)
+  const u = vcp(sub, r) / div;
+
+  if (div === 0 && vcp(sub, s) === 0) {
+    return true;
+  } else if (div !== 0 && t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+    return true;
+  }
+
+  return false;
+};

@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element";
+import { testLineSegmentIntersect } from "../math";
 
 export function setSelection(
   elements: ExcalidrawElement[],
@@ -18,12 +19,70 @@ export function setSelection(
       elementX2,
       elementY2
     ] = getElementAbsoluteCoords(element);
-    element.isSelected =
-      element.type !== "selection" &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2;
+    if (element.type === "selection") {
+      element.isSelected = false;
+    } else if (element.type === "arrow") {
+      if (
+        selectionX1 < elementX1 &&
+        selectionX2 > elementX2 &&
+        selectionY1 < elementY1 &&
+        selectionY2 > elementY2
+      ) {
+        element.isSelected = true;
+      } else {
+        // lt -> lb
+        const line1 = {
+          x1: selectionX1,
+          y1: selectionY1,
+          x2: selectionX1,
+          y2: selectionY2
+        };
+
+        // rt -> rb
+        const line2 = {
+          x1: selectionX2,
+          y1: selectionY1,
+          x2: selectionX2,
+          y2: selectionY2
+        };
+
+        // lt -> rt
+        const line3 = {
+          x1: selectionX1,
+          y1: selectionY1,
+          x2: selectionX2,
+          y2: selectionY1
+        };
+
+        // lb -> rb
+        const line4 = {
+          x1: selectionX1,
+          y1: selectionY2,
+          x2: selectionX2,
+          y2: selectionY2
+        };
+
+        const target = {
+          x1: elementX1,
+          y1: elementY1,
+          x2: elementX2,
+          y2: elementY2
+        };
+
+        element.isSelected =
+          testLineSegmentIntersect(line1, target) ||
+          testLineSegmentIntersect(line2, target) ||
+          testLineSegmentIntersect(line3, target) ||
+          testLineSegmentIntersect(line4, target);
+      }
+    } else {
+      element.isSelected = !(
+        (selectionX1 < elementX1 && selectionX2 < elementX1) ||
+        (selectionX1 > elementX2 && selectionX2 > elementX2) ||
+        (selectionY1 < elementY1 && selectionY2 < elementY1) ||
+        (selectionY1 > elementY2 && selectionY2 > elementY2)
+      );
+    }
   });
 }
 
