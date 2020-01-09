@@ -147,13 +147,20 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isInputLike(event.target)) return;
-
     if (event.key === KEYS.ESCAPE) {
       clearSelection(elements);
       this.forceUpdate();
+      console.log('selection')
+      this.setState({ elementType: 'selection' });
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur()
+      }
       event.preventDefault();
-    } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
+      return;
+    }
+    if (isInputLike(event.target)) return;
+
+    if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
       this.deleteSelectedElements();
       event.preventDefault();
     } else if (isArrowKey(event.key)) {
