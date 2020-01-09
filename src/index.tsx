@@ -1077,7 +1077,7 @@ export class App extends React.Component<{}, AppState> {
 
             if (elementAtPosition && isTextElement(elementAtPosition)) {
               elements = elements.filter(
-                element => element !== elementAtPosition
+                element => element.id !== elementAtPosition.id
               );
               this.forceUpdate();
 
