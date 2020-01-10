@@ -18,6 +18,7 @@ export const PanelCanvas: React.FC<PanelCanvasProps> = ({
     <Panel title="Canvas">
       <h5>Canvas Background Color</h5>
       <ColorPicker
+        type="canvasBackground"
         color={viewBackgroundColor}
         onChange={color => onViewBackgroundColorChange(color)}
       />

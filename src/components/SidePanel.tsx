@@ -71,6 +71,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
         <PanelColor
           title="Stroke Color"
+          colorType="elementStroke"
           onColorChange={(color: string) => {
             changeProperty(element => ({
               ...element,
@@ -88,6 +89,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           <>
             <PanelColor
               title="Background Color"
+              colorType="elementBackground"
               onColorChange={(color: string) => {
                 changeProperty(element => ({
                   ...element,
