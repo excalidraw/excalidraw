@@ -56,6 +56,15 @@ import { Panel } from "./components/Panel";
 
 import "./styles.scss";
 import { getElementWithResizeHandler } from "./element/resizeTest";
+import {
+  ActionManager,
+  actionDeleteSelected,
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+  actionBringToFront,
+  actionSelectAll
+} from "./actions";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -114,6 +123,17 @@ export function viewportCoordsToSceneCoords(
 export class App extends React.Component<{}, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
+
+  actionManager: ActionManager = new ActionManager();
+  constructor(props: any) {
+    super(props);
+    this.actionManager.registerAction(actionDeleteSelected);
+    this.actionManager.registerAction(actionSendBackward);
+    this.actionManager.registerAction(actionBringForward);
+    this.actionManager.registerAction(actionSendToBack);
+    this.actionManager.registerAction(actionBringToFront);
+    this.actionManager.registerAction(actionSelectAll);
+  }
 
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -180,10 +200,22 @@ export class App extends React.Component<{}, AppState> {
     }
     if (isInputLike(event.target)) return;
 
-    if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      this.deleteSelectedElements();
-      event.preventDefault();
-    } else if (isArrowKey(event.key)) {
+    const data = this.actionManager.handleKeyDown(event, elements, this.state);
+
+    if (data.elements !== undefined) {
+      elements = data.elements;
+      this.forceUpdate();
+    }
+
+    if (data.appState !== undefined) {
+      this.setState(data.appState);
+    }
+
+    if (data.elements !== undefined && data.appState !== undefined) {
+      return;
+    }
+
+    if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
@@ -198,46 +230,6 @@ export class App extends React.Component<{}, AppState> {
         }
         return el;
       });
-      this.forceUpdate();
-      event.preventDefault();
-
-      // Send backward: Cmd-Shift-Alt-B
-    } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyB"
-    ) {
-      this.moveOneLeft();
-      event.preventDefault();
-
-      // Send to back: Cmd-Shift-B
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyB") {
-      this.moveAllLeft();
-      event.preventDefault();
-
-      // Bring forward: Cmd-Shift-Alt-F
-    } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyF"
-    ) {
-      this.moveOneRight();
-      event.preventDefault();
-
-      // Bring to front: Cmd-Shift-F
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
-      this.moveAllRight();
-      event.preventDefault();
-      // Select all: Cmd-A
-    } else if (event[META_KEY] && event.code === "KeyA") {
-      let newElements = [...elements];
-      newElements.forEach(element => {
-        element.isSelected = true;
-      });
-
-      elements = newElements;
       this.forceUpdate();
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
