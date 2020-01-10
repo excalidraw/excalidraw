@@ -2,7 +2,7 @@ import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
-type ActionResult = {
+export type ActionResult = {
   elements?: ExcalidrawElement[];
   appState?: AppState;
 };
@@ -37,4 +37,9 @@ export interface ActionsManagerInterface {
     elements: readonly ExcalidrawElement[],
     appState: AppState
   ) => ActionResult | {};
+  getContextMenuItems: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    updater: (res: ActionResult) => void
+  ) => { label: string; action: () => void }[];
 }

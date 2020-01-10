@@ -1,4 +1,4 @@
-import { Action, ActionsManagerInterface } from "./types";
+import { Action, ActionResult, ActionsManagerInterface } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
@@ -22,5 +22,20 @@ export class ActionManager implements ActionsManagerInterface {
 
     event.preventDefault();
     return data;
+  }
+
+  getContextMenuItems(
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    updater: (res: ActionResult) => void
+  ) {
+    return Object.values(this.actions)
+      .filter(action => "contextItemLabel" in action)
+      .map(action => ({
+        label: action.contextItemLabel!,
+        action: () => {
+          updater(action.perform(elements, appState, null));
+        }
+      }));
   }
 }

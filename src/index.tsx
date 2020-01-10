@@ -476,11 +476,25 @@ export class App extends React.Component<{}, AppState> {
                 },
                 { label: "Copy Styles", action: this.copyStyles },
                 { label: "Paste Styles", action: this.pasteStyles },
-                { label: "Delete", action: this.deleteSelectedElements },
+                /*{ label: "Delete", action: this.deleteSelectedElements },
                 { label: "Move Forward", action: this.moveOneRight },
                 { label: "Send to Front", action: this.moveAllRight },
                 { label: "Move Backwards", action: this.moveOneLeft },
-                { label: "Send to Back", action: this.moveAllLeft }
+                { label: "Send to Back", action: this.moveAllLeft },*/
+                ...this.actionManager.getContextMenuItems(
+                  elements,
+                  this.state,
+                  ({ elements: newElements, appState }) => {
+                    if (appState !== undefined) {
+                      this.setState({ ...appState });
+                    }
+
+                    if (newElements !== undefined) {
+                      elements = newElements;
+                      this.forceUpdate();
+                    }
+                  }
+                )
               ],
               top: e.clientY,
               left: e.clientX
