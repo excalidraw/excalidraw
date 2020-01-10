@@ -829,6 +829,8 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement: null,
                 elementType: "selection"
               });
+
+              history.resumeRecording();
               this.forceUpdate();
             };
 
@@ -1058,7 +1060,6 @@ export class App extends React.Component<{}, AppState> {
       history.pushEntry(history.generateCurrentEntry(elements));
       history.clearRedoStack();
     }
-    history.resumeRecording();
   }
 }
 
