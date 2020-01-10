@@ -20,7 +20,6 @@ import {
   deleteSelectedElements,
   setSelection,
   isOverScrollBars,
-  someElementIsSelected,
   restoreFromLocalStorage,
   saveToLocalStorage,
   getElementAtPosition,
@@ -542,7 +541,6 @@ export class App extends React.Component<{}, AppState> {
             );
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
-            let isDraggingElements = false;
             let isResizingElements = false;
             let someElementIsDragged = false;
             let hitElement: ExcalidrawElement | null = null;
@@ -601,13 +599,6 @@ export class App extends React.Component<{}, AppState> {
                       }, [] as typeof elements)
                     ];
                   }
-                }
-
-                isDraggingElements =
-                  Boolean(hitElement) && someElementIsSelected(elements);
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
                 }
               }
             } else {
@@ -763,7 +754,7 @@ export class App extends React.Component<{}, AppState> {
                 }
               }
 
-              if (isDraggingElements) {
+              if (hitElement?.isSelected) {
                 // Marking that click was used for dragging to check
                 // if elements should be deselected on mouseup
                 someElementIsDragged = true;
@@ -850,9 +841,6 @@ export class App extends React.Component<{}, AppState> {
               }
 
               if (elementType === "selection") {
-                if (isDraggingElements) {
-                  isDraggingElements = false;
-                }
                 elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
