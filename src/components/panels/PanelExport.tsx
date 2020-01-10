@@ -27,6 +27,7 @@ const ClipboardIcon = () => (
 
 const probablySupportsClipboard =
   "toBlob" in HTMLCanvasElement.prototype &&
+  "clipboard" in navigator &&
   "write" in navigator.clipboard &&
   "ClipboardItem" in window;
 
