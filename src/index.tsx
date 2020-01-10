@@ -20,7 +20,6 @@ import {
   deleteSelectedElements,
   setSelection,
   isOverScrollBars,
-  someElementIsSelected,
   restoreFromLocalStorage,
   saveToLocalStorage,
   getElementAtPosition,
@@ -542,8 +541,10 @@ export class App extends React.Component<{}, AppState> {
             );
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
-            let isDraggingElements = false;
             let isResizingElements = false;
+            let draggingOccured = false;
+            let hitElement: ExcalidrawElement | null = null;
+            let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
               const resizeElement = getElementWithResizeHandler(
                 elements,
@@ -569,7 +570,7 @@ export class App extends React.Component<{}, AppState> {
                 if (!selected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
-                const hitElement = getElementAtPosition(elements, x, y);
+                hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -577,7 +578,10 @@ export class App extends React.Component<{}, AppState> {
                   // if shift is not clicked, this will always return true
                   // otherwise, it will trigger selection based on current
                   // state of the box
-                  hitElement.isSelected = true;
+                  if (!hitElement.isSelected) {
+                    hitElement.isSelected = true;
+                    elementIsAddedToSelection = true;
+                  }
 
                   // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
@@ -596,13 +600,9 @@ export class App extends React.Component<{}, AppState> {
                     ];
                   }
                 }
-
-                isDraggingElements = someElementIsSelected(elements);
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
-                }
               }
+            } else {
+              elements = clearSelection(elements);
             }
 
             if (isTextElement(element)) {
@@ -754,7 +754,10 @@ export class App extends React.Component<{}, AppState> {
                 }
               }
 
-              if (isDraggingElements) {
+              if (hitElement?.isSelected) {
+                // Marking that click was used for dragging to check
+                // if elements should be deselected on mouseup
+                draggingOccured = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -809,17 +812,35 @@ export class App extends React.Component<{}, AppState> {
 
               resetCursor();
 
-              // if no element is clicked, clear the selection and redraw
+              // If click occured on already selected element
+              // it is needed to remove selection from other elements
+              // or if SHIFT or META key pressed remove selection
+              // from hitted element
+              //
+              // If click occured and elements were dragged or some element
+              // was added to selection (on mousedown phase) we need to keep
+              // selection unchanged
+              if (
+                hitElement &&
+                !draggingOccured &&
+                !elementIsAddedToSelection
+              ) {
+                if (e.shiftKey) {
+                  hitElement.isSelected = false;
+                } else {
+                  elements = clearSelection(elements);
+                  hitElement.isSelected = true;
+                }
+              }
+
               if (draggingElement === null) {
+                // if no element is clicked, clear the selection and redraw
                 elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
 
               if (elementType === "selection") {
-                if (isDraggingElements) {
-                  isDraggingElements = false;
-                }
                 elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
