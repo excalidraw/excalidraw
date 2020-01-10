@@ -147,8 +147,8 @@ export function renderElement(
 
     const w = element.width;
     const h = element.height;
-
     const offsetHeight = h * 0.05;
+
     const shapes = withCustomMathRandom(element.seed, () => [
       generator.arc(w / 2, offsetHeight, w, offsetHeight * 2, Math.PI, Math.PI * 2, false, options), // prettier-ignore
       generator.line(0, offsetHeight, 0, h - offsetHeight, options),

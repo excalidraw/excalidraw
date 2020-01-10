@@ -4,7 +4,8 @@ import { ExcalidrawElement } from "./types";
 import {
   getArrowPoints,
   getDiamondPoints,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getServerPoints
 } from "./bounds";
 
 export function hitTest(
@@ -110,9 +111,34 @@ export function hitTest(
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
   } else if (element.type === "server") {
-    const collide = false;
+    // prettier-ignore
+    const [ 
+      x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, 
+      x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14
+    ] = getServerPoints(element);
 
-    return collide;
+    return (
+      // top arc
+      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, x2, y2, x3, y3) < lineThreshold ||
+      // center top arc
+      distanceBetweenPointAndSegment(x, y, x4, y4, x5, y5) < lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, x5, y5, x6, y6) < lineThreshold ||
+      // center line
+      distanceBetweenPointAndSegment(x, y, x7, y7, x8, y8) < lineThreshold ||
+      // center bottom arc
+      distanceBetweenPointAndSegment(x, y, x9, y9, x10, y10) < lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, x10, y10, x11, y11) <
+        lineThreshold ||
+      // bottom arc
+      distanceBetweenPointAndSegment(x, y, x12, y12, x13, y13) <
+        lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, x13, y13, x14, y14) <
+        lineThreshold ||
+      // sides
+      distanceBetweenPointAndSegment(x, y, x1, y1, x12, y12) < lineThreshold ||
+      distanceBetweenPointAndSegment(x, y, x3, y3, x14, y14) < lineThreshold
+    );
   } else {
     throw new Error("Unimplemented type " + element.type);
   }
