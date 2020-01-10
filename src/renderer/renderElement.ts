@@ -140,6 +140,8 @@ export function renderElement(
     context.globalAlpha = 1;
   } else if (element.type === "server") {
     const options = {
+      fill: element.backgroundColor,
+      fillStyle: element.fillStyle || "solid",
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
       roughness: element.roughness
@@ -150,6 +152,23 @@ export function renderElement(
     const offsetHeight = h * 0.05;
 
     const shapes = withCustomMathRandom(element.seed, () => [
+      // background
+      generator.arc(w / 2, offsetHeight, w, offsetHeight * 2, Math.PI, Math.PI * 2, true, {
+        ...options,
+        stroke: 'transparent',  
+      }), // prettier-ignore
+      generator.arc(w / 2, h - offsetHeight, w, offsetHeight * 2, Math.PI * 2, Math.PI * 3, true,
+        {
+          ...options,
+          stroke: "transparent"
+        }
+      ), // prettier-ignore
+      generator.rectangle(0, offsetHeight, w, h - offsetHeight * 2, {
+        ...options,
+        stroke: "transparent"
+      }),
+
+      // lines
       generator.arc(w / 2, offsetHeight, w, offsetHeight * 2, Math.PI, Math.PI * 2, false, options), // prettier-ignore
       generator.line(0, offsetHeight, 0, h - offsetHeight, options),
       generator.arc(w / 2, h * 0.25 + offsetHeight / 2 , w, offsetHeight, Math.PI, Math.PI * 2, false, options), // prettier-ignore
