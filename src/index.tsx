@@ -421,6 +421,9 @@ export class App extends React.Component<{}, AppState> {
             if (this.canvas === null) {
               this.canvas = canvas;
               this.rc = rough.canvas(this.canvas!);
+
+              // @ts-ignore Hack to increase Rough performance
+              this.rc.computeBBox = () => null;
             }
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
