@@ -1,8 +1,10 @@
 import React from "react";
 import { Action } from "./types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { getSelectedAttribute } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
+import { PanelColor } from "../components/panels/PanelColor";
+import { isTextElement, redrawTextBoundingBox } from "../element";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -16,34 +18,6 @@ const changeProperty = (
   });
 };
 
-export const actionChangeOpacity: Action = {
-  name: "changeOpacity",
-  perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, el => ({
-        ...el,
-        opacity: +value
-      })),
-      appState
-    };
-  },
-  PanelComponent: ({ elements, updateData }) => (
-    <>
-      <h5>Opacity</h5>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        onChange={e => updateData(e.target.value)}
-        value={
-          getSelectedAttribute(elements, element => element.opacity) ||
-          0 /* Put the opacity at 0 if there are two conflicting ones */
-        }
-      />
-    </>
-  )
-};
-
 export const actionChangeStrokeColor: Action = {
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
@@ -54,7 +28,72 @@ export const actionChangeStrokeColor: Action = {
       })),
       appState: { ...appState, currentItemStrokeColor: value }
     };
-  }
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <PanelColor
+      title="Stroke Color"
+      onColorChange={(color: string) => {
+        updateData(color);
+      }}
+      colorValue={getSelectedAttribute(
+        elements,
+        element => element.strokeColor
+      )}
+    />
+  )
+};
+
+export const actionChangeBackgroundColor: Action = {
+  name: "changeBackgroundColor",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, el => ({
+        ...el,
+        backgroundColor: value
+      })),
+      appState: { ...appState, currentItemBackgroundColor: value }
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => (
+    <PanelColor
+      title="Background Color"
+      onColorChange={(color: string) => {
+        updateData(color);
+      }}
+      colorValue={getSelectedAttribute(
+        elements,
+        element => element.backgroundColor
+      )}
+    />
+  )
+};
+
+export const actionChangeFillStyle: Action = {
+  name: "changeFillStyle",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, el => ({
+        ...el,
+        fillStyle: value
+      }))
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => (
+    <>
+      <h5>Fill</h5>
+      <ButtonSelect
+        options={[
+          { value: "solid", text: "Solid" },
+          { value: "hachure", text: "Hachure" },
+          { value: "cross-hatch", text: "Cross-hatch" }
+        ]}
+        value={getSelectedAttribute(elements, element => element.fillStyle)}
+        onChange={value => {
+          updateData(value);
+        }}
+      />
+    </>
+  )
 };
 
 export const actionChangeStrokeWidth: Action = {
@@ -63,9 +102,8 @@ export const actionChangeStrokeWidth: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        strokeColor: value
-      })),
-      appState: { ...appState, currentItemStrokeColor: value }
+        strokeWidth: value
+      }))
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -84,27 +122,128 @@ export const actionChangeStrokeWidth: Action = {
   )
 };
 
-export const actionChangeBackgroundColor: Action = {
-  name: "changeBackgroundColor",
-  perform: (elements, appState, formData) => {
+export const actionChangeSloppiness: Action = {
+  name: "changeSloppiness",
+  perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        backgroundColor: formData.value
-      })),
-      appState: { ...appState, currentItemBackgroundColor: formData.value }
+        roughness: value
+      }))
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
-      <h5>Stroke Width</h5>
+      <h5>Sloppiness</h5>
       <ButtonSelect
         options={[
-          { value: 1, text: "Thin" },
-          { value: 2, text: "Bold" },
-          { value: 4, text: "Extra Bold" }
+          { value: 0, text: "Draftsman" },
+          { value: 1, text: "Artist" },
+          { value: 3, text: "Cartoonist" }
         ]}
-        value={getSelectedAttribute(elements, element => element.strokeWidth)}
+        value={getSelectedAttribute(elements, element => element.roughness)}
+        onChange={value => updateData(value)}
+      />
+    </>
+  )
+};
+
+export const actionChangeOpacity: Action = {
+  name: "changeOpacity",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, el => ({
+        ...el,
+        opacity: value
+      }))
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => (
+    <>
+      <h5>Opacity</h5>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        onChange={e => updateData(+e.target.value)}
+        value={
+          getSelectedAttribute(elements, element => element.opacity) ||
+          0 /* Put the opacity at 0 if there are two conflicting ones */
+        }
+      />
+    </>
+  )
+};
+
+export const actionChangeFontSize: Action = {
+  name: "changeFontSize",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, el => {
+        if (isTextElement(el)) {
+          const element: ExcalidrawTextElement = {
+            ...el,
+            font: `${value}px ${el.font.split("px ")[1]}`
+          };
+          redrawTextBoundingBox(element);
+          return element;
+        }
+
+        return el;
+      })
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => (
+    <>
+      <h5>Font size</h5>
+      <ButtonSelect
+        options={[
+          { value: 16, text: "Small" },
+          { value: 20, text: "Medium" },
+          { value: 28, text: "Large" },
+          { value: 36, text: "Very Large" }
+        ]}
+        value={getSelectedAttribute(
+          elements,
+          element => isTextElement(element) && +element.font.split("px ")[0]
+        )}
+        onChange={value => updateData(value)}
+      />
+    </>
+  )
+};
+
+export const actionChangeFontFamily: Action = {
+  name: "changeFontFamily",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, el => {
+        if (isTextElement(el)) {
+          const element: ExcalidrawTextElement = {
+            ...el,
+            font: `${el.font.split("px ")[0]}px ${value}`
+          };
+          redrawTextBoundingBox(element);
+          return element;
+        }
+
+        return el;
+      })
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => (
+    <>
+      <h5>Font family</h5>
+      <ButtonSelect
+        options={[
+          { value: "Virgil", text: "Virgil" },
+          { value: "Helvetica", text: "Helvetica" },
+          { value: "Courier", text: "Courier" }
+        ]}
+        value={getSelectedAttribute(
+          elements,
+          element => isTextElement(element) && element.font.split("px ")[1]
+        )}
         onChange={value => updateData(value)}
       />
     </>

@@ -46,7 +46,17 @@ import {
   actionBringForward,
   actionSendToBack,
   actionBringToFront,
-  actionSelectAll
+  actionSelectAll,
+  actionChangeStrokeColor,
+  actionChangeBackgroundColor,
+  actionChangeOpacity,
+  actionChangeStrokeWidth,
+  actionChangeFillStyle,
+  actionChangeSloppiness,
+  actionChangeFontSize,
+  actionChangeFontFamily,
+  actionChangeViewBackgroundColor,
+  actionClearCanvas
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
 import { ActionResult } from "./actions/types";
@@ -118,6 +128,16 @@ export class App extends React.Component<{}, AppState> {
     this.actionManager.registerAction(actionSendToBack);
     this.actionManager.registerAction(actionBringToFront);
     this.actionManager.registerAction(actionSelectAll);
+    this.actionManager.registerAction(actionChangeStrokeColor);
+    this.actionManager.registerAction(actionChangeBackgroundColor);
+    this.actionManager.registerAction(actionChangeFillStyle);
+    this.actionManager.registerAction(actionChangeStrokeWidth);
+    this.actionManager.registerAction(actionChangeOpacity);
+    this.actionManager.registerAction(actionChangeSloppiness);
+    this.actionManager.registerAction(actionChangeFontSize);
+    this.actionManager.registerAction(actionChangeFontFamily);
+    this.actionManager.registerAction(actionChangeViewBackgroundColor);
+    this.actionManager.registerAction(actionClearCanvas);
   }
 
   private syncActionResult = (res: ActionResult) => {
@@ -368,8 +388,6 @@ export class App extends React.Component<{}, AppState> {
               value === "text" ? "text" : "crosshair";
             this.forceUpdate();
           }}
-          onClearCanvas={this.clearCanvas}
-          changeProperty={this.changeProperty}
           onUpdateAppState={(name, value) => {
             this.setState({ [name]: value } as any);
           }}

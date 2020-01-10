@@ -2,21 +2,16 @@ import React from "react";
 import { PanelTools } from "./panels/PanelTools";
 import { Panel } from "./Panel";
 import { PanelSelection } from "./panels/PanelSelection";
-import { PanelColor } from "./panels/PanelColor";
 import {
   hasBackground,
   someElementIsSelected,
-  getSelectedAttribute,
   hasStroke,
   hasText,
   loadFromJSON,
   saveAsJSON,
-  exportCanvas,
-  deleteSelectedElements
+  exportCanvas
 } from "../scene";
-import { ButtonSelect } from "./ButtonSelect";
 import { ExcalidrawElement } from "../element/types";
-import { redrawTextBoundingBox, isTextElement } from "../element";
 import { PanelCanvas } from "./panels/PanelCanvas";
 import { PanelExport } from "./panels/PanelExport";
 import { ExportType } from "../scene/types";
@@ -29,10 +24,6 @@ interface SidePanelProps {
   elements: readonly ExcalidrawElement[];
   syncActionResult: UpdaterFn;
   onToolChange: (elementType: string) => void;
-  changeProperty: (
-    callback: (element: ExcalidrawElement) => ExcalidrawElement
-  ) => void;
-  onClearCanvas: React.MouseEventHandler;
   onUpdateAppState: (name: string, value: any) => void;
   appState: AppState;
   onUpdateElements: (elements: readonly ExcalidrawElement[]) => void;
@@ -44,8 +35,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   syncActionResult,
   elements,
   onToolChange,
-  changeProperty,
-  onClearCanvas,
   onUpdateAppState,
   appState,
   onUpdateElements,
@@ -67,184 +56,86 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           appState={appState}
         />
 
-        <PanelColor
-          title="Stroke Color"
-          onColorChange={(color: string) => {
-            changeProperty(element => ({
-              ...element,
-              strokeColor: color
-            }));
-            onUpdateAppState("currentItemStrokeColor", color);
-          }}
-          colorValue={getSelectedAttribute(
-            elements,
-            element => element.strokeColor
-          )}
-        />
+        {actionManager.renderAction(
+          "changeStrokeColor",
+          elements,
+          appState,
+          syncActionResult
+        )}
 
         {hasBackground(elements) && (
           <>
-            <PanelColor
-              title="Background Color"
-              onColorChange={(color: string) => {
-                changeProperty(element => ({
-                  ...element,
-                  backgroundColor: color
-                }));
-                onUpdateAppState("currentItemBackgroundColor", color);
-              }}
-              colorValue={getSelectedAttribute(
-                elements,
-                element => element.backgroundColor
-              )}
-            />
+            {actionManager.renderAction(
+              "changeBackgroundColor",
+              elements,
+              appState,
+              syncActionResult
+            )}
 
-            <h5>Fill</h5>
-            <ButtonSelect
-              options={[
-                { value: "solid", text: "Solid" },
-                { value: "hachure", text: "Hachure" },
-                { value: "cross-hatch", text: "Cross-hatch" }
-              ]}
-              value={getSelectedAttribute(
-                elements,
-                element => element.fillStyle
-              )}
-              onChange={value => {
-                changeProperty(element => ({
-                  ...element,
-                  fillStyle: value
-                }));
-              }}
-            />
+            {actionManager.renderAction(
+              "changeFillStyle",
+              elements,
+              appState,
+              syncActionResult
+            )}
           </>
         )}
 
         {hasStroke(elements) && (
           <>
-            <h5>Stroke Width</h5>
-            <ButtonSelect
-              options={[
-                { value: 1, text: "Thin" },
-                { value: 2, text: "Bold" },
-                { value: 4, text: "Extra Bold" }
-              ]}
-              value={getSelectedAttribute(
-                elements,
-                element => element.strokeWidth
-              )}
-              onChange={value => {
-                changeProperty(element => ({
-                  ...element,
-                  strokeWidth: value
-                }));
-              }}
-            />
+            {actionManager.renderAction(
+              "changeStrokeWidth",
+              elements,
+              appState,
+              syncActionResult
+            )}
 
-            <h5>Sloppiness</h5>
-            <ButtonSelect
-              options={[
-                { value: 0, text: "Draftsman" },
-                { value: 1, text: "Artist" },
-                { value: 3, text: "Cartoonist" }
-              ]}
-              value={getSelectedAttribute(
-                elements,
-                element => element.roughness
-              )}
-              onChange={value =>
-                changeProperty(element => ({
-                  ...element,
-                  roughness: value
-                }))
-              }
-            />
+            {actionManager.renderAction(
+              "changeSloppiness",
+              elements,
+              appState,
+              syncActionResult
+            )}
           </>
         )}
 
         {hasText(elements) && (
           <>
-            <h5>Font size</h5>
-            <ButtonSelect
-              options={[
-                { value: 16, text: "Small" },
-                { value: 20, text: "Medium" },
-                { value: 28, text: "Large" },
-                { value: 36, text: "Very Large" }
-              ]}
-              value={getSelectedAttribute(
-                elements,
-                element =>
-                  isTextElement(element) && +element.font.split("px ")[0]
-              )}
-              onChange={value =>
-                changeProperty(element => {
-                  if (isTextElement(element)) {
-                    element.font = `${value}px ${element.font.split("px ")[1]}`;
-                    redrawTextBoundingBox(element);
-                  }
+            {actionManager.renderAction(
+              "changeFontSize",
+              elements,
+              appState,
+              syncActionResult
+            )}
 
-                  return element;
-                })
-              }
-            />
-            <h5>Font familly</h5>
-            <ButtonSelect
-              options={[
-                { value: "Virgil", text: "Virgil" },
-                { value: "Helvetica", text: "Helvetica" },
-                { value: "Courier", text: "Courier" }
-              ]}
-              value={getSelectedAttribute(
-                elements,
-                element =>
-                  isTextElement(element) && element.font.split("px ")[1]
-              )}
-              onChange={value =>
-                changeProperty(element => {
-                  if (isTextElement(element)) {
-                    element.font = `${element.font.split("px ")[0]}px ${value}`;
-                    redrawTextBoundingBox(element);
-                  }
-
-                  return element;
-                })
-              }
-            />
+            {actionManager.renderAction(
+              "changeFontFamily",
+              elements,
+              appState,
+              syncActionResult
+            )}
           </>
         )}
 
-        <h5>Opacity</h5>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          onChange={event => {
-            changeProperty(element => ({
-              ...element,
-              opacity: +event.target.value
-            }));
-          }}
-          value={
-            getSelectedAttribute(elements, element => element.opacity) ||
-            0 /* Put the opacity at 0 if there are two conflicting ones */
-          }
-        />
+        {actionManager.renderAction(
+          "changeOpacity",
+          elements,
+          appState,
+          syncActionResult
+        )}
 
-        <button
-          onClick={() => {
-            onUpdateElements(deleteSelectedElements(elements));
-          }}
-        >
-          Delete selected
-        </button>
+        {actionManager.renderAction(
+          "deleteSelectedElements",
+          elements,
+          appState,
+          syncActionResult
+        )}
       </Panel>
       <PanelCanvas
-        onClearCanvas={onClearCanvas}
-        onViewBackgroundColorChange={value => {
-          onUpdateAppState("viewBackgroundColor", value);
-        }}
-        viewBackgroundColor={appState.viewBackgroundColor}
+        actionManager={actionManager}
+        syncActionResult={syncActionResult}
+        elements={elements}
+        appState={appState}
       />
       <PanelExport
         projectName={appState.name}

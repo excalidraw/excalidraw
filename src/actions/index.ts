@@ -7,3 +7,18 @@ export {
   actionSendToBack
 } from "./actionZindex";
 export { actionSelectAll } from "./actionSelectAll";
+export {
+  actionChangeStrokeColor,
+  actionChangeBackgroundColor,
+  actionChangeStrokeWidth,
+  actionChangeFillStyle,
+  actionChangeSloppiness,
+  actionChangeOpacity,
+  actionChangeFontSize,
+  actionChangeFontFamily
+} from "./actionProperties";
+
+export {
+  actionChangeViewBackgroundColor,
+  actionClearCanvas
+} from "./actionCanvas";
