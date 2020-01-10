@@ -542,7 +542,7 @@ export class App extends React.Component<{}, AppState> {
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
-            let someElementIsDragged = false;
+            let draggingOccured = false;
             let hitElement: ExcalidrawElement | null = null;
             let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
@@ -757,7 +757,7 @@ export class App extends React.Component<{}, AppState> {
               if (hitElement?.isSelected) {
                 // Marking that click was used for dragging to check
                 // if elements should be deselected on mouseup
-                someElementIsDragged = true;
+                draggingOccured = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -822,7 +822,7 @@ export class App extends React.Component<{}, AppState> {
               // selection unchanged
               if (
                 hitElement &&
-                !someElementIsDragged &&
+                !draggingOccured &&
                 !elementIsAddedToSelection
               ) {
                 if (e.shiftKey) {
