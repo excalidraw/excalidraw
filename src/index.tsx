@@ -11,7 +11,8 @@ import {
   resizeTest,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  redrawTextBoundingBox
 } from "./element";
 import {
   clearSelection,
@@ -293,7 +294,7 @@ export class App extends React.Component<{}, AppState> {
         };
         if (isTextElement(newElement)) {
           newElement.font = pastedElement?.font;
-          this.redrawTextBoundingBox(newElement);
+          redrawTextBoundingBox(newElement);
         }
         return newElement;
       }
@@ -354,13 +355,6 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
-    const metrics = measureText(element.text, element.font);
-    element.width = metrics.width;
-    element.height = metrics.height;
-    element.baseline = metrics.baseline;
-  };
-
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -391,12 +385,7 @@ export class App extends React.Component<{}, AppState> {
         }}
       >
         <SidePanel
-          name={this.state.name}
-          onProjectNameChange={name => {
-            this.setState({ name });
-          }}
           elements={elements}
-          elementType={this.state.elementType}
           onToolChange={value => {
             this.setState({ elementType: value });
             elements = clearSelection(elements);
@@ -404,30 +393,21 @@ export class App extends React.Component<{}, AppState> {
               value === "text" ? "text" : "crosshair";
             this.forceUpdate();
           }}
-          changeProperty={this.changeProperty}
           moveAllLeft={this.moveAllLeft}
           moveAllRight={this.moveAllRight}
           moveOneLeft={this.moveOneLeft}
           moveOneRight={this.moveOneRight}
-          redrawTextBoundingBox={this.redrawTextBoundingBox}
           onClearCanvas={this.clearCanvas}
-          onDeleteSelectedElements={this.deleteSelectedElements}
+          changeProperty={this.changeProperty}
           onUpdateAppState={(name, value) => {
             this.setState({ [name]: value } as any);
           }}
-          onViewBackgroundColorChange={(value: string) => {
-            this.setState({ viewBackgroundColor: value });
-          }}
-          viewBackgroundColor={this.state.viewBackgroundColor}
           onUpdateElements={newElements => {
             elements = newElements;
             this.forceUpdate();
           }}
+          appState={{ ...this.state }}
           canvas={this.canvas!}
-          onExportBackgroundChange={value => {
-            this.setState({ exportBackground: value });
-          }}
-          appState={this.state}
         />
         <canvas
           id="canvas"

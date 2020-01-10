@@ -11,21 +11,19 @@ import {
   hasText,
   loadFromJSON,
   saveAsJSON,
-  exportCanvas
+  exportCanvas,
+  deleteSelectedElements
 } from "../scene";
 import { ButtonSelect } from "./ButtonSelect";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { isTextElement } from "../element";
+import { ExcalidrawElement } from "../element/types";
+import { redrawTextBoundingBox, isTextElement } from "../element";
 import { PanelCanvas } from "./panels/PanelCanvas";
 import { PanelExport } from "./panels/PanelExport";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
 
 interface SidePanelProps {
-  name: string;
-  onProjectNameChange: (name: string) => void;
   elements: readonly ExcalidrawElement[];
-  elementType: string;
   onToolChange: (elementType: string) => void;
   changeProperty: (
     callback: (element: ExcalidrawElement) => ExcalidrawElement
@@ -34,44 +32,31 @@ interface SidePanelProps {
   moveOneLeft: () => void;
   moveAllRight: () => void;
   moveOneRight: () => void;
-  redrawTextBoundingBox: (element: ExcalidrawTextElement) => void;
   onClearCanvas: React.MouseEventHandler;
-  onDeleteSelectedElements: React.MouseEventHandler;
   onUpdateAppState: (name: string, value: any) => void;
-  onViewBackgroundColorChange: (value: string) => void;
-  viewBackgroundColor: string;
   appState: AppState;
   onUpdateElements: (elements: readonly ExcalidrawElement[]) => void;
   canvas: HTMLCanvasElement;
-  onExportBackgroundChange: (value: boolean) => void;
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({
-  name,
-  onProjectNameChange,
   elements,
-  elementType,
   onToolChange,
   changeProperty,
   moveAllLeft,
   moveOneLeft,
   moveAllRight,
   moveOneRight,
-  redrawTextBoundingBox,
   onClearCanvas,
-  onDeleteSelectedElements,
   onUpdateAppState,
-  onViewBackgroundColorChange,
-  viewBackgroundColor,
   appState,
   onUpdateElements,
-  onExportBackgroundChange,
   canvas
 }) => {
   return (
     <div className="sidePanel">
       <PanelTools
-        activeTool={elementType}
+        activeTool={appState.elementType}
         onToolChange={value => {
           onToolChange(value);
         }}
@@ -248,22 +233,34 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           }
         />
 
-        <button onClick={onDeleteSelectedElements}>Delete selected</button>
+        <button
+          onClick={() => {
+            onUpdateElements(deleteSelectedElements(elements));
+          }}
+        >
+          Delete selected
+        </button>
       </Panel>
       <PanelCanvas
         onClearCanvas={onClearCanvas}
-        onViewBackgroundColorChange={onViewBackgroundColorChange}
-        viewBackgroundColor={viewBackgroundColor}
+        onViewBackgroundColorChange={value => {
+          onUpdateAppState("viewBackgroundColor", value);
+        }}
+        viewBackgroundColor={appState.viewBackgroundColor}
       />
       <PanelExport
-        projectName={name}
-        onProjectNameChange={onProjectNameChange}
+        projectName={appState.name}
+        onProjectNameChange={name => {
+          onUpdateAppState("name", name);
+        }}
         onExportCanvas={(type: ExportType) =>
           exportCanvas(type, elements, canvas, appState)
         }
         exportBackground={appState.exportBackground}
-        onExportBackgroundChange={onExportBackgroundChange}
-        onSaveScene={() => saveAsJSON(elements, name)}
+        onExportBackgroundChange={value => {
+          onUpdateAppState("exportBackground", value);
+        }}
+        onSaveScene={() => saveAsJSON(elements, appState.name)}
         onLoadScene={() =>
           loadFromJSON().then(({ elements }) => {
             onUpdateElements(elements);
