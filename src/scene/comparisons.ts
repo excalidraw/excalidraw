@@ -8,7 +8,9 @@ export const hasBackground = (elements: readonly ExcalidrawElement[]) =>
       element.isSelected &&
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
-        element.type === "diamond")
+        element.type === "ellipse" ||
+        element.type === "diamond" ||
+        element.type === "server")
   );
 
 export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
@@ -18,7 +20,8 @@ export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
         element.type === "diamond" ||
-        element.type === "arrow")
+        element.type === "arrow" ||
+        element.type === "server")
   );
 
 export const hasText = (elements: readonly ExcalidrawElement[]) =>
