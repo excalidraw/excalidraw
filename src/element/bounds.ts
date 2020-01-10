@@ -55,17 +55,21 @@ export function getServerPoints(element: ExcalidrawElement) {
   const offsetHeight = h * 0.05;
 
   /*
-  ___ 2 ___
+  prettier-ignore
+
+  Points of the server shape
+  
+    ___ 2 ___
   1           3
   4 --- 5 --- 6          
   7 --------- 8        
   9 -- 10 -- 11          
   12         14         
-  -- 13 --
+    -- 13 --
   */
 
-  const [ax1, ay1] = getElementAbsoluteCoords(element);
-
+  const ax1 = element.x;
+  const ay1 = element.y;
   const x1 = ax1 + 0;
   const y1 = ay1 + offsetHeight;
   const x2 = ax1 + w / 2;
