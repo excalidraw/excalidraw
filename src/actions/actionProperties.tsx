@@ -27,14 +27,14 @@ export const actionChangeOpacity: Action = {
       appState
     };
   },
-  PanelComponent: ({ elements, updater }) => (
+  PanelComponent: ({ elements, updateData }) => (
     <>
       <h5>Opacity</h5>
       <input
         type="range"
         min="0"
         max="100"
-        onChange={e => updater(e.target.value)}
+        onChange={e => updateData(e.target.value)}
         value={
           getSelectedAttribute(elements, element => element.opacity) ||
           0 /* Put the opacity at 0 if there are two conflicting ones */
@@ -68,7 +68,7 @@ export const actionChangeStrokeWidth: Action = {
       appState: { ...appState, currentItemStrokeColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updater }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h5>Stroke Width</h5>
       <ButtonSelect
@@ -78,7 +78,7 @@ export const actionChangeStrokeWidth: Action = {
           { value: 4, text: "Extra Bold" }
         ]}
         value={getSelectedAttribute(elements, element => element.strokeWidth)}
-        onChange={value => updater(value)}
+        onChange={value => updateData(value)}
       />
     </>
   )
@@ -95,7 +95,7 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: formData.value }
     };
   },
-  PanelComponent: ({ elements, appState, updater }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h5>Stroke Width</h5>
       <ButtonSelect
@@ -105,7 +105,7 @@ export const actionChangeBackgroundColor: Action = {
           { value: 4, text: "Extra Bold" }
         ]}
         value={getSelectedAttribute(elements, element => element.strokeWidth)}
-        onChange={value => updater(value)}
+        onChange={value => updateData(value)}
       />
     </>
   )

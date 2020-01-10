@@ -1,33 +1,49 @@
 import React from "react";
+import { ActionManager } from "../../actions";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+import { UpdaterFn } from "../../actions/types";
 
 interface PanelSelectionProps {
-  onBringForward: React.MouseEventHandler;
-  onBringToFront: React.MouseEventHandler;
-  onSendBackward: React.MouseEventHandler;
-  onSendToBack: React.MouseEventHandler;
+  actionManager: ActionManager;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  syncActionResult: UpdaterFn;
 }
 
 export const PanelSelection: React.FC<PanelSelectionProps> = ({
-  onBringForward,
-  onBringToFront,
-  onSendBackward,
-  onSendToBack
+  actionManager,
+  elements,
+  appState,
+  syncActionResult
 }) => {
   return (
     <div>
       <div className="buttonList">
-        <button type="button" onClick={onBringForward}>
-          Bring forward
-        </button>
-        <button type="button" onClick={onBringToFront}>
-          Bring to front
-        </button>
-        <button type="button" onClick={onSendBackward}>
-          Send backward
-        </button>
-        <button type="button" onClick={onSendToBack}>
-          Send to back
-        </button>
+        {actionManager.renderAction(
+          "bringForward",
+          elements,
+          appState,
+          syncActionResult
+        )}
+        {actionManager.renderAction(
+          "bringToFront",
+          elements,
+          appState,
+          syncActionResult
+        )}
+        {actionManager.renderAction(
+          "sendBackward",
+          elements,
+          appState,
+          syncActionResult
+        )}
+        {actionManager.renderAction(
+          "sendToBack",
+          elements,
+          appState,
+          syncActionResult
+        )}
       </div>
     </div>
   );

@@ -21,17 +21,17 @@ import { PanelCanvas } from "./panels/PanelCanvas";
 import { PanelExport } from "./panels/PanelExport";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
+import { ActionManager } from "../actions";
+import { UpdaterFn } from "../actions/types";
 
 interface SidePanelProps {
+  actionManager: ActionManager;
   elements: readonly ExcalidrawElement[];
+  syncActionResult: UpdaterFn;
   onToolChange: (elementType: string) => void;
   changeProperty: (
     callback: (element: ExcalidrawElement) => ExcalidrawElement
   ) => void;
-  moveAllLeft: () => void;
-  moveOneLeft: () => void;
-  moveAllRight: () => void;
-  moveOneRight: () => void;
   onClearCanvas: React.MouseEventHandler;
   onUpdateAppState: (name: string, value: any) => void;
   appState: AppState;
@@ -40,13 +40,11 @@ interface SidePanelProps {
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({
+  actionManager,
+  syncActionResult,
   elements,
   onToolChange,
   changeProperty,
-  moveAllLeft,
-  moveOneLeft,
-  moveAllRight,
-  moveOneRight,
   onClearCanvas,
   onUpdateAppState,
   appState,
@@ -63,10 +61,10 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       />
       <Panel title="Selection" hide={!someElementIsSelected(elements)}>
         <PanelSelection
-          onBringForward={moveOneRight}
-          onBringToFront={moveAllRight}
-          onSendBackward={moveOneLeft}
-          onSendToBack={moveAllLeft}
+          actionManager={actionManager}
+          syncActionResult={syncActionResult}
+          elements={elements}
+          appState={appState}
         />
 
         <PanelColor

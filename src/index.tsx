@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import {
   newElement,
   duplicateElement,
@@ -16,7 +15,6 @@ import {
 } from "./element";
 import {
   clearSelection,
-  getSelectedIndices,
   deleteSelectedElements,
   setSelection,
   isOverScrollBars,
@@ -51,6 +49,7 @@ import {
   actionSelectAll
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
+import { ActionResult } from "./actions/types";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -121,6 +120,16 @@ export class App extends React.Component<{}, AppState> {
     this.actionManager.registerAction(actionSelectAll);
   }
 
+  private syncActionResult = (res: ActionResult) => {
+    if (res.elements !== undefined) {
+      elements = res.elements;
+    }
+
+    if (res.appState !== undefined) {
+      this.setState({ ...res.appState });
+    }
+  };
+
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
@@ -187,15 +196,7 @@ export class App extends React.Component<{}, AppState> {
     if (isInputLike(event.target)) return;
 
     const data = this.actionManager.handleKeyDown(event, elements, this.state);
-
-    if (data.elements !== undefined) {
-      elements = data.elements;
-      this.forceUpdate();
-    }
-
-    if (data.appState !== undefined) {
-      this.setState(data.appState);
-    }
+    this.syncActionResult(data);
 
     if (data.elements !== undefined && data.appState !== undefined) {
       return;
@@ -294,26 +295,6 @@ export class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
-  private moveAllLeft = () => {
-    elements = moveAllLeft([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneLeft = () => {
-    elements = moveOneLeft([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveAllRight = () => {
-    elements = moveAllRight([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneRight = () => {
-    elements = moveOneRight([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
   private removeWheelEventListener: (() => void) | undefined;
 
   private changeProperty = (
@@ -376,6 +357,9 @@ export class App extends React.Component<{}, AppState> {
         }}
       >
         <SidePanel
+          actionManager={this.actionManager}
+          syncActionResult={this.syncActionResult}
+          appState={{ ...this.state }}
           elements={elements}
           onToolChange={value => {
             this.setState({ elementType: value });
@@ -384,10 +368,6 @@ export class App extends React.Component<{}, AppState> {
               value === "text" ? "text" : "crosshair";
             this.forceUpdate();
           }}
-          moveAllLeft={this.moveAllLeft}
-          moveAllRight={this.moveAllRight}
-          moveOneLeft={this.moveOneLeft}
-          moveOneRight={this.moveOneRight}
           onClearCanvas={this.clearCanvas}
           changeProperty={this.changeProperty}
           onUpdateAppState={(name, value) => {
@@ -397,7 +377,6 @@ export class App extends React.Component<{}, AppState> {
             elements = newElements;
             this.forceUpdate();
           }}
-          appState={{ ...this.state }}
           canvas={this.canvas!}
         />
         <canvas
@@ -484,16 +463,7 @@ export class App extends React.Component<{}, AppState> {
                 ...this.actionManager.getContextMenuItems(
                   elements,
                   this.state,
-                  ({ elements: newElements, appState }) => {
-                    if (appState !== undefined) {
-                      this.setState({ ...appState });
-                    }
-
-                    if (newElements !== undefined) {
-                      elements = newElements;
-                      this.forceUpdate();
-                    }
-                  }
+                  this.syncActionResult
                 )
               ],
               top: e.clientY,

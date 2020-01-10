@@ -13,14 +13,14 @@ type ActionFn = (
   formData: any
 ) => ActionResult;
 
-type UpdaterFn = (formData: any) => void;
+export type UpdaterFn = (res: ActionResult) => void;
 
 export interface Action {
   name: string;
   PanelComponent?: React.FC<{
     elements: readonly ExcalidrawElement[];
     appState: AppState;
-    updater: UpdaterFn;
+    updateData: (formData: any) => void;
   }>;
   perform: ActionFn;
   keyTest?: (event: KeyboardEvent) => boolean;
@@ -40,6 +40,12 @@ export interface ActionsManagerInterface {
   getContextMenuItems: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: (res: ActionResult) => void
+    updater: UpdaterFn
   ) => { label: string; action: () => void }[];
+  renderAction: (
+    name: string,
+    elements: ExcalidrawElement[],
+    appState: AppState,
+    updater: UpdaterFn
+  ) => React.ReactElement | null;
 }
