@@ -11,7 +11,8 @@ import {
   resizeTest,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  redrawTextBoundingBox
 } from "./element";
 import {
   clearSelection,
@@ -19,40 +20,24 @@ import {
   deleteSelectedElements,
   setSelection,
   isOverScrollBars,
-  someElementIsSelected,
-  getSelectedAttribute,
-  loadFromJSON,
-  saveAsJSON,
-  exportCanvas,
   restoreFromLocalStorage,
   saveToLocalStorage,
-  hasBackground,
-  hasStroke,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition,
-  hasText
+  getElementContainingPosition
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
-import { ExportType } from "./scene/types";
 
 import { getDateTime, isInputLike, measureText } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
-import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import ContextMenu from "./components/ContextMenu";
-import { PanelTools } from "./components/panels/PanelTools";
-import { PanelSelection } from "./components/panels/PanelSelection";
-import { PanelColor } from "./components/panels/PanelColor";
-import { PanelExport } from "./components/panels/PanelExport";
-import { PanelCanvas } from "./components/panels/PanelCanvas";
-import { Panel } from "./components/Panel";
 
 import "./styles.scss";
 import { getElementWithResizeHandler } from "./element/resizeTest";
@@ -65,6 +50,7 @@ import {
   actionBringToFront,
   actionSelectAll
 } from "./actions";
+import { SidePanel } from "./components/SidePanel";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -299,7 +285,7 @@ export class App extends React.Component<{}, AppState> {
         };
         if (isTextElement(newElement)) {
           newElement.font = pastedElement?.font;
-          this.redrawTextBoundingBox(newElement);
+          redrawTextBoundingBox(newElement);
         }
         return newElement;
       }
@@ -330,10 +316,6 @@ export class App extends React.Component<{}, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private updateProjectName(name: string): void {
-    this.setState({ name });
-  }
-
   private changeProperty = (
     callback: (element: ExcalidrawElement) => ExcalidrawElement
   ) => {
@@ -345,29 +327,6 @@ export class App extends React.Component<{}, AppState> {
     });
 
     this.forceUpdate();
-  };
-
-  private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.changeProperty(element => ({
-      ...element,
-      opacity: +event.target.value
-    }));
-  };
-
-  private changeStrokeColor = (color: string) => {
-    this.changeProperty(element => ({
-      ...element,
-      strokeColor: color
-    }));
-    this.setState({ currentItemStrokeColor: color });
-  };
-
-  private changeBackgroundColor = (color: string) => {
-    this.changeProperty(element => ({
-      ...element,
-      backgroundColor: color
-    }));
-    this.setState({ currentItemBackgroundColor: color });
   };
 
   private copyToClipboard = () => {
@@ -385,13 +344,6 @@ export class App extends React.Component<{}, AppState> {
         .readText()
         .then(text => this.addElementsFromPaste(text));
     }
-  };
-
-  private redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
-    const metrics = measureText(element.text, element.font);
-    element.width = metrics.width;
-    element.height = metrics.height;
-    element.baseline = metrics.baseline;
   };
 
   public render() {
@@ -423,206 +375,31 @@ export class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
       >
-        <div className="sidePanel">
-          <PanelTools
-            activeTool={this.state.elementType}
-            onToolChange={value => {
-              this.setState({ elementType: value });
-              elements = clearSelection(elements);
-              document.documentElement.style.cursor =
-                value === "text" ? "text" : "crosshair";
-              this.forceUpdate();
-            }}
-          />
-          <Panel title="Selection" hide={!someElementIsSelected(elements)}>
-            <PanelSelection
-              onBringForward={this.moveOneRight}
-              onBringToFront={this.moveAllRight}
-              onSendBackward={this.moveOneLeft}
-              onSendToBack={this.moveAllLeft}
-            />
-
-            <PanelColor
-              title="Stroke Color"
-              onColorChange={this.changeStrokeColor}
-              colorValue={getSelectedAttribute(
-                elements,
-                element => element.strokeColor
-              )}
-            />
-
-            {hasBackground(elements) && (
-              <>
-                <PanelColor
-                  title="Background Color"
-                  onColorChange={this.changeBackgroundColor}
-                  colorValue={getSelectedAttribute(
-                    elements,
-                    element => element.backgroundColor
-                  )}
-                />
-
-                <h5>Fill</h5>
-                <ButtonSelect
-                  options={[
-                    { value: "solid", text: "Solid" },
-                    { value: "hachure", text: "Hachure" },
-                    { value: "cross-hatch", text: "Cross-hatch" }
-                  ]}
-                  value={getSelectedAttribute(
-                    elements,
-                    element => element.fillStyle
-                  )}
-                  onChange={value => {
-                    this.changeProperty(element => ({
-                      ...element,
-                      fillStyle: value
-                    }));
-                  }}
-                />
-              </>
-            )}
-
-            {hasStroke(elements) && (
-              <>
-                <h5>Stroke Width</h5>
-                <ButtonSelect
-                  options={[
-                    { value: 1, text: "Thin" },
-                    { value: 2, text: "Bold" },
-                    { value: 4, text: "Extra Bold" }
-                  ]}
-                  value={getSelectedAttribute(
-                    elements,
-                    element => element.strokeWidth
-                  )}
-                  onChange={value => {
-                    this.changeProperty(element => ({
-                      ...element,
-                      strokeWidth: value
-                    }));
-                  }}
-                />
-
-                <h5>Sloppiness</h5>
-                <ButtonSelect
-                  options={[
-                    { value: 0, text: "Draftsman" },
-                    { value: 1, text: "Artist" },
-                    { value: 3, text: "Cartoonist" }
-                  ]}
-                  value={getSelectedAttribute(
-                    elements,
-                    element => element.roughness
-                  )}
-                  onChange={value =>
-                    this.changeProperty(element => ({
-                      ...element,
-                      roughness: value
-                    }))
-                  }
-                />
-              </>
-            )}
-
-            {hasText(elements) && (
-              <>
-                <h5>Font size</h5>
-                <ButtonSelect
-                  options={[
-                    { value: 16, text: "Small" },
-                    { value: 20, text: "Medium" },
-                    { value: 28, text: "Large" },
-                    { value: 36, text: "Very Large" }
-                  ]}
-                  value={getSelectedAttribute(
-                    elements,
-                    element =>
-                      isTextElement(element) && +element.font.split("px ")[0]
-                  )}
-                  onChange={value =>
-                    this.changeProperty(element => {
-                      if (isTextElement(element)) {
-                        element.font = `${value}px ${
-                          element.font.split("px ")[1]
-                        }`;
-                        this.redrawTextBoundingBox(element);
-                      }
-
-                      return element;
-                    })
-                  }
-                />
-                <h5>Font familly</h5>
-                <ButtonSelect
-                  options={[
-                    { value: "Virgil", text: "Virgil" },
-                    { value: "Helvetica", text: "Helvetica" },
-                    { value: "Courier", text: "Courier" }
-                  ]}
-                  value={getSelectedAttribute(
-                    elements,
-                    element =>
-                      isTextElement(element) && element.font.split("px ")[1]
-                  )}
-                  onChange={value =>
-                    this.changeProperty(element => {
-                      if (isTextElement(element)) {
-                        element.font = `${
-                          element.font.split("px ")[0]
-                        }px ${value}`;
-                        this.redrawTextBoundingBox(element);
-                      }
-
-                      return element;
-                    })
-                  }
-                />
-              </>
-            )}
-
-            <h5>Opacity</h5>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              onChange={this.changeOpacity}
-              value={
-                getSelectedAttribute(elements, element => element.opacity) ||
-                0 /* Put the opacity at 0 if there are two conflicting ones */
-              }
-            />
-
-            <button onClick={this.deleteSelectedElements}>
-              Delete selected
-            </button>
-          </Panel>
-          <PanelCanvas
-            onClearCanvas={this.clearCanvas}
-            onViewBackgroundColorChange={val =>
-              this.setState({ viewBackgroundColor: val })
-            }
-            viewBackgroundColor={this.state.viewBackgroundColor}
-          />
-          <PanelExport
-            projectName={this.state.name}
-            onProjectNameChange={this.updateProjectName}
-            onExportCanvas={(type: ExportType) =>
-              exportCanvas(type, elements, this.canvas!, this.state)
-            }
-            exportBackground={this.state.exportBackground}
-            onExportBackgroundChange={val =>
-              this.setState({ exportBackground: val })
-            }
-            onSaveScene={() => saveAsJSON(elements, this.state.name)}
-            onLoadScene={() =>
-              loadFromJSON().then(({ elements: newElements }) => {
-                elements = newElements;
-                this.forceUpdate();
-              })
-            }
-          />
-        </div>
+        <SidePanel
+          elements={elements}
+          onToolChange={value => {
+            this.setState({ elementType: value });
+            elements = clearSelection(elements);
+            document.documentElement.style.cursor =
+              value === "text" ? "text" : "crosshair";
+            this.forceUpdate();
+          }}
+          moveAllLeft={this.moveAllLeft}
+          moveAllRight={this.moveAllRight}
+          moveOneLeft={this.moveOneLeft}
+          moveOneRight={this.moveOneRight}
+          onClearCanvas={this.clearCanvas}
+          changeProperty={this.changeProperty}
+          onUpdateAppState={(name, value) => {
+            this.setState({ [name]: value } as any);
+          }}
+          onUpdateElements={newElements => {
+            elements = newElements;
+            this.forceUpdate();
+          }}
+          appState={{ ...this.state }}
+          canvas={this.canvas!}
+        />
         <canvas
           id="canvas"
           style={{
@@ -756,8 +533,10 @@ export class App extends React.Component<{}, AppState> {
             );
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
-            let isDraggingElements = false;
             let isResizingElements = false;
+            let draggingOccured = false;
+            let hitElement: ExcalidrawElement | null = null;
+            let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
               const resizeElement = getElementWithResizeHandler(
                 elements,
@@ -783,7 +562,7 @@ export class App extends React.Component<{}, AppState> {
                 if (!selected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
-                const hitElement = getElementAtPosition(elements, x, y);
+                hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -791,7 +570,10 @@ export class App extends React.Component<{}, AppState> {
                   // if shift is not clicked, this will always return true
                   // otherwise, it will trigger selection based on current
                   // state of the box
-                  hitElement.isSelected = true;
+                  if (!hitElement.isSelected) {
+                    hitElement.isSelected = true;
+                    elementIsAddedToSelection = true;
+                  }
 
                   // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
@@ -810,13 +592,9 @@ export class App extends React.Component<{}, AppState> {
                     ];
                   }
                 }
-
-                isDraggingElements = someElementIsSelected(elements);
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
-                }
               }
+            } else {
+              elements = clearSelection(elements);
             }
 
             if (isTextElement(element)) {
@@ -968,7 +746,10 @@ export class App extends React.Component<{}, AppState> {
                 }
               }
 
-              if (isDraggingElements) {
+              if (hitElement?.isSelected) {
+                // Marking that click was used for dragging to check
+                // if elements should be deselected on mouseup
+                draggingOccured = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1023,17 +804,35 @@ export class App extends React.Component<{}, AppState> {
 
               resetCursor();
 
-              // if no element is clicked, clear the selection and redraw
+              // If click occured on already selected element
+              // it is needed to remove selection from other elements
+              // or if SHIFT or META key pressed remove selection
+              // from hitted element
+              //
+              // If click occured and elements were dragged or some element
+              // was added to selection (on mousedown phase) we need to keep
+              // selection unchanged
+              if (
+                hitElement &&
+                !draggingOccured &&
+                !elementIsAddedToSelection
+              ) {
+                if (e.shiftKey) {
+                  hitElement.isSelected = false;
+                } else {
+                  elements = clearSelection(elements);
+                  hitElement.isSelected = true;
+                }
+              }
+
               if (draggingElement === null) {
+                // if no element is clicked, clear the selection and redraw
                 elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
 
               if (elementType === "selection") {
-                if (isDraggingElements) {
-                  isDraggingElements = false;
-                }
                 elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
@@ -1043,6 +842,8 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement: null,
                 elementType: "selection"
               });
+
+              history.resumeRecording();
               this.forceUpdate();
             };
 
@@ -1272,7 +1073,6 @@ export class App extends React.Component<{}, AppState> {
       history.pushEntry(history.generateCurrentEntry(elements));
       history.clearRedoStack();
     }
-    history.resumeRecording();
   }
 }
 
