@@ -109,6 +109,10 @@ export function hitTest(
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
+  } else if (element.type === "server") {
+    const collide = false;
+
+    return collide;
   } else {
     throw new Error("Unimplemented type " + element.type);
   }

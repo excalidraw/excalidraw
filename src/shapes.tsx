@@ -55,6 +55,12 @@ export const SHAPES = [
       </svg>
     ),
     value: "text"
+  },
+  {
+    icon:
+      // fa-font
+      "",
+    value: "server"
   }
 ];
 

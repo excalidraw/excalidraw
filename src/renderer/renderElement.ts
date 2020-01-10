@@ -138,6 +138,30 @@ export function renderElement(
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;
+  } else if (element.type === "server") {
+    const options = {
+      stroke: element.strokeColor,
+      strokeWidth: element.strokeWidth,
+      roughness: element.roughness
+    };
+
+    const w = element.width;
+    const h = element.height;
+    const shapes = withCustomMathRandom(element.seed, () => [
+      generator.arc(w / 2, 0, w, h * 0.1, Math.PI, Math.PI * 2, false, options), // prettier-ignore
+      generator.line(0, 0, 0, h, options),
+      generator.arc(w / 2, h * 0.25, w, h * 0.1, Math.PI, Math.PI * 2, false, options), // prettier-ignore
+      generator.line(0, h / 2, w, h / 2, options), // prettier-ignore
+      generator.arc(w / 2, h * 0.75, w, h * 0.1, Math.PI * 2, Math.PI * 3, false, options), // prettier-ignore
+      generator.line(w, 0, w, h, options), // prettier-ignore
+      generator.arc(w / 2, h, w, h * 0.1, Math.PI * 2, Math.PI * 3, false, options) // prettier-ignore
+    ]);
+
+    context.globalAlpha = element.opacity / 100;
+    context.translate(element.x + scrollX, element.y + scrollY);
+    shapes.forEach(shape => rc.draw(shape));
+    context.translate(-element.x - scrollX, -element.y - scrollY);
+    context.globalAlpha = 1;
   } else {
     throw new Error("Unimplemented type " + element.type);
   }
