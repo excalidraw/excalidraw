@@ -569,7 +569,7 @@ export class App extends React.Component<{}, AppState> {
                   y
                 );
                 // clear selection if shift is not clicked
-                if (!selected && !(e.shiftKey || e.metaKey)) {
+                if (!selected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
                 hitElement = getElementAtPosition(elements, x, y);
@@ -834,7 +834,7 @@ export class App extends React.Component<{}, AppState> {
                 !someElementIsDragged &&
                 !elementIsAddedToSelection
               ) {
-                if (e.shiftKey || e.metaKey) {
+                if (e.shiftKey) {
                   hitElement.isSelected = false;
                 } else {
                   elements = clearSelection(elements);
