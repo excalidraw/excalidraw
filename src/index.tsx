@@ -143,6 +143,7 @@ export class App extends React.Component<{}, AppState> {
   private syncActionResult = (res: ActionResult) => {
     if (res.elements !== undefined) {
       elements = res.elements;
+      this.forceUpdate();
     }
 
     if (res.appState !== undefined) {
@@ -272,18 +273,6 @@ export class App extends React.Component<{}, AppState> {
     this.forceUpdate();
   };
 
-  private clearCanvas = () => {
-    if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements = [];
-      this.setState({
-        viewBackgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      });
-      this.forceUpdate();
-    }
-  };
-
   private copyStyles = () => {
     const element = elements.find(el => el.isSelected);
     if (element) {
@@ -316,19 +305,6 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private removeWheelEventListener: (() => void) | undefined;
-
-  private changeProperty = (
-    callback: (element: ExcalidrawElement) => ExcalidrawElement
-  ) => {
-    elements = elements.map(element => {
-      if (element.isSelected) {
-        return callback(element);
-      }
-      return element;
-    });
-
-    this.forceUpdate();
-  };
 
   private copyToClipboard = () => {
     if (navigator.clipboard) {
