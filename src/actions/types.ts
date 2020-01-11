@@ -23,7 +23,11 @@ export interface Action {
     updateData: (formData: any) => void;
   }>;
   perform: ActionFn;
-  keyTest?: (event: KeyboardEvent) => boolean;
+  keyTest?: (
+    event: KeyboardEvent,
+    elements?: readonly ExcalidrawElement[],
+    appState?: AppState
+  ) => boolean;
   contextItemLabel?: string;
 }
 

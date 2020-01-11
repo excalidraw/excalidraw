@@ -25,7 +25,9 @@ export class ActionManager implements ActionsManagerInterface {
     appState: AppState
   ) {
     const data = Object.values(this.actions)
-      .filter(action => action.keyTest && action.keyTest(event))
+      .filter(
+        action => action.keyTest && action.keyTest(event, elements, appState)
+      )
       .map(action => action.perform(elements, appState, null))[0];
 
     if (!data) return {};
