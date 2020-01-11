@@ -32,6 +32,7 @@ export const actionChangeStrokeColor: Action = {
   PanelComponent: ({ elements, appState, updateData }) => (
     <PanelColor
       title="Stroke Color"
+      colorType="elementStroke"
       onColorChange={(color: string) => {
         updateData(color);
       }}
@@ -57,6 +58,7 @@ export const actionChangeBackgroundColor: Action = {
   PanelComponent: ({ elements, updateData }) => (
     <PanelColor
       title="Background Color"
+      colorType="elementBackground"
       onColorChange={(color: string) => {
         updateData(color);
       }}
