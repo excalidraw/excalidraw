@@ -475,6 +475,7 @@ export class App extends React.Component<{}, AppState> {
               1,
               100
             );
+
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
@@ -716,6 +717,7 @@ export class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
+
               let width =
                 e.clientX -
                 CANVAS_WINDOW_OFFSET_LEFT -
@@ -731,6 +733,7 @@ export class App extends React.Component<{}, AppState> {
               draggingElement.height = e.shiftKey
                 ? Math.abs(width) * Math.sign(height)
                 : height;
+              draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
                 elements = setSelection(elements, draggingElement);
