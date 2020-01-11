@@ -34,7 +34,7 @@ export function measureText(text: string, font: string) {
   line.style.font = font;
   body.appendChild(line);
   // Now we can measure width and height of the letter
-  line.innerHTML = text;
+  line.innerText = text;
   const width = line.offsetWidth;
   const height = line.offsetHeight;
   // Now creating 1px sized item that will be aligned to baseline
