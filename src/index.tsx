@@ -4,19 +4,16 @@ import ReactDOM from "react-dom";
 import rough from "roughjs/bin/wrappers/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
 import {
   newElement,
   duplicateElement,
   resizeTest,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords,
-  redrawTextBoundingBox
+  getElementAbsoluteCoords
 } from "./element";
 import {
   clearSelection,
-  getSelectedIndices,
   deleteSelectedElements,
   setSelection,
   isOverScrollBars,
@@ -41,7 +38,33 @@ import ContextMenu from "./components/ContextMenu";
 
 import "./styles.scss";
 import { getElementWithResizeHandler } from "./element/resizeTest";
+import {
+  ActionManager,
+  actionDeleteSelected,
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+  actionBringToFront,
+  actionSelectAll,
+  actionChangeStrokeColor,
+  actionChangeBackgroundColor,
+  actionChangeOpacity,
+  actionChangeStrokeWidth,
+  actionChangeFillStyle,
+  actionChangeSloppiness,
+  actionChangeFontSize,
+  actionChangeFontFamily,
+  actionChangeViewBackgroundColor,
+  actionClearCanvas,
+  actionChangeProjectName,
+  actionChangeExportBackground,
+  actionLoadScene,
+  actionSaveScene,
+  actionCopyStyles,
+  actionPasteStyles
+} from "./actions";
 import { SidePanel } from "./components/SidePanel";
+import { ActionResult } from "./actions/types";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -49,8 +72,6 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-let copiedStyles: string = "{}";
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -100,6 +121,48 @@ export function viewportCoordsToSceneCoords(
 export class App extends React.Component<{}, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
+
+  actionManager: ActionManager = new ActionManager();
+  constructor(props: any) {
+    super(props);
+    this.actionManager.registerAction(actionDeleteSelected);
+    this.actionManager.registerAction(actionSendToBack);
+    this.actionManager.registerAction(actionBringToFront);
+    this.actionManager.registerAction(actionSendBackward);
+    this.actionManager.registerAction(actionBringForward);
+    this.actionManager.registerAction(actionSelectAll);
+
+    this.actionManager.registerAction(actionChangeStrokeColor);
+    this.actionManager.registerAction(actionChangeBackgroundColor);
+    this.actionManager.registerAction(actionChangeFillStyle);
+    this.actionManager.registerAction(actionChangeStrokeWidth);
+    this.actionManager.registerAction(actionChangeOpacity);
+    this.actionManager.registerAction(actionChangeSloppiness);
+    this.actionManager.registerAction(actionChangeFontSize);
+    this.actionManager.registerAction(actionChangeFontFamily);
+
+    this.actionManager.registerAction(actionChangeViewBackgroundColor);
+    this.actionManager.registerAction(actionClearCanvas);
+
+    this.actionManager.registerAction(actionChangeProjectName);
+    this.actionManager.registerAction(actionChangeExportBackground);
+    this.actionManager.registerAction(actionSaveScene);
+    this.actionManager.registerAction(actionLoadScene);
+
+    this.actionManager.registerAction(actionCopyStyles);
+    this.actionManager.registerAction(actionPasteStyles);
+  }
+
+  private syncActionResult = (res: ActionResult) => {
+    if (res.elements !== undefined) {
+      elements = res.elements;
+      this.forceUpdate();
+    }
+
+    if (res.appState !== undefined) {
+      this.setState({ ...res.appState });
+    }
+  };
 
   public componentDidMount() {
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -166,10 +229,14 @@ export class App extends React.Component<{}, AppState> {
     }
     if (isInputLike(event.target)) return;
 
-    if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      this.deleteSelectedElements();
-      event.preventDefault();
-    } else if (isArrowKey(event.key)) {
+    const data = this.actionManager.handleKeyDown(event, elements, this.state);
+    this.syncActionResult(data);
+
+    if (data.elements !== undefined && data.appState !== undefined) {
+      return;
+    }
+
+    if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
@@ -184,46 +251,6 @@ export class App extends React.Component<{}, AppState> {
         }
         return el;
       });
-      this.forceUpdate();
-      event.preventDefault();
-
-      // Send backward: Cmd-Shift-Alt-B
-    } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyB"
-    ) {
-      this.moveOneLeft();
-      event.preventDefault();
-
-      // Send to back: Cmd-Shift-B
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyB") {
-      this.moveAllLeft();
-      event.preventDefault();
-
-      // Bring forward: Cmd-Shift-Alt-F
-    } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyF"
-    ) {
-      this.moveOneRight();
-      event.preventDefault();
-
-      // Bring to front: Cmd-Shift-F
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
-      this.moveAllRight();
-      event.preventDefault();
-      // Select all: Cmd-A
-    } else if (event[META_KEY] && event.code === "KeyA") {
-      let newElements = [...elements];
-      newElements.forEach(element => {
-        element.isSelected = true;
-      });
-
-      elements = newElements;
       this.forceUpdate();
       event.preventDefault();
     } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
@@ -244,98 +271,10 @@ export class App extends React.Component<{}, AppState> {
       }
       this.forceUpdate();
       event.preventDefault();
-      // Copy Styles: Cmd-Shift-C
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
-      this.copyStyles();
-      // Paste Styles: Cmd-Shift-V
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
-      this.pasteStyles();
-      event.preventDefault();
     }
-  };
-
-  private deleteSelectedElements = () => {
-    elements = deleteSelectedElements(elements);
-    this.forceUpdate();
-  };
-
-  private clearCanvas = () => {
-    if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements = [];
-      this.setState({
-        viewBackgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      });
-      this.forceUpdate();
-    }
-  };
-
-  private copyStyles = () => {
-    const element = elements.find(el => el.isSelected);
-    if (element) {
-      copiedStyles = JSON.stringify(element);
-    }
-  };
-
-  private pasteStyles = () => {
-    const pastedElement = JSON.parse(copiedStyles);
-    elements = elements.map(element => {
-      if (element.isSelected) {
-        const newElement = {
-          ...element,
-          backgroundColor: pastedElement?.backgroundColor,
-          strokeWidth: pastedElement?.strokeWidth,
-          strokeColor: pastedElement?.strokeColor,
-          fillStyle: pastedElement?.fillStyle,
-          opacity: pastedElement?.opacity,
-          roughness: pastedElement?.roughness
-        };
-        if (isTextElement(newElement)) {
-          newElement.font = pastedElement?.font;
-          redrawTextBoundingBox(newElement);
-        }
-        return newElement;
-      }
-      return element;
-    });
-    this.forceUpdate();
-  };
-
-  private moveAllLeft = () => {
-    elements = moveAllLeft([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneLeft = () => {
-    elements = moveOneLeft([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveAllRight = () => {
-    elements = moveAllRight([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneRight = () => {
-    elements = moveOneRight([...elements], getSelectedIndices(elements));
-    this.forceUpdate();
   };
 
   private removeWheelEventListener: (() => void) | undefined;
-
-  private changeProperty = (
-    callback: (element: ExcalidrawElement) => ExcalidrawElement
-  ) => {
-    elements = elements.map(element => {
-      if (element.isSelected) {
-        return callback(element);
-      }
-      return element;
-    });
-
-    this.forceUpdate();
-  };
 
   private copyToClipboard = () => {
     if (navigator.clipboard) {
@@ -384,6 +323,9 @@ export class App extends React.Component<{}, AppState> {
         }}
       >
         <SidePanel
+          actionManager={this.actionManager}
+          syncActionResult={this.syncActionResult}
+          appState={{ ...this.state }}
           elements={elements}
           onToolChange={value => {
             this.setState({ elementType: value });
@@ -392,20 +334,6 @@ export class App extends React.Component<{}, AppState> {
               value === "text" ? "text" : "crosshair";
             this.forceUpdate();
           }}
-          moveAllLeft={this.moveAllLeft}
-          moveAllRight={this.moveAllRight}
-          moveOneLeft={this.moveOneLeft}
-          moveOneRight={this.moveOneRight}
-          onClearCanvas={this.clearCanvas}
-          changeProperty={this.changeProperty}
-          onUpdateAppState={(name, value) => {
-            this.setState({ [name]: value } as any);
-          }}
-          onUpdateElements={newElements => {
-            elements = newElements;
-            this.forceUpdate();
-          }}
-          appState={{ ...this.state }}
           canvas={this.canvas!}
         />
         <canvas
@@ -482,13 +410,11 @@ export class App extends React.Component<{}, AppState> {
                   label: "Paste",
                   action: () => this.pasteFromClipboard()
                 },
-                { label: "Copy Styles", action: this.copyStyles },
-                { label: "Paste Styles", action: this.pasteStyles },
-                { label: "Delete", action: this.deleteSelectedElements },
-                { label: "Move Forward", action: this.moveOneRight },
-                { label: "Send to Front", action: this.moveAllRight },
-                { label: "Move Backwards", action: this.moveOneLeft },
-                { label: "Send to Back", action: this.moveAllLeft }
+                ...this.actionManager.getContextMenuItems(
+                  elements,
+                  this.state,
+                  this.syncActionResult
+                )
               ],
               top: e.clientY,
               left: e.clientX
