@@ -129,6 +129,14 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
+function pickAppStatePropertiesForHistory(
+  appState: AppState
+): Partial<AppState> {
+  return {
+    viewBackgroundColor: appState.viewBackgroundColor
+  };
+}
+
 export class App extends React.Component<{}, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -323,13 +331,15 @@ export class App extends React.Component<{}, AppState> {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
-          elements = data;
+          this.setState(data.appState);
+          elements = data.elements;
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
-          elements = data;
+          this.setState(data.appState);
+          elements = data.elements;
         }
       }
       this.forceUpdate();
@@ -1328,7 +1338,12 @@ export class App extends React.Component<{}, AppState> {
     });
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(history.generateCurrentEntry(elements));
+      history.pushEntry(
+        history.generateCurrentEntry(
+          pickAppStatePropertiesForHistory(this.state),
+          elements
+        )
+      );
     }
   }
 }

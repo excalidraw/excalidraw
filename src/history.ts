@@ -1,3 +1,4 @@
+import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 class SceneHistory {
@@ -5,13 +6,17 @@ class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(elements: readonly ExcalidrawElement[]) {
-    return JSON.stringify(
-      elements.map(({ shape, ...element }) => ({
+  generateCurrentEntry(
+    appState: Partial<AppState>,
+    elements: readonly ExcalidrawElement[]
+  ) {
+    return JSON.stringify({
+      appState,
+      elements: elements.map(({ shape, ...element }) => ({
         ...element,
         isSelected: false
       }))
-    );
+    });
   }
 
   pushEntry(newEntry: string) {
