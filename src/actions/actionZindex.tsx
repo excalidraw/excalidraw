@@ -1,4 +1,3 @@
-import React from "react";
 import { Action } from "./types";
 import {
   moveOneLeft,
@@ -20,12 +19,7 @@ export const actionSendBackward: Action = {
   contextItemLabel: "Send Backward",
   keyPriority: 40,
   keyTest: event =>
-    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyB",
-  PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
-      Send backward
-    </button>
-  )
+    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyB"
 };
 
 export const actionBringForward: Action = {
@@ -39,12 +33,7 @@ export const actionBringForward: Action = {
   contextItemLabel: "Bring Forward",
   keyPriority: 40,
   keyTest: event =>
-    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyF",
-  PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
-      Bring Forward
-    </button>
-  )
+    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyF"
 };
 
 export const actionSendToBack: Action = {
@@ -56,12 +45,7 @@ export const actionSendToBack: Action = {
     };
   },
   contextItemLabel: "Send to Back",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyB",
-  PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
-      Send to Back
-    </button>
-  )
+  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyB"
 };
 
 export const actionBringToFront: Action = {
@@ -73,10 +57,5 @@ export const actionBringToFront: Action = {
     };
   },
   contextItemLabel: "Bring to Front",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyF",
-  PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
-      Bring to Front
-    </button>
-  )
+  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyF"
 };
