@@ -670,6 +670,7 @@ export class App extends React.Component<{}, AppState> {
 
                     el.x = element.x;
                     el.y = element.y;
+                    el.shape = null;
                   });
                   lastX = x;
                   lastY = y;
