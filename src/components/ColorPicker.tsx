@@ -73,7 +73,8 @@ const colors = {
     "#AF7AA1",
     "#FF9DA7",
     "#9C755F",
-    "#BAB0AB"
+    "#BAB0AB",
+    "#FFFFFF"
   ],
   elementStroke: [
     "#324E6B",
