@@ -60,7 +60,8 @@ const colors = {
     "#F0E6ED",
     "#FFEDEF",
     "#EDE5E1",
-    "#F2F0EF"
+    "#F2F0EF",
+    "#FFFFFF"
   ],
   elementBackground: [
     "#4E79A7",
@@ -84,6 +85,7 @@ const colors = {
     "#805976",
     "#BA737A",
     "#725646",
-    "#88817D"
+    "#88817D",
+    "#000000"
   ]
 };
