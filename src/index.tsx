@@ -274,11 +274,6 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private deleteSelectedElements = () => {
-    elements = deleteSelectedElements(elements);
-    this.forceUpdate();
-  };
-
   private removeWheelEventListener: (() => void) | undefined;
 
   private copyToClipboard = () => {
