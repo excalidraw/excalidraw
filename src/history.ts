@@ -7,7 +7,10 @@ class SceneHistory {
 
   generateCurrentEntry(elements: readonly ExcalidrawElement[]) {
     return JSON.stringify(
-      elements.map(element => ({ ...element, isSelected: false }))
+      elements.map(({ shape, ...element }) => ({
+        ...element,
+        isSelected: false
+      }))
     );
   }
 

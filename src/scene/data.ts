@@ -35,7 +35,7 @@ export function saveAsJSON(
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
-    elements
+    elements: elements.map(({ shape, ...el }) => el)
   });
 
   saveFile(
