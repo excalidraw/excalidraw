@@ -279,7 +279,9 @@ export class App extends React.Component<{}, AppState> {
   private copyToClipboard = () => {
     if (navigator.clipboard) {
       const text = JSON.stringify(
-        elements.filter(element => element.isSelected)
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
       );
       navigator.clipboard.writeText(text);
     }
@@ -303,7 +305,11 @@ export class App extends React.Component<{}, AppState> {
         onCut={e => {
           e.clipboardData.setData(
             "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
+            JSON.stringify(
+              elements
+                .filter(element => element.isSelected)
+                .map(({ shape, ...el }) => el)
+            )
           );
           elements = deleteSelectedElements(elements);
           this.forceUpdate();
@@ -312,7 +318,11 @@ export class App extends React.Component<{}, AppState> {
         onCopy={e => {
           e.clipboardData.setData(
             "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
+            JSON.stringify(
+              elements
+                .filter(element => element.isSelected)
+                .map(({ shape, ...el }) => el)
+            )
           );
           e.preventDefault();
         }}
