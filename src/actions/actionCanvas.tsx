@@ -11,6 +11,7 @@ export const actionChangeViewBackgroundColor: Action = {
     <>
       <h5>Canvas Background Color</h5>
       <ColorPicker
+        type="canvasBackground"
         color={appState.viewBackgroundColor}
         onChange={color => updateData(color)}
       />
