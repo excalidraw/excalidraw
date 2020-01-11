@@ -10,8 +10,7 @@ import {
   resizeTest,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords,
-  redrawTextBoundingBox
+  getElementAbsoluteCoords
 } from "./element";
 import {
   clearSelection,
@@ -60,7 +59,9 @@ import {
   actionChangeProjectName,
   actionChangeExportBackground,
   actionLoadScene,
-  actionSaveScene
+  actionSaveScene,
+  actionCopyStyles,
+  actionPasteStyles
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
 import { ActionResult } from "./actions/types";
@@ -71,8 +72,6 @@ const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-let copiedStyles: string = "{}";
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -149,6 +148,9 @@ export class App extends React.Component<{}, AppState> {
     this.actionManager.registerAction(actionChangeExportBackground);
     this.actionManager.registerAction(actionSaveScene);
     this.actionManager.registerAction(actionLoadScene);
+
+    this.actionManager.registerAction(actionCopyStyles);
+    this.actionManager.registerAction(actionPasteStyles);
   }
 
   private syncActionResult = (res: ActionResult) => {
@@ -269,49 +271,11 @@ export class App extends React.Component<{}, AppState> {
       }
       this.forceUpdate();
       event.preventDefault();
-      // Copy Styles: Cmd-Shift-C
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
-      this.copyStyles();
-      // Paste Styles: Cmd-Shift-V
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
-      this.pasteStyles();
-      event.preventDefault();
     }
   };
 
   private deleteSelectedElements = () => {
     elements = deleteSelectedElements(elements);
-    this.forceUpdate();
-  };
-
-  private copyStyles = () => {
-    const element = elements.find(el => el.isSelected);
-    if (element) {
-      copiedStyles = JSON.stringify(element);
-    }
-  };
-
-  private pasteStyles = () => {
-    const pastedElement = JSON.parse(copiedStyles);
-    elements = elements.map(element => {
-      if (element.isSelected) {
-        const newElement = {
-          ...element,
-          backgroundColor: pastedElement?.backgroundColor,
-          strokeWidth: pastedElement?.strokeWidth,
-          strokeColor: pastedElement?.strokeColor,
-          fillStyle: pastedElement?.fillStyle,
-          opacity: pastedElement?.opacity,
-          roughness: pastedElement?.roughness
-        };
-        if (isTextElement(newElement)) {
-          newElement.font = pastedElement?.font;
-          redrawTextBoundingBox(newElement);
-        }
-        return newElement;
-      }
-      return element;
-    });
     this.forceUpdate();
   };
 
@@ -451,9 +415,9 @@ export class App extends React.Component<{}, AppState> {
                   label: "Paste",
                   action: () => this.pasteFromClipboard()
                 },
-                { label: "Copy Styles", action: this.copyStyles },
+                /*{ label: "Copy Styles", action: this.copyStyles },
                 { label: "Paste Styles", action: this.pasteStyles },
-                /*{ label: "Delete", action: this.deleteSelectedElements },
+                { label: "Delete", action: this.deleteSelectedElements },
                 { label: "Move Forward", action: this.moveOneRight },
                 { label: "Send to Front", action: this.moveAllRight },
                 { label: "Move Backwards", action: this.moveOneLeft },

@@ -29,3 +29,5 @@ export {
   actionSaveScene,
   actionLoadScene
 } from "./actionExport";
+
+export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
