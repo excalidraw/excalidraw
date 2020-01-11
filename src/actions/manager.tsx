@@ -42,11 +42,6 @@ export class ActionManager implements ActionsManagerInterface {
     appState: AppState,
     updater: UpdaterFn
   ) {
-    console.log(
-      Object.values(this.actions)
-        .filter(action => "contextItemLabel" in action)
-        .map(a => ({ name: a.name, label: a.contextItemLabel }))
-    );
     return Object.values(this.actions)
       .filter(action => "contextItemLabel" in action)
       .sort(
