@@ -30,6 +30,7 @@ export interface Action {
     appState?: AppState
   ) => boolean;
   contextItemLabel?: string;
+  contextMenuOrder?: number;
 }
 
 export interface ActionsManagerInterface {

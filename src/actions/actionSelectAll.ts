@@ -8,6 +8,6 @@ export const actionSelectAll: Action = {
       elements: elements.map(elem => ({ ...elem, isSelected: true }))
     };
   },
-  contextItemLabel: "Delete",
+  contextItemLabel: "Select All",
   keyTest: event => event[META_KEY] && event.code === "KeyA"
 };

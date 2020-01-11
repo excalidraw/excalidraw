@@ -11,6 +11,7 @@ export const actionDeleteSelected: Action = {
     };
   },
   contextItemLabel: "Delete",
+  contextMenuOrder: 3,
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
   PanelComponent: ({ updateData }) => (
     <button onClick={() => updateData(null)}>Delete selected</button>
