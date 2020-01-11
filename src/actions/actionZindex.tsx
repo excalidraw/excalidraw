@@ -18,6 +18,7 @@ export const actionSendBackward: Action = {
     };
   },
   contextItemLabel: "Send Backward",
+  keyPriority: 40,
   keyTest: event =>
     event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyB",
   PanelComponent: ({ updateData }) => (
@@ -36,6 +37,7 @@ export const actionBringForward: Action = {
     };
   },
   contextItemLabel: "Bring Forward",
+  keyPriority: 40,
   keyTest: event =>
     event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyF",
   PanelComponent: ({ updateData }) => (

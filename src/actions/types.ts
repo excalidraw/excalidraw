@@ -23,6 +23,7 @@ export interface Action {
     updateData: (formData: any) => void;
   }>;
   perform: ActionFn;
+  keyPriority?: number;
   keyTest?: (
     event: KeyboardEvent,
     elements?: readonly ExcalidrawElement[],

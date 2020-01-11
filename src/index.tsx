@@ -127,10 +127,10 @@ export class App extends React.Component<{}, AppState> {
   constructor(props: any) {
     super(props);
     this.actionManager.registerAction(actionDeleteSelected);
-    this.actionManager.registerAction(actionSendBackward);
-    this.actionManager.registerAction(actionBringForward);
     this.actionManager.registerAction(actionSendToBack);
     this.actionManager.registerAction(actionBringToFront);
+    this.actionManager.registerAction(actionSendBackward);
+    this.actionManager.registerAction(actionBringForward);
     this.actionManager.registerAction(actionSelectAll);
 
     this.actionManager.registerAction(actionChangeStrokeColor);

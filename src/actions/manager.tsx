@@ -5,6 +5,7 @@ import { AppState } from "../types";
 
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
+
   updater:
     | ((elements: ExcalidrawElement[], appState: AppState) => void)
     | null = null;
@@ -25,15 +26,15 @@ export class ActionManager implements ActionsManagerInterface {
     appState: AppState
   ) {
     const data = Object.values(this.actions)
+      .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
         action => action.keyTest && action.keyTest(event, elements, appState)
-      )
-      .map(action => action.perform(elements, appState, null))[0];
+      );
 
-    if (!data) return {};
+    if (data.length === 0) return {};
 
     event.preventDefault();
-    return data;
+    return data[0].perform(elements, appState, null);
   }
 
   getContextMenuItems(
