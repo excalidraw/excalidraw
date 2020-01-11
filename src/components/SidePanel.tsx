@@ -7,8 +7,6 @@ import {
   someElementIsSelected,
   hasStroke,
   hasText,
-  loadFromJSON,
-  saveAsJSON,
   exportCanvas
 } from "../scene";
 import { ExcalidrawElement } from "../element/types";
@@ -23,10 +21,8 @@ interface SidePanelProps {
   actionManager: ActionManager;
   elements: readonly ExcalidrawElement[];
   syncActionResult: UpdaterFn;
-  onToolChange: (elementType: string) => void;
-  onUpdateAppState: (name: string, value: any) => void;
   appState: AppState;
-  onUpdateElements: (elements: readonly ExcalidrawElement[]) => void;
+  onToolChange: (elementType: string) => void;
   canvas: HTMLCanvasElement;
 }
 
@@ -35,9 +31,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   syncActionResult,
   elements,
   onToolChange,
-  onUpdateAppState,
   appState,
-  onUpdateElements,
   canvas
 }) => {
   return (
@@ -138,22 +132,12 @@ export const SidePanel: React.FC<SidePanelProps> = ({
         appState={appState}
       />
       <PanelExport
-        projectName={appState.name}
-        onProjectNameChange={name => {
-          onUpdateAppState("name", name);
-        }}
+        actionManager={actionManager}
+        syncActionResult={syncActionResult}
+        elements={elements}
+        appState={appState}
         onExportCanvas={(type: ExportType) =>
           exportCanvas(type, elements, canvas, appState)
-        }
-        exportBackground={appState.exportBackground}
-        onExportBackgroundChange={value => {
-          onUpdateAppState("exportBackground", value);
-        }}
-        onSaveScene={() => saveAsJSON(elements, appState.name)}
-        onLoadScene={() =>
-          loadFromJSON().then(({ elements }) => {
-            onUpdateElements(elements);
-          })
         }
       />
     </div>

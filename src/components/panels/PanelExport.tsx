@@ -1,18 +1,19 @@
 import React from "react";
-import { EditableText } from "../EditableText";
 import { Panel } from "../Panel";
 import { ExportType } from "../../scene/types";
 
 import "./panelExport.scss";
+import { ActionManager } from "../../actions";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+import { UpdaterFn } from "../../actions/types";
 
 interface PanelExportProps {
-  projectName: string;
-  onProjectNameChange: (name: string) => void;
+  actionManager: ActionManager;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  syncActionResult: UpdaterFn;
   onExportCanvas: (type: ExportType) => void;
-  exportBackground: boolean;
-  onExportBackgroundChange: (val: boolean) => void;
-  onSaveScene: React.MouseEventHandler;
-  onLoadScene: React.MouseEventHandler;
 }
 
 // fa-clipboard
@@ -32,23 +33,20 @@ const probablySupportsClipboard =
   "ClipboardItem" in window;
 
 export const PanelExport: React.FC<PanelExportProps> = ({
-  projectName,
-  exportBackground,
-  onProjectNameChange,
-  onExportBackgroundChange,
-  onSaveScene,
-  onLoadScene,
+  actionManager,
+  elements,
+  appState,
+  syncActionResult,
   onExportCanvas
 }) => {
   return (
     <Panel title="Export">
       <div className="panelColumn">
-        <h5>Name</h5>
-        {projectName && (
-          <EditableText
-            value={projectName}
-            onChange={(name: string) => onProjectNameChange(name)}
-          />
+        {actionManager.renderAction(
+          "changeProjectName",
+          elements,
+          appState,
+          syncActionResult
         )}
         <h5>Image</h5>
         <div className="panelExport-imageButtons">
@@ -68,19 +66,26 @@ export const PanelExport: React.FC<PanelExportProps> = ({
             </button>
           )}
         </div>
-        <label>
-          <input
-            type="checkbox"
-            checked={exportBackground}
-            onChange={e => {
-              onExportBackgroundChange(e.target.checked);
-            }}
-          />
-          background
-        </label>
+        {actionManager.renderAction(
+          "changeExportBackground",
+          elements,
+          appState,
+          syncActionResult
+        )}
+
         <h5>Scene</h5>
-        <button onClick={onSaveScene}>Save as...</button>
-        <button onClick={onLoadScene}>Load file...</button>
+        {actionManager.renderAction(
+          "saveScene",
+          elements,
+          appState,
+          syncActionResult
+        )}
+        {actionManager.renderAction(
+          "loadScene",
+          elements,
+          appState,
+          syncActionResult
+        )}
       </div>
     </Panel>
   );

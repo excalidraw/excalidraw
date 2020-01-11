@@ -22,3 +22,10 @@ export {
   actionChangeViewBackgroundColor,
   actionClearCanvas
 } from "./actionCanvas";
+
+export {
+  actionChangeProjectName,
+  actionChangeExportBackground,
+  actionSaveScene,
+  actionLoadScene
+} from "./actionExport";
