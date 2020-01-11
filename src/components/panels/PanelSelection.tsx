@@ -6,7 +6,7 @@ import { UpdaterFn } from "../../actions/types";
 
 interface PanelSelectionProps {
   actionManager: ActionManager;
-  elements: readonly ExcalidrawElement[];
+  elements: ExcalidrawElement[];
   appState: AppState;
   syncActionResult: UpdaterFn;
 }

@@ -8,7 +8,7 @@ import { UpdaterFn } from "../../actions/types";
 
 interface PanelCanvasProps {
   actionManager: ActionManager;
-  elements: readonly ExcalidrawElement[];
+  elements: ExcalidrawElement[];
   appState: AppState;
   syncActionResult: UpdaterFn;
 }

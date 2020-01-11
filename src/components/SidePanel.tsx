@@ -19,7 +19,7 @@ import { UpdaterFn } from "../actions/types";
 
 interface SidePanelProps {
   actionManager: ActionManager;
-  elements: readonly ExcalidrawElement[];
+  elements: ExcalidrawElement[];
   syncActionResult: UpdaterFn;
   appState: AppState;
   onToolChange: (elementType: string) => void;

@@ -34,18 +34,24 @@ export function resizeTest(
 }
 
 export function getElementWithResizeHandler(
-  elements: readonly ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   { x, y }: { x: number; y: number },
   { scrollX, scrollY }: SceneScroll
 ) {
-  return elements.reduce((result, element) => {
-    if (result) {
-      return result;
-    }
-    const resizeHandle = resizeTest(element, x, y, {
-      scrollX,
-      scrollY
-    });
-    return resizeHandle ? { element, resizeHandle } : null;
-  }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+  return elements.reduce(
+    (result, element) => {
+      if (result) {
+        return result;
+      }
+      const resizeHandle = resizeTest(element, x, y, {
+        scrollX,
+        scrollY
+      });
+      return resizeHandle ? { element, resizeHandle } : null;
+    },
+    null as {
+      element: ExcalidrawElement;
+      resizeHandle: ReturnType<typeof resizeTest>;
+    } | null
+  );
 }

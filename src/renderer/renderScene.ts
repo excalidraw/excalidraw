@@ -14,7 +14,7 @@ import {
 import { renderElement } from "./renderElement";
 
 export function renderScene(
-  elements: readonly ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,

@@ -7,7 +7,7 @@ import { PanelColor } from "../components/panels/PanelColor";
 import { isTextElement, redrawTextBoundingBox } from "../element";
 
 const changeProperty = (
-  elements: readonly ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   callback: (element: ExcalidrawElement) => ExcalidrawElement
 ) => {
   return elements.map(element => {

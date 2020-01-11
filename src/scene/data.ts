@@ -24,14 +24,11 @@ function saveFile(name: string, data: string) {
 }
 
 interface DataState {
-  elements: readonly ExcalidrawElement[];
+  elements: ExcalidrawElement[];
   appState: any;
 }
 
-export function saveAsJSON(
-  elements: readonly ExcalidrawElement[],
-  name: string
-) {
+export function saveAsJSON(elements: ExcalidrawElement[], name: string) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
@@ -79,7 +76,7 @@ export function loadFromJSON() {
 
 export function exportCanvas(
   type: ExportType,
-  elements: readonly ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   canvas: HTMLCanvasElement,
   {
     exportBackground,
@@ -161,7 +158,7 @@ export function exportCanvas(
 }
 
 function restore(
-  savedElements: readonly ExcalidrawElement[],
+  savedElements: ExcalidrawElement[],
   savedState: any
 ): DataState {
   return {
@@ -206,7 +203,7 @@ export function restoreFromLocalStorage() {
 }
 
 export function saveToLocalStorage(
-  elements: readonly ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   state: AppState
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));

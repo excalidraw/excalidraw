@@ -22,7 +22,7 @@ export class ActionManager implements ActionsManagerInterface {
 
   handleKeyDown(
     event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
+    elements: ExcalidrawElement[],
     appState: AppState
   ) {
     const data = Object.values(this.actions)
@@ -38,7 +38,7 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   getContextMenuItems(
-    elements: readonly ExcalidrawElement[],
+    elements: ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn
   ) {
@@ -64,7 +64,7 @@ export class ActionManager implements ActionsManagerInterface {
 
   renderAction(
     name: string,
-    elements: readonly ExcalidrawElement[],
+    elements: ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn
   ) {
