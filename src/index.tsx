@@ -164,7 +164,44 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
+  private onCut = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    elements = deleteSelectedElements(elements);
+    this.forceUpdate();
+    e.preventDefault();
+  };
+  private onCopy = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    e.preventDefault();
+  };
+  private onPaste = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    const paste = e.clipboardData?.getData("text") || "";
+    this.addElementsFromPaste(paste);
+    e.preventDefault();
+  };
+
   public componentDidMount() {
+    document.addEventListener("copy", this.onCopy);
+    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("cut", this.onCut);
+
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
@@ -183,6 +220,10 @@ export class App extends React.Component<{}, AppState> {
   }
 
   public componentWillUnmount() {
+    document.removeEventListener("copy", this.onCopy);
+    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("cut", this.onCut);
+
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
       "mousemove",
@@ -292,41 +333,7 @@ export class App extends React.Component<{}, AppState> {
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
-      <div
-        className="container"
-        onCut={e => {
-          if (isInputLike(e.target)) return;
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(
-              elements
-                .filter(element => element.isSelected)
-                .map(({ shape, ...el }) => el)
-            )
-          );
-          elements = deleteSelectedElements(elements);
-          this.forceUpdate();
-          e.preventDefault();
-        }}
-        onCopy={e => {
-          if (isInputLike(e.target)) return;
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(
-              elements
-                .filter(element => element.isSelected)
-                .map(({ shape, ...el }) => el)
-            )
-          );
-          e.preventDefault();
-        }}
-        onPaste={e => {
-          if (isInputLike(e.target)) return;
-          const paste = e.clipboardData.getData("text");
-          this.addElementsFromPaste(paste);
-          e.preventDefault();
-        }}
-      >
+      <div className="container">
         <SidePanel
           actionManager={this.actionManager}
           syncActionResult={this.syncActionResult}
