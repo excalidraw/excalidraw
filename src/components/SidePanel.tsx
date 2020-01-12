@@ -136,9 +136,12 @@ export const SidePanel: React.FC<SidePanelProps> = ({
         syncActionResult={syncActionResult}
         elements={elements}
         appState={appState}
-        onExportCanvas={(type: ExportType) =>
-          exportCanvas(type, elements, canvas, appState)
-        }
+        onExportCanvas={(type: ExportType) => {
+          const exportedElements = elements.some(element => element.isSelected)
+            ? elements.filter(element => element.isSelected)
+            : elements;
+          return exportCanvas(type, exportedElements, canvas, appState);
+        }}
       />
     </div>
   );
