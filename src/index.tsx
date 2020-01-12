@@ -28,7 +28,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike, measureText } from "./utils";
+import { getDateTime, isInputLike, measureText, debounce } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
@@ -1016,13 +1016,17 @@ export class App extends React.Component<{}, AppState> {
     }
   }
 
+  private saveDebounced = debounce(() => {
+    saveToLocalStorage(elements, this.state);
+  }, 300);
+
   componentDidUpdate() {
     renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    saveToLocalStorage(elements, this.state);
+    this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
       history.clearRedoStack();
