@@ -902,27 +902,20 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-            const resizeElement = getElementWithResizeHandler(
-              elements,
-              { x, y },
-              this.state
-            );
-            if (resizeElement && resizeElement.resizeHandle) {
-              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
-              return;
+            const selectedElements = elements.filter(e => e.isSelected).length;
+            if (selectedElements === 1) {
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
+              if (resizeElement && resizeElement.resizeHandle) {
+                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                return;
+              }
             }
             const hitElement = getElementAtPosition(elements, x, y);
-            if (hitElement) {
-              const resizeHandle = resizeTest(hitElement, x, y, {
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY
-              });
-              document.documentElement.style.cursor = resizeHandle
-                ? `${resizeHandle}-resize`
-                : `move`;
-            } else {
-              document.documentElement.style.cursor = ``;
-            }
+            document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
       </div>
