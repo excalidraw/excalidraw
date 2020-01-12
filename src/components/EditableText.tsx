@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from "react";
+import React, { Component } from "react";
 
 type InputState = {
   value: string;
@@ -11,6 +11,7 @@ type Props = {
 };
 
 export class EditableText extends Component<Props, InputState> {
+  width: number | undefined;
   constructor(props: Props) {
     super(props);
 
@@ -21,7 +22,9 @@ export class EditableText extends Component<Props, InputState> {
   }
 
   UNSAFE_componentWillReceiveProps(props: Props) {
-    this.setState({ value: props.value });
+    if (this.props.value !== props.value) {
+      this.setState({ value: props.value });
+    }
   }
 
   private handleEdit(e: React.ChangeEvent<HTMLInputElement>) {
@@ -43,12 +46,13 @@ export class EditableText extends Component<Props, InputState> {
     const { value, edit } = this.state;
 
     return (
-      <Fragment>
-        {edit ? (
+      <div className="project-name-wrapper">
+        {edit && (
           <input
             className="project-name-input"
             name="name"
             maxLength={25}
+            style={{ minWidth: this.width }}
             value={value}
             onChange={e => this.handleEdit(e)}
             onBlur={() => this.handleBlur()}
@@ -59,15 +63,16 @@ export class EditableText extends Component<Props, InputState> {
             }}
             autoFocus
           />
-        ) : (
-          <span
-            onClick={() => this.setState({ edit: true })}
-            className="project-name"
-          >
-            {value}
-          </span>
         )}
-      </Fragment>
+        <button
+          onClick={() => this.setState({ edit: true })}
+          className="project-name"
+          disabled={edit}
+          ref={el => (this.width = el?.offsetWidth || this.width)}
+        >
+          {this.props.value}
+        </button>
+      </div>
     );
   }
 }

@@ -21,17 +21,21 @@ import {
   saveToLocalStorage,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasBackground,
+  hasStroke,
+  hasText,
+  exportCanvas
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { isInputLike, measureText, debounce } from "./utils";
+import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
-import { findShapeByKey, shapesShortcutKeys } from "./shapes";
+import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
 
 import ContextMenu from "./components/ContextMenu";
@@ -63,14 +67,14 @@ import {
   actionCopyStyles,
   actionPasteStyles
 } from "./actions";
-import { SidePanel } from "./components/SidePanel";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
+import { image, clipboard } from "./components/icons";
 
 let { elements } = createScene();
 const { history } = createHistory();
 
-const CANVAS_WINDOW_OFFSET_LEFT = 250;
+const CANVAS_WINDOW_OFFSET_LEFT = 0;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function resetCursor() {
@@ -208,6 +212,9 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
+    document.addEventListener("wheel", this.handleWheel, {
+      passive: false
+    });
 
     const { elements: newElements, appState } = restoreFromLocalStorage();
 
@@ -234,6 +241,7 @@ export class App extends React.Component<{}, AppState> {
       false
     );
     window.removeEventListener("resize", this.onResize, false);
+    document.removeEventListener("wheel", this.handleWheel);
   }
 
   public state: AppState = getDefaultAppState();
@@ -310,8 +318,6 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private removeWheelEventListener: (() => void) | undefined;
-
   private copyToClipboard = () => {
     if (navigator.clipboard) {
       const text = JSON.stringify(
@@ -331,13 +337,283 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
+  private renderSelectedElementsPopover(
+    elements: readonly ExcalidrawElement[]
+  ) {
+    const selectedElements = elements.filter(el => el.isSelected);
+    if (selectedElements.length === 0) {
+      return null;
+    }
+
+    const x = Math.max(
+      ...selectedElements.map(el => (el.width > 0 ? el.x + el.width : el.x))
+    );
+    const y = Math.min(
+      ...selectedElements.map(el => (el.height < 0 ? el.y + el.width : el.y))
+    );
+
+    return (
+      <div
+        style={{
+          left: x + this.state.scrollX + 16,
+          top: y + this.state.scrollY - 4,
+          position: "absolute",
+          zIndex: 1,
+          background: "rgba(255,255,255,0.8)",
+          borderRadius: 4,
+          padding: 10
+        }}
+        className="panelColumn"
+      >
+        {this.actionManager.renderAction(
+          "changeStrokeColor",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+
+        {hasBackground(elements) && (
+          <>
+            {this.actionManager.renderAction(
+              "changeBackgroundColor",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+
+            {this.actionManager.renderAction(
+              "changeFillStyle",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            <hr />
+          </>
+        )}
+
+        {hasStroke(elements) && (
+          <>
+            {this.actionManager.renderAction(
+              "changeStrokeWidth",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+
+            {this.actionManager.renderAction(
+              "changeSloppiness",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            <hr />
+          </>
+        )}
+
+        {hasText(elements) && (
+          <>
+            {this.actionManager.renderAction(
+              "changeFontSize",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+
+            {this.actionManager.renderAction(
+              "changeFontFamily",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            <hr />
+          </>
+        )}
+
+        {this.actionManager.renderAction(
+          "changeOpacity",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+
+        {this.actionManager.renderAction(
+          "deleteSelectedElements",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </div>
+    );
+  }
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
       <div className="container">
-        <SidePanel
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 5,
+            right: 0,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr minmax(0,1fr)",
+
+            zIndex: 3
+          }}
+        >
+          <div
+            style={{
+              paddingTop: 5,
+              paddingLeft: 10,
+              paddingRight: 5,
+              flexShrink: 0,
+              flexGrow: 1,
+              display: "flex"
+            }}
+          >
+            {this.actionManager.renderAction(
+              "changeProjectName",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+          </div>
+          <div
+            style={{
+              boxShadow: "0 1px 5px rgba(0,0,0,0.15)",
+              display: "flex",
+              flexDirection: "row",
+              padding: 1,
+              borderRadius: 4,
+              justifySelf: "center",
+              background: "white"
+            }}
+          >
+            {this.actionManager.renderAction(
+              "loadScene",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            {this.actionManager.renderAction(
+              "saveScene",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            <div className="vertical-divider"></div>
+            <label className="tool" title="Export to PNG">
+              <button
+                aria-label="Export to png"
+                onClick={() => {
+                  const exportedElements = elements.some(
+                    element => element.isSelected
+                  )
+                    ? elements.filter(element => element.isSelected)
+                    : elements;
+                  if (this.canvas)
+                    exportCanvas(
+                      "png",
+                      exportedElements,
+                      this.canvas,
+                      this.state
+                    );
+                }}
+              >
+                <div className="toolIcon">{image}</div>
+              </button>
+            </label>
+            <label className="tool" title="Copy to clipboard">
+              <button
+                aria-label="Copy to clipboard"
+                onClick={() => {
+                  const exportedElements = elements.some(
+                    element => element.isSelected
+                  )
+                    ? elements.filter(element => element.isSelected)
+                    : elements;
+                  if (this.canvas)
+                    exportCanvas(
+                      "clipboard",
+                      exportedElements,
+                      this.canvas,
+                      this.state
+                    );
+                }}
+              >
+                <div className="toolIcon">{clipboard}</div>
+              </button>
+            </label>
+            <div className="vertical-divider"></div>
+            {this.actionManager.renderAction(
+              "changeViewBackgroundColor",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+            {this.actionManager.renderAction(
+              "clearCanvas",
+              elements,
+              this.state,
+              this.syncActionResult
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            left: 5,
+            top: 0,
+            bottom: 0,
+            display: "grid",
+            gridTemplateColumns: "auto",
+            gridTemplateRows: "minmax(50px, 1fr) 1fr minmax(0, 1fr)",
+            zIndex: 2
+          }}
+        >
+          <div />
+          <div
+            style={{
+              boxShadow: "0 1px 5px rgba(0,0,0,0.15)",
+              display: "flex",
+              flexDirection: "column",
+              padding: 1,
+              borderRadius: 4,
+              background: "white",
+              alignSelf: "center"
+            }}
+          >
+            {SHAPES.map(({ value, icon }) => (
+              <label
+                key={value}
+                className="tool"
+                title={`${capitalizeString(value)} - ${
+                  capitalizeString(value)[0]
+                }`}
+              >
+                <input
+                  type="radio"
+                  checked={this.state.elementType === value}
+                  onChange={() => {
+                    this.setState({ elementType: value });
+                    elements = clearSelection(elements);
+                    document.documentElement.style.cursor =
+                      value === "text" ? "text" : "crosshair";
+                    this.forceUpdate();
+                  }}
+                />
+                <div className="toolIcon">{icon}</div>
+              </label>
+            ))}
+          </div>
+        </div>
+        {this.renderSelectedElementsPopover(elements)}
+
+        {/* <SidePanel
           actionManager={this.actionManager}
           syncActionResult={this.syncActionResult}
           appState={{ ...this.state }}
@@ -350,7 +626,7 @@ export class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           canvas={this.canvas!}
-        />
+        /> */}
         <canvas
           id="canvas"
           style={{
@@ -364,17 +640,7 @@ export class App extends React.Component<{}, AppState> {
               this.canvas = canvas;
               this.rc = rough.canvas(this.canvas!);
             }
-            if (this.removeWheelEventListener) {
-              this.removeWheelEventListener();
-              this.removeWheelEventListener = undefined;
-            }
             if (canvas) {
-              canvas.addEventListener("wheel", this.handleWheel, {
-                passive: false
-              });
-              this.removeWheelEventListener = () =>
-                canvas.removeEventListener("wheel", this.handleWheel);
-
               // Whenever React sets the width/height of the canvas element,
               // the context loses the scale transform. We need to re-apply it
               if (

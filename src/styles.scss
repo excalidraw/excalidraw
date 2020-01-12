@@ -60,40 +60,74 @@ body {
       margin: 2px 0;
     }
   }
+}
 
-  .panelColumn {
-    display: flex;
-    flex-direction: column;
+.panelColumn {
+  display: flex;
+  flex-direction: column;
 
-    h5 {
-      margin-top: 4px;
-      margin-bottom: 4px;
-      font-size: 12px;
-      color: #333;
-    }
+  h5 {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #333;
+  }
 
-    h5:first-child {
-      margin-top: 0;
-    }
+  h5:first-child {
+    margin-top: 0;
+  }
 
-    .buttonList {
-      flex-wrap: wrap;
+  .buttonList {
+    flex-wrap: wrap;
 
-      button {
-        margin-right: 4px;
-      }
+    button {
+      margin-right: 4px;
     }
   }
 }
 
 .tool {
   position: relative;
+  display: inline-block;
+  margin: 1px;
 
   input[type="radio"] {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
+  }
+
+  button {
+    padding: 0;
+    border: none;
+    margin: 0;
+
+    .toolIcon {
+      background-color: #ddd;
+
+      width: 41px;
+      height: 41px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      border-radius: 3px;
+
+      svg {
+        height: 1.5em;
+      }
+    }
+    &:hover .toolIcon {
+      background-color: #e7e5e5;
+    }
+    &:active .toolIcon {
+      background-color: #bdbebc;
+    }
+    &:focus .toolIcon {
+      box-shadow: 0 0 0 2px steelblue;
+    }
   }
 
   input[type="radio"] {
@@ -123,6 +157,12 @@ body {
       box-shadow: 0 0 0 2px steelblue;
     }
   }
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: #ddd;
+  margin: 1px 2px;
 }
 
 label {
@@ -209,12 +249,39 @@ button {
   padding: 2px 4px;
   border: 1px solid #ddd;
 }
+
+.project-name-wrapper {
+  position: relative;
+
+  font-size: 15px;
+  line-height: 20px;
+}
+
 .project-name {
-  font-size: 14px;
   cursor: pointer;
+  border: none;
+  padding: 4px;
+  margin: -4px;
+  background: transparent;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.project-name:disabled {
+  pointer-events: none;
 }
 
 .project-name-input {
-  width: 200px;
-  font: inherit;
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  border: none;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+
+  &:focus {
+    box-shadow: none;
+  }
 }
