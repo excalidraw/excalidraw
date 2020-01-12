@@ -232,7 +232,7 @@ export class App extends React.Component<{}, AppState> {
     const data = this.actionManager.handleKeyDown(event, elements, this.state);
     this.syncActionResult(data);
 
-    if (data.elements !== undefined && data.appState !== undefined) {
+    if (data.elements !== undefined || data.appState !== undefined) {
       return;
     }
 
