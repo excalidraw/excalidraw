@@ -295,6 +295,7 @@ export class App extends React.Component<{}, AppState> {
       <div
         className="container"
         onCut={e => {
+          if (isInputLike(e.target)) return;
           e.clipboardData.setData(
             "text/plain",
             JSON.stringify(
@@ -308,6 +309,7 @@ export class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
         onCopy={e => {
+          if (isInputLike(e.target)) return;
           e.clipboardData.setData(
             "text/plain",
             JSON.stringify(
@@ -319,6 +321,7 @@ export class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
         onPaste={e => {
+          if (isInputLike(e.target)) return;
           const paste = e.clipboardData.getData("text");
           this.addElementsFromPaste(paste);
           e.preventDefault();
