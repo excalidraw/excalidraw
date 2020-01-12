@@ -964,13 +964,23 @@ export class App extends React.Component<{}, AppState> {
 
             const point = getPointOnAPath([dx, dy], arrow.points);
             if (point !== null) {
+              let overlappingPoint = -1;
+              const [x1] = arrow.points[point.segment];
+              const [x2] = arrow.points[point.segment + 1];
+              if (Math.abs(point.x - x1) < 2.5) {
+                overlappingPoint = point.segment;
+              }
+              if (Math.abs(point.x - x2) < 2.5) {
+                overlappingPoint = point.segment;
+              }
               this.setState({
                 pathSegmentCircle: {
                   x: point.x + arrow.x,
                   y: point.y + arrow.y,
                   arrow,
                   segment: point.segment,
-                  point: [point.x, point.y]
+                  point: [point.x, point.y],
+                  overlappingPoint
                 }
               });
             } else {

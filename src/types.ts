@@ -10,6 +10,7 @@ export type AppState = {
     arrow: ExcalidrawElement;
     segment: number;
     point: Point;
+    overlappingPoint: number;
   } | null;
   elementType: string;
   exportBackground: boolean;

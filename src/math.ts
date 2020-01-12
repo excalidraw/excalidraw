@@ -93,7 +93,7 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
 
     // if coefficient is more than an arbitrary epsilon,
     // these lines are nor collinear
-    if (Math.abs(kP - kL) > 0.07) {
+    if (Math.abs(kP - kL) > 0.8) {
       return false;
     }
 

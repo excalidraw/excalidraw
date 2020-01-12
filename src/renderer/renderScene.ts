@@ -15,7 +15,7 @@ import { renderElement } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
-  pathSegmentCircle: { x: number; y: number } | null,
+  pathSegmentCircle: { x: number; y: number; overlappingPoint: number } | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -97,6 +97,7 @@ export function renderScene(
     rc.ellipse(pathSegmentCircle.x, pathSegmentCircle.y, 10, 10, {
       fillStyle: "solid",
       fill: "#ffffff",
+      stroke: pathSegmentCircle.overlappingPoint === -1 ? "#000000" : "#22a7f0",
       strokeWidth: 2,
       roughness: 0
     });
