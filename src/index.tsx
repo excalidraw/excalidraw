@@ -510,13 +510,8 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const selected = getElementAtPosition(
-                  elements.filter(el => el.isSelected),
-                  x,
-                  y
-                );
                 // clear selection if shift is not clicked
-                if (!selected && !e.shiftKey) {
+                if (!e.shiftKey) {
                   elements = clearSelection(elements);
                 }
                 hitElement = getElementAtPosition(elements, x, y);
