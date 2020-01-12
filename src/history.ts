@@ -51,15 +51,15 @@ class SceneHistory {
     return null;
   }
 
-  undoOnce(elements: readonly ExcalidrawElement[]) {
-    const currentEntry = this.generateCurrentEntry(elements);
-    let entryToRestore = this.stateHistory.pop();
-
-    // If nothing was changed since last, take the previous one
-    if (currentEntry === entryToRestore) {
-      entryToRestore = this.stateHistory.pop();
+  undoOnce() {
+    if (this.stateHistory.length === 0) {
+      return null;
     }
-    if (entryToRestore !== undefined) {
+
+    const currentEntry = this.stateHistory.pop();
+    const entryToRestore = this.stateHistory[this.stateHistory.length - 1];
+
+    if (currentEntry !== undefined) {
       this.redoStack.push(currentEntry);
       return this.restoreEntry(entryToRestore);
     }

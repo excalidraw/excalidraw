@@ -256,7 +256,7 @@ export class App extends React.Component<{}, AppState> {
         }
       } else {
         // undo action
-        const data = history.undoOnce(elements);
+        const data = history.undoOnce();
         if (data !== null) {
           elements = data;
         }
