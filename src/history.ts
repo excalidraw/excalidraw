@@ -22,13 +22,14 @@ class SceneHistory {
       // If the last entry is the same as this one, ignore it
       return;
     }
+
     this.stateHistory.push(newEntry);
+
+    // As a new entry was pushed, we invalidate the redo stack
+    this.clearRedoStack();
   }
 
   restoreEntry(entry: string) {
-    // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
-    this.skipRecording();
-
     try {
       return JSON.parse(entry);
     } catch {
@@ -40,11 +41,15 @@ class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(elements: readonly ExcalidrawElement[]) {
-    const currentEntry = this.generateCurrentEntry(elements);
+  redoOnce() {
+    if (this.redoStack.length === 0) {
+      return null;
+    }
+
     const entryToRestore = this.redoStack.pop();
+
     if (entryToRestore !== undefined) {
-      this.stateHistory.push(currentEntry);
+      this.stateHistory.push(entryToRestore);
       return this.restoreEntry(entryToRestore);
     }
 
