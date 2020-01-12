@@ -86,14 +86,20 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
     const kL = (y2 - y1) / (x2 - x1);
 
     // coefficient for the line segment (p0, point)
-    const kP = (py - y1) / (px - x1);
+    const kP1 = (py - y1) / (px - x1);
+
+    // coefficient for the line segment (point, p1)
+    const kP2 = (py - y2) / (px - x2);
 
     // because we are basing both lines from the same starting point
     // the only option for collinearity is having same coefficients
 
+    // using it for floating point comparisons
+    const epsilon = 0.3;
+
     // if coefficient is more than an arbitrary epsilon,
     // these lines are nor collinear
-    if (Math.abs(kP - kL) > 0.8) {
+    if (Math.abs(kP1 - kL) > epsilon && Math.abs(kP2 - kL) > epsilon) {
       return false;
     }
 
