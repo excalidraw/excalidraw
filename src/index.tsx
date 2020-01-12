@@ -28,7 +28,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike, measureText, debounce } from "./utils";
+import { isInputLike, measureText, debounce } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
@@ -65,10 +65,10 @@ import {
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
 import { ActionResult } from "./actions/types";
+import { getDefaultAppState } from "./appState";
 
 let { elements } = createScene();
 const { history } = createHistory();
-const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
@@ -192,21 +192,7 @@ export class App extends React.Component<{}, AppState> {
     window.removeEventListener("resize", this.onResize, false);
   }
 
-  public state: AppState = {
-    draggingElement: null,
-    resizingElement: null,
-    elementType: "selection",
-    exportBackground: true,
-    currentItemStrokeColor: "#000000",
-    currentItemBackgroundColor: "#ffffff",
-    currentItemFont: "20px Virgil",
-    viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
-    cursorX: 0,
-    cursorY: 0,
-    name: DEFAULT_PROJECT_NAME
-  };
+  public state: AppState = getDefaultAppState();
 
   private onResize = () => {
     this.forceUpdate();
