@@ -15,7 +15,7 @@ import {
 import {
   clearSelection,
   deleteSelectedElements,
-  getElementsWithinSelection,
+  setSelection,
   isOverScrollBars,
   restoreFromLocalStorage,
   saveToLocalStorage,
@@ -746,24 +746,13 @@ export class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height =
-                // Shift key on selection must add items to selection
-                e.shiftKey && this.state.elementType !== "selection"
-                  ? Math.abs(width) * Math.sign(height)
-                  : height;
+              draggingElement.height = e.shiftKey
+                ? Math.abs(width) * Math.sign(height)
+                : height;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                const elementsWithinSelection = getElementsWithinSelection(
-                  elements,
-                  draggingElement
-                );
-                if (!e.shiftKey) {
-                  elements = clearSelection(elements);
-                }
-                elementsWithinSelection.forEach(
-                  element => (element.isSelected = true)
-                );
+                elements = setSelection(elements, draggingElement);
               }
               // We don't want to save history when moving an element
               history.skipRecording();

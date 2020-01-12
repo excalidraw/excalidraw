@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element";
 
-export function getElementsWithinSelection(
+export function setSelection(
   elements: readonly ExcalidrawElement[],
   selection: ExcalidrawElement
 ) {
@@ -11,22 +11,22 @@ export function getElementsWithinSelection(
     selectionX2,
     selectionY2
   ] = getElementAbsoluteCoords(selection);
-
-  return elements.filter(element => {
+  elements.forEach(element => {
     const [
       elementX1,
       elementY1,
       elementX2,
       elementY2
     ] = getElementAbsoluteCoords(element);
-    return (
+    element.isSelected =
       element.type !== "selection" &&
       selectionX1 <= elementX1 &&
       selectionY1 <= elementY1 &&
       selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2
-    );
+      selectionY2 >= elementY2;
   });
+
+  return elements;
 }
 
 export function clearSelection(elements: readonly ExcalidrawElement[]) {
