@@ -14,6 +14,7 @@ type ActionFn = (
 ) => ActionResult;
 
 export type UpdaterFn = (res: ActionResult) => void;
+export type ActionFilterFn = (action: Action) => void;
 
 export interface Action {
   name: string;
@@ -46,7 +47,8 @@ export interface ActionsManagerInterface {
   getContextMenuItems: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn
+    updater: UpdaterFn,
+    actionFilter: ActionFilterFn
   ) => { label: string; action: () => void }[];
   renderAction: (
     name: string,

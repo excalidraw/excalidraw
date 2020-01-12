@@ -64,7 +64,7 @@ import {
   actionPasteStyles
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
-import { ActionResult } from "./actions/types";
+import { Action, ActionResult } from "./actions/types";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -123,6 +123,7 @@ export class App extends React.Component<{}, AppState> {
   rc: RoughCanvas | null = null;
 
   actionManager: ActionManager = new ActionManager();
+  canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
     this.actionManager.registerAction(actionDeleteSelected);
@@ -151,6 +152,8 @@ export class App extends React.Component<{}, AppState> {
 
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
+
+    this.canvasOnlyActions = [actionSelectAll];
   }
 
   private syncActionResult = (res: ActionResult) => {
@@ -396,7 +399,13 @@ export class App extends React.Component<{}, AppState> {
                   navigator.clipboard && {
                     label: "Paste",
                     action: () => this.pasteFromClipboard()
-                  }
+                  },
+                  ...this.actionManager.getContextMenuItems(
+                    elements,
+                    this.state,
+                    this.syncActionResult,
+                    action => this.canvasOnlyActions.includes(action)
+                  )
                 ],
                 top: e.clientY,
                 left: e.clientX
@@ -423,7 +432,8 @@ export class App extends React.Component<{}, AppState> {
                 ...this.actionManager.getContextMenuItems(
                   elements,
                   this.state,
-                  this.syncActionResult
+                  this.syncActionResult,
+                  action => !this.canvasOnlyActions.includes(action)
                 )
               ],
               top: e.clientY,
