@@ -5,7 +5,7 @@ import { isTextElement } from "../element/typeChecks";
 import { getDiamondPoints, getArrowPoints } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
-import { Point } from "roughjs/bin/geometry";
+import { Point, Line } from "roughjs/bin/geometry";
 
 export function renderElement(
   element: ExcalidrawElement,
@@ -107,27 +107,36 @@ export function renderElement(
       roughness: element.roughness
     };
 
-    // if (!element.shape) {
+    // points array can be empty in the beginning, so it is important to add
+    // initial position to it
     const points =
       element.points.length > 0 ? element.points : ([[0, 0]] as Point[]);
 
-    const [start, ...paths] = points;
+    if (!element.shape) {
+      const [start, ...paths] = points;
 
-    const pathStr = paths.reduce((str, val) => {
-      return `${str} L${val[0]},${val[1]}`;
-    }, `M${start[0]},${start[1]}`);
-    element.shape = withCustomMathRandom(element.seed, () => [
-      //    \
-      generator.line(x3, y3, x2, y2, options),
-      // -----
-      generator.path(pathStr, options),
-      // generator.line(x1, y1, x2, y2, options)
-      //    /
-      generator.line(x4, y4, x2, y2, options)
-    ]);
-    // }
+      // Create line segments from points
+      const lines: Line[] = [];
+      let lastPoint = start;
+      paths.forEach(pnt => {
+        lines.push([lastPoint, pnt]);
+        lastPoint = pnt;
+      });
+
+      element.shape = withCustomMathRandom(element.seed, () => [
+        //    \
+        generator.line(x3, y3, x2, y2, options),
+        // generate lines
+        ...lines.map(([p1, p2]) =>
+          generator.line(p1[0], p1[1], p2[0], p2[1], options)
+        ),
+        //    /
+        generator.line(x4, y4, x2, y2, options)
+      ]);
+    }
 
     if (element.isSelected) {
+      // draw segment endpoints when element is selected
       points.forEach(p => {
         rc.ellipse(p[0], p[1], 10, 10, {
           fillStyle: "solid",
