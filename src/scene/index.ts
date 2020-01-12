@@ -12,7 +12,9 @@ export {
   loadFromJSON,
   saveAsJSON,
   restoreFromLocalStorage,
-  saveToLocalStorage
+  saveToLocalStorage,
+  exportToShortlink,
+  importFromShortlink
 } from "./data";
 export {
   hasBackground,

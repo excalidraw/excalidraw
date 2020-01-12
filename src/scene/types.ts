@@ -16,4 +16,4 @@ export interface Scene {
   elements: ExcalidrawTextElement[];
 }
 
-export type ExportType = "png" | "clipboard";
+export type ExportType = "png" | "clipboard" | "shortlink";

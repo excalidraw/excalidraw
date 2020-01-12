@@ -11,6 +11,9 @@ import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const JSONSTOREIO_SHORTLINK_ENDPOINT = new URL(
+  "https://www.jsonstore.io/7535731590bfdc991d38b97d0fec2b722f5701c15118e0b1896968c7fe9f07a9"
+);
 
 function saveFile(name: string, data: string) {
   // create a temporary <a> elem which we'll use to download the image
@@ -42,6 +45,62 @@ export function saveAsJSON(
     `${name}.json`,
     "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
   );
+}
+
+export async function exportToShortlink(
+  elements: readonly ExcalidrawElement[]
+) {
+  const serialized = JSON.stringify({
+    version: 1,
+    source: window.location.origin,
+    elements: elements.map(({ shape, ...el }) => el)
+  });
+
+  // Generating a random unique shortcode
+  // https://stackoverflow.com/questions/6248666/
+  const firstPart = (Math.random() * 46656) | 0;
+  const secondPart = (Math.random() * 46656) | 0;
+  const shortcode =
+    ("000" + firstPart.toString(36)).slice(-3) +
+    ("000" + secondPart.toString(36)).slice(-3);
+
+  const response = await fetch(
+    JSONSTOREIO_SHORTLINK_ENDPOINT + "/" + shortcode,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: serialized
+    }
+  );
+  const json = await response.json();
+  if (json.ok) {
+    const url = new URL(window.location.href);
+    url.searchParams.append("share", shortcode);
+
+    await navigator.clipboard.writeText(url.toString());
+    window.alert("Copied shareable link " + url.toString() + " to clipboard");
+  } else {
+    window.alert("Couldn't create shareable link");
+  }
+}
+
+export async function importFromShortlink(shortcode: string | null) {
+  let elements: readonly ExcalidrawElement[] = [];
+  const response = await fetch(
+    JSONSTOREIO_SHORTLINK_ENDPOINT + "/" + shortcode
+  ).then(data => data.text());
+  // const data = await response.text();
+  if (response != null) {
+    try {
+      const json = JSON.parse(response);
+      elements = json.result.elements || [];
+    } catch (e) {
+      // Show an error message that importing failed
+    }
+  }
+  return restore(elements, null);
 }
 
 export function loadFromJSON() {
@@ -207,6 +266,8 @@ export function exportCanvas(
     } catch (err) {
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
+  } else if (type === "shortlink") {
+    exportToShortlink(elements);
   }
 
   // clean up the DOM
