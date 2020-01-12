@@ -41,6 +41,10 @@ class SceneHistory {
   }
 
   redoOnce() {
+    if (this.redoStack.length === 0) {
+      return null;
+    }
+
     const entryToRestore = this.redoStack.pop();
 
     if (entryToRestore !== undefined) {
