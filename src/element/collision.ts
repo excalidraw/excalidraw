@@ -50,9 +50,24 @@ export function hitTest(
       ty /= t;
     });
 
-    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
+    if (element.backgroundColor !== "transparent") {
+      return (
+        a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
+      );
+    } else {
+      return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
+    }
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    if (element.backgroundColor !== "transparent") {
+      return (
+        x > x1 - lineThreshold &&
+        x < x2 + lineThreshold &&
+        y > y1 - lineThreshold &&
+        y < y2 + lineThreshold
+      );
+    }
 
     // (x1, y1) --A-- (x2, y1)
     //    |D             |B
@@ -67,7 +82,7 @@ export function hitTest(
     x -= element.x;
     y -= element.y;
 
-    const [
+    let [
       topX,
       topY,
       rightX,
@@ -77,6 +92,42 @@ export function hitTest(
       leftX,
       leftY
     ] = getDiamondPoints(element);
+
+    if (element.backgroundColor !== "transparent") {
+      // TODO: remove this when we normalize coordinates globally
+      if (topY > bottomY) [bottomY, topY] = [topY, bottomY];
+      if (rightX < leftX) [leftX, rightX] = [rightX, leftX];
+
+      topY -= lineThreshold;
+      bottomY += lineThreshold;
+      leftX -= lineThreshold;
+      rightX += lineThreshold;
+
+      // all deltas should be < 0. Delta > 0 indicates it's on the outside side
+      //  of the line.
+      //
+      //          (topX, topY)
+      //     D  /             \ A
+      //      /               \
+      //  (leftX, leftY)  (rightX, rightY)
+      //    C \               / B
+      //      \              /
+      //      (bottomX, bottomY)
+      //
+      // https://stackoverflow.com/a/2752753/927631
+      return (
+        // delta from line D
+        (leftX - topX) * (y - leftY) - (leftX - x) * (topY - leftY) <= 0 &&
+        // delta from line A
+        (topX - rightX) * (y - rightY) - (x - rightX) * (topY - rightY) <= 0 &&
+        // delta from line B
+        (rightX - bottomX) * (y - bottomY) -
+          (x - bottomX) * (rightY - bottomY) <=
+          0 &&
+        // delta from line C
+        (bottomX - leftX) * (y - leftY) - (x - leftX) * (bottomY - leftY) <= 0
+      );
+    }
 
     return (
       distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
