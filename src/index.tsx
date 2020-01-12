@@ -637,9 +637,12 @@ export class App extends React.Component<{}, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  let deltaX,
-                    deltaY = 0;
+                  let deltaX = 0;
+                  let deltaY = 0;
                   const element = selectedElements[0];
+                  // When handling resizing we might need to invoke the "mirrored"
+                  // resizing logic, in case the user is dragging the handler beyond
+                  // the origin to flip the element.
                   switch (resizeHandle) {
                     case "nw":
                       deltaX = lastX - x;
