@@ -568,6 +568,7 @@ export class App extends React.Component<{}, AppState> {
                   });
                 }
               });
+              this.setState({ elementType: "selection" });
               return;
             }
 
