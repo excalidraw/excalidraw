@@ -22,7 +22,10 @@ export function renderElement(
       element.shape = withCustomMathRandom(element.seed, () => {
         return generator.rectangle(0, 0, element.width, element.height, {
           stroke: element.strokeColor,
-          fill: element.backgroundColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
           fillStyle: element.fillStyle,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness
@@ -55,7 +58,10 @@ export function renderElement(
           ],
           {
             stroke: element.strokeColor,
-            fill: element.backgroundColor,
+            fill:
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
             roughness: element.roughness
@@ -77,7 +83,10 @@ export function renderElement(
           element.height,
           {
             stroke: element.strokeColor,
-            fill: element.backgroundColor,
+            fill:
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
             roughness: element.roughness

@@ -1,0 +1,89 @@
+.color-picker {
+  width: 205px;
+  background: rgb(255, 255, 255);
+  border: 0px solid rgba(0, 0, 0, 0.25);
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.color-picker-triangle-shadow {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0px 9px 10px;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: -11px;
+  left: 12px;
+}
+
+.color-picker-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0px 9px 10px;
+  border-color: transparent transparent rgb(255, 255, 255);
+  position: absolute;
+  top: -10px;
+  left: 12px;
+}
+
+.color-picker-content {
+  padding: 15px 9px 9px 15px;
+}
+
+.color-picker-swatch {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  float: left;
+  border-radius: 4px;
+  margin: 0px 6px 6px 0px;
+}
+
+.color-picker-swatch:focus {
+  /* Note: in the original react-color it uses the color of the element,
+     but it's too annoying to set from JavaScript without a css lib... */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.color-picker-transparent {
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+    left center;
+}
+
+.color-picker-hash {
+  background: rgb(240, 240, 240);
+  height: 30px;
+  width: 30px;
+  border-radius: 4px 0px 0px 4px;
+  float: left;
+  color: rgb(152, 161, 164);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-picker-input {
+  width: 100px;
+  font-size: 14px;
+  color: rgb(102, 102, 102);
+  border: 0px;
+  outline: none;
+  height: 28px;
+  box-shadow: rgb(240, 240, 240) 0px 0px 0px 1px inset;
+  box-sizing: content-box;
+  border-radius: 0px 4px 4px 0px;
+  float: left;
+  padding-left: 8px;
+}
