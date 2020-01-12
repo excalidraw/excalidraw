@@ -1,6 +1,7 @@
 import { randomSeed } from "../random";
 import nanoid from "nanoid";
 import { Drawable } from "roughjs/bin/core";
+import { Point } from "roughjs/bin/geometry";
 
 export function newElement(
   type: string,
@@ -15,6 +16,7 @@ export function newElement(
   width = 0,
   height = 0
 ) {
+  let points = [] as Point[];
   const element = {
     id: nanoid(),
     type,
@@ -30,7 +32,8 @@ export function newElement(
     opacity,
     isSelected: false,
     seed: randomSeed(),
-    shape: null as Drawable | Drawable[] | null
+    shape: null as Drawable | Drawable[] | null,
+    points
   };
   return element;
 }

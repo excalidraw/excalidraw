@@ -5,6 +5,7 @@ import { isTextElement } from "../element/typeChecks";
 import { getDiamondPoints, getArrowPoints } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
+import { Point } from "roughjs/bin/geometry";
 
 export function renderElement(
   element: ExcalidrawElement,
@@ -99,22 +100,42 @@ export function renderElement(
     rc.draw(element.shape as Drawable);
     context.globalAlpha = 1;
   } else if (element.type === "arrow") {
-    const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+    const [, , x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const options = {
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
       roughness: element.roughness
     };
 
-    if (!element.shape) {
-      element.shape = withCustomMathRandom(element.seed, () => [
-        //    \
-        generator.line(x3, y3, x2, y2, options),
-        // -----
-        generator.line(x1, y1, x2, y2, options),
-        //    /
-        generator.line(x4, y4, x2, y2, options)
-      ]);
+    // if (!element.shape) {
+    const points =
+      element.points.length > 0 ? element.points : ([[0, 0]] as Point[]);
+
+    const [start, ...paths] = points;
+
+    const pathStr = paths.reduce((str, val) => {
+      return `${str} L${val[0]},${val[1]}`;
+    }, `M${start[0]},${start[1]}`);
+    element.shape = withCustomMathRandom(element.seed, () => [
+      //    \
+      generator.line(x3, y3, x2, y2, options),
+      // -----
+      generator.path(pathStr, options),
+      // generator.line(x1, y1, x2, y2, options)
+      //    /
+      generator.line(x4, y4, x2, y2, options)
+    ]);
+    // }
+
+    if (element.isSelected) {
+      points.forEach(p => {
+        rc.ellipse(p[0], p[1], 10, 10, {
+          fillStyle: "solid",
+          fill: "#ffffff",
+          strokeWidth: 2,
+          roughness: 0
+        });
+      });
     }
 
     context.globalAlpha = element.opacity / 100;

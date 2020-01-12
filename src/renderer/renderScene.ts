@@ -15,6 +15,7 @@ import { renderElement } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
+  pathSegmentCircle: { x: number; y: number } | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -90,6 +91,15 @@ export function renderScene(
         context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
       });
     }
+  }
+
+  if (pathSegmentCircle) {
+    rc.ellipse(pathSegmentCircle.x, pathSegmentCircle.y, 10, 10, {
+      fillStyle: "solid",
+      fill: "#ffffff",
+      strokeWidth: 2,
+      roughness: 0
+    });
   }
 
   if (renderScrollbars) {

@@ -123,6 +123,7 @@ export function exportCanvas(
 
   renderScene(
     elements,
+    null,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
@@ -196,7 +197,9 @@ export function restoreFromLocalStorage() {
   let appState = null;
   if (savedState) {
     try {
-      appState = JSON.parse(savedState);
+      appState = JSON.parse(savedState) as AppState;
+      const { pathSegmentCircle, ...parsedState } = appState;
+      appState = parsedState;
     } catch (e) {
       // Do nothing because appState is already null
     }

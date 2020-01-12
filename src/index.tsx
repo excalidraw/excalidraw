@@ -66,6 +66,7 @@ import {
 import { SidePanel } from "./components/SidePanel";
 import { ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
+import { getPointOnAPath } from "./math";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -247,7 +248,7 @@ export class App extends React.Component<{}, AppState> {
     if (event.key === KEYS.ESCAPE) {
       elements = clearSelection(elements);
       this.forceUpdate();
-      this.setState({ elementType: "selection" });
+      this.setState({ elementType: "selection", pathSegmentCircle: null });
       if (window.document.activeElement instanceof HTMLElement) {
         window.document.activeElement.blur();
       }
@@ -587,7 +588,9 @@ export class App extends React.Component<{}, AppState> {
               });
             } else {
               elements = [...elements, element];
-              this.setState({ draggingElement: element });
+              this.setState({
+                draggingElement: element
+              });
             }
 
             let lastX = x;
@@ -684,6 +687,12 @@ export class App extends React.Component<{}, AppState> {
 
                     el.x = element.x;
                     el.y = element.y;
+                    if (el.type === "arrow") {
+                      el.points = [
+                        [0, 0],
+                        [element.width, element.height]
+                      ];
+                    }
                     el.shape = null;
                   });
                   lastX = x;
@@ -721,6 +730,9 @@ export class App extends React.Component<{}, AppState> {
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
 
+              // These are the endpoints of the shape
+              // in arrow it is the end of the line segment
+              // in rectangle it is the width and the height
               let width =
                 e.clientX -
                 CANVAS_WINDOW_OFFSET_LEFT -
@@ -731,11 +743,22 @@ export class App extends React.Component<{}, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP -
                 draggingElement.y -
                 this.state.scrollY;
-              draggingElement.width = width;
+
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey
+              height = e.shiftKey
                 ? Math.abs(width) * Math.sign(height)
                 : height;
+
+              draggingElement.width = width;
+              draggingElement.height = height;
+
+              // add points for drawing when it is the arrow
+              if (element.type === "arrow") {
+                draggingElement.points = [
+                  [0, 0],
+                  [width, height]
+                ];
+              }
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
@@ -828,6 +851,16 @@ export class App extends React.Component<{}, AppState> {
             let textX = e.clientX;
             let textY = e.clientY;
 
+            if (this.state.pathSegmentCircle) {
+              const element = this.state.pathSegmentCircle.arrow;
+              const points = [...element.points];
+              const idx = this.state.pathSegmentCircle.segment;
+              points.splice(idx + 1, 0, this.state.pathSegmentCircle.point);
+              element.points = points;
+              this.forceUpdate();
+              return;
+            }
+
             if (elementAtPosition && isTextElement(elementAtPosition)) {
               elements = elements.filter(
                 element => element.id !== elementAtPosition.id
@@ -909,6 +942,39 @@ export class App extends React.Component<{}, AppState> {
                 : `move`;
             } else {
               document.documentElement.style.cursor = ``;
+            }
+
+            const selectedElements = elements.filter(el => el.isSelected);
+
+            // cannot select more than one elemnt
+            if (selectedElements.length > 1) return;
+            const arrow = selectedElements.find(el => el.type === "arrow");
+
+            // if no arrow is selected, ignore
+            if (!arrow) {
+              if (this.state.pathSegmentCircle) {
+                this.setState({ pathSegmentCircle: null });
+              }
+              return;
+            }
+
+            // get mouse position relative to arrow element
+            const dx = x - arrow.x;
+            const dy = y - arrow.y;
+
+            const point = getPointOnAPath([dx, dy], arrow.points);
+            if (point !== null) {
+              this.setState({
+                pathSegmentCircle: {
+                  x: point.x + arrow.x,
+                  y: point.y + arrow.y,
+                  arrow,
+                  segment: point.segment,
+                  point: [point.x, point.y]
+                }
+              });
+            } else {
+              this.setState({ pathSegmentCircle: null });
             }
           }}
         />
@@ -1018,11 +1084,17 @@ export class App extends React.Component<{}, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    renderScene(elements, this.rc!, this.canvas!, {
-      scrollX: this.state.scrollX,
-      scrollY: this.state.scrollY,
-      viewBackgroundColor: this.state.viewBackgroundColor
-    });
+    renderScene(
+      elements,
+      this.state.pathSegmentCircle,
+      this.rc!,
+      this.canvas!,
+      {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor
+      }
+    );
     this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
