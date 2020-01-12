@@ -27,6 +27,7 @@ export const actionPasteStyles: Action = {
         if (element.isSelected) {
           const newElement = {
             ...element,
+            shape: null,
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,

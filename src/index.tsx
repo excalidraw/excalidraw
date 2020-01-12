@@ -279,7 +279,9 @@ export class App extends React.Component<{}, AppState> {
   private copyToClipboard = () => {
     if (navigator.clipboard) {
       const text = JSON.stringify(
-        elements.filter(element => element.isSelected)
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
       );
       navigator.clipboard.writeText(text);
     }
@@ -303,7 +305,11 @@ export class App extends React.Component<{}, AppState> {
         onCut={e => {
           e.clipboardData.setData(
             "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
+            JSON.stringify(
+              elements
+                .filter(element => element.isSelected)
+                .map(({ shape, ...el }) => el)
+            )
           );
           elements = deleteSelectedElements(elements);
           this.forceUpdate();
@@ -312,7 +318,11 @@ export class App extends React.Component<{}, AppState> {
         onCopy={e => {
           e.clipboardData.setData(
             "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
+            JSON.stringify(
+              elements
+                .filter(element => element.isSelected)
+                .map(({ shape, ...el }) => el)
+            )
           );
           e.preventDefault();
         }}
@@ -465,6 +475,7 @@ export class App extends React.Component<{}, AppState> {
               1,
               100
             );
+
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
@@ -670,6 +681,7 @@ export class App extends React.Component<{}, AppState> {
 
                     el.x = element.x;
                     el.y = element.y;
+                    el.shape = null;
                   });
                   lastX = x;
                   lastY = y;
@@ -705,6 +717,7 @@ export class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
+
               let width =
                 e.clientX -
                 CANVAS_WINDOW_OFFSET_LEFT -
@@ -720,6 +733,7 @@ export class App extends React.Component<{}, AppState> {
               draggingElement.height = e.shiftKey
                 ? Math.abs(width) * Math.sign(height)
                 : height;
+              draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
                 elements = setSelection(elements, draggingElement);
