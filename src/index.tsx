@@ -638,72 +638,72 @@ export class App extends React.Component<{}, AppState> {
 
                   let deltaX = 0;
                   let deltaY = 0;
-                  selectedElements.forEach(element => {
-                    switch (resizeHandle) {
-                      case "nw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          const deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "ne":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "sw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "se":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "n":
+                  const element = selectedElements[0];
+                  switch (resizeHandle) {
+                    case "nw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
+                        const deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
+                      }
+                      break;
+                    case "ne":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
                         deltaY = lastY - y;
                         element.height += deltaY;
                         element.y -= deltaY;
-                        break;
-                      case "w":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        break;
-                      case "s":
+                      }
+                      break;
+                    case "sw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
                         element.height += y - lastY;
-                        break;
-                      case "e":
-                        element.width += x - lastX;
-                        break;
-                    }
+                      }
+                      break;
+                    case "se":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
+                        element.height += y - lastY;
+                      }
+                      break;
+                    case "n":
+                      deltaY = lastY - y;
+                      element.height += deltaY;
+                      element.y -= deltaY;
+                      break;
+                    case "w":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      break;
+                    case "s":
+                      element.height += y - lastY;
+                      break;
+                    case "e":
+                      element.width += x - lastX;
+                      break;
+                  }
 
-                    el.x = element.x;
-                    el.y = element.y;
-                    el.shape = null;
-                  });
+                  el.x = element.x;
+                  el.y = element.y;
+                  el.shape = null;
+
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
@@ -765,7 +765,11 @@ export class App extends React.Component<{}, AppState> {
             };
 
             const onMouseUp = (e: MouseEvent) => {
-              const { draggingElement, elementType } = this.state;
+              const {
+                draggingElement,
+                elementType,
+                resizingElement
+              } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
@@ -773,6 +777,26 @@ export class App extends React.Component<{}, AppState> {
 
               resetCursor();
 
+              if (isResizingElements && resizingElement) {
+                const element = elements.find(el => el === resizingElement);
+                // Normalize the width, height, x and y position of
+                // the resized element if needed. A common scenario is
+                // when the element is flipped when resizing. We might end
+                // up with negative width and/or height. Thus, we need
+                // to compensate that.
+                if (element && element.width < 0) {
+                  element.width *= -1;
+                  element.x -= element.width;
+                  resizingElement.x = element.x;
+                  resizingElement.shape = null;
+                }
+                if (element && element.height < 0) {
+                  element.height *= -1;
+                  element.y -= element.height;
+                  resizingElement.y = element.y;
+                  resizingElement.shape = null;
+                }
+              }
               // If click occured on already selected element
               // it is needed to remove selection from other elements
               // or if SHIFT or META key pressed remove selection
