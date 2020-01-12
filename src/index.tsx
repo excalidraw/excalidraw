@@ -37,7 +37,7 @@ import { createHistory } from "./history";
 import ContextMenu from "./components/ContextMenu";
 
 import "./styles.scss";
-import { getElementWithResizeHandler } from "./element/resizeTest";
+import { getElementWithResizeHandler, resizer } from "./element/resizeTest";
 import {
   ActionManager,
   actionDeleteSelected,
@@ -608,6 +608,8 @@ export class App extends React.Component<{}, AppState> {
               lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
             }
 
+            let flipped = false;
+
             const onMouseMove = (e: MouseEvent) => {
               const target = e.target;
               if (!(target instanceof HTMLElement)) {
@@ -635,68 +637,113 @@ export class App extends React.Component<{}, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-
-                  let deltaX = 0;
-                  let deltaY = 0;
+                  let deltaX,
+                    deltaY = 0;
                   const element = selectedElements[0];
                   switch (resizeHandle) {
                     case "nw":
                       deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
-                      if (e.shiftKey) {
-                        element.y += element.height - element.width;
-                        element.height = element.width;
-                      } else {
-                        const deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                      deltaY = lastY - y;
+                      if (flipped) {
+                        deltaX *= -1;
+                        deltaY *= -1;
                       }
+                      if (
+                        element.height + deltaY < 0 ||
+                        element.width + deltaX < 0
+                      ) {
+                        flipped = !flipped;
+                      }
+                      flipped
+                        ? resizer.se(element, e, { x, y }, { lastX, lastY })
+                        : resizer.nw(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "ne":
-                      element.width += x - lastX;
-                      if (e.shiftKey) {
-                        element.y += element.height - element.width;
-                        element.height = element.width;
-                      } else {
-                        deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                      deltaX = x - lastX;
+                      deltaY = lastY - y;
+                      if (flipped) {
+                        deltaX *= -1;
+                        deltaY *= -1;
                       }
+                      if (
+                        element.height + deltaY < 0 ||
+                        element.width + deltaX < 0
+                      ) {
+                        flipped = !flipped;
+                      }
+                      flipped
+                        ? resizer.sw(element, e, { x, y }, { lastX, lastY })
+                        : resizer.ne(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "sw":
                       deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
-                      if (e.shiftKey) {
-                        element.height = element.width;
-                      } else {
-                        element.height += y - lastY;
+                      deltaY = y - lastY;
+                      if (flipped) {
+                        deltaX *= -1;
+                        deltaY *= -1;
                       }
+                      if (
+                        element.height + deltaY < 0 ||
+                        element.width + deltaX < 0
+                      ) {
+                        flipped = !flipped;
+                      }
+                      flipped
+                        ? resizer.ne(element, e, { x, y }, { lastX, lastY })
+                        : resizer.sw(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "se":
-                      element.width += x - lastX;
-                      if (e.shiftKey) {
-                        element.height = element.width;
-                      } else {
-                        element.height += y - lastY;
+                      deltaX = x - lastY;
+                      deltaY = y - lastY;
+                      if (flipped) {
+                        deltaX *= -1;
+                        deltaY *= -1;
                       }
+                      if (
+                        element.height + deltaY < 0 ||
+                        element.width + deltaX < 0
+                      ) {
+                        flipped = !flipped;
+                      }
+                      flipped
+                        ? resizer.nw(element, e, { x, y }, { lastX, lastY })
+                        : resizer.se(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "n":
                       deltaY = lastY - y;
-                      element.height += deltaY;
-                      element.y -= deltaY;
+                      if (flipped) deltaY *= -1;
+                      if (element.height + deltaY < 0) flipped = !flipped;
+
+                      flipped
+                        ? resizer.s(element, e, { x, y }, { lastX, lastY })
+                        : resizer.n(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "w":
                       deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      if (flipped) deltaX *= -1;
+                      if (element.width + deltaX < 0) flipped = !flipped;
+
+                      flipped
+                        ? resizer.e(element, e, { x, y }, { lastX, lastY })
+                        : resizer.w(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "s":
-                      element.height += y - lastY;
+                      deltaY = y - lastY;
+                      if (flipped) deltaY *= -1;
+                      if (element.height + deltaY < 0) flipped = !flipped;
+
+                      flipped
+                        ? resizer.n(element, e, { x, y }, { lastX, lastY })
+                        : resizer.s(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "e":
-                      element.width += x - lastX;
+                      deltaX = x - lastX;
+                      if (flipped) deltaX *= -1;
+                      if (element.width + deltaX < 0) flipped = !flipped;
+
+                      flipped
+                        ? resizer.w(element, e, { x, y }, { lastX, lastY })
+                        : resizer.e(element, e, { x, y }, { lastX, lastY });
                       break;
                   }
 
