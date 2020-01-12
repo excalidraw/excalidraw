@@ -51,3 +51,14 @@ export function measureText(text: string, font: string) {
 
   return { width, height, baseline };
 }
+
+export function debounce<T extends any[]>(
+  fn: (...args: T) => void,
+  timeout: number
+) {
+  let handle = 0;
+  return (...args: T) => {
+    clearTimeout(handle);
+    handle = window.setTimeout(() => fn(...args), timeout);
+  };
+}
