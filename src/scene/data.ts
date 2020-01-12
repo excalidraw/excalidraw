@@ -91,7 +91,6 @@ export async function importFromShortlink(shortcode: string | null) {
   const response = await fetch(
     JSONSTOREIO_SHORTLINK_ENDPOINT + "/" + shortcode
   ).then(data => data.text());
-  // const data = await response.text();
   if (response != null) {
     try {
       const json = JSON.parse(response);
