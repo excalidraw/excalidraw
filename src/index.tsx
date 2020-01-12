@@ -520,20 +520,20 @@ export class App extends React.Component<{}, AppState> {
                     elementIsAddedToSelection = true;
                   }
 
-                  // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
                   if (e.altKey) {
                     elements = [
-                      ...elements,
-                      ...elements.reduce((duplicates, element) => {
-                        if (element.isSelected) {
-                          duplicates = duplicates.concat(
-                            duplicateElement(element)
-                          );
-                          element.isSelected = false;
-                        }
-                        return duplicates;
-                      }, [] as typeof elements)
+                      ...elements.map(element => ({
+                        ...element,
+                        isSelected: false
+                      })),
+                      ...elements
+                        .filter(element => element.isSelected)
+                        .map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        })
                     ];
                   }
                 }
