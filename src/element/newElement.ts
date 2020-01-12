@@ -37,6 +37,7 @@ export function newElement(
 
 export function duplicateElement(element: ReturnType<typeof newElement>) {
   const copy = { ...element };
+  delete copy.shape;
   copy.id = nanoid();
   copy.seed = randomSeed();
   return copy;
