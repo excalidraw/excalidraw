@@ -511,9 +511,8 @@ export class App extends React.Component<{}, AppState> {
                 isResizingElements = true;
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
-                const selected = hitElement?.isSelected;
                 // clear selection if shift is not clicked
-                if (!selected && !e.shiftKey) {
+                if (!hitElement?.isSelected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
 
