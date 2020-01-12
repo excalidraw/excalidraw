@@ -15,7 +15,7 @@ import {
 import {
   clearSelection,
   deleteSelectedElements,
-  setSelection,
+  getElementsWithinSelection,
   isOverScrollBars,
   restoreFromLocalStorage,
   saveToLocalStorage,
@@ -510,11 +510,11 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
+                hitElement = getElementAtPosition(elements, x, y);
                 // clear selection if shift is not clicked
-                if (!e.shiftKey) {
+                if (!hitElement?.isSelected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
-                hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -746,13 +746,23 @@ export class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey
-                ? Math.abs(width) * Math.sign(height)
-                : height;
+              draggingElement.height =
+                e.shiftKey && this.state.elementType !== "selection"
+                  ? Math.abs(width) * Math.sign(height)
+                  : height;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                elements = setSelection(elements, draggingElement);
+                if (!e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
+                const elementsWithinSelection = getElementsWithinSelection(
+                  elements,
+                  draggingElement
+                );
+                elementsWithinSelection.forEach(element => {
+                  element.isSelected = true;
+                });
               }
               // We don't want to save history when moving an element
               history.skipRecording();
