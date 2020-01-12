@@ -253,7 +253,13 @@ export class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
       event.preventDefault();
-    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+    } else if (
+      shapesShortcutKeys.includes(event.key.toLowerCase()) &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.metaKey
+    ) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
