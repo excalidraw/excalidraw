@@ -4,7 +4,7 @@ export {
   getSelectedIndices,
   deleteSelectedElements,
   someElementIsSelected,
-  setSelection,
+  getElementsWithinSelection,
   getSelectedAttribute
 } from "./selection";
 export {
