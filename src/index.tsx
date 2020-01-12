@@ -636,36 +636,42 @@ export class App extends React.Component<{}, AppState> {
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
+                  let deltaX = 0;
+                  let deltaY = 0;
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          const deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "ne":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "sw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.height = element.width;
                         } else {
-                          element.height = lastY - element.y;
+                          element.height += y - lastY;
                         }
                         break;
                       case "se":
@@ -677,18 +683,20 @@ export class App extends React.Component<{}, AppState> {
                         }
                         break;
                       case "n":
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
                         break;
                       case "w":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         break;
                       case "s":
-                        element.height = lastY - element.y;
+                        element.height += y - lastY;
                         break;
                       case "e":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         break;
                     }
 
