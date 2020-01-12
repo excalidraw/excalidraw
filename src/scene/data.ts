@@ -187,7 +187,9 @@ export function restoreFromLocalStorage() {
   let elements = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements);
+      elements = JSON.parse(savedElements).map(
+        ({ shape, ...element }: ExcalidrawElement) => element
+      );
     } catch (e) {
       // Do nothing because elements array is already empty
     }
