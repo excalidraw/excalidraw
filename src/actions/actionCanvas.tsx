@@ -1,6 +1,7 @@
 import React from "react";
 import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
+import { getDefaultAppState } from "../appState";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
@@ -24,12 +25,7 @@ export const actionClearCanvas: Action = {
   perform: (elements, appState, value) => {
     return {
       elements: [],
-      appState: {
-        ...appState,
-        viewBackgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      }
+      appState: getDefaultAppState()
     };
   },
   PanelComponent: ({ updateData }) => (

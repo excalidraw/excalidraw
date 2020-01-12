@@ -28,7 +28,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike, measureText } from "./utils";
+import { isInputLike, measureText, debounce } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
@@ -65,10 +65,10 @@ import {
 } from "./actions";
 import { SidePanel } from "./components/SidePanel";
 import { Action, ActionResult } from "./actions/types";
+import { getDefaultAppState } from "./appState";
 
 let { elements } = createScene();
 const { history } = createHistory();
-const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
@@ -195,21 +195,7 @@ export class App extends React.Component<{}, AppState> {
     window.removeEventListener("resize", this.onResize, false);
   }
 
-  public state: AppState = {
-    draggingElement: null,
-    resizingElement: null,
-    elementType: "selection",
-    exportBackground: true,
-    currentItemStrokeColor: "#000000",
-    currentItemBackgroundColor: "#ffffff",
-    currentItemFont: "20px Virgil",
-    viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
-    cursorX: 0,
-    cursorY: 0,
-    name: DEFAULT_PROJECT_NAME
-  };
+  public state: AppState = getDefaultAppState();
 
   private onResize = () => {
     this.forceUpdate();
@@ -256,7 +242,13 @@ export class App extends React.Component<{}, AppState> {
       });
       this.forceUpdate();
       event.preventDefault();
-    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+    } else if (
+      shapesShortcutKeys.includes(event.key.toLowerCase()) &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.metaKey
+    ) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
@@ -267,7 +259,7 @@ export class App extends React.Component<{}, AppState> {
         }
       } else {
         // undo action
-        const data = history.undoOnce(elements);
+        const data = history.undoOnce();
         if (data !== null) {
           elements = data;
         }
@@ -306,6 +298,7 @@ export class App extends React.Component<{}, AppState> {
       <div
         className="container"
         onCut={e => {
+          if (isInputLike(e.target)) return;
           e.clipboardData.setData(
             "text/plain",
             JSON.stringify(
@@ -319,6 +312,7 @@ export class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
         onCopy={e => {
+          if (isInputLike(e.target)) return;
           e.clipboardData.setData(
             "text/plain",
             JSON.stringify(
@@ -330,6 +324,7 @@ export class App extends React.Component<{}, AppState> {
           e.preventDefault();
         }}
         onPaste={e => {
+          if (isInputLike(e.target)) return;
           const paste = e.clipboardData.getData("text");
           this.addElementsFromPaste(paste);
           e.preventDefault();
@@ -530,20 +525,20 @@ export class App extends React.Component<{}, AppState> {
                     elementIsAddedToSelection = true;
                   }
 
-                  // No matter what, we select it
                   // We duplicate the selected element if alt is pressed on Mouse down
                   if (e.altKey) {
                     elements = [
-                      ...elements,
-                      ...elements.reduce((duplicates, element) => {
-                        if (element.isSelected) {
-                          duplicates = duplicates.concat(
-                            duplicateElement(element)
-                          );
-                          element.isSelected = false;
-                        }
-                        return duplicates;
-                      }, [] as typeof elements)
+                      ...elements.map(element => ({
+                        ...element,
+                        isSelected: false
+                      })),
+                      ...elements
+                        .filter(element => element.isSelected)
+                        .map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        })
                     ];
                   }
                 }
@@ -583,6 +578,7 @@ export class App extends React.Component<{}, AppState> {
                   });
                 }
               });
+              this.setState({ elementType: "selection" });
               return;
             }
 
@@ -1020,13 +1016,17 @@ export class App extends React.Component<{}, AppState> {
     }
   }
 
+  private saveDebounced = debounce(() => {
+    saveToLocalStorage(elements, this.state);
+  }, 300);
+
   componentDidUpdate() {
     renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    saveToLocalStorage(elements, this.state);
+    this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
       history.clearRedoStack();

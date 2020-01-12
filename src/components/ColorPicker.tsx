@@ -1,11 +1,66 @@
-import React, { lazy } from "react";
+import React from "react";
 import { Popover } from "./Popover";
 
-const TwitterPicker = lazy(() =>
-  import(
-    /* webpackPrefetch: true */ "react-color/lib/components/twitter/Twitter"
-  )
-);
+import "./ColorPicker.css";
+
+// This is a narrow reimplementation of the awesome react-color Twitter component
+// https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
+
+const Picker = function({
+  colors,
+  color,
+  onChange
+}: {
+  colors: string[];
+  color: string | undefined;
+  onChange: (color: string) => void;
+}) {
+  const [innerValue, setInnerValue] = React.useState(color);
+  React.useEffect(() => {
+    setInnerValue(color);
+  }, [color]);
+  return (
+    <div className="color-picker">
+      <div className="color-picker-triangle-shadow"></div>
+      <div className="color-picker-triangle"></div>
+      <div className="color-picker-content">
+        {colors.map(color => (
+          <div
+            className="color-picker-swatch"
+            onClick={() => {
+              onChange(color);
+            }}
+            title={color}
+            tabIndex={0}
+            style={{ backgroundColor: color }}
+          >
+            {color === "transparent" ? (
+              <div className="color-picker-transparent"></div>
+            ) : (
+              undefined
+            )}
+          </div>
+        ))}
+        <div className="color-picker-hash">#</div>
+        <div style={{ position: "relative" }}>
+          <input
+            spellCheck={false}
+            className="color-picker-input"
+            onChange={e => {
+              const value = e.target.value;
+              if (value.match(/^([0-9a-f]{3}|[0-9a-f]{6}|transparent)$/)) {
+                onChange(value === "transparent" ? "transparent" : "#" + value);
+              }
+              setInnerValue(value);
+            }}
+            value={(innerValue || "").replace(/^#/, "")}
+          />
+        </div>
+        <div style={{ clear: "both" }}></div>
+      </div>
+    </div>
+  );
+};
 
 export function ColorPicker({
   type,
@@ -27,12 +82,11 @@ export function ColorPicker({
       <React.Suspense fallback="">
         {isActive ? (
           <Popover onCloseRequest={() => setActive(false)}>
-            <TwitterPicker
+            <Picker
               colors={colors[type]}
-              width="205px"
               color={color || undefined}
               onChange={changedColor => {
-                onChange(changedColor.hex);
+                onChange(changedColor);
               }}
             />
           </Popover>
@@ -74,7 +128,7 @@ const colors = {
     "#FF9DA7",
     "#9C755F",
     "#BAB0AB",
-    "#FFFFFF"
+    "transparent"
   ],
   elementStroke: [
     "#324E6B",
