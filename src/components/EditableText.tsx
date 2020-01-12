@@ -1,3 +1,5 @@
+import "./EditableText.css";
+
 import React, { Component } from "react";
 
 type InputState = {

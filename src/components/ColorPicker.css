@@ -87,3 +87,19 @@
   float: left;
   padding-left: 8px;
 }
+
+.color-picker-label-swatch {
+  height: 24px;
+  width: 24px;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.color-picker-swatch-input {
+  font-size: 16px;
+  display: inline-block;
+  width: 100px;
+  border-radius: 2px;
+  padding: 2px 4px;
+  border: 1px solid #ddd;
+}

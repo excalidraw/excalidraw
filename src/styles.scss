@@ -1,3 +1,5 @@
+@import "./theme.css";
+
 /* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
 @font-face {
   font-family: "Virgil";
@@ -8,6 +10,7 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-color-primary);
 }
 
 .container {
@@ -17,49 +20,6 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-}
-
-.sidePanel {
-  width: 230px;
-  background-color: #eee;
-  padding: 10px;
-  overflow-y: auto;
-  position: relative;
-
-  h4 {
-    margin: 10px 0 10px 0;
-  }
-
-  .panel {
-    position: relative;
-    .btn-panel-collapse {
-      position: absolute;
-      top: -2px;
-      right: 5px;
-      background: none;
-      margin: 0px;
-      color: black;
-    }
-
-    .btn-panel-collapse-icon {
-      transform: none;
-      display: inline-block;
-    }
-
-    .btn-panel-collapse-icon-closed {
-      transform: rotateZ(90deg);
-    }
-  }
-
-  .panelTools {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-
-    label {
-      margin: 2px 0;
-    }
-  }
 }
 
 .panelColumn {
@@ -86,111 +46,15 @@ body {
   }
 }
 
-.tool {
-  position: relative;
-  display: inline-block;
-  margin: 1px;
-
-  input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  button {
-    padding: 0;
-    border: none;
-    margin: 0;
-
-    .toolIcon {
-      background-color: #ddd;
-
-      width: 41px;
-      height: 41px;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      border-radius: 3px;
-
-      svg {
-        height: 1.5em;
-      }
-    }
-    &:hover .toolIcon {
-      background-color: #e7e5e5;
-    }
-    &:active .toolIcon {
-      background-color: #bdbebc;
-    }
-    &:focus .toolIcon {
-      box-shadow: 0 0 0 2px steelblue;
-    }
-  }
-
-  input[type="radio"] {
-    & + .toolIcon {
-      background-color: #ddd;
-
-      width: 41px;
-      height: 41px;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      border-radius: 3px;
-
-      svg {
-        height: 1em;
-      }
-    }
-    &:hover + .toolIcon {
-      background-color: #e7e5e5;
-    }
-    &:checked + .toolIcon {
-      background-color: #bdbebc;
-    }
-    &:focus + .toolIcon {
-      box-shadow: 0 0 0 2px steelblue;
-    }
-  }
-}
-
-.vertical-divider {
-  width: 1px;
+.divider {
+  height: 1px;
   background-color: #ddd;
-  margin: 1px 2px;
+  margin: 1px;
 }
 
-label {
-  margin-right: 6px;
-  span {
-    display: inline-block;
-  }
-}
-
-input[type="number"] {
-  width: 30px;
-}
-
-input[type="color"] {
-  margin: 2px;
-}
-
-input[type="range"] {
-  width: 230px;
-}
-
-input {
-  margin-right: 5px;
-
-  &:focus {
-    outline: transparent;
-    box-shadow: 0 0 0 2px steelblue;
-  }
+input:focus {
+  outline: transparent;
+  box-shadow: 0 0 0 2px steelblue;
 }
 
 button {
@@ -210,8 +74,7 @@ button {
     border-color: #d6d4d4;
   }
 
-  &:active,
-  &.active {
+  &:active {
     background-color: #bdbebc;
     border-color: #bdbebc;
   }
@@ -221,67 +84,24 @@ button {
   }
 }
 
-.popover {
-  position: absolute;
-  z-index: 2;
-
-  .cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
+.App-menu {
+  display: grid;
 }
 
-.swatch {
-  height: 24px;
-  width: 24px;
-  display: inline;
-  margin-right: 4px;
+.App-menu_top {
+  grid-template-columns: 1fr auto 1fr;
 }
 
-.swatch-input {
-  font-size: 16px;
-  display: inline;
-  width: 100px;
-  border-radius: 2px;
-  padding: 2px 4px;
-  border: 1px solid #ddd;
+.App-menu_left {
+  grid-template-rows: 1fr auto 1fr;
+  height: 100%;
 }
 
-.project-name-wrapper {
-  position: relative;
-
-  font-size: 15px;
-  line-height: 20px;
-}
-
-.project-name {
-  cursor: pointer;
-  border: none;
-  padding: 4px;
-  margin: -4px;
-  background: transparent;
-  font-size: inherit;
-  line-height: inherit;
-  white-space: nowrap;
-}
-
-.project-name:disabled {
-  pointer-events: none;
-}
-
-.project-name-input {
-  position: absolute;
-  left: -1px;
-  top: -1px;
-  border: none;
-  margin: 0;
-  font-size: inherit;
-  line-height: inherit;
-
-  &:focus {
-    box-shadow: none;
-  }
+.App-filename {
+  padding-left: 10px;
+  padding-right: 10px;
+  flex-shrink: 0;
+  flex-grow: 1;
+  display: flex;
+  align-self: "center";
 }

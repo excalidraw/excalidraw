@@ -70,6 +70,10 @@ import {
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
 import { image, clipboard } from "./components/icons";
+import { Island } from "./components/Island";
+import Stack from "./components/Stack";
+import { FixedSideContainer } from "./components/FixedSideContainer";
+import { ToolIcon } from "./components/ToolIcon";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -446,187 +450,138 @@ export class App extends React.Component<{}, AppState> {
     );
   }
 
+  private renderEditorActions() {
+    return (
+      <>
+        {this.actionManager.renderAction(
+          "loadScene",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+        {this.actionManager.renderAction(
+          "saveScene",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+        <div className="divider"></div>
+        <ToolIcon
+          type="button"
+          icon={image}
+          title="Export to PNG"
+          aria-label="Export to PNG"
+          onClick={() => {
+            const exportedElements = elements.some(
+              element => element.isSelected
+            )
+              ? elements.filter(element => element.isSelected)
+              : elements;
+            if (this.canvas)
+              exportCanvas("png", exportedElements, this.canvas, this.state);
+          }}
+        />
+
+        <ToolIcon
+          type="button"
+          icon={clipboard}
+          title="Copy to clipboard"
+          aria-label="Copy to clipboard"
+          onClick={() => {
+            const exportedElements = elements.some(
+              element => element.isSelected
+            )
+              ? elements.filter(element => element.isSelected)
+              : elements;
+            if (this.canvas)
+              exportCanvas(
+                "clipboard",
+                exportedElements,
+                this.canvas,
+                this.state
+              );
+          }}
+        />
+        <div className="divider"></div>
+        {this.actionManager.renderAction(
+          "changeViewBackgroundColor",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+        {this.actionManager.renderAction(
+          "clearCanvas",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </>
+    );
+  }
+
+  private renderShapesSwitcher() {
+    return (
+      <>
+        {SHAPES.map(({ value, icon }) => (
+          <ToolIcon
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={this.state.elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}`}
+            onChange={() => {
+              this.setState({ elementType: value });
+              elements = clearSelection(elements);
+              document.documentElement.style.cursor =
+                value === "text" ? "text" : "crosshair";
+              this.forceUpdate();
+            }}
+          ></ToolIcon>
+        ))}
+      </>
+    );
+  }
+
+  private renderFileName() {
+    return (
+      <div className="App-filename">
+        {this.actionManager.renderAction(
+          "changeProjectName",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </div>
+    );
+  }
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
       <div className="container">
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 5,
-            right: 0,
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr minmax(0,1fr)",
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            {this.renderFileName()}
+            <Island padding={1}>
+              <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+            </Island>
+          </div>
+        </FixedSideContainer>
 
-            zIndex: 3
-          }}
-        >
-          <div
-            style={{
-              paddingTop: 5,
-              paddingLeft: 10,
-              paddingRight: 5,
-              flexShrink: 0,
-              flexGrow: 1,
-              display: "flex"
-            }}
-          >
-            {this.actionManager.renderAction(
-              "changeProjectName",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
+        <FixedSideContainer side="left">
+          <div className="App-menu App-menu_left">
+            <div style={{ height: 50 }}></div>
+            <Island padding={1}>
+              <Stack.Col gap={1}>{this.renderEditorActions()}</Stack.Col>
+            </Island>
           </div>
-          <div
-            style={{
-              boxShadow: "0 1px 5px rgba(0,0,0,0.15)",
-              display: "flex",
-              flexDirection: "row",
-              padding: 1,
-              borderRadius: 4,
-              justifySelf: "center",
-              background: "white"
-            }}
-          >
-            {this.actionManager.renderAction(
-              "loadScene",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            {this.actionManager.renderAction(
-              "saveScene",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            <div className="vertical-divider"></div>
-            <label className="tool" title="Export to PNG">
-              <button
-                aria-label="Export to png"
-                onClick={() => {
-                  const exportedElements = elements.some(
-                    element => element.isSelected
-                  )
-                    ? elements.filter(element => element.isSelected)
-                    : elements;
-                  if (this.canvas)
-                    exportCanvas(
-                      "png",
-                      exportedElements,
-                      this.canvas,
-                      this.state
-                    );
-                }}
-              >
-                <div className="toolIcon">{image}</div>
-              </button>
-            </label>
-            <label className="tool" title="Copy to clipboard">
-              <button
-                aria-label="Copy to clipboard"
-                onClick={() => {
-                  const exportedElements = elements.some(
-                    element => element.isSelected
-                  )
-                    ? elements.filter(element => element.isSelected)
-                    : elements;
-                  if (this.canvas)
-                    exportCanvas(
-                      "clipboard",
-                      exportedElements,
-                      this.canvas,
-                      this.state
-                    );
-                }}
-              >
-                <div className="toolIcon">{clipboard}</div>
-              </button>
-            </label>
-            <div className="vertical-divider"></div>
-            {this.actionManager.renderAction(
-              "changeViewBackgroundColor",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            {this.actionManager.renderAction(
-              "clearCanvas",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-          </div>
-        </div>
+        </FixedSideContainer>
 
-        <div
-          style={{
-            position: "absolute",
-            left: 5,
-            top: 0,
-            bottom: 0,
-            display: "grid",
-            gridTemplateColumns: "auto",
-            gridTemplateRows: "minmax(50px, 1fr) 1fr minmax(0, 1fr)",
-            zIndex: 2
-          }}
-        >
-          <div />
-          <div
-            style={{
-              boxShadow: "0 1px 5px rgba(0,0,0,0.15)",
-              display: "flex",
-              flexDirection: "column",
-              padding: 1,
-              borderRadius: 4,
-              background: "white",
-              alignSelf: "center"
-            }}
-          >
-            {SHAPES.map(({ value, icon }) => (
-              <label
-                key={value}
-                className="tool"
-                title={`${capitalizeString(value)} - ${
-                  capitalizeString(value)[0]
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={this.state.elementType === value}
-                  onChange={() => {
-                    this.setState({ elementType: value });
-                    elements = clearSelection(elements);
-                    document.documentElement.style.cursor =
-                      value === "text" ? "text" : "crosshair";
-                    this.forceUpdate();
-                  }}
-                />
-                <div className="toolIcon">{icon}</div>
-              </label>
-            ))}
-          </div>
-        </div>
         {this.renderSelectedElementsPopover(elements)}
 
-        {/* <SidePanel
-          actionManager={this.actionManager}
-          syncActionResult={this.syncActionResult}
-          appState={{ ...this.state }}
-          elements={elements}
-          onToolChange={value => {
-            this.setState({ elementType: value });
-            elements = clearSelection(elements);
-            document.documentElement.style.cursor =
-              value === "text" ? "text" : "crosshair";
-            this.forceUpdate();
-          }}
-          canvas={this.canvas!}
-        /> */}
         <canvas
           id="canvas"
           style={{

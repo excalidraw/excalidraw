@@ -1,0 +1,39 @@
+.project-name-wrapper {
+  position: relative;
+  font-family: Virgil;
+  font-size: 20px;
+  line-height: 32px;
+}
+
+.project-name {
+  cursor: pointer;
+  border: none;
+  padding: 4px;
+  margin: -4px;
+  background: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.project-name:disabled {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.project-name-input {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  border: none;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  background: transparent;
+}
+
+.project-name-input:focus {
+  box-shadow: none;
+}

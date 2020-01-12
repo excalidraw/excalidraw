@@ -3,6 +3,7 @@ import { Action } from "./types";
 import { EditableText } from "../components/EditableText";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
+import { ToolIcon } from "../components/ToolIcon";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
@@ -43,11 +44,13 @@ export const actionSaveScene: Action = {
     return {};
   },
   PanelComponent: ({ updateData }) => (
-    <label className="tool" title="Save">
-      <button aria-label="save" onClick={() => updateData(null)}>
-        <div className="toolIcon">{save}</div>
-      </button>
-    </label>
+    <ToolIcon
+      type="button"
+      icon={save}
+      title="Save"
+      aria-label="Save"
+      onClick={() => updateData(null)}
+    />
   )
 };
 
@@ -57,17 +60,16 @@ export const actionLoadScene: Action = {
     return { elements: loadedElements };
   },
   PanelComponent: ({ updateData }) => (
-    <label className="tool" title="Load">
-      <button
-        aria-label="load"
-        onClick={() => {
-          loadFromJSON().then(({ elements }) => {
-            updateData(elements);
-          });
-        }}
-      >
-        <div className="toolIcon">{load}</div>
-      </button>
-    </label>
+    <ToolIcon
+      type="button"
+      icon={load}
+      title="Load"
+      aria-label="Load"
+      onClick={() => {
+        loadFromJSON().then(({ elements }) => {
+          updateData(elements);
+        });
+      }}
+    />
   )
 };

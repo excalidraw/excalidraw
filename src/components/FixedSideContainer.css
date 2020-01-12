@@ -1,0 +1,18 @@
+.FixedSideContainer {
+  --margin: 5px;
+  position: fixed;
+}
+
+.FixedSideContainer_side_top {
+  left: 0;
+  top: var(--margin);
+  right: 0;
+  z-index: 2;
+}
+
+.FixedSideContainer_side_left {
+  left: var(--margin);
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+}
