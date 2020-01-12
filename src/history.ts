@@ -30,9 +30,6 @@ class SceneHistory {
   }
 
   restoreEntry(entry: string) {
-    // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
-    this.skipRecording();
-
     try {
       return JSON.parse(entry);
     } catch {
