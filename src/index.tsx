@@ -291,7 +291,7 @@ export class App extends React.Component<{}, AppState> {
     } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
-        const data = history.redoOnce(elements);
+        const data = history.redoOnce();
         if (data !== null) {
           elements = data;
         }

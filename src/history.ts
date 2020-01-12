@@ -40,11 +40,11 @@ class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(elements: readonly ExcalidrawElement[]) {
-    const currentEntry = this.generateCurrentEntry(elements);
+  redoOnce() {
     const entryToRestore = this.redoStack.pop();
+
     if (entryToRestore !== undefined) {
-      this.stateHistory.push(currentEntry);
+      this.stateHistory.push(entryToRestore);
       return this.restoreEntry(entryToRestore);
     }
 
