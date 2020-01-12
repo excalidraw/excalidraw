@@ -22,7 +22,11 @@ class SceneHistory {
       // If the last entry is the same as this one, ignore it
       return;
     }
+
     this.stateHistory.push(newEntry);
+
+    // As a new entry was pushed, we invalidate the redo stack
+    this.clearRedoStack();
   }
 
   restoreEntry(entry: string) {

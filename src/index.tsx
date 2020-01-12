@@ -1026,7 +1026,6 @@ export class App extends React.Component<{}, AppState> {
     this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
-      history.clearRedoStack();
     }
   }
 }
