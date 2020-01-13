@@ -1,4 +1,4 @@
-import { randomSeed } from "../random";
+import { randomSeed } from "roughjs/bin/math";
 import nanoid from "nanoid";
 import { Drawable } from "roughjs/bin/core";
 
