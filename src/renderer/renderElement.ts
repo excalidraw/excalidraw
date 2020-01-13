@@ -1,5 +1,3 @@
-import { withCustomMathRandom } from "../random";
-
 import { ExcalidrawElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
 import { getDiamondPoints, getArrowPoints } from "../element/bounds";
@@ -19,17 +17,16 @@ export function renderElement(
     context.fillStyle = fillStyle;
   } else if (element.type === "rectangle") {
     if (!element.shape) {
-      element.shape = withCustomMathRandom(element.seed, () => {
-        return generator.rectangle(0, 0, element.width, element.height, {
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness
-        });
+      element.shape = generator.rectangle(0, 0, element.width, element.height, {
+        stroke: element.strokeColor,
+        fill:
+          element.backgroundColor === "transparent"
+            ? undefined
+            : element.backgroundColor,
+        fillStyle: element.fillStyle,
+        strokeWidth: element.strokeWidth,
+        roughness: element.roughness,
+        seed: element.seed
       });
     }
 
@@ -38,36 +35,35 @@ export function renderElement(
     context.globalAlpha = 1;
   } else if (element.type === "diamond") {
     if (!element.shape) {
-      element.shape = withCustomMathRandom(element.seed, () => {
-        const [
-          topX,
-          topY,
-          rightX,
-          rightY,
-          bottomX,
-          bottomY,
-          leftX,
-          leftY
-        ] = getDiamondPoints(element);
-        return generator.polygon(
-          [
-            [topX, topY],
-            [rightX, rightY],
-            [bottomX, bottomY],
-            [leftX, leftY]
-          ],
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness
-          }
-        );
-      });
+      const [
+        topX,
+        topY,
+        rightX,
+        rightY,
+        bottomX,
+        bottomY,
+        leftX,
+        leftY
+      ] = getDiamondPoints(element);
+      element.shape = generator.polygon(
+        [
+          [topX, topY],
+          [rightX, rightY],
+          [bottomX, bottomY],
+          [leftX, leftY]
+        ],
+        {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed
+        }
+      );
     }
 
     context.globalAlpha = element.opacity / 100;
@@ -75,23 +71,22 @@ export function renderElement(
     context.globalAlpha = 1;
   } else if (element.type === "ellipse") {
     if (!element.shape) {
-      element.shape = withCustomMathRandom(element.seed, () =>
-        generator.ellipse(
-          element.width / 2,
-          element.height / 2,
-          element.width,
-          element.height,
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness
-          }
-        )
+      element.shape = generator.ellipse(
+        element.width / 2,
+        element.height / 2,
+        element.width,
+        element.height,
+        {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed
+        }
       );
     }
 
@@ -103,18 +98,19 @@ export function renderElement(
     const options = {
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
-      roughness: element.roughness
+      roughness: element.roughness,
+      seed: element.seed
     };
 
     if (!element.shape) {
-      element.shape = withCustomMathRandom(element.seed, () => [
+      element.shape = [
         //    \
         generator.line(x3, y3, x2, y2, options),
         // -----
         generator.line(x1, y1, x2, y2, options),
         //    /
         generator.line(x4, y4, x2, y2, options)
-      ]);
+      ];
     }
 
     context.globalAlpha = element.opacity / 100;
