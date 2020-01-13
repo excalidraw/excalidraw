@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import rough from "roughjs/bin/wrappers/rough";
+import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 import {
@@ -15,7 +15,7 @@ import {
 import {
   clearSelection,
   deleteSelectedElements,
-  setSelection,
+  getElementsWithinSelection,
   isOverScrollBars,
   restoreFromLocalStorage,
   saveToLocalStorage,
@@ -510,16 +510,11 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const selected = getElementAtPosition(
-                  elements.filter(el => el.isSelected),
-                  x,
-                  y
-                );
+                hitElement = getElementAtPosition(elements, x, y);
                 // clear selection if shift is not clicked
-                if (!selected && !e.shiftKey) {
+                if (!hitElement?.isSelected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
-                hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -801,13 +796,23 @@ export class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey
-                ? Math.abs(width) * Math.sign(height)
-                : height;
+              draggingElement.height =
+                e.shiftKey && this.state.elementType !== "selection"
+                  ? Math.abs(width) * Math.sign(height)
+                  : height;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                elements = setSelection(elements, draggingElement);
+                if (!e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
+                const elementsWithinSelection = getElementsWithinSelection(
+                  elements,
+                  draggingElement
+                );
+                elementsWithinSelection.forEach(element => {
+                  element.isSelected = true;
+                });
               }
               // We don't want to save history when moving an element
               history.skipRecording();
@@ -981,27 +986,20 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-            const resizeElement = getElementWithResizeHandler(
-              elements,
-              { x, y },
-              this.state
-            );
-            if (resizeElement && resizeElement.resizeHandle) {
-              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
-              return;
+            const selectedElements = elements.filter(e => e.isSelected).length;
+            if (selectedElements === 1) {
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
+              if (resizeElement && resizeElement.resizeHandle) {
+                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                return;
+              }
             }
             const hitElement = getElementAtPosition(elements, x, y);
-            if (hitElement) {
-              const resizeHandle = resizeTest(hitElement, x, y, {
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY
-              });
-              document.documentElement.style.cursor = resizeHandle
-                ? `${resizeHandle}-resize`
-                : `move`;
-            } else {
-              document.documentElement.style.cursor = ``;
-            }
+            document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
       </div>
