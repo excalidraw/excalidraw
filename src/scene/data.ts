@@ -1,4 +1,4 @@
-import rough from "roughjs/bin/wrappers/rough";
+import rough from "roughjs/bin/rough";
 
 import { ExcalidrawElement } from "../element/types";
 
