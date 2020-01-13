@@ -18,7 +18,12 @@ type Props = {
 
 function ContextMenu({ options, onCloseRequest, top, left }: Props) {
   return (
-    <Popover onCloseRequest={onCloseRequest} top={top} left={left}>
+    <Popover
+      onCloseRequest={onCloseRequest}
+      top={top}
+      left={left}
+      fitInViewport={true}
+    >
       <ul className="context-menu" onContextMenu={e => e.preventDefault()}>
         {options.map((option, idx) => (
           <li
