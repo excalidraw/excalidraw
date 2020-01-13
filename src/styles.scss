@@ -97,6 +97,11 @@ button {
   height: 100%;
 }
 
+.App-menu_right {
+  grid-template-rows: 1fr auto 1fr;
+  height: 100%;
+}
+
 .App-filename {
   padding-left: 10px;
   padding-right: 10px;

@@ -4,7 +4,7 @@ import React from "react";
 
 type FixedSideContainerProps = {
   children: React.ReactNode;
-  side: "top" | "left";
+  side: "top" | "left" | "right";
 };
 
 export function FixedSideContainer({

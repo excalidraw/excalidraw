@@ -349,104 +349,88 @@ export class App extends React.Component<{}, AppState> {
       return null;
     }
 
-    const x = Math.max(
-      ...selectedElements.map(el => (el.width > 0 ? el.x + el.width : el.x))
-    );
-    const y = Math.min(
-      ...selectedElements.map(el => (el.height < 0 ? el.y + el.width : el.y))
-    );
-
     return (
-      <div
-        style={{
-          left: x + this.state.scrollX + 16,
-          top: y + this.state.scrollY - 4,
-          position: "absolute",
-          zIndex: 1,
-          background: "rgba(255,255,255,0.8)",
-          borderRadius: 4,
-          padding: 10
-        }}
-        className="panelColumn"
-      >
-        {this.actionManager.renderAction(
-          "changeStrokeColor",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
+      <Island padding={1}>
+        <div className="panelColumn">
+          {this.actionManager.renderAction(
+            "changeStrokeColor",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
 
-        {hasBackground(elements) && (
-          <>
-            {this.actionManager.renderAction(
-              "changeBackgroundColor",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
+          {hasBackground(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeBackgroundColor",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
 
-            {this.actionManager.renderAction(
-              "changeFillStyle",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            <hr />
-          </>
-        )}
+              {this.actionManager.renderAction(
+                "changeFillStyle",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
 
-        {hasStroke(elements) && (
-          <>
-            {this.actionManager.renderAction(
-              "changeStrokeWidth",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
+          {hasStroke(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeStrokeWidth",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
 
-            {this.actionManager.renderAction(
-              "changeSloppiness",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            <hr />
-          </>
-        )}
+              {this.actionManager.renderAction(
+                "changeSloppiness",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
 
-        {hasText(elements) && (
-          <>
-            {this.actionManager.renderAction(
-              "changeFontSize",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
+          {hasText(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeFontSize",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
 
-            {this.actionManager.renderAction(
-              "changeFontFamily",
-              elements,
-              this.state,
-              this.syncActionResult
-            )}
-            <hr />
-          </>
-        )}
+              {this.actionManager.renderAction(
+                "changeFontFamily",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
 
-        {this.actionManager.renderAction(
-          "changeOpacity",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
+          {this.actionManager.renderAction(
+            "changeOpacity",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
 
-        {this.actionManager.renderAction(
-          "deleteSelectedElements",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-      </div>
+          {this.actionManager.renderAction(
+            "deleteSelectedElements",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </div>
+      </Island>
     );
   }
 
@@ -580,7 +564,12 @@ export class App extends React.Component<{}, AppState> {
           </div>
         </FixedSideContainer>
 
-        {this.renderSelectedElementsPopover(elements)}
+        <FixedSideContainer side="right">
+          <div className="App-menu App-menu_right">
+            <div style={{ height: 50 }}></div>
+            {this.renderSelectedElementsPopover(elements)}
+          </div>
+        </FixedSideContainer>
 
         <canvas
           id="canvas"
