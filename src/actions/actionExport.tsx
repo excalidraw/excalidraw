@@ -40,7 +40,7 @@ export const actionChangeExportBackground: Action = {
 export const actionSaveScene: Action = {
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState.name);
+    saveAsJSON(elements, appState);
     return {};
   },
   PanelComponent: ({ updateData }) => (
@@ -56,8 +56,12 @@ export const actionSaveScene: Action = {
 
 export const actionLoadScene: Action = {
   name: "loadScene",
-  perform: (elements, appState, loadedElements) => {
-    return { elements: loadedElements };
+  perform: (
+    elements,
+    appState,
+    { elements: loadedElements, appState: loadedAppState }
+  ) => {
+    return { elements: loadedElements, appState: loadedAppState };
   },
   PanelComponent: ({ updateData }) => (
     <ToolIcon
@@ -66,8 +70,8 @@ export const actionLoadScene: Action = {
       title="Load"
       aria-label="Load"
       onClick={() => {
-        loadFromJSON().then(({ elements }) => {
-          updateData(elements);
+        loadFromJSON().then(({ elements, appState }) => {
+          updateData({ elements: elements, appState: appState });
         });
       }}
     />
