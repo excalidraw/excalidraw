@@ -350,7 +350,7 @@ export class App extends React.Component<{}, AppState> {
     }
 
     return (
-      <Island padding={1}>
+      <Island padding={4}>
         <div className="panelColumn">
           {this.actionManager.renderAction(
             "changeStrokeColor",
@@ -437,19 +437,6 @@ export class App extends React.Component<{}, AppState> {
   private renderEditorActions() {
     return (
       <>
-        {this.actionManager.renderAction(
-          "loadScene",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-        {this.actionManager.renderAction(
-          "saveScene",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-        <div className="divider"></div>
         <ToolIcon
           type="button"
           icon={image}
@@ -495,6 +482,19 @@ export class App extends React.Component<{}, AppState> {
         )}
         {this.actionManager.renderAction(
           "clearCanvas",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+        <div className="divider"></div>
+        {this.actionManager.renderAction(
+          "loadScene",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+        {this.actionManager.renderAction(
+          "saveScene",
           elements,
           this.state,
           this.syncActionResult
@@ -548,26 +548,18 @@ export class App extends React.Component<{}, AppState> {
       <div className="container">
         <FixedSideContainer side="top">
           <div className="App-menu App-menu_top">
-            {this.renderFileName()}
             <Island padding={1}>
               <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
             </Island>
-          </div>
-        </FixedSideContainer>
-
-        <FixedSideContainer side="left">
-          <div className="App-menu App-menu_left">
-            <div style={{ height: 50 }}></div>
-            <Island padding={1}>
-              <Stack.Col gap={1}>{this.renderEditorActions()}</Stack.Col>
-            </Island>
-          </div>
-        </FixedSideContainer>
-
-        <FixedSideContainer side="right">
-          <div className="App-menu App-menu_right">
-            <div style={{ height: 50 }}></div>
-            {this.renderSelectedElementsPopover(elements)}
+            {this.renderFileName()}
+            <Stack.Col gap={4} align="end">
+              <Island padding={1}>
+                <Stack.Row gap={1}>{this.renderEditorActions()}</Stack.Row>
+              </Island>
+              <div className="App-right-menu">
+                {this.renderSelectedElementsPopover(elements)}
+              </div>
+            </Stack.Col>
           </div>
         </FixedSideContainer>
 

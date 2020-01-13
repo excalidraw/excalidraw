@@ -18,7 +18,7 @@ type ToolIconProps =
       title?: string;
       name?: string;
       id?: string;
-      checked?: boolean;
+      checked: boolean;
       onChange?(): void;
     };
 
@@ -45,6 +45,7 @@ export function ToolIcon(props: ToolIconProps) {
         name={props.name}
         id={props.id}
         onChange={props.onChange}
+        checked={props.checked}
       />
       <div className="ToolIcon__icon">{props.icon}</div>
     </label>

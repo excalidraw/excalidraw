@@ -1,6 +1,11 @@
 .FixedSideContainer {
   --margin: 5px;
   position: fixed;
+  pointer-events: none;
+}
+
+.FixedSideContainer > * {
+  pointer-events: all;
 }
 
 .FixedSideContainer_side_top {
@@ -21,5 +26,5 @@
   right: var(--margin);
   top: var(--margin);
   bottom: var(--margin);
-  z-index: 1;
+  z-index: 3;
 }

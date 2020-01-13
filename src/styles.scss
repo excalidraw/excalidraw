@@ -47,7 +47,7 @@ body {
 }
 
 .divider {
-  height: 1px;
+  width: 1px;
   background-color: #ddd;
   margin: 1px;
 }
@@ -89,7 +89,23 @@ button {
 }
 
 .App-menu_top {
+  --right-menu-width: 250px;
   grid-template-columns: 1fr auto 1fr;
+  align-items: flex-start;
+  cursor: default;
+  pointer-events: none !important;
+}
+
+.App-menu_top > * {
+  pointer-events: all;
+}
+
+.App-menu_top > *:first-child {
+  justify-self: flex-start;
+}
+
+.App-menu_top > *:last-child {
+  justify-self: flex-end;
 }
 
 .App-menu_left {
@@ -98,15 +114,19 @@ button {
 }
 
 .App-menu_right {
-  grid-template-rows: 1fr auto 1fr;
+  grid-template-rows: 1fr;
   height: 100%;
 }
 
+.App-right-menu {
+  width: var(--right-menu-width);
+}
+
 .App-filename {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: calc(var(--space-factor) * 2);
+  padding-right: calc(var(--space-factor) * 2);
+  padding-top: calc(var(--space-factor) * 2);
   flex-shrink: 0;
   flex-grow: 1;
   display: flex;
-  align-self: "center";
 }
