@@ -1,7 +1,8 @@
 import { ExcalidrawElement } from "../element/types";
 import { hitTest } from "../element/collision";
+import { getElementAbsoluteCoords } from "../element";
 
-export const hasBackground = (elements: ExcalidrawElement[]) =>
+export const hasBackground = (elements: readonly ExcalidrawElement[]) =>
   elements.some(
     element =>
       element.isSelected &&
@@ -10,7 +11,7 @@ export const hasBackground = (elements: ExcalidrawElement[]) =>
         element.type === "diamond")
   );
 
-export const hasStroke = (elements: ExcalidrawElement[]) =>
+export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
   elements.some(
     element =>
       element.isSelected &&
@@ -20,8 +21,11 @@ export const hasStroke = (elements: ExcalidrawElement[]) =>
         element.type === "arrow")
   );
 
+export const hasText = (elements: readonly ExcalidrawElement[]) =>
+  elements.some(element => element.isSelected && element.type === "text");
+
 export function getElementAtPosition(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   x: number,
   y: number
 ) {
@@ -34,5 +38,22 @@ export function getElementAtPosition(
     }
   }
 
+  return hitElement;
+}
+
+export function getElementContainingPosition(
+  elements: readonly ExcalidrawElement[],
+  x: number,
+  y: number
+) {
+  let hitElement = null;
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  for (let i = elements.length - 1; i >= 0; --i) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[i]);
+    if (x1 < x && x < x2 && y1 < y && y < y2) {
+      hitElement = elements[i];
+      break;
+    }
+  }
   return hitElement;
 }

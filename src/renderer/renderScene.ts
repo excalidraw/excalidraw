@@ -14,7 +14,7 @@ import {
 import { renderElement } from "./renderElement";
 
 export function renderScene(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -50,7 +50,15 @@ export function renderScene(
   };
 
   elements.forEach(element => {
-    renderElement(element, rc, context, sceneState);
+    context.translate(
+      element.x + sceneState.scrollX,
+      element.y + sceneState.scrollY
+    );
+    renderElement(element, rc, context);
+    context.translate(
+      -element.x - sceneState.scrollX,
+      -element.y - sceneState.scrollY
+    );
   });
 
   if (renderSelection) {

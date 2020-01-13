@@ -1,80 +1,77 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import rough from "roughjs/bin/wrappers/rough";
 
-import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
-import { randomSeed } from "./random";
-import { newElement, resizeTest, isTextElement, textWysiwyg } from "./element";
+import rough from "roughjs/bin/wrappers/rough";
+import { RoughCanvas } from "roughjs/bin/canvas";
+
+import {
+  newElement,
+  duplicateElement,
+  resizeTest,
+  isTextElement,
+  textWysiwyg,
+  getElementAbsoluteCoords
+} from "./element";
 import {
   clearSelection,
-  getSelectedIndices,
   deleteSelectedElements,
-  setSelection,
+  getElementsWithinSelection,
   isOverScrollBars,
-  someElementIsSelected,
-  getSelectedAttribute,
-  loadFromJSON,
-  saveAsJSON,
-  exportAsPNG,
   restoreFromLocalStorage,
   saveToLocalStorage,
-  hasBackground,
-  hasStroke,
   getElementAtPosition,
-  createScene
+  createScene,
+  getElementContainingPosition
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { getDateTime, isInputLike } from "./utils";
+import { isInputLike, measureText, debounce } from "./utils";
+import { KEYS, META_KEY, isArrowKey } from "./keys";
 
-import { ButtonSelect } from "./components/ButtonSelect";
 import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
-import "./styles.scss";
 import ContextMenu from "./components/ContextMenu";
-import { PanelTools } from "./components/panels/PanelTools";
-import { PanelSelection } from "./components/panels/PanelSelection";
-import { PanelColor } from "./components/panels/PanelColor";
-import { PanelExport } from "./components/panels/PanelExport";
-import { PanelCanvas } from "./components/panels/PanelCanvas";
 
-const { elements } = createScene();
+import "./styles.scss";
+import { getElementWithResizeHandler } from "./element/resizeTest";
+import {
+  ActionManager,
+  actionDeleteSelected,
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+  actionBringToFront,
+  actionSelectAll,
+  actionChangeStrokeColor,
+  actionChangeBackgroundColor,
+  actionChangeOpacity,
+  actionChangeStrokeWidth,
+  actionChangeFillStyle,
+  actionChangeSloppiness,
+  actionChangeFontSize,
+  actionChangeFontFamily,
+  actionChangeViewBackgroundColor,
+  actionClearCanvas,
+  actionChangeProjectName,
+  actionChangeExportBackground,
+  actionLoadScene,
+  actionSaveScene,
+  actionCopyStyles,
+  actionPasteStyles
+} from "./actions";
+import { SidePanel } from "./components/SidePanel";
+import { Action, ActionResult } from "./actions/types";
+import { getDefaultAppState } from "./appState";
+
+let { elements } = createScene();
 const { history } = createHistory();
-
-const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
 const CANVAS_WINDOW_OFFSET_LEFT = 250;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-export const KEYS = {
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-  ARROW_UP: "ArrowUp",
-  ENTER: "Enter",
-  ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace"
-};
-
-const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  ? "metaKey"
-  : "ctrlKey";
-
-let copiedStyles: string = "{}";
-
-function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -89,255 +86,248 @@ function addTextElement(
   if (text === null || text === "") {
     return false;
   }
+
+  const metrics = measureText(text, font);
   element.text = text;
   element.font = font;
-  const currentFont = context.font;
-  context.font = element.font;
-  const textMeasure = context.measureText(element.text);
-  const width = textMeasure.width;
-  const actualBoundingBoxAscent =
-    textMeasure.actualBoundingBoxAscent || parseInt(font);
-  const actualBoundingBoxDescent = textMeasure.actualBoundingBoxDescent || 0;
-  element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-  context.font = currentFont;
-  const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
   // Center the text
-  element.x -= width / 2;
-  element.y -= actualBoundingBoxAscent;
-  element.width = width;
-  element.height = height;
+  element.x -= metrics.width / 2;
+  element.y -= metrics.height / 2;
+  element.width = metrics.width;
+  element.height = metrics.height;
+  element.baseline = metrics.baseline;
 
   return true;
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
+const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
-class App extends React.Component<{}, AppState> {
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+) {
+  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
+  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  return { x, y };
+}
+
+export class App extends React.Component<{}, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+
+  actionManager: ActionManager = new ActionManager();
+  canvasOnlyActions: Array<Action>;
+  constructor(props: any) {
+    super(props);
+    this.actionManager.registerAction(actionDeleteSelected);
+    this.actionManager.registerAction(actionSendToBack);
+    this.actionManager.registerAction(actionBringToFront);
+    this.actionManager.registerAction(actionSendBackward);
+    this.actionManager.registerAction(actionBringForward);
+    this.actionManager.registerAction(actionSelectAll);
+
+    this.actionManager.registerAction(actionChangeStrokeColor);
+    this.actionManager.registerAction(actionChangeBackgroundColor);
+    this.actionManager.registerAction(actionChangeFillStyle);
+    this.actionManager.registerAction(actionChangeStrokeWidth);
+    this.actionManager.registerAction(actionChangeOpacity);
+    this.actionManager.registerAction(actionChangeSloppiness);
+    this.actionManager.registerAction(actionChangeFontSize);
+    this.actionManager.registerAction(actionChangeFontFamily);
+
+    this.actionManager.registerAction(actionChangeViewBackgroundColor);
+    this.actionManager.registerAction(actionClearCanvas);
+
+    this.actionManager.registerAction(actionChangeProjectName);
+    this.actionManager.registerAction(actionChangeExportBackground);
+    this.actionManager.registerAction(actionSaveScene);
+    this.actionManager.registerAction(actionLoadScene);
+
+    this.actionManager.registerAction(actionCopyStyles);
+    this.actionManager.registerAction(actionPasteStyles);
+
+    this.canvasOnlyActions = [actionSelectAll];
+  }
+
+  private syncActionResult = (res: ActionResult) => {
+    if (res.elements !== undefined) {
+      elements = res.elements;
+      this.forceUpdate();
+    }
+
+    if (res.appState !== undefined) {
+      this.setState({ ...res.appState });
+    }
+  };
+
+  private onCut = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    elements = deleteSelectedElements(elements);
+    this.forceUpdate();
+    e.preventDefault();
+  };
+  private onCopy = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    e.preventDefault();
+  };
+  private onPaste = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    const paste = e.clipboardData?.getData("text") || "";
+    this.addElementsFromPaste(paste);
+    e.preventDefault();
+  };
+
   public componentDidMount() {
+    document.addEventListener("copy", this.onCopy);
+    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("cut", this.onCut);
+
     document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restoreFromLocalStorage(elements);
-    if (savedState) {
-      this.setState(savedState);
+    const { elements: newElements, appState } = restoreFromLocalStorage();
+
+    if (newElements) {
+      elements = newElements;
+    }
+
+    if (appState) {
+      this.setState(appState);
+    } else {
+      this.forceUpdate();
     }
   }
 
   public componentWillUnmount() {
+    document.removeEventListener("copy", this.onCopy);
+    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("cut", this.onCut);
+
     document.removeEventListener("keydown", this.onKeyDown, false);
+    document.removeEventListener(
+      "mousemove",
+      this.getCurrentCursorPosition,
+      false
+    );
     window.removeEventListener("resize", this.onResize, false);
   }
 
-  public state: AppState = {
-    draggingElement: null,
-    resizingElement: null,
-    elementType: "selection",
-    exportBackground: true,
-    currentItemStrokeColor: "#000000",
-    currentItemBackgroundColor: "#ffffff",
-    currentItemFont: "20px Virgil",
-    viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
-    name: DEFAULT_PROJECT_NAME
-  };
+  public state: AppState = getDefaultAppState();
 
   private onResize = () => {
     this.forceUpdate();
   };
 
+  private getCurrentCursorPosition = (e: MouseEvent) => {
+    this.setState({ cursorX: e.x, cursorY: e.y });
+  };
+
   private onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === KEYS.ESCAPE) {
+      elements = clearSelection(elements);
+      this.forceUpdate();
+      this.setState({ elementType: "selection" });
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur();
+      }
+      event.preventDefault();
+      return;
+    }
     if (isInputLike(event.target)) return;
 
-    if (event.key === KEYS.ESCAPE) {
-      clearSelection(elements);
-      this.forceUpdate();
-      event.preventDefault();
-    } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      this.deleteSelectedElements();
-      event.preventDefault();
-    } else if (isArrowKey(event.key)) {
+    const data = this.actionManager.handleKeyDown(event, elements, this.state);
+    this.syncActionResult(data);
+
+    if (data.elements !== undefined || data.appState !== undefined) {
+      return;
+    }
+
+    if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
-      elements.forEach(element => {
-        if (element.isSelected) {
+      elements = elements.map(el => {
+        if (el.isSelected) {
+          const element = { ...el };
           if (event.key === KEYS.ARROW_LEFT) element.x -= step;
           else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
           else if (event.key === KEYS.ARROW_UP) element.y -= step;
           else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          return element;
         }
+        return el;
       });
       this.forceUpdate();
       event.preventDefault();
-
-      // Send backward: Cmd-Shift-Alt-B
     } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyB"
+      shapesShortcutKeys.includes(event.key.toLowerCase()) &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.metaKey
     ) {
-      this.moveOneLeft();
-      event.preventDefault();
-
-      // Send to back: Cmd-Shift-B
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyB") {
-      this.moveAllLeft();
-      event.preventDefault();
-
-      // Bring forward: Cmd-Shift-Alt-F
-    } else if (
-      event[META_KEY] &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyF"
-    ) {
-      this.moveOneRight();
-      event.preventDefault();
-
-      // Bring to front: Cmd-Shift-F
-    } else if (event[META_KEY] && event.shiftKey && event.code === "KeyF") {
-      this.moveAllRight();
-      event.preventDefault();
-      // Select all: Cmd-A
-    } else if (event[META_KEY] && event.code === "KeyA") {
-      elements.forEach(element => {
-        element.isSelected = true;
-      });
-      this.forceUpdate();
-      event.preventDefault();
-    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[META_KEY] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
-        history.redoOnce(elements);
+        const data = history.redoOnce();
+        if (data !== null) {
+          elements = data;
+        }
       } else {
         // undo action
-        history.undoOnce(elements);
+        const data = history.undoOnce();
+        if (data !== null) {
+          elements = data;
+        }
       }
       this.forceUpdate();
       event.preventDefault();
-      // Copy Styles: Cmd-Shift-C
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyC") {
-      this.copyStyles();
-      // Paste Styles: Cmd-Shift-V
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyV") {
-      this.pasteStyles();
-      event.preventDefault();
     }
-  };
-
-  private deleteSelectedElements = () => {
-    deleteSelectedElements(elements);
-    this.forceUpdate();
-  };
-
-  private clearCanvas = () => {
-    if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements.splice(0, elements.length);
-      this.setState({
-        viewBackgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      });
-      this.forceUpdate();
-    }
-  };
-
-  private copyStyles = () => {
-    const element = elements.find(el => el.isSelected);
-    if (element) {
-      copiedStyles = JSON.stringify(element);
-    }
-  };
-
-  private pasteStyles = () => {
-    const pastedElement = JSON.parse(copiedStyles);
-    elements.forEach(element => {
-      if (element.isSelected) {
-        element.backgroundColor = pastedElement?.backgroundColor;
-        element.strokeWidth = pastedElement?.strokeWidth;
-        element.strokeColor = pastedElement?.strokeColor;
-        element.fillStyle = pastedElement?.fillStyle;
-        element.opacity = pastedElement?.opacity;
-        element.roughness = pastedElement?.roughness;
-      }
-    });
-    this.forceUpdate();
-  };
-
-  private moveAllLeft = () => {
-    moveAllLeft(elements, getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneLeft = () => {
-    moveOneLeft(elements, getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveAllRight = () => {
-    moveAllRight(elements, getSelectedIndices(elements));
-    this.forceUpdate();
-  };
-
-  private moveOneRight = () => {
-    moveOneRight(elements, getSelectedIndices(elements));
-    this.forceUpdate();
   };
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private updateProjectName(name: string): void {
-    this.setState({ name });
-  }
-
-  private changeProperty = (callback: (element: ExcalidrawElement) => void) => {
-    elements.forEach(element => {
-      if (element.isSelected) {
-        callback(element);
-      }
-    });
-
-    this.forceUpdate();
-  };
-
-  private changeOpacity = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.changeProperty(element => (element.opacity = +event.target.value));
-  };
-
-  private changeStrokeColor = (color: string) => {
-    this.changeProperty(element => (element.strokeColor = color));
-    this.setState({ currentItemStrokeColor: color });
-  };
-
-  private changeBackgroundColor = (color: string) => {
-    this.changeProperty(element => (element.backgroundColor = color));
-    this.setState({ currentItemBackgroundColor: color });
-  };
-
   private copyToClipboard = () => {
     if (navigator.clipboard) {
       const text = JSON.stringify(
-        elements.filter(element => element.isSelected)
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
       );
       navigator.clipboard.writeText(text);
     }
   };
 
-  private pasteFromClipboard = (x?: number, y?: number) => {
+  private pasteFromClipboard = () => {
     if (navigator.clipboard) {
       navigator.clipboard
         .readText()
-        .then(text => this.addElementsFromPaste(text, x, y));
+        .then(text => this.addElementsFromPaste(text));
     }
   };
 
@@ -346,168 +336,21 @@ class App extends React.Component<{}, AppState> {
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
-      <div
-        className="container"
-        onCut={e => {
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
-          );
-          deleteSelectedElements(elements);
-          this.forceUpdate();
-          e.preventDefault();
-        }}
-        onCopy={e => {
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
-          );
-          e.preventDefault();
-        }}
-        onPaste={e => {
-          const paste = e.clipboardData.getData("text");
-          this.addElementsFromPaste(paste);
-          e.preventDefault();
-        }}
-      >
-        <div className="sidePanel">
-          <PanelTools
-            activeTool={this.state.elementType}
-            onToolChange={value => {
-              this.setState({ elementType: value });
-              clearSelection(elements);
-              document.documentElement.style.cursor =
-                value === "text" ? "text" : "crosshair";
-              this.forceUpdate();
-            }}
-          />
-          {someElementIsSelected(elements) && (
-            <div className="panelColumn">
-              <PanelSelection
-                onBringForward={this.moveOneRight}
-                onBringToFront={this.moveAllRight}
-                onSendBackward={this.moveOneLeft}
-                onSendToBack={this.moveAllLeft}
-              />
-
-              <PanelColor
-                title="Stroke Color"
-                onColorChange={this.changeStrokeColor}
-                colorValue={getSelectedAttribute(
-                  elements,
-                  element => element.strokeColor
-                )}
-              />
-
-              {hasBackground(elements) && (
-                <>
-                  <PanelColor
-                    title="Background Color"
-                    onColorChange={this.changeBackgroundColor}
-                    colorValue={getSelectedAttribute(
-                      elements,
-                      element => element.backgroundColor
-                    )}
-                  />
-
-                  <h5>Fill</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: "solid", text: "Solid" },
-                      { value: "hachure", text: "Hachure" },
-                      { value: "cross-hatch", text: "Cross-hatch" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.fillStyle
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.fillStyle = value;
-                      });
-                    }}
-                  />
-                </>
-              )}
-
-              {hasStroke(elements) && (
-                <>
-                  <h5>Stroke Width</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 1, text: "Thin" },
-                      { value: 2, text: "Bold" },
-                      { value: 4, text: "Extra Bold" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.strokeWidth
-                    )}
-                    onChange={value => {
-                      this.changeProperty(element => {
-                        element.strokeWidth = value;
-                      });
-                    }}
-                  />
-
-                  <h5>Sloppiness</h5>
-                  <ButtonSelect
-                    options={[
-                      { value: 0, text: "Draftsman" },
-                      { value: 1, text: "Artist" },
-                      { value: 3, text: "Cartoonist" }
-                    ]}
-                    value={getSelectedAttribute(
-                      elements,
-                      element => element.roughness
-                    )}
-                    onChange={value =>
-                      this.changeProperty(element => {
-                        element.roughness = value;
-                      })
-                    }
-                  />
-                </>
-              )}
-
-              <h5>Opacity</h5>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                onChange={this.changeOpacity}
-                value={
-                  getSelectedAttribute(elements, element => element.opacity) ||
-                  0 /* Put the opacity at 0 if there are two conflicting ones */
-                }
-              />
-
-              <button onClick={this.deleteSelectedElements}>
-                Delete selected
-              </button>
-            </div>
-          )}
-          <PanelCanvas
-            onClearCanvas={this.clearCanvas}
-            onViewBackgroundColorChange={val =>
-              this.setState({ viewBackgroundColor: val })
-            }
-            viewBackgroundColor={this.state.viewBackgroundColor}
-          />
-          <PanelExport
-            projectName={this.state.name}
-            onProjectNameChange={this.updateProjectName}
-            onExportAsPNG={() => exportAsPNG(elements, canvas, this.state)}
-            exportBackground={this.state.exportBackground}
-            onExportBackgroundChange={val =>
-              this.setState({ exportBackground: val })
-            }
-            onSaveScene={() => saveAsJSON(elements, this.state.name)}
-            onLoadScene={() =>
-              loadFromJSON(elements).then(() => this.forceUpdate())
-            }
-          />
-        </div>
+      <div className="container">
+        <SidePanel
+          actionManager={this.actionManager}
+          syncActionResult={this.syncActionResult}
+          appState={{ ...this.state }}
+          elements={elements}
+          onToolChange={value => {
+            this.setState({ elementType: value });
+            elements = clearSelection(elements);
+            document.documentElement.style.cursor =
+              value === "text" ? "text" : "crosshair";
+            this.forceUpdate();
+          }}
+          canvas={this.canvas!}
+        />
         <canvas
           id="canvas"
           style={{
@@ -517,6 +360,10 @@ class App extends React.Component<{}, AppState> {
           width={canvasWidth * window.devicePixelRatio}
           height={canvasHeight * window.devicePixelRatio}
           ref={canvas => {
+            if (this.canvas === null) {
+              this.canvas = canvas;
+              this.rc = rough.canvas(this.canvas!);
+            }
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
               this.removeWheelEventListener = undefined;
@@ -545,9 +392,7 @@ class App extends React.Component<{}, AppState> {
           onContextMenu={e => {
             e.preventDefault();
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const element = getElementAtPosition(elements, x, y);
             if (!element) {
@@ -555,8 +400,14 @@ class App extends React.Component<{}, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: "Paste",
-                    action: () => this.pasteFromClipboard(x, y)
-                  }
+                    action: () => this.pasteFromClipboard()
+                  },
+                  ...this.actionManager.getContextMenuItems(
+                    elements,
+                    this.state,
+                    this.syncActionResult,
+                    action => this.canvasOnlyActions.includes(action)
+                  )
                 ],
                 top: e.clientY,
                 left: e.clientX
@@ -565,7 +416,7 @@ class App extends React.Component<{}, AppState> {
             }
 
             if (!element.isSelected) {
-              clearSelection(elements);
+              elements = clearSelection(elements);
               element.isSelected = true;
               this.forceUpdate();
             }
@@ -578,15 +429,14 @@ class App extends React.Component<{}, AppState> {
                 },
                 navigator.clipboard && {
                   label: "Paste",
-                  action: () => this.pasteFromClipboard(x, y)
+                  action: () => this.pasteFromClipboard()
                 },
-                { label: "Copy Styles", action: this.copyStyles },
-                { label: "Paste Styles", action: this.pasteStyles },
-                { label: "Delete", action: this.deleteSelectedElements },
-                { label: "Move Forward", action: this.moveOneRight },
-                { label: "Send to Front", action: this.moveAllRight },
-                { label: "Move Backwards", action: this.moveOneLeft },
-                { label: "Send to Back", action: this.moveAllLeft }
+                ...this.actionManager.getContextMenuItems(
+                  elements,
+                  this.state,
+                  this.syncActionResult,
+                  action => !this.canvasOnlyActions.includes(action)
+                )
               ],
               top: e.clientY,
               left: e.clientX
@@ -624,9 +474,8 @@ class App extends React.Component<{}, AppState> {
               this.state.scrollY
             );
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const element = newElement(
               this.state.elementType,
               x,
@@ -638,87 +487,111 @@ class App extends React.Component<{}, AppState> {
               1,
               100
             );
-            let resizeHandle: string | false = false;
-            let isDraggingElements = false;
+
+            type ResizeTestType = ReturnType<typeof resizeTest>;
+            let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
+            let draggingOccured = false;
+            let hitElement: ExcalidrawElement | null = null;
+            let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
-              const resizeElement = elements.find(element => {
-                return resizeTest(element, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
-              });
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
 
               this.setState({
-                resizingElement: resizeElement ? resizeElement : null
+                resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
-                resizeHandle = resizeTest(resizeElement, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const hitElement = getElementAtPosition(elements, x, y);
+                hitElement = getElementAtPosition(elements, x, y);
+                // clear selection if shift is not clicked
+                if (!hitElement?.isSelected && !e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
 
                 // If we click on something
                 if (hitElement) {
-                  if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
-                    // we're likely going to drag it
-                  } else {
-                    // We unselect every other elements unless shift is pressed
-                    if (!e.shiftKey) {
-                      clearSelection(elements);
-                    }
-                    // No matter what, we select it
+                  // deselect if item is selected
+                  // if shift is not clicked, this will always return true
+                  // otherwise, it will trigger selection based on current
+                  // state of the box
+                  if (!hitElement.isSelected) {
                     hitElement.isSelected = true;
+                    elementIsAddedToSelection = true;
                   }
-                } else {
-                  // If we don't click on anything, let's remove all the selected elements
-                  clearSelection(elements);
-                }
 
-                isDraggingElements = someElementIsSelected(elements);
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
+                  // We duplicate the selected element if alt is pressed on Mouse down
+                  if (e.altKey) {
+                    elements = [
+                      ...elements.map(element => ({
+                        ...element,
+                        isSelected: false
+                      })),
+                      ...elements
+                        .filter(element => element.isSelected)
+                        .map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        })
+                    ];
+                  }
                 }
               }
+            } else {
+              elements = clearSelection(elements);
             }
 
             if (isTextElement(element)) {
+              let textX = e.clientX;
+              let textY = e.clientY;
+              if (!e.altKey) {
+                const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                  x,
+                  y
+                );
+                if (snappedToCenterPosition) {
+                  element.x = snappedToCenterPosition.elementCenterX;
+                  element.y = snappedToCenterPosition.elementCenterY;
+                  textX = snappedToCenterPosition.wysiwygX;
+                  textY = snappedToCenterPosition.wysiwygY;
+                }
+              }
+
               textWysiwyg({
                 initText: "",
-                x: e.clientX,
-                y: e.clientY,
+                x: textX,
+                y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
                   addTextElement(element, text, this.state.currentItemFont);
-                  elements.push(element);
-                  element.isSelected = true;
+                  elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
                     elementType: "selection"
                   });
                 }
               });
+              this.setState({ elementType: "selection" });
               return;
             }
 
-            elements.push(element);
             if (this.state.elementType === "text") {
+              elements = [...elements, { ...element, isSelected: true }];
               this.setState({
                 draggingElement: null,
                 elementType: "selection"
               });
-              element.isSelected = true;
             } else {
+              elements = [...elements, element];
               this.setState({ draggingElement: element });
             }
 
@@ -756,40 +629,44 @@ class App extends React.Component<{}, AppState> {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
+                  let deltaX = 0;
+                  let deltaY = 0;
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          const deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "ne":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "sw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.height = element.width;
                         } else {
-                          element.height = lastY - element.y;
+                          element.height += y - lastY;
                         }
                         break;
                       case "se":
@@ -801,23 +678,26 @@ class App extends React.Component<{}, AppState> {
                         }
                         break;
                       case "n":
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
                         break;
                       case "w":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         break;
                       case "s":
-                        element.height = lastY - element.y;
+                        element.height += y - lastY;
                         break;
                       case "e":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         break;
                     }
 
                     el.x = element.x;
                     el.y = element.y;
+                    el.shape = null;
                   });
                   lastX = x;
                   lastY = y;
@@ -828,13 +708,14 @@ class App extends React.Component<{}, AppState> {
                 }
               }
 
-              if (isDraggingElements) {
+              if (hitElement?.isSelected) {
+                // Marking that click was used for dragging to check
+                // if elements should be deselected on mouseup
+                draggingOccured = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -852,6 +733,7 @@ class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
+
               let width =
                 e.clientX -
                 CANVAS_WINDOW_OFFSET_LEFT -
@@ -864,12 +746,23 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey
-                ? Math.abs(width) * Math.sign(height)
-                : height;
+              draggingElement.height =
+                e.shiftKey && this.state.elementType !== "selection"
+                  ? Math.abs(width) * Math.sign(height)
+                  : height;
+              draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                setSelection(elements, draggingElement);
+                if (!e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
+                const elementsWithinSelection = getElementsWithinSelection(
+                  elements,
+                  draggingElement
+                );
+                elementsWithinSelection.forEach(element => {
+                  element.isSelected = true;
+                });
               }
               // We don't want to save history when moving an element
               history.skipRecording();
@@ -885,18 +778,36 @@ class App extends React.Component<{}, AppState> {
 
               resetCursor();
 
-              // if no element is clicked, clear the selection and redraw
+              // If click occured on already selected element
+              // it is needed to remove selection from other elements
+              // or if SHIFT or META key pressed remove selection
+              // from hitted element
+              //
+              // If click occured and elements were dragged or some element
+              // was added to selection (on mousedown phase) we need to keep
+              // selection unchanged
+              if (
+                hitElement &&
+                !draggingOccured &&
+                !elementIsAddedToSelection
+              ) {
+                if (e.shiftKey) {
+                  hitElement.isSelected = false;
+                } else {
+                  elements = clearSelection(elements);
+                  hitElement.isSelected = true;
+                }
+              }
+
               if (draggingElement === null) {
-                clearSelection(elements);
+                // if no element is clicked, clear the selection and redraw
+                elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
 
               if (elementType === "selection") {
-                if (isDraggingElements) {
-                  isDraggingElements = false;
-                }
-                elements.pop();
+                elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
               }
@@ -905,6 +816,8 @@ class App extends React.Component<{}, AppState> {
                 draggingElement: null,
                 elementType: "selection"
               });
+
+              history.resumeRecording();
               this.forceUpdate();
             };
 
@@ -918,16 +831,9 @@ class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const elementAtPosition = getElementAtPosition(elements, x, y);
-            if (elementAtPosition && !isTextElement(elementAtPosition)) {
-              return;
-            } else if (elementAtPosition) {
-              elements.splice(elements.indexOf(elementAtPosition), 1);
-              this.forceUpdate();
-            }
 
             const element = newElement(
               "text",
@@ -944,12 +850,17 @@ class App extends React.Component<{}, AppState> {
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
-            if (elementAtPosition) {
+
+            if (elementAtPosition && isTextElement(elementAtPosition)) {
+              elements = elements.filter(
+                element => element.id !== elementAtPosition.id
+              );
+              this.forceUpdate();
+
               Object.assign(element, elementAtPosition);
               // x and y will change after calling addTextElement function
               element.x = elementAtPosition.x + elementAtPosition.width / 2;
-              element.y =
-                elementAtPosition.y + elementAtPosition.actualBoundingBoxAscent;
+              element.y = elementAtPosition.y + elementAtPosition.height / 2;
               initText = elementAtPosition.text;
               textX =
                 this.state.scrollX +
@@ -960,7 +871,19 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY +
                 elementAtPosition.y +
                 CANVAS_WINDOW_OFFSET_TOP +
-                elementAtPosition.actualBoundingBoxAscent;
+                elementAtPosition.height / 2;
+            } else if (!e.altKey) {
+              const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                x,
+                y
+              );
+
+              if (snappedToCenterPosition) {
+                element.x = snappedToCenterPosition.elementCenterX;
+                element.y = snappedToCenterPosition.elementCenterY;
+                textX = snappedToCenterPosition.wysiwygX;
+                textY = snappedToCenterPosition.wysiwygY;
+              }
             }
 
             textWysiwyg({
@@ -975,14 +898,34 @@ class App extends React.Component<{}, AppState> {
                   text,
                   element.font || this.state.currentItemFont
                 );
-                elements.push(element);
-                element.isSelected = true;
+                elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
                   elementType: "selection"
                 });
               }
             });
+          }}
+          onMouseMove={e => {
+            const hasDeselectedButton = Boolean(e.buttons);
+            if (hasDeselectedButton || this.state.elementType !== "selection") {
+              return;
+            }
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const selectedElements = elements.filter(e => e.isSelected).length;
+            if (selectedElements === 1) {
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
+              if (resizeElement && resizeElement.resizeHandle) {
+                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                return;
+              }
+            }
+            const hitElement = getElementAtPosition(elements, x, y);
+            document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
       </div>
@@ -998,7 +941,7 @@ class App extends React.Component<{}, AppState> {
     }));
   };
 
-  private addElementsFromPaste = (paste: string, x?: number, y?: number) => {
+  private addElementsFromPaste = (paste: string) => {
     let parsedElements;
     try {
       parsedElements = JSON.parse(paste);
@@ -1008,44 +951,100 @@ class App extends React.Component<{}, AppState> {
       parsedElements.length > 0 &&
       parsedElements[0].type // need to implement a better check here...
     ) {
-      clearSelection(elements);
+      elements = clearSelection(elements);
 
-      if (x == null) x = 10 - this.state.scrollX;
-      if (y == null) y = 10 - this.state.scrollY;
+      let subCanvasX1 = Infinity;
+      let subCanvasX2 = 0;
+      let subCanvasY1 = Infinity;
+      let subCanvasY2 = 0;
+
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));
-      const dx = x - minX;
-      const dy = y - minY;
+
+      const distance = (x: number, y: number) => {
+        return Math.abs(x > y ? x - y : y - x);
+      };
 
       parsedElements.forEach(parsedElement => {
-        parsedElement.x += dx;
-        parsedElement.y += dy;
-        parsedElement.seed = randomSeed();
-        elements.push(parsedElement);
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
+        subCanvasX1 = Math.min(subCanvasX1, x1);
+        subCanvasY1 = Math.min(subCanvasY1, y1);
+        subCanvasX2 = Math.max(subCanvasX2, x2);
+        subCanvasY2 = Math.max(subCanvasY2, y2);
       });
+
+      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
+      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
+
+      const dx =
+        this.state.cursorX -
+        this.state.scrollX -
+        CANVAS_WINDOW_OFFSET_LEFT -
+        elementsCenterX;
+      const dy =
+        this.state.cursorY -
+        this.state.scrollY -
+        CANVAS_WINDOW_OFFSET_TOP -
+        elementsCenterY;
+
+      elements = [
+        ...elements,
+        ...parsedElements.map(parsedElement => {
+          const duplicate = duplicateElement(parsedElement);
+          duplicate.x += dx - minX;
+          duplicate.y += dy - minY;
+          return duplicate;
+        })
+      ];
       this.forceUpdate();
     }
   };
 
+  private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
+    const elementClickedInside = getElementContainingPosition(elements, x, y);
+    if (elementClickedInside) {
+      const elementCenterX =
+        elementClickedInside.x + elementClickedInside.width / 2;
+      const elementCenterY =
+        elementClickedInside.y + elementClickedInside.height / 2;
+      const distanceToCenter = Math.hypot(
+        x - elementCenterX,
+        y - elementCenterY
+      );
+      const isSnappedToCenter =
+        distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
+      if (isSnappedToCenter) {
+        const wysiwygX =
+          this.state.scrollX +
+          elementClickedInside.x +
+          CANVAS_WINDOW_OFFSET_LEFT +
+          elementClickedInside.width / 2;
+        const wysiwygY =
+          this.state.scrollY +
+          elementClickedInside.y +
+          CANVAS_WINDOW_OFFSET_TOP +
+          elementClickedInside.height / 2;
+        return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
+      }
+    }
+  }
+
+  private saveDebounced = debounce(() => {
+    saveToLocalStorage(elements, this.state);
+  }, 300);
+
   componentDidUpdate() {
-    renderScene(elements, rc, canvas, {
+    renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    saveToLocalStorage(elements, this.state);
+    this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(history.generateCurrentEntry(elements));
-      history.clearRedoStack();
     }
-    history.resumeRecording();
   }
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const rc = rough.canvas(canvas);
-const context = canvas.getContext("2d")!;
-
 ReactDOM.render(<App />, rootElement);

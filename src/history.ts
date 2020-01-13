@@ -5,9 +5,12 @@ class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(elements: ExcalidrawElement[]) {
+  generateCurrentEntry(elements: readonly ExcalidrawElement[]) {
     return JSON.stringify(
-      elements.map(element => ({ ...element, isSelected: false }))
+      elements.map(({ shape, ...element }) => ({
+        ...element,
+        isSelected: false
+      }))
     );
   }
 
@@ -19,44 +22,54 @@ class SceneHistory {
       // If the last entry is the same as this one, ignore it
       return;
     }
+
     this.stateHistory.push(newEntry);
+
+    // As a new entry was pushed, we invalidate the redo stack
+    this.clearRedoStack();
   }
 
-  restoreEntry(elements: ExcalidrawElement[], entry: string) {
-    const newElements = JSON.parse(entry);
-    elements.splice(0, elements.length);
-    newElements.forEach((newElement: ExcalidrawElement) => {
-      elements.push(newElement);
-    });
-    // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
-    this.skipRecording();
+  restoreEntry(entry: string) {
+    try {
+      return JSON.parse(entry);
+    } catch {
+      return null;
+    }
   }
 
   clearRedoStack() {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(elements: ExcalidrawElement[]) {
-    const currentEntry = this.generateCurrentEntry(elements);
-    const entryToRestore = this.redoStack.pop();
-    if (entryToRestore !== undefined) {
-      this.restoreEntry(elements, entryToRestore);
-      this.stateHistory.push(currentEntry);
+  redoOnce() {
+    if (this.redoStack.length === 0) {
+      return null;
     }
+
+    const entryToRestore = this.redoStack.pop();
+
+    if (entryToRestore !== undefined) {
+      this.stateHistory.push(entryToRestore);
+      return this.restoreEntry(entryToRestore);
+    }
+
+    return null;
   }
 
-  undoOnce(elements: ExcalidrawElement[]) {
-    const currentEntry = this.generateCurrentEntry(elements);
-    let entryToRestore = this.stateHistory.pop();
+  undoOnce() {
+    if (this.stateHistory.length === 0) {
+      return null;
+    }
 
-    // If nothing was changed since last, take the previous one
-    if (currentEntry === entryToRestore) {
-      entryToRestore = this.stateHistory.pop();
-    }
-    if (entryToRestore !== undefined) {
-      this.restoreEntry(elements, entryToRestore);
+    const currentEntry = this.stateHistory.pop();
+    const entryToRestore = this.stateHistory[this.stateHistory.length - 1];
+
+    if (currentEntry !== undefined) {
       this.redoStack.push(currentEntry);
+      return this.restoreEntry(entryToRestore);
     }
+
+    return null;
   }
 
   isRecording() {

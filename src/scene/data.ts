@@ -6,6 +6,7 @@ import { getElementAbsoluteCoords } from "../element";
 
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
+import { ExportType } from "./types";
 import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -22,11 +23,19 @@ function saveFile(name: string, data: string) {
   link.remove();
 }
 
-export function saveAsJSON(elements: ExcalidrawElement[], name: string) {
+interface DataState {
+  elements: readonly ExcalidrawElement[];
+  appState: any;
+}
+
+export function saveAsJSON(
+  elements: readonly ExcalidrawElement[],
+  name: string
+) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
-    elements
+    elements: elements.map(({ shape, ...el }) => el)
   });
 
   saveFile(
@@ -35,7 +44,7 @@ export function saveAsJSON(elements: ExcalidrawElement[], name: string) {
   );
 }
 
-export function loadFromJSON(elements: ExcalidrawElement[]) {
+export function loadFromJSON() {
   const input = document.createElement("input");
   const reader = new FileReader();
   input.type = "file";
@@ -52,19 +61,25 @@ export function loadFromJSON(elements: ExcalidrawElement[]) {
 
   input.click();
 
-  return new Promise(resolve => {
+  return new Promise<DataState>(resolve => {
     reader.onloadend = () => {
       if (reader.readyState === FileReader.DONE) {
-        const data = JSON.parse(reader.result as string);
-        restore(elements, data.elements, null);
-        resolve();
+        let elements = [];
+        try {
+          const data = JSON.parse(reader.result as string);
+          elements = data.elements || [];
+        } catch (e) {
+          // Do nothing because elements array is already empty
+        }
+        resolve(restore(elements, null));
       }
     };
   });
 }
 
-export function exportAsPNG(
-  elements: ExcalidrawElement[],
+export function exportCanvas(
+  type: ExportType,
+  elements: readonly ExcalidrawElement[],
   canvas: HTMLCanvasElement,
   {
     exportBackground,
@@ -123,54 +138,77 @@ export function exportAsPNG(
     }
   );
 
-  saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+  if (type === "png") {
+    saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+  } else if (type === "clipboard") {
+    try {
+      tempCanvas.toBlob(async function(blob) {
+        try {
+          await navigator.clipboard.write([
+            new window.ClipboardItem({ "image/png": blob })
+          ]);
+        } catch (err) {
+          window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+        }
+      });
+    } catch (err) {
+      window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+    }
+  }
 
   // clean up the DOM
   if (tempCanvas !== canvas) tempCanvas.remove();
 }
 
 function restore(
-  elements: ExcalidrawElement[],
-  savedElements: string | ExcalidrawElement[] | null,
-  savedState: string | null
-) {
-  try {
-    if (savedElements) {
-      elements.splice(
-        0,
-        elements.length,
-        ...(typeof savedElements === "string"
-          ? JSON.parse(savedElements)
-          : savedElements)
-      );
-      elements.forEach((element: ExcalidrawElement) => {
-        element.id = element.id || nanoid();
-        element.fillStyle = element.fillStyle || "hachure";
-        element.strokeWidth = element.strokeWidth || 1;
-        element.roughness = element.roughness || 1;
-        element.opacity =
-          element.opacity === null || element.opacity === undefined
-            ? 100
-            : element.opacity;
-      });
-    }
-
-    return savedState ? JSON.parse(savedState) : null;
-  } catch (e) {
-    elements.splice(0, elements.length);
-    return null;
-  }
+  savedElements: readonly ExcalidrawElement[],
+  savedState: any
+): DataState {
+  return {
+    elements: savedElements.map(element => ({
+      ...element,
+      id: element.id || nanoid(),
+      fillStyle: element.fillStyle || "hachure",
+      strokeWidth: element.strokeWidth || 1,
+      roughness: element.roughness || 1,
+      opacity:
+        element.opacity === null || element.opacity === undefined
+          ? 100
+          : element.opacity
+    })),
+    appState: savedState
+  };
 }
 
-export function restoreFromLocalStorage(elements: ExcalidrawElement[]) {
+export function restoreFromLocalStorage() {
   const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
   const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
 
-  return restore(elements, savedElements, savedState);
+  let elements = [];
+  if (savedElements) {
+    try {
+      elements = JSON.parse(savedElements).map(
+        ({ shape, ...element }: ExcalidrawElement) => element
+      );
+    } catch (e) {
+      // Do nothing because elements array is already empty
+    }
+  }
+
+  let appState = null;
+  if (savedState) {
+    try {
+      appState = JSON.parse(savedState);
+    } catch (e) {
+      // Do nothing because appState is already null
+    }
+  }
+
+  return restore(elements, appState);
 }
 
 export function saveToLocalStorage(
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   state: AppState
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));

@@ -17,6 +17,8 @@ export function moveOneLeft<T>(elements: T[], indicesToMove: number[]) {
     }
     swap(elements, index - 1, index);
   });
+
+  return elements;
 }
 
 export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
@@ -35,6 +37,7 @@ export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
     }
     swap(elements, index + 1, index);
   });
+  return elements;
 }
 
 // Let's go through an example
@@ -112,6 +115,8 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
   leftMostElements.forEach((element, i) => {
     elements[i] = element;
   });
+
+  return elements;
 }
 
 // Let's go through an example
@@ -190,4 +195,6 @@ export function moveAllRight<T>(elements: T[], indicesToMove: number[]) {
   rightMostElements.forEach((element, i) => {
     elements[elements.length - i - 1] = element;
   });
+
+  return elements;
 }

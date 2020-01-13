@@ -1,35 +1,39 @@
 import React from "react";
 
-import { ColorPicker } from "../ColorPicker";
+import { Panel } from "../Panel";
+import { ActionManager } from "../../actions";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+import { UpdaterFn } from "../../actions/types";
 
 interface PanelCanvasProps {
-  viewBackgroundColor: string;
-  onViewBackgroundColorChange: (val: string) => void;
-  onClearCanvas: React.MouseEventHandler;
+  actionManager: ActionManager;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  syncActionResult: UpdaterFn;
 }
 
 export const PanelCanvas: React.FC<PanelCanvasProps> = ({
-  viewBackgroundColor,
-  onViewBackgroundColorChange,
-  onClearCanvas
+  actionManager,
+  elements,
+  appState,
+  syncActionResult
 }) => {
   return (
-    <>
-      <h4>Canvas</h4>
-      <div className="panelColumn">
-        <h5>Canvas Background Color</h5>
-        <ColorPicker
-          color={viewBackgroundColor}
-          onChange={color => onViewBackgroundColorChange(color)}
-        />
-        <button
-          type="button"
-          onClick={onClearCanvas}
-          title="Clear the canvas & reset background color"
-        >
-          Clear canvas
-        </button>
-      </div>
-    </>
+    <Panel title="Canvas">
+      {actionManager.renderAction(
+        "changeViewBackgroundColor",
+        elements,
+        appState,
+        syncActionResult
+      )}
+
+      {actionManager.renderAction(
+        "clearCanvas",
+        elements,
+        appState,
+        syncActionResult
+      )}
+    </Panel>
   );
 };

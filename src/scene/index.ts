@@ -4,15 +4,21 @@ export {
   getSelectedIndices,
   deleteSelectedElements,
   someElementIsSelected,
-  setSelection,
+  getElementsWithinSelection,
   getSelectedAttribute
 } from "./selection";
 export {
-  exportAsPNG,
+  exportCanvas,
   loadFromJSON,
   saveAsJSON,
   restoreFromLocalStorage,
   saveToLocalStorage
 } from "./data";
-export { hasBackground, hasStroke, getElementAtPosition } from "./comparisons";
+export {
+  hasBackground,
+  hasStroke,
+  getElementAtPosition,
+  getElementContainingPosition,
+  hasText
+} from "./comparisons";
 export { createScene } from "./createScene";

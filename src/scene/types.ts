@@ -7,6 +7,13 @@ export type SceneState = {
   viewBackgroundColor: string | null;
 };
 
+export type SceneScroll = {
+  scrollX: number;
+  scrollY: number;
+};
+
 export interface Scene {
   elements: ExcalidrawTextElement[];
 }
+
+export type ExportType = "png" | "clipboard";

@@ -1,5 +1,6 @@
 import { randomSeed } from "../random";
 import nanoid from "nanoid";
+import { Drawable } from "roughjs/bin/core";
 
 export function newElement(
   type: string,
@@ -28,7 +29,16 @@ export function newElement(
     roughness,
     opacity,
     isSelected: false,
-    seed: randomSeed()
+    seed: randomSeed(),
+    shape: null as Drawable | Drawable[] | null
   };
   return element;
+}
+
+export function duplicateElement(element: ReturnType<typeof newElement>) {
+  const copy = { ...element };
+  delete copy.shape;
+  copy.id = nanoid();
+  copy.seed = randomSeed();
+  return copy;
 }
