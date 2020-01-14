@@ -341,9 +341,7 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
-  private renderSelectedElementsPopover(
-    elements: readonly ExcalidrawElement[]
-  ) {
+  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
     const selectedElements = elements.filter(el => el.isSelected);
     if (selectedElements.length === 0) {
       return null;
@@ -434,75 +432,6 @@ export class App extends React.Component<{}, AppState> {
     );
   }
 
-  private renderEditorActions() {
-    return (
-      <>
-        <ToolIcon
-          type="button"
-          icon={image}
-          title="Export to PNG"
-          aria-label="Export to PNG"
-          onClick={() => {
-            const exportedElements = elements.some(
-              element => element.isSelected
-            )
-              ? elements.filter(element => element.isSelected)
-              : elements;
-            if (this.canvas)
-              exportCanvas("png", exportedElements, this.canvas, this.state);
-          }}
-        />
-
-        <ToolIcon
-          type="button"
-          icon={clipboard}
-          title="Copy to clipboard"
-          aria-label="Copy to clipboard"
-          onClick={() => {
-            const exportedElements = elements.some(
-              element => element.isSelected
-            )
-              ? elements.filter(element => element.isSelected)
-              : elements;
-            if (this.canvas)
-              exportCanvas(
-                "clipboard",
-                exportedElements,
-                this.canvas,
-                this.state
-              );
-          }}
-        />
-        <div className="divider"></div>
-        {this.actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-        {this.actionManager.renderAction(
-          "clearCanvas",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-        <div className="divider"></div>
-        {this.actionManager.renderAction(
-          "loadScene",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-        {this.actionManager.renderAction(
-          "saveScene",
-          elements,
-          this.state,
-          this.syncActionResult
-        )}
-      </>
-    );
-  }
-
   private renderShapesSwitcher() {
     return (
       <>
@@ -527,16 +456,98 @@ export class App extends React.Component<{}, AppState> {
     );
   }
 
-  private renderFileName() {
+  private renderCanvasActions() {
     return (
-      <div className="App-filename">
+      <Stack.Col gap={4}>
+        <Stack.Row gap={1}>
+          {this.actionManager.renderAction(
+            "loadScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          {this.actionManager.renderAction(
+            "saveScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          {this.actionManager.renderAction(
+            "clearCanvas",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </Stack.Row>
+        <Stack.Col gap={2}>
+          <strong>Export</strong>
+          <Stack.Row gap={1} align="center">
+            <ToolIcon
+              type="button"
+              icon={image}
+              title="Export to PNG"
+              aria-label="Export to PNG"
+              onClick={() => {
+                const exportedElements = elements.some(
+                  element => element.isSelected
+                )
+                  ? elements.filter(element => element.isSelected)
+                  : elements;
+                if (this.canvas)
+                  exportCanvas(
+                    "png",
+                    exportedElements,
+                    this.canvas,
+                    this.state
+                  );
+              }}
+            />
+
+            <ToolIcon
+              type="button"
+              icon={clipboard}
+              title="Copy to clipboard"
+              aria-label="Copy to clipboard"
+              onClick={() => {
+                const exportedElements = elements.some(
+                  element => element.isSelected
+                )
+                  ? elements.filter(element => element.isSelected)
+                  : elements;
+                if (this.canvas)
+                  exportCanvas(
+                    "clipboard",
+                    exportedElements,
+                    this.canvas,
+                    this.state
+                  );
+              }}
+            />
+
+            <div style={{ whiteSpace: "nowrap" }}>
+              {this.actionManager.renderAction(
+                "changeExportBackground",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+            </div>
+          </Stack.Row>
+          {this.actionManager.renderAction(
+            "changeProjectName",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </Stack.Col>
+
         {this.actionManager.renderAction(
-          "changeProjectName",
+          "changeViewBackgroundColor",
           elements,
           this.state,
           this.syncActionResult
         )}
-      </div>
+      </Stack.Col>
     );
   }
 
@@ -548,16 +559,18 @@ export class App extends React.Component<{}, AppState> {
       <div className="container">
         <FixedSideContainer side="top">
           <div className="App-menu App-menu_top">
-            <Island padding={1}>
-              <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-            </Island>
-            {this.renderFileName()}
-            <Stack.Col gap={4} align="end">
+            <Stack.Col gap={4} align="start">
               <Island padding={1}>
-                <Stack.Row gap={1}>{this.renderEditorActions()}</Stack.Row>
+                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
               </Island>
+            </Stack.Col>
+            <div />
+            <Stack.Col gap={4} align="end">
               <div className="App-right-menu">
-                {this.renderSelectedElementsPopover(elements)}
+                <Island padding={4}>{this.renderCanvasActions()}</Island>
+              </div>
+              <div className="App-right-menu">
+                {this.renderSelectedShapeActions(elements)}
               </div>
             </Stack.Col>
           </div>

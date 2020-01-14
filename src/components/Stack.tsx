@@ -12,7 +12,7 @@ function RowStack({ children, gap, align }: StackProps) {
   return (
     <div
       className="Stack Stack_horizontal"
-      style={{ "--gap": gap, justifyItems: align } as React.CSSProperties}
+      style={{ "--gap": gap, alignItems: align } as React.CSSProperties}
     >
       {children}
     </div>

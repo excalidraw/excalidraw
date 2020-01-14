@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, palete } from "../components/icons";
-import { Popover } from "../components/Popover";
+import { trash } from "../components/icons";
 import { ToolIcon } from "../components/ToolIcon";
 
 export const actionChangeViewBackgroundColor: Action = {
@@ -12,27 +11,13 @@ export const actionChangeViewBackgroundColor: Action = {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
   PanelComponent: ({ appState, updateData }) => {
-    const [active, setActive] = useState(false);
     return (
       <div style={{ position: "relative" }}>
-        <ToolIcon
-          type="button"
-          icon={palete}
-          title="Change background color"
-          aria-label="Change background color"
-          onClick={() => setActive(true)}
+        <ColorPicker
+          type="canvasBackground"
+          color={appState.viewBackgroundColor}
+          onChange={color => updateData(color)}
         />
-        {active && (
-          <Popover onCloseRequest={() => setActive(false)}>
-            <div style={{ width: 150, position: "relative", top: 4, left: 8 }}>
-              <ColorPicker
-                type="canvasBackground"
-                color={appState.viewBackgroundColor}
-                onChange={color => updateData(color)}
-              />
-            </div>
-          </Popover>
-        )}
       </div>
     );
   }
@@ -40,7 +25,7 @@ export const actionChangeViewBackgroundColor: Action = {
 
 export const actionClearCanvas: Action = {
   name: "clearCanvas",
-  perform: (elements, appState, value) => {
+  perform: () => {
     return {
       elements: [],
       appState: getDefaultAppState()
