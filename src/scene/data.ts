@@ -108,7 +108,6 @@ export function getExportCanvasPreview(
   }
 
   const tempCanvas = document.createElement("canvas");
-  document.body.appendChild(tempCanvas);
   tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
   tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
 
