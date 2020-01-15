@@ -29,13 +29,19 @@ export function ExportDialog({
   onExportToPng(elements: readonly ExcalidrawElement[]): void;
   onExportToClipboard(elements: readonly ExcalidrawElement[]): void;
 }) {
+  const someElementIsSelected = elements.some(element => element.isSelected);
   const [modalIsShown, setModalIsShown] = useState(false);
+  const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previeRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
 
-  const exportedElements = elements.some(element => element.isSelected)
+  const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
     : elements;
+
+  useEffect(() => {
+    setExportSelected(someElementIsSelected);
+  }, [someElementIsSelected]);
 
   useEffect(() => {
     const previewNode = previeRef.current;
@@ -56,6 +62,11 @@ export function ExportDialog({
     viewBackgroundColor
   ]);
 
+  function handleClose() {
+    setModalIsShown(false);
+    setExportSelected(someElementIsSelected);
+  }
+
   return (
     <>
       <ToolIcon
@@ -65,7 +76,7 @@ export function ExportDialog({
         aria-label="Show export dialog"
       />
       {modalIsShown && (
-        <Modal maxWidth={640} onCloseRequest={() => setModalIsShown(false)}>
+        <Modal maxWidth={640} onCloseRequest={handleClose}>
           <Island padding={4}>
             <h2>Export</h2>
             <div className="ExportDialog__preview" ref={previeRef}></div>
@@ -94,12 +105,28 @@ export function ExportDialog({
                 appState,
                 syncActionResult
               )}
-              {actionManager.renderAction(
-                "changeExportBackground",
-                elements,
-                appState,
-                syncActionResult
-              )}
+              <Stack.Col gap={1}>
+                {actionManager.renderAction(
+                  "changeExportBackground",
+                  elements,
+                  appState,
+                  syncActionResult
+                )}
+                {someElementIsSelected && (
+                  <div>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={exportSelected}
+                        onChange={e =>
+                          setExportSelected(e.currentTarget.checked)
+                        }
+                      />{" "}
+                      Only selected
+                    </label>
+                  </div>
+                )}
+              </Stack.Col>
             </div>
           </Island>
         </Modal>

@@ -1,6 +1,7 @@
 .ExportDialog__preview {
   --preview-padding: calc(var(--space-factor) * 4);
-  background-color: #fafafa;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+    left center;
   text-align: center;
   padding: var(--preview-padding);
   margin-bottom: calc(var(--space-factor) * 3);
@@ -12,7 +13,7 @@
 
 .ExportDialog__actions {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
 }
