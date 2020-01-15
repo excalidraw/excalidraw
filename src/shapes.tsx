@@ -59,8 +59,15 @@ export const SHAPES = [
   {
     icon: (
       // custom
-      <svg viewBox="0 0 448 512">
-        <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059" />
+      <svg viewBox="0 0 6 6">
+        <line
+          x1="0"
+          y1="3"
+          x2="6"
+          y2="3"
+          stroke="black"
+          strokeLinecap="round"
+        />
       </svg>
     ),
     value: "line"
