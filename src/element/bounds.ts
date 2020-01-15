@@ -5,14 +5,12 @@ import { rotate } from "../math";
 // This set of functions retrieves the absolute position of the 4 points.
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
-export function getElementAbsoluteCoords(
-  element: ExcalidrawElement | ExcalidrawArrowElement
-) {
+export function getElementAbsoluteCoords(element: ExcalidrawElement) {
   return [
-    element.x, // x1
-    element.y, // y1
-    element.x + element.width, // x2
-    element.y + element.height // y2
+    element.width >= 0 ? element.x : element.x + element.width, // x1
+    element.height >= 0 ? element.y : element.y + element.height, // y1
+    element.width >= 0 ? element.x + element.width : element.x, // x2
+    element.height >= 0 ? element.y + element.height : element.y // y2
   ];
 }
 
