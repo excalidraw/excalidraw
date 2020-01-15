@@ -80,6 +80,7 @@ export function ExportDialog({
         icon={exportFile}
         type="button"
         aria-label="Show export dialog"
+        title="Export"
       />
       {modalIsShown && (
         <Modal maxWidth={640} onCloseRequest={handleClose}>
