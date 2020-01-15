@@ -32,6 +32,10 @@ export const PanelTools: React.FC<PanelToolsProps> = ({
             <div className="toolIcon">{icon}</div>
           </label>
         ))}
+        {// https://stackoverflow.com/a/22018710/4653792
+        [3, 4, 5].map((_, i) => (
+          <div key={i} className="placeholder-tool"></div>
+        ))}
       </div>
     </Panel>
   );

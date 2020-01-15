@@ -53,17 +53,11 @@ body {
 
   .panelTools {
     display: flex;
-    flex-flow: row wrap;
+    flex-wrap: wrap;
     justify-content: space-between;
 
     label {
       margin: 2px 0;
-    }
-
-    // https://stackoverflow.com/a/34816625/4653792
-    &::after {
-      content: "";
-      width: 128px;
     }
   }
 
@@ -129,6 +123,11 @@ body {
       box-shadow: 0 0 0 2px steelblue;
     }
   }
+}
+
+.placeholder-tool {
+  width: 41px;
+  height: 0;
 }
 
 label {
