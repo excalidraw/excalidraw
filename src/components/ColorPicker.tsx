@@ -24,7 +24,7 @@ const Picker = function({
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div className="color-picker-content">
-        {colors.map((color, i) => (
+        {colors.map(color => (
           <div
             className="color-picker-swatch"
             onClick={() => {
@@ -33,7 +33,7 @@ const Picker = function({
             title={color}
             tabIndex={0}
             style={{ backgroundColor: color }}
-            key={i}
+            key={color}
           >
             {color === "transparent" ? (
               <div className="color-picker-transparent"></div>
