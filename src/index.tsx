@@ -833,15 +833,14 @@ export class App extends React.Component<{}, AppState> {
                   let deltaX = 0;
                   let deltaY = 0;
                   const element = selectedElements[0];
-                  // When handling resizing we might need to invoke the "mirrored"
-                  // resizing logic, in case the user is dragging the handler beyond
-                  // the origin to flip the element.
-                  switch (resizeHandle) {
-                    case "nw":
-                      deltaX = lastX - x;
-                      deltaY = lastY - y;
-                      if (isArrowElement(element) || isLineElement(element)) {
-                        const quadrant = getQuadrant(element);
+                  if (isArrowElement(element) || isLineElement(element)) {
+                    // Track the position of the origin and end points along
+                    // the resizing
+                    const quadrant = getQuadrant(element);
+                    switch (resizeHandle) {
+                      case "nw":
+                        deltaX = lastX - x;
+                        deltaY = lastY - y;
                         if (quadrant === Quadrant.TopLeft) {
                           lineEndX -= deltaX;
                           lineEndY -= deltaY;
@@ -849,7 +848,49 @@ export class App extends React.Component<{}, AppState> {
                           lineOriginX -= deltaX;
                           lineOriginY -= deltaY;
                         }
-                      }
+                        break;
+                      case "se":
+                        deltaX = x - lastX;
+                        deltaY = y - lastY;
+                        if (quadrant === Quadrant.TopLeft) {
+                          lineOriginX += deltaX;
+                          lineOriginY += deltaY;
+                        } else {
+                          lineEndX += deltaX;
+                          lineEndY += deltaY;
+                        }
+                        break;
+                      case "ne":
+                        deltaX = x - lastX;
+                        deltaY = lastY - y;
+                        if (quadrant === Quadrant.TopRight) {
+                          lineEndX += deltaX;
+                          lineEndY -= deltaY;
+                        } else {
+                          lineOriginX += deltaX;
+                          lineOriginY -= deltaY;
+                        }
+                        break;
+                      case "sw":
+                        deltaX = lastX - x;
+                        deltaY = y - lastY;
+                        if (quadrant === Quadrant.TopRight) {
+                          lineOriginX -= deltaX;
+                          lineOriginY += deltaY;
+                        } else {
+                          lineEndX -= deltaX;
+                          lineEndY += deltaY;
+                        }
+                        break;
+                    }
+                  }
+                  // When handling resizing we might need to invoke the "mirrored"
+                  // resizing logic, in case the user is dragging the handler beyond
+                  // the origin to flip the element.
+                  switch (resizeHandle) {
+                    case "nw":
+                      deltaX = lastX - x;
+                      deltaY = lastY - y;
                       element.width += deltaX;
                       element.x -= deltaX;
                       if (e.shiftKey) {
@@ -863,16 +904,6 @@ export class App extends React.Component<{}, AppState> {
                     case "ne":
                       deltaX = x - lastX;
                       deltaY = lastY - y;
-                      if (isArrowElement(element) || isLineElement(element)) {
-                        const quadrant = getQuadrant(element);
-                        if (quadrant === Quadrant.TopRight) {
-                          lineEndX += deltaX;
-                          lineEndY -= deltaY;
-                        } else {
-                          lineOriginX += deltaX;
-                          lineOriginY -= deltaY;
-                        }
-                      }
                       element.width += deltaX;
                       if (e.shiftKey) {
                         element.y += element.height - element.width;
@@ -885,16 +916,6 @@ export class App extends React.Component<{}, AppState> {
                     case "sw":
                       deltaX = lastX - x;
                       deltaY = y - lastY;
-                      if (isArrowElement(element) || isLineElement(element)) {
-                        const quadrant = getQuadrant(element);
-                        if (quadrant === Quadrant.TopRight) {
-                          lineOriginX -= deltaX;
-                          lineOriginY += deltaY;
-                        } else {
-                          lineEndX -= deltaX;
-                          lineEndY += deltaY;
-                        }
-                      }
                       element.width += deltaX;
                       element.x -= deltaX;
                       if (e.shiftKey) {
@@ -906,16 +927,6 @@ export class App extends React.Component<{}, AppState> {
                     case "se":
                       deltaX = x - lastX;
                       deltaY = y - lastY;
-                      if (isArrowElement(element) || isLineElement(element)) {
-                        const quadrant = getQuadrant(element);
-                        if (quadrant === Quadrant.TopLeft) {
-                          lineOriginX += deltaX;
-                          lineOriginY += deltaY;
-                        } else {
-                          lineEndX += deltaX;
-                          lineEndY += deltaY;
-                        }
-                      }
                       element.width += deltaX;
                       if (e.shiftKey) {
                         element.height = element.width;
