@@ -9,3 +9,8 @@ export type ExcalidrawTextElement = ExcalidrawElement & {
   actualBoundingBoxAscent?: number;
   baseline: number;
 };
+
+export type ExcalidrawArrowElement = ExcalidrawElement & {
+  type: "arrow";
+  angle: number;
+};

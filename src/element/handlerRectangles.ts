@@ -1,5 +1,7 @@
 import { ExcalidrawElement } from "./types";
 import { SceneScroll } from "../scene/types";
+import { getElementAbsoluteCoords } from "./bounds";
+import { isArrowElement } from "./typeChecks";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -7,10 +9,9 @@ export function handlerRectangles(
   element: ExcalidrawElement,
   { scrollX, scrollY }: SceneScroll
 ) {
-  const elementX1 = element.x;
-  const elementX2 = element.x + element.width;
-  const elementY1 = element.y;
-  const elementY2 = element.y + element.height;
+  const [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
+    element
+  );
 
   const margin = 4;
   const minimumSize = 40;
@@ -76,11 +77,18 @@ export function handlerRectangles(
     8
   ]; // se
 
-  if (element.type === "arrow") {
-    return {
-      nw: handlers.nw,
-      se: handlers.se
-    } as typeof handlers;
+  if (isArrowElement(element)) {
+    if (element.angle > 90 || (element.angle < 0 && element.angle >= -90)) {
+      return {
+        ne: handlers.ne,
+        sw: handlers.sw
+      } as typeof handlers;
+    } else if (element.angle < -90 || element.angle < 90) {
+      return {
+        nw: handlers.nw,
+        se: handlers.se
+      } as typeof handlers;
+    }
   }
 
   return handlers;

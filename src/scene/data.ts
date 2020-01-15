@@ -2,12 +2,11 @@ import rough from "roughjs/bin/rough";
 
 import { ExcalidrawElement } from "../element/types";
 
-import { getElementAbsoluteCoords } from "../element";
-
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
 import { ExportType } from "./types";
 import nanoid from "nanoid";
+import { getElementAbsoluteCoords } from "../element";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";

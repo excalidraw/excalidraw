@@ -26,7 +26,11 @@ import {
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawArrowElement
+} from "./element/types";
 
 import { isInputLike, measureText, debounce } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
@@ -37,7 +41,7 @@ import { createHistory } from "./history";
 import ContextMenu from "./components/ContextMenu";
 
 import "./styles.scss";
-import { getElementWithResizeHandler, resizer } from "./element/resizeTest";
+import { getElementWithResizeHandler } from "./element/resizeTest";
 import {
   ActionManager,
   actionDeleteSelected,
@@ -66,6 +70,7 @@ import {
 import { SidePanel } from "./components/SidePanel";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
+import { isArrowElement } from "./element/typeChecks";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -98,6 +103,75 @@ function addTextElement(
   element.baseline = metrics.baseline;
 
   return true;
+}
+
+function normalizeArrowElement(
+  element: ExcalidrawArrowElement,
+  { x1, y1 }: { x1: number; y1: number },
+  { x2, y2 }: { x2: number; y2: number }
+) {
+  //   Angle by quadrant
+  //
+  //
+  //            |
+  //  < -90     | <0 && >= -90
+  //            |
+  //  - - - - - - - - - - - - -
+  //            |
+  //   > 90     |  < 90
+  //            |
+  //            |
+
+  element.angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
+  if (element.angle > 90) {
+    element.x = x2;
+    element.y = y1;
+  } else if (element.angle < 0 && element.angle >= -90) {
+    element.x = x1;
+    element.y = y2;
+  } else if (element.angle < -90) {
+    element.x = x2;
+    element.y = y2;
+  } else {
+    element.x = x1;
+    element.y = y1;
+  }
+  element.width = Math.abs(element.width);
+  element.height = Math.abs(element.height);
+}
+
+function getArrowPoints(element: ExcalidrawArrowElement) {
+  if (element.angle > 90) {
+    return {
+      x1: element.x + element.width,
+      y1: element.y,
+      x2: element.x,
+      y2: element.y + element.height
+    };
+  }
+  if (element.angle < 0 && element.angle >= -90) {
+    return {
+      x1: element.x,
+      y1: element.y + element.height,
+      x2: element.x + element.width,
+      y2: element.y
+    };
+  }
+  if (element.angle < -90) {
+    return {
+      x1: element.x + element.width,
+      y1: element.y + element.height,
+      x2: element.x,
+      y2: element.y
+    };
+  } else {
+    return {
+      x1: element.x,
+      y1: element.y,
+      x2: element.x + element.width,
+      y2: element.y + element.height
+    };
+  }
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -494,6 +568,7 @@ export class App extends React.Component<{}, AppState> {
             let draggingOccured = false;
             let hitElement: ExcalidrawElement | null = null;
             let elementIsAddedToSelection = false;
+            let [arrowX1, arrowY1, arrowX2, arrowY2] = [0, 0, 0, 0];
             if (this.state.elementType === "selection") {
               const resizeElement = getElementWithResizeHandler(
                 elements,
@@ -504,11 +579,19 @@ export class App extends React.Component<{}, AppState> {
               this.setState({
                 resizingElement: resizeElement ? resizeElement.element : null
               });
-
               if (resizeElement) {
                 resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
+                if (isArrowElement(resizeElement.element)) {
+                  const { x1, y1, x2, y2 } = getArrowPoints(
+                    resizeElement.element
+                  );
+                  arrowX1 = x1;
+                  arrowY1 = y1;
+                  arrowX2 = x2;
+                  arrowY2 = y2;
+                }
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
                 // clear selection if shift is not clicked
@@ -603,8 +686,6 @@ export class App extends React.Component<{}, AppState> {
               lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
             }
 
-            let flipped = false;
-
             const onMouseMove = (e: MouseEvent) => {
               const target = e.target;
               if (!(target instanceof HTMLElement)) {
@@ -642,106 +723,100 @@ export class App extends React.Component<{}, AppState> {
                     case "nw":
                       deltaX = lastX - x;
                       deltaY = lastY - y;
-                      if (flipped) {
-                        deltaX *= -1;
-                        deltaY *= -1;
+                      if (isArrowElement(element)) {
+                        if (element.angle < -90) {
+                          arrowX2 -= deltaX;
+                          arrowY2 -= deltaY;
+                        } else {
+                          arrowX1 -= deltaX;
+                          arrowY1 -= deltaY;
+                        }
                       }
-                      if (
-                        element.height + deltaY < 0 ||
-                        element.width + deltaX < 0
-                      ) {
-                        flipped = !flipped;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
+                        element.height += deltaY;
+                        element.y -= deltaY;
                       }
-                      flipped
-                        ? resizer.se(element, e, { x, y }, { lastX, lastY })
-                        : resizer.nw(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "ne":
                       deltaX = x - lastX;
                       deltaY = lastY - y;
-                      if (flipped) {
-                        deltaX *= -1;
-                        deltaY *= -1;
+                      if (isArrowElement(element)) {
+                        if (element.angle < 0 && element.angle >= -90) {
+                          arrowX2 += deltaX;
+                          arrowY2 -= deltaY;
+                        } else {
+                          arrowX1 += deltaX;
+                          arrowY1 -= deltaY;
+                        }
                       }
-                      if (
-                        element.height + deltaY < 0 ||
-                        element.width + deltaX < 0
-                      ) {
-                        flipped = !flipped;
+                      element.width += deltaX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
+                        element.height += deltaY;
+                        element.y -= deltaY;
                       }
-                      flipped
-                        ? resizer.sw(element, e, { x, y }, { lastX, lastY })
-                        : resizer.ne(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "sw":
                       deltaX = lastX - x;
                       deltaY = y - lastY;
-                      if (flipped) {
-                        deltaX *= -1;
-                        deltaY *= -1;
+                      if (isArrowElement(element)) {
+                        if (element.angle < 0 && element.angle >= -90) {
+                          arrowX1 -= deltaX;
+                          arrowY1 += deltaY;
+                        } else {
+                          arrowX2 -= deltaX;
+                          arrowY2 += deltaY;
+                        }
                       }
-                      if (
-                        element.height + deltaY < 0 ||
-                        element.width + deltaX < 0
-                      ) {
-                        flipped = !flipped;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
+                        element.height += deltaY;
                       }
-                      flipped
-                        ? resizer.ne(element, e, { x, y }, { lastX, lastY })
-                        : resizer.sw(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "se":
-                      deltaX = x - lastY;
+                      deltaX = x - lastX;
                       deltaY = y - lastY;
-                      if (flipped) {
-                        deltaX *= -1;
-                        deltaY *= -1;
+                      if (isArrowElement(element)) {
+                        if (element.angle < -90) {
+                          arrowX1 += deltaX;
+                          arrowY1 += deltaY;
+                        } else {
+                          arrowX2 += deltaX;
+                          arrowY2 += deltaY;
+                        }
                       }
-                      if (
-                        element.height + deltaY < 0 ||
-                        element.width + deltaX < 0
-                      ) {
-                        flipped = !flipped;
+                      element.width += deltaX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
+                        element.height += deltaY;
                       }
-                      flipped
-                        ? resizer.nw(element, e, { x, y }, { lastX, lastY })
-                        : resizer.se(element, e, { x, y }, { lastX, lastY });
                       break;
                     case "n":
                       deltaY = lastY - y;
-                      if (flipped) deltaY *= -1;
-                      if (element.height + deltaY < 0) flipped = !flipped;
-
-                      flipped
-                        ? resizer.s(element, e, { x, y }, { lastX, lastY })
-                        : resizer.n(element, e, { x, y }, { lastX, lastY });
+                      element.height += deltaY;
+                      element.y -= deltaY;
                       break;
                     case "w":
                       deltaX = lastX - x;
-                      if (flipped) deltaX *= -1;
-                      if (element.width + deltaX < 0) flipped = !flipped;
-
-                      flipped
-                        ? resizer.e(element, e, { x, y }, { lastX, lastY })
-                        : resizer.w(element, e, { x, y }, { lastX, lastY });
+                      element.width += deltaX;
+                      element.x -= deltaX;
                       break;
                     case "s":
-                      deltaY = y - lastY;
-                      if (flipped) deltaY *= -1;
-                      if (element.height + deltaY < 0) flipped = !flipped;
-
-                      flipped
-                        ? resizer.n(element, e, { x, y }, { lastX, lastY })
-                        : resizer.s(element, e, { x, y }, { lastX, lastY });
+                      element.height += y - lastY;
                       break;
                     case "e":
-                      deltaX = x - lastX;
-                      if (flipped) deltaX *= -1;
-                      if (element.width + deltaX < 0) flipped = !flipped;
-
-                      flipped
-                        ? resizer.w(element, e, { x, y }, { lastX, lastY })
-                        : resizer.e(element, e, { x, y }, { lastX, lastY });
+                      element.width += x - lastX;
                       break;
                   }
 
@@ -832,26 +907,6 @@ export class App extends React.Component<{}, AppState> {
 
               resetCursor();
 
-              if (isResizingElements && resizingElement) {
-                const element = elements.find(el => el === resizingElement);
-                // Normalize the width, height, x and y position of
-                // the resized element if needed. A common scenario is
-                // when the element is flipped when resizing. We might end
-                // up with negative width and/or height. Thus, we need
-                // to compensate that.
-                if (element && element.width < 0) {
-                  element.width *= -1;
-                  element.x -= element.width;
-                  resizingElement.x = element.x;
-                  resizingElement.shape = null;
-                }
-                if (element && element.height < 0) {
-                  element.height *= -1;
-                  element.y -= element.height;
-                  resizingElement.y = element.y;
-                  resizingElement.shape = null;
-                }
-              }
               // If click occured on already selected element
               // it is needed to remove selection from other elements
               // or if SHIFT or META key pressed remove selection
@@ -878,6 +933,48 @@ export class App extends React.Component<{}, AppState> {
                 elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
+              }
+
+              if (draggingElement && isArrowElement(draggingElement)) {
+                const element = elements.find(el => el === draggingElement);
+                if (element && isArrowElement(element)) {
+                  const x1 = element.x;
+                  const y1 = element.y;
+                  const x2 = element.x + element.width;
+                  const y2 = element.y + element.height;
+                  normalizeArrowElement(element, { x1, y1 }, { x2, y2 });
+                  draggingElement.shape = null;
+                }
+              }
+              if (isResizingElements && resizingElement) {
+                const element = elements.find(el => el === resizingElement);
+                if (element && isArrowElement(element)) {
+                  normalizeArrowElement(
+                    element,
+                    { x1: arrowX1, y1: arrowY1 },
+                    { x2: arrowX2, y2: arrowY2 }
+                  );
+                  resizingElement.shape = null;
+                } else if (
+                  element &&
+                  (element.width < 0 || element.height < 0)
+                ) {
+                  // Normalize the width, height, x and y position of
+                  // the resized element if needed. A common scenario is
+                  // when the element is flipped when resizing. We might end
+                  // up with negative width and/or height. Thus, we need
+                  // to compensate that.
+                  if (element.width < 0) {
+                    element.width *= -1;
+                    element.x -= element.width;
+                    resizingElement.shape = null;
+                  }
+                  if (element.height < 0) {
+                    element.height *= -1;
+                    element.y -= element.height;
+                    resizingElement.shape = null;
+                  }
+                }
               }
 
               if (elementType === "selection") {

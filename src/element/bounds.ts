@@ -1,16 +1,18 @@
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, ExcalidrawArrowElement } from "./types";
 import { rotate } from "../math";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
-export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+export function getElementAbsoluteCoords(
+  element: ExcalidrawElement | ExcalidrawArrowElement
+) {
   return [
-    element.width >= 0 ? element.x : element.x + element.width, // x1
-    element.height >= 0 ? element.y : element.y + element.height, // y1
-    element.width >= 0 ? element.x + element.width : element.x, // x2
-    element.height >= 0 ? element.y + element.height : element.y // y2
+    element.x, // x1
+    element.y, // y1
+    element.x + element.width, // x2
+    element.y + element.height // y2
   ];
 }
 
@@ -29,11 +31,29 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getArrowPoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
+export function getArrowPoints(element: ExcalidrawArrowElement) {
+  let x1, y1, x2, y2;
+  if (element.angle < 0 && element.angle >= -90) {
+    x1 = 0;
+    y1 = element.height;
+    x2 = element.width;
+    y2 = 0;
+  } else if (element.angle < -90) {
+    x1 = element.width;
+    y1 = element.height;
+    x2 = 0;
+    y2 = 0;
+  } else if (element.angle > 90) {
+    x1 = element.width;
+    y1 = 0;
+    x2 = 0;
+    y2 = element.height;
+  } else {
+    x1 = 0;
+    y1 = 0;
+    x2 = element.width;
+    y2 = element.height;
+  }
 
   const size = 30; // pixels
   const distance = Math.hypot(x2 - x1, y2 - y1);

@@ -1,5 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import { isTextElement } from "../element/typeChecks";
+import { isTextElement, isArrowElement } from "../element/typeChecks";
 import { getDiamondPoints, getArrowPoints } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
@@ -93,7 +93,7 @@ export function renderElement(
     context.globalAlpha = element.opacity / 100;
     rc.draw(element.shape as Drawable);
     context.globalAlpha = 1;
-  } else if (element.type === "arrow") {
+  } else if (isArrowElement(element)) {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const options = {
       stroke: element.strokeColor,
