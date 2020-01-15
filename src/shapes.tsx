@@ -55,6 +55,22 @@ export const SHAPES = [
       </svg>
     ),
     value: "text"
+  },
+  {
+    icon: (
+      // custom
+      <svg viewBox="0 0 6 6">
+        <line
+          x1="0"
+          y1="3"
+          x2="6"
+          y2="3"
+          stroke="black"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+    value: "line"
   }
 ];
 

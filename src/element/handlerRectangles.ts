@@ -91,5 +91,12 @@ export function handlerRectangles(
     }
   }
 
+  if (element.type === "line") {
+    return {
+      nw: handlers.nw,
+      se: handlers.se
+    } as typeof handlers;
+  }
+
   return handlers;
 }

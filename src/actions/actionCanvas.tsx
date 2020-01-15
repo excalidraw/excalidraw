@@ -2,43 +2,46 @@ import React from "react";
 import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
+import { trash } from "../components/icons";
+import { ToolIcon } from "../components/ToolIcon";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
   perform: (elements, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <>
-      <h5>Canvas Background Color</h5>
-      <ColorPicker
-        type="canvasBackground"
-        color={appState.viewBackgroundColor}
-        onChange={color => updateData(color)}
-      />
-    </>
-  )
+  PanelComponent: ({ appState, updateData }) => {
+    return (
+      <div style={{ position: "relative" }}>
+        <ColorPicker
+          type="canvasBackground"
+          color={appState.viewBackgroundColor}
+          onChange={color => updateData(color)}
+        />
+      </div>
+    );
+  }
 };
 
 export const actionClearCanvas: Action = {
   name: "clearCanvas",
-  perform: (elements, appState, value) => {
+  perform: () => {
     return {
       elements: [],
       appState: getDefaultAppState()
     };
   },
   PanelComponent: ({ updateData }) => (
-    <button
+    <ToolIcon
       type="button"
+      icon={trash}
+      title="Clear the canvas & reset background color"
+      aria-label="Clear the canvas & reset background color"
       onClick={() => {
         if (window.confirm("This will clear the whole canvas. Are you sure?")) {
           updateData(null);
         }
       }}
-      title="Clear the canvas & reset background color"
-    >
-      Clear canvas
-    </button>
+    />
   )
 };

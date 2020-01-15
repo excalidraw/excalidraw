@@ -2,7 +2,8 @@ export { newElement, duplicateElement } from "./newElement";
 export {
   getDiamondPoints,
   getArrowPoints,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getLinePoints
 } from "./bounds";
 
 export { handlerRectangles } from "./handlerRectangles";
