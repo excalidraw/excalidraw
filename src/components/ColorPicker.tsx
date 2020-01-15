@@ -76,7 +76,7 @@ export function ColorPicker({
   return (
     <div>
       <button
-        className="swatch"
+        className="color-picker-label-swatch"
         style={color ? { backgroundColor: color } : undefined}
         onClick={() => setActive(!isActive)}
       />
@@ -95,7 +95,7 @@ export function ColorPicker({
       </React.Suspense>
       <input
         type="text"
-        className="swatch-input"
+        className="color-picker-swatch-input"
         value={color || ""}
         onPaste={e => onChange(e.clipboardData.getData("text"))}
         onChange={e => onChange(e.target.value)}

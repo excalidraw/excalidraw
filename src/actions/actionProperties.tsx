@@ -3,8 +3,8 @@ import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { getSelectedAttribute } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
-import { PanelColor } from "../components/panels/PanelColor";
 import { isTextElement, redrawTextBoundingBox } from "../element";
+import { ColorPicker } from "../components/ColorPicker";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -31,17 +31,14 @@ export const actionChangeStrokeColor: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
-    <PanelColor
-      title="Stroke Color"
-      colorType="elementStroke"
-      onColorChange={(color: string) => {
-        updateData(color);
-      }}
-      colorValue={getSelectedAttribute(
-        elements,
-        element => element.strokeColor
-      )}
-    />
+    <>
+      <h5>Stroke</h5>
+      <ColorPicker
+        type="elementStroke"
+        color={getSelectedAttribute(elements, element => element.strokeColor)}
+        onChange={updateData}
+      />
+    </>
   )
 };
 
@@ -58,17 +55,17 @@ export const actionChangeBackgroundColor: Action = {
     };
   },
   PanelComponent: ({ elements, updateData }) => (
-    <PanelColor
-      title="Background Color"
-      colorType="elementBackground"
-      onColorChange={(color: string) => {
-        updateData(color);
-      }}
-      colorValue={getSelectedAttribute(
-        elements,
-        element => element.backgroundColor
-      )}
-    />
+    <>
+      <h5>Background</h5>
+      <ColorPicker
+        type="elementBackground"
+        color={getSelectedAttribute(
+          elements,
+          element => element.backgroundColor
+        )}
+        onChange={updateData}
+      />
+    </>
   )
 };
 

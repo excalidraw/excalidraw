@@ -1,0 +1,46 @@
+.ExportDialog__dialog {
+  /* transition: opacity 0.15s ease-in, transform 0.15s ease-in; */
+  opacity: 0;
+  transform: translateY(10px);
+  animation: ExportDialog__fade-in 0.1s ease-out 0.05s forwards;
+  position: relative;
+}
+
+@keyframes ExportDialog__fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ExportDialog__close {
+  position: absolute;
+  right: calc(var(--space-factor) * 5);
+  top: calc(var(--space-factor) * 5);
+}
+
+.ExportDialog__preview {
+  --preview-padding: calc(var(--space-factor) * 4);
+
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+    left center;
+  text-align: center;
+  padding: var(--preview-padding);
+  margin-bottom: calc(var(--space-factor) * 3);
+}
+
+.ExportDialog__preview canvas {
+  max-width: calc(100% - var(--preview-padding) * 2);
+  max-height: 400px;
+}
+
+.ExportDialog__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,53 @@
+.ToolIcon {
+  display: inline-block;
+  position: relative;
+}
+
+.ToolIcon__icon {
+  background-color: #ddd;
+
+  width: 41px;
+  height: 41px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: var(--space-factor);
+
+  svg {
+    height: 1em;
+  }
+}
+
+.ToolIcon_type_button {
+  padding: 0;
+  border: none;
+  margin: 0;
+  font-size: inherit;
+
+  &:hover .ToolIcon__icon {
+    background-color: #e7e5e5;
+  }
+  &:active .ToolIcon__icon {
+    background-color: #bdbebc;
+  }
+  &:focus .ToolIcon__icon {
+    box-shadow: 0 0 0 2px steelblue;
+  }
+}
+
+.ToolIcon_type_radio {
+  position: absolute;
+  opacity: 0;
+
+  &:hover + .ToolIcon__icon {
+    background-color: #e7e5e5;
+  }
+  &:checked + .ToolIcon__icon {
+    background-color: #bdbebc;
+  }
+  &:focus + .ToolIcon__icon {
+    box-shadow: 0 0 0 2px steelblue;
+  }
+}

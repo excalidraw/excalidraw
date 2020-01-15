@@ -52,7 +52,7 @@ export interface ActionsManagerInterface {
   ) => { label: string; action: () => void }[];
   renderAction: (
     name: string,
-    elements: ExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn
   ) => React.ReactElement | null;
