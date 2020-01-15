@@ -10,7 +10,7 @@
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-scripts": "3.3.0",
-    "roughjs": "4.0.3"
+    "roughjs": "^4.0.4"
   },
   "devDependencies": {
     "@types/jest": "^24.0.25",
