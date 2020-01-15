@@ -627,6 +627,34 @@ export class App extends React.Component<{}, AppState> {
               // being in a weird state, we clean up on the next mousedown
               lastMouseUp(e);
             }
+
+            // pan canvas on wheel button drag
+            if (e.button === 1) {
+              let { clientX: lastX, clientY: lastY } = e;
+              const onMouseMove = (e: MouseEvent) => {
+                document.documentElement.style.cursor = `grabbing`;
+                let deltaX = lastX - e.clientX;
+                let deltaY = lastY - e.clientY;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                this.setState(state => ({
+                  scrollX: state.scrollX - deltaX,
+                  scrollY: state.scrollY - deltaY
+                }));
+              };
+              const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
+                lastMouseUp = null;
+                resetCursor();
+                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+              });
+              window.addEventListener("mousemove", onMouseMove, {
+                passive: true
+              });
+              window.addEventListener("mouseup", onMouseUp);
+              return;
+            }
+
             // only handle left mouse button
             if (e.button !== 0) return;
             // fixes mousemove causing selection of UI texts #32
