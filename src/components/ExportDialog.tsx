@@ -12,6 +12,12 @@ import { getExportCanvasPreview } from "../scene/data";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
+const probablySupportsClipboard =
+  "toBlob" in HTMLCanvasElement.prototype &&
+  "clipboard" in navigator &&
+  "write" in navigator.clipboard &&
+  "ClipboardItem" in window;
+
 export function ExportDialog({
   elements,
   appState,
@@ -90,13 +96,15 @@ export function ExportDialog({
                   onClick={() => onExportToPng(exportedElements)}
                 />
 
-                <ToolIcon
-                  type="button"
-                  icon={clipboard}
-                  title="Copy to clipboard"
-                  aria-label="Copy to clipboard"
-                  onClick={() => onExportToClipboard(exportedElements)}
-                />
+                {probablySupportsClipboard && (
+                  <ToolIcon
+                    type="button"
+                    icon={clipboard}
+                    title="Copy to clipboard"
+                    aria-label="Copy to clipboard"
+                    onClick={() => onExportToClipboard(exportedElements)}
+                  />
+                )}
               </Stack.Row>
 
               {actionManager.renderAction(
