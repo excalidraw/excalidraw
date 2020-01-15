@@ -87,6 +87,13 @@ export function ExportDialog({
                   onClick={() => onExportToClipboard(exportedElements)}
                 />
               </Stack.Row>
+
+              {actionManager.renderAction(
+                "changeProjectName",
+                elements,
+                appState,
+                syncActionResult
+              )}
               {actionManager.renderAction(
                 "changeExportBackground",
                 elements,
