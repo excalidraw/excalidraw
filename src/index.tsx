@@ -21,17 +21,21 @@ import {
   saveToLocalStorage,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasBackground,
+  hasStroke,
+  hasText,
+  exportCanvas
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { isInputLike, measureText, debounce } from "./utils";
+import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
-import { findShapeByKey, shapesShortcutKeys } from "./shapes";
+import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
 
 import ContextMenu from "./components/ContextMenu";
@@ -63,14 +67,18 @@ import {
   actionCopyStyles,
   actionPasteStyles
 } from "./actions";
-import { SidePanel } from "./components/SidePanel";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
+import { Island } from "./components/Island";
+import Stack from "./components/Stack";
+import { FixedSideContainer } from "./components/FixedSideContainer";
+import { ToolIcon } from "./components/ToolIcon";
+import { ExportDialog } from "./components/ExportDialog";
 
 let { elements } = createScene();
 const { history } = createHistory();
 
-const CANVAS_WINDOW_OFFSET_LEFT = 250;
+const CANVAS_WINDOW_OFFSET_LEFT = 0;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function resetCursor() {
@@ -331,26 +339,197 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
+  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const selectedElements = elements.filter(el => el.isSelected);
+    if (selectedElements.length === 0) {
+      return null;
+    }
+
+    return (
+      <Island padding={4}>
+        <div className="panelColumn">
+          {this.actionManager.renderAction(
+            "changeStrokeColor",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {hasBackground(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeBackgroundColor",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFillStyle",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasStroke(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeStrokeWidth",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeSloppiness",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasText(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeFontSize",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFontFamily",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {this.actionManager.renderAction(
+            "changeOpacity",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {this.actionManager.renderAction(
+            "deleteSelectedElements",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </div>
+      </Island>
+    );
+  }
+
+  private renderShapesSwitcher() {
+    return (
+      <>
+        {SHAPES.map(({ value, icon }) => (
+          <ToolIcon
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={this.state.elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}`}
+            onChange={() => {
+              this.setState({ elementType: value });
+              elements = clearSelection(elements);
+              document.documentElement.style.cursor =
+                value === "text" ? "text" : "crosshair";
+              this.forceUpdate();
+            }}
+          ></ToolIcon>
+        ))}
+      </>
+    );
+  }
+
+  private renderCanvasActions() {
+    return (
+      <Stack.Col gap={4}>
+        <Stack.Row gap={1}>
+          {this.actionManager.renderAction(
+            "loadScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          {this.actionManager.renderAction(
+            "saveScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          <ExportDialog
+            elements={elements}
+            appState={this.state}
+            actionManager={this.actionManager}
+            syncActionResult={this.syncActionResult}
+            onExportToPng={exportedElements => {
+              if (this.canvas)
+                exportCanvas("png", exportedElements, this.canvas, this.state);
+            }}
+            onExportToClipboard={exportedElements => {
+              if (this.canvas)
+                exportCanvas(
+                  "clipboard",
+                  exportedElements,
+                  this.canvas,
+                  this.state
+                );
+            }}
+          />
+          {this.actionManager.renderAction(
+            "clearCanvas",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </Stack.Row>
+        {this.actionManager.renderAction(
+          "changeViewBackgroundColor",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </Stack.Col>
+    );
+  }
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
       <div className="container">
-        <SidePanel
-          actionManager={this.actionManager}
-          syncActionResult={this.syncActionResult}
-          appState={{ ...this.state }}
-          elements={elements}
-          onToolChange={value => {
-            this.setState({ elementType: value });
-            elements = clearSelection(elements);
-            document.documentElement.style.cursor =
-              value === "text" ? "text" : "crosshair";
-            this.forceUpdate();
-          }}
-          canvas={this.canvas!}
-        />
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            <Stack.Col gap={4} align="end">
+              <div className="App-right-menu">
+                <Island padding={4}>{this.renderCanvasActions()}</Island>
+              </div>
+              <div className="App-right-menu">
+                {this.renderSelectedShapeActions(elements)}
+              </div>
+            </Stack.Col>
+            <Stack.Col gap={4} align="start">
+              <Island padding={1}>
+                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+              </Island>
+            </Stack.Col>
+            <div />
+          </div>
+        </FixedSideContainer>
         <canvas
           id="canvas"
           style={{
@@ -374,7 +553,6 @@ export class App extends React.Component<{}, AppState> {
               });
               this.removeWheelEventListener = () =>
                 canvas.removeEventListener("wheel", this.handleWheel);
-
               // Whenever React sets the width/height of the canvas element,
               // the context loses the scale transform. We need to re-apply it
               if (

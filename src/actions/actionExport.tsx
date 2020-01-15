@@ -2,6 +2,8 @@ import React from "react";
 import { Action } from "./types";
 import { EditableText } from "../components/EditableText";
 import { saveAsJSON, loadFromJSON } from "../scene";
+import { load, save } from "../components/icons";
+import { ToolIcon } from "../components/ToolIcon";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
@@ -9,15 +11,10 @@ export const actionChangeProjectName: Action = {
     return { appState: { ...appState, name: value } };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <>
-      <h5>Name</h5>
-      {appState.name && (
-        <EditableText
-          value={appState.name}
-          onChange={(name: string) => updateData(name)}
-        />
-      )}
-    </>
+    <EditableText
+      value={appState.name || "Unnamed"}
+      onChange={(name: string) => updateData(name)}
+    />
   )
 };
 
@@ -34,8 +31,8 @@ export const actionChangeExportBackground: Action = {
         onChange={e => {
           updateData(e.target.checked);
         }}
-      />
-      background
+      />{" "}
+      With background
     </label>
   )
 };
@@ -47,7 +44,13 @@ export const actionSaveScene: Action = {
     return {};
   },
   PanelComponent: ({ updateData }) => (
-    <button onClick={() => updateData(null)}>Save as...</button>
+    <ToolIcon
+      type="button"
+      icon={save}
+      title="Save"
+      aria-label="Save"
+      onClick={() => updateData(null)}
+    />
   )
 };
 
@@ -57,14 +60,16 @@ export const actionLoadScene: Action = {
     return { elements: loadedElements };
   },
   PanelComponent: ({ updateData }) => (
-    <button
+    <ToolIcon
+      type="button"
+      icon={load}
+      title="Load"
+      aria-label="Load"
       onClick={() => {
         loadFromJSON().then(({ elements }) => {
           updateData(elements);
         });
       }}
-    >
-      Load file...
-    </button>
+    />
   )
 };
