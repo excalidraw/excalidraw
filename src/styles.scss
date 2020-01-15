@@ -84,6 +84,13 @@ button {
   }
 }
 
+.active {
+  background-color: #bdbebc;
+  &:hover {
+    background-color: #bdbebc;
+  }
+}
+
 .App-menu {
   display: grid;
 }
