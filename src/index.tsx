@@ -30,7 +30,11 @@ import {
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawArrowElement
+} from "./element/types";
 
 import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
@@ -69,18 +73,17 @@ import {
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
-import { isArrowElement } from "./element/typeChecks";
+import { isArrowElement, isLineElement } from "./element/typeChecks";
 import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import {
-  getAbsoluteArrowPointsCoords,
-  normalizeArrowElement,
-  Quadrant,
-  getArrowQuadrant
-} from "./element/arrowElement";
+  getAbsoluteArrowOrLinePointsCoords,
+  normalizeArrowOrLineElement
+} from "./element/arrowOrLineElement";
+import { getQuadrant, Quadrant } from "./element/bounds";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -679,7 +682,7 @@ export class App extends React.Component<{}, AppState> {
             let draggingOccured = false;
             let hitElement: ExcalidrawElement | null = null;
             let elementIsAddedToSelection = false;
-            let [arrowX1, arrowY1, arrowX2, arrowY2] = [0, 0, 0, 0];
+            let [lineOriginX, lineOriginY, lineEndX, lineEndY] = [0, 0, 0, 0];
             if (this.state.elementType === "selection") {
               const resizeElement = getElementWithResizeHandler(
                 elements,
@@ -694,14 +697,17 @@ export class App extends React.Component<{}, AppState> {
                 resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
-                if (isArrowElement(resizeElement.element)) {
-                  const { x1, y1, x2, y2 } = getAbsoluteArrowPointsCoords(
+                if (
+                  isArrowElement(resizeElement.element) ||
+                  isLineElement(resizeElement.element)
+                ) {
+                  const { x1, y1, x2, y2 } = getAbsoluteArrowOrLinePointsCoords(
                     resizeElement.element
                   );
-                  arrowX1 = x1;
-                  arrowY1 = y1;
-                  arrowX2 = x2;
-                  arrowY2 = y2;
+                  lineOriginX = x1;
+                  lineOriginY = y1;
+                  lineEndX = x2;
+                  lineEndY = y2;
                 }
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
@@ -834,14 +840,14 @@ export class App extends React.Component<{}, AppState> {
                     case "nw":
                       deltaX = lastX - x;
                       deltaY = lastY - y;
-                      if (isArrowElement(element)) {
-                        const quadrant = getArrowQuadrant(element);
+                      if (isArrowElement(element) || isLineElement(element)) {
+                        const quadrant = getQuadrant(element);
                         if (quadrant === Quadrant.TopLeft) {
-                          arrowX2 -= deltaX;
-                          arrowY2 -= deltaY;
+                          lineEndX -= deltaX;
+                          lineEndY -= deltaY;
                         } else {
-                          arrowX1 -= deltaX;
-                          arrowY1 -= deltaY;
+                          lineOriginX -= deltaX;
+                          lineOriginY -= deltaY;
                         }
                       }
                       element.width += deltaX;
@@ -857,14 +863,14 @@ export class App extends React.Component<{}, AppState> {
                     case "ne":
                       deltaX = x - lastX;
                       deltaY = lastY - y;
-                      if (isArrowElement(element)) {
-                        const quadrant = getArrowQuadrant(element);
+                      if (isArrowElement(element) || isLineElement(element)) {
+                        const quadrant = getQuadrant(element);
                         if (quadrant === Quadrant.TopRight) {
-                          arrowX2 += deltaX;
-                          arrowY2 -= deltaY;
+                          lineEndX += deltaX;
+                          lineEndY -= deltaY;
                         } else {
-                          arrowX1 += deltaX;
-                          arrowY1 -= deltaY;
+                          lineOriginX += deltaX;
+                          lineOriginY -= deltaY;
                         }
                       }
                       element.width += deltaX;
@@ -879,14 +885,14 @@ export class App extends React.Component<{}, AppState> {
                     case "sw":
                       deltaX = lastX - x;
                       deltaY = y - lastY;
-                      if (isArrowElement(element)) {
-                        const quadrant = getArrowQuadrant(element);
+                      if (isArrowElement(element) || isLineElement(element)) {
+                        const quadrant = getQuadrant(element);
                         if (quadrant === Quadrant.TopRight) {
-                          arrowX1 -= deltaX;
-                          arrowY1 += deltaY;
+                          lineOriginX -= deltaX;
+                          lineOriginY += deltaY;
                         } else {
-                          arrowX2 -= deltaX;
-                          arrowY2 += deltaY;
+                          lineEndX -= deltaX;
+                          lineEndY += deltaY;
                         }
                       }
                       element.width += deltaX;
@@ -900,14 +906,14 @@ export class App extends React.Component<{}, AppState> {
                     case "se":
                       deltaX = x - lastX;
                       deltaY = y - lastY;
-                      if (isArrowElement(element)) {
-                        const quadrant = getArrowQuadrant(element);
+                      if (isArrowElement(element) || isLineElement(element)) {
+                        const quadrant = getQuadrant(element);
                         if (quadrant === Quadrant.TopLeft) {
-                          arrowX1 += deltaX;
-                          arrowY1 += deltaY;
+                          lineOriginX += deltaX;
+                          lineOriginY += deltaY;
                         } else {
-                          arrowX2 += deltaX;
-                          arrowY2 += deltaY;
+                          lineEndX += deltaX;
+                          lineEndY += deltaY;
                         }
                       }
                       element.width += deltaX;
@@ -1050,24 +1056,33 @@ export class App extends React.Component<{}, AppState> {
                 return;
               }
 
-              if (draggingElement && isArrowElement(draggingElement)) {
+              if (
+                draggingElement &&
+                (isArrowElement(draggingElement) ||
+                  isLineElement(draggingElement))
+              ) {
                 const element = elements.find(el => el === draggingElement);
-                if (element && isArrowElement(element)) {
-                  const x1 = element.x;
-                  const y1 = element.y;
-                  const x2 = element.x + element.width;
-                  const y2 = element.y + element.height;
-                  normalizeArrowElement(element, { x1, y1 }, { x2, y2 });
-                  draggingElement.shape = null;
-                }
+                const x1 = element!.x;
+                const y1 = element!.y;
+                const x2 = element!.x + element!.width;
+                const y2 = element!.y + element!.height;
+                normalizeArrowOrLineElement(
+                  element as ExcalidrawArrowElement,
+                  { x1, y1 },
+                  { x2, y2 }
+                );
+                draggingElement.shape = null;
               }
               if (isResizingElements && resizingElement) {
                 const element = elements.find(el => el === resizingElement);
-                if (element && isArrowElement(element)) {
-                  normalizeArrowElement(
+                if (
+                  element &&
+                  (isArrowElement(element) || isLineElement(element))
+                ) {
+                  normalizeArrowOrLineElement(
                     element,
-                    { x1: arrowX1, y1: arrowY1 },
-                    { x2: arrowX2, y2: arrowY2 }
+                    { x1: lineOriginX, y1: lineOriginY },
+                    { x2: lineEndX, y2: lineEndY }
                   );
                   resizingElement.shape = null;
                 } else if (

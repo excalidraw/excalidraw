@@ -14,3 +14,8 @@ export type ExcalidrawArrowElement = ExcalidrawElement & {
   type: "arrow";
   angle: number;
 };
+
+export type ExcalidrawLineElement = ExcalidrawElement & {
+  type: "line";
+  angle: number;
+};

@@ -1,5 +1,9 @@
 import { ExcalidrawElement } from "../element/types";
-import { isTextElement, isArrowElement } from "../element/typeChecks";
+import {
+  isTextElement,
+  isArrowElement,
+  isLineElement
+} from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
@@ -122,7 +126,7 @@ export function renderElement(
     (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
     context.globalAlpha = 1;
     return;
-  } else if (element.type === "line") {
+  } else if (isLineElement(element)) {
     const [x1, y1, x2, y2] = getLinePoints(element);
     const options = {
       stroke: element.strokeColor,

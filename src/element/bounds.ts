@@ -1,6 +1,9 @@
-import { ExcalidrawElement, ExcalidrawArrowElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawArrowElement,
+  ExcalidrawLineElement
+} from "./types";
 import { rotate } from "../math";
-import { getArrowQuadrant, Quadrant } from "./arrowElement";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -30,9 +33,16 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
+export enum Quadrant {
+  TopLeft,
+  TopRight,
+  BottomLeft,
+  BottomRight
+}
+
 export function getArrowPoints(element: ExcalidrawArrowElement) {
   let x1, y1, x2, y2;
-  const quadrant = getArrowQuadrant(element);
+  const quadrant = getQuadrant(element);
   switch (quadrant) {
     case Quadrant.TopLeft:
       x1 = element.width;
@@ -74,11 +84,62 @@ export function getArrowPoints(element: ExcalidrawArrowElement) {
   return [x1, y1, x2, y2, x3, y3, x4, y4];
 }
 
-export function getLinePoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
+export function getLinePoints(element: ExcalidrawLineElement) {
+  let x1, y1, x2, y2;
+  const quadrant = getQuadrant(element);
+  switch (quadrant) {
+    case Quadrant.TopLeft:
+      x1 = element.width;
+      y1 = element.height;
+      x2 = 0;
+      y2 = 0;
+      break;
+    case Quadrant.TopRight:
+      x1 = 0;
+      y1 = element.height;
+      x2 = element.width;
+      y2 = 0;
+      break;
+    case Quadrant.BottomLeft:
+      x1 = element.width;
+      y1 = 0;
+      x2 = 0;
+      y2 = element.height;
+      break;
+    case Quadrant.BottomRight:
+      x1 = 0;
+      y1 = 0;
+      x2 = element.width;
+      y2 = element.height;
+      break;
+  }
 
   return [x1, y1, x2, y2];
+}
+
+// From the current arrow angle returns the quadrant that the end of it is
+// pointing towards
+export function getQuadrant(
+  element: ExcalidrawArrowElement | ExcalidrawLineElement
+): Quadrant {
+  //   Angle by quadrant
+  //
+  //
+  //            |
+  //  < -90     | <0 && >= -90
+  //            |
+  //  - - - - - - - - - - - - -
+  //            |
+  //   > 90     |  < 90
+  //            |
+  //            |
+  if (element.angle > 90) {
+    return Quadrant.BottomLeft;
+  } else if (element.angle < 0 && element.angle >= -90) {
+    return Quadrant.TopRight;
+  } else if (element.angle < -90) {
+    return Quadrant.TopLeft;
+  } else {
+    return Quadrant.BottomRight;
+  }
 }

@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "./types";
 import { SceneScroll } from "../scene/types";
-import { isArrowElement } from "./typeChecks";
-import { getArrowQuadrant, Quadrant } from "./arrowElement";
+import { isArrowElement, isLineElement } from "./typeChecks";
+import { getQuadrant, Quadrant } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -78,8 +78,8 @@ export function handlerRectangles(
     8
   ]; // se
 
-  if (isArrowElement(element)) {
-    const quadrant = getArrowQuadrant(element);
+  if (isArrowElement(element) || isLineElement(element)) {
+    const quadrant = getQuadrant(element);
     if (quadrant === Quadrant.BottomLeft || quadrant === Quadrant.TopRight) {
       return {
         ne: handlers.ne,
@@ -94,13 +94,6 @@ export function handlerRectangles(
         se: handlers.se
       } as typeof handlers;
     }
-  }
-
-  if (element.type === "line") {
-    return {
-      nw: handlers.nw,
-      se: handlers.se
-    } as typeof handlers;
   }
 
   return handlers;

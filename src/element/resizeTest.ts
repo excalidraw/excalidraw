@@ -49,10 +49,3 @@ export function getElementWithResizeHandler(
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
 }
-
-type ResizerFunction = (
-  element: ExcalidrawElement,
-  e: MouseEvent,
-  { x, y }: { x: number; y: number },
-  { lastX, lastY }: { lastX: number; lastY: number }
-) => void;

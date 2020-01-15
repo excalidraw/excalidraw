@@ -1,8 +1,8 @@
 export { newElement, duplicateElement } from "./newElement";
 export {
+  getElementAbsoluteCoords,
   getDiamondPoints,
   getArrowPoints,
-  getElementAbsoluteCoords,
   getLinePoints
 } from "./bounds";
 

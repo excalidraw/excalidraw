@@ -1,7 +1,8 @@
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
-  ExcalidrawArrowElement
+  ExcalidrawArrowElement,
+  ExcalidrawLineElement
 } from "./types";
 
 export function isTextElement(
@@ -14,4 +15,10 @@ export function isArrowElement(
   element: ExcalidrawElement
 ): element is ExcalidrawArrowElement {
   return element.type === "arrow";
+}
+
+export function isLineElement(
+  element: ExcalidrawElement
+): element is ExcalidrawLineElement {
+  return element.type === "line";
 }

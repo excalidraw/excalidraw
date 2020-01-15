@@ -7,7 +7,7 @@ import {
   getElementAbsoluteCoords,
   getLinePoints
 } from "./bounds";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isLineElement } from "./typeChecks";
 
 export function hitTest(
   element: ExcalidrawElement,
@@ -155,7 +155,7 @@ export function hitTest(
       //    /
       distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
     );
-  } else if (element.type === "line") {
+  } else if (isLineElement(element)) {
     const [x1, y1, x2, y2] = getLinePoints(element);
     // The computation is done at the origin, we need to add a translation
     x -= element.x;

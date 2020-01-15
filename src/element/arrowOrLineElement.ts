@@ -1,44 +1,13 @@
-import { ExcalidrawArrowElement } from "./types";
+import { ExcalidrawArrowElement, ExcalidrawLineElement } from "./types";
+import { getQuadrant, Quadrant } from "./bounds";
 
-export enum Quadrant {
-  TopLeft,
-  TopRight,
-  BottomLeft,
-  BottomRight
-}
-
-// From the current arrow angle returns the quadrant that the end of it is
-// pointing towards
-export function getArrowQuadrant(element: ExcalidrawArrowElement): Quadrant {
-  //   Angle by quadrant
-  //
-  //
-  //            |
-  //  < -90     | <0 && >= -90
-  //            |
-  //  - - - - - - - - - - - - -
-  //            |
-  //   > 90     |  < 90
-  //            |
-  //            |
-  if (element.angle > 90) {
-    return Quadrant.BottomLeft;
-  } else if (element.angle < 0 && element.angle >= -90) {
-    return Quadrant.TopRight;
-  } else if (element.angle < -90) {
-    return Quadrant.TopLeft;
-  } else {
-    return Quadrant.BottomRight;
-  }
-}
-
-export function normalizeArrowElement(
-  element: ExcalidrawArrowElement,
+export function normalizeArrowOrLineElement(
+  element: ExcalidrawArrowElement | ExcalidrawLineElement,
   { x1, y1 }: { x1: number; y1: number },
   { x2, y2 }: { x2: number; y2: number }
 ) {
   element.angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
-  const quadrant = getArrowQuadrant(element);
+  const quadrant = getQuadrant(element);
   switch (quadrant) {
     case Quadrant.TopLeft:
       element.x = x2;
@@ -60,8 +29,13 @@ export function normalizeArrowElement(
   element.height = Math.abs(element.height);
 }
 
-export function getAbsoluteArrowPointsCoords(element: ExcalidrawArrowElement) {
-  const quadrant = getArrowQuadrant(element);
+// From a denormalized arrow/line (where "x" and "y" point to the start of the line and
+// not necessarily the top-left corner of the bounding box) get the coordinates
+// of the top-left spot
+export function getAbsoluteArrowOrLinePointsCoords(
+  element: ExcalidrawArrowElement | ExcalidrawLineElement
+) {
+  const quadrant = getQuadrant(element);
   switch (quadrant) {
     case Quadrant.TopLeft:
       return {
