@@ -4,7 +4,8 @@ import { ExcalidrawElement } from "./types";
 import {
   getArrowPoints,
   getDiamondPoints,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getLinePoints
 } from "./bounds";
 
 export function hitTest(
@@ -153,6 +154,13 @@ export function hitTest(
       //    /
       distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
     );
+  } else if (element.type === "line") {
+    const [x1, y1, x2, y2] = getLinePoints(element);
+    // The computation is done at the origin, we need to add a translation
+    x -= element.x;
+    y -= element.y;
+
+    return distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold;
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
