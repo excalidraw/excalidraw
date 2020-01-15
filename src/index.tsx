@@ -648,7 +648,9 @@ export class App extends React.Component<{}, AppState> {
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
               });
-              window.addEventListener("mousemove", onMouseMove);
+              window.addEventListener("mousemove", onMouseMove, {
+                passive: true
+              });
               window.addEventListener("mouseup", onMouseUp);
               return;
             }
