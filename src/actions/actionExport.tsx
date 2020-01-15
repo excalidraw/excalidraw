@@ -25,6 +25,7 @@ export const actionChangeExportBackground: Action = {
   },
   PanelComponent: ({ appState, updateData }) => (
     <label>
+      With background{" "}
       <input
         type="checkbox"
         checked={appState.exportBackground}
@@ -32,7 +33,6 @@ export const actionChangeExportBackground: Action = {
           updateData(e.target.checked);
         }}
       />
-      background
     </label>
   )
 };

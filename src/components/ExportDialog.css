@@ -1,0 +1,17 @@
+.ExportDialog__preview {
+  --preview-padding: calc(var(--space-factor) * 4);
+  background-color: #fafafa;
+  text-align: center;
+  padding: var(--preview-padding);
+  margin-bottom: calc(var(--space-factor) * 3);
+}
+
+.ExportDialog__preview canvas {
+  max-width: calc(100% - var(--preview-padding));
+}
+
+.ExportDialog__actions {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
