@@ -83,60 +83,65 @@ export function ExportDialog({
       />
       {modalIsShown && (
         <Modal maxWidth={640} onCloseRequest={handleClose}>
-          <Island padding={4}>
-            <h2>Export</h2>
-            <div className="ExportDialog__preview" ref={previeRef}></div>
-            <div className="ExportDialog__actions">
-              <Stack.Row gap={2}>
-                <ToolIcon
-                  type="button"
-                  icon={downloadFile}
-                  title="Export to PNG"
-                  aria-label="Export to PNG"
-                  onClick={() => onExportToPng(exportedElements)}
-                />
-
-                {probablySupportsClipboard && (
+          <div className="ExportDialog__dialog">
+            <Island padding={4}>
+              <button className="ExportDialog__close" onClick={handleClose}>
+                ╳
+              </button>
+              <h2>Export</h2>
+              <div className="ExportDialog__preview" ref={previeRef}></div>
+              <div className="ExportDialog__actions">
+                <Stack.Row gap={2}>
                   <ToolIcon
                     type="button"
-                    icon={clipboard}
-                    title="Copy to clipboard"
-                    aria-label="Copy to clipboard"
-                    onClick={() => onExportToClipboard(exportedElements)}
+                    icon={downloadFile}
+                    title="Export to PNG"
+                    aria-label="Export to PNG"
+                    onClick={() => onExportToPng(exportedElements)}
                   />
-                )}
-              </Stack.Row>
 
-              {actionManager.renderAction(
-                "changeProjectName",
-                elements,
-                appState,
-                syncActionResult
-              )}
-              <Stack.Col gap={1}>
+                  {probablySupportsClipboard && (
+                    <ToolIcon
+                      type="button"
+                      icon={clipboard}
+                      title="Copy to clipboard"
+                      aria-label="Copy to clipboard"
+                      onClick={() => onExportToClipboard(exportedElements)}
+                    />
+                  )}
+                </Stack.Row>
+
                 {actionManager.renderAction(
-                  "changeExportBackground",
+                  "changeProjectName",
                   elements,
                   appState,
                   syncActionResult
                 )}
-                {someElementIsSelected && (
-                  <div>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={exportSelected}
-                        onChange={e =>
-                          setExportSelected(e.currentTarget.checked)
-                        }
-                      />{" "}
-                      Only selected
-                    </label>
-                  </div>
-                )}
-              </Stack.Col>
-            </div>
-          </Island>
+                <Stack.Col gap={1}>
+                  {actionManager.renderAction(
+                    "changeExportBackground",
+                    elements,
+                    appState,
+                    syncActionResult
+                  )}
+                  {someElementIsSelected && (
+                    <div>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={exportSelected}
+                          onChange={e =>
+                            setExportSelected(e.currentTarget.checked)
+                          }
+                        />{" "}
+                        Only selected
+                      </label>
+                    </div>
+                  )}
+                </Stack.Col>
+              </div>
+            </Island>
+          </div>
         </Modal>
       )}
     </>

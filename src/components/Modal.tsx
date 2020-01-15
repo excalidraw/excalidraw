@@ -14,9 +14,6 @@ export function Modal(props: {
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div className="Modal__content" style={{ maxWidth: props.maxWidth }}>
         {props.children}
-        <button className="Modal__close" onClick={props.onCloseRequest}>
-          ╳
-        </button>
       </div>
     </div>,
     modalRoot

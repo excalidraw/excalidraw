@@ -27,9 +27,3 @@
   z-index: 2;
   width: 100%;
 }
-
-.Modal__close {
-  position: absolute;
-  right: calc(var(--space-factor) * 5);
-  top: calc(var(--space-factor) * 5);
-}
