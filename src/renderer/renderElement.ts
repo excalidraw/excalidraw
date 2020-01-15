@@ -85,7 +85,8 @@ export function renderElement(
           fillStyle: element.fillStyle,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
-          seed: element.seed
+          seed: element.seed,
+          curveFitting: 1
         }
       );
     }
