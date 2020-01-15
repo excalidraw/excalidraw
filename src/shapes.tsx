@@ -55,6 +55,15 @@ export const SHAPES = [
       </svg>
     ),
     value: "text"
+  },
+  {
+    icon: (
+      // custom
+      <svg viewBox="0 0 448 512">
+        <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059" />
+      </svg>
+    ),
+    value: "line"
   }
 ];
 

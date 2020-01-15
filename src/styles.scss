@@ -53,11 +53,17 @@ body {
 
   .panelTools {
     display: flex;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
     justify-content: space-between;
 
     label {
       margin: 2px 0;
+    }
+
+    // https://stackoverflow.com/a/34816625/4653792
+    &::after {
+      content: "";
+      width: 128px;
     }
   }
 

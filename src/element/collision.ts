@@ -153,6 +153,10 @@ export function hitTest(
       //    /
       distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
     );
+  } else if (element.type === "line") {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    return distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold;
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 

@@ -117,6 +117,27 @@ export function renderElement(
     (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
     context.globalAlpha = 1;
     return;
+  } else if (element.type === "line") {
+    const options = {
+      stroke: element.strokeColor,
+      strokeWidth: element.strokeWidth,
+      roughness: element.roughness,
+      seed: element.seed
+    };
+
+    if (!element.shape) {
+      element.shape = generator.line(
+        0,
+        0,
+        element.width,
+        element.height,
+        options
+      );
+    }
+
+    context.globalAlpha = element.opacity / 100;
+    rc.draw(element.shape as Drawable);
+    context.globalAlpha = 1;
   } else if (isTextElement(element)) {
     context.globalAlpha = element.opacity / 100;
     const font = context.font;
