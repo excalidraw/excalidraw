@@ -42,6 +42,8 @@
   float: left;
   border-radius: 4px;
   margin: 0px 6px 6px 0px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
 }
 
 .color-picker-swatch:focus {
