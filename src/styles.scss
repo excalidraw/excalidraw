@@ -78,9 +78,16 @@ button {
     background-color: #bdbebc;
     border-color: #bdbebc;
   }
-
+  
   &:disabled {
     cursor: not-allowed;
+  }
+}
+
+.active {
+  background-color: #bdbebc;
+  &:hover {
+    background-color: #bdbebc;
   }
 }
 
