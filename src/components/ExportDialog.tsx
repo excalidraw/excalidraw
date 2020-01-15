@@ -26,16 +26,20 @@ export function ExportDialog({
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
-  onExportToPng(): void;
-  onExportToClipboard(): void;
+  onExportToPng(elements: readonly ExcalidrawElement[]): void;
+  onExportToClipboard(elements: readonly ExcalidrawElement[]): void;
 }) {
   const [modalIsShown, setModalIsShown] = useState(false);
   const previeRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
 
+  const exportedElements = elements.some(element => element.isSelected)
+    ? elements.filter(element => element.isSelected)
+    : elements;
+
   useEffect(() => {
     const previewNode = previeRef.current;
-    const canvas = getExportCanvasPreview(elements, {
+    const canvas = getExportCanvasPreview(exportedElements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding
@@ -46,7 +50,7 @@ export function ExportDialog({
     };
   }, [
     modalIsShown,
-    elements,
+    exportedElements,
     exportBackground,
     exportPadding,
     viewBackgroundColor
@@ -72,7 +76,7 @@ export function ExportDialog({
                   icon={downloadFile}
                   title="Export to PNG"
                   aria-label="Export to PNG"
-                  onClick={onExportToPng}
+                  onClick={() => onExportToPng(exportedElements)}
                 />
 
                 <ToolIcon
@@ -80,7 +84,7 @@ export function ExportDialog({
                   icon={clipboard}
                   title="Copy to clipboard"
                   aria-label="Copy to clipboard"
-                  onClick={onExportToClipboard}
+                  onClick={() => onExportToClipboard(exportedElements)}
                 />
               </Stack.Row>
               {actionManager.renderAction(

@@ -475,21 +475,11 @@ export class App extends React.Component<{}, AppState> {
             appState={this.state}
             actionManager={this.actionManager}
             syncActionResult={this.syncActionResult}
-            onExportToPng={() => {
-              const exportedElements = elements.some(
-                element => element.isSelected
-              )
-                ? elements.filter(element => element.isSelected)
-                : elements;
+            onExportToPng={exportedElements => {
               if (this.canvas)
                 exportCanvas("png", exportedElements, this.canvas, this.state);
             }}
-            onExportToClipboard={() => {
-              const exportedElements = elements.some(
-                element => element.isSelected
-              )
-                ? elements.filter(element => element.isSelected)
-                : elements;
+            onExportToClipboard={exportedElements => {
               if (this.canvas)
                 exportCanvas(
                   "clipboard",
