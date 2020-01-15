@@ -1,5 +1,6 @@
 import { ExcalidrawElement, ExcalidrawArrowElement } from "./types";
 import { rotate } from "../math";
+import { getArrowQuadrant, Quadrant } from "./arrowElement";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -31,26 +32,32 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 
 export function getArrowPoints(element: ExcalidrawArrowElement) {
   let x1, y1, x2, y2;
-  if (element.angle < 0 && element.angle >= -90) {
-    x1 = 0;
-    y1 = element.height;
-    x2 = element.width;
-    y2 = 0;
-  } else if (element.angle < -90) {
-    x1 = element.width;
-    y1 = element.height;
-    x2 = 0;
-    y2 = 0;
-  } else if (element.angle > 90) {
-    x1 = element.width;
-    y1 = 0;
-    x2 = 0;
-    y2 = element.height;
-  } else {
-    x1 = 0;
-    y1 = 0;
-    x2 = element.width;
-    y2 = element.height;
+  const quadrant = getArrowQuadrant(element);
+  switch (quadrant) {
+    case Quadrant.TopLeft:
+      x1 = element.width;
+      y1 = element.height;
+      x2 = 0;
+      y2 = 0;
+      break;
+    case Quadrant.TopRight:
+      x1 = 0;
+      y1 = element.height;
+      x2 = element.width;
+      y2 = 0;
+      break;
+    case Quadrant.BottomLeft:
+      x1 = element.width;
+      y1 = 0;
+      x2 = 0;
+      y2 = element.height;
+      break;
+    case Quadrant.BottomRight:
+      x1 = 0;
+      y1 = 0;
+      x2 = element.width;
+      y2 = element.height;
+      break;
   }
 
   const size = 30; // pixels

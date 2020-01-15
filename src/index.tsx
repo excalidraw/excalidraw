@@ -30,11 +30,7 @@ import {
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  ExcalidrawArrowElement
-} from "./element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
@@ -79,6 +75,12 @@ import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
 import { ExportDialog } from "./components/ExportDialog";
+import {
+  getAbsoluteArrowPointsCoords,
+  normalizeArrowElement,
+  Quadrant,
+  getArrowQuadrant
+} from "./element/arrowElement";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -111,75 +113,6 @@ function addTextElement(
   element.baseline = metrics.baseline;
 
   return true;
-}
-
-function normalizeArrowElement(
-  element: ExcalidrawArrowElement,
-  { x1, y1 }: { x1: number; y1: number },
-  { x2, y2 }: { x2: number; y2: number }
-) {
-  //   Angle by quadrant
-  //
-  //
-  //            |
-  //  < -90     | <0 && >= -90
-  //            |
-  //  - - - - - - - - - - - - -
-  //            |
-  //   > 90     |  < 90
-  //            |
-  //            |
-
-  element.angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
-  if (element.angle > 90) {
-    element.x = x2;
-    element.y = y1;
-  } else if (element.angle < 0 && element.angle >= -90) {
-    element.x = x1;
-    element.y = y2;
-  } else if (element.angle < -90) {
-    element.x = x2;
-    element.y = y2;
-  } else {
-    element.x = x1;
-    element.y = y1;
-  }
-  element.width = Math.abs(element.width);
-  element.height = Math.abs(element.height);
-}
-
-function getArrowPoints(element: ExcalidrawArrowElement) {
-  if (element.angle > 90) {
-    return {
-      x1: element.x + element.width,
-      y1: element.y,
-      x2: element.x,
-      y2: element.y + element.height
-    };
-  }
-  if (element.angle < 0 && element.angle >= -90) {
-    return {
-      x1: element.x,
-      y1: element.y + element.height,
-      x2: element.x + element.width,
-      y2: element.y
-    };
-  }
-  if (element.angle < -90) {
-    return {
-      x1: element.x + element.width,
-      y1: element.y + element.height,
-      x2: element.x,
-      y2: element.y
-    };
-  } else {
-    return {
-      x1: element.x,
-      y1: element.y,
-      x2: element.x + element.width,
-      y2: element.y + element.height
-    };
-  }
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -762,7 +695,7 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
                 if (isArrowElement(resizeElement.element)) {
-                  const { x1, y1, x2, y2 } = getArrowPoints(
+                  const { x1, y1, x2, y2 } = getAbsoluteArrowPointsCoords(
                     resizeElement.element
                   );
                   arrowX1 = x1;
@@ -902,7 +835,8 @@ export class App extends React.Component<{}, AppState> {
                       deltaX = lastX - x;
                       deltaY = lastY - y;
                       if (isArrowElement(element)) {
-                        if (element.angle < -90) {
+                        const quadrant = getArrowQuadrant(element);
+                        if (quadrant === Quadrant.TopLeft) {
                           arrowX2 -= deltaX;
                           arrowY2 -= deltaY;
                         } else {
@@ -924,7 +858,8 @@ export class App extends React.Component<{}, AppState> {
                       deltaX = x - lastX;
                       deltaY = lastY - y;
                       if (isArrowElement(element)) {
-                        if (element.angle < 0 && element.angle >= -90) {
+                        const quadrant = getArrowQuadrant(element);
+                        if (quadrant === Quadrant.TopRight) {
                           arrowX2 += deltaX;
                           arrowY2 -= deltaY;
                         } else {
@@ -945,7 +880,8 @@ export class App extends React.Component<{}, AppState> {
                       deltaX = lastX - x;
                       deltaY = y - lastY;
                       if (isArrowElement(element)) {
-                        if (element.angle < 0 && element.angle >= -90) {
+                        const quadrant = getArrowQuadrant(element);
+                        if (quadrant === Quadrant.TopRight) {
                           arrowX1 -= deltaX;
                           arrowY1 += deltaY;
                         } else {
@@ -965,7 +901,8 @@ export class App extends React.Component<{}, AppState> {
                       deltaX = x - lastX;
                       deltaY = y - lastY;
                       if (isArrowElement(element)) {
-                        if (element.angle < -90) {
+                        const quadrant = getArrowQuadrant(element);
+                        if (quadrant === Quadrant.TopLeft) {
                           arrowX1 += deltaX;
                           arrowY1 += deltaY;
                         } else {
