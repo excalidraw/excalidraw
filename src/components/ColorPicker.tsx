@@ -33,6 +33,7 @@ const Picker = function({
             title={color}
             tabIndex={0}
             style={{ backgroundColor: color }}
+            key={color}
           >
             {color === "transparent" ? (
               <div className="color-picker-transparent"></div>

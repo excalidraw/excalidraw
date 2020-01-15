@@ -76,7 +76,7 @@ export function handlerRectangles(
     8
   ]; // se
 
-  if (element.type === "arrow") {
+  if (element.type === "arrow" || element.type === "line") {
     return {
       nw: handlers.nw,
       se: handlers.se

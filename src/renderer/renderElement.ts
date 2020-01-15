@@ -1,6 +1,10 @@
 import { ExcalidrawElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
-import { getDiamondPoints, getArrowPoints } from "../element/bounds";
+import {
+  getDiamondPoints,
+  getArrowPoints,
+  getLinePoints
+} from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 
@@ -118,6 +122,22 @@ export function renderElement(
     (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
     context.globalAlpha = 1;
     return;
+  } else if (element.type === "line") {
+    const [x1, y1, x2, y2] = getLinePoints(element);
+    const options = {
+      stroke: element.strokeColor,
+      strokeWidth: element.strokeWidth,
+      roughness: element.roughness,
+      seed: element.seed
+    };
+
+    if (!element.shape) {
+      element.shape = generator.line(x1, y1, x2, y2, options);
+    }
+
+    context.globalAlpha = element.opacity / 100;
+    rc.draw(element.shape as Drawable);
+    context.globalAlpha = 1;
   } else if (isTextElement(element)) {
     context.globalAlpha = element.opacity / 100;
     const font = context.font;
