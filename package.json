@@ -6,29 +6,33 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "nanoid": "^2.1.9",
+    "nanoid": "2.1.9",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-scripts": "3.3.0",
-    "roughjs": "^4.0.4"
+    "roughjs": "4.0.4"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.25",
-    "@types/nanoid": "^2.1.0",
+    "@types/jest": "24.9.0",
+    "@types/nanoid": "2.1.0",
     "@types/react": "16.9.17",
-    "@types/react-color": "^3.0.1",
+    "@types/react-color": "3.0.1",
     "@types/react-dom": "16.9.4",
-    "husky": "3.1.0",
+    "husky": "4.0.10",
     "lint-staged": "9.5.0",
-    "node-sass": "^4.13.0",
+    "node-sass": "4.13.1",
     "prettier": "1.19.1",
-    "typescript": "3.7.4"
+    "typescript": "3.7.5"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom --passWithNoTests",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "fix": "npm run prettier -- --write",
+    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\"",
+    "start": "react-scripts start",
+    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
+    "test:code": "npm run prettier -- --list-different",
+    "test": "npm run test:code && npm run test:app"
   },
   "browserslist": [
     ">0.2%",
@@ -45,7 +49,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,css,json,md,ts,tsx}": [
+    "*.{js,css,scss,json,md,ts,tsx,html,yml}": [
       "prettier --write",
       "git add"
     ],
