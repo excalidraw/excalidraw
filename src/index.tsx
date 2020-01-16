@@ -8,6 +8,7 @@ import {
   newElement,
   duplicateElement,
   resizeTest,
+  isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
   getElementAbsoluteCoords
@@ -978,7 +979,11 @@ export class App extends React.Component<{}, AppState> {
             };
 
             const onMouseUp = (e: MouseEvent) => {
-              const { draggingElement, elementType } = this.state;
+              const {
+                draggingElement,
+                resizingElement,
+                elementType
+              } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
@@ -987,8 +992,7 @@ export class App extends React.Component<{}, AppState> {
               if (
                 elementType !== "selection" &&
                 draggingElement &&
-                draggingElement.width === 0 &&
-                draggingElement.height === 0
+                isInvisiblySmallElement(draggingElement)
               ) {
                 // remove invisible element which was added in onMouseDown
                 elements = elements.slice(0, -1);
@@ -997,6 +1001,10 @@ export class App extends React.Component<{}, AppState> {
                 });
                 this.forceUpdate();
                 return;
+              }
+
+              if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+                elements = elements.filter(el => el.id !== resizingElement.id);
               }
 
               resetCursor();
