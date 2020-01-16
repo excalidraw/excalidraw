@@ -58,7 +58,7 @@ input:focus {
 }
 
 button {
-  background-color: #ddd;
+  background-color: #e9ecef;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin: 2px 0;
@@ -70,13 +70,13 @@ button {
   }
 
   &:hover {
-    background-color: #e7e5e5;
-    border-color: #d6d4d4;
+    background-color: #ced4da;
+    border-color: #adb5bd;
   }
 
   &:active {
-    background-color: #bdbebc;
-    border-color: #bdbebc;
+    background-color: #adb5bd;
+    border-color: #adb5bd;
   }
 
   &:disabled {
@@ -85,9 +85,9 @@ button {
 }
 
 .active {
-  background-color: #bdbebc;
+  background-color: #adb5bd;
   &:hover {
-    background-color: #bdbebc;
+    background-color: #adb5bd;
   }
 }
 
