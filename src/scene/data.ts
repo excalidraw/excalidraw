@@ -29,7 +29,9 @@ async function saveFileNative(name: string, data: Blob) {
     type: "saveFile",
     accepts: [
       {
-        description: "Excalidraw file",
+        description: `Excalidraw ${
+          data.type === "image/png" ? "image" : "file"
+        }`,
         extensions: [data.type.split("/")[1]],
         mimeTypes: [data.type]
       }
@@ -76,40 +78,65 @@ export async function saveAsJSON(
   }
 }
 
-export function loadFromJSON() {
-  const input = document.createElement("input");
-  const reader = new FileReader();
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = () => {
-    if (!input.files!.length) {
-      alert("A file was not selected.");
-      return;
+export async function loadFromJSON() {
+  const updateAppState = (contents: string) => {
+    const defaultAppState = getDefaultAppState();
+    let elements = [];
+    let appState = defaultAppState;
+    try {
+      const data = JSON.parse(contents);
+      elements = data.elements || [];
+      appState = { ...defaultAppState, ...data.appState };
+    } catch (e) {
+      // Do nothing because elements array is already empty
     }
-
-    reader.readAsText(input.files![0], "utf8");
+    return { elements, appState };
   };
 
-  input.click();
-
-  return new Promise<DataState>(resolve => {
-    reader.onloadend = () => {
-      if (reader.readyState === FileReader.DONE) {
-        const defaultAppState = getDefaultAppState();
-        let elements = [];
-        let appState = defaultAppState;
-        try {
-          const data = JSON.parse(reader.result as string);
-          elements = data.elements || [];
-          appState = { ...defaultAppState, ...data.appState };
-        } catch (e) {
-          // Do nothing because elements array is already empty
-        }
+  if ("chooseFileSystemEntries" in window) {
+    try {
+      const handle = await (window as any).chooseFileSystemEntries({
+        mimeTypes: ["application/json"],
+        extensions: ["json"]
+      });
+      const file = await handle.getFile();
+      const contents = await file.text();
+      const { elements, appState } = updateAppState(contents);
+      return new Promise<DataState>(resolve => {
         resolve(restore(elements, appState));
+      });
+    } catch (err) {
+      console.error(err.name, err.message);
+      throw err;
+    }
+  } else {
+    const input = document.createElement("input");
+    const reader = new FileReader();
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = () => {
+      if (!input.files!.length) {
+        alert("A file was not selected.");
+        return;
       }
+
+      reader.readAsText(input.files![0], "utf8");
     };
-  });
+
+    input.click();
+
+    return new Promise<DataState>(resolve => {
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          const { elements, appState } = updateAppState(
+            reader.result as string
+          );
+          resolve(restore(elements, appState));
+        }
+      };
+    });
+  }
 }
 
 export function getExportCanvasPreview(
