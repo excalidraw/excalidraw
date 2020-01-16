@@ -982,6 +982,21 @@ export class App extends React.Component<{}, AppState> {
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
+              if (
+                elementType !== "selection" &&
+                draggingElement &&
+                draggingElement.width === 0 &&
+                draggingElement.height === 0
+              ) {
+                // remove invisible element which was added in onMouseDown
+                elements = elements.slice(0, -1);
+                this.setState({
+                  draggingElement: null
+                });
+                this.forceUpdate();
+                return;
+              }
+
               resetCursor();
 
               // If click occured on already selected element
