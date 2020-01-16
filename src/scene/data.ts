@@ -3,6 +3,7 @@ import rough from "roughjs/bin/rough";
 import { ExcalidrawElement } from "../element/types";
 
 import { getElementAbsoluteCoords } from "../element";
+import { getDefaultAppState } from "../appState";
 
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
@@ -25,21 +26,22 @@ function saveFile(name: string, data: string) {
 
 interface DataState {
   elements: readonly ExcalidrawElement[];
-  appState: any;
+  appState: AppState;
 }
 
 export function saveAsJSON(
   elements: readonly ExcalidrawElement[],
-  name: string
+  appState: AppState
 ) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el)
+    elements: elements.map(({ shape, ...el }) => el),
+    appState: appState
   });
 
   saveFile(
-    `${name}.json`,
+    `${appState.name}.json`,
     "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
   );
 }
@@ -64,14 +66,17 @@ export function loadFromJSON() {
   return new Promise<DataState>(resolve => {
     reader.onloadend = () => {
       if (reader.readyState === FileReader.DONE) {
+        const defaultAppState = getDefaultAppState();
         let elements = [];
+        let appState = defaultAppState;
         try {
           const data = JSON.parse(reader.result as string);
           elements = data.elements || [];
+          appState = { ...defaultAppState, ...data.appState };
         } catch (e) {
           // Do nothing because elements array is already empty
         }
-        resolve(restore(elements, null));
+        resolve(restore(elements, appState));
       }
     };
   });
@@ -215,7 +220,7 @@ export function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: any
+  savedState: AppState
 ): DataState {
   return {
     elements: savedElements.map(element => ({
