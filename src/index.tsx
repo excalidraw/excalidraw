@@ -440,7 +440,9 @@ export class App extends React.Component<{}, AppState> {
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}, ${index + 1}`}
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);
@@ -803,7 +805,6 @@ export class App extends React.Component<{}, AppState> {
 
             let lastX = x;
             let lastY = y;
-
             if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
               lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
               lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
@@ -974,9 +975,26 @@ export class App extends React.Component<{}, AppState> {
               history.skipRecording();
               this.forceUpdate();
             };
-
             const onMouseUp = (e: MouseEvent) => {
               const { draggingElement, elementType } = this.state;
+              const latestElementAdded =
+                elements.length > 0 && elements[elements.length - 1];
+              if (latestElementAdded) {
+                const [
+                  elementX1,
+                  elementY1,
+                  elementX2,
+                  elementY2
+                ] = getElementAbsoluteCoords(element);
+                /**
+                 * Avoid drawing when user did not drag
+                 */
+                if (elementY1 === elementY2 && elementX2 === elementX1) {
+                  const newElements = [...elements];
+                  newElements.splice(-1);
+                  elements = newElements;
+                }
+              }
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
