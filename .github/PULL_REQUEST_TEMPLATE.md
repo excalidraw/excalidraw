@@ -12,6 +12,5 @@
 
 - [ ] tested locally
 - [ ] updated the docs
-- [ ] added a test
 
 Fixes #
