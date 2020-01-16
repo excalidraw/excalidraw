@@ -62,3 +62,20 @@ export function debounce<T extends any[]>(
     handle = window.setTimeout(() => fn(...args), timeout);
   };
 }
+
+export function selectNode(node: Element) {
+  const selection = window.getSelection();
+  if (selection) {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
+export function removeSelection() {
+  const selection = window.getSelection();
+  if (selection) {
+    selection.removeAllRanges();
+  }
+}

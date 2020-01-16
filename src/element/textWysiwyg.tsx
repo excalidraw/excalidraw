@@ -1,4 +1,5 @@
 import { KEYS } from "../keys";
+import { selectNode } from "../utils";
 
 type TextWysiwygParams = {
   initText: string;
@@ -89,11 +90,5 @@ export function textWysiwyg({
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();
-  const selection = window.getSelection();
-  if (selection) {
-    const range = document.createRange();
-    range.selectNodeContents(editable);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
+  selectNode(editable);
 }
