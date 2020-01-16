@@ -24,12 +24,34 @@ function saveFile(name: string, data: string) {
   link.remove();
 }
 
+async function saveFileNative(name: string, data: Blob) {
+  const options = {
+    type: "saveFile",
+    accepts: [
+      {
+        description: "Excalidraw file",
+        extensions: [data.type.split("/")[1]],
+        mimeTypes: [data.type]
+      }
+    ]
+  };
+  try {
+    const handle = await (window as any).chooseFileSystemEntries(options);
+    const writer = await handle.createWriter();
+    await writer.truncate(0);
+    await writer.write(0, data, data.type);
+    await writer.close();
+  } catch (err) {
+    console.error(err.name, err.message);
+  }
+}
+
 interface DataState {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
 }
 
-export function saveAsJSON(
+export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState
 ) {
@@ -40,10 +62,18 @@ export function saveAsJSON(
     appState: appState
   });
 
-  saveFile(
-    `${appState.name}.json`,
-    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
-  );
+  const name = `${appState.name}.json`;
+  if ("chooseFileSystemEntries" in window) {
+    await saveFileNative(
+      name,
+      new Blob([serialized], { type: "application/json" })
+    );
+  } else {
+    saveFile(
+      name,
+      "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+    );
+  }
 }
 
 export function loadFromJSON() {
@@ -135,7 +165,7 @@ export function getExportCanvasPreview(
   return tempCanvas;
 }
 
-export function exportCanvas(
+export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
   canvas: HTMLCanvasElement,
@@ -197,7 +227,16 @@ export function exportCanvas(
   );
 
   if (type === "png") {
-    saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+    const fileName = `${name}.png`;
+    if ("chooseFileSystemEntries" in window) {
+      tempCanvas.toBlob(async blob => {
+        if (blob) {
+          await saveFileNative(fileName, blob);
+        }
+      });
+    } else {
+      saveFile(fileName, tempCanvas.toDataURL("image/png"));
+    }
   } else if (type === "clipboard") {
     try {
       tempCanvas.toBlob(async function(blob) {
