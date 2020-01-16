@@ -218,27 +218,22 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
-    let newElements;
-    let appState;
+    let data;
     const searchParams = new URLSearchParams(window.location.search);
 
-    if (searchParams.get("share") != null) {
-      const data = await importFromShortlink(searchParams.get("share"));
-      newElements = data.elements;
-      appState = data.appState;
+    if (searchParams.get("share_js") != null) {
+      data = await importFromShortlink(searchParams.get("share_js"));
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
-      const data = restoreFromLocalStorage();
-      newElements = data.elements;
-      appState = data.appState;
+      data = restoreFromLocalStorage();
     }
 
-    if (newElements) {
-      elements = newElements;
+    if (data.elements) {
+      elements = data.elements;
     }
 
-    if (appState) {
-      this.setState(appState);
+    if (data.appState) {
+      this.setState(data.appState);
     } else {
       this.forceUpdate();
     }
@@ -497,6 +492,15 @@ export class App extends React.Component<{}, AppState> {
               if (this.canvas)
                 exportCanvas(
                   "clipboard",
+                  exportedElements,
+                  this.canvas,
+                  this.state
+                );
+            }}
+            onExportToShortlink={exportedElements => {
+              if (this.canvas)
+                exportCanvas(
+                  "shortlink",
                   exportedElements,
                   this.canvas,
                   this.state

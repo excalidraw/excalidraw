@@ -31,31 +31,28 @@ interface DataState {
   appState: any;
 }
 
-export function saveAsJSON(
-  elements: readonly ExcalidrawElement[],
-  name: string
-) {
-  const serialized = JSON.stringify({
+function serializeAsJSON(elements: readonly ExcalidrawElement[]) {
+  return JSON.stringify({
     version: 1,
     source: window.location.origin,
     elements: elements.map(({ shape, ...el }) => el)
   });
+}
 
+export function saveAsJSON(
+  elements: readonly ExcalidrawElement[],
+  name: string
+) {
   saveFile(
     `${name}.json`,
-    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+    "data:text/plain;charset=utf-8," +
+      encodeURIComponent(serializeAsJSON(elements))
   );
 }
 
 export async function exportToShortlink(
   elements: readonly ExcalidrawElement[]
 ) {
-  const serialized = JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el)
-  });
-
   // Generating a random unique shortcode
   // https://stackoverflow.com/questions/6248666/
   const firstPart = (Math.random() * 46656) | 0;
@@ -71,13 +68,13 @@ export async function exportToShortlink(
       headers: {
         "Content-Type": "application/json"
       },
-      body: serialized
+      body: serializeAsJSON(elements)
     }
   );
   const json = await response.json();
   if (json.ok) {
     const url = new URL(window.location.href);
-    url.searchParams.append("share", shortcode);
+    url.searchParams.append("share_js", shortcode);
 
     await navigator.clipboard.writeText(url.toString());
     window.alert("Copied shareable link " + url.toString() + " to clipboard");
@@ -96,7 +93,8 @@ export async function importFromShortlink(shortcode: string | null) {
       const json = JSON.parse(response);
       elements = json.result.elements || [];
     } catch (e) {
-      // Show an error message that importing failed
+      window.alert("Importing from shortlink failed");
+      console.error(e);
     }
   }
   return restore(elements, null);

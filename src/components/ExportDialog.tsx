@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolIcon } from "./ToolIcon";
-import { clipboard, exportFile, downloadFile } from "./icons";
+import { clipboard, exportFile, downloadFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -25,7 +25,8 @@ export function ExportDialog({
   actionManager,
   syncActionResult,
   onExportToPng,
-  onExportToClipboard
+  onExportToClipboard,
+  onExportToShortlink
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -34,6 +35,7 @@ export function ExportDialog({
   syncActionResult: UpdaterFn;
   onExportToPng(elements: readonly ExcalidrawElement[]): void;
   onExportToClipboard(elements: readonly ExcalidrawElement[]): void;
+  onExportToShortlink(elements: readonly ExcalidrawElement[]): void;
 }) {
   const someElementIsSelected = elements.some(element => element.isSelected);
   const [modalIsShown, setModalIsShown] = useState(false);
@@ -100,7 +102,6 @@ export function ExportDialog({
                     aria-label="Export to PNG"
                     onClick={() => onExportToPng(exportedElements)}
                   />
-
                   {probablySupportsClipboard && (
                     <ToolIcon
                       type="button"
@@ -110,6 +111,13 @@ export function ExportDialog({
                       onClick={() => onExportToClipboard(exportedElements)}
                     />
                   )}
+                  <ToolIcon
+                    type="button"
+                    icon={link}
+                    title="Get shareable link"
+                    aria-label="Get shareable link"
+                    onClick={() => onExportToShortlink(exportedElements)}
+                  />
                 </Stack.Row>
 
                 {actionManager.renderAction(
