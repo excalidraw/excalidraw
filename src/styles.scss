@@ -59,7 +59,7 @@ input:focus {
 
 button {
   background-color: #e9ecef;
-  border: 1px solid #dee2e6;
+  border: 0;
   border-radius: 4px;
   margin: 2px 0;
   padding: 5px;
@@ -71,12 +71,10 @@ button {
 
   &:hover {
     background-color: #ced4da;
-    border-color: #ced4da;
   }
 
   &:active {
     background-color: #ced4da;
-    border-color: #ced4da;
   }
 
   &:disabled {
