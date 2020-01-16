@@ -293,10 +293,9 @@ export class App extends React.Component<{}, AppState> {
       event.preventDefault();
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
-      !event.ctrlKey &&
+      !event[META_KEY] &&
       !event.shiftKey &&
-      !event.altKey &&
-      !event.metaKey
+      !event.altKey
     ) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[META_KEY] && event.code === "KeyZ") {
@@ -440,7 +439,9 @@ export class App extends React.Component<{}, AppState> {
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}, ${index + 1}`}
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);
@@ -1018,10 +1019,13 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement.isSelected = true;
               }
 
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
+              if (!e[META_KEY]) {
+                // Doesn't reset selection when the user holds cmd or ctrl
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
 
               history.resumeRecording();
               this.forceUpdate();
