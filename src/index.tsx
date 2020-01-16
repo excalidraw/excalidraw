@@ -265,6 +265,18 @@ export class App extends React.Component<{}, AppState> {
       event.preventDefault();
       return;
     }
+
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === 67) {
+      this.copyToClipboard();
+      event.preventDefault();
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === 86) {
+      this.pasteFromClipboard();
+      event.preventDefault();
+      return;
+    }
+
     if (isInputLike(event.target)) return;
 
     const data = this.actionManager.handleKeyDown(event, elements, this.state);
@@ -333,9 +345,12 @@ export class App extends React.Component<{}, AppState> {
 
   private pasteFromClipboard = () => {
     if (navigator.clipboard) {
-      navigator.clipboard
-        .readText()
-        .then(text => this.addElementsFromPaste(text));
+      if (typeof navigator.clipboard.readText !== "undefined") {
+        //avoid firefox problem
+        navigator.clipboard
+          .readText()
+          .then(text => this.addElementsFromPaste(text));
+      }
     }
   };
 
@@ -440,7 +455,9 @@ export class App extends React.Component<{}, AppState> {
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}, ${index + 1}`}
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);
