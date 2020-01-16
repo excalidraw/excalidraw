@@ -1,11 +1,7 @@
 :root {
   --text-color-primary: #333;
-
-  --bg-color-main: white;
-
+  --bg-color-main: #fff;
   --shadow-island: 0 1px 5px rgba(0, 0, 0, 0.15);
-
   --border-radius-m: 4px;
-
   --space-factor: 4px;
 }

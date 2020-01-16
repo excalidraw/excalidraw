@@ -54,7 +54,7 @@ body {
 
 input:focus {
   outline: transparent;
-  box-shadow: 0 0 0 2px steelblue;
+  box-shadow: 0 0 0 2px #4682b4;
 }
 
 button {
@@ -66,7 +66,7 @@ button {
   outline: transparent;
 
   &:focus {
-    box-shadow: 0 0 0 2px steelblue;
+    box-shadow: 0 0 0 2px #4682b4;
   }
 
   &:hover {
