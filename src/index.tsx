@@ -433,14 +433,14 @@ export class App extends React.Component<{}, AppState> {
   private renderShapesSwitcher() {
     return (
       <>
-        {SHAPES.map(({ value, icon }) => (
+        {SHAPES.map(({ value, icon }, index) => (
           <ToolIcon
             key={value}
             type="radio"
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}`}
+            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);

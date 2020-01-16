@@ -74,12 +74,14 @@ export const SHAPES = [
   }
 ];
 
-export const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
+export const shapesShortcutKeys = SHAPES.map((shape, index) => [
+    shape.value[0], (index + 1).toString()]
+).flat(1);
 
 export function findShapeByKey(key: string) {
   const defaultElement = "selection";
-  return SHAPES.reduce((element, shape) => {
-    if (shape.value[0] !== key) return element;
+  return SHAPES.reduce((element, shape, index) => {
+    if (shape.value[0] !== key && key !== (index + 1).toString()) return element;
 
     return shape.value;
   }, defaultElement);
