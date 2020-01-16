@@ -72,7 +72,7 @@ export function loadFromJSON() {
         try {
           const data = JSON.parse(reader.result as string);
           elements = data.elements || [];
-          appState = data.appState || defaultAppState;
+          appState = { ...defaultAppState, ...data.appState };
         } catch (e) {
           // Do nothing because elements array is already empty
         }
