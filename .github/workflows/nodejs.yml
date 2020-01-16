@@ -4,20 +4,19 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    
-    - name: Setup Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+      - uses: actions/checkout@v1
 
-    - name: Install and test
-      run: |
-        npm ci
-        npm test
-      env:
-        CI: true
+      - name: Setup Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install and test
+        run: |
+          npm ci
+          npm test
+        env:
+          CI: true
