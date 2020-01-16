@@ -104,44 +104,60 @@ export function ColorPicker({
   );
 }
 
+// https://yeun.github.io/open-color/
 const colors = {
+  // Shade 0
   canvasBackground: [
-    "#DEE6EF",
-    "#FCEAD8",
-    "#F9E0E0",
-    "#E6F1F1",
-    "#E0EDDF",
-    "#FBF5DD",
-    "#F0E6ED",
-    "#FFEDEF",
-    "#EDE5E1",
-    "#F2F0EF",
-    "#FFFFFF"
+    "#FFFFFF",
+    "#F8F9FA",
+    "#F1F3F5",
+    "#FFF5F5",
+    "#FFF0F6",
+    "#F8F0FC",
+    "#F3F0FF",
+    "#EDF2FF",
+    "#E7F5FF",
+    "#E3FAFC",
+    "#E6FCF5",
+    "#EBFBEE",
+    "#F4FCE3",
+    "#FFF9DB",
+    "#FFF4E6"
   ],
+  // Shade 6
   elementBackground: [
-    "#4E79A7",
-    "#F28E2C",
-    "#E15759",
-    "#76B7B2",
-    "#59A14F",
-    "#EDC949",
-    "#AF7AA1",
-    "#FF9DA7",
-    "#9C755F",
-    "#BAB0AB",
-    "transparent"
+    "transparent",
+    "#CED4DA",
+    "#868E96",
+    "#FA5252",
+    "#E64980",
+    "#BE4BDB",
+    "#7950F2",
+    "#4C6EF5",
+    "#228BE6",
+    "#15AABF",
+    "#12B886",
+    "#40C057",
+    "#82C91E",
+    "#FAB005",
+    "#FD7E14"
   ],
+  // Shade 9
   elementStroke: [
-    "#324E6B",
-    "#9B5B1D",
-    "#903839",
-    "#4C7572",
-    "#396733",
-    "#AD9336",
-    "#805976",
-    "#BA737A",
-    "#725646",
-    "#88817D",
-    "#000000"
+    "#000000",
+    "#343A40",
+    "#495057",
+    "#C92A2A",
+    "#A61E4D",
+    "#862E9C",
+    "#5F3DC4",
+    "#364FC7",
+    "#1864AB",
+    "#0B7285",
+    "#087F5B",
+    "#2B8A3E",
+    "#5C940D",
+    "#E67700",
+    "#D9480F"
   ]
 };
