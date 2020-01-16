@@ -440,7 +440,9 @@ export class App extends React.Component<{}, AppState> {
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}, ${index + 1}`}
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);
