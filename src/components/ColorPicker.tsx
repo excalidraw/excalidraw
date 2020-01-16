@@ -104,24 +104,27 @@ export function ColorPicker({
   );
 }
 
+// https://yeun.github.io/open-color/
 const colors = {
+  // Shade 1
   canvasBackground: [
     "#FFFFFF",
-    "#F1F3F5",
-    "#E9ECEF",
-    "#FFC9C9",
-    "#FCC2D7",
-    "#EEBEFA",
-    "#D0BFFF",
-    "#BAC8FF",
-    "#A5D8FF",
-    "#99E9F2",
-    "#96F2D7",
-    "#B2F2BB",
-    "#D8F5A2",
-    "#FFEC99",
-    "#FFD8A8"
+    "#f8f9fa",
+    "#f1f3f5",
+    "#ffe3e3",
+    "#ffdeeb",
+    "#f3d9fa",
+    "#e5dbff",
+    "#dbe4ff",
+    "#d0ebff",
+    "#c5f6fa",
+    "#c3fae8",
+    "#d3f9d8",
+    "#e9fac8",
+    "#fff3bf",
+    "#ffe8cc"
   ],
+  // Shade 6
   elementBackground: [
     "transparent",
     "#CED4DA",
@@ -139,6 +142,7 @@ const colors = {
     "#FAB005",
     "#FD7E14"
   ],
+  // Shade 9
   elementStroke: [
     "#000000",
     "#343A40",
