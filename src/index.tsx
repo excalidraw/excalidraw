@@ -772,6 +772,7 @@ export class App extends React.Component<{}, AppState> {
               }
 
               textWysiwyg({
+                // on create
                 initText: "",
                 x: textX,
                 y: textY,
@@ -1093,6 +1094,7 @@ export class App extends React.Component<{}, AppState> {
             }
 
             textWysiwyg({
+              // on edit
               initText,
               x: textX,
               y: textY,

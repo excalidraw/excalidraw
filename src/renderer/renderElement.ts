@@ -144,11 +144,19 @@ export function renderElement(
     context.font = element.font;
     const fillStyle = context.fillStyle;
     context.fillStyle = element.strokeColor;
-    context.fillText(
-      element.text,
-      0,
-      element.baseline || element.actualBoundingBoxAscent || 0
-    );
+    const lines = element.text.split("\n");
+    if (lines.length > 1) {
+      let lineHeight = element.baseline / lines.length;
+      for (let i = 0; i < lines.length; i++) {
+        context.fillText(lines[i], 0, (i + 1) * lineHeight);
+      }
+    } else {
+      context.fillText(
+        element.text,
+        0,
+        element.baseline || element.actualBoundingBoxAscent || 0
+      );
+    }
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;

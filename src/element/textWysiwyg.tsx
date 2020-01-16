@@ -53,7 +53,7 @@ export function textWysiwyg({
       cleanup();
       return;
     }
-    if (ev.key === KEYS.ENTER) {
+    if (ev.key === KEYS.ENTER && !ev.shiftKey) {
       ev.preventDefault();
       handleSubmit();
     }
