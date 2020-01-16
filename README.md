@@ -32,23 +32,22 @@ Go to https://www.excalidraw.com to start sketching
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-Clone the repo
+#### Clone the repo
 
 ```bash
 git clone https://github.com/excalidraw/excalidraw.git
 ```
 
-Install all the dependencies
+#### Commands
 
-```bash
-npm install
-```
-
-Run the project
-
-```bash
-npm run start
-```
+| Command             | Description                       |
+| ------------------- | --------------------------------- |
+| `npm install`       | Install the dependencies          |
+| `npm run start`     | Run the project                   |
+| `npm run fix`       | Reformat all files with Prettier  |
+| `npm run test:code` | Test for formatting with Prettier |
+| `npm run test:app`  | Test the app                      |
+| `npm run test`      | Run all tests                     |
 
 ## Contributing
 
