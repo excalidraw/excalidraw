@@ -44,3 +44,9 @@
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
+.ExportDialog__scales {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+}
