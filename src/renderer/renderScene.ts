@@ -128,8 +128,10 @@ export function renderScene(
     y1 += sceneState.scrollY;
     x2 += sceneState.scrollX;
     y2 += sceneState.scrollY;
-    const width = parseInt(canvas.style.width);
-    const height = parseInt(canvas.style.height);
+    // If canvas is scaled for high pixelDeviceRatio, width and height
+    // setted in the `style` attribute
+    const width = parseInt(canvas.style.width) || canvas.width;
+    const height = parseInt(canvas.style.height) || canvas.height;
     return x2 >= 0 && x1 <= width && y2 >= 0 && y1 <= height;
   }
 }
