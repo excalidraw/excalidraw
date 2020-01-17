@@ -1,1212 +1,543 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import rough from "roughjs/bin/wrappers/rough";
+
+import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { moveOneLeft, moveAllLeft, moveOneRight, moveAllRight } from "./zindex";
+import {
+  newElement,
+  duplicateElement,
+  resizeTest,
+  isInvisiblySmallElement,
+  isTextElement,
+  textWysiwyg,
+  getElementAbsoluteCoords
+} from "./element";
+import {
+  clearSelection,
+  deleteSelectedElements,
+  getElementsWithinSelection,
+  isOverScrollBars,
+  restoreFromLocalStorage,
+  saveToLocalStorage,
+  getElementAtPosition,
+  createScene,
+  getElementContainingPosition,
+  hasBackground,
+  hasStroke,
+  hasText,
+  exportCanvas
+} from "./scene";
+
+import { renderScene } from "./renderer";
+import { AppState } from "./types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+
+import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
+import { KEYS, META_KEY, isArrowKey } from "./keys";
+
+import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
+import { createHistory } from "./history";
+
+import ContextMenu from "./components/ContextMenu";
 
 import "./styles.scss";
+import { getElementWithResizeHandler } from "./element/resizeTest";
+import {
+  ActionManager,
+  actionDeleteSelected,
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+  actionBringToFront,
+  actionSelectAll,
+  actionChangeStrokeColor,
+  actionChangeBackgroundColor,
+  actionChangeOpacity,
+  actionChangeStrokeWidth,
+  actionChangeFillStyle,
+  actionChangeSloppiness,
+  actionChangeFontSize,
+  actionChangeFontFamily,
+  actionChangeViewBackgroundColor,
+  actionClearCanvas,
+  actionChangeProjectName,
+  actionChangeExportBackground,
+  actionLoadScene,
+  actionSaveScene,
+  actionCopyStyles,
+  actionPasteStyles
+} from "./actions";
+import { Action, ActionResult } from "./actions/types";
+import { getDefaultAppState } from "./appState";
+import { Island } from "./components/Island";
+import Stack from "./components/Stack";
+import { FixedSideContainer } from "./components/FixedSideContainer";
+import { ToolIcon } from "./components/ToolIcon";
+import { ExportDialog } from "./components/ExportDialog";
 
-type ExcalidrawElement = ReturnType<typeof newElement>;
-type ExcalidrawTextElement = ExcalidrawElement & {
-  type: "text";
-  font: string;
-  text: string;
-  actualBoundingBoxAscent: number;
-};
+let { elements } = createScene();
+const { history } = createHistory();
 
-const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-
-const elements = Array.of<ExcalidrawElement>();
-
-let skipHistory = false;
-const stateHistory: string[] = [];
-function generateHistoryCurrentEntry() {
-  return JSON.stringify(
-    elements.map(element => ({ ...element, isSelected: false }))
-  );
-}
-function pushHistoryEntry(newEntry: string) {
-  if (
-    stateHistory.length > 0 &&
-    stateHistory[stateHistory.length - 1] === newEntry
-  ) {
-    // If the last entry is the same as this one, ignore it
-    return;
-  }
-  stateHistory.push(newEntry);
-}
-function restoreHistoryEntry(entry: string) {
-  const newElements = JSON.parse(entry);
-  elements.splice(0, elements.length);
-  newElements.forEach((newElement: ExcalidrawElement) => {
-    generateDraw(newElement);
-    elements.push(newElement);
-  });
-  // When restoring, we shouldn't add an history entry otherwise we'll be stuck with it and can't go back
-  skipHistory = true;
-}
-
-// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript/47593316#47593316
-const LCG = (seed: number) => () =>
-  ((2 ** 31 - 1) & (seed = Math.imul(48271, seed))) / 2 ** 31;
-
-function randomSeed() {
-  return Math.floor(Math.random() * 2 ** 31);
-}
-
-// Unfortunately, roughjs doesn't support a seed attribute (https://github.com/pshihn/rough/issues/27).
-// We can achieve the same result by overriding the Math.random function with a
-// pseudo random generator that supports a random seed and swapping it back after.
-function withCustomMathRandom<T>(seed: number, cb: () => T): T {
-  const random = Math.random;
-  Math.random = LCG(seed);
-  const result = cb();
-  Math.random = random;
-  return result;
-}
-
-// https://stackoverflow.com/a/6853926/232122
-function distanceBetweenPointAndSegment(
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-) {
-  const A = x - x1;
-  const B = y - y1;
-  const C = x2 - x1;
-  const D = y2 - y1;
-
-  const dot = A * C + B * D;
-  const lenSquare = C * C + D * D;
-  let param = -1;
-  if (lenSquare !== 0) {
-    // in case of 0 length line
-    param = dot / lenSquare;
-  }
-
-  let xx, yy;
-  if (param < 0) {
-    xx = x1;
-    yy = y1;
-  } else if (param > 1) {
-    xx = x2;
-    yy = y2;
-  } else {
-    xx = x1 + param * C;
-    yy = y1 + param * D;
-  }
-
-  const dx = x - xx;
-  const dy = y - yy;
-  return Math.hypot(dx, dy);
-}
-
-function hitTest(element: ExcalidrawElement, x: number, y: number): boolean {
-  // For shapes that are composed of lines, we only enable point-selection when the distance
-  // of the click is less than x pixels of any of the lines that the shape is composed of
-  const lineThreshold = 10;
-
-  if (element.type === "ellipse") {
-    // https://stackoverflow.com/a/46007540/232122
-    const px = Math.abs(x - element.x - element.width / 2);
-    const py = Math.abs(y - element.y - element.height / 2);
-
-    let tx = 0.707;
-    let ty = 0.707;
-
-    const a = element.width / 2;
-    const b = element.height / 2;
-
-    [0, 1, 2, 3].forEach(x => {
-      const xx = a * tx;
-      const yy = b * ty;
-
-      const ex = ((a * a - b * b) * tx ** 3) / a;
-      const ey = ((b * b - a * a) * ty ** 3) / b;
-
-      const rx = xx - ex;
-      const ry = yy - ey;
-
-      const qx = px - ex;
-      const qy = py - ey;
-
-      const r = Math.hypot(ry, rx);
-      const q = Math.hypot(qy, qx);
-
-      tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-      ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-      const t = Math.hypot(ty, tx);
-      tx /= t;
-      ty /= t;
-    });
-
-    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
-  } else if (element.type === "rectangle") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
-
-    // (x1, y1) --A-- (x2, y1)
-    //    |D             |B
-    // (x1, y2) --C-- (x2, y2)
-    return (
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
-      distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
-      distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
-      distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
-    );
-  } else if (element.type === "arrow") {
-    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
-
-    return (
-      //    \
-      distanceBetweenPointAndSegment(x, y, x3, y3, x2, y2) < lineThreshold ||
-      // -----
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold ||
-      //    /
-      distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
-    );
-  } else if (element.type === "text") {
-    const x1 = getElementAbsoluteX1(element);
-    const x2 = getElementAbsoluteX2(element);
-    const y1 = getElementAbsoluteY1(element);
-    const y2 = getElementAbsoluteY2(element);
-
-    return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-  } else if (element.type === "selection") {
-    console.warn("This should not happen, we need to investigate why it does.");
-    return false;
-  } else {
-    throw new Error("Unimplemented type " + element.type);
-  }
-}
-
-function resizeTest(
-  element: ExcalidrawElement,
-  x: number,
-  y: number,
-  sceneState: SceneState
-): string | false {
-  if (element.type === "text" || element.type === "arrow") return false;
-
-  const handlers = handlerRectangles(element, sceneState);
-
-  const filter = Object.keys(handlers).filter(key => {
-    const handler = handlers[key];
-
-    return (
-      x + sceneState.scrollX >= handler[0] &&
-      x + sceneState.scrollX <= handler[0] + handler[2] &&
-      y + sceneState.scrollY >= handler[1] &&
-      y + sceneState.scrollY <= handler[1] + handler[3]
-    );
-  });
-
-  if (filter.length > 0) {
-    return filter[0];
-  }
-
-  return false;
-}
-
-function newElement(
-  type: string,
-  x: number,
-  y: number,
-  strokeColor: string,
-  backgroundColor: string,
-  width = 0,
-  height = 0
-) {
-  const element = {
-    type: type,
-    x: x,
-    y: y,
-    width: width,
-    height: height,
-    isSelected: false,
-    strokeColor: strokeColor,
-    backgroundColor: backgroundColor,
-    seed: randomSeed(),
-    draw(
-      rc: RoughCanvas,
-      context: CanvasRenderingContext2D,
-      sceneState: SceneState
-    ) {}
-  };
-  return element;
-}
-
-type SceneState = {
-  scrollX: number;
-  scrollY: number;
-  // null indicates transparent bg
-  viewBackgroundColor: string | null;
-};
-
-const SCROLLBAR_WIDTH = 6;
-const SCROLLBAR_MARGIN = 4;
-const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
-const CANVAS_WINDOW_OFFSET_LEFT = 250;
+const CANVAS_WINDOW_OFFSET_LEFT = 0;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-function getScrollbars(
-  canvasWidth: number,
-  canvasHeight: number,
-  scrollX: number,
-  scrollY: number
-) {
-  // horizontal scrollbar
-  const sceneWidth = canvasWidth + Math.abs(scrollX);
-  const scrollBarWidth = (canvasWidth * canvasWidth) / sceneWidth;
-  const scrollBarX = scrollX > 0 ? 0 : canvasWidth - scrollBarWidth;
-  const horizontalScrollBar = {
-    x: scrollBarX + SCROLLBAR_MARGIN,
-    y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    width: scrollBarWidth - SCROLLBAR_MARGIN * 2,
-    height: SCROLLBAR_WIDTH
-  };
-
-  // vertical scrollbar
-  const sceneHeight = canvasHeight + Math.abs(scrollY);
-  const scrollBarHeight = (canvasHeight * canvasHeight) / sceneHeight;
-  const scrollBarY = scrollY > 0 ? 0 : canvasHeight - scrollBarHeight;
-  const verticalScrollBar = {
-    x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
-    y: scrollBarY + SCROLLBAR_MARGIN,
-    width: SCROLLBAR_WIDTH,
-    height: scrollBarHeight - SCROLLBAR_WIDTH * 2
-  };
-
-  return {
-    horizontal: horizontalScrollBar,
-    vertical: verticalScrollBar
-  };
-}
-
-function handlerRectangles(element: ExcalidrawElement, sceneState: SceneState) {
-  const elementX1 = element.x;
-  const elementX2 = element.x + element.width;
-  const elementY1 = element.y;
-  const elementY2 = element.y + element.height;
-
-  const margin = 4;
-  const minimumSize = 40;
-  const handlers: { [handler: string]: number[] } = {};
-
-  const marginX = element.width < 0 ? 8 : -8;
-  const marginY = element.height < 0 ? 8 : -8;
-
-  if (Math.abs(elementX2 - elementX1) > minimumSize) {
-    handlers["n"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY1 - margin + sceneState.scrollY + marginY,
-      8,
-      8
-    ];
-
-    handlers["s"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + sceneState.scrollX - 4,
-      elementY2 - margin + sceneState.scrollY - marginY,
-      8,
-      8
-    ];
-  }
-
-  if (Math.abs(elementY2 - elementY1) > minimumSize) {
-    handlers["w"] = [
-      elementX1 - margin + sceneState.scrollX + marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-      8,
-      8
-    ];
-
-    handlers["e"] = [
-      elementX2 - margin + sceneState.scrollX - marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + sceneState.scrollY - 4,
-      8,
-      8
-    ];
-  }
-
-  handlers["nw"] = [
-    elementX1 - margin + sceneState.scrollX + marginX,
-    elementY1 - margin + sceneState.scrollY + marginY,
-    8,
-    8
-  ]; // nw
-  handlers["ne"] = [
-    elementX2 - margin + sceneState.scrollX - marginX,
-    elementY1 - margin + sceneState.scrollY + marginY,
-    8,
-    8
-  ]; // ne
-  handlers["sw"] = [
-    elementX1 - margin + sceneState.scrollX + marginX,
-    elementY2 - margin + sceneState.scrollY - marginY,
-    8,
-    8
-  ]; // sw
-  handlers["se"] = [
-    elementX2 - margin + sceneState.scrollX - marginX,
-    elementY2 - margin + sceneState.scrollY - marginY,
-    8,
-    8
-  ]; // se
-
-  return handlers;
-}
-
-function renderScene(
-  rc: RoughCanvas,
-  canvas: HTMLCanvasElement,
-  sceneState: SceneState,
-  // extra options, currently passed by export helper
-  {
-    offsetX,
-    offsetY,
-    renderScrollbars = true,
-    renderSelection = true
-  }: {
-    offsetX?: number;
-    offsetY?: number;
-    renderScrollbars?: boolean;
-    renderSelection?: boolean;
-  } = {}
-) {
-  if (!canvas) return;
-  const context = canvas.getContext("2d")!;
-
-  const fillStyle = context.fillStyle;
-  if (typeof sceneState.viewBackgroundColor === "string") {
-    context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  context.fillStyle = fillStyle;
-
-  const selectedIndices = getSelectedIndices();
-
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY
-  };
-
-  elements.forEach(element => {
-    element.draw(rc, context, sceneState);
-    if (renderSelection && element.isSelected) {
-      const margin = 4;
-
-      const elementX1 = getElementAbsoluteX1(element);
-      const elementX2 = getElementAbsoluteX2(element);
-      const elementY1 = getElementAbsoluteY1(element);
-      const elementY2 = getElementAbsoluteY2(element);
-      const lineDash = context.getLineDash();
-      context.setLineDash([8, 4]);
-      context.strokeRect(
-        elementX1 - margin + sceneState.scrollX,
-        elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2
-      );
-      context.setLineDash(lineDash);
-
-      if (
-        element.type !== "text" &&
-        element.type !== "arrow" &&
-        selectedIndices.length === 1
-      ) {
-        const handlers = handlerRectangles(element, sceneState);
-        Object.values(handlers).forEach(handler => {
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-        });
-      }
-    }
-  });
-
-  if (renderScrollbars) {
-    const scrollBars = getScrollbars(
-      context.canvas.width / window.devicePixelRatio,
-      context.canvas.height / window.devicePixelRatio,
-      sceneState.scrollX,
-      sceneState.scrollY
-    );
-
-    context.fillStyle = SCROLLBAR_COLOR;
-    context.fillRect(
-      scrollBars.horizontal.x,
-      scrollBars.horizontal.y,
-      scrollBars.horizontal.width,
-      scrollBars.horizontal.height
-    );
-    context.fillRect(
-      scrollBars.vertical.x,
-      scrollBars.vertical.y,
-      scrollBars.vertical.width,
-      scrollBars.vertical.height
-    );
-    context.fillStyle = fillStyle;
-  }
-}
-
-function saveAsJSON() {
-  const serialized = JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements
-  });
-
-  saveFile(
-    "excalidraw.json",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
-  );
-}
-
-function loadFromJSON() {
-  const input = document.createElement("input");
-  const reader = new FileReader();
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = () => {
-    if (!input.files!.length) {
-      alert("A file was not selected.");
-      return;
-    }
-
-    reader.readAsText(input.files![0], "utf8");
-  };
-
-  input.click();
-
-  return new Promise(resolve => {
-    reader.onloadend = () => {
-      if (reader.readyState === FileReader.DONE) {
-        const data = JSON.parse(reader.result as string);
-        restore(data.elements, null);
-        resolve();
-      }
-    };
-  });
-}
-
-function exportAsPNG({
-  exportBackground,
-  exportPadding = 10,
-  viewBackgroundColor
-}: {
-  exportBackground: boolean;
-  exportPadding?: number;
-  viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
-}) {
-  if (!elements.length) return window.alert("Cannot export empty canvas.");
-
-  // calculate smallest area to fit the contents in
-
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
-
-  elements.forEach(element => {
-    subCanvasX1 = Math.min(subCanvasX1, getElementAbsoluteX1(element));
-    subCanvasX2 = Math.max(subCanvasX2, getElementAbsoluteX2(element));
-    subCanvasY1 = Math.min(subCanvasY1, getElementAbsoluteY1(element));
-    subCanvasY2 = Math.max(subCanvasY2, getElementAbsoluteY2(element));
-  });
-
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
-  }
-
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
-
-  renderScene(
-    rough.canvas(tempCanvas),
-    tempCanvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0
-    },
-    {
-      offsetX: -subCanvasX1 + exportPadding,
-      offsetY: -subCanvasY1 + exportPadding,
-      renderScrollbars: false,
-      renderSelection: false
-    }
-  );
-
-  saveFile("excalidraw.png", tempCanvas.toDataURL("image/png"));
-
-  // clean up the DOM
-  if (tempCanvas !== canvas) tempCanvas.remove();
-}
-
-function saveFile(name: string, data: string) {
-  // create a temporary <a> elem which we'll use to download the image
-  const link = document.createElement("a");
-  link.setAttribute("download", name);
-  link.setAttribute("href", data);
-  link.click();
-
-  // clean up
-  link.remove();
-}
-
-function rotate(x1: number, y1: number, x2: number, y2: number, angle: number) {
-  // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
-  // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
-  // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
-  return [
-    (x1 - x2) * Math.cos(angle) - (y1 - y2) * Math.sin(angle) + x2,
-    (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2
-  ];
-}
-
-// Casting second argument (DrawingSurface) to any,
-// because it is requred by TS definitions and not required at runtime
-const generator = rough.generator(null, null as any);
-
-function isTextElement(
-  element: ExcalidrawElement
-): element is ExcalidrawTextElement {
-  return element.type === "text";
-}
-
-function isInputLike(
-  target: Element | EventTarget | null
-): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
-  return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  );
-}
-
-function getArrowPoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
-
-  const size = 30; // pixels
-  const distance = Math.hypot(x2 - x1, y2 - y1);
-  // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  const minSize = Math.min(size, distance / 2);
-  const xs = x2 - ((x2 - x1) / distance) * minSize;
-  const ys = y2 - ((y2 - y1) / distance) * minSize;
-
-  const angle = 20; // degrees
-  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
-  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
-
-  return [x1, y1, x2, y2, x3, y3, x4, y4];
-}
-
-function generateDraw(element: ExcalidrawElement) {
-  if (element.type === "selection") {
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      const fillStyle = context.fillStyle;
-      context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(
-        element.x + scrollX,
-        element.y + scrollY,
-        element.width,
-        element.height
-      );
-      context.fillStyle = fillStyle;
-    };
-  } else if (element.type === "rectangle") {
-    const shape = withCustomMathRandom(element.seed, () => {
-      return generator.rectangle(0, 0, element.width, element.height, {
-        stroke: element.strokeColor,
-        fill: element.backgroundColor
-      });
-    });
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.translate(element.x + scrollX, element.y + scrollY);
-      rc.draw(shape);
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-    };
-  } else if (element.type === "ellipse") {
-    const shape = withCustomMathRandom(element.seed, () =>
-      generator.ellipse(
-        element.width / 2,
-        element.height / 2,
-        element.width,
-        element.height,
-        { stroke: element.strokeColor, fill: element.backgroundColor }
-      )
-    );
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.translate(element.x + scrollX, element.y + scrollY);
-      rc.draw(shape);
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-    };
-  } else if (element.type === "arrow") {
-    const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-    const shapes = withCustomMathRandom(element.seed, () => [
-      //    \
-      generator.line(x3, y3, x2, y2, { stroke: element.strokeColor }),
-      // -----
-      generator.line(x1, y1, x2, y2, { stroke: element.strokeColor }),
-      //    /
-      generator.line(x4, y4, x2, y2, { stroke: element.strokeColor })
-    ]);
-
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      context.translate(element.x + scrollX, element.y + scrollY);
-      shapes.forEach(shape => rc.draw(shape));
-      context.translate(-element.x - scrollX, -element.y - scrollY);
-    };
-    return;
-  } else if (isTextElement(element)) {
-    element.draw = (rc, context, { scrollX, scrollY }) => {
-      const font = context.font;
-      context.font = element.font;
-      const fillStyle = context.fillStyle;
-      context.fillStyle = element.strokeColor;
-      context.fillText(
-        element.text,
-        element.x + scrollX,
-        element.y + element.actualBoundingBoxAscent + scrollY
-      );
-      context.fillStyle = fillStyle;
-      context.font = font;
-    };
-  } else {
-    throw new Error("Unimplemented type " + element.type);
-  }
-}
-
-// If the element is created from right to left, the width is going to be negative
-// This set of functions retrieves the absolute position of the 4 points.
-// We can't just always normalize it since we need to remember the fact that an arrow
-// is pointing left or right.
-function getElementAbsoluteX1(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x : element.x + element.width;
-}
-function getElementAbsoluteX2(element: ExcalidrawElement) {
-  return element.width >= 0 ? element.x + element.width : element.x;
-}
-function getElementAbsoluteY1(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y : element.y + element.height;
-}
-function getElementAbsoluteY2(element: ExcalidrawElement) {
-  return element.height >= 0 ? element.y + element.height : element.y;
-}
-
-function setSelection(selection: ExcalidrawElement) {
-  const selectionX1 = getElementAbsoluteX1(selection);
-  const selectionX2 = getElementAbsoluteX2(selection);
-  const selectionY1 = getElementAbsoluteY1(selection);
-  const selectionY2 = getElementAbsoluteY2(selection);
-  elements.forEach(element => {
-    const elementX1 = getElementAbsoluteX1(element);
-    const elementX2 = getElementAbsoluteX2(element);
-    const elementY1 = getElementAbsoluteY1(element);
-    const elementY2 = getElementAbsoluteY2(element);
-    element.isSelected =
-      element.type !== "selection" &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2;
-  });
-}
-
-function clearSelection() {
-  elements.forEach(element => {
-    element.isSelected = false;
-  });
-}
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-function deleteSelectedElements() {
-  for (let i = elements.length - 1; i >= 0; --i) {
-    if (elements[i].isSelected) {
-      elements.splice(i, 1);
-    }
-  }
-}
-
-function save(state: AppState) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
-  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
-}
-
-function restoreFromLocalStorage() {
-  const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
-
-  return restore(savedElements, savedState);
-}
-
-function restore(
-  savedElements: string | ExcalidrawElement[] | null,
-  savedState: string | null
+function addTextElement(
+  element: ExcalidrawTextElement,
+  text: string,
+  font: string
 ) {
-  try {
-    if (savedElements) {
-      elements.splice(
-        0,
-        elements.length,
-        ...(typeof savedElements === "string"
-          ? JSON.parse(savedElements)
-          : savedElements)
-      );
-      elements.forEach((element: ExcalidrawElement) => generateDraw(element));
-    }
-
-    return savedState ? JSON.parse(savedState) : null;
-  } catch (e) {
-    elements.splice(0, elements.length);
-    return null;
+  resetCursor();
+  if (text === null || text === "") {
+    return false;
   }
+
+  const metrics = measureText(text, font);
+  element.text = text;
+  element.font = font;
+  // Center the text
+  element.x -= metrics.width / 2;
+  element.y -= metrics.height / 2;
+  element.width = metrics.width;
+  element.height = metrics.height;
+  element.baseline = metrics.baseline;
+
+  return true;
 }
-
-type AppState = {
-  draggingElement: ExcalidrawElement | null;
-  resizingElement: ExcalidrawElement | null;
-  elementType: string;
-  exportBackground: boolean;
-  currentItemStrokeColor: string;
-  currentItemBackgroundColor: string;
-  viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
-};
-
-const KEYS = {
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
-  ARROW_UP: "ArrowUp",
-  ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace"
-};
-
-// We inline font-awesome icons in order to save on js size rather than including the font awesome react library
-const SHAPES = [
-  {
-    icon: (
-      // fa-mouse-pointer
-      <svg viewBox="0 0 320 512">
-        <path d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z" />
-      </svg>
-    ),
-    value: "selection"
-  },
-  {
-    icon: (
-      // fa-square
-      <svg viewBox="0 0 448 512">
-        <path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z" />
-      </svg>
-    ),
-    value: "rectangle"
-  },
-  {
-    icon: (
-      // fa-circle
-      <svg viewBox="0 0 512 512">
-        <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z" />
-      </svg>
-    ),
-    value: "ellipse"
-  },
-  {
-    icon: (
-      // fa-long-arrow-alt-right
-      <svg viewBox="0 0 448 512">
-        <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-      </svg>
-    ),
-    value: "arrow"
-  },
-  {
-    icon: (
-      // fa-font
-      <svg viewBox="0 0 448 512">
-        <path d="M432 416h-23.41L277.88 53.69A32 32 0 0 0 247.58 32h-47.16a32 32 0 0 0-30.3 21.69L39.41 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-19.58l23.3-64h152.56l23.3 64H304a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM176.85 272L224 142.51 271.15 272z" />
-      </svg>
-    ),
-    value: "text"
-  }
-];
-
-const shapesShortcutKeys = SHAPES.map(shape => shape.value[0]);
-
-function findElementByKey(key: string) {
-  const defaultElement = "selection";
-  return SHAPES.reduce((element, shape) => {
-    if (shape.value[0] !== key) return element;
-
-    return shape.value;
-  }, defaultElement);
-}
-
-function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
-
-function getSelectedIndices() {
-  const selectedIndices: number[] = [];
-  elements.forEach((element, index) => {
-    if (element.isSelected) {
-      selectedIndices.push(index);
-    }
-  });
-  return selectedIndices;
-}
-
-const someElementIsSelected = () =>
-  elements.some(element => element.isSelected);
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
+const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
-class App extends React.Component<{}, AppState> {
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+) {
+  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
+  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  return { x, y };
+}
+
+export class App extends React.Component<{}, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+
+  actionManager: ActionManager = new ActionManager();
+  canvasOnlyActions: Array<Action>;
+  constructor(props: any) {
+    super(props);
+    this.actionManager.registerAction(actionDeleteSelected);
+    this.actionManager.registerAction(actionSendToBack);
+    this.actionManager.registerAction(actionBringToFront);
+    this.actionManager.registerAction(actionSendBackward);
+    this.actionManager.registerAction(actionBringForward);
+    this.actionManager.registerAction(actionSelectAll);
+
+    this.actionManager.registerAction(actionChangeStrokeColor);
+    this.actionManager.registerAction(actionChangeBackgroundColor);
+    this.actionManager.registerAction(actionChangeFillStyle);
+    this.actionManager.registerAction(actionChangeStrokeWidth);
+    this.actionManager.registerAction(actionChangeOpacity);
+    this.actionManager.registerAction(actionChangeSloppiness);
+    this.actionManager.registerAction(actionChangeFontSize);
+    this.actionManager.registerAction(actionChangeFontFamily);
+
+    this.actionManager.registerAction(actionChangeViewBackgroundColor);
+    this.actionManager.registerAction(actionClearCanvas);
+
+    this.actionManager.registerAction(actionChangeProjectName);
+    this.actionManager.registerAction(actionChangeExportBackground);
+    this.actionManager.registerAction(actionSaveScene);
+    this.actionManager.registerAction(actionLoadScene);
+
+    this.actionManager.registerAction(actionCopyStyles);
+    this.actionManager.registerAction(actionPasteStyles);
+
+    this.canvasOnlyActions = [actionSelectAll];
+  }
+
+  private syncActionResult = (res: ActionResult) => {
+    if (res.elements !== undefined) {
+      elements = res.elements;
+      this.forceUpdate();
+    }
+
+    if (res.appState !== undefined) {
+      this.setState({ ...res.appState });
+    }
+  };
+
+  private onCut = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    elements = deleteSelectedElements(elements);
+    this.forceUpdate();
+    e.preventDefault();
+  };
+  private onCopy = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    e.clipboardData?.setData(
+      "text/plain",
+      JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      )
+    );
+    e.preventDefault();
+  };
+  private onPaste = (e: ClipboardEvent) => {
+    if (isInputLike(e.target)) return;
+    const paste = e.clipboardData?.getData("text") || "";
+    this.addElementsFromPaste(paste);
+    e.preventDefault();
+  };
+
   public componentDidMount() {
+    document.addEventListener("copy", this.onCopy);
+    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("cut", this.onCut);
+
     document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
-    const savedState = restoreFromLocalStorage();
-    if (savedState) {
-      this.setState(savedState);
+    const { elements: newElements, appState } = restoreFromLocalStorage();
+
+    if (newElements) {
+      elements = newElements;
+    }
+
+    if (appState) {
+      this.setState(appState);
+    } else {
+      this.forceUpdate();
     }
   }
 
   public componentWillUnmount() {
+    document.removeEventListener("copy", this.onCopy);
+    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("cut", this.onCut);
+
     document.removeEventListener("keydown", this.onKeyDown, false);
+    document.removeEventListener(
+      "mousemove",
+      this.getCurrentCursorPosition,
+      false
+    );
     window.removeEventListener("resize", this.onResize, false);
   }
 
-  public state: AppState = {
-    draggingElement: null,
-    resizingElement: null,
-    elementType: "selection",
-    exportBackground: true,
-    currentItemStrokeColor: "#000000",
-    currentItemBackgroundColor: "#ffffff",
-    viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0
-  };
+  public state: AppState = getDefaultAppState();
 
   private onResize = () => {
     this.forceUpdate();
   };
 
+  private getCurrentCursorPosition = (e: MouseEvent) => {
+    this.setState({ cursorX: e.x, cursorY: e.y });
+  };
+
   private onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === KEYS.ESCAPE) {
+      elements = clearSelection(elements);
+      this.forceUpdate();
+      this.setState({ elementType: "selection" });
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur();
+      }
+      event.preventDefault();
+      return;
+    }
     if (isInputLike(event.target)) return;
 
-    if (event.key === KEYS.ESCAPE) {
-      clearSelection();
-      this.forceUpdate();
-      event.preventDefault();
-    } else if (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) {
-      deleteSelectedElements();
-      this.forceUpdate();
-      event.preventDefault();
-    } else if (isArrowKey(event.key)) {
+    const data = this.actionManager.handleKeyDown(event, elements, this.state);
+    this.syncActionResult(data);
+
+    if (data.elements !== undefined || data.appState !== undefined) {
+      return;
+    }
+
+    if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
-      elements.forEach(element => {
-        if (element.isSelected) {
+      elements = elements.map(el => {
+        if (el.isSelected) {
+          const element = { ...el };
           if (event.key === KEYS.ARROW_LEFT) element.x -= step;
           else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
           else if (event.key === KEYS.ARROW_UP) element.y -= step;
           else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          return element;
         }
+        return el;
       });
       this.forceUpdate();
       event.preventDefault();
-
-      // Send backward: Cmd-Shift-Alt-B
     } else if (
-      event.metaKey &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyB"
+      shapesShortcutKeys.includes(event.key.toLowerCase()) &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.metaKey
     ) {
-      this.moveOneLeft();
-      event.preventDefault();
-
-      // Send to back: Cmd-Shift-B
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyB") {
-      this.moveAllLeft();
-      event.preventDefault();
-
-      // Bring forward: Cmd-Shift-Alt-F
-    } else if (
-      event.metaKey &&
-      event.shiftKey &&
-      event.altKey &&
-      event.code === "KeyF"
-    ) {
-      this.moveOneRight();
-      event.preventDefault();
-
-      // Bring to front: Cmd-Shift-F
-    } else if (event.metaKey && event.shiftKey && event.code === "KeyF") {
-      this.moveAllRight();
-      event.preventDefault();
-
-      // Select all: Cmd-A
-    } else if (event.metaKey && event.code === "KeyA") {
-      elements.forEach(element => {
-        element.isSelected = true;
-      });
-      this.forceUpdate();
-      event.preventDefault();
-    } else if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
-      this.setState({ elementType: findElementByKey(event.key) });
-    } else if (event.metaKey && event.code === "KeyZ") {
-      let lastEntry = stateHistory.pop();
-      // If nothing was changed since last, take the previous one
-      if (generateHistoryCurrentEntry() === lastEntry) {
-        lastEntry = stateHistory.pop();
-      }
-      if (lastEntry !== undefined) {
-        restoreHistoryEntry(lastEntry);
+      this.setState({ elementType: findShapeByKey(event.key) });
+    } else if (event[META_KEY] && event.code === "KeyZ") {
+      if (event.shiftKey) {
+        // Redo action
+        const data = history.redoOnce();
+        if (data !== null) {
+          elements = data;
+        }
+      } else {
+        // undo action
+        const data = history.undoOnce();
+        if (data !== null) {
+          elements = data;
+        }
       }
       this.forceUpdate();
       event.preventDefault();
     }
-  };
-
-  private deleteSelectedElements = () => {
-    deleteSelectedElements();
-    this.forceUpdate();
-  };
-
-  private clearCanvas = () => {
-    if (window.confirm("This will clear the whole canvas. Are you sure?")) {
-      elements.splice(0, elements.length);
-      this.setState({
-        viewBackgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      });
-      this.forceUpdate();
-    }
-  };
-
-  private moveAllLeft = () => {
-    moveAllLeft(elements, getSelectedIndices());
-    this.forceUpdate();
-  };
-
-  private moveOneLeft = () => {
-    moveOneLeft(elements, getSelectedIndices());
-    this.forceUpdate();
-  };
-
-  private moveAllRight = () => {
-    moveAllRight(elements, getSelectedIndices());
-    this.forceUpdate();
-  };
-
-  private moveOneRight = () => {
-    moveOneRight(elements, getSelectedIndices());
-    this.forceUpdate();
   };
 
   private removeWheelEventListener: (() => void) | undefined;
+
+  private copyToClipboard = () => {
+    if (navigator.clipboard) {
+      const text = JSON.stringify(
+        elements
+          .filter(element => element.isSelected)
+          .map(({ shape, ...el }) => el)
+      );
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  private pasteFromClipboard = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .readText()
+        .then(text => this.addElementsFromPaste(text));
+    }
+  };
+
+  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const selectedElements = elements.filter(el => el.isSelected);
+    if (selectedElements.length === 0) {
+      return null;
+    }
+
+    return (
+      <Island padding={4}>
+        <div className="panelColumn">
+          {this.actionManager.renderAction(
+            "changeStrokeColor",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {hasBackground(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeBackgroundColor",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFillStyle",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasStroke(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeStrokeWidth",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeSloppiness",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasText(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeFontSize",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFontFamily",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {this.actionManager.renderAction(
+            "changeOpacity",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {this.actionManager.renderAction(
+            "deleteSelectedElements",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </div>
+      </Island>
+    );
+  }
+
+  private renderShapesSwitcher() {
+    return (
+      <>
+        {SHAPES.map(({ value, icon }, index) => (
+          <ToolIcon
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={this.state.elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
+            onChange={() => {
+              this.setState({ elementType: value });
+              elements = clearSelection(elements);
+              document.documentElement.style.cursor =
+                value === "text" ? "text" : "crosshair";
+              this.forceUpdate();
+            }}
+          ></ToolIcon>
+        ))}
+      </>
+    );
+  }
+
+  private renderCanvasActions() {
+    return (
+      <Stack.Col gap={4}>
+        <Stack.Row gap={1}>
+          {this.actionManager.renderAction(
+            "loadScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          {this.actionManager.renderAction(
+            "saveScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          <ExportDialog
+            elements={elements}
+            appState={this.state}
+            actionManager={this.actionManager}
+            syncActionResult={this.syncActionResult}
+            onExportToPng={(exportedElements, scale) => {
+              if (this.canvas)
+                exportCanvas("png", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
+            }}
+            onExportToClipboard={(exportedElements, scale) => {
+              if (this.canvas)
+                exportCanvas("clipboard", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
+            }}
+          />
+          {this.actionManager.renderAction(
+            "clearCanvas",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </Stack.Row>
+        {this.actionManager.renderAction(
+          "changeViewBackgroundColor",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </Stack.Col>
+    );
+  }
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
-      <div
-        className="container"
-        onCut={e => {
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
-          );
-          deleteSelectedElements();
-          this.forceUpdate();
-          e.preventDefault();
-        }}
-        onCopy={e => {
-          e.clipboardData.setData(
-            "text/plain",
-            JSON.stringify(elements.filter(element => element.isSelected))
-          );
-          e.preventDefault();
-        }}
-        onPaste={e => {
-          const paste = e.clipboardData.getData("text");
-          let parsedElements;
-          try {
-            parsedElements = JSON.parse(paste);
-          } catch (e) {}
-          if (
-            Array.isArray(parsedElements) &&
-            parsedElements.length > 0 &&
-            parsedElements[0].type // need to implement a better check here...
-          ) {
-            clearSelection();
-            parsedElements.forEach(parsedElement => {
-              parsedElement.x = 10 - this.state.scrollX;
-              parsedElement.y = 10 - this.state.scrollY;
-              parsedElement.seed = randomSeed();
-              generateDraw(parsedElement);
-              elements.push(parsedElement);
-            });
-            this.forceUpdate();
-          }
-          e.preventDefault();
-        }}
-      >
-        <div className="sidePanel">
-          <h4>Shapes</h4>
-          <div className="panelTools">
-            {SHAPES.map(({ value, icon }) => (
-              <label key={value} className="tool">
-                <input
-                  type="radio"
-                  checked={this.state.elementType === value}
-                  onChange={() => {
-                    this.setState({ elementType: value });
-                    clearSelection();
-                    document.documentElement.style.cursor =
-                      value === "text" ? "text" : "crosshair";
-                    this.forceUpdate();
-                  }}
-                />
-                <div className="toolIcon">{icon}</div>
-              </label>
-            ))}
-          </div>
-          <h4>Colors</h4>
-          <div className="panelColumn">
-            <label>
-              <input
-                type="color"
-                value={this.state.viewBackgroundColor}
-                onChange={e => {
-                  this.setState({ viewBackgroundColor: e.target.value });
-                }}
-              />
-              Background
-            </label>
-            <label>
-              <input
-                type="color"
-                value={this.state.currentItemStrokeColor}
-                onChange={e => {
-                  this.setState({ currentItemStrokeColor: e.target.value });
-                }}
-              />
-              Shape Stroke
-            </label>
-            <label>
-              <input
-                type="color"
-                value={this.state.currentItemBackgroundColor}
-                onChange={e => {
-                  this.setState({ currentItemBackgroundColor: e.target.value });
-                }}
-              />
-              Shape Background
-            </label>
-          </div>
-          <h4>Canvas</h4>
-          <div className="panelColumn">
-            <button
-              onClick={this.clearCanvas}
-              title="Clear the canvas & reset background color"
-            >
-              Clear canvas
-            </button>
-          </div>
-          <h4>Export</h4>
-          <div className="panelColumn">
-            <button
-              onClick={() => {
-                exportAsPNG(this.state);
-              }}
-            >
-              Export to png
-            </button>
-            <label>
-              <input
-                type="checkbox"
-                checked={this.state.exportBackground}
-                onChange={e => {
-                  this.setState({ exportBackground: e.target.checked });
-                }}
-              />
-              background
-            </label>
-          </div>
-          <h4>Save/Load</h4>
-          <div className="panelColumn">
-            <button
-              onClick={() => {
-                saveAsJSON();
-              }}
-            >
-              Save as...
-            </button>
-            <button
-              onClick={() => {
-                loadFromJSON().then(() => this.forceUpdate());
-              }}
-            >
-              Load file...
-            </button>
-          </div>
-          {someElementIsSelected() && (
-            <>
-              <h4>Shape options</h4>
-              <div className="panelColumn">
-                <button onClick={this.deleteSelectedElements}>Delete</button>
-                <button onClick={this.moveOneRight}>Bring forward</button>
-                <button onClick={this.moveAllRight}>Bring to front</button>
-                <button onClick={this.moveOneLeft}>Send backward</button>
-                <button onClick={this.moveAllLeft}>Send to back</button>
+      <div className="container">
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            <Stack.Col gap={4} align="end">
+              <div className="App-right-menu">
+                <Island padding={4}>{this.renderCanvasActions()}</Island>
               </div>
-            </>
-          )}
-        </div>
+              <div className="App-right-menu">
+                {this.renderSelectedShapeActions(elements)}
+              </div>
+            </Stack.Col>
+            <Stack.Col gap={4} align="start">
+              <Island padding={1}>
+                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+              </Island>
+            </Stack.Col>
+            <div />
+          </div>
+        </FixedSideContainer>
         <canvas
           id="canvas"
           style={{
@@ -1216,6 +547,10 @@ class App extends React.Component<{}, AppState> {
           width={canvasWidth * window.devicePixelRatio}
           height={canvasHeight * window.devicePixelRatio}
           ref={canvas => {
+            if (this.canvas === null) {
+              this.canvas = canvas;
+              this.rc = rough.canvas(this.canvas!);
+            }
             if (this.removeWheelEventListener) {
               this.removeWheelEventListener();
               this.removeWheelEventListener = undefined;
@@ -1226,7 +561,6 @@ class App extends React.Component<{}, AppState> {
               });
               this.removeWheelEventListener = () =>
                 canvas.removeEventListener("wheel", this.handleWheel);
-
               // Whenever React sets the width/height of the canvas element,
               // the context loses the scale transform. We need to re-apply it
               if (
@@ -1241,6 +575,59 @@ class App extends React.Component<{}, AppState> {
               }
             }
           }}
+          onContextMenu={e => {
+            e.preventDefault();
+
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
+            const element = getElementAtPosition(elements, x, y);
+            if (!element) {
+              ContextMenu.push({
+                options: [
+                  navigator.clipboard && {
+                    label: "Paste",
+                    action: () => this.pasteFromClipboard()
+                  },
+                  ...this.actionManager.getContextMenuItems(
+                    elements,
+                    this.state,
+                    this.syncActionResult,
+                    action => this.canvasOnlyActions.includes(action)
+                  )
+                ],
+                top: e.clientY,
+                left: e.clientX
+              });
+              return;
+            }
+
+            if (!element.isSelected) {
+              elements = clearSelection(elements);
+              element.isSelected = true;
+              this.forceUpdate();
+            }
+
+            ContextMenu.push({
+              options: [
+                navigator.clipboard && {
+                  label: "Copy",
+                  action: this.copyToClipboard
+                },
+                navigator.clipboard && {
+                  label: "Paste",
+                  action: () => this.pasteFromClipboard()
+                },
+                ...this.actionManager.getContextMenuItems(
+                  elements,
+                  this.state,
+                  this.syncActionResult,
+                  action => !this.canvasOnlyActions.includes(action)
+                )
+              ],
+              top: e.clientY,
+              left: e.clientX
+            });
+          }}
           onMouseDown={e => {
             if (lastMouseUp !== null) {
               // Unfortunately, sometimes we don't get a mouseup after a mousedown,
@@ -1248,6 +635,34 @@ class App extends React.Component<{}, AppState> {
               // being in a weird state, we clean up on the next mousedown
               lastMouseUp(e);
             }
+
+            // pan canvas on wheel button drag
+            if (e.button === 1) {
+              let { clientX: lastX, clientY: lastY } = e;
+              const onMouseMove = (e: MouseEvent) => {
+                document.documentElement.style.cursor = `grabbing`;
+                let deltaX = lastX - e.clientX;
+                let deltaY = lastY - e.clientY;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                this.setState(state => ({
+                  scrollX: state.scrollX - deltaX,
+                  scrollY: state.scrollY - deltaY
+                }));
+              };
+              const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
+                lastMouseUp = null;
+                resetCursor();
+                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+              });
+              window.addEventListener("mousemove", onMouseMove, {
+                passive: true
+              });
+              window.addEventListener("mouseup", onMouseUp);
+              return;
+            }
+
             // only handle left mouse button
             if (e.button !== 0) return;
             // fixes mousemove causing selection of UI texts #32
@@ -1259,117 +674,148 @@ class App extends React.Component<{}, AppState> {
               document.activeElement.blur();
             }
 
-            const x =
-              e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-            const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+            // Handle scrollbars dragging
+            const {
+              isOverHorizontalScrollBar,
+              isOverVerticalScrollBar
+            } = isOverScrollBars(
+              elements,
+              e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
+              e.clientY - CANVAS_WINDOW_OFFSET_TOP,
+              canvasWidth,
+              canvasHeight,
+              this.state.scrollX,
+              this.state.scrollY
+            );
+
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
             const element = newElement(
               this.state.elementType,
               x,
               y,
               this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor
+              this.state.currentItemBackgroundColor,
+              "hachure",
+              1,
+              1,
+              100
             );
-            let resizeHandle: string | false = false;
-            let isDraggingElements = false;
+
+            type ResizeTestType = ReturnType<typeof resizeTest>;
+            let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
+            let draggingOccured = false;
+            let hitElement: ExcalidrawElement | null = null;
+            let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
-              const resizeElement = elements.find(element => {
-                return resizeTest(element, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
-              });
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
 
               this.setState({
-                resizingElement: resizeElement ? resizeElement : null
+                resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
-                resizeHandle = resizeTest(resizeElement, x, y, {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  viewBackgroundColor: this.state.viewBackgroundColor
-                });
+                resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                let hitElement = null;
-                // We need to to hit testing from front (end of the array) to back (beginning of the array)
-                for (let i = elements.length - 1; i >= 0; --i) {
-                  if (hitTest(elements[i], x, y)) {
-                    hitElement = elements[i];
-                    break;
-                  }
+                hitElement = getElementAtPosition(elements, x, y);
+                // clear selection if shift is not clicked
+                if (!hitElement?.isSelected && !e.shiftKey) {
+                  elements = clearSelection(elements);
                 }
 
                 // If we click on something
                 if (hitElement) {
-                  if (hitElement.isSelected) {
-                    // If that element is not already selected, do nothing,
-                    // we're likely going to drag it
-                  } else {
-                    // We unselect every other elements unless shift is pressed
-                    if (!e.shiftKey) {
-                      clearSelection();
-                    }
-                    // No matter what, we select it
+                  // deselect if item is selected
+                  // if shift is not clicked, this will always return true
+                  // otherwise, it will trigger selection based on current
+                  // state of the box
+                  if (!hitElement.isSelected) {
                     hitElement.isSelected = true;
+                    elementIsAddedToSelection = true;
                   }
-                } else {
-                  // If we don't click on anything, let's remove all the selected elements
-                  clearSelection();
-                }
 
-                isDraggingElements = someElementIsSelected();
-
-                if (isDraggingElements) {
-                  document.documentElement.style.cursor = "move";
+                  // We duplicate the selected element if alt is pressed on Mouse down
+                  if (e.altKey) {
+                    elements = [
+                      ...elements.map(element => ({
+                        ...element,
+                        isSelected: false
+                      })),
+                      ...elements
+                        .filter(element => element.isSelected)
+                        .map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        })
+                    ];
+                  }
                 }
               }
+            } else {
+              elements = clearSelection(elements);
             }
 
             if (isTextElement(element)) {
-              resetCursor();
-              const text = prompt("What text do you want?");
-              if (text === null) {
-                return;
+              let textX = e.clientX;
+              let textY = e.clientY;
+              if (!e.altKey) {
+                const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                  x,
+                  y
+                );
+                if (snappedToCenterPosition) {
+                  element.x = snappedToCenterPosition.elementCenterX;
+                  element.y = snappedToCenterPosition.elementCenterY;
+                  textX = snappedToCenterPosition.wysiwygX;
+                  textY = snappedToCenterPosition.wysiwygY;
+                }
               }
-              const fontSize = 20;
-              element.text = text;
-              element.font = `${fontSize}px Virgil`;
-              const font = context.font;
-              context.font = element.font;
-              const textMeasure = context.measureText(element.text);
-              const width = textMeasure.width;
-              const actualBoundingBoxAscent =
-                textMeasure.actualBoundingBoxAscent || fontSize;
-              const actualBoundingBoxDescent =
-                textMeasure.actualBoundingBoxDescent || 0;
-              element.actualBoundingBoxAscent = actualBoundingBoxAscent;
-              context.font = font;
-              const height = actualBoundingBoxAscent + actualBoundingBoxDescent;
-              // Center the text
-              element.x -= width / 2;
-              element.y -= actualBoundingBoxAscent;
-              element.width = width;
-              element.height = height;
+
+              textWysiwyg({
+                initText: "",
+                x: textX,
+                y: textY,
+                strokeColor: this.state.currentItemStrokeColor,
+                font: this.state.currentItemFont,
+                onSubmit: text => {
+                  addTextElement(element, text, this.state.currentItemFont);
+                  elements = [...elements, { ...element, isSelected: true }];
+                  this.setState({
+                    draggingElement: null,
+                    elementType: "selection"
+                  });
+                }
+              });
+              this.setState({ elementType: "selection" });
+              return;
             }
 
-            generateDraw(element);
-            elements.push(element);
             if (this.state.elementType === "text") {
+              elements = [...elements, { ...element, isSelected: true }];
               this.setState({
                 draggingElement: null,
                 elementType: "selection"
               });
-              element.isSelected = true;
             } else {
+              elements = [...elements, element];
               this.setState({ draggingElement: element });
             }
 
             let lastX = x;
             let lastY = y;
+
+            if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
+              lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+              lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+            }
 
             const onMouseMove = (e: MouseEvent) => {
               const target = e.target;
@@ -1377,31 +823,65 @@ class App extends React.Component<{}, AppState> {
                 return;
               }
 
+              if (isOverHorizontalScrollBar) {
+                const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+                const dx = x - lastX;
+                this.setState(state => ({ scrollX: state.scrollX - dx }));
+                lastX = x;
+                return;
+              }
+
+              if (isOverVerticalScrollBar) {
+                const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                const dy = y - lastY;
+                this.setState(state => ({ scrollY: state.scrollY - dy }));
+                lastY = y;
+                return;
+              }
+
               if (isResizingElements && this.state.resizingElement) {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
+                  let deltaX = 0;
+                  let deltaY = 0;
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
-                        element.width += element.x - lastX;
-                        element.height += element.y - lastY;
-                        element.x = lastX;
-                        element.y = lastY;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          const deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
+                        }
                         break;
                       case "ne":
-                        element.width = lastX - element.x;
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        element.width += x - lastX;
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
+                        }
                         break;
                       case "sw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
-                        element.height = lastY - element.y;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height += y - lastY;
+                        }
                         break;
                       case "se":
                         element.width += x - lastX;
@@ -1412,41 +892,44 @@ class App extends React.Component<{}, AppState> {
                         }
                         break;
                       case "n":
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
                         break;
                       case "w":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         break;
                       case "s":
-                        element.height = lastY - element.y;
+                        element.height += y - lastY;
                         break;
                       case "e":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         break;
                     }
 
                     el.x = element.x;
                     el.y = element.y;
-                    generateDraw(el);
+                    el.shape = null;
                   });
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
-                  skipHistory = true;
+                  history.skipRecording();
                   this.forceUpdate();
                   return;
                 }
               }
 
-              if (isDraggingElements) {
+              if (hitElement?.isSelected) {
+                // Marking that click was used for dragging to check
+                // if elements should be deselected on mouseup
+                draggingOccured = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
-                  const x =
-                    e.clientX - CANVAS_WINDOW_OFFSET_LEFT - this.state.scrollX;
-                  const y =
-                    e.clientY - CANVAS_WINDOW_OFFSET_TOP - this.state.scrollY;
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
                   selectedElements.forEach(element => {
                     element.x += x - lastX;
                     element.y += y - lastY;
@@ -1454,7 +937,7 @@ class App extends React.Component<{}, AppState> {
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when dragging an element to initially size it
-                  skipHistory = true;
+                  history.skipRecording();
                   this.forceUpdate();
                   return;
                 }
@@ -1464,6 +947,7 @@ class App extends React.Component<{}, AppState> {
               // otherwise we would read a stale one!
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
+
               let width =
                 e.clientX -
                 CANVAS_WINDOW_OFFSET_LEFT -
@@ -1476,39 +960,90 @@ class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
               draggingElement.width = width;
               // Make a perfect square or circle when shift is enabled
-              draggingElement.height = e.shiftKey ? width : height;
-
-              generateDraw(draggingElement);
+              draggingElement.height =
+                e.shiftKey && this.state.elementType !== "selection"
+                  ? Math.abs(width) * Math.sign(height)
+                  : height;
+              draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                setSelection(draggingElement);
+                if (!e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
+                const elementsWithinSelection = getElementsWithinSelection(
+                  elements,
+                  draggingElement
+                );
+                elementsWithinSelection.forEach(element => {
+                  element.isSelected = true;
+                });
               }
               // We don't want to save history when moving an element
-              skipHistory = true;
+              history.skipRecording();
               this.forceUpdate();
             };
 
             const onMouseUp = (e: MouseEvent) => {
-              const { draggingElement, elementType } = this.state;
+              const {
+                draggingElement,
+                resizingElement,
+                elementType
+              } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
+              if (
+                elementType !== "selection" &&
+                draggingElement &&
+                isInvisiblySmallElement(draggingElement)
+              ) {
+                // remove invisible element which was added in onMouseDown
+                elements = elements.slice(0, -1);
+                this.setState({
+                  draggingElement: null
+                });
+                this.forceUpdate();
+                return;
+              }
+
+              if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+                elements = elements.filter(el => el.id !== resizingElement.id);
+              }
+
               resetCursor();
 
-              // if no element is clicked, clear the selection and redraw
+              // If click occured on already selected element
+              // it is needed to remove selection from other elements
+              // or if SHIFT or META key pressed remove selection
+              // from hitted element
+              //
+              // If click occured and elements were dragged or some element
+              // was added to selection (on mousedown phase) we need to keep
+              // selection unchanged
+              if (
+                hitElement &&
+                !draggingOccured &&
+                !elementIsAddedToSelection
+              ) {
+                if (e.shiftKey) {
+                  hitElement.isSelected = false;
+                } else {
+                  elements = clearSelection(elements);
+                  hitElement.isSelected = true;
+                }
+              }
+
               if (draggingElement === null) {
-                clearSelection();
+                // if no element is clicked, clear the selection and redraw
+                elements = clearSelection(elements);
                 this.forceUpdate();
                 return;
               }
 
               if (elementType === "selection") {
-                if (isDraggingElements) {
-                  isDraggingElements = false;
-                }
-                elements.pop();
+                elements = elements.slice(0, -1);
               } else {
                 draggingElement.isSelected = true;
               }
@@ -1517,6 +1052,8 @@ class App extends React.Component<{}, AppState> {
                 draggingElement: null,
                 elementType: "selection"
               });
+
+              history.resumeRecording();
               this.forceUpdate();
             };
 
@@ -1526,8 +1063,105 @@ class App extends React.Component<{}, AppState> {
             window.addEventListener("mouseup", onMouseUp);
 
             // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-            skipHistory = true;
+            history.skipRecording();
             this.forceUpdate();
+          }}
+          onDoubleClick={e => {
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
+            const elementAtPosition = getElementAtPosition(elements, x, y);
+
+            const element = newElement(
+              "text",
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor,
+              "hachure",
+              1,
+              1,
+              100
+            ) as ExcalidrawTextElement;
+
+            let initText = "";
+            let textX = e.clientX;
+            let textY = e.clientY;
+
+            if (elementAtPosition && isTextElement(elementAtPosition)) {
+              elements = elements.filter(
+                element => element.id !== elementAtPosition.id
+              );
+              this.forceUpdate();
+
+              Object.assign(element, elementAtPosition);
+              // x and y will change after calling addTextElement function
+              element.x = elementAtPosition.x + elementAtPosition.width / 2;
+              element.y = elementAtPosition.y + elementAtPosition.height / 2;
+              initText = elementAtPosition.text;
+              textX =
+                this.state.scrollX +
+                elementAtPosition.x +
+                CANVAS_WINDOW_OFFSET_LEFT +
+                elementAtPosition.width / 2;
+              textY =
+                this.state.scrollY +
+                elementAtPosition.y +
+                CANVAS_WINDOW_OFFSET_TOP +
+                elementAtPosition.height / 2;
+            } else if (!e.altKey) {
+              const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+                x,
+                y
+              );
+
+              if (snappedToCenterPosition) {
+                element.x = snappedToCenterPosition.elementCenterX;
+                element.y = snappedToCenterPosition.elementCenterY;
+                textX = snappedToCenterPosition.wysiwygX;
+                textY = snappedToCenterPosition.wysiwygY;
+              }
+            }
+
+            textWysiwyg({
+              initText,
+              x: textX,
+              y: textY,
+              strokeColor: element.strokeColor,
+              font: element.font || this.state.currentItemFont,
+              onSubmit: text => {
+                addTextElement(
+                  element,
+                  text,
+                  element.font || this.state.currentItemFont
+                );
+                elements = [...elements, { ...element, isSelected: true }];
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
+            });
+          }}
+          onMouseMove={e => {
+            const hasDeselectedButton = Boolean(e.buttons);
+            if (hasDeselectedButton || this.state.elementType !== "selection") {
+              return;
+            }
+            const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+            const selectedElements = elements.filter(e => e.isSelected).length;
+            if (selectedElements === 1) {
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
+              if (resizeElement && resizeElement.resizeHandle) {
+                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                return;
+              }
+            }
+            const hitElement = getElementAtPosition(elements, x, y);
+            document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
       </div>
@@ -1543,24 +1177,110 @@ class App extends React.Component<{}, AppState> {
     }));
   };
 
+  private addElementsFromPaste = (paste: string) => {
+    let parsedElements;
+    try {
+      parsedElements = JSON.parse(paste);
+    } catch (e) {}
+    if (
+      Array.isArray(parsedElements) &&
+      parsedElements.length > 0 &&
+      parsedElements[0].type // need to implement a better check here...
+    ) {
+      elements = clearSelection(elements);
+
+      let subCanvasX1 = Infinity;
+      let subCanvasX2 = 0;
+      let subCanvasY1 = Infinity;
+      let subCanvasY2 = 0;
+
+      const minX = Math.min(...parsedElements.map(element => element.x));
+      const minY = Math.min(...parsedElements.map(element => element.y));
+
+      const distance = (x: number, y: number) => {
+        return Math.abs(x > y ? x - y : y - x);
+      };
+
+      parsedElements.forEach(parsedElement => {
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
+        subCanvasX1 = Math.min(subCanvasX1, x1);
+        subCanvasY1 = Math.min(subCanvasY1, y1);
+        subCanvasX2 = Math.max(subCanvasX2, x2);
+        subCanvasY2 = Math.max(subCanvasY2, y2);
+      });
+
+      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
+      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
+
+      const dx =
+        this.state.cursorX -
+        this.state.scrollX -
+        CANVAS_WINDOW_OFFSET_LEFT -
+        elementsCenterX;
+      const dy =
+        this.state.cursorY -
+        this.state.scrollY -
+        CANVAS_WINDOW_OFFSET_TOP -
+        elementsCenterY;
+
+      elements = [
+        ...elements,
+        ...parsedElements.map(parsedElement => {
+          const duplicate = duplicateElement(parsedElement);
+          duplicate.x += dx - minX;
+          duplicate.y += dy - minY;
+          return duplicate;
+        })
+      ];
+      this.forceUpdate();
+    }
+  };
+
+  private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
+    const elementClickedInside = getElementContainingPosition(elements, x, y);
+    if (elementClickedInside) {
+      const elementCenterX =
+        elementClickedInside.x + elementClickedInside.width / 2;
+      const elementCenterY =
+        elementClickedInside.y + elementClickedInside.height / 2;
+      const distanceToCenter = Math.hypot(
+        x - elementCenterX,
+        y - elementCenterY
+      );
+      const isSnappedToCenter =
+        distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
+      if (isSnappedToCenter) {
+        const wysiwygX =
+          this.state.scrollX +
+          elementClickedInside.x +
+          CANVAS_WINDOW_OFFSET_LEFT +
+          elementClickedInside.width / 2;
+        const wysiwygY =
+          this.state.scrollY +
+          elementClickedInside.y +
+          CANVAS_WINDOW_OFFSET_TOP +
+          elementClickedInside.height / 2;
+        return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
+      }
+    }
+  }
+
+  private saveDebounced = debounce(() => {
+    saveToLocalStorage(elements, this.state);
+  }, 300);
+
   componentDidUpdate() {
-    renderScene(rc, canvas, {
+    renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor
     });
-    save(this.state);
-    if (!skipHistory) {
-      pushHistoryEntry(generateHistoryCurrentEntry());
+    this.saveDebounced();
+    if (history.isRecording()) {
+      history.pushEntry(history.generateCurrentEntry(elements));
     }
-    skipHistory = false;
   }
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const rc = rough.canvas(canvas);
-const context = canvas.getContext("2d")!;
-
 ReactDOM.render(<App />, rootElement);

@@ -17,3 +17,7 @@ yarn.lock
 # Editors
 .vscode/
 
+.DS_Store
+
+# build files
+static/

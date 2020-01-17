@@ -1,18 +1,25 @@
 <div align="center" style="display:flex;flex-direction:column;">
     <a href="https://excalidraw.com">
-        <img src=".github/assets/logo.png" alt="" width="220px" height="202"/>
+        <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
     </a>
     <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.</h3>
 </div>
 
 ## Try it now
 
-Go to https://excalidraw.com to start sketching
+Go to https://www.excalidraw.com to start sketching
 
 ## Testimonials
 
-<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" alt="Screen Shot 2020-01-05 at 9 50 15 AM" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
+<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
 
+<a href="https://twitter.com/dan_abramov/status/1213762494428262400"><img width="398" src="https://user-images.githubusercontent.com/197597/71783990-4d395880-2fa3-11ea-9ad7-186138db5003.png"></a>
+
+<a href="https://twitter.com/kyehohenberger/status/1214288572037025792"><img width="423" src="https://user-images.githubusercontent.com/197597/71851802-34f13880-308c-11ea-9416-191099e6349c.png"></a>
+
+<a href="https://twitter.com/jordwalke/status/1214858186789806080"><img width="434" src="https://user-images.githubusercontent.com/197597/72036874-07a1b780-3251-11ea-99e8-6bafd93483a0.png"></a>
+
+<a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
 
 ## Run the code
 
@@ -25,23 +32,22 @@ Go to https://excalidraw.com to start sketching
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-Clone the repo
+#### Clone the repo
 
 ```bash
 git clone https://github.com/excalidraw/excalidraw.git
 ```
 
-Install all the dependencies
+#### Commands
 
-```bash
-npm install
-```
-
-Run the project
-
-```bash
-npm run start
-```
+| Command             | Description                       |
+| ------------------- | --------------------------------- |
+| `npm install`       | Install the dependencies          |
+| `npm run start`     | Run the project                   |
+| `npm run fix`       | Reformat all files with Prettier  |
+| `npm run test:code` | Test for formatting with Prettier |
+| `npm run test:app`  | Test the app                      |
+| `npm run test`      | Run all tests                     |
 
 ## Contributing
 

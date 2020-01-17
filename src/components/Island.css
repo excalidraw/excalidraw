@@ -1,0 +1,7 @@
+.Island {
+  --padding: 0;
+  background-color: var(--bg-color-main);
+  box-shadow: var(--shadow-island);
+  border-radius: var(--border-radius-m);
+  padding: calc(var(--padding) * var(--space-factor));
+}

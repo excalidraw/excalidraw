@@ -1,0 +1,36 @@
+.context-menu {
+  position: relative;
+  border-radius: 4px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  list-style: none;
+  user-select: none;
+  margin: -4px 0 0 1px;
+  padding: 4px 0;
+  background-color: #f2f2f2;
+  border: 1px solid #bcbcbc;
+}
+
+.context-menu__option {
+  width: 150px;
+}
+
+.context-menu-option {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  border-radius: 0;
+  padding-left: 20px;
+  background-color: #f2f2f2;
+  border: none;
+}
+
+.context-menu-option:hover {
+  color: #fff;
+  background-color: #4e95f5;
+}
+
+.context-menu-option:focus {
+  z-index: 1;
+}
