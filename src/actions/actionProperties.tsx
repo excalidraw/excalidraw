@@ -141,7 +141,7 @@ export const actionChangeSloppiness: Action = {
       <h5>Sloppiness</h5>
       <ButtonSelect
         options={[
-          { value: 0, text: "Draftsman" },
+          { value: 0, text: "Architect" },
           { value: 1, text: "Artist" },
           { value: 3, text: "Cartoonist" }
         ]}
