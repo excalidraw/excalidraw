@@ -50,6 +50,9 @@ export function renderScene(
   };
 
   elements.forEach(element => {
+    if (!isVisibleElement(element)) {
+      return;
+    }
     context.translate(
       element.x + sceneState.scrollX,
       element.y + sceneState.scrollY
@@ -117,5 +120,16 @@ export function renderScene(
     });
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
+  }
+
+  function isVisibleElement(element: ExcalidrawElement) {
+    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    x1 += sceneState.scrollX;
+    y1 += sceneState.scrollY;
+    x2 += sceneState.scrollX;
+    y2 += sceneState.scrollY;
+    const width = parseInt(canvas.style.width);
+    const height = parseInt(canvas.style.height);
+    return x2 >= 0 && x1 <= width && y2 >= 0 && y1 <= height;
   }
 }
