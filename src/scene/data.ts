@@ -13,7 +13,10 @@ import nanoid from "nanoid";
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-let handle: any = null;
+// TODO: Defined globally, since file handles aren't yet serializable.
+// Once `FileSystemFileHandle` can be serialized, make this
+// part of `AppState`.
+(window as any).handle = null;
 
 function saveFile(name: string, data: string) {
   // create a temporary <a> elem which we'll use to download the image
@@ -40,7 +43,20 @@ async function saveFileNative(name: string, data: Blob) {
     ]
   };
   try {
-    if (!handle) {
+    let handle;
+    if (data.type === "application/json") {
+      // For Excalidraw files (i.e., `application/json` files):
+      // If it exists, write back to a previously opened file.
+      // Else, create a new file.
+      if ((window as any).handle) {
+        handle = (window as any).handle;
+      } else {
+        handle = await (window as any).chooseFileSystemEntries(options);
+        (window as any).handle = handle;
+      }
+    } else {
+      // For image export files (i.e., `image/png` files):
+      // Always create a new file.
       handle = await (window as any).chooseFileSystemEntries(options);
     }
     const writer = await handle.createWriter();
@@ -48,7 +64,10 @@ async function saveFileNative(name: string, data: Blob) {
     await writer.write(0, data, data.type);
     await writer.close();
   } catch (err) {
-    console.error(err.name, err.message);
+    if (err.name !== "AbortError") {
+      console.error(err.name, err.message);
+    }
+    throw err;
   }
 }
 
@@ -99,18 +118,25 @@ export async function loadFromJSON() {
 
   if ("chooseFileSystemEntries" in window) {
     try {
-      handle = await (window as any).chooseFileSystemEntries({
-        mimeTypes: ["application/json"],
-        extensions: ["json"]
+      (window as any).handle = await (window as any).chooseFileSystemEntries({
+        accepts: [
+          {
+            description: "Excalidraw files",
+            extensions: ["json"],
+            mimeTypes: ["application/json"]
+          }
+        ]
       });
-      const file = await handle.getFile();
+      const file = await (window as any).handle.getFile();
       const contents = await file.text();
       const { elements, appState } = updateAppState(contents);
       return new Promise<DataState>(resolve => {
         resolve(restore(elements, appState));
       });
     } catch (err) {
-      console.error(err.name, err.message);
+      if (err.name !== "AbortError") {
+        console.error(err.name, err.message);
+      }
       throw err;
     }
   } else {
