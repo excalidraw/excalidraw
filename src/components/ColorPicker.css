@@ -65,12 +65,12 @@
 }
 
 .color-picker-hash {
-  background: rgb(240, 240, 240);
+  background: #dee2e6;
   height: 30px;
   width: 30px;
   border-radius: 4px 0px 0px 4px;
   float: left;
-  color: rgb(152, 161, 164);
+  color: #868e96;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,11 +79,11 @@
 .color-picker-input {
   width: 100px;
   font-size: 14px;
-  color: rgb(102, 102, 102);
+  color: #868e96;
   border: 0px;
   outline: none;
   height: 28px;
-  box-shadow: rgb(240, 240, 240) 0px 0px 0px 1px inset;
+  box-shadow: #dee2e6 0px 0px 0px 1px inset;
   box-sizing: content-box;
   border-radius: 0px 4px 4px 0px;
   float: left;
@@ -103,5 +103,5 @@
   width: 100px;
   border-radius: 2px;
   padding: 2px 4px;
-  border: 1px solid #ddd;
+  border: 1px solid #dee2e6;
 }
