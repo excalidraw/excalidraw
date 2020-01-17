@@ -6,7 +6,9 @@ export const KEYS = {
   ENTER: "Enter",
   ESCAPE: "Escape",
   DELETE: "Delete",
-  BACKSPACE: "Backspace"
+  BACKSPACE: "Backspace",
+  C: "c",
+  V: "v"
 };
 
 export const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)

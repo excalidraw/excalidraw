@@ -266,12 +266,12 @@ export class App extends React.Component<{}, AppState> {
       return;
     }
 
-    if ((event.ctrlKey || event.metaKey) && event.keyCode === 67) {
+    if (event[META_KEY] && event.key === KEYS.C) {
       this.copyToClipboard();
       event.preventDefault();
       return;
     }
-    if ((event.ctrlKey || event.metaKey) && event.keyCode === 86) {
+    if (event[META_KEY] && event.key === KEYS.V) {
       this.pasteFromClipboard();
       event.preventDefault();
       return;
@@ -344,13 +344,10 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private pasteFromClipboard = () => {
-    if (navigator.clipboard) {
-      if (typeof navigator.clipboard.readText !== "undefined") {
-        //avoid firefox problem
-        navigator.clipboard
-          .readText()
-          .then(text => this.addElementsFromPaste(text));
-      }
+    if (navigator.clipboard && "readText" in navigator.clipboard) {
+      navigator.clipboard
+        .readText()
+        .then(text => this.addElementsFromPaste(text));
     }
   };
 
