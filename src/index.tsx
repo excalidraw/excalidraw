@@ -478,18 +478,23 @@ export class App extends React.Component<{}, AppState> {
             appState={this.state}
             actionManager={this.actionManager}
             syncActionResult={this.syncActionResult}
-            onExportToPng={exportedElements => {
+            onExportToPng={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas("png", exportedElements, this.canvas, this.state);
+                exportCanvas("png", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
             }}
-            onExportToClipboard={exportedElements => {
+            onExportToClipboard={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas(
-                  "clipboard",
-                  exportedElements,
-                  this.canvas,
-                  this.state
-                );
+                exportCanvas("clipboard", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
             }}
           />
           {this.actionManager.renderAction(
