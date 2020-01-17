@@ -40,7 +40,7 @@ export const actionChangeExportBackground: Action = {
 export const actionSaveScene: Action = {
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState);
+    saveAsJSON(elements, appState).catch(err => console.error(err));
     return {};
   },
   PanelComponent: ({ updateData }) => (
@@ -70,9 +70,11 @@ export const actionLoadScene: Action = {
       title="Load"
       aria-label="Load"
       onClick={() => {
-        loadFromJSON().then(({ elements, appState }) => {
-          updateData({ elements: elements, appState: appState });
-        });
+        loadFromJSON()
+          .then(({ elements, appState }) => {
+            updateData({ elements: elements, appState: appState });
+          })
+          .catch(err => console.error(err));
       }}
     />
   )
