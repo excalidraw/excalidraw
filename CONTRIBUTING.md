@@ -17,7 +17,7 @@
 > git branch --set-upstream-to=upstream/master master
 > ```
 
-### Option 2 - Codesandbox
+### Option 2 - CodeSandbox
 
 1. Go to https://codesandbox.io/s/github/excalidraw/excalidraw
 1. Connect your Github account
