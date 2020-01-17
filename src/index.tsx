@@ -13,7 +13,8 @@ import {
   isTextElement,
   textWysiwyg,
   getElementAbsoluteCoords,
-  getCursorForResizingElement
+  getCursorForResizingElement,
+  getDraggingElementSize
 } from "./element";
 import {
   clearSelection,
@@ -1056,12 +1057,19 @@ export class App extends React.Component<any, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP -
                 draggingElement.y -
                 this.state.scrollY;
-              draggingElement.width = width;
-              // Make a perfect square or circle when shift is enabled
-              draggingElement.height =
-                e.shiftKey && this.state.elementType !== "selection"
-                  ? Math.abs(width) * Math.sign(height)
-                  : height;
+
+              let {
+                width: newWidth,
+                height: newHeight
+              } = getDraggingElementSize(
+                this.state.elementType,
+                e.shiftKey,
+                width,
+                height
+              );
+
+              draggingElement.width = newWidth;
+              draggingElement.height = newHeight;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
