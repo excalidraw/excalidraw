@@ -2,8 +2,6 @@ import "./ToolIcon.scss";
 
 import React from "react";
 
-type ToolIconSize = "s" | "m";
-
 type ToolIconProps =
   | {
       type: "button";
@@ -13,7 +11,6 @@ type ToolIconProps =
       name?: string;
       id?: string;
       onClick?(): void;
-      size?: ToolIconSize;
     }
   | {
       type: "radio";
@@ -23,17 +20,12 @@ type ToolIconProps =
       id?: string;
       checked: boolean;
       onChange?(): void;
-      size?: ToolIconSize;
     };
 
-const DEFAULT_SIZE: ToolIconSize = "m";
-
 export function ToolIcon(props: ToolIconProps) {
-  const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
-
   if (props.type === "button")
     return (
-      <label className={`ToolIcon ${sizeCn}`} title={props.title}>
+      <label className="ToolIcon" title={props.title}>
         <button
           className="ToolIcon_type_button"
           aria-label={props["aria-label"]}
@@ -46,7 +38,7 @@ export function ToolIcon(props: ToolIconProps) {
     );
 
   return (
-    <label className={`ToolIcon ${sizeCn}`} title={props.title}>
+    <label className="ToolIcon" title={props.title}>
       <input
         className="ToolIcon_type_radio"
         type="radio"

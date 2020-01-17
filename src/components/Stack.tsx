@@ -5,7 +5,7 @@ import React from "react";
 type StackProps = {
   children: React.ReactNode;
   gap?: number;
-  align?: "start" | "center" | "end" | "baseline";
+  align?: "start" | "center" | "end";
 };
 
 function RowStack({ children, gap, align }: StackProps) {

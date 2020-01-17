@@ -174,12 +174,10 @@ export function getExportCanvasPreview(
   {
     exportBackground,
     exportPadding = 10,
-    viewBackgroundColor,
-    scale = 1
+    viewBackgroundColor
   }: {
     exportBackground: boolean;
     exportPadding?: number;
-    scale?: number;
     viewBackgroundColor: string;
   }
 ) {
@@ -202,13 +200,8 @@ export function getExportCanvasPreview(
   }
 
   const tempCanvas = document.createElement("canvas");
-  const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
-  tempCanvas.style.width = width + "px";
-  tempCanvas.style.height = height + "px";
-  tempCanvas.width = width * scale;
-  tempCanvas.height = height * scale;
-  tempCanvas.getContext("2d")?.scale(scale, scale);
+  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
+  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
 
   renderScene(
     elements,
@@ -237,27 +230,58 @@ export async function exportCanvas(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    name,
-    scale = 1
+    name
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
+    scrollX: number;
+    scrollY: number;
     name: string;
-    scale?: number;
   }
 ) {
   if (!elements.length) return window.alert("Cannot export empty canvas.");
   // calculate smallest area to fit the contents in
 
-  const tempCanvas = getExportCanvasPreview(elements, {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding,
-    scale
+  let subCanvasX1 = Infinity;
+  let subCanvasX2 = 0;
+  let subCanvasY1 = Infinity;
+  let subCanvasY2 = 0;
+
+  elements.forEach(element => {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    subCanvasX1 = Math.min(subCanvasX1, x1);
+    subCanvasY1 = Math.min(subCanvasY1, y1);
+    subCanvasX2 = Math.max(subCanvasX2, x2);
+    subCanvasY2 = Math.max(subCanvasY2, y2);
   });
+
+  function distance(x: number, y: number) {
+    return Math.abs(x > y ? x - y : y - x);
+  }
+
+  const tempCanvas = document.createElement("canvas");
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
+  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
+  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
+
+  renderScene(
+    elements,
+    rough.canvas(tempCanvas),
+    tempCanvas,
+    {
+      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      scrollX: 0,
+      scrollY: 0
+    },
+    {
+      offsetX: -subCanvasX1 + exportPadding,
+      offsetY: -subCanvasY1 + exportPadding,
+      renderScrollbars: false,
+      renderSelection: false
+    }
+  );
 
   if (type === "png") {
     const fileName = `${name}.png`;
