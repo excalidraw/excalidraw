@@ -30,7 +30,7 @@ body {
     margin-top: 4px;
     margin-bottom: 4px;
     font-size: 12px;
-    color: #333;
+    color: var(--text-color-primary);
   }
 
   h5:first-child {
@@ -48,35 +48,33 @@ body {
 
 .divider {
   width: 1px;
-  background-color: #ddd;
+  background-color: #e9ecef;
   margin: 1px;
 }
 
 input:focus {
   outline: transparent;
-  box-shadow: 0 0 0 2px #4682b4;
+  box-shadow: 0 0 0 2px #a5d8ff;
 }
 
 button {
-  background-color: #ddd;
-  border: 1px solid #ccc;
+  background-color: #e9ecef;
+  border: 0;
   border-radius: 4px;
   margin: 2px 0;
   padding: 5px;
   outline: transparent;
 
   &:focus {
-    box-shadow: 0 0 0 2px #4682b4;
+    box-shadow: 0 0 0 2px #a5d8ff;
   }
 
   &:hover {
-    background-color: #e7e5e5;
-    border-color: #d6d4d4;
+    background-color: #ced4da;
   }
 
   &:active {
-    background-color: #bdbebc;
-    border-color: #bdbebc;
+    background-color: #ced4da;
   }
 
   &:disabled {
@@ -85,9 +83,9 @@ button {
 }
 
 .active {
-  background-color: #bdbebc;
+  background-color: #ced4da;
   &:hover {
-    background-color: #bdbebc;
+    background-color: #ced4da;
   }
 }
 
