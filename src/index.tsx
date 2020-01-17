@@ -460,7 +460,7 @@ export class App extends React.Component<{}, AppState> {
   private renderCanvasActions() {
     return (
       <Stack.Col gap={4}>
-        <Stack.Row gap={1}>
+        <Stack.Row justifyContent={"space-between"}>
           {this.actionManager.renderAction(
             "loadScene",
             elements,
