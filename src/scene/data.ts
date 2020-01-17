@@ -13,6 +13,8 @@ import nanoid from "nanoid";
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
+let handle: any = null;
+
 function saveFile(name: string, data: string) {
   // create a temporary <a> elem which we'll use to download the image
   const link = document.createElement("a");
@@ -38,7 +40,9 @@ async function saveFileNative(name: string, data: Blob) {
     ]
   };
   try {
-    const handle = await (window as any).chooseFileSystemEntries(options);
+    if (!handle) {
+      handle = await (window as any).chooseFileSystemEntries(options);
+    }
     const writer = await handle.createWriter();
     await writer.truncate(0);
     await writer.write(0, data, data.type);
@@ -95,7 +99,7 @@ export async function loadFromJSON() {
 
   if ("chooseFileSystemEntries" in window) {
     try {
-      const handle = await (window as any).chooseFileSystemEntries({
+      handle = await (window as any).chooseFileSystemEntries({
         mimeTypes: ["application/json"],
         extensions: ["json"]
       });
