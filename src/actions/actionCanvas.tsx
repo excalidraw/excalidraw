@@ -1,5 +1,3 @@
-/// <reference path="../scene/data.ts" />
-
 import React from "react";
 import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
