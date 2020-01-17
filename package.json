@@ -32,7 +32,7 @@
     "start": "react-scripts start",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "npm run prettier -- --list-different",
-    "test": "npm run test:code && npm run test:app"
+    "test": "npm run test:app"
   },
   "browserslist": [
     ">0.2%",
