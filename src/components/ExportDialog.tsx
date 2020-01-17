@@ -18,6 +18,11 @@ const probablySupportsClipboard =
   "write" in navigator.clipboard &&
   "ClipboardItem" in window;
 
+const scales = [1, 2, 3];
+const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+
+type ExportCB = (elements: readonly ExcalidrawElement[], scale: number) => void;
+
 export function ExportDialog({
   elements,
   appState,
@@ -32,11 +37,12 @@ export function ExportDialog({
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
-  onExportToPng(elements: readonly ExcalidrawElement[]): void;
-  onExportToClipboard(elements: readonly ExcalidrawElement[]): void;
+  onExportToPng: ExportCB;
+  onExportToClipboard: ExportCB;
 }) {
   const someElementIsSelected = elements.some(element => element.isSelected);
   const [modalIsShown, setModalIsShown] = useState(false);
+  const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previeRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
@@ -54,7 +60,8 @@ export function ExportDialog({
     const canvas = getExportCanvasPreview(exportedElements, {
       exportBackground,
       viewBackgroundColor,
-      exportPadding
+      exportPadding,
+      scale
     });
     previewNode?.appendChild(canvas);
     return () => {
@@ -65,7 +72,8 @@ export function ExportDialog({
     exportedElements,
     exportBackground,
     exportPadding,
-    viewBackgroundColor
+    viewBackgroundColor,
+    scale
   ]);
 
   function handleClose() {
@@ -98,7 +106,7 @@ export function ExportDialog({
                     icon={downloadFile}
                     title="Export to PNG"
                     aria-label="Export to PNG"
-                    onClick={() => onExportToPng(exportedElements)}
+                    onClick={() => onExportToPng(exportedElements, scale)}
                   />
 
                   {probablySupportsClipboard && (
@@ -107,7 +115,9 @@ export function ExportDialog({
                       icon={clipboard}
                       title="Copy to clipboard"
                       aria-label="Copy to clipboard"
-                      onClick={() => onExportToClipboard(exportedElements)}
+                      onClick={() =>
+                        onExportToClipboard(exportedElements, scale)
+                      }
                     />
                   )}
                 </Stack.Row>
@@ -119,6 +129,21 @@ export function ExportDialog({
                   syncActionResult
                 )}
                 <Stack.Col gap={1}>
+                  <div className="ExportDialog__scales">
+                    <Stack.Row gap={1} align="baseline">
+                      {scales.map(s => (
+                        <ToolIcon
+                          size="s"
+                          type="radio"
+                          icon={"x" + s}
+                          name="export-canvas-scale"
+                          id="export-canvas-scale"
+                          checked={scale === s}
+                          onChange={() => setScale(s)}
+                        />
+                      ))}
+                    </Stack.Row>
+                  </div>
                   {actionManager.renderAction(
                     "changeExportBackground",
                     elements,
