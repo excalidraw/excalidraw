@@ -88,6 +88,7 @@
   border-radius: 0px 4px 4px 0px;
   float: left;
   padding-left: 8px;
+  text-transform: lowercase;
 }
 
 .color-picker-label-swatch {
@@ -104,4 +105,5 @@
   border-radius: 2px;
   padding: 2px 4px;
   border: 1px solid #dee2e6;
+  text-transform: lowercase;
 }
