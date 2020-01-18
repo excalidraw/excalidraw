@@ -267,14 +267,10 @@ export class App extends React.Component<{}, AppState> {
     }
 
     if (event[META_KEY] && event.key === KEYS.C) {
-      this.copyToClipboard();
-      event.preventDefault();
-      return;
+      return this.copyToClipboard();
     }
     if (event[META_KEY] && event.key === KEYS.V) {
-      this.pasteFromClipboard();
-      event.preventDefault();
-      return;
+      return this.pasteFromClipboard();
     }
 
     if (isInputLike(event.target)) return;
@@ -333,13 +329,15 @@ export class App extends React.Component<{}, AppState> {
   private removeWheelEventListener: (() => void) | undefined;
 
   private copyToClipboard = () => {
-    if (navigator.clipboard) {
-      const text = JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el)
-      );
-      navigator.clipboard.writeText(text);
+    const text = JSON.stringify(
+      elements
+        .filter(element => element.isSelected)
+        .map(({ shape, ...el }) => el)
+    );
+    if ((navigator as any).clipboard) {
+      navigator.clipboard
+        ? navigator.clipboard.writeText(text)
+        : document.execCommand("copy");
     }
   };
 
