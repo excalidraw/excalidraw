@@ -808,10 +808,12 @@ export class App extends React.Component<{}, AppState> {
               if (this.state.multiElement) {
                 const { multiElement } = this.state;
                 const { x, y } = multiElement;
+                multiElement.isSelected = true;
                 multiElement.points.push([e.clientX - x, e.clientY - y]);
                 multiElement.shape = null;
                 this.forceUpdate();
               } else {
+                element.isSelected = true;
                 element.points.push([0, 0]);
                 element.shape = null;
                 elements = [...elements, element];
