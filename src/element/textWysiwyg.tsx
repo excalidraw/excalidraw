@@ -55,6 +55,9 @@ export function textWysiwyg({
     }
     if (ev.key === KEYS.ENTER) {
       ev.preventDefault();
+      if (ev.isComposing || ev.keyCode === 229) {
+        return;
+      }
       handleSubmit();
     }
   };
