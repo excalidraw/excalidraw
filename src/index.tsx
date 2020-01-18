@@ -297,7 +297,9 @@ export class App extends React.Component<{}, AppState> {
       !event.ctrlKey &&
       !event.shiftKey &&
       !event.altKey &&
-      !event.metaKey
+      !event.metaKey &&
+      (this.state.draggingElement === null ||
+        this.state.elementType !== "selection")
     ) {
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[META_KEY] && event.code === "KeyZ") {
