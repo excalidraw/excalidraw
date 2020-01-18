@@ -57,8 +57,9 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 
 ## Excalidraw is built using these awesome tools
 
-- [React](https://reactjs.org/)
-- [Rough.js](https://roughjs.com/)
+- [React](https://reactjs.org)
+- [Rough.js](https://roughjs.com)
+- [Netlify](https://www.netlify.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 
