@@ -35,7 +35,10 @@ export const actionChangeStrokeColor: Action = {
       <h5>Stroke</h5>
       <ColorPicker
         type="elementStroke"
-        color={getSelectedAttribute(elements, element => element.strokeColor)}
+        color={
+          getSelectedAttribute(elements, element => element.strokeColor) ||
+          appState.currentItemStrokeColor
+        }
         onChange={updateData}
       />
     </>
@@ -54,15 +57,15 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value }
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h5>Background</h5>
       <ColorPicker
         type="elementBackground"
-        color={getSelectedAttribute(
-          elements,
-          element => element.backgroundColor
-        )}
+        color={
+          getSelectedAttribute(elements, element => element.backgroundColor) ||
+          appState.currentItemBackgroundColor
+        }
         onChange={updateData}
       />
     </>
