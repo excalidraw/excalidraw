@@ -29,7 +29,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getArrowPoints(element: ExcalidrawElement) {
+export function getArrowBounds(element: ExcalidrawElement) {
   const x1 = 0;
   const y1 = 0;
   const x2 = element.width;
@@ -47,6 +47,25 @@ export function getArrowPoints(element: ExcalidrawElement) {
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
   return [x1, y1, x2, y2, x3, y3, x4, y4];
+}
+
+export function getArrowPoints(element: ExcalidrawElement) {
+  const points = element.points;
+  const [x1, y1] = points.length >= 2 ? points[points.length - 2] : [0, 0];
+  const [x2, y2] = points[points.length - 1];
+
+  const size = 30; // pixels
+  const distance = Math.hypot(x2 - x1, y2 - y1);
+  // Scale down the arrow until we hit a certain size so that it doesn't look weird
+  const minSize = Math.min(size, distance / 2);
+  const xs = x2 - ((x2 - x1) / distance) * minSize;
+  const ys = y2 - ((y2 - y1) / distance) * minSize;
+
+  const angle = 20; // degrees
+  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
+  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
+
+  return [x2, y2, x3, y3, x4, y4];
 }
 
 export function getLinePoints(element: ExcalidrawElement) {

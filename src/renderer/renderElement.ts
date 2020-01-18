@@ -100,7 +100,7 @@ export function renderElement(
     rc.draw(element.shape as Drawable);
     context.globalAlpha = 1;
   } else if (element.type === "arrow") {
-    const [, , x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+    const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const options = {
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,

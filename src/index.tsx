@@ -445,7 +445,7 @@ export class App extends React.Component<{}, AppState> {
               capitalizeString(value)[0]
             }, ${index + 1}`}
             onChange={() => {
-              this.setState({ elementType: value });
+              this.setState({ elementType: value, multiElement: null });
               elements = clearSelection(elements);
               document.documentElement.style.cursor =
                 value === "text" ? "text" : "crosshair";
@@ -804,6 +804,19 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement: null,
                 elementType: "selection"
               });
+            } else if (this.state.elementType === "arrow") {
+              if (this.state.multiElement) {
+                const { multiElement } = this.state;
+                const { x, y } = multiElement;
+                multiElement.points.push([e.clientX - x, e.clientY - y]);
+                multiElement.shape = null;
+                this.forceUpdate();
+              } else {
+                element.points.push([0, 0]);
+                element.shape = null;
+                elements = [...elements, element];
+                this.setState({ multiElement: element });
+              }
             } else {
               elements = [...elements, element];
               this.setState({
@@ -1009,12 +1022,17 @@ export class App extends React.Component<{}, AppState> {
               const {
                 draggingElement,
                 resizingElement,
+                multiElement,
                 elementType
               } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
+
+              if (elementType === "arrow" && multiElement) {
+                return;
+              }
 
               if (
                 elementType !== "selection" &&
@@ -1069,7 +1087,6 @@ export class App extends React.Component<{}, AppState> {
               } else {
                 draggingElement.isSelected = true;
               }
-
               this.setState({
                 draggingElement: null,
                 elementType: "selection"

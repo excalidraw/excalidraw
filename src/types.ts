@@ -4,6 +4,7 @@ import { Point } from "roughjs/bin/geometry";
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
+  multiElement: ExcalidrawElement | null;
   pathSegmentCircle: {
     x: number;
     y: number;

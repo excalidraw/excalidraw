@@ -2,7 +2,7 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 import {
-  getArrowPoints,
+  getArrowBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
   getLinePoints
@@ -141,7 +141,7 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow") {
-    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowBounds(element);
     // The computation is done at the origin, we need to add a translation
     x -= element.x;
     y -= element.y;

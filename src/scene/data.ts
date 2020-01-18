@@ -73,7 +73,7 @@ async function saveFileNative(name: string, data: Blob) {
 
 interface DataState {
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: AppState | null;
 }
 
 export async function saveAsJSON(
@@ -293,7 +293,7 @@ export async function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState
+  savedState: AppState | null
 ): DataState {
   return {
     elements: savedElements.map(element => ({
@@ -330,8 +330,7 @@ export function restoreFromLocalStorage() {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
-      const { pathSegmentCircle, ...parsedState } = appState;
-      appState = parsedState;
+      appState.pathSegmentCircle = null;
     } catch (e) {
       // Do nothing because appState is already null
     }
