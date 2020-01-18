@@ -96,6 +96,7 @@
   width: 24px;
   display: inline-block;
   margin-right: 4px;
+  border: 1px solid #dee2e6;
 }
 
 .color-picker-swatch-input {
