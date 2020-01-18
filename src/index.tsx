@@ -343,8 +343,12 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const { elementType } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
-    if (selectedElements.length === 0) {
+    const hasSelectedElements = selectedElements.length > 0;
+    const isTextToolSelected = elementType === "text";
+    const isShapeToolSelected = elementType !== "selection";
+    if (!(hasSelectedElements || isShapeToolSelected || isTextToolSelected)) {
       return null;
     }
 
@@ -358,7 +362,8 @@ export class App extends React.Component<{}, AppState> {
             this.syncActionResult
           )}
 
-          {hasBackground(elements) && (
+          {(hasBackground(elements) ||
+            (isShapeToolSelected && !isTextToolSelected)) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -377,7 +382,8 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {hasStroke(elements) && (
+          {(hasStroke(elements) ||
+            (isShapeToolSelected && !isTextToolSelected)) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -396,7 +402,7 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {hasText(elements) && (
+          {(hasText(elements) || isTextToolSelected) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
