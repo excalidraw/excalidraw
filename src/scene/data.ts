@@ -1,13 +1,10 @@
-import rough from "roughjs/bin/rough";
-
 import { ExcalidrawElement } from "../element/types";
 
-import { getElementAbsoluteCoords } from "../element";
 import { getDefaultAppState } from "../appState";
 
-import { renderScene } from "../renderer";
 import { AppState } from "../types";
 import { ExportType } from "./types";
+import { getExportCanvasPreview } from "./getExportCanvasPreview";
 import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -169,66 +166,6 @@ export async function loadFromJSON() {
   }
 }
 
-export function getExportCanvasPreview(
-  elements: readonly ExcalidrawElement[],
-  {
-    exportBackground,
-    exportPadding = 10,
-    viewBackgroundColor,
-    scale = 1
-  }: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    scale?: number;
-    viewBackgroundColor: string;
-  }
-) {
-  // calculate smallest area to fit the contents in
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
-
-  elements.forEach(element => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    subCanvasX1 = Math.min(subCanvasX1, x1);
-    subCanvasY1 = Math.min(subCanvasY1, y1);
-    subCanvasX2 = Math.max(subCanvasX2, x2);
-    subCanvasY2 = Math.max(subCanvasY2, y2);
-  });
-
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
-  }
-
-  const tempCanvas = document.createElement("canvas");
-  const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
-  tempCanvas.style.width = width + "px";
-  tempCanvas.style.height = height + "px";
-  tempCanvas.width = width * scale;
-  tempCanvas.height = height * scale;
-  tempCanvas.getContext("2d")?.scale(scale, scale);
-
-  renderScene(
-    elements,
-    rough.canvas(tempCanvas),
-    tempCanvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0
-    },
-    {
-      offsetX: -subCanvasX1 + exportPadding,
-      offsetY: -subCanvasY1 + exportPadding,
-      renderScrollbars: false,
-      renderSelection: false
-    }
-  );
-  return tempCanvas;
-}
-
 export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
@@ -262,7 +199,7 @@ export async function exportCanvas(
   if (type === "png") {
     const fileName = `${name}.png`;
     if ("chooseFileSystemEntries" in window) {
-      tempCanvas.toBlob(async blob => {
+      tempCanvas.toBlob(async (blob: any) => {
         if (blob) {
           await saveFileNative(fileName, blob);
         }
@@ -272,7 +209,7 @@ export async function exportCanvas(
     }
   } else if (type === "clipboard") {
     try {
-      tempCanvas.toBlob(async function(blob) {
+      tempCanvas.toBlob(async function(blob: any) {
         try {
           await navigator.clipboard.write([
             new window.ClipboardItem({ "image/png": blob })
