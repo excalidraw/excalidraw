@@ -1,8 +1,9 @@
-import rough from "roughjs/bin/wrappers/rough";
+import rough from "roughjs/bin/rough";
 
 import { ExcalidrawElement } from "../element/types";
 
 import { getElementAbsoluteCoords } from "../element";
+import { getDefaultAppState } from "../appState";
 
 import { renderScene } from "../renderer";
 import { AppState } from "../types";
@@ -11,6 +12,11 @@ import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+
+// TODO: Defined globally, since file handles aren't yet serializable.
+// Once `FileSystemFileHandle` can be serialized, make this
+// part of `AppState`.
+(window as any).handle = null;
 
 function saveFile(name: string, data: string) {
   // create a temporary <a> elem which we'll use to download the image
@@ -23,81 +29,161 @@ function saveFile(name: string, data: string) {
   link.remove();
 }
 
-interface DataState {
-  elements: readonly ExcalidrawElement[];
-  appState: any;
+async function saveFileNative(name: string, data: Blob) {
+  const options = {
+    type: "saveFile",
+    accepts: [
+      {
+        description: `Excalidraw ${
+          data.type === "image/png" ? "image" : "file"
+        }`,
+        extensions: [data.type.split("/")[1]],
+        mimeTypes: [data.type]
+      }
+    ]
+  };
+  try {
+    let handle;
+    if (data.type === "application/json") {
+      // For Excalidraw files (i.e., `application/json` files):
+      // If it exists, write back to a previously opened file.
+      // Else, create a new file.
+      if ((window as any).handle) {
+        handle = (window as any).handle;
+      } else {
+        handle = await (window as any).chooseFileSystemEntries(options);
+        (window as any).handle = handle;
+      }
+    } else {
+      // For image export files (i.e., `image/png` files):
+      // Always create a new file.
+      handle = await (window as any).chooseFileSystemEntries(options);
+    }
+    const writer = await handle.createWriter();
+    await writer.truncate(0);
+    await writer.write(0, data, data.type);
+    await writer.close();
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      console.error(err.name, err.message);
+    }
+    throw err;
+  }
 }
 
-export function saveAsJSON(
+interface DataState {
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+}
+
+export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
-  name: string
+  appState: AppState
 ) {
   const serialized = JSON.stringify({
     version: 1,
     source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el)
+    elements: elements.map(({ shape, ...el }) => el),
+    appState: appState
   });
 
-  saveFile(
-    `${name}.json`,
-    "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
-  );
+  const name = `${appState.name}.json`;
+  if ("chooseFileSystemEntries" in window) {
+    await saveFileNative(
+      name,
+      new Blob([serialized], { type: "application/json" })
+    );
+  } else {
+    saveFile(
+      name,
+      "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+    );
+  }
 }
 
-export function loadFromJSON() {
-  const input = document.createElement("input");
-  const reader = new FileReader();
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = () => {
-    if (!input.files!.length) {
-      alert("A file was not selected.");
-      return;
+export async function loadFromJSON() {
+  const updateAppState = (contents: string) => {
+    const defaultAppState = getDefaultAppState();
+    let elements = [];
+    let appState = defaultAppState;
+    try {
+      const data = JSON.parse(contents);
+      elements = data.elements || [];
+      appState = { ...defaultAppState, ...data.appState };
+    } catch (e) {
+      // Do nothing because elements array is already empty
     }
-
-    reader.readAsText(input.files![0], "utf8");
+    return { elements, appState };
   };
 
-  input.click();
-
-  return new Promise<DataState>(resolve => {
-    reader.onloadend = () => {
-      if (reader.readyState === FileReader.DONE) {
-        let elements = [];
-        try {
-          const data = JSON.parse(reader.result as string);
-          elements = data.elements || [];
-        } catch (e) {
-          // Do nothing because elements array is already empty
-        }
-        resolve(restore(elements, null));
+  if ("chooseFileSystemEntries" in window) {
+    try {
+      (window as any).handle = await (window as any).chooseFileSystemEntries({
+        accepts: [
+          {
+            description: "Excalidraw files",
+            extensions: ["json"],
+            mimeTypes: ["application/json"]
+          }
+        ]
+      });
+      const file = await (window as any).handle.getFile();
+      const contents = await file.text();
+      const { elements, appState } = updateAppState(contents);
+      return new Promise<DataState>(resolve => {
+        resolve(restore(elements, appState));
+      });
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error(err.name, err.message);
       }
+      throw err;
+    }
+  } else {
+    const input = document.createElement("input");
+    const reader = new FileReader();
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = () => {
+      if (!input.files!.length) {
+        alert("A file was not selected.");
+        return;
+      }
+
+      reader.readAsText(input.files![0], "utf8");
     };
-  });
+
+    input.click();
+
+    return new Promise<DataState>(resolve => {
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          const { elements, appState } = updateAppState(
+            reader.result as string
+          );
+          resolve(restore(elements, appState));
+        }
+      };
+    });
+  }
 }
 
-export function exportCanvas(
-  type: ExportType,
+export function getExportCanvasPreview(
   elements: readonly ExcalidrawElement[],
-  canvas: HTMLCanvasElement,
   {
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    name
+    scale = 1
   }: {
     exportBackground: boolean;
     exportPadding?: number;
+    scale?: number;
     viewBackgroundColor: string;
-    scrollX: number;
-    scrollY: number;
-    name: string;
   }
 ) {
-  if (!elements.length) return window.alert("Cannot export empty canvas.");
   // calculate smallest area to fit the contents in
-
   let subCanvasX1 = Infinity;
   let subCanvasX2 = 0;
   let subCanvasY1 = Infinity;
@@ -116,10 +202,13 @@ export function exportCanvas(
   }
 
   const tempCanvas = document.createElement("canvas");
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  tempCanvas.width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  tempCanvas.height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
+  const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
+  const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
+  tempCanvas.style.width = width + "px";
+  tempCanvas.style.height = height + "px";
+  tempCanvas.width = width * scale;
+  tempCanvas.height = height * scale;
+  tempCanvas.getContext("2d")?.scale(scale, scale);
 
   renderScene(
     elements,
@@ -138,9 +227,50 @@ export function exportCanvas(
       renderSelection: false
     }
   );
+  return tempCanvas;
+}
+
+export async function exportCanvas(
+  type: ExportType,
+  elements: readonly ExcalidrawElement[],
+  canvas: HTMLCanvasElement,
+  {
+    exportBackground,
+    exportPadding = 10,
+    viewBackgroundColor,
+    name,
+    scale = 1
+  }: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    viewBackgroundColor: string;
+    name: string;
+    scale?: number;
+  }
+) {
+  if (!elements.length) return window.alert("Cannot export empty canvas.");
+  // calculate smallest area to fit the contents in
+
+  const tempCanvas = getExportCanvasPreview(elements, {
+    exportBackground,
+    viewBackgroundColor,
+    exportPadding,
+    scale
+  });
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
 
   if (type === "png") {
-    saveFile(`${name}.png`, tempCanvas.toDataURL("image/png"));
+    const fileName = `${name}.png`;
+    if ("chooseFileSystemEntries" in window) {
+      tempCanvas.toBlob(async blob => {
+        if (blob) {
+          await saveFileNative(fileName, blob);
+        }
+      });
+    } else {
+      saveFile(fileName, tempCanvas.toDataURL("image/png"));
+    }
   } else if (type === "clipboard") {
     try {
       tempCanvas.toBlob(async function(blob) {
@@ -163,7 +293,7 @@ export function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: any
+  savedState: AppState
 ): DataState {
   return {
     elements: savedElements.map(element => ({

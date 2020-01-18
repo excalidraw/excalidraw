@@ -1,5 +1,10 @@
 import React from "react";
-import { Action, ActionsManagerInterface, UpdaterFn } from "./types";
+import {
+  Action,
+  ActionsManagerInterface,
+  UpdaterFn,
+  ActionFilterFn
+} from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
@@ -40,9 +45,11 @@ export class ActionManager implements ActionsManagerInterface {
   getContextMenuItems(
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn
+    updater: UpdaterFn,
+    actionFilter: ActionFilterFn = action => action
   ) {
     return Object.values(this.actions)
+      .filter(actionFilter)
       .filter(action => "contextItemLabel" in action)
       .sort(
         (a, b) =>

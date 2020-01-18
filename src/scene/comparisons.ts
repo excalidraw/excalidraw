@@ -18,7 +18,8 @@ export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
         element.type === "diamond" ||
-        element.type === "arrow")
+        element.type === "arrow" ||
+        element.type === "line")
   );
 
 export const hasText = (elements: readonly ExcalidrawElement[]) =>

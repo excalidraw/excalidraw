@@ -1,13 +1,13 @@
 <div align="center" style="display:flex;flex-direction:column;">
     <a href="https://excalidraw.com">
-        <img src=".github/assets/logo.png" alt="" width="220px" height="202"/>
+        <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
     </a>
     <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.</h3>
 </div>
 
 ## Try it now
 
-Go to https://www.excalidraw.com to start sketching
+Go to https://excalidraw.com to start sketching
 
 ## Testimonials
 
@@ -32,23 +32,22 @@ Go to https://www.excalidraw.com to start sketching
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-Clone the repo
+#### Clone the repo
 
 ```bash
 git clone https://github.com/excalidraw/excalidraw.git
 ```
 
-Install all the dependencies
+#### Commands
 
-```bash
-npm install
-```
-
-Run the project
-
-```bash
-npm run start
-```
+| Command             | Description                       |
+| ------------------- | --------------------------------- |
+| `npm install`       | Install the dependencies          |
+| `npm run start`     | Run the project                   |
+| `npm run fix`       | Reformat all files with Prettier  |
+| `npm run test:code` | Test for formatting with Prettier |
+| `npm run test:app`  | Test the app                      |
+| `npm run test`      | Run all tests                     |
 
 ## Contributing
 
@@ -58,7 +57,38 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 
 ## Excalidraw is built using these awesome tools
 
-- [React](https://reactjs.org/)
-- [Rough.js](https://roughjs.com/)
+- [React](https://reactjs.org)
+- [Rough.js](https://roughjs.com)
+- [Netlify](https://www.netlify.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/excalidraw/excalidraw/graphs/contributors"><img src="https://opencollective.com/excalidraw/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/excalidraw/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/excalidraw"><img src="https://opencollective.com/excalidraw/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/excalidraw/contribute)]
+
+<a href="https://opencollective.com/excalidraw/organization/0/website"><img src="https://opencollective.com/excalidraw/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/1/website"><img src="https://opencollective.com/excalidraw/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/2/website"><img src="https://opencollective.com/excalidraw/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/3/website"><img src="https://opencollective.com/excalidraw/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/4/website"><img src="https://opencollective.com/excalidraw/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/5/website"><img src="https://opencollective.com/excalidraw/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/6/website"><img src="https://opencollective.com/excalidraw/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/7/website"><img src="https://opencollective.com/excalidraw/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/8/website"><img src="https://opencollective.com/excalidraw/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/excalidraw/organization/9/website"><img src="https://opencollective.com/excalidraw/organization/9/avatar.svg"></a>

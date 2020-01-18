@@ -1,13 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import rough from "roughjs/bin/wrappers/rough";
+import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 import {
   newElement,
   duplicateElement,
   resizeTest,
+  isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
   getElementAbsoluteCoords
@@ -15,23 +16,27 @@ import {
 import {
   clearSelection,
   deleteSelectedElements,
-  setSelection,
+  getElementsWithinSelection,
   isOverScrollBars,
   restoreFromLocalStorage,
   saveToLocalStorage,
   getElementAtPosition,
   createScene,
-  getElementContainingPosition
+  getElementContainingPosition,
+  hasBackground,
+  hasStroke,
+  hasText,
+  exportCanvas
 } from "./scene";
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
-import { isInputLike, measureText, debounce } from "./utils";
+import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
 import { KEYS, META_KEY, isArrowKey } from "./keys";
 
-import { findShapeByKey, shapesShortcutKeys } from "./shapes";
+import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
 
 import ContextMenu from "./components/ContextMenu";
@@ -63,15 +68,18 @@ import {
   actionCopyStyles,
   actionPasteStyles
 } from "./actions";
-import { SidePanel } from "./components/SidePanel";
-import { ActionResult } from "./actions/types";
+import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
-import { getPointOnAPath } from "./math";
+import { Island } from "./components/Island";
+import Stack from "./components/Stack";
+import { FixedSideContainer } from "./components/FixedSideContainer";
+import { ToolIcon } from "./components/ToolIcon";
+import { ExportDialog } from "./components/ExportDialog";
 
 let { elements } = createScene();
 const { history } = createHistory();
 
-const CANVAS_WINDOW_OFFSET_LEFT = 250;
+const CANVAS_WINDOW_OFFSET_LEFT = 0;
 const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function resetCursor() {
@@ -124,6 +132,7 @@ export class App extends React.Component<{}, AppState> {
   rc: RoughCanvas | null = null;
 
   actionManager: ActionManager = new ActionManager();
+  canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
     this.actionManager.registerAction(actionDeleteSelected);
@@ -152,6 +161,8 @@ export class App extends React.Component<{}, AppState> {
 
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
+
+    this.canvasOnlyActions = [actionSelectAll];
   }
 
   private syncActionResult = (res: ActionResult) => {
@@ -329,26 +340,204 @@ export class App extends React.Component<{}, AppState> {
     }
   };
 
+  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const selectedElements = elements.filter(el => el.isSelected);
+    if (selectedElements.length === 0) {
+      return null;
+    }
+
+    return (
+      <Island padding={4}>
+        <div className="panelColumn">
+          {this.actionManager.renderAction(
+            "changeStrokeColor",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {hasBackground(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeBackgroundColor",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFillStyle",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasStroke(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeStrokeWidth",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeSloppiness",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {hasText(elements) && (
+            <>
+              {this.actionManager.renderAction(
+                "changeFontSize",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+
+              {this.actionManager.renderAction(
+                "changeFontFamily",
+                elements,
+                this.state,
+                this.syncActionResult
+              )}
+              <hr />
+            </>
+          )}
+
+          {this.actionManager.renderAction(
+            "changeOpacity",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+
+          {this.actionManager.renderAction(
+            "deleteSelectedElements",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </div>
+      </Island>
+    );
+  }
+
+  private renderShapesSwitcher() {
+    return (
+      <>
+        {SHAPES.map(({ value, icon }, index) => (
+          <ToolIcon
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={this.state.elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
+            onChange={() => {
+              this.setState({ elementType: value });
+              elements = clearSelection(elements);
+              document.documentElement.style.cursor =
+                value === "text" ? "text" : "crosshair";
+              this.forceUpdate();
+            }}
+          ></ToolIcon>
+        ))}
+      </>
+    );
+  }
+
+  private renderCanvasActions() {
+    return (
+      <Stack.Col gap={4}>
+        <Stack.Row justifyContent={"space-between"}>
+          {this.actionManager.renderAction(
+            "loadScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          {this.actionManager.renderAction(
+            "saveScene",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+          <ExportDialog
+            elements={elements}
+            appState={this.state}
+            actionManager={this.actionManager}
+            syncActionResult={this.syncActionResult}
+            onExportToPng={(exportedElements, scale) => {
+              if (this.canvas)
+                exportCanvas("png", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
+            }}
+            onExportToClipboard={(exportedElements, scale) => {
+              if (this.canvas)
+                exportCanvas("clipboard", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
+            }}
+          />
+          {this.actionManager.renderAction(
+            "clearCanvas",
+            elements,
+            this.state,
+            this.syncActionResult
+          )}
+        </Stack.Row>
+        {this.actionManager.renderAction(
+          "changeViewBackgroundColor",
+          elements,
+          this.state,
+          this.syncActionResult
+        )}
+      </Stack.Col>
+    );
+  }
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
 
     return (
       <div className="container">
-        <SidePanel
-          actionManager={this.actionManager}
-          syncActionResult={this.syncActionResult}
-          appState={{ ...this.state }}
-          elements={elements}
-          onToolChange={value => {
-            this.setState({ elementType: value });
-            elements = clearSelection(elements);
-            document.documentElement.style.cursor =
-              value === "text" ? "text" : "crosshair";
-            this.forceUpdate();
-          }}
-          canvas={this.canvas!}
-        />
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            <Stack.Col gap={4} align="end">
+              <div className="App-right-menu">
+                <Island padding={4}>{this.renderCanvasActions()}</Island>
+              </div>
+              <div className="App-right-menu">
+                {this.renderSelectedShapeActions(elements)}
+              </div>
+            </Stack.Col>
+            <Stack.Col gap={4} align="start">
+              <Island padding={1}>
+                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+              </Island>
+            </Stack.Col>
+            <div />
+          </div>
+        </FixedSideContainer>
         <canvas
           id="canvas"
           style={{
@@ -372,7 +561,6 @@ export class App extends React.Component<{}, AppState> {
               });
               this.removeWheelEventListener = () =>
                 canvas.removeEventListener("wheel", this.handleWheel);
-
               // Whenever React sets the width/height of the canvas element,
               // the context loses the scale transform. We need to re-apply it
               if (
@@ -399,7 +587,13 @@ export class App extends React.Component<{}, AppState> {
                   navigator.clipboard && {
                     label: "Paste",
                     action: () => this.pasteFromClipboard()
-                  }
+                  },
+                  ...this.actionManager.getContextMenuItems(
+                    elements,
+                    this.state,
+                    this.syncActionResult,
+                    action => this.canvasOnlyActions.includes(action)
+                  )
                 ],
                 top: e.clientY,
                 left: e.clientX
@@ -426,7 +620,8 @@ export class App extends React.Component<{}, AppState> {
                 ...this.actionManager.getContextMenuItems(
                   elements,
                   this.state,
-                  this.syncActionResult
+                  this.syncActionResult,
+                  action => !this.canvasOnlyActions.includes(action)
                 )
               ],
               top: e.clientY,
@@ -440,6 +635,34 @@ export class App extends React.Component<{}, AppState> {
               // being in a weird state, we clean up on the next mousedown
               lastMouseUp(e);
             }
+
+            // pan canvas on wheel button drag
+            if (e.button === 1) {
+              let { clientX: lastX, clientY: lastY } = e;
+              const onMouseMove = (e: MouseEvent) => {
+                document.documentElement.style.cursor = `grabbing`;
+                let deltaX = lastX - e.clientX;
+                let deltaY = lastY - e.clientY;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                this.setState(state => ({
+                  scrollX: state.scrollX - deltaX,
+                  scrollY: state.scrollY - deltaY
+                }));
+              };
+              const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
+                lastMouseUp = null;
+                resetCursor();
+                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+              });
+              window.addEventListener("mousemove", onMouseMove, {
+                passive: true
+              });
+              window.addEventListener("mouseup", onMouseUp);
+              return;
+            }
+
             // only handle left mouse button
             if (e.button !== 0) return;
             // fixes mousemove causing selection of UI texts #32
@@ -501,16 +724,11 @@ export class App extends React.Component<{}, AppState> {
                 document.documentElement.style.cursor = `${resizeHandle}-resize`;
                 isResizingElements = true;
               } else {
-                const selected = getElementAtPosition(
-                  elements.filter(el => el.isSelected),
-                  x,
-                  y
-                );
+                hitElement = getElementAtPosition(elements, x, y);
                 // clear selection if shift is not clicked
-                if (!selected && !e.shiftKey) {
+                if (!hitElement?.isSelected && !e.shiftKey) {
                   elements = clearSelection(elements);
                 }
-                hitElement = getElementAtPosition(elements, x, y);
 
                 // If we click on something
                 if (hitElement) {
@@ -629,36 +847,42 @@ export class App extends React.Component<{}, AppState> {
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
+                  let deltaX = 0;
+                  let deltaY = 0;
                   selectedElements.forEach(element => {
                     switch (resizeHandle) {
                       case "nw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          const deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "ne":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         if (e.shiftKey) {
                           element.y += element.height - element.width;
                           element.height = element.width;
                         } else {
-                          element.height += element.y - lastY;
-                          element.y = lastY;
+                          deltaY = lastY - y;
+                          element.height += deltaY;
+                          element.y -= deltaY;
                         }
                         break;
                       case "sw":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         if (e.shiftKey) {
                           element.height = element.width;
                         } else {
-                          element.height = lastY - element.y;
+                          element.height += y - lastY;
                         }
                         break;
                       case "se":
@@ -670,18 +894,20 @@ export class App extends React.Component<{}, AppState> {
                         }
                         break;
                       case "n":
-                        element.height += element.y - lastY;
-                        element.y = lastY;
+                        deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
                         break;
                       case "w":
-                        element.width += element.x - lastX;
-                        element.x = lastX;
+                        deltaX = lastX - x;
+                        element.width += deltaX;
+                        element.x -= deltaX;
                         break;
                       case "s":
-                        element.height = lastY - element.y;
+                        element.height += y - lastY;
                         break;
                       case "e":
-                        element.width = lastX - element.x;
+                        element.width += x - lastX;
                         break;
                     }
 
@@ -745,9 +971,10 @@ export class App extends React.Component<{}, AppState> {
                 this.state.scrollY;
 
               // Make a perfect square or circle when shift is enabled
-              height = e.shiftKey
-                ? Math.abs(width) * Math.sign(height)
-                : height;
+              height =
+                e.shiftKey && this.state.elementType !== "selection"
+                  ? Math.abs(width) * Math.sign(height)
+                  : height;
 
               draggingElement.width = width;
               draggingElement.height = height;
@@ -762,7 +989,16 @@ export class App extends React.Component<{}, AppState> {
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
-                elements = setSelection(elements, draggingElement);
+                if (!e.shiftKey) {
+                  elements = clearSelection(elements);
+                }
+                const elementsWithinSelection = getElementsWithinSelection(
+                  elements,
+                  draggingElement
+                );
+                elementsWithinSelection.forEach(element => {
+                  element.isSelected = true;
+                });
               }
               // We don't want to save history when moving an element
               history.skipRecording();
@@ -770,11 +1006,33 @@ export class App extends React.Component<{}, AppState> {
             };
 
             const onMouseUp = (e: MouseEvent) => {
-              const { draggingElement, elementType } = this.state;
+              const {
+                draggingElement,
+                resizingElement,
+                elementType
+              } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
+
+              if (
+                elementType !== "selection" &&
+                draggingElement &&
+                isInvisiblySmallElement(draggingElement)
+              ) {
+                // remove invisible element which was added in onMouseDown
+                elements = elements.slice(0, -1);
+                this.setState({
+                  draggingElement: null
+                });
+                this.forceUpdate();
+                return;
+              }
+
+              if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+                elements = elements.filter(el => el.id !== resizingElement.id);
+              }
 
               resetCursor();
 
@@ -922,70 +1180,20 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-            const resizeElement = getElementWithResizeHandler(
-              elements,
-              { x, y },
-              this.state
-            );
-            if (resizeElement && resizeElement.resizeHandle) {
-              document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
-              return;
+            const selectedElements = elements.filter(e => e.isSelected).length;
+            if (selectedElements === 1) {
+              const resizeElement = getElementWithResizeHandler(
+                elements,
+                { x, y },
+                this.state
+              );
+              if (resizeElement && resizeElement.resizeHandle) {
+                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                return;
+              }
             }
             const hitElement = getElementAtPosition(elements, x, y);
-            if (hitElement) {
-              const resizeHandle = resizeTest(hitElement, x, y, {
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY
-              });
-              document.documentElement.style.cursor = resizeHandle
-                ? `${resizeHandle}-resize`
-                : `move`;
-            } else {
-              document.documentElement.style.cursor = ``;
-            }
-
-            const selectedElements = elements.filter(el => el.isSelected);
-
-            // cannot select more than one elemnt
-            if (selectedElements.length > 1) return;
-            const arrow = selectedElements.find(el => el.type === "arrow");
-
-            // if no arrow is selected, ignore
-            if (!arrow) {
-              if (this.state.pathSegmentCircle) {
-                this.setState({ pathSegmentCircle: null });
-              }
-              return;
-            }
-
-            // get mouse position relative to arrow element
-            const dx = x - arrow.x;
-            const dy = y - arrow.y;
-
-            const point = getPointOnAPath([dx, dy], arrow.points);
-            if (point !== null) {
-              let overlappingPoint = -1;
-              const [x1] = arrow.points[point.segment];
-              const [x2] = arrow.points[point.segment + 1];
-              if (Math.abs(point.x - x1) < 2.5) {
-                overlappingPoint = point.segment;
-              }
-              if (Math.abs(point.x - x2) < 2.5) {
-                overlappingPoint = point.segment;
-              }
-              this.setState({
-                pathSegmentCircle: {
-                  x: point.x + arrow.x,
-                  y: point.y + arrow.y,
-                  arrow,
-                  segment: point.segment,
-                  point: [point.x, point.y],
-                  overlappingPoint
-                }
-              });
-            } else {
-              this.setState({ pathSegmentCircle: null });
-            }
+            document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
       </div>

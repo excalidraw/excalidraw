@@ -1,0 +1,18 @@
+.project-name {
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  padding: 4px;
+  margin: -4px;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+}
+
+.project-name:hover {
+  background-color: #eee;
+}
+
+.project-name:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px steelblue;
+}
