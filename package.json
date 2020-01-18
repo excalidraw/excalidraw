@@ -34,7 +34,6 @@
       "pre-commit": "lint-staged"
     }
   },
-  "keywords": [],
   "lint-staged": {
     "*.{js,css,scss,json,md,ts,tsx,html,yml}": [
       "prettier --write",
