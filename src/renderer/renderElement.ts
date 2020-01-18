@@ -7,7 +7,7 @@ import {
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
-import { Point, Line } from "roughjs/bin/geometry";
+import { Point } from "roughjs/bin/geometry";
 
 export function renderElement(
   element: ExcalidrawElement,
@@ -100,7 +100,6 @@ export function renderElement(
     rc.draw(element.shape as Drawable);
     context.globalAlpha = 1;
   } else if (element.type === "arrow") {
-    const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
     const options = {
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
@@ -114,23 +113,13 @@ export function renderElement(
       element.points.length > 0 ? element.points : ([[0, 0]] as Point[]);
 
     if (!element.shape) {
-      const [start, ...paths] = points;
-
-      // Create line segments from points
-      const lines: Line[] = [];
-      let lastPoint = start;
-      paths.forEach(pnt => {
-        lines.push([lastPoint, pnt]);
-        lastPoint = pnt;
-      });
+      const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
 
       element.shape = [
         //    \
         generator.line(x3, y3, x2, y2, options),
         // generate lines
-        ...lines.map(([p1, p2]) =>
-          generator.line(p1[0], p1[1], p2[0], p2[1], options)
-        ),
+        generator.curve(points),
         //    /
         generator.line(x4, y4, x2, y2, options)
       ];
