@@ -7,7 +7,7 @@
 
 ## Try it now
 
-Go to https://www.excalidraw.com to start sketching
+Go to https://excalidraw.com to start sketching
 
 ## Testimonials
 
