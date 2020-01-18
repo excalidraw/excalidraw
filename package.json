@@ -1,10 +1,10 @@
 {
-  "name": "excalidraw",
-  "homepage": "https://excalidraw.com",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "main": "src/index.js",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
   "dependencies": {
     "nanoid": "2.1.9",
     "react": "16.12.0",
@@ -12,6 +12,7 @@
     "react-scripts": "3.3.0",
     "roughjs": "4.0.4"
   },
+  "description": "",
   "devDependencies": {
     "@types/jest": "24.9.0",
     "@types/nanoid": "2.1.0",
@@ -24,25 +25,10 @@
     "prettier": "1.19.1",
     "typescript": "3.7.5"
   },
-  "scripts": {
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "fix": "npm run prettier -- --write",
-    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\"",
-    "start": "react-scripts start",
-    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:code": "npm run prettier -- --list-different",
-    "test": "npm run test:app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
   "eslintConfig": {
     "extends": "react-app"
   },
+  "homepage": "https://excalidraw.com",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -56,5 +42,18 @@
     "*.{js,ts,tsx}": [
       "eslint --max-warnings 0"
     ]
-  }
+  },
+  "main": "src/index.js",
+  "name": "excalidraw",
+  "scripts": {
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "fix": "npm run prettier -- --write",
+    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\"",
+    "start": "react-scripts start",
+    "test": "npm run test:app",
+    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
+    "test:code": "npm run prettier -- --list-different"
+  },
+  "version": "1.0.0"
 }
