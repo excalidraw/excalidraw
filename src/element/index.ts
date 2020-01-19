@@ -12,4 +12,8 @@ export { resizeTest, getCursorForResizingElement } from "./resizeTest";
 export { isTextElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
-export { getDraggingElementSize, isInvisiblySmallElement } from "./sizeHelpers";
+export {
+  getPerfectElementSize,
+  isInvisiblySmallElement,
+  resizePerfectLineForNWHandler
+} from "./sizeHelpers";

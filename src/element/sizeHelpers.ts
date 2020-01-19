@@ -6,29 +6,54 @@ export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
 
 /**
  * Makes a perfect shape or diagonal/horizontal/vertical line
- * when shift key is pressed.
  */
-export function getDraggingElementSize(
+export function getPerfectElementSize(
   elementType: string,
-  shiftKeyPressed: boolean,
   width: number,
   height: number
 ): { width: number; height: number } {
-  if (shiftKeyPressed) {
-    const absWidth = Math.abs(width);
-    const absHeight = Math.abs(height);
+  const absWidth = Math.abs(width);
+  const absHeight = Math.abs(height);
 
-    if (elementType === "line" || elementType === "arrow") {
-      if (absHeight < absWidth / 2) {
-        height = 0;
-      } else if (absWidth < absHeight / 2) {
-        width = 0;
-      } else {
-        height = absWidth * Math.sign(height);
-      }
-    } else if (elementType !== "selection") {
+  if (elementType === "line" || elementType === "arrow") {
+    if (absHeight < absWidth / 2) {
+      height = 0;
+    } else if (absWidth < absHeight / 2) {
+      width = 0;
+    } else {
       height = absWidth * Math.sign(height);
     }
+  } else if (elementType !== "selection") {
+    height = absWidth * Math.sign(height);
   }
+
   return { width, height };
+}
+
+export function resizePerfectLineForNWHandler(
+  element: ExcalidrawElement,
+  x: number,
+  y: number
+) {
+  const anchorX = element.x + element.width;
+  const anchorY = element.y + element.height;
+  const distanceToAnchorX = x - anchorX;
+  const distanceToAnchorY = y - anchorY;
+  if (Math.abs(distanceToAnchorX) < Math.abs(distanceToAnchorY) / 2) {
+    element.x = anchorX;
+    element.width = 0;
+    element.y = y;
+    element.height = -distanceToAnchorY;
+  } else if (Math.abs(distanceToAnchorY) < Math.abs(element.width) / 2) {
+    element.y = anchorY;
+    element.height = 0;
+  } else {
+    element.x = x;
+    element.width = -distanceToAnchorX;
+    element.height =
+      Math.sign(distanceToAnchorY) *
+      Math.sign(distanceToAnchorX) *
+      element.width;
+    element.y = anchorY - element.height;
+  }
 }

@@ -14,7 +14,8 @@ import {
   textWysiwyg,
   getElementAbsoluteCoords,
   getCursorForResizingElement,
-  getDraggingElementSize
+  getPerfectElementSize,
+  resizePerfectLineForNWHandler
 } from "./element";
 import {
   clearSelection,
@@ -948,9 +949,17 @@ export class App extends React.Component<any, AppState> {
                     case "nw":
                       element.width -= deltaX;
                       element.x += deltaX;
+
                       if (e.shiftKey) {
-                        element.y += element.height - element.width;
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          resizePerfectLineForNWHandler(element, x, y);
+                        } else {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        }
                       } else {
                         element.height -= deltaY;
                         element.y += deltaY;
@@ -976,10 +985,24 @@ export class App extends React.Component<any, AppState> {
                       }
                       break;
                     case "se":
-                      element.width += deltaX;
                       if (e.shiftKey) {
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          const { width, height } = getPerfectElementSize(
+                            element.type,
+                            x - element.x,
+                            y - element.y
+                          );
+                          element.width = width;
+                          element.height = height;
+                        } else {
+                          element.width += deltaX;
+                          element.height = element.width;
+                        }
                       } else {
+                        element.width += deltaX;
                         element.height += deltaY;
                       }
                       break;
@@ -1005,7 +1028,7 @@ export class App extends React.Component<any, AppState> {
                   el.x = element.x;
                   el.y = element.y;
                   el.shape = null;
-                  
+
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
@@ -1052,18 +1075,22 @@ export class App extends React.Component<any, AppState> {
                 draggingElement.y -
                 this.state.scrollY;
 
-              let {
-                width: newWidth,
-                height: newHeight
-              } = getDraggingElementSize(
-                this.state.elementType,
-                e.shiftKey,
-                width,
-                height
-              );
+              if (e.shiftKey) {
+                let {
+                  width: newWidth,
+                  height: newHeight
+                } = getPerfectElementSize(
+                  this.state.elementType,
+                  width,
+                  height
+                );
+                draggingElement.width = newWidth;
+                draggingElement.height = newHeight;
+              } else {
+                draggingElement.width = width;
+                draggingElement.height = height;
+              }
 
-              draggingElement.width = newWidth;
-              draggingElement.height = newHeight;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
