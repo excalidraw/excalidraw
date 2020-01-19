@@ -75,6 +75,8 @@ import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
 import { ExportDialog } from "./components/ExportDialog";
+import { withTranslation } from "react-i18next";
+import "./i18n";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -127,7 +129,7 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
-export class App extends React.Component<{}, AppState> {
+export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
 
@@ -525,6 +527,7 @@ export class App extends React.Component<{}, AppState> {
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const { t } = this.props;
 
     return (
       <div className="container">
@@ -593,7 +596,7 @@ export class App extends React.Component<{}, AppState> {
               ContextMenu.push({
                 options: [
                   navigator.clipboard && {
-                    label: "Paste",
+                    label: t("labels.paste"),
                     action: () => this.pasteFromClipboard()
                   },
                   ...this.actionManager.getContextMenuItems(
@@ -618,11 +621,11 @@ export class App extends React.Component<{}, AppState> {
             ContextMenu.push({
               options: [
                 navigator.clipboard && {
-                  label: "Copy",
+                  label: t("labels.copy"),
                   action: this.copyToClipboard
                 },
                 navigator.clipboard && {
-                  label: "Paste",
+                  label: t("labels.paste"),
                   action: () => this.pasteFromClipboard()
                 },
                 ...this.actionManager.getContextMenuItems(
@@ -1290,5 +1293,7 @@ export class App extends React.Component<{}, AppState> {
   }
 }
 
+const AppWithTrans = withTranslation()(App);
+
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<AppWithTrans />, rootElement);
