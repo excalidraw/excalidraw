@@ -22,7 +22,6 @@ export function textWysiwyg({
   // But this solution has an issue — it allows to paste
   // multiline text, which is not currently supported
   const editable = document.createElement("div");
-  editable.id = "wysiwyg";
   editable.contentEditable = "true";
   editable.tabIndex = 0;
   editable.innerText = initText;

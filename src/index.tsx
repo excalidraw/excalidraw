@@ -118,8 +118,6 @@ let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
-let prevElementTypeTool = "selection";
-
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
   { scrollX, scrollY }: { scrollX: number; scrollY: number }
@@ -215,7 +213,6 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.onPaste);
     document.addEventListener("cut", this.onCut);
-    document.addEventListener("click", this.cleanupWysiwyg);
 
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
@@ -238,7 +235,6 @@ export class App extends React.Component<{}, AppState> {
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.onPaste);
     document.removeEventListener("cut", this.onCut);
-    document.removeEventListener("click", this.cleanupWysiwyg);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
@@ -253,16 +249,6 @@ export class App extends React.Component<{}, AppState> {
 
   private onResize = () => {
     this.forceUpdate();
-  };
-
-  // When we double-click to insert a text and then click away, the wysiwyg div that was created
-  // remains in the DOM, this is a hack-y way to remove it whenever we click anywhere in the DOM
-  private cleanupWysiwyg = () => {
-    if (prevElementTypeTool === "text") {
-      const wysiwygDiv = document.querySelector("#wysiwyg");
-      wysiwygDiv?.parentNode?.removeChild(wysiwygDiv);
-      prevElementTypeTool = "selection";
-    }
   };
 
   private getCurrentCursorPosition = (e: MouseEvent) => {
@@ -357,12 +343,18 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType } = this.state;
+    const { elementType, editingElement } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
     const hasSelectedElements = selectedElements.length > 0;
     const isTextToolSelected = elementType === "text";
     const isShapeToolSelected = elementType !== "selection";
-    if (!(hasSelectedElements || isShapeToolSelected || isTextToolSelected)) {
+    const isEditingText = editingElement && editingElement.type === "text";
+    if (
+      !hasSelectedElements &&
+      !isShapeToolSelected &&
+      !isTextToolSelected &&
+      !isEditingText
+    ) {
       return null;
     }
 
@@ -416,7 +408,7 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected) && (
+          {(hasText(elements) || isTextToolSelected || isEditingText) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -812,11 +804,15 @@ export class App extends React.Component<{}, AppState> {
                   elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
+                    editingElement: null,
                     elementType: "selection"
                   });
                 }
               });
-              this.setState({ elementType: "selection" });
+              this.setState({
+                elementType: "selection",
+                editingElement: element
+              });
               return;
             }
 
@@ -1089,8 +1085,6 @@ export class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
-            this.setState({ elementType: "text" });
-            prevElementTypeTool = "text";
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const elementAtPosition = getElementAtPosition(elements, x, y);
@@ -1106,6 +1100,8 @@ export class App extends React.Component<{}, AppState> {
               1,
               100
             ) as ExcalidrawTextElement;
+
+            this.setState({ editingElement: element });
 
             let initText = "";
             let textX = e.clientX;
@@ -1161,6 +1157,7 @@ export class App extends React.Component<{}, AppState> {
                 elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
+                  editingElement: null,
                   elementType: "selection"
                 });
               }
