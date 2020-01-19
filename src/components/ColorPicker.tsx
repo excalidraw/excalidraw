@@ -71,6 +71,7 @@ function ColorInput({
       <input
         spellCheck={false}
         className="color-picker-input"
+        aria-label="Hex color code"
         onChange={e => {
           const value = e.target.value;
           if (value.match(colorRegex)) {
@@ -102,6 +103,7 @@ export function ColorPicker({
       <div className="color-picker-control-container">
         <button
           className="color-picker-label-swatch"
+          aria-label="Change color"
           style={color ? { backgroundColor: color } : undefined}
           onClick={() => setActive(!isActive)}
         />

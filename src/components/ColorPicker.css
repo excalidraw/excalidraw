@@ -78,7 +78,7 @@
   height: 30px;
   width: 30px;
   border-radius: 4px 0px 0px 4px;
-  color: #868e96;
+  color: #495057;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +91,7 @@
 .color-picker-input {
   width: 100px;
   font-size: 14px;
-  color: #868e96;
+  color: #343a40;
   border: 0px;
   outline: none;
   height: 28px;
