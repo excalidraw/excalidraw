@@ -1075,6 +1075,7 @@ export class App extends React.Component<{}, AppState> {
             this.forceUpdate();
           }}
           onDoubleClick={e => {
+            this.setState({ elementType: "text" });
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const elementAtPosition = getElementAtPosition(elements, x, y);
