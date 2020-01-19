@@ -35,7 +35,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
-import { KEYS, META_KEY, isArrowKey } from "./keys";
+import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
@@ -303,7 +303,7 @@ export class App extends React.Component<{}, AppState> {
         this.state.elementType !== "selection")
     ) {
       this.setState({ elementType: findShapeByKey(event.key) });
-    } else if (event[META_KEY] && event.code === "KeyZ") {
+    } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
