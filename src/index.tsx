@@ -118,6 +118,8 @@ let lastCanvasHeight = -1;
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
+let prevElementTypeTool = "selection";
+
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
   { scrollX, scrollY }: { scrollX: number; scrollY: number }
@@ -213,6 +215,7 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.onPaste);
     document.addEventListener("cut", this.onCut);
+    document.addEventListener("click", this.cleanupWysiwyg);
 
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
@@ -235,6 +238,7 @@ export class App extends React.Component<{}, AppState> {
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.onPaste);
     document.removeEventListener("cut", this.onCut);
+    document.removeEventListener("click", this.cleanupWysiwyg);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
@@ -249,6 +253,16 @@ export class App extends React.Component<{}, AppState> {
 
   private onResize = () => {
     this.forceUpdate();
+  };
+
+  // When we double-click to insert a text and then click away, the wysiwyg div that was created
+  // remains in the DOM, this is a hack-y way to remove it whenever we click anywhere in the DOM
+  private cleanupWysiwyg = () => {
+    if (prevElementTypeTool === "text") {
+      const wysiwygDiv = document.querySelector("#wysiwyg");
+      wysiwygDiv?.parentNode?.removeChild(wysiwygDiv);
+      prevElementTypeTool = "selection";
+    }
   };
 
   private getCurrentCursorPosition = (e: MouseEvent) => {
@@ -1076,6 +1090,7 @@ export class App extends React.Component<{}, AppState> {
           }}
           onDoubleClick={e => {
             this.setState({ elementType: "text" });
+            prevElementTypeTool = "text";
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
             const elementAtPosition = getElementAtPosition(elements, x, y);
