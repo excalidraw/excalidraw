@@ -4,13 +4,11 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/6a2f94e6-20d1-42ba-8af5-2f91802debe8/deploy-status)](https://app.netlify.com/sites/excalidraw/deploys)
 
-
 <div align="center" style="display:flex;flex-direction:column;">
     <a href="https://excalidraw.com">
         <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
     </a>
 </div>
-
 
 ## Try it now
 
