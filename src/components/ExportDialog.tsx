@@ -8,7 +8,7 @@ import { clipboard, exportFile, downloadFile } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { getExportCanvasPreview } from "../scene/data";
+import { getExportCanvasPreview } from "../scene/getExportCanvasPreview";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 

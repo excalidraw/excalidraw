@@ -1,5 +1,5 @@
 import { Action } from "./types";
-import { META_KEY } from "../keys";
+import { KEYS } from "../keys";
 
 export const actionSelectAll: Action = {
   name: "selectAll",
@@ -9,5 +9,5 @@ export const actionSelectAll: Action = {
     };
   },
   contextItemLabel: "Select All",
-  keyTest: event => event[META_KEY] && event.code === "KeyA"
+  keyTest: event => event[KEYS.META] && event.code === "KeyA"
 };
