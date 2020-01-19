@@ -7,6 +7,7 @@ export function getDefaultAppState(): AppState {
   return {
     draggingElement: null,
     resizingElement: null,
+    editingElement: null,
     elementType: "selection",
     exportBackground: true,
     currentItemStrokeColor: "#000000",
