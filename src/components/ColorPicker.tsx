@@ -80,6 +80,7 @@ function ColorInput({
         }}
         value={(innerValue || "").replace(/^#/, "")}
         onPaste={e => onChange(e.clipboardData.getData("text"))}
+        onBlur={() => setInnerValue(color)}
       />
     </div>
   );
