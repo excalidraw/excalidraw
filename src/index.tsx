@@ -11,7 +11,8 @@ import {
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getCursorForResizingElement
 } from "./element";
 import {
   clearSelection,
@@ -722,14 +723,15 @@ export class App extends React.Component<{}, AppState> {
                 { x, y },
                 this.state
               );
-
               this.setState({
                 resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
                 resizeHandle = resizeElement.resizeHandle;
-                document.documentElement.style.cursor = `${resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 isResizingElements = true;
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
@@ -852,7 +854,6 @@ export class App extends React.Component<{}, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-
                   let deltaX = 0;
                   let deltaY = 0;
                   selectedElements.forEach(element => {
@@ -917,6 +918,9 @@ export class App extends React.Component<{}, AppState> {
                         break;
                     }
 
+                    document.documentElement.style.cursor = getCursorForResizingElement(
+                      { element, resizeHandle }
+                    );
                     el.x = element.x;
                     el.y = element.y;
                     el.shape = null;
@@ -1164,7 +1168,9 @@ export class App extends React.Component<{}, AppState> {
                 this.state
               );
               if (resizeElement && resizeElement.resizeHandle) {
-                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 return;
               }
             }
