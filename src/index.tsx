@@ -344,12 +344,18 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType } = this.state;
+    const { elementType, editingElement } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
     const hasSelectedElements = selectedElements.length > 0;
     const isTextToolSelected = elementType === "text";
     const isShapeToolSelected = elementType !== "selection";
-    if (!(hasSelectedElements || isShapeToolSelected || isTextToolSelected)) {
+    const isEditingText = editingElement && editingElement.type === "text";
+    if (
+      !hasSelectedElements &&
+      !isShapeToolSelected &&
+      !isTextToolSelected &&
+      !isEditingText
+    ) {
       return null;
     }
 
@@ -403,7 +409,7 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected) && (
+          {(hasText(elements) || isTextToolSelected || isEditingText) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -800,11 +806,15 @@ export class App extends React.Component<{}, AppState> {
                   elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
+                    editingElement: null,
                     elementType: "selection"
                   });
                 }
               });
-              this.setState({ elementType: "selection" });
+              this.setState({
+                elementType: "selection",
+                editingElement: element
+              });
               return;
             }
 
@@ -1095,6 +1105,8 @@ export class App extends React.Component<{}, AppState> {
               100
             ) as ExcalidrawTextElement;
 
+            this.setState({ editingElement: element });
+
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
@@ -1149,6 +1161,7 @@ export class App extends React.Component<{}, AppState> {
                 elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
+                  editingElement: null,
                   elementType: "selection"
                 });
               }
