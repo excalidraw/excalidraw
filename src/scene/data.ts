@@ -96,7 +96,7 @@ export async function saveAsJSON(
   } else {
     saveFile(
       name,
-      "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+      "data:application/json;charset=utf-8," + encodeURIComponent(serialized)
     );
   }
 }
