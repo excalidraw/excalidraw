@@ -10,6 +10,12 @@ type TextWysiwygParams = {
   onSubmit: (text: string) => void;
 };
 
+// When WYSIWYG text ends with white spaces, the text gets vertically misaligned
+// in order to fix this issue, we remove those white spaces
+function trimText(text: string) {
+  return text.trim();
+}
+
 export function textWysiwyg({
   initText,
   x,
@@ -77,7 +83,7 @@ export function textWysiwyg({
 
   function handleSubmit() {
     if (editable.innerText) {
-      onSubmit(editable.innerText);
+      onSubmit(trimText(editable.innerText));
     }
     cleanup();
   }
