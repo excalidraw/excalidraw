@@ -463,11 +463,12 @@ export class App extends React.Component<{}, AppState> {
   }
 
   private renderShapeLock() {
+    const {elementLocked} = this.state;
     return (
       <LockIcon
-        checked={this.state.elementLocked}
+        checked={elementLocked}
         onChange={() =>
-          this.setState({ elementLocked: !this.state.elementLocked })
+          this.setState({ elementLocked: !elementLocked })
         }
       />
     );
@@ -1046,7 +1047,8 @@ export class App extends React.Component<{}, AppState> {
               const {
                 draggingElement,
                 resizingElement,
-                elementType
+                elementType,
+                elementLocked,
               } = this.state;
 
               lastMouseUp = null;
@@ -1103,11 +1105,11 @@ export class App extends React.Component<{}, AppState> {
 
               if (elementType === "selection") {
                 elements = elements.slice(0, -1);
-              } else {
+              } else if (!elementLocked) {
                 draggingElement.isSelected = true;
               }
 
-              if (!this.state.elementLocked) {
+              if (!elementLocked) {
                 this.setState({
                   draggingElement: null,
                   elementType: "selection"
