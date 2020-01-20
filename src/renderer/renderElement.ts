@@ -137,6 +137,33 @@ export function renderElement(
       });
     }
 
+    // debug here
+    // REMOVE after done
+    if (points.length >= 3) {
+      const [p0, p1, p2] = points;
+      const p3 = points.length === 4 ? points[3] : p2;
+
+      const equation = (t: number, idx: number) =>
+        Math.pow(1 - t, 3) * p3[idx] +
+        3 * t * Math.pow(1 - t, 2) * p2[idx] +
+        3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+        p0[idx] * Math.pow(t, 3);
+
+      let t = 0;
+      while (t <= 1.0) {
+        const x = equation(t, 0);
+        const y = equation(t, 1);
+        rc.ellipse(x, y, 10, 10, {
+          fillStyle: "solid",
+          fill:
+            (parseFloat(t.toFixed(2)) * 10) % 2 === 0 ? "#ff0000" : "#00ff00",
+          strokeWidth: 2,
+          roughness: 0
+        });
+        t += 0.1;
+      }
+    }
+
     context.globalAlpha = element.opacity / 100;
     (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
     context.globalAlpha = 1;

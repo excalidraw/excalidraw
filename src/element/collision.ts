@@ -2,11 +2,11 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 import {
-  getArrowBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
   getLinePoints
 } from "./bounds";
+import { Point } from "roughjs/bin/geometry";
 
 export function hitTest(
   element: ExcalidrawElement,
@@ -141,19 +141,13 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow") {
-    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowBounds(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
+    if (element.points.length < 2) {
+      return false;
+    }
 
-    return (
-      //    \
-      distanceBetweenPointAndSegment(x, y, x3, y3, x2, y2) < lineThreshold ||
-      // -----
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold ||
-      //    /
-      distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
-    );
+    return pointOnCurve(element.points, x - element.x, y - element.y);
+
+    // return closestPoint([...element.points], x - element.x, y - element.y);
   } else if (element.type === "line") {
     const [x1, y1, x2, y2] = getLinePoints(element);
     // The computation is done at the origin, we need to add a translation
@@ -172,3 +166,111 @@ export function hitTest(
     throw new Error("Unimplemented type " + element.type);
   }
 }
+
+const pointOnCurve = (points: Point[], x: number, y: number) => {
+  // pass 1: Generate curves
+  const curves: Point[][] = [];
+  let lastCurve: Point[] = [];
+  points.forEach((p, i) => {
+    lastCurve.push(p);
+
+    if (i > 0 && i % 3 === 0) {
+      curves.push(lastCurve);
+      lastCurve = [p];
+    }
+  });
+
+  // add the remaining curve
+  // this curve can be quadratic bezier curve or
+  // a line segment
+  if (lastCurve.length > 1) {
+    curves.push(lastCurve);
+  }
+
+  // if there are no curves, nothing to select
+  if (curves.length < 0) return false;
+
+  const pointInBezierEquation = (
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    M: number
+  ) => {
+    // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+    const equation = (t: number) =>
+      Math.pow(1 - t, 3) * p3 +
+      3 * t * Math.pow(1 - t, 2) * p2 +
+      3 * Math.pow(t, 2) * (1 - t) * p1 +
+      p0 * Math.pow(t, 3);
+
+    // debug
+    let min = Infinity;
+    let minT = 1.1;
+
+    const epsilon = 3;
+    // go through t in increments of 0.01
+    let t = 0;
+    while (t <= 1.0) {
+      const diff = Math.abs(M - equation(t));
+
+      if (diff < min) {
+        min = diff;
+        minT = t;
+      }
+
+      if (diff < epsilon) {
+        return true;
+      }
+
+      t += 0.1;
+    }
+
+    console.log({ min, t: minT, eq: equation(minT), M });
+
+    return false;
+  };
+
+  return curves.some(points => {
+    if (points.length === 4) {
+      // cubic bezier curve
+      const [p0, p1, p2, p3] = points;
+
+      const minX = Math.min(p0[0], p1[0], p2[0], p3[0]);
+      const maxX = Math.max(p0[0], p1[0], p2[0], p3[0]);
+
+      const minY = Math.min(p0[1], p1[1], p2[1], p3[1]);
+      const maxY = Math.max(p0[1], p1[1], p2[1], p3[1]);
+
+      // if outside the bounds of the curve
+      if (x > maxX || x < minX || y > maxY || y < minY) return false;
+
+      // we only need to check Y here because if
+      // we are outside the domain of the curve,
+      // we already know that the point is not going to be on the curve
+      return (
+        pointInBezierEquation(p0[1], p1[1], p2[1], p3[1], y) &&
+        pointInBezierEquation(p0[0], p1[0], p2[0], p3[0], x)
+      );
+    } else if (points.length === 3) {
+      // quadratic bezier curve here
+      return false;
+    } else if (points.length === 2) {
+      const [p0, p1] = points;
+
+      // if outside the domain of the line segment
+      if (x < p0[0] || x > p1[0]) return false;
+
+      const k1 = (p1[1] - p0[1]) / (p1[0] - p0[0]);
+      const k2 = (y - p0[1]) / (x - p0[0]);
+      const k3 = (p1[1] - y) / (p1[0] - x);
+
+      // check coefficients of both line segments
+      // p0 -> M and M -> p1 for collinearity
+      return Math.abs(k2 - k1) < 0.05 || Math.abs(k3 - k1) < 0.05;
+    }
+
+    // for any other points, return false
+    return false;
+  });
+};
