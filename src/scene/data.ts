@@ -187,7 +187,7 @@ export async function exportToBackend(
   const json = await response.json();
   if (json.id) {
     const url = new URL(window.location.href);
-    url.searchParams.append("json", json.id);
+    url.searchParams.append("id", json.id);
 
     await navigator.clipboard.writeText(url.toString());
     window.alert(`Copied to clipboard: ${url.toString()}`);
