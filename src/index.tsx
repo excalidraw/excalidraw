@@ -828,16 +828,8 @@ export class App extends React.Component<{}, AppState> {
               return;
             }
 
-            if (this.state.elementType === "text") {
-              elements = [...elements, { ...element, isSelected: true }];
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
-            } else {
-              elements = [...elements, element];
-              this.setState({ draggingElement: element });
-            }
+            elements = [...elements, element];
+            this.setState({ draggingElement: element });
 
             let lastX = x;
             let lastY = y;
