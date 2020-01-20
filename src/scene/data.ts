@@ -184,7 +184,6 @@ export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
     body: serializeAsJSON(elements)
   });
   const json = await response.json();
-  console.log("json", json);
   if (json.id) {
     const url = new URL(window.location.href);
     url.searchParams.append("json", json.id);
