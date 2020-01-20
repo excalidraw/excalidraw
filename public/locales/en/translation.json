@@ -19,7 +19,10 @@
     "fontSize": "Font Size",
     "fontFamily": "Font Family",
     "onlySelected": "Only selected",
-    "withBackground": "With Background"
+    "withBackground": "With Background",
+    "handDrawn": "Hand-Drawn",
+    "normal": "Normal",
+    "code": "Code"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
