@@ -77,6 +77,7 @@ import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
+import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import "./i18n";
@@ -451,6 +452,16 @@ export class App extends React.Component<any, AppState> {
     );
   }
 
+  private renderShapeLock() {
+    const { elementLocked } = this.state;
+    return (
+      <LockIcon
+        checked={elementLocked}
+        onChange={() => this.setState({ elementLocked: !elementLocked })}
+      />
+    );
+  }
+
   private renderShapesSwitcher() {
     const { t } = this.props;
 
@@ -478,6 +489,7 @@ export class App extends React.Component<any, AppState> {
             ></ToolIcon>
           );
         })}
+        {this.renderShapeLock()}
       </>
     );
   }
@@ -1043,7 +1055,8 @@ export class App extends React.Component<any, AppState> {
               const {
                 draggingElement,
                 resizingElement,
-                elementType
+                elementType,
+                elementLocked
               } = this.state;
 
               lastMouseUp = null;
@@ -1067,8 +1080,6 @@ export class App extends React.Component<any, AppState> {
               if (resizingElement && isInvisiblySmallElement(resizingElement)) {
                 elements = elements.filter(el => el.id !== resizingElement.id);
               }
-
-              resetCursor();
 
               // If click occured on already selected element
               // it is needed to remove selection from other elements
@@ -1100,14 +1111,18 @@ export class App extends React.Component<any, AppState> {
 
               if (elementType === "selection") {
                 elements = elements.slice(0, -1);
-              } else {
+              } else if (!elementLocked) {
                 draggingElement.isSelected = true;
               }
 
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
+              if (!elementLocked) {
+                resetCursor();
+
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
 
               history.resumeRecording();
               this.forceUpdate();
