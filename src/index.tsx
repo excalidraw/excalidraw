@@ -1073,8 +1073,6 @@ export class App extends React.Component<{}, AppState> {
                 elements = elements.filter(el => el.id !== resizingElement.id);
               }
 
-              if (!elementLocked) resetCursor();
-
               // If click occured on already selected element
               // it is needed to remove selection from other elements
               // or if SHIFT or META key pressed remove selection
@@ -1110,6 +1108,8 @@ export class App extends React.Component<{}, AppState> {
               }
 
               if (!elementLocked) {
+                resetCursor();
+
                 this.setState({
                   draggingElement: null,
                   elementType: "selection"
