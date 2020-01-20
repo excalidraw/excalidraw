@@ -5,7 +5,7 @@ export {
   deleteSelectedElements,
   someElementIsSelected,
   getElementsWithinSelection,
-  getSelectedAttribute
+  getCommonAttributeOfSelectedElements
 } from "./selection";
 export {
   exportCanvas,

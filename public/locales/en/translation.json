@@ -1,0 +1,47 @@
+{
+  "labels": {
+    "paste": "Paste",
+    "selectAll": "Select All",
+    "copy": "Copy",
+    "bringForward": "Bring Forward",
+    "sendToBack": "Send To Back",
+    "bringToFront": "Bring To Front",
+    "sendBackward": "Send Backward",
+    "delete": "Delete",
+    "copyStyles": "Copy Styles",
+    "pasteStyles": "Paste Styles",
+    "stroke": "Stroke",
+    "background": "Background",
+    "fill": "Fill",
+    "strokeWidth": "Stroke Width",
+    "sloppiness": "Sloppiness",
+    "oppacity": "Oppacity",
+    "fontSize": "Font Size",
+    "fontFamily": "Font Family",
+    "onlySelected": "Only selected",
+    "withBackground": "With Background",
+    "handDrawn": "Hand-Drawn",
+    "normal": "Normal",
+    "code": "Code"
+  },
+  "buttons": {
+    "clearReset": "Clear the canvas & reset background color",
+    "export": "Export",
+    "exportToPng": "Export to PNG",
+    "copyToClipboard": "Copy to clipboard",
+    "save": "Save",
+    "load": "Load"
+  },
+  "alerts": {
+    "clearReset": "This will clear the whole canvas. Are you sure?"
+  },
+  "toolBar": {
+    "selection": "Selection",
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "text": "Text"
+  }
+}

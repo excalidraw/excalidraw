@@ -7,6 +7,7 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
+import { TFunction } from "i18next";
 
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
@@ -46,7 +47,8 @@ export class ActionManager implements ActionsManagerInterface {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    actionFilter: ActionFilterFn = action => action
+    actionFilter: ActionFilterFn = action => action,
+    t?: TFunction
   ) {
     return Object.values(this.actions)
       .filter(actionFilter)
@@ -57,7 +59,10 @@ export class ActionManager implements ActionsManagerInterface {
           (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999)
       )
       .map(action => ({
-        label: action.contextItemLabel!,
+        label:
+          t && action.contextItemLabel
+            ? t(action.contextItemLabel)
+            : action.contextItemLabel!,
         action: () => {
           updater(action.perform(elements, appState, null));
         }
@@ -68,7 +73,8 @@ export class ActionManager implements ActionsManagerInterface {
     name: string,
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn
+    updater: UpdaterFn,
+    t: TFunction
   ) {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
@@ -82,6 +88,7 @@ export class ActionManager implements ActionsManagerInterface {
           elements={elements}
           appState={appState}
           updateData={updateData}
+          t={t}
         />
       );
     }
