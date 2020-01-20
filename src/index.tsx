@@ -133,7 +133,12 @@ function pickAppStatePropertiesForHistory(
   appState: AppState
 ): Partial<AppState> {
   return {
-    viewBackgroundColor: appState.viewBackgroundColor
+    exportBackground: appState.exportBackground,
+    currentItemStrokeColor: appState.currentItemStrokeColor,
+    currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFont: appState.currentItemFont,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    name: appState.name
   };
 }
 
