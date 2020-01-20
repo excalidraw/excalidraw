@@ -39,6 +39,10 @@ export const actionClearCanvas: Action = {
       aria-label="Clear the canvas & reset background color"
       onClick={() => {
         if (window.confirm("This will clear the whole canvas. Are you sure?")) {
+          // TODO: Defined globally, since file handles aren't yet serializable.
+          // Once `FileSystemFileHandle` can be serialized, make this
+          // part of `AppState`.
+          (window as any).handle = null;
           updateData(null);
         }
       }}

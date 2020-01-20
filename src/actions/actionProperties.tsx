@@ -35,7 +35,10 @@ export const actionChangeStrokeColor: Action = {
       <h5>Stroke</h5>
       <ColorPicker
         type="elementStroke"
-        color={getSelectedAttribute(elements, element => element.strokeColor)}
+        color={
+          getSelectedAttribute(elements, element => element.strokeColor) ||
+          appState.currentItemStrokeColor
+        }
         onChange={updateData}
       />
     </>
@@ -54,15 +57,15 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value }
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h5>Background</h5>
       <ColorPicker
         type="elementBackground"
-        color={getSelectedAttribute(
-          elements,
-          element => element.backgroundColor
-        )}
+        color={
+          getSelectedAttribute(elements, element => element.backgroundColor) ||
+          appState.currentItemBackgroundColor
+        }
         onChange={updateData}
       />
     </>
@@ -141,7 +144,7 @@ export const actionChangeSloppiness: Action = {
       <h5>Sloppiness</h5>
       <ButtonSelect
         options={[
-          { value: 0, text: "Draftsman" },
+          { value: 0, text: "Architect" },
           { value: 1, text: "Artist" },
           { value: 3, text: "Cartoonist" }
         ]}
@@ -243,9 +246,9 @@ export const actionChangeFontFamily: Action = {
       <h5>Font family</h5>
       <ButtonSelect
         options={[
-          { value: "Virgil", text: "Virgil" },
-          { value: "Helvetica", text: "Helvetica" },
-          { value: "Courier", text: "Courier" }
+          { value: "Virgil", text: "Hand-drawn" },
+          { value: "Helvetica", text: "Normal" },
+          { value: "Courier", text: "Code" }
         ]}
         value={getSelectedAttribute(
           elements,

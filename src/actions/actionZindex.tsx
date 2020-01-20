@@ -6,7 +6,7 @@ import {
   moveAllRight
 } from "../zindex";
 import { getSelectedIndices } from "../scene";
-import { META_KEY } from "../keys";
+import { KEYS } from "../keys";
 
 export const actionSendBackward: Action = {
   name: "sendBackward",
@@ -19,7 +19,7 @@ export const actionSendBackward: Action = {
   contextItemLabel: "Send Backward",
   keyPriority: 40,
   keyTest: event =>
-    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyB"
+    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyB"
 };
 
 export const actionBringForward: Action = {
@@ -33,7 +33,7 @@ export const actionBringForward: Action = {
   contextItemLabel: "Bring Forward",
   keyPriority: 40,
   keyTest: event =>
-    event[META_KEY] && event.shiftKey && event.altKey && event.code === "KeyF"
+    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyF"
 };
 
 export const actionSendToBack: Action = {
@@ -45,7 +45,7 @@ export const actionSendToBack: Action = {
     };
   },
   contextItemLabel: "Send to Back",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyB"
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyB"
 };
 
 export const actionBringToFront: Action = {
@@ -57,5 +57,5 @@ export const actionBringToFront: Action = {
     };
   },
   contextItemLabel: "Bring to Front",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyF"
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyF"
 };

@@ -8,9 +8,11 @@ import {
   newElement,
   duplicateElement,
   resizeTest,
+  isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getCursorForResizingElement
 } from "./element";
 import {
   clearSelection,
@@ -34,7 +36,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
-import { KEYS, META_KEY, isArrowKey } from "./keys";
+import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
@@ -305,10 +307,11 @@ export class App extends React.Component<{}, AppState> {
       !event.ctrlKey &&
       !event.shiftKey &&
       !event.altKey &&
-      !event.metaKey
+      !event.metaKey &&
+      this.state.draggingElement === null
     ) {
       this.setState({ elementType: findShapeByKey(event.key) });
-    } else if (event[META_KEY] && event.code === "KeyZ") {
+    } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
@@ -349,8 +352,18 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const { elementType, editingElement } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
-    if (selectedElements.length === 0) {
+    const hasSelectedElements = selectedElements.length > 0;
+    const isTextToolSelected = elementType === "text";
+    const isShapeToolSelected = elementType !== "selection";
+    const isEditingText = editingElement && editingElement.type === "text";
+    if (
+      !hasSelectedElements &&
+      !isShapeToolSelected &&
+      !isTextToolSelected &&
+      !isEditingText
+    ) {
       return null;
     }
 
@@ -364,7 +377,8 @@ export class App extends React.Component<{}, AppState> {
             this.syncActionResult
           )}
 
-          {hasBackground(elements) && (
+          {(hasBackground(elements) ||
+            (isShapeToolSelected && !isTextToolSelected)) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -383,7 +397,8 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {hasStroke(elements) && (
+          {(hasStroke(elements) ||
+            (isShapeToolSelected && !isTextToolSelected)) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -402,7 +417,7 @@ export class App extends React.Component<{}, AppState> {
             </>
           )}
 
-          {hasText(elements) && (
+          {(hasText(elements) || isTextToolSelected || isEditingText) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -442,14 +457,16 @@ export class App extends React.Component<{}, AppState> {
   private renderShapesSwitcher() {
     return (
       <>
-        {SHAPES.map(({ value, icon }) => (
+        {SHAPES.map(({ value, icon }, index) => (
           <ToolIcon
             key={value}
             type="radio"
             icon={icon}
             checked={this.state.elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${capitalizeString(value)[0]}`}
+            title={`${capitalizeString(value)} — ${
+              capitalizeString(value)[0]
+            }, ${index + 1}`}
             onChange={() => {
               this.setState({ elementType: value });
               elements = clearSelection(elements);
@@ -466,7 +483,7 @@ export class App extends React.Component<{}, AppState> {
   private renderCanvasActions() {
     return (
       <Stack.Col gap={4}>
-        <Stack.Row gap={1}>
+        <Stack.Row justifyContent={"space-between"}>
           {this.actionManager.renderAction(
             "loadScene",
             elements,
@@ -484,18 +501,23 @@ export class App extends React.Component<{}, AppState> {
             appState={this.state}
             actionManager={this.actionManager}
             syncActionResult={this.syncActionResult}
-            onExportToPng={exportedElements => {
+            onExportToPng={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas("png", exportedElements, this.canvas, this.state);
+                exportCanvas("png", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
             }}
-            onExportToClipboard={exportedElements => {
+            onExportToClipboard={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas(
-                  "clipboard",
-                  exportedElements,
-                  this.canvas,
-                  this.state
-                );
+                exportCanvas("clipboard", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale
+                });
             }}
             onExportToShortlink={exportedElements => {
               if (this.canvas)
@@ -724,14 +746,15 @@ export class App extends React.Component<{}, AppState> {
                 { x, y },
                 this.state
               );
-
               this.setState({
                 resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
                 resizeHandle = resizeElement.resizeHandle;
-                document.documentElement.style.cursor = `${resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 isResizingElements = true;
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
@@ -800,11 +823,15 @@ export class App extends React.Component<{}, AppState> {
                   elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
+                    editingElement: null,
                     elementType: "selection"
                   });
                 }
               });
-              this.setState({ elementType: "selection" });
+              this.setState({
+                elementType: "selection",
+                editingElement: element
+              });
               return;
             }
 
@@ -854,75 +881,77 @@ export class App extends React.Component<{}, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-
                   let deltaX = 0;
                   let deltaY = 0;
-                  selectedElements.forEach(element => {
-                    switch (resizeHandle) {
-                      case "nw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          const deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "ne":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "sw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "se":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "n":
+                  const element = selectedElements[0];
+                  switch (resizeHandle) {
+                    case "nw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
+                        const deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
+                      }
+                      break;
+                    case "ne":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
                         deltaY = lastY - y;
                         element.height += deltaY;
                         element.y -= deltaY;
-                        break;
-                      case "w":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        break;
-                      case "s":
+                      }
+                      break;
+                    case "sw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
                         element.height += y - lastY;
-                        break;
-                      case "e":
-                        element.width += x - lastX;
-                        break;
-                    }
+                      }
+                      break;
+                    case "se":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
+                        element.height += y - lastY;
+                      }
+                      break;
+                    case "n":
+                      deltaY = lastY - y;
+                      element.height += deltaY;
+                      element.y -= deltaY;
+                      break;
+                    case "w":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      break;
+                    case "s":
+                      element.height += y - lastY;
+                      break;
+                    case "e":
+                      element.width += x - lastX;
+                      break;
+                  }
 
-                    el.x = element.x;
-                    el.y = element.y;
-                    el.shape = null;
-                  });
+                  document.documentElement.style.cursor = getCursorForResizingElement(
+                    { element, resizeHandle }
+                  );
+                  el.x = element.x;
+                  el.y = element.y;
+                  el.shape = null;
+
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
@@ -994,11 +1023,33 @@ export class App extends React.Component<{}, AppState> {
             };
 
             const onMouseUp = (e: MouseEvent) => {
-              const { draggingElement, elementType } = this.state;
+              const {
+                draggingElement,
+                resizingElement,
+                elementType
+              } = this.state;
 
               lastMouseUp = null;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
+
+              if (
+                elementType !== "selection" &&
+                draggingElement &&
+                isInvisiblySmallElement(draggingElement)
+              ) {
+                // remove invisible element which was added in onMouseDown
+                elements = elements.slice(0, -1);
+                this.setState({
+                  draggingElement: null
+                });
+                this.forceUpdate();
+                return;
+              }
+
+              if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+                elements = elements.filter(el => el.id !== resizingElement.id);
+              }
 
               resetCursor();
 
@@ -1071,6 +1122,8 @@ export class App extends React.Component<{}, AppState> {
               100
             ) as ExcalidrawTextElement;
 
+            this.setState({ editingElement: element });
+
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
@@ -1125,6 +1178,7 @@ export class App extends React.Component<{}, AppState> {
                 elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
+                  editingElement: null,
                   elementType: "selection"
                 });
               }
@@ -1144,7 +1198,9 @@ export class App extends React.Component<{}, AppState> {
                 this.state
               );
               if (resizeElement && resizeElement.resizeHandle) {
-                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 return;
               }
             }
