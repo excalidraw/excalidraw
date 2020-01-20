@@ -248,7 +248,7 @@ export const actionChangeFontFamily: Action = {
         options={[
           { value: "Virgil", text: "Hand-drawn" },
           { value: "Helvetica", text: "Normal" },
-          { value: "Courier", text: "Code" }
+          { value: "Cascadia", text: "Code" }
         ]}
         value={getSelectedAttribute(
           elements,
