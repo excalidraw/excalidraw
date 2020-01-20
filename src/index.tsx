@@ -463,13 +463,11 @@ export class App extends React.Component<{}, AppState> {
   }
 
   private renderShapeLock() {
-    const {elementLocked} = this.state;
+    const { elementLocked } = this.state;
     return (
       <LockIcon
         checked={elementLocked}
-        onChange={() =>
-          this.setState({ elementLocked: !elementLocked })
-        }
+        onChange={() => this.setState({ elementLocked: !elementLocked })}
       />
     );
   }
@@ -1048,7 +1046,7 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement,
                 resizingElement,
                 elementType,
-                elementLocked,
+                elementLocked
               } = this.state;
 
               lastMouseUp = null;
