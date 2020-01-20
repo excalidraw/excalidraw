@@ -13,8 +13,8 @@ export {
   saveAsJSON,
   restoreFromLocalStorage,
   saveToLocalStorage,
-  exportToShortlink,
-  importFromShortlink
+  exportToBackend,
+  importFromBackend
 } from "./data";
 export {
   hasBackground,
