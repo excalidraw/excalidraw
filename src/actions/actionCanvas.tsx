@@ -31,14 +31,14 @@ export const actionClearCanvas: Action = {
       appState: getDefaultAppState()
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, t }) => (
     <ToolIcon
       type="button"
       icon={trash}
-      title="Clear the canvas & reset background color"
-      aria-label="Clear the canvas & reset background color"
+      title={t("buttons.clearReset")}
+      aria-label={t("buttons.clearReset")}
       onClick={() => {
-        if (window.confirm("This will clear the whole canvas. Are you sure?")) {
+        if (window.confirm(t("alerts.clearReset"))) {
           // TODO: Defined globally, since file handles aren't yet serializable.
           // Once `FileSystemFileHandle` can be serialized, make this
           // part of `AppState`.

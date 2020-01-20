@@ -30,19 +30,21 @@ export const actionChangeStrokeColor: Action = {
       appState: { ...appState, currentItemStrokeColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <>
-      <h5>Stroke</h5>
-      <ColorPicker
-        type="elementStroke"
-        color={
-          getSelectedAttribute(elements, element => element.strokeColor) ||
-          appState.currentItemStrokeColor
-        }
-        onChange={updateData}
-      />
-    </>
-  )
+  PanelComponent: ({ elements, appState, updateData, t }) => {
+    return (
+      <>
+        <h5>{t("labels.stroke")}</h5>
+        <ColorPicker
+          type="elementStroke"
+          color={
+            getSelectedAttribute(elements, element => element.strokeColor) ||
+            appState.currentItemStrokeColor
+          }
+          onChange={updateData}
+        />
+      </>
+    );
+  }
 };
 
 export const actionChangeBackgroundColor: Action = {
@@ -57,9 +59,9 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Background</h5>
+      <h5>{t("labels.background")}</h5>
       <ColorPicker
         type="elementBackground"
         color={
@@ -83,9 +85,9 @@ export const actionChangeFillStyle: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, updateData, t }) => (
     <>
-      <h5>Fill</h5>
+      <h5>{t("labels.fill")}</h5>
       <ButtonSelect
         options={[
           { value: "solid", text: "Solid" },
@@ -112,9 +114,9 @@ export const actionChangeStrokeWidth: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Stroke Width</h5>
+      <h5>{t("labels.strokeWidth")}</h5>
       <ButtonSelect
         options={[
           { value: 1, text: "Thin" },
@@ -139,9 +141,9 @@ export const actionChangeSloppiness: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Sloppiness</h5>
+      <h5>{t("labels.sloppiness")}</h5>
       <ButtonSelect
         options={[
           { value: 0, text: "Architect" },
@@ -166,9 +168,9 @@ export const actionChangeOpacity: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, updateData, t }) => (
     <>
-      <h5>Opacity</h5>
+      <h5>{t("labels.oppacity")}</h5>
       <input
         type="range"
         min="0"
@@ -202,9 +204,9 @@ export const actionChangeFontSize: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, updateData, t }) => (
     <>
-      <h5>Font size</h5>
+      <h5>{t("labels.fontSize")}</h5>
       <ButtonSelect
         options={[
           { value: 16, text: "Small" },
@@ -241,14 +243,14 @@ export const actionChangeFontFamily: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, updateData, t }) => (
     <>
-      <h5>Font family</h5>
+      <h5>{t("labels.fontFamily")}</h5>
       <ButtonSelect
         options={[
-          { value: "Virgil", text: "Hand-drawn" },
-          { value: "Helvetica", text: "Normal" },
-          { value: "Cascadia", text: "Code" }
+          { value: "Virgil", text: t("labels.handDrawn") },
+          { value: "Helvetica", text: t("labels.normal") },
+          { value: "Cascadia", text: t("labels.code") }
         ]}
         value={getSelectedAttribute(
           elements,
