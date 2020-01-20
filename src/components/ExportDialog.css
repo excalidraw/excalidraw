@@ -35,7 +35,7 @@
 
 .ExportDialog__preview canvas {
   max-width: calc(100% - var(--preview-padding) * 2);
-  max-height: 400px;
+  max-height: 25rem;
 }
 
 .ExportDialog__actions {

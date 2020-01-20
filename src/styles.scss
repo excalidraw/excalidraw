@@ -7,6 +7,13 @@
   font-display: swap;
 }
 
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("https://uploads.codesandbox.io/uploads/user/5f5b1ecd-ac15-4c7f-803e-e11ff53ea4ce/z1tp-Cascadia.ttf");
+  font-display: swap;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -27,9 +34,9 @@ body {
   flex-direction: column;
 
   h5 {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    font-size: 12px;
+    margin-top: 0.333rem;
+    margin-bottom: 0.333em;
+    font-size: 0.75rem;
     color: var(--text-color-primary);
   }
 
@@ -41,7 +48,8 @@ body {
     flex-wrap: wrap;
 
     button {
-      margin-right: 4px;
+      margin-right: 0.25rem;
+      font-size: 0.75rem;
     }
   }
 }
@@ -61,8 +69,8 @@ button {
   background-color: #e9ecef;
   border: 0;
   border-radius: 4px;
-  margin: 2px 0;
-  padding: 5px;
+  margin: 0.125rem 0;
+  padding: 0.25rem;
   outline: transparent;
 
   &:focus {
@@ -123,5 +131,5 @@ button {
 }
 
 .App-right-menu {
-  width: 220px;
+  width: 13.75rem;
 }
