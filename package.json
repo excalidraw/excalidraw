@@ -24,9 +24,10 @@
     "@types/react-color": "3.0.1",
     "@types/react-dom": "16.9.4",
     "husky": "4.0.10",
-    "lint-staged": "9.5.0",
+    "lint-staged": "10.0.0",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
+    "rewire": "^4.0.1",
     "typescript": "3.7.5"
   },
   "eslintConfig": {
@@ -51,6 +52,7 @@
   "name": "excalidraw",
   "scripts": {
     "build": "react-scripts build",
+    "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
     "fix": "npm run prettier -- --write",
     "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\"",

@@ -1,17 +1,16 @@
-import rough from "roughjs/bin/rough";
-
 import { ExcalidrawElement } from "../element/types";
 
-import { getElementAbsoluteCoords } from "../element";
 import { getDefaultAppState } from "../appState";
 
-import { renderScene } from "../renderer";
 import { AppState } from "../types";
 import { ExportType } from "./types";
+import { getExportCanvasPreview } from "./getExportCanvasPreview";
 import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
+const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -76,16 +75,23 @@ interface DataState {
   appState: AppState;
 }
 
+export function serializeAsJSON(
+  elements: readonly ExcalidrawElement[],
+  appState?: AppState
+): string {
+  return JSON.stringify({
+    version: 1,
+    source: window.location.origin,
+    elements: elements.map(({ shape, ...el }) => el),
+    appState: appState || getDefaultAppState()
+  });
+}
+
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState
 ) {
-  const serialized = JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el),
-    appState: appState
-  });
+  const serialized = serializeAsJSON(elements, appState);
 
   const name = `${appState.name}.json`;
   if ("chooseFileSystemEntries" in window) {
@@ -96,7 +102,7 @@ export async function saveAsJSON(
   } else {
     saveFile(
       name,
-      "data:text/plain;charset=utf-8," + encodeURIComponent(serialized)
+      "data:application/json;charset=utf-8," + encodeURIComponent(serialized)
     );
   }
 }
@@ -169,64 +175,43 @@ export async function loadFromJSON() {
   }
 }
 
-export function getExportCanvasPreview(
+export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
-  {
-    exportBackground,
-    exportPadding = 10,
-    viewBackgroundColor,
-    scale = 1
-  }: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    scale?: number;
-    viewBackgroundColor: string;
-  }
+  appState: AppState
 ) {
-  // calculate smallest area to fit the contents in
-  let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
-  let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
-
-  elements.forEach(element => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    subCanvasX1 = Math.min(subCanvasX1, x1);
-    subCanvasY1 = Math.min(subCanvasY1, y1);
-    subCanvasX2 = Math.max(subCanvasX2, x2);
-    subCanvasY2 = Math.max(subCanvasY2, y2);
+  const response = await fetch(BACKEND_POST, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: serializeAsJSON(elements, appState)
   });
+  const json = await response.json();
+  if (json.id) {
+    const url = new URL(window.location.href);
+    url.searchParams.append("json", json.id);
 
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
+    await navigator.clipboard.writeText(url.toString());
+    window.alert(`Copied to clipboard: ${url.toString()}`);
+  } else {
+    window.alert("Couldn't create shareable link");
   }
+}
 
-  const tempCanvas = document.createElement("canvas");
-  const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
-  const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
-  tempCanvas.style.width = width + "px";
-  tempCanvas.style.height = height + "px";
-  tempCanvas.width = width * scale;
-  tempCanvas.height = height * scale;
-  tempCanvas.getContext("2d")?.scale(scale, scale);
-
-  renderScene(
-    elements,
-    rough.canvas(tempCanvas),
-    tempCanvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0
-    },
-    {
-      offsetX: -subCanvasX1 + exportPadding,
-      offsetY: -subCanvasY1 + exportPadding,
-      renderScrollbars: false,
-      renderSelection: false
-    }
+export async function importFromBackend(id: string | null) {
+  let elements: readonly ExcalidrawElement[] = [];
+  let appState: AppState = getDefaultAppState();
+  const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
+    data.clone().json()
   );
-  return tempCanvas;
+  if (response != null) {
+    try {
+      elements = response.elements || elements;
+      appState = response.appState || appState;
+    } catch (error) {
+      window.alert("Importing from backend failed");
+      console.error(error);
+    }
+  }
+  return restore(elements, appState);
 }
 
 export async function exportCanvas(
@@ -262,7 +247,7 @@ export async function exportCanvas(
   if (type === "png") {
     const fileName = `${name}.png`;
     if ("chooseFileSystemEntries" in window) {
-      tempCanvas.toBlob(async blob => {
+      tempCanvas.toBlob(async (blob: any) => {
         if (blob) {
           await saveFileNative(fileName, blob);
         }
@@ -272,7 +257,7 @@ export async function exportCanvas(
     }
   } else if (type === "clipboard") {
     try {
-      tempCanvas.toBlob(async function(blob) {
+      tempCanvas.toBlob(async function(blob: any) {
         try {
           await navigator.clipboard.write([
             new window.ClipboardItem({ "image/png": blob })
@@ -284,6 +269,12 @@ export async function exportCanvas(
     } catch (err) {
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
+  } else if (type === "backend") {
+    const appState = getDefaultAppState();
+    if (exportBackground) {
+      appState.viewBackgroundColor = viewBackgroundColor;
+    }
+    exportToBackend(elements, appState);
   }
 
   // clean up the DOM

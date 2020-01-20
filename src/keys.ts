@@ -6,12 +6,13 @@ export const KEYS = {
   ENTER: "Enter",
   ESCAPE: "Escape",
   DELETE: "Delete",
-  BACKSPACE: "Backspace"
+  BACKSPACE: "Backspace",
+  get META() {
+    return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+      ? "metaKey"
+      : "ctrlKey";
+  }
 };
-
-export const META_KEY = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  ? "metaKey"
-  : "ctrlKey";
 
 export function isArrowKey(keyCode: string) {
   return (

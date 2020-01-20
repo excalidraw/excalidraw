@@ -11,7 +11,8 @@ import {
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords
+  getElementAbsoluteCoords,
+  getCursorForResizingElement
 } from "./element";
 import {
   clearSelection,
@@ -26,7 +27,8 @@ import {
   hasBackground,
   hasStroke,
   hasText,
-  exportCanvas
+  exportCanvas,
+  importFromBackend
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -34,7 +36,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
 
 import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
-import { KEYS, META_KEY, isArrowKey } from "./keys";
+import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
 import { createHistory } from "./history";
@@ -211,7 +213,12 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
 
-  public componentDidMount() {
+  private onUnload = () => {
+    this.saveDebounced();
+    this.saveDebounced.flush();
+  };
+
+  public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.onPaste);
     document.addEventListener("cut", this.onCut);
@@ -219,15 +226,24 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
+    window.addEventListener("unload", this.onUnload, false);
 
-    const { elements: newElements, appState } = restoreFromLocalStorage();
+    let data;
+    const searchParams = new URLSearchParams(window.location.search);
 
-    if (newElements) {
-      elements = newElements;
+    if (searchParams.get("json") != null) {
+      data = await importFromBackend(searchParams.get("json"));
+      window.history.replaceState({}, "Excalidraw", window.location.origin);
+    } else {
+      data = restoreFromLocalStorage();
     }
 
-    if (appState) {
-      this.setState(appState);
+    if (data.elements) {
+      elements = data.elements;
+    }
+
+    if (data.appState) {
+      this.setState(data.appState);
     } else {
       this.forceUpdate();
     }
@@ -245,6 +261,7 @@ export class App extends React.Component<any, AppState> {
       false
     );
     window.removeEventListener("resize", this.onResize, false);
+    window.removeEventListener("unload", this.onUnload, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -300,11 +317,10 @@ export class App extends React.Component<any, AppState> {
       !event.shiftKey &&
       !event.altKey &&
       !event.metaKey &&
-      (this.state.draggingElement === null ||
-        this.state.elementType !== "selection")
+      this.state.draggingElement === null
     ) {
       this.setState({ elementType: findShapeByKey(event.key) });
-    } else if (event[META_KEY] && event.code === "KeyZ") {
+    } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
@@ -346,12 +362,18 @@ export class App extends React.Component<any, AppState> {
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
     const { t } = this.props;
-    const { elementType } = this.state;
+    const { elementType, editingElement } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
     const hasSelectedElements = selectedElements.length > 0;
     const isTextToolSelected = elementType === "text";
     const isShapeToolSelected = elementType !== "selection";
-    if (!(hasSelectedElements || isShapeToolSelected || isTextToolSelected)) {
+    const isEditingText = editingElement && editingElement.type === "text";
+    if (
+      !hasSelectedElements &&
+      !isShapeToolSelected &&
+      !isTextToolSelected &&
+      !isEditingText
+    ) {
       return null;
     }
 
@@ -410,7 +432,7 @@ export class App extends React.Component<any, AppState> {
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected) && (
+          {(hasText(elements) || isTextToolSelected || isEditingText) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -523,6 +545,15 @@ export class App extends React.Component<any, AppState> {
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale
                 });
+            }}
+            onExportToBackend={exportedElements => {
+              if (this.canvas)
+                exportCanvas(
+                  "backend",
+                  exportedElements,
+                  this.canvas,
+                  this.state
+                );
             }}
           />
           {this.actionManager.renderAction(
@@ -747,14 +778,15 @@ export class App extends React.Component<any, AppState> {
                 { x, y },
                 this.state
               );
-
               this.setState({
                 resizingElement: resizeElement ? resizeElement.element : null
               });
 
               if (resizeElement) {
                 resizeHandle = resizeElement.resizeHandle;
-                document.documentElement.style.cursor = `${resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 isResizingElements = true;
               } else {
                 hitElement = getElementAtPosition(elements, x, y);
@@ -823,11 +855,15 @@ export class App extends React.Component<any, AppState> {
                   elements = [...elements, { ...element, isSelected: true }];
                   this.setState({
                     draggingElement: null,
+                    editingElement: null,
                     elementType: "selection"
                   });
                 }
               });
-              this.setState({ elementType: "selection" });
+              this.setState({
+                elementType: "selection",
+                editingElement: element
+              });
               return;
             }
 
@@ -877,75 +913,77 @@ export class App extends React.Component<any, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-
                   let deltaX = 0;
                   let deltaY = 0;
-                  selectedElements.forEach(element => {
-                    switch (resizeHandle) {
-                      case "nw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          const deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "ne":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
-                        } else {
-                          deltaY = lastY - y;
-                          element.height += deltaY;
-                          element.y -= deltaY;
-                        }
-                        break;
-                      case "sw":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "se":
-                        element.width += x - lastX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
-                        } else {
-                          element.height += y - lastY;
-                        }
-                        break;
-                      case "n":
+                  const element = selectedElements[0];
+                  switch (resizeHandle) {
+                    case "nw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
+                        const deltaY = lastY - y;
+                        element.height += deltaY;
+                        element.y -= deltaY;
+                      }
+                      break;
+                    case "ne":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.y += element.height - element.width;
+                        element.height = element.width;
+                      } else {
                         deltaY = lastY - y;
                         element.height += deltaY;
                         element.y -= deltaY;
-                        break;
-                      case "w":
-                        deltaX = lastX - x;
-                        element.width += deltaX;
-                        element.x -= deltaX;
-                        break;
-                      case "s":
+                      }
+                      break;
+                    case "sw":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
                         element.height += y - lastY;
-                        break;
-                      case "e":
-                        element.width += x - lastX;
-                        break;
-                    }
+                      }
+                      break;
+                    case "se":
+                      element.width += x - lastX;
+                      if (e.shiftKey) {
+                        element.height = element.width;
+                      } else {
+                        element.height += y - lastY;
+                      }
+                      break;
+                    case "n":
+                      deltaY = lastY - y;
+                      element.height += deltaY;
+                      element.y -= deltaY;
+                      break;
+                    case "w":
+                      deltaX = lastX - x;
+                      element.width += deltaX;
+                      element.x -= deltaX;
+                      break;
+                    case "s":
+                      element.height += y - lastY;
+                      break;
+                    case "e":
+                      element.width += x - lastX;
+                      break;
+                  }
 
-                    el.x = element.x;
-                    el.y = element.y;
-                    el.shape = null;
-                  });
+                  document.documentElement.style.cursor = getCursorForResizingElement(
+                    { element, resizeHandle }
+                  );
+                  el.x = element.x;
+                  el.y = element.y;
+                  el.shape = null;
+
                   lastX = x;
                   lastY = y;
                   // We don't want to save history when resizing an element
@@ -1116,6 +1154,8 @@ export class App extends React.Component<any, AppState> {
               100
             ) as ExcalidrawTextElement;
 
+            this.setState({ editingElement: element });
+
             let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
@@ -1170,6 +1210,7 @@ export class App extends React.Component<any, AppState> {
                 elements = [...elements, { ...element, isSelected: true }];
                 this.setState({
                   draggingElement: null,
+                  editingElement: null,
                   elementType: "selection"
                 });
               }
@@ -1189,7 +1230,9 @@ export class App extends React.Component<any, AppState> {
                 this.state
               );
               if (resizeElement && resizeElement.resizeHandle) {
-                document.documentElement.style.cursor = `${resizeElement.resizeHandle}-resize`;
+                document.documentElement.style.cursor = getCursorForResizingElement(
+                  resizeElement
+                );
                 return;
               }
             }

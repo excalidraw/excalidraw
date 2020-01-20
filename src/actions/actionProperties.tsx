@@ -248,9 +248,9 @@ export const actionChangeFontFamily: Action = {
       <h5>{t("labels.fontFamily")}</h5>
       <ButtonSelect
         options={[
-          { value: "Virgil", text: "Virgil" },
-          { value: "Helvetica", text: "Helvetica" },
-          { value: "Courier", text: "Courier" }
+          { value: "Virgil", text: "Hand-drawn" },
+          { value: "Helvetica", text: "Normal" },
+          { value: "Cascadia", text: "Code" }
         ]}
         value={getSelectedAttribute(
           elements,

@@ -7,6 +7,11 @@
   position: relative;
 }
 
+.color-picker-control-container {
+  display: flex;
+  align-items: center;
+}
+
 .color-picker-triangle-shadow {
   width: 0px;
   height: 0px;
@@ -33,13 +38,17 @@
   padding: 15px 9px 9px 15px;
 }
 
+.colors-gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .color-picker-swatch {
+  position: relative;
   height: 30px;
   width: 30px;
   cursor: pointer;
-  position: relative;
   outline: none;
-  float: left;
   border-radius: 4px;
   margin: 0px 6px 6px 0px;
   box-sizing: border-box;
@@ -69,17 +78,20 @@
   height: 30px;
   width: 30px;
   border-radius: 4px 0px 0px 4px;
-  float: left;
-  color: #868e96;
+  color: #495057;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.color-input-container {
+  display: flex;
+}
+
 .color-picker-input {
   width: 100px;
   font-size: 14px;
-  color: #868e96;
+  color: #343a40;
   border: 0px;
   outline: none;
   height: 28px;
@@ -92,9 +104,8 @@
 }
 
 .color-picker-label-swatch {
-  height: 24px;
-  width: 24px;
-  display: inline-block;
+  height: 30px;
+  width: 30px;
   margin-right: 4px;
   border: 1px solid #dee2e6;
 }

@@ -1,6 +1,6 @@
 import { Action } from "./types";
 import { isTextElement, redrawTextBoundingBox } from "../element";
-import { META_KEY } from "../keys";
+import { KEYS } from "../keys";
 
 let copiedStyles: string = "{}";
 
@@ -14,7 +14,7 @@ export const actionCopyStyles: Action = {
     return {};
   },
   contextItemLabel: "labels.copyStyles",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyC",
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyC",
   contextMenuOrder: 0
 };
 
@@ -46,6 +46,6 @@ export const actionPasteStyles: Action = {
     };
   },
   contextItemLabel: "labels.pasteStyles",
-  keyTest: event => event[META_KEY] && event.shiftKey && event.code === "KeyV",
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyV",
   contextMenuOrder: 1
 };

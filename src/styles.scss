@@ -7,6 +7,13 @@
   font-display: swap;
 }
 
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("https://uploads.codesandbox.io/uploads/user/5f5b1ecd-ac15-4c7f-803e-e11ff53ea4ce/z1tp-Cascadia.ttf");
+  font-display: swap;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
