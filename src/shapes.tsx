@@ -49,39 +49,34 @@ export const SHAPES = [
   },
   {
     icon: (
+      // custom
+      <svg viewBox="0 0 6 6">
+        <line x1="0" y1="3" x2="6" y2="3" stroke="#000" strokeLinecap="round" />
+      </svg>
+    ),
+    value: "line"
+  },
+  {
+    icon: (
       // fa-font
       <svg viewBox="0 0 448 512">
         <path d="M432 416h-23.41L277.88 53.69A32 32 0 0 0 247.58 32h-47.16a32 32 0 0 0-30.3 21.69L39.41 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16h-19.58l23.3-64h152.56l23.3 64H304a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM176.85 272L224 142.51 271.15 272z" />
       </svg>
     ),
     value: "text"
-  },
-  {
-    icon: (
-      // custom
-      <svg viewBox="0 0 6 6">
-        <line
-          x1="0"
-          y1="3"
-          x2="6"
-          y2="3"
-          stroke="black"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-    value: "line"
   }
 ];
 
 export const shapesShortcutKeys = SHAPES.map((shape, index) => [
-    shape.value[0], (index + 1).toString()]
-).flat(1);
+  shape.value[0],
+  (index + 1).toString()
+]).flat(1);
 
 export function findShapeByKey(key: string) {
   const defaultElement = "selection";
   return SHAPES.reduce((element, shape, index) => {
-    if (shape.value[0] !== key && key !== (index + 1).toString()) return element;
+    if (shape.value[0] !== key && key !== (index + 1).toString())
+      return element;
 
     return shape.value;
   }, defaultElement);

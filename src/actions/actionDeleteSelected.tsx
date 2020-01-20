@@ -9,7 +9,7 @@ export const actionDeleteSelected: Action = {
       elements: deleteSelectedElements(elements)
     };
   },
-  contextItemLabel: "Delete",
+  contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE
 };
