@@ -9,8 +9,8 @@ import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-//const BACKEND_POST = "http://localhost:3001/api/v1/post/";
-//const BACKEND_GET = "http://localhost:3001/api/v1/";
+// const BACKEND_POST = "http://localhost:3001/api/v1/post/";
+// const BACKEND_GET = "http://localhost:3001/api/v1/";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
