@@ -1073,7 +1073,7 @@ export class App extends React.Component<{}, AppState> {
                 elements = elements.filter(el => el.id !== resizingElement.id);
               }
 
-              resetCursor();
+              if (!elementLocked) resetCursor();
 
               // If click occured on already selected element
               // it is needed to remove selection from other elements
