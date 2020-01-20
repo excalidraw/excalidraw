@@ -175,13 +175,14 @@ export async function loadFromJSON() {
   }
 }
 
-export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
+export async function exportToBackend(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState
+) {
   const response = await fetch(BACKEND_POST, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: serializeAsJSON(elements)
+    headers: { "Content-Type": "application/json" },
+    body: serializeAsJSON(elements, appState)
   });
   const json = await response.json();
   if (json.id) {
@@ -189,7 +190,7 @@ export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
     url.searchParams.append("json", json.id);
 
     await navigator.clipboard.writeText(url.toString());
-    window.alert(`Copied shareable link ${url.toString()} to clipboard`);
+    window.alert(`Copied to clipboard: ${url.toString()}`);
   } else {
     window.alert("Couldn't create shareable link");
   }
@@ -269,7 +270,11 @@ export async function exportCanvas(
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
   } else if (type === "backend") {
-    exportToBackend(elements);
+    const appState = getDefaultAppState();
+    if (exportBackground) {
+      appState.viewBackgroundColor = viewBackgroundColor;
+    }
+    exportToBackend(elements, appState);
   }
 
   // clean up the DOM
