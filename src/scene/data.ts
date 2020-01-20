@@ -184,21 +184,21 @@ export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
     body: serializeAsJSON(elements)
   });
   const json = await response.json();
-  if (json.hash) {
+  if (json.id) {
     const url = new URL(window.location.href);
-    url.searchParams.append("json", json.hash);
+    url.searchParams.append("json", json.id);
 
     await navigator.clipboard.writeText(url.toString());
-    window.alert("Copied shareable link " + url.toString() + " to clipboard");
+    window.alert(`Copied shareable link ${url.toString()} to clipboard`);
   } else {
     window.alert("Couldn't create shareable link");
   }
 }
 
-export async function importFromBackend(hash: string | null) {
+export async function importFromBackend(id: string | null) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
-  const response = await fetch(`${BACKEND_GET}${hash}.json`).then(data =>
+  const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
     data.clone().json()
   );
   if (response != null) {
