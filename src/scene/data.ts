@@ -9,6 +9,8 @@ import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
+const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -73,16 +75,23 @@ interface DataState {
   appState: AppState;
 }
 
+export function serializeAsJSON(
+  elements: readonly ExcalidrawElement[],
+  appState?: AppState
+): string {
+  return JSON.stringify({
+    version: 1,
+    source: window.location.origin,
+    elements: elements.map(({ shape, ...el }) => el),
+    appState: appState || getDefaultAppState()
+  });
+}
+
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState
 ) {
-  const serialized = JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el),
-    appState: appState
-  });
+  const serialized = serializeAsJSON(elements, appState);
 
   const name = `${appState.name}.json`;
   if ("chooseFileSystemEntries" in window) {
@@ -166,6 +175,44 @@ export async function loadFromJSON() {
   }
 }
 
+export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
+  const response = await fetch(BACKEND_POST, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: serializeAsJSON(elements)
+  });
+  const json = await response.json();
+  if (json.hash) {
+    const url = new URL(window.location.href);
+    url.searchParams.append("json", json.hash);
+
+    await navigator.clipboard.writeText(url.toString());
+    window.alert("Copied shareable link " + url.toString() + " to clipboard");
+  } else {
+    window.alert("Couldn't create shareable link");
+  }
+}
+
+export async function importFromBackend(hash: string | null) {
+  let elements: readonly ExcalidrawElement[] = [];
+  let appState: AppState = getDefaultAppState();
+  const response = await fetch(`${BACKEND_GET}${hash}.json`).then(data =>
+    data.clone().json()
+  );
+  if (response != null) {
+    try {
+      elements = response.elements || elements;
+      appState = response.appState || appState;
+    } catch (error) {
+      window.alert("Importing from backend failed");
+      console.error(error);
+    }
+  }
+  return restore(elements, appState);
+}
+
 export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
@@ -221,6 +268,8 @@ export async function exportCanvas(
     } catch (err) {
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
+  } else if (type === "backend") {
+    exportToBackend(elements);
   }
 
   // clean up the DOM
