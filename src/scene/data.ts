@@ -271,7 +271,9 @@ export async function exportCanvas(
     }
   } else if (type === "backend") {
     const appState = getDefaultAppState();
-    appState.viewBackgroundColor = viewBackgroundColor;
+    if (exportBackground) {
+      appState.viewBackgroundColor = viewBackgroundColor;
+    }
     exportToBackend(elements, appState);
   }
 
