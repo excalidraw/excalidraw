@@ -28,7 +28,7 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  importFromShortlink
+  importFromBackend
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -223,8 +223,8 @@ export class App extends React.Component<{}, AppState> {
     let data;
     const searchParams = new URLSearchParams(window.location.search);
 
-    if (searchParams.get("share_js") != null) {
-      data = await importFromShortlink(searchParams.get("share_js"));
+    if (searchParams.get("json") != null) {
+      data = await importFromBackend(searchParams.get("json"));
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();

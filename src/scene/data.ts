@@ -9,9 +9,10 @@ import nanoid from "nanoid";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const JSONSTOREIO_SHORTLINK_ENDPOINT = new URL(
-  "https://www.jsonstore.io/7535731590bfdc991d38b97d0fec2b722f5701c15118e0b1896968c7fe9f07a9"
-);
+//const BACKEND_POST = "http://localhost:3001/api/v1/post/";
+//const BACKEND_GET = "http://localhost:3001/api/v1/";
+const BACKEND_POST = "https://json.excaliber.com/api/v1/post/";
+const BACKEND_GET = "https://json.excaliber.com/api/v1/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -176,31 +177,18 @@ export async function loadFromJSON() {
   }
 }
 
-export async function exportToShortlink(
-  elements: readonly ExcalidrawElement[]
-) {
-  // Generating a random unique shortcode
-  // https://stackoverflow.com/questions/6248666/
-  const firstPart = (Math.random() * 46656) | 0;
-  const secondPart = (Math.random() * 46656) | 0;
-  const shortcode =
-    ("000" + firstPart.toString(36)).slice(-3) +
-    ("000" + secondPart.toString(36)).slice(-3);
-
-  const response = await fetch(
-    JSONSTOREIO_SHORTLINK_ENDPOINT + "/" + shortcode,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: serializeAsJSON(elements)
-    }
-  );
+export async function exportToBackend(elements: readonly ExcalidrawElement[]) {
+  const response = await fetch(BACKEND_POST, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: serializeAsJSON(elements)
+  });
   const json = await response.json();
-  if (json.ok) {
+  if (json.hash) {
     const url = new URL(window.location.href);
-    url.searchParams.append("share_js", shortcode);
+    url.searchParams.append("json", json.hash);
 
     await navigator.clipboard.writeText(url.toString());
     window.alert("Copied shareable link " + url.toString() + " to clipboard");
@@ -209,20 +197,19 @@ export async function exportToShortlink(
   }
 }
 
-export async function importFromShortlink(shortcode: string | null) {
+export async function importFromBackend(hash: string | null) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
-  const response = await fetch(
-    JSONSTOREIO_SHORTLINK_ENDPOINT + "/" + shortcode
-  ).then(data => data.text());
+  const response = await fetch(`${BACKEND_GET}${hash}.json`).then(data =>
+    data.clone().json()
+  );
   if (response != null) {
     try {
-      const json = JSON.parse(response);
-      elements = json.result.elements || elements;
-      appState = json.result.appState || appState;
-    } catch (e) {
-      window.alert("Importing from shortlink failed");
-      console.error(e);
+      elements = response.elements || elements;
+      appState = response.appState || appState;
+    } catch (error) {
+      window.alert("Importing from backend failed");
+      console.error(error);
     }
   }
   return restore(elements, appState);
@@ -284,7 +271,7 @@ export async function exportCanvas(
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
   } else if (type === "shortlink") {
-    exportToShortlink(elements);
+    exportToBackend(elements);
   }
 
   // clean up the DOM
