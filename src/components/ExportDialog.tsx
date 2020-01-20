@@ -141,6 +141,7 @@ export function ExportDialog({
                     <Stack.Row gap={1} align="baseline">
                       {scales.map(s => (
                         <ToolIcon
+                          key={s}
                           size="s"
                           type="radio"
                           icon={"x" + s}
