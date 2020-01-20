@@ -298,6 +298,11 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
+      if (event.key !== "7") {
+        document.documentElement.style.cursor = "crosshair";
+      } else {
+        document.documentElement.style.cursor = "text";
+      }
       this.setState({ elementType: findShapeByKey(event.key) });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
