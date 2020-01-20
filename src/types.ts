@@ -7,7 +7,7 @@ export type AppState = {
   //  (e.g. text element when typing into the input)
   editingElement: ExcalidrawElement | null;
   elementType: string;
-  elementLocked: boolean,
+  elementLocked: boolean;
   exportBackground: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;

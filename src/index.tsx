@@ -463,7 +463,14 @@ export class App extends React.Component<{}, AppState> {
   }
 
   private renderShapeLock() {
-    return <LockIcon checked={this.state.elementLocked} onChange={() => this.setState({ elementLocked: !this.state.elementLocked })} />;
+    return (
+      <LockIcon
+        checked={this.state.elementLocked}
+        onChange={() =>
+          this.setState({ elementLocked: !this.state.elementLocked })
+        }
+      />
+    );
   }
 
   private renderShapesSwitcher() {
