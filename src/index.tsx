@@ -211,6 +211,11 @@ export class App extends React.Component<{}, AppState> {
     e.preventDefault();
   };
 
+  private onUnload = () => {
+    this.saveDebounced();
+    this.saveDebounced.flush();
+  };
+
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.onPaste);
@@ -219,6 +224,7 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
+    window.addEventListener("unload", this.onUnload, false);
 
     let data;
     const searchParams = new URLSearchParams(window.location.search);
@@ -253,6 +259,7 @@ export class App extends React.Component<{}, AppState> {
       false
     );
     window.removeEventListener("resize", this.onResize, false);
+    window.removeEventListener("unload", this.onUnload, false);
   }
 
   public state: AppState = getDefaultAppState();
