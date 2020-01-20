@@ -801,17 +801,19 @@ export class App extends React.Component<{}, AppState> {
                 strokeColor: this.state.currentItemStrokeColor,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
-                  elements = [
-                    ...elements,
-                    {
-                      ...newTextElement(
-                        element,
-                        text,
-                        this.state.currentItemFont
-                      ),
-                      isSelected: true
-                    }
-                  ];
+                  if (text) {
+                    elements = [
+                      ...elements,
+                      {
+                        ...newTextElement(
+                          element,
+                          text,
+                          this.state.currentItemFont
+                        ),
+                        isSelected: true
+                      }
+                    ];
+                  }
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
@@ -1166,15 +1168,17 @@ export class App extends React.Component<{}, AppState> {
               strokeColor: element.strokeColor,
               font: element.font,
               onSubmit: text => {
-                elements = [
-                  ...elements,
-                  {
-                    // we need to recreate the element to update dimensions &
-                    //  position
-                    ...newTextElement(element, text, element.font),
-                    isSelected: true
-                  }
-                ];
+                if (text) {
+                  elements = [
+                    ...elements,
+                    {
+                      // we need to recreate the element to update dimensions &
+                      //  position
+                      ...newTextElement(element, text, element.font),
+                      isSelected: true
+                    }
+                  ];
+                }
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
