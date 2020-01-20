@@ -57,10 +57,17 @@ export function debounce<T extends any[]>(
   timeout: number
 ) {
   let handle = 0;
-  return (...args: T) => {
+  let lastArgs: T;
+  const ret = (...args: T) => {
+    lastArgs = args;
     clearTimeout(handle);
     handle = window.setTimeout(() => fn(...args), timeout);
   };
+  ret.flush = () => {
+    clearTimeout(handle);
+    fn(...lastArgs);
+  };
+  return ret;
 }
 
 export function selectNode(node: Element) {
