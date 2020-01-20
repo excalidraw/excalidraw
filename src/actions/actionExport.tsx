@@ -23,7 +23,7 @@ export const actionChangeExportBackground: Action = {
   perform: (elements, appState, value) => {
     return { appState: { ...appState, exportBackground: value } };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, t }) => (
     <label>
       <input
         type="checkbox"
@@ -32,7 +32,7 @@ export const actionChangeExportBackground: Action = {
           updateData(e.target.checked);
         }}
       />{" "}
-      With background
+      {t("labels.withBackground")}
     </label>
   )
 };
@@ -43,12 +43,12 @@ export const actionSaveScene: Action = {
     saveAsJSON(elements, appState).catch(err => console.error(err));
     return {};
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, t }) => (
     <ToolIcon
       type="button"
       icon={save}
-      title="Save"
-      aria-label="Save"
+      title={t("buttons.save")}
+      aria-label={t("buttons.save")}
       onClick={() => updateData(null)}
     />
   )
@@ -63,12 +63,12 @@ export const actionLoadScene: Action = {
   ) => {
     return { elements: loadedElements, appState: loadedAppState };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, t }) => (
     <ToolIcon
       type="button"
       icon={load}
-      title="Load"
-      aria-label="Load"
+      title={t("buttons.load")}
+      aria-label={t("buttons.load")}
       onClick={() => {
         loadFromJSON()
           .then(({ elements, appState }) => {

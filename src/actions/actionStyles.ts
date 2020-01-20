@@ -13,7 +13,7 @@ export const actionCopyStyles: Action = {
     }
     return {};
   },
-  contextItemLabel: "Copy Styles",
+  contextItemLabel: "labels.copyStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyC",
   contextMenuOrder: 0
 };
@@ -45,7 +45,7 @@ export const actionPasteStyles: Action = {
       })
     };
   },
-  contextItemLabel: "Paste Styles",
+  contextItemLabel: "labels.pasteStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyV",
   contextMenuOrder: 1
 };

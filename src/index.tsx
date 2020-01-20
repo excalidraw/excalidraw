@@ -77,6 +77,8 @@ import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
 import { ExportDialog } from "./components/ExportDialog";
+import { withTranslation } from "react-i18next";
+import "./i18n";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -129,7 +131,7 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
-export class App extends React.Component<{}, AppState> {
+export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
 
@@ -359,6 +361,7 @@ export class App extends React.Component<{}, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const { t } = this.props;
     const { elementType, editingElement } = this.state;
     const selectedElements = elements.filter(el => el.isSelected);
     const hasSelectedElements = selectedElements.length > 0;
@@ -381,7 +384,8 @@ export class App extends React.Component<{}, AppState> {
             "changeStrokeColor",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
 
           {(hasBackground(elements) ||
@@ -391,14 +395,16 @@ export class App extends React.Component<{}, AppState> {
                 "changeBackgroundColor",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
 
               {this.actionManager.renderAction(
                 "changeFillStyle",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
               <hr />
             </>
@@ -411,14 +417,16 @@ export class App extends React.Component<{}, AppState> {
                 "changeStrokeWidth",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
 
               {this.actionManager.renderAction(
                 "changeSloppiness",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
               <hr />
             </>
@@ -430,14 +438,16 @@ export class App extends React.Component<{}, AppState> {
                 "changeFontSize",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
 
               {this.actionManager.renderAction(
                 "changeFontFamily",
                 elements,
                 this.state,
-                this.syncActionResult
+                this.syncActionResult,
+                t
               )}
               <hr />
             </>
@@ -447,14 +457,16 @@ export class App extends React.Component<{}, AppState> {
             "changeOpacity",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
 
           {this.actionManager.renderAction(
             "deleteSelectedElements",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
         </div>
       </Island>
@@ -462,32 +474,38 @@ export class App extends React.Component<{}, AppState> {
   }
 
   private renderShapesSwitcher() {
+    const { t } = this.props;
+
     return (
       <>
-        {SHAPES.map(({ value, icon }, index) => (
-          <ToolIcon
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={this.state.elementType === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(value)} — ${
-              capitalizeString(value)[0]
-            }, ${index + 1}`}
-            onChange={() => {
-              this.setState({ elementType: value });
-              elements = clearSelection(elements);
-              document.documentElement.style.cursor =
-                value === "text" ? "text" : "crosshair";
-              this.forceUpdate();
-            }}
-          ></ToolIcon>
-        ))}
+        {SHAPES.map(({ value, icon }, index) => {
+          const label = t(`toolBar.${value}`);
+          return (
+            <ToolIcon
+              key={value}
+              type="radio"
+              icon={icon}
+              checked={this.state.elementType === value}
+              name="editor-current-shape"
+              title={`${capitalizeString(label)} — ${
+                capitalizeString(label)[0]
+              }, ${index + 1}`}
+              onChange={() => {
+                this.setState({ elementType: value });
+                elements = clearSelection(elements);
+                document.documentElement.style.cursor =
+                  value === "text" ? "text" : "crosshair";
+                this.forceUpdate();
+              }}
+            ></ToolIcon>
+          );
+        })}
       </>
     );
   }
 
   private renderCanvasActions() {
+    const { t } = this.props;
     return (
       <Stack.Col gap={4}>
         <Stack.Row justifyContent={"space-between"}>
@@ -495,13 +513,15 @@ export class App extends React.Component<{}, AppState> {
             "loadScene",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
           {this.actionManager.renderAction(
             "saveScene",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
           <ExportDialog
             elements={elements}
@@ -540,14 +560,16 @@ export class App extends React.Component<{}, AppState> {
             "clearCanvas",
             elements,
             this.state,
-            this.syncActionResult
+            this.syncActionResult,
+            t
           )}
         </Stack.Row>
         {this.actionManager.renderAction(
           "changeViewBackgroundColor",
           elements,
           this.state,
-          this.syncActionResult
+          this.syncActionResult,
+          t
         )}
       </Stack.Col>
     );
@@ -556,6 +578,7 @@ export class App extends React.Component<{}, AppState> {
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const { t } = this.props;
 
     return (
       <div className="container">
@@ -624,14 +647,15 @@ export class App extends React.Component<{}, AppState> {
               ContextMenu.push({
                 options: [
                   navigator.clipboard && {
-                    label: "Paste",
+                    label: t("labels.paste"),
                     action: () => this.pasteFromClipboard()
                   },
                   ...this.actionManager.getContextMenuItems(
                     elements,
                     this.state,
                     this.syncActionResult,
-                    action => this.canvasOnlyActions.includes(action)
+                    action => this.canvasOnlyActions.includes(action),
+                    t
                   )
                 ],
                 top: e.clientY,
@@ -649,18 +673,19 @@ export class App extends React.Component<{}, AppState> {
             ContextMenu.push({
               options: [
                 navigator.clipboard && {
-                  label: "Copy",
+                  label: t("labels.copy"),
                   action: this.copyToClipboard
                 },
                 navigator.clipboard && {
-                  label: "Paste",
+                  label: t("labels.paste"),
                   action: () => this.pasteFromClipboard()
                 },
                 ...this.actionManager.getContextMenuItems(
                   elements,
                   this.state,
                   this.syncActionResult,
-                  action => !this.canvasOnlyActions.includes(action)
+                  action => !this.canvasOnlyActions.includes(action),
+                  t
                 )
               ],
               top: e.clientY,
@@ -1333,5 +1358,7 @@ export class App extends React.Component<{}, AppState> {
   }
 }
 
+const AppWithTrans = withTranslation()(App);
+
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<AppWithTrans />, rootElement);

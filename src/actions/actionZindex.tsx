@@ -16,7 +16,7 @@ export const actionSendBackward: Action = {
       appState
     };
   },
-  contextItemLabel: "Send Backward",
+  contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   keyTest: event =>
     event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyB"
@@ -30,7 +30,7 @@ export const actionBringForward: Action = {
       appState
     };
   },
-  contextItemLabel: "Bring Forward",
+  contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   keyTest: event =>
     event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyF"
@@ -44,7 +44,7 @@ export const actionSendToBack: Action = {
       appState
     };
   },
-  contextItemLabel: "Send to Back",
+  contextItemLabel: "labels.sendToBack",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyB"
 };
 
@@ -56,6 +56,6 @@ export const actionBringToFront: Action = {
       appState
     };
   },
-  contextItemLabel: "Bring to Front",
+  contextItemLabel: "labels.bringToFront",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyF"
 };
