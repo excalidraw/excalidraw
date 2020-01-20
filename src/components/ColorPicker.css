@@ -35,7 +35,7 @@
 }
 
 .color-picker-content {
-  padding: 15px 9px 9px 15px;
+  padding: 1rem 0.5rem 0.5rem 1rem;
 }
 
 .colors-gallery {
@@ -45,12 +45,12 @@
 
 .color-picker-swatch {
   position: relative;
-  height: 30px;
-  width: 30px;
+  height: 1.875rem;
+  width: 1.875rem;
   cursor: pointer;
   outline: none;
   border-radius: 4px;
-  margin: 0px 6px 6px 0px;
+  margin: 0px 0.375rem 0.375rem 0px;
   box-sizing: border-box;
   border: 1px solid #ddd;
 }
@@ -75,8 +75,8 @@
 
 .color-picker-hash {
   background: #dee2e6;
-  height: 30px;
-  width: 30px;
+  height: 1.875rem;
+  width: 1.875rem;
   border-radius: 4px 0px 0px 4px;
   color: #495057;
   display: flex;
@@ -89,33 +89,33 @@
 }
 
 .color-picker-input {
-  width: 100px;
-  font-size: 14px;
+  width: 6.25em;
+  font-size: 1rem;
   color: #343a40;
   border: 0px;
   outline: none;
-  height: 28px;
+  height: 1.75em;
   box-shadow: #dee2e6 0px 0px 0px 1px inset;
   box-sizing: content-box;
   border-radius: 0px 4px 4px 0px;
   float: left;
-  padding-left: 8px;
+  padding-left: 0.5em;
   text-transform: lowercase;
 }
 
 .color-picker-label-swatch {
-  height: 30px;
-  width: 30px;
-  margin-right: 4px;
+  height: 1.875rem;
+  width: 1.875rem;
+  margin-right: 0.25rem;
   border: 1px solid #dee2e6;
 }
 
 .color-picker-swatch-input {
-  font-size: 16px;
+  font-size: 1rem;
   display: inline-block;
-  width: 100px;
+  width: 6.25rem;
   border-radius: 2px;
-  padding: 2px 4px;
+  padding: 0.125em 0.25em;
   border: 1px solid #dee2e6;
   text-transform: lowercase;
 }
