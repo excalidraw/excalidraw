@@ -56,7 +56,11 @@ export function getSelectedIndices(elements: readonly ExcalidrawElement[]) {
 export const someElementIsSelected = (elements: readonly ExcalidrawElement[]) =>
   elements.some(element => element.isSelected);
 
-export function getSelectedAttribute<T>(
+/**
+ * Returns common attribute (picked by `getAttribute` callback) of selected
+ *  elements. If elements don't share the same value, returns `null`.
+ */
+export function getCommonAttributeOfSelectedElements<T>(
   elements: readonly ExcalidrawElement[],
   getAttribute: (element: ExcalidrawElement) => T
 ): T | null {

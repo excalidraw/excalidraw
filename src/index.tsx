@@ -6,6 +6,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 
 import {
   newElement,
+  newTextElement,
   duplicateElement,
   resizeTest,
   isInvisiblySmallElement,
@@ -33,9 +34,9 @@ import {
 
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "./element/types";
+import { ExcalidrawElement } from "./element/types";
 
-import { isInputLike, measureText, debounce, capitalizeString } from "./utils";
+import { isInputLike, debounce, capitalizeString } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -88,29 +89,6 @@ const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
-}
-
-function addTextElement(
-  element: ExcalidrawTextElement,
-  text: string,
-  font: string
-) {
-  resetCursor();
-  if (text === null || text === "") {
-    return false;
-  }
-
-  const metrics = measureText(text, font);
-  element.text = text;
-  element.font = font;
-  // Center the text
-  element.x -= metrics.width / 2;
-  element.y -= metrics.height / 2;
-  element.width = metrics.width;
-  element.height = metrics.height;
-  element.baseline = metrics.baseline;
-
-  return true;
 }
 
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -754,7 +732,7 @@ export class App extends React.Component<any, AppState> {
 
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
-            const element = newElement(
+            let element = newElement(
               this.state.elementType,
               x,
               y,
@@ -765,6 +743,10 @@ export class App extends React.Component<any, AppState> {
               1,
               100
             );
+
+            if (isTextElement(element)) {
+              element = newTextElement(element, "", this.state.currentItemFont);
+            }
 
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
@@ -851,8 +833,19 @@ export class App extends React.Component<any, AppState> {
                 strokeColor: this.state.currentItemStrokeColor,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
-                  addTextElement(element, text, this.state.currentItemFont);
-                  elements = [...elements, { ...element, isSelected: true }];
+                  if (text) {
+                    elements = [
+                      ...elements,
+                      {
+                        ...newTextElement(
+                          element,
+                          text,
+                          this.state.currentItemFont
+                        ),
+                        isSelected: true
+                      }
+                    ];
+                  }
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
@@ -867,16 +860,8 @@ export class App extends React.Component<any, AppState> {
               return;
             }
 
-            if (this.state.elementType === "text") {
-              elements = [...elements, { ...element, isSelected: true }];
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
-            } else {
-              elements = [...elements, element];
-              this.setState({ draggingElement: element });
-            }
+            elements = [...elements, element];
+            this.setState({ draggingElement: element });
 
             let lastX = x;
             let lastY = y;
@@ -1142,21 +1127,27 @@ export class App extends React.Component<any, AppState> {
 
             const elementAtPosition = getElementAtPosition(elements, x, y);
 
-            const element = newElement(
-              "text",
-              x,
-              y,
-              this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor,
-              "hachure",
-              1,
-              1,
-              100
-            ) as ExcalidrawTextElement;
+            const element =
+              elementAtPosition && isTextElement(elementAtPosition)
+                ? elementAtPosition
+                : newTextElement(
+                    newElement(
+                      "text",
+                      x,
+                      y,
+                      this.state.currentItemStrokeColor,
+                      this.state.currentItemBackgroundColor,
+                      "hachure",
+                      1,
+                      1,
+                      100
+                    ),
+                    "", // default text
+                    this.state.currentItemFont // default font
+                  );
 
             this.setState({ editingElement: element });
 
-            let initText = "";
             let textX = e.clientX;
             let textY = e.clientY;
 
@@ -1166,11 +1157,6 @@ export class App extends React.Component<any, AppState> {
               );
               this.forceUpdate();
 
-              Object.assign(element, elementAtPosition);
-              // x and y will change after calling addTextElement function
-              element.x = elementAtPosition.x + elementAtPosition.width / 2;
-              element.y = elementAtPosition.y + elementAtPosition.height / 2;
-              initText = elementAtPosition.text;
               textX =
                 this.state.scrollX +
                 elementAtPosition.x +
@@ -1181,6 +1167,10 @@ export class App extends React.Component<any, AppState> {
                 elementAtPosition.y +
                 CANVAS_WINDOW_OFFSET_TOP +
                 elementAtPosition.height / 2;
+
+              // x and y will change after calling newTextElement function
+              element.x = elementAtPosition.x + elementAtPosition.width / 2;
+              element.y = elementAtPosition.y + elementAtPosition.height / 2;
             } else if (!e.altKey) {
               const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                 x,
@@ -1196,18 +1186,23 @@ export class App extends React.Component<any, AppState> {
             }
 
             textWysiwyg({
-              initText,
+              initText: element.text,
               x: textX,
               y: textY,
               strokeColor: element.strokeColor,
-              font: element.font || this.state.currentItemFont,
+              font: element.font,
               onSubmit: text => {
-                addTextElement(
-                  element,
-                  text,
-                  element.font || this.state.currentItemFont
-                );
-                elements = [...elements, { ...element, isSelected: true }];
+                if (text) {
+                  elements = [
+                    ...elements,
+                    {
+                      // we need to recreate the element to update dimensions &
+                      //  position
+                      ...newTextElement(element, text, element.font),
+                      isSelected: true
+                    }
+                  ];
+                }
                 this.setState({
                   draggingElement: null,
                   editingElement: null,

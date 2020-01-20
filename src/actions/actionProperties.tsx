@@ -1,10 +1,11 @@
 import React from "react";
 import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { getSelectedAttribute } from "../scene";
+import { getCommonAttributeOfSelectedElements } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
+import { AppState } from "../../src/types";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -16,6 +17,20 @@ const changeProperty = (
     }
     return element;
   });
+};
+
+const getFormValue = function<T>(
+  editingElement: AppState["editingElement"],
+  elements: readonly ExcalidrawElement[],
+  getAttribute: (element: ExcalidrawElement) => T,
+  defaultValue?: T
+): T | null {
+  return (
+    (editingElement && getAttribute(editingElement)) ||
+    getCommonAttributeOfSelectedElements(elements, getAttribute) ||
+    defaultValue ||
+    null
+  );
 };
 
 export const actionChangeStrokeColor: Action = {
@@ -30,21 +45,21 @@ export const actionChangeStrokeColor: Action = {
       appState: { ...appState, currentItemStrokeColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => {
-    return (
-      <>
-        <h5>{t("labels.stroke")}</h5>
-        <ColorPicker
-          type="elementStroke"
-          color={
-            getSelectedAttribute(elements, element => element.strokeColor) ||
-            appState.currentItemStrokeColor
-          }
-          onChange={updateData}
-        />
-      </>
-    );
-  }
+  PanelComponent: ({ elements, appState, updateData, t }) => (
+    <>
+      <h5>{t("labels.stroke")}</h5>
+      <ColorPicker
+        type="elementStroke"
+        color={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.strokeColor,
+          appState.currentItemStrokeColor
+        )}
+        onChange={updateData}
+      />
+    </>
+  )
 };
 
 export const actionChangeBackgroundColor: Action = {
@@ -64,10 +79,12 @@ export const actionChangeBackgroundColor: Action = {
       <h5>{t("labels.background")}</h5>
       <ColorPicker
         type="elementBackground"
-        color={
-          getSelectedAttribute(elements, element => element.backgroundColor) ||
+        color={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.backgroundColor,
           appState.currentItemBackgroundColor
-        }
+        )}
         onChange={updateData}
       />
     </>
@@ -85,7 +102,7 @@ export const actionChangeFillStyle: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
       <h5>{t("labels.fill")}</h5>
       <ButtonSelect
@@ -94,7 +111,11 @@ export const actionChangeFillStyle: Action = {
           { value: "hachure", text: "Hachure" },
           { value: "cross-hatch", text: "Cross-hatch" }
         ]}
-        value={getSelectedAttribute(elements, element => element.fillStyle)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.fillStyle
+        )}
         onChange={value => {
           updateData(value);
         }}
@@ -123,7 +144,11 @@ export const actionChangeStrokeWidth: Action = {
           { value: 2, text: "Bold" },
           { value: 4, text: "Extra Bold" }
         ]}
-        value={getSelectedAttribute(elements, element => element.strokeWidth)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.strokeWidth
+        )}
         onChange={value => updateData(value)}
       />
     </>
@@ -150,7 +175,11 @@ export const actionChangeSloppiness: Action = {
           { value: 1, text: "Artist" },
           { value: 3, text: "Cartoonist" }
         ]}
-        value={getSelectedAttribute(elements, element => element.roughness)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.roughness
+        )}
         onChange={value => updateData(value)}
       />
     </>
@@ -168,7 +197,7 @@ export const actionChangeOpacity: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
       <h5>{t("labels.oppacity")}</h5>
       <input
@@ -177,8 +206,12 @@ export const actionChangeOpacity: Action = {
         max="100"
         onChange={e => updateData(+e.target.value)}
         value={
-          getSelectedAttribute(elements, element => element.opacity) ||
-          0 /* Put the opacity at 0 if there are two conflicting ones */
+          getFormValue(
+            appState.editingElement,
+            elements,
+            element => element.opacity,
+            100 /* default opacity */
+          ) || undefined
         }
       />
     </>
@@ -204,7 +237,7 @@ export const actionChangeFontSize: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
       <h5>{t("labels.fontSize")}</h5>
       <ButtonSelect
@@ -214,7 +247,8 @@ export const actionChangeFontSize: Action = {
           { value: 28, text: "Large" },
           { value: 36, text: "Very Large" }
         ]}
-        value={getSelectedAttribute(
+        value={getFormValue(
+          appState.editingElement,
           elements,
           element => isTextElement(element) && +element.font.split("px ")[0]
         )}
@@ -243,7 +277,7 @@ export const actionChangeFontFamily: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
       <h5>{t("labels.fontFamily")}</h5>
       <ButtonSelect
@@ -252,7 +286,8 @@ export const actionChangeFontFamily: Action = {
           { value: "Helvetica", text: t("labels.normal") },
           { value: "Cascadia", text: t("labels.code") }
         ]}
-        value={getSelectedAttribute(
+        value={getFormValue(
+          appState.editingElement,
           elements,
           element => isTextElement(element) && element.font.split("px ")[1]
         )}
