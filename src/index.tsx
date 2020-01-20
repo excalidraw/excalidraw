@@ -76,6 +76,7 @@ import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolIcon } from "./components/ToolIcon";
+import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 
 let { elements } = createScene();
@@ -461,6 +462,10 @@ export class App extends React.Component<{}, AppState> {
     );
   }
 
+  private renderShapeLock() {
+    return <LockIcon checked={this.state.elementLocked} onChange={() => this.setState({ elementLocked: !this.state.elementLocked })} />;
+  }
+
   private renderShapesSwitcher() {
     return (
       <>
@@ -475,7 +480,7 @@ export class App extends React.Component<{}, AppState> {
               capitalizeString(value)[0]
             }, ${index + 1}`}
             onChange={() => {
-              this.setState({ elementType: value });
+              this.setState({ elementType: value, elementLocked: false });
               elements = clearSelection(elements);
               document.documentElement.style.cursor =
                 value === "text" ? "text" : "crosshair";
@@ -483,6 +488,7 @@ export class App extends React.Component<{}, AppState> {
             }}
           ></ToolIcon>
         ))}
+        {this.renderShapeLock()}
       </>
     );
   }
@@ -1094,10 +1100,12 @@ export class App extends React.Component<{}, AppState> {
                 draggingElement.isSelected = true;
               }
 
-              this.setState({
-                draggingElement: null,
-                elementType: "selection"
-              });
+              if (!this.state.elementLocked) {
+                this.setState({
+                  draggingElement: null,
+                  elementType: "selection"
+                });
+              }
 
               history.resumeRecording();
               this.forceUpdate();
