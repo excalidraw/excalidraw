@@ -31,7 +31,7 @@ export function ExportDialog({
   syncActionResult,
   onExportToPng,
   onExportToClipboard,
-  onExportToShortlink
+  onExportToBackend
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -40,7 +40,7 @@ export function ExportDialog({
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToShortlink: ExportCB;
+  onExportToBackend: ExportCB;
 }) {
   const someElementIsSelected = elements.some(element => element.isSelected);
   const [modalIsShown, setModalIsShown] = useState(false);
@@ -126,7 +126,7 @@ export function ExportDialog({
                     icon={link}
                     title="Get shareable link"
                     aria-label="Get shareable link"
-                    onClick={() => onExportToShortlink(exportedElements, 1)}
+                    onClick={() => onExportToBackend(exportedElements, 1)}
                   />
                 </Stack.Row>
 

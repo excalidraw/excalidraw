@@ -270,7 +270,7 @@ export async function exportCanvas(
     } catch (err) {
       window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
     }
-  } else if (type === "shortlink") {
+  } else if (type === "backend") {
     exportToBackend(elements);
   }
 

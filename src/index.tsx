@@ -519,10 +519,10 @@ export class App extends React.Component<{}, AppState> {
                   scale
                 });
             }}
-            onExportToShortlink={exportedElements => {
+            onExportToBackend={exportedElements => {
               if (this.canvas)
                 exportCanvas(
-                  "shortlink",
+                  "backend",
                   exportedElements,
                   this.canvas,
                   this.state
