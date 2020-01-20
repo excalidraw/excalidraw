@@ -27,7 +27,8 @@ import {
   hasBackground,
   hasStroke,
   hasText,
-  exportCanvas
+  exportCanvas,
+  importFromBackend
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -210,7 +211,7 @@ export class App extends React.Component<{}, AppState> {
     e.preventDefault();
   };
 
-  public componentDidMount() {
+  public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.onPaste);
     document.addEventListener("cut", this.onCut);
@@ -219,14 +220,22 @@ export class App extends React.Component<{}, AppState> {
     document.addEventListener("mousemove", this.getCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
 
-    const { elements: newElements, appState } = restoreFromLocalStorage();
+    let data;
+    const searchParams = new URLSearchParams(window.location.search);
 
-    if (newElements) {
-      elements = newElements;
+    if (searchParams.get("json") != null) {
+      data = await importFromBackend(searchParams.get("json"));
+      window.history.replaceState({}, "Excalidraw", window.location.origin);
+    } else {
+      data = restoreFromLocalStorage();
     }
 
-    if (appState) {
-      this.setState(appState);
+    if (data.elements) {
+      elements = data.elements;
+    }
+
+    if (data.appState) {
+      this.setState(data.appState);
     } else {
       this.forceUpdate();
     }
@@ -509,6 +518,15 @@ export class App extends React.Component<{}, AppState> {
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale
                 });
+            }}
+            onExportToBackend={exportedElements => {
+              if (this.canvas)
+                exportCanvas(
+                  "backend",
+                  exportedElements,
+                  this.canvas,
+                  this.state
+                );
             }}
           />
           {this.actionManager.renderAction(
