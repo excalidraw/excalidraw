@@ -5,7 +5,7 @@ export default `
 // paste stack trace here
 \`\`\`
 
-# localStorage
+### localStorage
 
 \`\`\`
 // paste localStorage content here (if it doesn't contain sensitive data)
