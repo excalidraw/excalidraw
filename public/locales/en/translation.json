@@ -1,4 +1,5 @@
 {
+  "test": "this is a test",
   "labels": {
     "paste": "Paste",
     "selectAll": "Select All",
@@ -33,7 +34,13 @@
     "load": "Load"
   },
   "alerts": {
-    "clearReset": "This will clear the whole canvas. Are you sure?"
+    "clearReset": "This will clear the whole canvas. Are you sure?",
+    "fileNotSelected": "A file was not selected.",
+    "couldNotCreateShareableLink": "Couldn't create shareable link.",
+    "importBackendFailed": "Importing from backend failed.",
+    "cannotExportEmptyCanvas": "Cannot export empty canvas.",
+    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
+    "copiedToClipboard": "Copied to clipboard: {{url}}"
   },
   "toolBar": {
     "selection": "Selection",
