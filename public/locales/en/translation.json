@@ -25,7 +25,7 @@
     "code": "Code"
   },
   "buttons": {
-    "clearReset": "Clear the canvas & reset background color",
+    "clearReset": "Clear the canvas and reset background color",
     "copyToClipboard": "Copy to clipboard",
     "export": "Export",
     "exportToPng": "Export to PNG",
