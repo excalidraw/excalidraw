@@ -1371,4 +1371,53 @@ export class App extends React.Component<any, AppState> {
 const AppWithTrans = withTranslation()(App);
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<AppWithTrans />, rootElement);
+
+class TopErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="ErrorSplash">
+          <div className="ErrorSplash-messageContainer">
+            <div className="ErrorSplash-paragraph bigger">
+              Encountered an error. Please{" "}
+              <button onClick={() => window.location.reload()}>
+                reload the page
+              </button>
+              .
+            </div>
+            <div className="ErrorSplash-paragraph">
+              If reloading doesn't work. Try{" "}
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+              >
+                clearing the canvas
+              </button>
+              .<br />
+              <div className="smaller">
+                (This will unfortunately result in loss of work.)
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+ReactDOM.render(
+  <TopErrorBoundary>
+    <AppWithTrans />
+  </TopErrorBoundary>,
+  rootElement
+);

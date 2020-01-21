@@ -133,3 +133,39 @@ button {
 .App-right-menu {
   width: 13.75rem;
 }
+
+.ErrorSplash {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background: #fdf4f5;
+    border: 3px solid #d72b3f;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    text-align: center;
+  }
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+}
