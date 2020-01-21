@@ -14,6 +14,8 @@
 
 ### Shareable Link
 
+By clicking on `Get shareable link` your scene will be uploaded and stored in our backend and sharable link will be generated and copied to clipboard.
+
 ## Shortcuts
 
 | Shortcut   | Action           |
