@@ -26,12 +26,12 @@
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
+    "copyToClipboard": "Copy to clipboard",
     "export": "Export",
     "exportToPng": "Export to PNG",
-    "copyToClipboard": "Copy to clipboard",
     "getShareableLink": "Get shareable link",
-    "save": "Save",
-    "load": "Load"
+    "load": "Load",
+    "save": "Save"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?"
