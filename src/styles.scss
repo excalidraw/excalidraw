@@ -73,6 +73,8 @@ button {
   padding: 0.25rem;
   outline: transparent;
 
+  cursor: pointer;
+
   &:focus {
     box-shadow: 0 0 0 2px #a5d8ff;
   }
@@ -132,4 +134,52 @@ button {
 
 .App-right-menu {
   width: 13.75rem;
+}
+
+.ErrorSplash {
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background-color: #fff5f5;
+    border: 3px solid #c92a2a;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+      font-family: "Cascadia";
+      font-size: 0.8em;
+    }
+  }
 }
