@@ -1,47 +1,47 @@
 {
-  "labels": {
-    "paste": "Paste",
-    "selectAll": "Select All",
-    "copy": "Copy",
-    "bringForward": "Bring Forward",
-    "sendToBack": "Send To Back",
-    "bringToFront": "Bring To Front",
-    "sendBackward": "Send Backward",
-    "delete": "Delete",
-    "copyStyles": "Copy Styles",
-    "pasteStyles": "Paste Styles",
-    "stroke": "Stroke",
-    "background": "Background",
-    "fill": "Fill",
-    "strokeWidth": "Stroke Width",
-    "sloppiness": "Sloppiness",
-    "oppacity": "Oppacity",
-    "fontSize": "Font Size",
-    "fontFamily": "Font Family",
-    "onlySelected": "Only selected",
-    "withBackground": "With Background",
-    "handDrawn": "Hand-Drawn",
-    "normal": "Normal",
-    "code": "Code"
-  },
-  "buttons": {
-    "clearReset": "Clear the canvas & reset background color",
-    "export": "Export",
-    "exportToPng": "Export to PNG",
-    "copyToClipboard": "Copy to clipboard",
-    "save": "Save",
-    "load": "Load"
-  },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?"
   },
+  "buttons": {
+    "clearReset": "Clear the canvas & reset background color",
+    "copyToClipboard": "Copy to clipboard",
+    "export": "Export",
+    "exportToPng": "Export to PNG",
+    "load": "Load",
+    "save": "Save"
+  },
+  "labels": {
+    "background": "Background",
+    "bringForward": "Bring Forward",
+    "bringToFront": "Bring To Front",
+    "code": "Code",
+    "copy": "Copy",
+    "copyStyles": "Copy Styles",
+    "delete": "Delete",
+    "fill": "Fill",
+    "fontFamily": "Font Family",
+    "fontSize": "Font Size",
+    "handDrawn": "Hand-Drawn",
+    "normal": "Normal",
+    "onlySelected": "Only selected",
+    "oppacity": "Oppacity",
+    "paste": "Paste",
+    "pasteStyles": "Paste Styles",
+    "selectAll": "Select All",
+    "sendBackward": "Send Backward",
+    "sendToBack": "Send To Back",
+    "sloppiness": "Sloppiness",
+    "stroke": "Stroke",
+    "strokeWidth": "Stroke Width",
+    "withBackground": "With Background"
+  },
   "toolBar": {
-    "selection": "Selection",
-    "rectangle": "Rectangle",
+    "arrow": "Arrow",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
-    "arrow": "Arrow",
     "line": "Line",
+    "rectangle": "Rectangle",
+    "selection": "Selection",
     "text": "Text"
   }
 }
