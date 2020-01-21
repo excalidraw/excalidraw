@@ -1,5 +1,4 @@
 {
-  "test": "this is a test",
   "labels": {
     "paste": "Paste",
     "selectAll": "Select All",
@@ -23,7 +22,11 @@
     "withBackground": "With Background",
     "handDrawn": "Hand-Drawn",
     "normal": "Normal",
-    "code": "Code"
+    "code": "Code",
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large",
+    "veryLarge": "Very Large"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",

@@ -242,10 +242,10 @@ export const actionChangeFontSize: Action = {
       <h5>{t("labels.fontSize")}</h5>
       <ButtonSelect
         options={[
-          { value: 16, text: "Small" },
-          { value: 20, text: "Medium" },
-          { value: 28, text: "Large" },
-          { value: 36, text: "Very Large" }
+          { value: 16, text: t("labels.small") },
+          { value: 20, text: t("labels.medium") },
+          { value: 28, text: t("labels.large") },
+          { value: 36, text: t("labels.veryLarge") }
         ]}
         value={getFormValue(
           appState.editingElement,
