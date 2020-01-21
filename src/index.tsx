@@ -304,10 +304,10 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (shape !== "text") {
-        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
-      } else {
+      if (shape === "text") {
         document.documentElement.style.cursor = CURSOR_TYPE.TEXT;
+      } else {
+        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
       }
       this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
