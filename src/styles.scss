@@ -135,12 +135,9 @@ button {
 }
 
 .ErrorSplash {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +156,9 @@ button {
   .ErrorSplash-paragraph {
     margin: 15px 0;
     text-align: center;
+    max-width: 600px;
   }
+
   .bigger,
   .bigger button {
     font-size: 1.1em;
@@ -167,5 +166,16 @@ button {
   .smaller,
   .smaller button {
     font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+    }
   }
 }
