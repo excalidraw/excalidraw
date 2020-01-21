@@ -73,6 +73,8 @@ button {
   padding: 0.25rem;
   outline: transparent;
 
+  cursor: pointer;
+
   &:focus {
     box-shadow: 0 0 0 2px #a5d8ff;
   }
