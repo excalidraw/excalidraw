@@ -7,6 +7,7 @@ import {
   getLinePoints
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
+import { Drawable, OpSet } from "roughjs/bin/core";
 
 export function hitTest(
   element: ExcalidrawElement,
@@ -141,13 +142,23 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow") {
-    if (element.points.length < 2) {
+    if (element.shape === null) {
       return false;
     }
+    const shape = element.shape as Drawable[];
+    // If shape does not consist of curve and two line segments
+    // for arrow shape, return false
+    if (shape.length < 3) return false;
 
-    return pointOnCurve(element.points, x - element.x, y - element.y);
+    const relX = x - element.x;
+    const relY = y - element.y;
 
-    // return closestPoint([...element.points], x - element.x, y - element.y);
+    // hit test curve and lien segments for arrow
+    return (
+      hitTestRoughShape(shape[0].sets, relX, relY) ||
+      hitTestRoughShape(shape[1].sets, relX, relY) ||
+      hitTestRoughShape(shape[2].sets, relX, relY)
+    );
   } else if (element.type === "line") {
     const [x1, y1, x2, y2] = getLinePoints(element);
     // The computation is done at the origin, we need to add a translation
@@ -167,110 +178,89 @@ export function hitTest(
   }
 }
 
-const pointOnCurve = (points: Point[], x: number, y: number) => {
-  // pass 1: Generate curves
-  const curves: Point[][] = [];
-  let lastCurve: Point[] = [];
-  points.forEach((p, i) => {
-    lastCurve.push(p);
+const pointInBezierEquation = (
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+  M: number
+) => {
+  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+  const equation = (t: number) =>
+    Math.pow(1 - t, 3) * p3 +
+    3 * t * Math.pow(1 - t, 2) * p2 +
+    3 * Math.pow(t, 2) * (1 - t) * p1 +
+    p0 * Math.pow(t, 3);
 
-    if (i > 0 && i % 3 === 0) {
-      curves.push(lastCurve);
-      lastCurve = [p];
+  // debug
+  // let min = Infinity;
+  // let minT = 1.1;
+
+  const epsilon = 3;
+  // go through t in increments of 0.01
+  let t = 0;
+  while (t <= 1.0) {
+    const diff = Math.abs(M - equation(t));
+
+    // if (diff < min) {
+    //   min = diff;
+    //   minT = t;
+    // }
+
+    if (diff < epsilon) {
+      return true;
     }
-  });
 
-  // add the remaining curve
-  // this curve can be quadratic bezier curve or
-  // a line segment
-  if (lastCurve.length > 1) {
-    curves.push(lastCurve);
+    t += 0.01;
   }
 
-  // if there are no curves, nothing to select
-  if (curves.length < 0) return false;
+  // console.log({ min, minT, eq: equation(minT) });
 
-  const pointInBezierEquation = (
-    p0: number,
-    p1: number,
-    p2: number,
-    p3: number,
-    M: number
-  ) => {
-    // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-    const equation = (t: number) =>
-      Math.pow(1 - t, 3) * p3 +
-      3 * t * Math.pow(1 - t, 2) * p2 +
-      3 * Math.pow(t, 2) * (1 - t) * p1 +
-      p0 * Math.pow(t, 3);
+  return false;
+};
 
-    // debug
-    let min = Infinity;
-    let minT = 1.1;
+const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
+  // read operations from first opSet
+  const ops = opSet[0].ops;
 
-    const epsilon = 3;
-    // go through t in increments of 0.01
-    let t = 0;
-    while (t <= 1.0) {
-      const diff = Math.abs(M - equation(t));
+  // set start position as (0,0) just in case
+  // move operation does not exist (unlikely but it is worth safekeeping it)
+  let p0: Point = [0, 0];
 
-      if (diff < min) {
-        min = diff;
-        minT = t;
-      }
+  return ops.some(({ op, data }) => {
+    // There are only four operation types:
+    // move, bcurveTo, lineTo, and curveTo
+    if (op === "move") {
+      // change starting point
+      p0 = data as Point;
+      // move operation does not draw anything; so, it always
+      // returns false
+    } else if (op === "bcurveTo") {
+      // create points from bezier curve
+      // bezier curve stores data as a flattened array of three positions
+      // [x1, y1, x2, y2, x3, y3]
+      const p1 = [data[0], data[1]] as Point;
+      const p2 = [data[2], data[3]] as Point;
+      const p3 = [data[4], data[5]] as Point;
 
-      if (diff < epsilon) {
-        return true;
-      }
+      // check if points are on the curve
+      // cubic bezier curves require four parameters
+      // the first parameter is the last stored position (p0)
+      let retVal =
+        pointInBezierEquation(p0[0], p1[0], p2[0], p3[0], x) &&
+        pointInBezierEquation(p0[1], p1[1], p2[1], p3[1], y);
 
-      t += 0.1;
+      // set end point of bezier curve as the new starting point for
+      // upcoming operations as each operation is based on the last drawn
+      // position of the previous operation
+      p0 = p3;
+      return retVal;
+    } else if (op === "lineTo") {
+      // TODO: Implement this
+    } else if (op === "qcurveTo") {
+      // TODO: Implement this
     }
 
-    console.log({ min, t: minT, eq: equation(minT), M });
-
-    return false;
-  };
-
-  return curves.some(points => {
-    if (points.length === 4) {
-      // cubic bezier curve
-      const [p0, p1, p2, p3] = points;
-
-      const minX = Math.min(p0[0], p1[0], p2[0], p3[0]);
-      const maxX = Math.max(p0[0], p1[0], p2[0], p3[0]);
-
-      const minY = Math.min(p0[1], p1[1], p2[1], p3[1]);
-      const maxY = Math.max(p0[1], p1[1], p2[1], p3[1]);
-
-      // if outside the bounds of the curve
-      if (x > maxX || x < minX || y > maxY || y < minY) return false;
-
-      // we only need to check Y here because if
-      // we are outside the domain of the curve,
-      // we already know that the point is not going to be on the curve
-      return (
-        pointInBezierEquation(p0[1], p1[1], p2[1], p3[1], y) &&
-        pointInBezierEquation(p0[0], p1[0], p2[0], p3[0], x)
-      );
-    } else if (points.length === 3) {
-      // quadratic bezier curve here
-      return false;
-    } else if (points.length === 2) {
-      const [p0, p1] = points;
-
-      // if outside the domain of the line segment
-      if (x < p0[0] || x > p1[0]) return false;
-
-      const k1 = (p1[1] - p0[1]) / (p1[0] - p0[0]);
-      const k2 = (y - p0[1]) / (x - p0[0]);
-      const k3 = (p1[1] - y) / (p1[0] - x);
-
-      // check coefficients of both line segments
-      // p0 -> M and M -> p1 for collinearity
-      return Math.abs(k2 - k1) < 0.05 || Math.abs(k3 - k1) < 0.05;
-    }
-
-    // for any other points, return false
     return false;
   });
 };
