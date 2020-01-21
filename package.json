@@ -38,6 +38,17 @@
     ],
     "settings": {
       "json/sort-package-json": false
+    },
+    "rules": {
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ]
     }
   },
   "homepage": "https://excalidraw.com",
