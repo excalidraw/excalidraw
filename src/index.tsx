@@ -877,6 +877,7 @@ export class App extends React.Component<any, AppState> {
                 x: textX,
                 y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
+                opacity: this.state.currentItemOpacity,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
                   if (text) {
@@ -1240,6 +1241,7 @@ export class App extends React.Component<any, AppState> {
               y: textY,
               strokeColor: element.strokeColor,
               font: element.font,
+              opacity: this.state.currentItemOpacity,
               onSubmit: text => {
                 if (text) {
                   elements = [
