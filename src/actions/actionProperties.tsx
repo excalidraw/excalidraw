@@ -107,9 +107,9 @@ export const actionChangeFillStyle: Action = {
       <h5>{t("labels.fill")}</h5>
       <ButtonSelect
         options={[
-          { value: "solid", text: "Solid" },
-          { value: "hachure", text: "Hachure" },
-          { value: "cross-hatch", text: "Cross-hatch" }
+          { value: "solid", text: t("labels.solid") },
+          { value: "hachure", text: t("labels.hachure") },
+          { value: "cross-hatch", text: t("labels.crossHatch") }
         ]}
         value={getFormValue(
           appState.editingElement,
@@ -140,9 +140,9 @@ export const actionChangeStrokeWidth: Action = {
       <h5>{t("labels.strokeWidth")}</h5>
       <ButtonSelect
         options={[
-          { value: 1, text: "Thin" },
-          { value: 2, text: "Bold" },
-          { value: 4, text: "Extra Bold" }
+          { value: 1, text: t("labels.thin") },
+          { value: 2, text: t("labels.bold") },
+          { value: 4, text: t("labels.extraBold") }
         ]}
         value={getFormValue(
           appState.editingElement,
@@ -171,9 +171,9 @@ export const actionChangeSloppiness: Action = {
       <h5>{t("labels.sloppiness")}</h5>
       <ButtonSelect
         options={[
-          { value: 0, text: "Architect" },
-          { value: 1, text: "Artist" },
-          { value: 3, text: "Cartoonist" }
+          { value: 0, text: t("labels.architect") },
+          { value: 1, text: t("labels.artist") },
+          { value: 3, text: t("labels.cartoonist") }
         ]}
         value={getFormValue(
           appState.editingElement,
@@ -242,10 +242,10 @@ export const actionChangeFontSize: Action = {
       <h5>{t("labels.fontSize")}</h5>
       <ButtonSelect
         options={[
-          { value: 16, text: "Small" },
-          { value: 20, text: "Medium" },
-          { value: 28, text: "Large" },
-          { value: 36, text: "Very Large" }
+          { value: 16, text: t("labels.small") },
+          { value: 20, text: t("labels.medium") },
+          { value: 28, text: t("labels.large") },
+          { value: 36, text: t("labels.veryLarge") }
         ]}
         value={getFormValue(
           appState.editingElement,

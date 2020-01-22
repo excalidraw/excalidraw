@@ -8,6 +8,8 @@ import { getExportCanvasPreview } from "./getExportCanvasPreview";
 import nanoid from "nanoid";
 import { fileOpenPromise, fileSavePromise } from "browser-nativefs";
 
+import i18n from "../i18n";
+
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
@@ -120,9 +122,14 @@ export async function exportToBackend(
     url.searchParams.append("id", json.id);
 
     await navigator.clipboard.writeText(url.toString());
-    window.alert(`Copied to clipboard: ${url.toString()}`);
+    window.alert(
+      i18n.t("alerts.copiedToClipboard", {
+        url: url.toString(),
+        interpolation: { escapeValue: false }
+      })
+    );
   } else {
-    window.alert("Couldn't create shareable link");
+    window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
   }
 }
 
@@ -137,7 +144,7 @@ export async function importFromBackend(id: string | null) {
       elements = response.elements || elements;
       appState = response.appState || appState;
     } catch (error) {
-      window.alert("Importing from backend failed");
+      window.alert(i18n.t("alerts.importBackendFailed"));
       console.error(error);
     }
   }
@@ -162,7 +169,8 @@ export async function exportCanvas(
     scale?: number;
   }
 ) {
-  if (!elements.length) return window.alert("Cannot export empty canvas.");
+  if (!elements.length)
+    return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));
   // calculate smallest area to fit the contents in
 
   const tempCanvas = getExportCanvasPreview(elements, {
@@ -185,6 +193,7 @@ export async function exportCanvas(
       }
     });
   } else if (type === "clipboard") {
+    const errorMsg = i18n.t("alerts.couldNotCopyToClipboard");
     try {
       tempCanvas.toBlob(async function(blob: any) {
         try {
@@ -192,11 +201,11 @@ export async function exportCanvas(
             new window.ClipboardItem({ "image/png": blob })
           ]);
         } catch (err) {
-          window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+          window.alert(errorMsg);
         }
       });
     } catch (err) {
-      window.alert("Couldn't copy to clipboard. Try using Chrome browser.");
+      window.alert(errorMsg);
     }
   } else if (type === "backend") {
     const appState = getDefaultAppState();
