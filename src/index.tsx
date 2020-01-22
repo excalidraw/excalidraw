@@ -76,7 +76,7 @@ import { getDefaultAppState } from "./appState";
 import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
-import { ToolIcon } from "./components/ToolIcon";
+import { ToolButton } from "./components/ToolButton";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
@@ -497,7 +497,7 @@ export class App extends React.Component<any, AppState> {
         {SHAPES.map(({ value, icon }, index) => {
           const label = t(`toolBar.${value}`);
           return (
-            <ToolIcon
+            <ToolButton
               key={value}
               type="radio"
               icon={icon}
@@ -513,7 +513,7 @@ export class App extends React.Component<any, AppState> {
                   value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
                 this.forceUpdate();
               }}
-            ></ToolIcon>
+            ></ToolButton>
           );
         })}
         {this.renderShapeLock()}

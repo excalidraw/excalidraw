@@ -3,7 +3,7 @@ import { Action } from "./types";
 import { EditableText } from "../components/EditableText";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
-import { ToolIcon } from "../components/ToolIcon";
+import { ToolButton } from "../components/ToolButton";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
@@ -44,7 +44,7 @@ export const actionSaveScene: Action = {
     return {};
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={save}
       title={t("buttons.save")}
@@ -64,7 +64,7 @@ export const actionLoadScene: Action = {
     return { elements: loadedElements, appState: loadedAppState };
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={load}
       title={t("buttons.load")}

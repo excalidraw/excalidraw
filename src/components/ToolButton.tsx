@@ -28,7 +28,7 @@ type ToolIconProps =
 
 const DEFAULT_SIZE: ToolIconSize = "m";
 
-export function ToolIcon(props: ToolIconProps) {
+export function ToolButton(props: ToolIconProps) {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   if (props.type === "button")

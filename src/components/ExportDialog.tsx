@@ -3,7 +3,7 @@ import "./ExportDialog.css";
 import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
-import { ToolIcon } from "./ToolIcon";
+import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, downloadFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
@@ -91,7 +91,7 @@ export function ExportDialog({
 
   return (
     <>
-      <ToolIcon
+      <ToolButton
         onClick={() => setModalIsShown(true)}
         icon={exportFile}
         type="button"
@@ -109,7 +109,7 @@ export function ExportDialog({
               <div className="ExportDialog__preview" ref={previeRef}></div>
               <div className="ExportDialog__actions">
                 <Stack.Row gap={2}>
-                  <ToolIcon
+                  <ToolButton
                     type="button"
                     icon={downloadFile}
                     title={t("buttons.exportToPng")}
@@ -117,7 +117,7 @@ export function ExportDialog({
                     onClick={() => onExportToPng(exportedElements, scale)}
                   />
                   {probablySupportsClipboard && (
-                    <ToolIcon
+                    <ToolButton
                       type="button"
                       icon={clipboard}
                       title={t("buttons.copyToClipboard")}
@@ -127,7 +127,7 @@ export function ExportDialog({
                       }
                     />
                   )}
-                  <ToolIcon
+                  <ToolButton
                     type="button"
                     icon={link}
                     title={t("buttons.getShareableLink")}
@@ -147,7 +147,7 @@ export function ExportDialog({
                   <div className="ExportDialog__scales">
                     <Stack.Row gap={1} align="baseline">
                       {scales.map(s => (
-                        <ToolIcon
+                        <ToolButton
                           key={s}
                           size="s"
                           type="radio"
