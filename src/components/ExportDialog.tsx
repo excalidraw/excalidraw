@@ -23,7 +23,10 @@ const probablySupportsClipboard =
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (elements: readonly ExcalidrawElement[], scale: number) => void;
+type ExportCB = (
+  elements: readonly ExcalidrawElement[],
+  scale?: number
+) => void;
 
 export function ExportDialog({
   elements,
@@ -129,7 +132,7 @@ export function ExportDialog({
                     icon={link}
                     title={t("buttons.getShareableLink")}
                     aria-label={t("buttons.getShareableLink")}
-                    onClick={() => onExportToBackend(exportedElements, 1)}
+                    onClick={() => onExportToBackend(exportedElements)}
                   />
                 </Stack.Row>
 

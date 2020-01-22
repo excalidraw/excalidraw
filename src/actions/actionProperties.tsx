@@ -26,9 +26,9 @@ const getFormValue = function<T>(
   defaultValue?: T
 ): T | null {
   return (
-    (editingElement && getAttribute(editingElement)) ||
-    getCommonAttributeOfSelectedElements(elements, getAttribute) ||
-    defaultValue ||
+    (editingElement && getAttribute(editingElement)) ??
+    getCommonAttributeOfSelectedElements(elements, getAttribute) ??
+    defaultValue ??
     null
   );
 };
@@ -211,7 +211,7 @@ export const actionChangeOpacity: Action = {
             elements,
             element => element.opacity,
             100 /* default opacity */
-          ) || undefined
+          ) ?? undefined
         }
       />
     </>
