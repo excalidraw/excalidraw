@@ -80,7 +80,8 @@ import { ToolIcon } from "./components/ToolIcon";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
-import "./i18n";
+import { LanguageList } from "./components/LanguageList";
+import i18n, { languages, parseDetectedLang } from "./i18n";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -1261,6 +1262,15 @@ export class App extends React.Component<any, AppState> {
             document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
+        <div className="langBox">
+          <LanguageList
+            onClick={lng => {
+              i18n.changeLanguage(lng);
+            }}
+            languages={languages}
+            currentLanguage={parseDetectedLang(i18n.language)}
+          />
+        </div>
       </div>
     );
   }
