@@ -608,6 +608,7 @@ export class App extends React.Component<any, AppState> {
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
               <div className="App-right-menu">
+                <h2 className="visually-hidden">Canvas actions</h2>
                 <Island padding={4}>{this.renderCanvasActions()}</Island>
               </div>
               <div className="App-right-menu">
@@ -616,6 +617,7 @@ export class App extends React.Component<any, AppState> {
             </Stack.Col>
             <Stack.Col gap={4} align="start">
               <Island padding={1}>
+                <h2 className="visually-hidden">Shapes</h2>
                 <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
               </Island>
             </Stack.Col>
