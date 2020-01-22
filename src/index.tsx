@@ -540,7 +540,10 @@ export class App extends React.Component<any, AppState> {
               if (this.canvas)
                 exportCanvas(
                   "backend",
-                  exportedElements,
+                  exportedElements.map(element => ({
+                    ...element,
+                    isSelected: false
+                  })),
                   this.canvas,
                   this.state
                 );
