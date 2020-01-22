@@ -72,6 +72,5 @@ const out = fs.createWriteStream("test.png");
 const stream = canvas.createPNGStream();
 stream.pipe(out);
 out.on("finish", () => {
-  // eslint-disable-next-line no-console
-  console.log("test.png was created.");
+  console.info("test.png was created.");
 });
