@@ -183,3 +183,30 @@ button {
     }
   }
 }
+
+.langBox {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-right: 0.5em;
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  ul > li {
+    list-style: none;
+    display: inline-block;
+    padding: 4px;
+  }
+  li > a,
+  li > a:visited {
+    text-decoration: none;
+    color: gray;
+    font-size: 0.8em;
+  }
+  li.current > a,
+  li.current > a:visited {
+    color: black;
+    text-decoration: underline;
+  }
+}

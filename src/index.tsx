@@ -80,7 +80,8 @@ import { ToolIcon } from "./components/ToolIcon";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
-import "./i18n";
+import { LanguageList } from "./components/LanguageList";
+import i18n, { languages, parseDetectedLang } from "./i18n";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -95,6 +96,10 @@ function resetCursor() {
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
+const CURSOR_TYPE = {
+  TEXT: "text",
+  CROSSHAIR: "crosshair"
+};
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
@@ -273,6 +278,8 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
+    const shape = findShapeByKey(event.key);
+
     if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
@@ -298,7 +305,12 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      this.setState({ elementType: findShapeByKey(event.key) });
+      if (shape === "text") {
+        document.documentElement.style.cursor = CURSOR_TYPE.TEXT;
+      } else {
+        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+      }
+      this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
@@ -483,7 +495,7 @@ export class App extends React.Component<any, AppState> {
                 this.setState({ elementType: value });
                 elements = clearSelection(elements);
                 document.documentElement.style.cursor =
-                  value === "text" ? "text" : "crosshair";
+                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
                 this.forceUpdate();
               }}
             ></ToolIcon>
@@ -1253,6 +1265,15 @@ export class App extends React.Component<any, AppState> {
             document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
+        <div className="langBox">
+          <LanguageList
+            onClick={lng => {
+              i18n.changeLanguage(lng);
+            }}
+            languages={languages}
+            currentLanguage={parseDetectedLang(i18n.language)}
+          />
+        </div>
       </div>
     );
   }

@@ -130,8 +130,8 @@ export function ExportDialog({
                   <ToolIcon
                     type="button"
                     icon={link}
-                    title="Get shareable link"
-                    aria-label="Get shareable link"
+                    title={t("buttons.getShareableLink")}
+                    aria-label={t("buttons.getShareableLink")}
                     onClick={() => onExportToBackend(exportedElements)}
                   />
                 </Stack.Row>

@@ -71,4 +71,6 @@ const fs = require("fs");
 const out = fs.createWriteStream("test.png");
 const stream = canvas.createPNGStream();
 stream.pipe(out);
-out.on("finish", () => console.log("test.png was created."));
+out.on("finish", () => {
+  console.info("test.png was created.");
+});
