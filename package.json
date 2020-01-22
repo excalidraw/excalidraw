@@ -49,7 +49,7 @@
     ]
   },
   "main": "src/index.js",
-  "name": "excalidraw",
+  "name": "allow-dragging-transparent-shapes-when-selected",
   "scripts": {
     "build": "react-scripts build",
     "build-node": "./scripts/build-node.js",
@@ -61,5 +61,6 @@
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "npm run prettier -- --list-different"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "keywords": []
 }
