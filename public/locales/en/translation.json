@@ -43,7 +43,8 @@
     "exportToPng": "Export to PNG",
     "copyToClipboard": "Copy to clipboard",
     "save": "Save",
-    "load": "Load"
+    "load": "Load",
+    "getShareableLink": "Get shareable link"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

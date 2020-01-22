@@ -43,7 +43,8 @@
     "exportToPng": "Exportar a PNG",
     "copyToClipboard": "Copiar al portapapeles",
     "save": "Guardar",
-    "load": "Cargar"
+    "load": "Cargar",
+    "getShareableLink": "Obtener enlace para compartir"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
