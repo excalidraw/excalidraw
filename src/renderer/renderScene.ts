@@ -57,6 +57,19 @@ export function renderScene(
   };
 
   elements.forEach(element => {
+    if (
+      !isVisibleElement(
+        element,
+        sceneState.scrollX,
+        sceneState.scrollY,
+        // If canvas is scaled for high pixelDeviceRatio width and height
+        // setted in the `style` attribute
+        parseInt(canvas.style.width) || canvas.width,
+        parseInt(canvas.style.height) || canvas.height
+      )
+    ) {
+      return;
+    }
     context.translate(
       element.x + sceneState.scrollX,
       element.y + sceneState.scrollY
@@ -125,4 +138,19 @@ export function renderScene(
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
   }
+}
+
+function isVisibleElement(
+  element: ExcalidrawElement,
+  scrollX: number,
+  scrollY: number,
+  canvasWidth: number,
+  canvasHeight: number
+) {
+  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  x1 += scrollX;
+  y1 += scrollY;
+  x2 += scrollX;
+  y2 += scrollY;
+  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
 }
