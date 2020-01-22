@@ -325,23 +325,25 @@ export class App extends React.Component<any, AppState> {
       }
       this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
+      event.preventDefault();
+
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
-          this.setState(data.appState);
           elements = data.elements;
+          this.forceUpdate();
+          this.setState(data.appState);
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
-          this.setState(data.appState);
           elements = data.elements;
+          this.forceUpdate();
+          this.setState(data.appState);
         }
       }
-      this.forceUpdate();
-      event.preventDefault();
     }
   };
 
