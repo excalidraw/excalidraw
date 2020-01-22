@@ -12,7 +12,7 @@ const Picker = function({
   onChange
 }: {
   colors: string[];
-  color: string | undefined;
+  color: string | null;
   onChange: (color: string) => void;
 }) {
   return (
@@ -55,7 +55,7 @@ function ColorInput({
   color,
   onChange
 }: {
-  color: string | undefined;
+  color: string | null;
   onChange: (color: string) => void;
 }) {
   const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
@@ -93,7 +93,7 @@ export function ColorPicker({
   onChange
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
-  color: string | undefined;
+  color: string | null;
   onChange: (color: string) => void;
 }) {
   const [isActive, setActive] = React.useState(false);
@@ -119,7 +119,7 @@ export function ColorPicker({
           <Popover onCloseRequest={() => setActive(false)}>
             <Picker
               colors={colors[type]}
-              color={color || undefined}
+              color={color || null}
               onChange={changedColor => {
                 onChange(changedColor);
               }}

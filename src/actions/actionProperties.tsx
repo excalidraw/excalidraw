@@ -1,10 +1,11 @@
 import React from "react";
 import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { getSelectedAttribute } from "../scene";
+import { getCommonAttributeOfSelectedElements } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
+import { AppState } from "../../src/types";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -16,6 +17,20 @@ const changeProperty = (
     }
     return element;
   });
+};
+
+const getFormValue = function<T>(
+  editingElement: AppState["editingElement"],
+  elements: readonly ExcalidrawElement[],
+  getAttribute: (element: ExcalidrawElement) => T,
+  defaultValue?: T
+): T | null {
+  return (
+    (editingElement && getAttribute(editingElement)) ||
+    getCommonAttributeOfSelectedElements(elements, getAttribute) ||
+    defaultValue ||
+    null
+  );
 };
 
 export const actionChangeStrokeColor: Action = {
@@ -30,15 +45,17 @@ export const actionChangeStrokeColor: Action = {
       appState: { ...appState, currentItemStrokeColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Stroke</h5>
+      <h5>{t("labels.stroke")}</h5>
       <ColorPicker
         type="elementStroke"
-        color={
-          getSelectedAttribute(elements, element => element.strokeColor) ||
+        color={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.strokeColor,
           appState.currentItemStrokeColor
-        }
+        )}
         onChange={updateData}
       />
     </>
@@ -57,15 +74,17 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value }
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Background</h5>
+      <h5>{t("labels.background")}</h5>
       <ColorPicker
         type="elementBackground"
-        color={
-          getSelectedAttribute(elements, element => element.backgroundColor) ||
+        color={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.backgroundColor,
           appState.currentItemBackgroundColor
-        }
+        )}
         onChange={updateData}
       />
     </>
@@ -83,16 +102,20 @@ export const actionChangeFillStyle: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Fill</h5>
+      <h5>{t("labels.fill")}</h5>
       <ButtonSelect
         options={[
-          { value: "solid", text: "Solid" },
-          { value: "hachure", text: "Hachure" },
-          { value: "cross-hatch", text: "Cross-hatch" }
+          { value: "solid", text: t("labels.solid") },
+          { value: "hachure", text: t("labels.hachure") },
+          { value: "cross-hatch", text: t("labels.crossHatch") }
         ]}
-        value={getSelectedAttribute(elements, element => element.fillStyle)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.fillStyle
+        )}
         onChange={value => {
           updateData(value);
         }}
@@ -112,16 +135,20 @@ export const actionChangeStrokeWidth: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Stroke Width</h5>
+      <h5>{t("labels.strokeWidth")}</h5>
       <ButtonSelect
         options={[
-          { value: 1, text: "Thin" },
-          { value: 2, text: "Bold" },
-          { value: 4, text: "Extra Bold" }
+          { value: 1, text: t("labels.thin") },
+          { value: 2, text: t("labels.bold") },
+          { value: 4, text: t("labels.extraBold") }
         ]}
-        value={getSelectedAttribute(elements, element => element.strokeWidth)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.strokeWidth
+        )}
         onChange={value => updateData(value)}
       />
     </>
@@ -139,16 +166,20 @@ export const actionChangeSloppiness: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Sloppiness</h5>
+      <h5>{t("labels.sloppiness")}</h5>
       <ButtonSelect
         options={[
-          { value: 0, text: "Architect" },
-          { value: 1, text: "Artist" },
-          { value: 3, text: "Cartoonist" }
+          { value: 0, text: t("labels.architect") },
+          { value: 1, text: t("labels.artist") },
+          { value: 3, text: t("labels.cartoonist") }
         ]}
-        value={getSelectedAttribute(elements, element => element.roughness)}
+        value={getFormValue(
+          appState.editingElement,
+          elements,
+          element => element.roughness
+        )}
         onChange={value => updateData(value)}
       />
     </>
@@ -166,17 +197,21 @@ export const actionChangeOpacity: Action = {
       }))
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Opacity</h5>
+      <h5>{t("labels.opacity")}</h5>
       <input
         type="range"
         min="0"
         max="100"
         onChange={e => updateData(+e.target.value)}
         value={
-          getSelectedAttribute(elements, element => element.opacity) ||
-          0 /* Put the opacity at 0 if there are two conflicting ones */
+          getFormValue(
+            appState.editingElement,
+            elements,
+            element => element.opacity,
+            100 /* default opacity */
+          ) || undefined
         }
       />
     </>
@@ -202,17 +237,18 @@ export const actionChangeFontSize: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Font size</h5>
+      <h5>{t("labels.fontSize")}</h5>
       <ButtonSelect
         options={[
-          { value: 16, text: "Small" },
-          { value: 20, text: "Medium" },
-          { value: 28, text: "Large" },
-          { value: 36, text: "Very Large" }
+          { value: 16, text: t("labels.small") },
+          { value: 20, text: t("labels.medium") },
+          { value: 28, text: t("labels.large") },
+          { value: 36, text: t("labels.veryLarge") }
         ]}
-        value={getSelectedAttribute(
+        value={getFormValue(
+          appState.editingElement,
           elements,
           element => isTextElement(element) && +element.font.split("px ")[0]
         )}
@@ -241,16 +277,17 @@ export const actionChangeFontFamily: Action = {
       })
     };
   },
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>Font family</h5>
+      <h5>{t("labels.fontFamily")}</h5>
       <ButtonSelect
         options={[
-          { value: "Virgil", text: "Hand-drawn" },
-          { value: "Helvetica", text: "Normal" },
-          { value: "Cascadia", text: "Code" }
+          { value: "Virgil", text: t("labels.handDrawn") },
+          { value: "Helvetica", text: t("labels.normal") },
+          { value: "Cascadia", text: t("labels.code") }
         ]}
-        value={getSelectedAttribute(
+        value={getFormValue(
+          appState.editingElement,
           elements,
           element => isTextElement(element) && element.font.split("px ")[1]
         )}

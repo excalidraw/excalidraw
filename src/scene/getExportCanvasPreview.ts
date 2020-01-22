@@ -21,8 +21,6 @@ export function getExportCanvasPreview(
     height
   ) {
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.style.width = width + "px";
-    tempCanvas.style.height = height + "px";
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
     return tempCanvas;

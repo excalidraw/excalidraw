@@ -2,8 +2,8 @@
   display: inline-block;
   cursor: pointer;
   border: none;
-  padding: 4px;
-  margin: -4px;
+  padding: 0.25rem;
+  margin: -0.25rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
 }
