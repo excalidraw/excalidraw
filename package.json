@@ -6,6 +6,7 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "browser-nativefs": "0.0.5",
     "i18next": "19.0.3",
     "i18next-browser-languagedetector": "4.0.1",
     "i18next-xhr-backend": "3.2.2",
@@ -61,5 +62,10 @@
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "npm run prettier -- --list-different"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/excalidraw/excalidraw.git"
+  }
 }
