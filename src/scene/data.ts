@@ -120,25 +120,18 @@ export async function exportToBackend(
   if (json.id) {
     const url = new URL(window.location.href);
     url.searchParams.append("id", json.id);
-
-    navigator.clipboard
-      .writeText(url.toString())
-      .then(() => {
-        window.alert(
-          i18n.t("alerts.copiedToClipboard", {
-            url: url.toString(),
-            interpolation: { escapeValue: false }
-          })
-        );
+    let msg = "alerts.copiedToClipboard";
+    try {
+      await navigator.clipboard.writeText(url.toString());
+    } catch (err) {
+      msg = "alerts.shareableLink";
+    }
+    window.alert(
+      i18n.t(msg, {
+        url: url.toString(),
+        interpolation: { escapeValue: false }
       })
-      .catch(() => {
-        window.alert(
-          i18n.t("alerts.shareableLink", {
-            url: url.toString(),
-            interpolation: { escapeValue: false }
-          })
-        );
-      });
+    );
   } else {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
   }
