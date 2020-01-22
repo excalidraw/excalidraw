@@ -121,13 +121,24 @@ export async function exportToBackend(
     const url = new URL(window.location.href);
     url.searchParams.append("id", json.id);
 
-    await navigator.clipboard.writeText(url.toString());
-    window.alert(
-      i18n.t("alerts.copiedToClipboard", {
-        url: url.toString(),
-        interpolation: { escapeValue: false }
+    navigator.clipboard
+      .writeText(url.toString())
+      .then(() => {
+        window.alert(
+          i18n.t("alerts.copiedToClipboard", {
+            url: url.toString(),
+            interpolation: { escapeValue: false }
+          })
+        );
       })
-    );
+      .catch(() => {
+        window.alert(
+          i18n.t("alerts.shareableLink", {
+            url: url.toString(),
+            interpolation: { escapeValue: false }
+          })
+        );
+      });
   } else {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
   }

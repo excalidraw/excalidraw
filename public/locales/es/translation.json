@@ -52,7 +52,8 @@
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
-    "copiedToClipboard": "Copiado en el portapapeles: {{url}}"
+    "copiedToClipboard": "Copiado en el portapapeles: {{url}}",
+    "shareableLink": "Enlace para compartir: {{url}}"
   },
   "toolBar": {
     "selection": "Selección",
