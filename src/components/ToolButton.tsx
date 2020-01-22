@@ -4,34 +4,28 @@ import React from "react";
 
 type ToolIconSize = "s" | "m";
 
-type ToolIconProps =
-  | {
-      type: "button";
-      icon: React.ReactNode;
-      "aria-label": string;
-      "aria-keyshortcuts"?: string;
-      title?: string;
-      name?: string;
-      id?: string;
-      onClick?(): void;
-      size?: ToolIconSize;
-    }
-  | {
+type ToolButtonBaseProps = {
+  icon: React.ReactNode;
+  "aria-label": string;
+  "aria-keyshortcuts"?: string;
+  title?: string;
+  name?: string;
+  id?: string;
+  size?: ToolIconSize;
+};
+
+type ToolButtonProps =
+  | (ToolButtonBaseProps & { type: "button"; onClick?(): void })
+  | (ToolButtonBaseProps & {
       type: "radio";
-      icon: React.ReactNode;
-      "aria-label": string;
-      "aria-keyshortcuts"?: string;
-      title?: string;
-      name?: string;
-      id?: string;
+
       checked: boolean;
       onChange?(): void;
-      size?: ToolIconSize;
-    };
+    });
 
 const DEFAULT_SIZE: ToolIconSize = "m";
 
-export function ToolButton(props: ToolIconProps) {
+export function ToolButton(props: ToolButtonProps) {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   if (props.type === "button")
