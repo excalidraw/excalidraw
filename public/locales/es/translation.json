@@ -14,8 +14,8 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Ancho de trazo",
-    "sloppiness": "Sloppiness",
-    "oppacity": "Opacidad",
+    "sloppiness": "Estilo de trazo",
+    "opacity": "Opacidad",
     "fontSize": "Tamaño de letra",
     "fontFamily": "Tipo de letra",
     "onlySelected": "Sólo seleccionados",
@@ -26,7 +26,16 @@
     "small": "Pequeña",
     "medium": "Mediana",
     "large": "Grande",
-    "veryLarge": "Muy Grande"
+    "veryLarge": "Muy Grande",
+    "solid": "Sólido",
+    "hachure": "Folleto",
+    "crossHatch": "Rayado transversal",
+    "thin": "Fino",
+    "bold": "Grueso",
+    "extraBold": "Extra Grueso",
+    "architect": "Arquitecto",
+    "artist": "Artista",
+    "cartoonist": "Caricatura"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

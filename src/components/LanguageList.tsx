@@ -9,7 +9,6 @@ export function LanguageList<T>({
   onClick: (value: string) => void;
   currentLanguage: string;
 }) {
-  console.log(currentLanguage);
   return (
     <ul>
       {languages.map((language, idx) => (

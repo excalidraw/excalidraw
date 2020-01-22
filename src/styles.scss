@@ -188,7 +188,11 @@ button {
   position: absolute;
   right: 0;
   bottom: 0;
-  margin-right: 1em;
+  margin-right: 0.5em;
+  ul {
+    margin: 0;
+    padding: 0;
+  }
   ul > li {
     list-style: none;
     display: inline-block;

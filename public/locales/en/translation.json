@@ -26,7 +26,16 @@
     "small": "Small",
     "medium": "Medium",
     "large": "Large",
-    "veryLarge": "Very Large"
+    "veryLarge": "Very Large",
+    "solid": "Solid",
+    "hachure": "Hachure",
+    "crossHatch": "Cross-Hatch",
+    "thin": "Thin",
+    "bold": "Bold",
+    "extraBold": "Extra Bold",
+    "architect": "Architect",
+    "artist": "Artist",
+    "cartoonist": "Cartoonist"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
