@@ -80,7 +80,8 @@ import { ToolIcon } from "./components/ToolIcon";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
-import "./i18n";
+import { LanguageList } from "./components/LanguageList";
+import i18n, { languages, parseDetectedLang } from "./i18n";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -95,6 +96,10 @@ function resetCursor() {
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
+const CURSOR_TYPE = {
+  TEXT: "text",
+  CROSSHAIR: "crosshair"
+};
 
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
@@ -273,6 +278,8 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
+    const shape = findShapeByKey(event.key);
+
     if (isArrowKey(event.key)) {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
@@ -298,7 +305,12 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      this.setState({ elementType: findShapeByKey(event.key) });
+      if (shape === "text") {
+        document.documentElement.style.cursor = CURSOR_TYPE.TEXT;
+      } else {
+        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+      }
+      this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       if (event.shiftKey) {
         // Redo action
@@ -483,7 +495,7 @@ export class App extends React.Component<any, AppState> {
                 this.setState({ elementType: value });
                 elements = clearSelection(elements);
                 document.documentElement.style.cursor =
-                  value === "text" ? "text" : "crosshair";
+                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
                 this.forceUpdate();
               }}
             ></ToolIcon>
@@ -1250,6 +1262,15 @@ export class App extends React.Component<any, AppState> {
             document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
+        <div className="langBox">
+          <LanguageList
+            onClick={lng => {
+              i18n.changeLanguage(lng);
+            }}
+            languages={languages}
+            currentLanguage={parseDetectedLang(i18n.language)}
+          />
+        </div>
       </div>
     );
   }
@@ -1371,4 +1392,100 @@ export class App extends React.Component<any, AppState> {
 const AppWithTrans = withTranslation()(App);
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<AppWithTrans />, rootElement);
+
+class TopErrorBoundary extends React.Component {
+  state = { hasError: false, stack: "", localStorage: "" };
+
+  static getDerivedStateFromError(error: any) {
+    console.error(error);
+    return {
+      hasError: true,
+      localStorage: JSON.stringify({ ...localStorage }),
+      stack: error.stack
+    };
+  }
+
+  private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
+    (event.target as HTMLTextAreaElement).select();
+  }
+
+  private async createGithubIssue() {
+    let body = "";
+    try {
+      const templateStr = (await import("./bug-issue-template")).default;
+      if (typeof templateStr === "string") {
+        body = encodeURIComponent(templateStr);
+      }
+    } catch {}
+
+    window.open(
+      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`
+    );
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="ErrorSplash">
+          <div className="ErrorSplash-messageContainer">
+            <div className="ErrorSplash-paragraph bigger">
+              Encountered an error. Please{" "}
+              <button onClick={() => window.location.reload()}>
+                reload the page
+              </button>
+              .
+            </div>
+            <div className="ErrorSplash-paragraph">
+              If reloading doesn't work. Try{" "}
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+              >
+                clearing the canvas
+              </button>
+              .<br />
+              <div className="smaller">
+                (This will unfortunately result in loss of work.)
+              </div>
+            </div>
+            <div>
+              <div className="ErrorSplash-paragraph">
+                Before doing so, we'd appreciate if you opened an issue on our{" "}
+                <button onClick={this.createGithubIssue}>bug tracker</button>.
+                Please include the following error stack trace & localStorage
+                content (provided it's not private):
+              </div>
+              <div className="ErrorSplash-paragraph">
+                <div className="ErrorSplash-details">
+                  <label>Error stack trace:</label>
+                  <textarea
+                    rows={10}
+                    onClick={this.selectTextArea}
+                    defaultValue={this.state.stack}
+                  />
+                  <label>LocalStorage content:</label>
+                  <textarea
+                    rows={5}
+                    onClick={this.selectTextArea}
+                    defaultValue={this.state.localStorage}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+ReactDOM.render(
+  <TopErrorBoundary>
+    <AppWithTrans />
+  </TopErrorBoundary>,
+  rootElement
+);
