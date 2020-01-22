@@ -115,6 +115,19 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
+function pickAppStatePropertiesForHistory(
+  appState: AppState
+): Partial<AppState> {
+  return {
+    exportBackground: appState.exportBackground,
+    currentItemStrokeColor: appState.currentItemStrokeColor,
+    currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFont: appState.currentItemFont,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    name: appState.name
+  };
+}
+
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -312,21 +325,23 @@ export class App extends React.Component<any, AppState> {
       }
       this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
+      event.preventDefault();
+
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
-          elements = data;
+          elements = data.elements;
+          this.setState(data.appState);
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
-          elements = data;
+          elements = data.elements;
+          this.setState(data.appState);
         }
       }
-      this.forceUpdate();
-      event.preventDefault();
     }
   };
 
@@ -1387,7 +1402,12 @@ export class App extends React.Component<any, AppState> {
     });
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(history.generateCurrentEntry(elements));
+      history.pushEntry(
+        history.generateCurrentEntry(
+          pickAppStatePropertiesForHistory(this.state),
+          elements
+        )
+      );
     }
   }
 }
