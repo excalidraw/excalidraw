@@ -48,7 +48,6 @@
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
-    "fileNotSelected": "Un archivo no fue seleccionado.",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
