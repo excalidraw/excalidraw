@@ -99,7 +99,8 @@ export const actionChangeFillStyle: Action = {
         ...el,
         shape: null,
         fillStyle: value
-      }))
+      })),
+      appState: { ...appState, currentItemFillStyle: value }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -132,7 +133,8 @@ export const actionChangeStrokeWidth: Action = {
         ...el,
         shape: null,
         strokeWidth: value
-      }))
+      })),
+      appState: { ...appState, currentItemStrokeWidth: value }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -163,7 +165,8 @@ export const actionChangeSloppiness: Action = {
         ...el,
         shape: null,
         roughness: value
-      }))
+      })),
+      appState: { ...appState, currentItemRoughness: value }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -194,7 +197,8 @@ export const actionChangeOpacity: Action = {
         ...el,
         shape: null,
         opacity: value
-      }))
+      })),
+      appState: { ...appState, currentItemOpacity: value }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -234,7 +238,13 @@ export const actionChangeFontSize: Action = {
         }
 
         return el;
-      })
+      }),
+      appState: {
+        ...appState,
+        currentItemFont: `${value}px ${
+          appState.currentItemFont.split("px ")[1]
+        }`
+      }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -274,7 +284,13 @@ export const actionChangeFontFamily: Action = {
         }
 
         return el;
-      })
+      }),
+      appState: {
+        ...appState,
+        currentItemFont: `${
+          appState.currentItemFont.split("px ")[0]
+        }px ${value}`
+      }
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
