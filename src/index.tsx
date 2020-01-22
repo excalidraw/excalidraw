@@ -506,6 +506,8 @@ export class App extends React.Component<any, AppState> {
               title={`${capitalizeString(label)} — ${
                 capitalizeString(label)[0]
               }, ${index + 1}`}
+              aria-label={capitalizeString(label)}
+              aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
                 this.setState({ elementType: value });
                 elements = clearSelection(elements);
