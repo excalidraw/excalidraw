@@ -332,7 +332,6 @@ export class App extends React.Component<any, AppState> {
         const data = history.redoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.forceUpdate();
           this.setState(data.appState);
         }
       } else {
@@ -340,7 +339,6 @@ export class App extends React.Component<any, AppState> {
         const data = history.undoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.forceUpdate();
           this.setState(data.appState);
         }
       }
