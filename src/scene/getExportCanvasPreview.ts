@@ -51,6 +51,7 @@ export function getExportCanvasPreview(
 
   renderScene(
     elements,
+    null,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
