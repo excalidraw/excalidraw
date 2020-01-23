@@ -6,7 +6,7 @@ import { AppState } from "../types";
 import { ExportType } from "./types";
 import { getExportCanvasPreview } from "./getExportCanvasPreview";
 import nanoid from "nanoid";
-import { fileOpenPromise, fileSavePromise } from "browser-nativefs";
+import { fileOpen, fileSave } from "browser-nativefs";
 
 import i18n from "../i18n";
 
@@ -14,14 +14,6 @@ const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
-
-let fileOpen: Function;
-let fileSave: Function;
-
-(async () => {
-  fileOpen = (await fileOpenPromise).default;
-  fileSave = (await fileSavePromise).default;
-})();
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
