@@ -16,7 +16,7 @@ export function parseDetectedLang(lng: string | undefined): string {
 
 export const languages = [
   { lng: "en", label: "English" },
-  { lng: "es", label: "Español" }
+  { lng: "es", label: "Español" },
 ];
 
 i18n
@@ -26,7 +26,7 @@ i18n
   .init({
     fallbackLng,
     react: { useSuspense: false },
-    load: "languageOnly"
+    load: "languageOnly",
   });
 
 export default i18n;

@@ -5,7 +5,7 @@ type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
 export function handlerRectangles(
   element: ExcalidrawElement,
-  { scrollX, scrollY }: SceneScroll
+  { scrollX, scrollY }: SceneScroll,
 ) {
   const elementX1 = element.x;
   const elementX2 = element.x + element.width;
@@ -24,14 +24,14 @@ export function handlerRectangles(
       elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
       elementY1 - margin + scrollY + marginY,
       8,
-      8
+      8,
     ];
 
     handlers["s"] = [
       elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
       elementY2 - margin + scrollY - marginY,
       8,
-      8
+      8,
     ];
   }
 
@@ -40,14 +40,14 @@ export function handlerRectangles(
       elementX1 - margin + scrollX + marginX,
       elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
       8,
-      8
+      8,
     ];
 
     handlers["e"] = [
       elementX2 - margin + scrollX - marginX,
       elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
       8,
-      8
+      8,
     ];
   }
 
@@ -55,31 +55,31 @@ export function handlerRectangles(
     elementX1 - margin + scrollX + marginX,
     elementY1 - margin + scrollY + marginY,
     8,
-    8
+    8,
   ]; // nw
   handlers["ne"] = [
     elementX2 - margin + scrollX - marginX,
     elementY1 - margin + scrollY + marginY,
     8,
-    8
+    8,
   ]; // ne
   handlers["sw"] = [
     elementX1 - margin + scrollX + marginX,
     elementY2 - margin + scrollY - marginY,
     8,
-    8
+    8,
   ]; // sw
   handlers["se"] = [
     elementX2 - margin + scrollX - marginX,
     elementY2 - margin + scrollY - marginY,
     8,
-    8
+    8,
   ]; // se
 
   if (element.type === "arrow" || element.type === "line") {
     return {
       nw: handlers.nw,
-      se: handlers.se
+      se: handlers.se,
     } as typeof handlers;
   }
 

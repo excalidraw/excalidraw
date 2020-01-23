@@ -3,7 +3,7 @@ import React from "react";
 export function ButtonSelect<T>({
   options,
   value,
-  onChange
+  onChange,
 }: {
   options: { value: T; text: string }[];
   value: T | null;

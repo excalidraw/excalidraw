@@ -11,7 +11,7 @@ export function getScrollBars(
   canvasWidth: number,
   canvasHeight: number,
   scrollX: number,
-  scrollY: number
+  scrollY: number,
 ) {
   let minX = Infinity;
   let maxX = 0;
@@ -41,14 +41,14 @@ export function getScrollBars(
     horizontalScrollBar = {
       x: Math.min(
         leftOverflow + SCROLLBAR_MARGIN,
-        canvasWidth - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
+        canvasWidth - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN,
       ),
       y: canvasHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
       width: Math.max(
         canvasWidth - rightOverflow - leftOverflow - SCROLLBAR_MARGIN * 2,
-        SCROLLBAR_MIN_SIZE
+        SCROLLBAR_MIN_SIZE,
       ),
-      height: SCROLLBAR_WIDTH
+      height: SCROLLBAR_WIDTH,
     };
   }
 
@@ -59,19 +59,19 @@ export function getScrollBars(
       x: canvasWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
       y: Math.min(
         topOverflow + SCROLLBAR_MARGIN,
-        canvasHeight - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN
+        canvasHeight - SCROLLBAR_MIN_SIZE - SCROLLBAR_MARGIN,
       ),
       width: SCROLLBAR_WIDTH,
       height: Math.max(
         canvasHeight - bottomOverflow - topOverflow - SCROLLBAR_WIDTH * 2,
-        SCROLLBAR_MIN_SIZE
-      )
+        SCROLLBAR_MIN_SIZE,
+      ),
     };
   }
 
   return {
     horizontal: horizontalScrollBar,
-    vertical: verticalScrollBar
+    vertical: verticalScrollBar,
   };
 }
 
@@ -82,30 +82,30 @@ export function isOverScrollBars(
   canvasWidth: number,
   canvasHeight: number,
   scrollX: number,
-  scrollY: number
+  scrollY: number,
 ) {
   const scrollBars = getScrollBars(
     elements,
     canvasWidth,
     canvasHeight,
     scrollX,
-    scrollY
+    scrollY,
   );
 
   const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
     scrollBars.horizontal,
-    scrollBars.vertical
+    scrollBars.vertical,
   ].map(
     scrollBar =>
       scrollBar &&
       scrollBar.x <= x &&
       x <= scrollBar.x + scrollBar.width &&
       scrollBar.y <= y &&
-      y <= scrollBar.y + scrollBar.height
+      y <= scrollBar.y + scrollBar.height,
   );
 
   return {
     isOverHorizontalScrollBar,
-    isOverVerticalScrollBar
+    isOverVerticalScrollBar,
   };
 }
