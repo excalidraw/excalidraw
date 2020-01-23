@@ -956,12 +956,10 @@ export class App extends React.Component<any, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  let deltaX = 0;
-                  let deltaY = 0;
                   const element = selectedElements[0];
                   switch (resizeHandle) {
-                    case "nw":
-                      deltaX = lastX - x;
+                    case "nw": {
+                      const deltaX = lastX - x;
                       element.width += deltaX;
                       element.x -= deltaX;
                       if (e.shiftKey) {
@@ -973,65 +971,119 @@ export class App extends React.Component<any, AppState> {
                         element.y -= deltaY;
                       }
                       break;
-                    case "ne":
+                    }
+                    case "ne": {
                       element.width += x - lastX;
                       if (e.shiftKey) {
                         element.y += element.height - element.width;
                         element.height = element.width;
                       } else {
-                        deltaY = lastY - y;
+                        const deltaY = lastY - y;
                         element.height += deltaY;
                         element.y -= deltaY;
                       }
                       break;
-                    case "sw":
-                      deltaX = lastX - x;
+                    }
+                    case "sw": {
+                      const deltaX = lastX - x;
+                      const deltaY = y - lastY;
                       element.width += deltaX;
                       element.x -= deltaX;
                       if (e.shiftKey) {
                         element.height = element.width;
                       } else {
-                        element.height += y - lastY;
+                        element.height += deltaY;
                       }
                       break;
-                    case "se":
-                      element.width += x - lastX;
+                    }
+                    case "se": {
+                      const deltaX = x - lastX;
+                      const deltaY = y - lastY;
+                      element.width += deltaX;
                       if (e.shiftKey) {
                         element.height = element.width;
                       } else {
-                        element.height += y - lastY;
+                        element.height += deltaY;
                       }
                       break;
-                    case "n":
-                      deltaY = lastY - y;
+                    }
+                    case "n": {
+                      const deltaY = lastY - y;
                       element.height += deltaY;
                       element.y -= deltaY;
+
+                      if (element.points.length > 0) {
+                        const len = element.points.length;
+
+                        const points = [...element.points].sort(
+                          (a, b) => a[1] - b[1]
+                        );
+
+                        for (let i = 1; i < points.length; ++i) {
+                          const pnt = points[i];
+                          pnt[1] += deltaY / (len - i);
+                        }
+                      }
                       break;
-                    case "w":
-                      deltaX = lastX - x;
+                    }
+                    case "w": {
+                      const deltaX = lastX - x;
                       element.width += deltaX;
                       element.x -= deltaX;
+
+                      if (element.points.length > 0) {
+                        const len = element.points.length;
+                        const points = [...element.points].sort(
+                          (a, b) => a[0] - b[0]
+                        );
+
+                        for (let i = 0; i < points.length; ++i) {
+                          const pnt = points[i];
+                          pnt[0] += deltaX / (len - i);
+                        }
+                      }
                       break;
-                    case "s":
-                      element.height += y - lastY;
+                    }
+                    case "s": {
+                      const deltaY = y - lastY;
+                      element.height += deltaY;
+                      if (element.points.length > 0) {
+                        const len = element.points.length;
+                        const points = [...element.points].sort(
+                          (a, b) => a[1] - b[1]
+                        );
+
+                        for (let i = 1; i < points.length; ++i) {
+                          const pnt = points[i];
+                          pnt[1] += deltaY / (len - i);
+                        }
+                      }
                       break;
-                    case "e":
-                      element.width += x - lastX;
+                    }
+                    case "e": {
+                      const deltaX = x - lastX;
+                      element.width += deltaX;
+                      if (element.points.length > 0) {
+                        const len = element.points.length;
+                        const points = [...element.points].sort(
+                          (a, b) => a[0] - b[0]
+                        );
+
+                        for (let i = 0; i < points.length; ++i) {
+                          const pnt = points[i];
+                          pnt[0] += deltaX / (len - i);
+                        }
+                      }
                       break;
+                    }
                   }
 
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     { element, resizeHandle }
                   );
+
                   el.x = element.x;
                   el.y = element.y;
-
-                  if (el.type === "arrow") {
-                    el.points = [
-                      [0, 0],
-                      [element.width, element.height]
-                    ];
-                  }
                   el.shape = null;
 
                   lastX = x;

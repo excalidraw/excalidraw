@@ -6,6 +6,9 @@ import { rotate } from "../math";
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
 export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+  if (element.type === "arrow") {
+    return getArrowAbsoluteBounds(element);
+  }
   return [
     element.width >= 0 ? element.x : element.x + element.width, // x1
     element.height >= 0 ? element.y : element.y + element.height, // y1
@@ -29,24 +32,24 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getArrowBounds(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
+export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = 0,
+    maxY = 0;
+  element.points.forEach(pnt => {
+    minX = Math.min(minX, pnt[0]);
+    minY = Math.min(minY, pnt[1]);
 
-  const size = 30; // pixels
-  const distance = Math.hypot(x2 - x1, y2 - y1);
-  // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  const minSize = Math.min(size, distance / 2);
-  const xs = x2 - ((x2 - x1) / distance) * minSize;
-  const ys = y2 - ((y2 - y1) / distance) * minSize;
-
-  const angle = 20; // degrees
-  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
-  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
-
-  return [x1, y1, x2, y2, x3, y3, x4, y4];
+    maxX = Math.max(maxX, pnt[0]);
+    maxY = Math.max(maxY, pnt[1]);
+  });
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y
+  ];
 }
 
 export function getArrowPoints(element: ExcalidrawElement) {

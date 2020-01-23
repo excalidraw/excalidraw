@@ -3,7 +3,8 @@ export {
   getElementAbsoluteCoords,
   getDiamondPoints,
   getArrowPoints,
-  getLinePoints
+  getLinePoints,
+  getArrowAbsoluteBounds
 } from "./bounds";
 
 export { handlerRectangles } from "./handlerRectangles";

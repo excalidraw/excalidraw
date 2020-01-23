@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { SceneScroll } from "../scene/types";
+import { getArrowAbsoluteBounds } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -11,26 +12,11 @@ export function handlerRectangles(
   let elementY2 = 0;
   let elementX1 = Infinity;
   let elementY1 = Infinity;
+  let minimumSize = 40;
   if (element.type === "arrow") {
-    for (let i = 0; i < element.points.length; ++i) {
-      const pnt = element.points[i];
-      const [dx, dy] = [pnt[0] + element.x, pnt[1] + element.y];
-      if (elementX1 > dx) {
-        elementX1 = dx;
-      }
-
-      if (elementY1 > dy) {
-        elementY1 = dy;
-      }
-
-      if (elementX2 < dx) {
-        elementX2 = dx;
-      }
-
-      if (elementY2 < dy) {
-        elementY2 = dy;
-      }
-    }
+    [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
+      element
+    );
   } else {
     elementX1 = element.x;
     elementX2 = element.x + element.width;
@@ -39,7 +25,6 @@ export function handlerRectangles(
   }
 
   const margin = 4;
-  const minimumSize = 40;
   const handlers = {} as { [T in Sides]: number[] };
 
   const marginX = element.width < 0 ? 8 : -8;
@@ -106,6 +91,13 @@ export function handlerRectangles(
     return {
       nw: handlers.nw,
       se: handlers.se
+    } as typeof handlers;
+  } else if (element.type === "arrow") {
+    return {
+      n: handlers.n,
+      s: handlers.s,
+      w: handlers.w,
+      e: handlers.e
     } as typeof handlers;
   }
 
