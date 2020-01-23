@@ -55,7 +55,7 @@
     "copiedToClipboard": "Copié dans le presse-papier: {{url}}"
   },
   "toolBar": {
-    "selection": "Selection",
+    "selection": "Sélection",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",
