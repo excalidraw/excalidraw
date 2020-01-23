@@ -7,10 +7,36 @@ export function handlerRectangles(
   element: ExcalidrawElement,
   { scrollX, scrollY }: SceneScroll
 ) {
-  const elementX1 = element.x;
-  const elementX2 = element.x + element.width;
-  const elementY1 = element.y;
-  const elementY2 = element.y + element.height;
+  let elementX2 = 0;
+  let elementY2 = 0;
+  let elementX1 = Infinity;
+  let elementY1 = Infinity;
+  if (element.type === "arrow") {
+    for (let i = 0; i < element.points.length; ++i) {
+      const pnt = element.points[i];
+      const [dx, dy] = [pnt[0] + element.x, pnt[1] + element.y];
+      if (elementX1 > dx) {
+        elementX1 = dx;
+      }
+
+      if (elementY1 > dy) {
+        elementY1 = dy;
+      }
+
+      if (elementX2 < dx) {
+        elementX2 = dx;
+      }
+
+      if (elementY2 < dy) {
+        elementY2 = dy;
+      }
+    }
+  } else {
+    elementX1 = element.x;
+    elementX2 = element.x + element.width;
+    elementY1 = element.y;
+    elementY2 = element.y + element.height;
+  }
 
   const margin = 4;
   const minimumSize = 40;
@@ -76,7 +102,7 @@ export function handlerRectangles(
     8
   ]; // se
 
-  if (element.type === "arrow" || element.type === "line") {
+  if (element.type === "line") {
     return {
       nw: handlers.nw,
       se: handlers.se
