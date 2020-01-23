@@ -3,6 +3,9 @@ import nanoid from "nanoid";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import { measureText } from "../utils";
+
 export function newElement(
   type: string,
   x: number,
@@ -36,6 +39,28 @@ export function newElement(
     points
   };
   return element;
+}
+
+export function newTextElement(
+  element: ExcalidrawElement,
+  text: string,
+  font: string
+) {
+  const metrics = measureText(text, font);
+  const textElement: ExcalidrawTextElement = {
+    ...element,
+    type: "text",
+    text: text,
+    font: font,
+    // Center the text
+    x: element.x - metrics.width / 2,
+    y: element.y - metrics.height / 2,
+    width: metrics.width,
+    height: metrics.height,
+    baseline: metrics.baseline
+  };
+
+  return textElement;
 }
 
 export function duplicateElement(element: ReturnType<typeof newElement>) {

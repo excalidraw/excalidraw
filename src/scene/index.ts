@@ -5,14 +5,16 @@ export {
   deleteSelectedElements,
   someElementIsSelected,
   getElementsWithinSelection,
-  getSelectedAttribute
+  getCommonAttributeOfSelectedElements
 } from "./selection";
 export {
   exportCanvas,
   loadFromJSON,
   saveAsJSON,
   restoreFromLocalStorage,
-  saveToLocalStorage
+  saveToLocalStorage,
+  exportToBackend,
+  importFromBackend
 } from "./data";
 export {
   hasBackground,

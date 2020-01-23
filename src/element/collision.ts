@@ -9,6 +9,10 @@ import {
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
 
+function isElementDraggableFromInside(element: ExcalidrawElement): boolean {
+  return element.backgroundColor !== "transparent" || element.isSelected;
+}
+
 export function hitTest(
   element: ExcalidrawElement,
   x: number,
@@ -52,7 +56,7 @@ export function hitTest(
       ty /= t;
     });
 
-    if (element.backgroundColor !== "transparent") {
+    if (isElementDraggableFromInside(element)) {
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
@@ -62,7 +66,7 @@ export function hitTest(
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-    if (element.backgroundColor !== "transparent") {
+    if (isElementDraggableFromInside(element)) {
       return (
         x > x1 - lineThreshold &&
         x < x2 + lineThreshold &&
@@ -95,7 +99,7 @@ export function hitTest(
       leftY
     ] = getDiamondPoints(element);
 
-    if (element.backgroundColor !== "transparent") {
+    if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
       if (topY > bottomY) [bottomY, topY] = [topY, bottomY];
       if (rightX < leftX) [leftX, rightX] = [rightX, leftX];

@@ -13,7 +13,11 @@ export type AppState = {
     point: Point;
     overlappingPoint: number;
   } | null;
+  // element being edited, but not necessarily added to elements array yet
+  //  (e.g. text element when typing into the input)
+  editingElement: ExcalidrawElement | null;
   elementType: string;
+  elementLocked: boolean;
   exportBackground: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;

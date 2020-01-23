@@ -7,6 +7,13 @@
   font-display: swap;
 }
 
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("https://uploads.codesandbox.io/uploads/user/5f5b1ecd-ac15-4c7f-803e-e11ff53ea4ce/z1tp-Cascadia.ttf");
+  font-display: swap;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -27,9 +34,9 @@ body {
   flex-direction: column;
 
   h5 {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    font-size: 12px;
+    margin-top: 0.333rem;
+    margin-bottom: 0.333em;
+    font-size: 0.75rem;
     color: var(--text-color-primary);
   }
 
@@ -41,7 +48,8 @@ body {
     flex-wrap: wrap;
 
     button {
-      margin-right: 4px;
+      margin-right: 0.25rem;
+      font-size: 0.75rem;
     }
   }
 }
@@ -61,9 +69,11 @@ button {
   background-color: #e9ecef;
   border: 0;
   border-radius: 4px;
-  margin: 2px 0;
-  padding: 5px;
+  margin: 0.125rem 0;
+  padding: 0.25rem;
   outline: transparent;
+
+  cursor: pointer;
 
   &:focus {
     box-shadow: 0 0 0 2px #a5d8ff;
@@ -123,5 +133,80 @@ button {
 }
 
 .App-right-menu {
-  width: 220px;
+  width: 13.75rem;
+}
+
+.ErrorSplash {
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background-color: #fff5f5;
+    border: 3px solid #c92a2a;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+      font-family: "Cascadia";
+      font-size: 0.8em;
+    }
+  }
+}
+
+.langBox {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-right: 0.5em;
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  ul > li {
+    list-style: none;
+    display: inline-block;
+    padding: 4px;
+  }
+  li > a,
+  li > a:visited {
+    text-decoration: none;
+    color: gray;
+    font-size: 0.8em;
+  }
+  li.current > a,
+  li.current > a:visited {
+    color: black;
+    text-decoration: underline;
+  }
 }

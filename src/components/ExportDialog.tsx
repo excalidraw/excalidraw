@@ -4,13 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolIcon } from "./ToolIcon";
-import { clipboard, exportFile, downloadFile } from "./icons";
+import { clipboard, exportFile, downloadFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { getExportCanvasPreview } from "../scene/data";
+import { getExportCanvasPreview } from "../scene/getExportCanvasPreview";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
+
+import { useTranslation } from "react-i18next";
 
 const probablySupportsClipboard =
   "toBlob" in HTMLCanvasElement.prototype &&
@@ -21,7 +23,10 @@ const probablySupportsClipboard =
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (elements: readonly ExcalidrawElement[], scale: number) => void;
+type ExportCB = (
+  elements: readonly ExcalidrawElement[],
+  scale?: number
+) => void;
 
 export function ExportDialog({
   elements,
@@ -30,7 +35,8 @@ export function ExportDialog({
   actionManager,
   syncActionResult,
   onExportToPng,
-  onExportToClipboard
+  onExportToClipboard,
+  onExportToBackend
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -39,7 +45,9 @@ export function ExportDialog({
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToClipboard: ExportCB;
+  onExportToBackend: ExportCB;
 }) {
+  const { t } = useTranslation();
   const someElementIsSelected = elements.some(element => element.isSelected);
   const [modalIsShown, setModalIsShown] = useState(false);
   const [scale, setScale] = useState(defaultScale);
@@ -88,7 +96,7 @@ export function ExportDialog({
         icon={exportFile}
         type="button"
         aria-label="Show export dialog"
-        title="Export"
+        title={t("buttons.export")}
       />
       {modalIsShown && (
         <Modal maxWidth={640} onCloseRequest={handleClose}>
@@ -97,42 +105,50 @@ export function ExportDialog({
               <button className="ExportDialog__close" onClick={handleClose}>
                 ╳
               </button>
-              <h2>Export</h2>
+              <h2>{t("buttons.export")}</h2>
               <div className="ExportDialog__preview" ref={previeRef}></div>
               <div className="ExportDialog__actions">
                 <Stack.Row gap={2}>
                   <ToolIcon
                     type="button"
                     icon={downloadFile}
-                    title="Export to PNG"
-                    aria-label="Export to PNG"
+                    title={t("buttons.exportToPng")}
+                    aria-label={t("buttons.exportToPng")}
                     onClick={() => onExportToPng(exportedElements, scale)}
                   />
-
                   {probablySupportsClipboard && (
                     <ToolIcon
                       type="button"
                       icon={clipboard}
-                      title="Copy to clipboard"
-                      aria-label="Copy to clipboard"
+                      title={t("buttons.copyToClipboard")}
+                      aria-label={t("buttons.copyToClipboard")}
                       onClick={() =>
                         onExportToClipboard(exportedElements, scale)
                       }
                     />
                   )}
+                  <ToolIcon
+                    type="button"
+                    icon={link}
+                    title={t("buttons.getShareableLink")}
+                    aria-label={t("buttons.getShareableLink")}
+                    onClick={() => onExportToBackend(exportedElements)}
+                  />
                 </Stack.Row>
 
                 {actionManager.renderAction(
                   "changeProjectName",
                   elements,
                   appState,
-                  syncActionResult
+                  syncActionResult,
+                  t
                 )}
                 <Stack.Col gap={1}>
                   <div className="ExportDialog__scales">
                     <Stack.Row gap={1} align="baseline">
                       {scales.map(s => (
                         <ToolIcon
+                          key={s}
                           size="s"
                           type="radio"
                           icon={"x" + s}
@@ -148,7 +164,8 @@ export function ExportDialog({
                     "changeExportBackground",
                     elements,
                     appState,
-                    syncActionResult
+                    syncActionResult,
+                    t
                   )}
                   {someElementIsSelected && (
                     <div>
@@ -160,7 +177,7 @@ export function ExportDialog({
                             setExportSelected(e.currentTarget.checked)
                           }
                         />{" "}
-                        Only selected
+                        {t("labels.onlySelected")}
                       </label>
                     </div>
                   )}

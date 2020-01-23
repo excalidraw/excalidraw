@@ -6,9 +6,14 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "browser-nativefs": "0.0.5",
+    "i18next": "19.0.3",
+    "i18next-browser-languagedetector": "4.0.1",
+    "i18next-xhr-backend": "3.2.2",
     "nanoid": "2.1.9",
     "react": "16.12.0",
     "react-dom": "16.12.0",
+    "react-i18next": "11.3.1",
     "react-scripts": "3.3.0",
     "roughjs": "4.0.4"
   },
@@ -19,14 +24,34 @@
     "@types/react": "16.9.17",
     "@types/react-color": "3.0.1",
     "@types/react-dom": "16.9.4",
+    "eslint-plugin-json-format": "2.0.1",
     "husky": "4.0.10",
-    "lint-staged": "9.5.0",
+    "lint-staged": "10.0.0",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
+    "rewire": "4.0.1",
     "typescript": "3.7.5"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "plugins": [
+      "json-format"
+    ],
+    "settings": {
+      "json/sort-package-json": false
+    },
+    "rules": {
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error",
+            "info"
+          ]
+        }
+      ]
+    }
   },
   "homepage": "https://excalidraw.com",
   "husky": {
@@ -34,26 +59,23 @@
       "pre-commit": "lint-staged"
     }
   },
-  "lint-staged": {
-    "*.{js,css,scss,json,md,ts,tsx,html,yml}": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.{js,ts,tsx}": [
-      "eslint --max-warnings 0"
-    ]
-  },
   "main": "src/index.js",
   "name": "excalidraw",
   "scripts": {
     "build": "react-scripts build",
+    "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
     "fix": "npm run prettier -- --write",
-    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\"",
+    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "npm run prettier -- --list-different"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/excalidraw/excalidraw.git"
+  }
 }

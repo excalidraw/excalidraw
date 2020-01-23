@@ -12,56 +12,80 @@ const Picker = function({
   onChange
 }: {
   colors: string[];
-  color: string | undefined;
+  color: string | null;
   onChange: (color: string) => void;
 }) {
-  const [innerValue, setInnerValue] = React.useState(color);
-  React.useEffect(() => {
-    setInnerValue(color);
-  }, [color]);
   return (
     <div className="color-picker">
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div className="color-picker-content">
-        {colors.map(color => (
-          <div
-            className="color-picker-swatch"
-            onClick={() => {
-              onChange(color);
-            }}
-            title={color}
-            tabIndex={0}
-            style={{ backgroundColor: color }}
-            key={color}
-          >
-            {color === "transparent" ? (
-              <div className="color-picker-transparent"></div>
-            ) : (
-              undefined
-            )}
-          </div>
-        ))}
-        <div className="color-picker-hash">#</div>
-        <div style={{ position: "relative" }}>
-          <input
-            spellCheck={false}
-            className="color-picker-input"
-            onChange={e => {
-              const value = e.target.value;
-              if (value.match(/^([0-9a-f]{3}|[0-9a-f]{6}|transparent)$/)) {
-                onChange(value === "transparent" ? "transparent" : "#" + value);
-              }
-              setInnerValue(value);
-            }}
-            value={(innerValue || "").replace(/^#/, "")}
-          />
+        <div className="colors-gallery">
+          {colors.map(color => (
+            <div
+              className="color-picker-swatch"
+              onClick={() => {
+                onChange(color);
+              }}
+              title={color}
+              tabIndex={0}
+              style={{ backgroundColor: color }}
+              key={color}
+            >
+              {color === "transparent" ? (
+                <div className="color-picker-transparent"></div>
+              ) : (
+                undefined
+              )}
+            </div>
+          ))}
         </div>
-        <div style={{ clear: "both" }}></div>
+        <ColorInput
+          color={color}
+          onChange={color => {
+            onChange(color);
+          }}
+        />
       </div>
     </div>
   );
 };
+
+function ColorInput({
+  color,
+  onChange
+}: {
+  color: string | null;
+  onChange: (color: string) => void;
+}) {
+  const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
+  const [innerValue, setInnerValue] = React.useState(color);
+
+  React.useEffect(() => {
+    setInnerValue(color);
+  }, [color]);
+
+  return (
+    <div className="color-input-container">
+      <div className="color-picker-hash">#</div>
+      <input
+        spellCheck={false}
+        className="color-picker-input"
+        aria-label="Hex color code"
+        onChange={e => {
+          const value = e.target.value;
+          if (value.match(colorRegex)) {
+            onChange(value === "transparent" ? "transparent" : "#" + value);
+          }
+          setInnerValue(value);
+        }}
+        value={(innerValue || "").replace(/^#/, "")}
+        onPaste={e => onChange(e.clipboardData.getData("text"))}
+        onBlur={() => setInnerValue(color)}
+      />
+    </div>
+  );
+}
 
 export function ColorPicker({
   type,
@@ -73,19 +97,29 @@ export function ColorPicker({
   onChange: (color: string) => void;
 }) {
   const [isActive, setActive] = React.useState(false);
+
   return (
     <div>
-      <button
-        className="color-picker-label-swatch"
-        style={color ? { backgroundColor: color } : undefined}
-        onClick={() => setActive(!isActive)}
-      />
+      <div className="color-picker-control-container">
+        <button
+          className="color-picker-label-swatch"
+          aria-label="Change color"
+          style={color ? { backgroundColor: color } : undefined}
+          onClick={() => setActive(!isActive)}
+        />
+        <ColorInput
+          color={color}
+          onChange={color => {
+            onChange(color);
+          }}
+        />
+      </div>
       <React.Suspense fallback="">
         {isActive ? (
           <Popover onCloseRequest={() => setActive(false)}>
             <Picker
               colors={colors[type]}
-              color={color || undefined}
+              color={color || null}
               onChange={changedColor => {
                 onChange(changedColor);
               }}
@@ -93,13 +127,6 @@ export function ColorPicker({
           </Popover>
         ) : null}
       </React.Suspense>
-      <input
-        type="text"
-        className="color-picker-swatch-input"
-        value={color || ""}
-        onPaste={e => onChange(e.clipboardData.getData("text"))}
-        onChange={e => onChange(e.target.value)}
-      />
     </div>
   );
 }
