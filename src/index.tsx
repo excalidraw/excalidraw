@@ -13,7 +13,9 @@ import {
   isTextElement,
   textWysiwyg,
   getElementAbsoluteCoords,
-  getCursorForResizingElement
+  getCursorForResizingElement,
+  getPerfectElementSize,
+  resizePerfectLineForNWHandler
 } from "./element";
 import {
   clearSelection,
@@ -940,67 +942,83 @@ export class App extends React.Component<any, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  let deltaX = 0;
-                  let deltaY = 0;
+                  const deltaX = x - lastX;
+                  const deltaY = y - lastY;
                   const element = selectedElements[0];
                   switch (resizeHandle) {
                     case "nw":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
+
                       if (e.shiftKey) {
-                        element.y += element.height - element.width;
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          resizePerfectLineForNWHandler(element, x, y);
+                        } else {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        }
                       } else {
-                        const deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                        element.height -= deltaY;
+                        element.y += deltaY;
                       }
                       break;
                     case "ne":
-                      element.width += x - lastX;
+                      element.width += deltaX;
                       if (e.shiftKey) {
                         element.y += element.height - element.width;
                         element.height = element.width;
                       } else {
-                        deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                        element.height -= deltaY;
+                        element.y += deltaY;
                       }
                       break;
                     case "sw":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
                       if (e.shiftKey) {
                         element.height = element.width;
                       } else {
-                        element.height += y - lastY;
+                        element.height += deltaY;
                       }
                       break;
                     case "se":
-                      element.width += x - lastX;
                       if (e.shiftKey) {
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          const { width, height } = getPerfectElementSize(
+                            element.type,
+                            x - element.x,
+                            y - element.y
+                          );
+                          element.width = width;
+                          element.height = height;
+                        } else {
+                          element.width += deltaX;
+                          element.height = element.width;
+                        }
                       } else {
-                        element.height += y - lastY;
+                        element.width += deltaX;
+                        element.height += deltaY;
                       }
                       break;
                     case "n":
-                      deltaY = lastY - y;
-                      element.height += deltaY;
-                      element.y -= deltaY;
+                      element.height -= deltaY;
+                      element.y += deltaY;
                       break;
                     case "w":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
                       break;
                     case "s":
-                      element.height += y - lastY;
+                      element.height += deltaY;
                       break;
                     case "e":
-                      element.width += x - lastX;
+                      element.width += deltaX;
                       break;
                   }
 
@@ -1056,12 +1074,23 @@ export class App extends React.Component<any, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP -
                 draggingElement.y -
                 this.state.scrollY;
-              draggingElement.width = width;
-              // Make a perfect square or circle when shift is enabled
-              draggingElement.height =
-                e.shiftKey && this.state.elementType !== "selection"
-                  ? Math.abs(width) * Math.sign(height)
-                  : height;
+
+              if (e.shiftKey) {
+                let {
+                  width: newWidth,
+                  height: newHeight
+                } = getPerfectElementSize(
+                  this.state.elementType,
+                  width,
+                  height
+                );
+                draggingElement.width = newWidth;
+                draggingElement.height = newHeight;
+              } else {
+                draggingElement.width = width;
+                draggingElement.height = height;
+              }
+
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
