@@ -125,6 +125,14 @@ export async function exportToBackend(
       await navigator.clipboard.writeText(url.toString());
     } catch (err) {
       msg = "alerts.shareableLink";
+      const backupClipboard = document.querySelector(
+        "#backupClipboard"
+      ) as HTMLInputElement;
+      if (backupClipboard) {
+        backupClipboard.value = url.toString();
+        backupClipboard.select();
+        document.execCommand("copy");
+      }
     }
     window.alert(
       i18n.t(msg, {
