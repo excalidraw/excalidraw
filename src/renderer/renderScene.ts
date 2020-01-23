@@ -107,9 +107,11 @@ export function renderScene(
 
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       const handlers = handlerRectangles(selectedElements[0], sceneState);
-      Object.values(handlers).forEach(handler => {
-        context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-      });
+      Object.values(handlers)
+        .filter(handler => handler !== undefined)
+        .forEach(handler => {
+          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+        });
     }
   }
 

@@ -4,9 +4,10 @@ import { KEYS } from "../keys";
 
 export const actionDeleteSelected: Action = {
   name: "deleteSelectedElements",
-  perform: elements => {
+  perform: (elements, appState) => {
     return {
-      elements: deleteSelectedElements(elements)
+      elements: deleteSelectedElements(elements),
+      appState: { ...appState, multiElement: null }
     };
   },
   contextItemLabel: "labels.delete",
