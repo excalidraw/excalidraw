@@ -496,7 +496,7 @@ export class App extends React.Component<any, AppState> {
 
     return (
       <>
-        {SHAPES.map(({ value, icon }, index) => {
+        {SHAPES.map(({ value, icon, shortcut }, index) => {
           const label = t(`toolBar.${value}`);
           return (
             <ToolIcon
@@ -505,9 +505,7 @@ export class App extends React.Component<any, AppState> {
               icon={icon}
               checked={this.state.elementType === value}
               name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${
-                capitalizeString(label)[0]
-              }, ${index + 1}`}
+              title={`${capitalizeString(label)} — ${shortcut}, ${index + 1}`}
               onChange={() => {
                 this.setState({ elementType: value });
                 elements = clearSelection(elements);
