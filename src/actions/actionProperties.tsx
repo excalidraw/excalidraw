@@ -203,7 +203,7 @@ export const actionChangeOpacity: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <label>
+    <label className="control-label">
       {t("labels.opacity")}
       <input
         type="range"
