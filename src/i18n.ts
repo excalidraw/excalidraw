@@ -18,7 +18,7 @@ export const languages = [
   { lng: "en", label: "English" },
   { lng: "es", label: "Español" },
   { lng: "fr", label: "Français" },
-  { lng: "pt", label: "Português" },
+  { lng: "pt", label: "Português" }
 ];
 
 i18n
