@@ -506,7 +506,7 @@ export class App extends React.Component<any, AppState> {
               checked={this.state.elementType === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${
-                capitalizeString(label)[0]
+                capitalizeString(value)[0]
               }, ${index + 1}`}
               onChange={() => {
                 this.setState({ elementType: value });
