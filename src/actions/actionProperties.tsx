@@ -46,10 +46,11 @@ export const actionChangeStrokeColor: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <label>
-      {t("labels.stroke")}
+    <>
+      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
         type="elementStroke"
+        label={t("labels.stroke")}
         color={getFormValue(
           appState.editingElement,
           elements,
@@ -58,7 +59,7 @@ export const actionChangeStrokeColor: Action = {
         )}
         onChange={updateData}
       />
-    </label>
+    </>
   )
 };
 
@@ -75,10 +76,11 @@ export const actionChangeBackgroundColor: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <label>
-      {t("labels.background")}
+    <>
+      <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
         type="elementBackground"
+        label={t("labels.background")}
         color={getFormValue(
           appState.editingElement,
           elements,
@@ -87,7 +89,7 @@ export const actionChangeBackgroundColor: Action = {
         )}
         onChange={updateData}
       />
-    </label>
+    </>
   )
 };
 

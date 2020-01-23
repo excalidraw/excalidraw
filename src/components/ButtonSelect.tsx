@@ -14,11 +14,10 @@ export function ButtonSelect<T>({
   return (
     <div className="buttonList">
       {options.map(option => (
-        <label>
+        <label key={option.text}>
           <input
             type="radio"
             name={group}
-            key={option.text}
             onChange={() => onChange(option.value)}
             className={value === option.value ? "active" : ""}
             checked={value === option.value ? true : false}
