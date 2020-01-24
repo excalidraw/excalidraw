@@ -942,10 +942,6 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              const isLinear =
-                this.state.elementType === "line" ||
-                this.state.elementType === "arrow";
-
               if (isResizingElements && this.state.resizingElement) {
                 const el = this.state.resizingElement;
                 const selectedElements = elements.filter(el => el.isSelected);
@@ -954,6 +950,8 @@ export class App extends React.Component<any, AppState> {
                   const deltaX = x - lastX;
                   const deltaY = y - lastY;
                   const element = selectedElements[0];
+                  const isLinear =
+                    element.type === "line" || element.type === "arrow";
                   switch (resizeHandle) {
                     case "nw":
                       element.width -= deltaX;
@@ -1076,6 +1074,10 @@ export class App extends React.Component<any, AppState> {
 
               let width = distance(originX, x);
               let height = distance(originY, y);
+
+              const isLinear =
+                this.state.elementType === "line" ||
+                this.state.elementType === "arrow";
 
               if (isLinear && x < originX) width = -width;
               if (isLinear && y < originY) height = -height;
