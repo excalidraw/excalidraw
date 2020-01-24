@@ -52,7 +52,7 @@ export function ExportDialog({
   const [modalIsShown, setModalIsShown] = useState(false);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
-  const previeRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
@@ -64,7 +64,7 @@ export function ExportDialog({
   }, [someElementIsSelected]);
 
   useEffect(() => {
-    const previewNode = previeRef.current;
+    const previewNode = previewRef.current;
     const canvas = getExportCanvasPreview(exportedElements, {
       exportBackground,
       viewBackgroundColor,
@@ -106,7 +106,7 @@ export function ExportDialog({
                 ╳
               </button>
               <h2>{t("buttons.export")}</h2>
-              <div className="ExportDialog__preview" ref={previeRef}></div>
+              <div className="ExportDialog__preview" ref={previewRef}></div>
               <div className="ExportDialog__actions">
                 <Stack.Row gap={2}>
                   <ToolIcon
