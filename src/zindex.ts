@@ -80,7 +80,7 @@ export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
 // [_, _, a, b, d, e, g]
 //
 // At this point, we can fill back the leftmost elements with the array we saved at
-// the beggining
+// the beginning
 //
 //        |1       |0
 // [c, f, a, b, d, e, g]
@@ -158,7 +158,7 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
 // [a, b, d, e, g, _, _]
 //
 // At this point, we can fill back the rightmost elements with the array we saved at
-// the beggining
+// the beginning
 //
 //        |0       |1
 // [a, b, d, e, g, c, f]

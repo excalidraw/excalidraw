@@ -800,7 +800,7 @@ export class App extends React.Component<any, AppState> {
             type ResizeTestType = ReturnType<typeof resizeTest>;
             let resizeHandle: ResizeTestType = false;
             let isResizingElements = false;
-            let draggingOccured = false;
+            let draggingOccurred = false;
             let hitElement: ExcalidrawElement | null = null;
             let elementIsAddedToSelection = false;
             if (this.state.elementType === "selection") {
@@ -1047,7 +1047,7 @@ export class App extends React.Component<any, AppState> {
               if (hitElement?.isSelected) {
                 // Marking that click was used for dragging to check
                 // if elements should be deselected on mouseup
-                draggingOccured = true;
+                draggingOccurred = true;
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1152,17 +1152,17 @@ export class App extends React.Component<any, AppState> {
                 elements = elements.filter(el => el.id !== resizingElement.id);
               }
 
-              // If click occured on already selected element
+              // If click occurred on already selected element
               // it is needed to remove selection from other elements
               // or if SHIFT or META key pressed remove selection
               // from hitted element
               //
-              // If click occured and elements were dragged or some element
+              // If click occurred and elements were dragged or some element
               // was added to selection (on mousedown phase) we need to keep
               // selection unchanged
               if (
                 hitElement &&
-                !draggingOccured &&
+                !draggingOccurred &&
                 !elementIsAddedToSelection
               ) {
                 if (e.shiftKey) {
