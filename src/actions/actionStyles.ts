@@ -15,7 +15,7 @@ export const actionCopyStyles: Action = {
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyC",
-  contextMenuOrder: 0
+  contextMenuOrder: 0,
 };
 
 export const actionPasteStyles: Action = {
@@ -33,7 +33,7 @@ export const actionPasteStyles: Action = {
             strokeColor: pastedElement?.strokeColor,
             fillStyle: pastedElement?.fillStyle,
             opacity: pastedElement?.opacity,
-            roughness: pastedElement?.roughness
+            roughness: pastedElement?.roughness,
           };
           if (isTextElement(newElement)) {
             newElement.font = pastedElement?.font;
@@ -42,10 +42,10 @@ export const actionPasteStyles: Action = {
           return newElement;
         }
         return element;
-      })
+      }),
     };
   },
   contextItemLabel: "labels.pasteStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyV",
-  contextMenuOrder: 1
+  contextMenuOrder: 1,
 };

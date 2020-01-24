@@ -3,7 +3,7 @@ import {
   Action,
   ActionsManagerInterface,
   UpdaterFn,
-  ActionFilterFn
+  ActionFilterFn,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -17,7 +17,7 @@ export class ActionManager implements ActionsManagerInterface {
     | null = null;
 
   setUpdater(
-    updater: (elements: ExcalidrawElement[], appState: AppState) => void
+    updater: (elements: ExcalidrawElement[], appState: AppState) => void,
   ) {
     this.updater = updater;
   }
@@ -29,12 +29,12 @@ export class ActionManager implements ActionsManagerInterface {
   handleKeyDown(
     event: KeyboardEvent,
     elements: readonly ExcalidrawElement[],
-    appState: AppState
+    appState: AppState,
   ) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action => action.keyTest && action.keyTest(event, elements, appState)
+        action => action.keyTest && action.keyTest(event, elements, appState),
       );
 
     if (data.length === 0) return {};
@@ -48,7 +48,7 @@ export class ActionManager implements ActionsManagerInterface {
     appState: AppState,
     updater: UpdaterFn,
     actionFilter: ActionFilterFn = action => action,
-    t?: TFunction
+    t?: TFunction,
   ) {
     return Object.values(this.actions)
       .filter(actionFilter)
@@ -56,7 +56,7 @@ export class ActionManager implements ActionsManagerInterface {
       .sort(
         (a, b) =>
           (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -
-          (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999)
+          (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
       )
       .map(action => ({
         label:
@@ -65,7 +65,7 @@ export class ActionManager implements ActionsManagerInterface {
             : action.contextItemLabel!,
         action: () => {
           updater(action.perform(elements, appState, null));
-        }
+        },
       }));
   }
 
@@ -74,7 +74,7 @@ export class ActionManager implements ActionsManagerInterface {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    t: TFunction
+    t: TFunction,
   ) {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];

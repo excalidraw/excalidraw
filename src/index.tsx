@@ -13,7 +13,9 @@ import {
   isTextElement,
   textWysiwyg,
   getElementAbsoluteCoords,
-  getCursorForResizingElement
+  getCursorForResizingElement,
+  getPerfectElementSize,
+  resizePerfectLineForNWHandler,
 } from "./element";
 import {
   clearSelection,
@@ -29,7 +31,7 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  importFromBackend
+  importFromBackend,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -69,7 +71,7 @@ import {
   actionLoadScene,
   actionSaveScene,
   actionCopyStyles,
-  actionPasteStyles
+  actionPasteStyles,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -98,7 +100,7 @@ const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 const CURSOR_TYPE = {
   TEXT: "text",
-  CROSSHAIR: "crosshair"
+  CROSSHAIR: "crosshair",
 };
 
 let lastCanvasWidth = -1;
@@ -108,7 +110,7 @@ let lastMouseUp: ((e: any) => void) | null = null;
 
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
-  { scrollX, scrollY }: { scrollX: number; scrollY: number }
+  { scrollX, scrollY }: { scrollX: number; scrollY: number },
 ) {
   const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
   const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
@@ -116,7 +118,7 @@ export function viewportCoordsToSceneCoords(
 }
 
 function pickAppStatePropertiesForHistory(
-  appState: AppState
+  appState: AppState,
 ): Partial<AppState> {
   return {
     exportBackground: appState.exportBackground,
@@ -124,7 +126,7 @@ function pickAppStatePropertiesForHistory(
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
     currentItemFont: appState.currentItemFont,
     viewBackgroundColor: appState.viewBackgroundColor,
-    name: appState.name
+    name: appState.name,
   };
 }
 
@@ -184,8 +186,8 @@ export class App extends React.Component<any, AppState> {
       JSON.stringify(
         elements
           .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el)
-      )
+          .map(({ shape, ...el }) => el),
+      ),
     );
     elements = deleteSelectedElements(elements);
     this.forceUpdate();
@@ -198,8 +200,8 @@ export class App extends React.Component<any, AppState> {
       JSON.stringify(
         elements
           .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el)
-      )
+          .map(({ shape, ...el }) => el),
+      ),
     );
     e.preventDefault();
   };
@@ -255,7 +257,7 @@ export class App extends React.Component<any, AppState> {
     document.removeEventListener(
       "mousemove",
       this.getCurrentCursorPosition,
-      false
+      false,
     );
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
@@ -352,7 +354,7 @@ export class App extends React.Component<any, AppState> {
       const text = JSON.stringify(
         elements
           .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el)
+          .map(({ shape, ...el }) => el),
       );
       navigator.clipboard.writeText(text);
     }
@@ -391,7 +393,7 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
 
           {(hasBackground(elements) ||
@@ -402,7 +404,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
 
               {this.actionManager.renderAction(
@@ -410,7 +412,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
               <hr />
             </>
@@ -424,7 +426,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
 
               {this.actionManager.renderAction(
@@ -432,7 +434,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
               <hr />
             </>
@@ -445,7 +447,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
 
               {this.actionManager.renderAction(
@@ -453,7 +455,7 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t
+                t,
               )}
               <hr />
             </>
@@ -464,7 +466,7 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
 
           {this.actionManager.renderAction(
@@ -472,7 +474,7 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
         </div>
       </Island>
@@ -504,7 +506,7 @@ export class App extends React.Component<any, AppState> {
               checked={this.state.elementType === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${
-                capitalizeString(label)[0]
+                capitalizeString(value)[0]
               }, ${index + 1}`}
               onChange={() => {
                 this.setState({ elementType: value });
@@ -531,14 +533,14 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
           {this.actionManager.renderAction(
             "saveScene",
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
           <ExportDialog
             elements={elements}
@@ -551,7 +553,7 @@ export class App extends React.Component<any, AppState> {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale
+                  scale,
                 });
             }}
             onExportToClipboard={(exportedElements, scale) => {
@@ -560,7 +562,7 @@ export class App extends React.Component<any, AppState> {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale
+                  scale,
                 });
             }}
             onExportToBackend={exportedElements => {
@@ -569,10 +571,10 @@ export class App extends React.Component<any, AppState> {
                   "backend",
                   exportedElements.map(element => ({
                     ...element,
-                    isSelected: false
+                    isSelected: false,
                   })),
                   this.canvas,
-                  this.state
+                  this.state,
                 );
             }}
           />
@@ -581,7 +583,7 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t
+            t,
           )}
         </Stack.Row>
         {this.actionManager.renderAction(
@@ -589,7 +591,7 @@ export class App extends React.Component<any, AppState> {
           elements,
           this.state,
           this.syncActionResult,
-          t
+          t,
         )}
       </Stack.Col>
     );
@@ -624,7 +626,7 @@ export class App extends React.Component<any, AppState> {
           id="canvas"
           style={{
             width: canvasWidth,
-            height: canvasHeight
+            height: canvasHeight,
           }}
           width={canvasWidth * window.devicePixelRatio}
           height={canvasHeight * window.devicePixelRatio}
@@ -639,7 +641,7 @@ export class App extends React.Component<any, AppState> {
             }
             if (canvas) {
               canvas.addEventListener("wheel", this.handleWheel, {
-                passive: false
+                passive: false,
               });
               this.removeWheelEventListener = () =>
                 canvas.removeEventListener("wheel", this.handleWheel);
@@ -668,18 +670,18 @@ export class App extends React.Component<any, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: t("labels.paste"),
-                    action: () => this.pasteFromClipboard()
+                    action: () => this.pasteFromClipboard(),
                   },
                   ...this.actionManager.getContextMenuItems(
                     elements,
                     this.state,
                     this.syncActionResult,
                     action => this.canvasOnlyActions.includes(action),
-                    t
-                  )
+                    t,
+                  ),
                 ],
                 top: e.clientY,
-                left: e.clientX
+                left: e.clientX,
               });
               return;
             }
@@ -694,22 +696,22 @@ export class App extends React.Component<any, AppState> {
               options: [
                 navigator.clipboard && {
                   label: t("labels.copy"),
-                  action: this.copyToClipboard
+                  action: this.copyToClipboard,
                 },
                 navigator.clipboard && {
                   label: t("labels.paste"),
-                  action: () => this.pasteFromClipboard()
+                  action: () => this.pasteFromClipboard(),
                 },
                 ...this.actionManager.getContextMenuItems(
                   elements,
                   this.state,
                   this.syncActionResult,
                   action => !this.canvasOnlyActions.includes(action),
-                  t
-                )
+                  t,
+                ),
               ],
               top: e.clientY,
-              left: e.clientX
+              left: e.clientX,
             });
           }}
           onMouseDown={e => {
@@ -731,7 +733,7 @@ export class App extends React.Component<any, AppState> {
                 lastY = e.clientY;
                 this.setState(state => ({
                   scrollX: state.scrollX - deltaX,
-                  scrollY: state.scrollY - deltaY
+                  scrollY: state.scrollY - deltaY,
                 }));
               };
               const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
@@ -741,7 +743,7 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mouseup", onMouseUp);
               });
               window.addEventListener("mousemove", onMouseMove, {
-                passive: true
+                passive: true,
               });
               window.addEventListener("mouseup", onMouseUp);
               return;
@@ -761,7 +763,7 @@ export class App extends React.Component<any, AppState> {
             // Handle scrollbars dragging
             const {
               isOverHorizontalScrollBar,
-              isOverVerticalScrollBar
+              isOverVerticalScrollBar,
             } = isOverScrollBars(
               elements,
               e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
@@ -769,7 +771,7 @@ export class App extends React.Component<any, AppState> {
               canvasWidth,
               canvasHeight,
               this.state.scrollX,
-              this.state.scrollY
+              this.state.scrollY,
             );
 
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -783,7 +785,7 @@ export class App extends React.Component<any, AppState> {
               "hachure",
               1,
               1,
-              100
+              100,
             );
 
             if (isTextElement(element)) {
@@ -800,16 +802,16 @@ export class App extends React.Component<any, AppState> {
               const resizeElement = getElementWithResizeHandler(
                 elements,
                 { x, y },
-                this.state
+                this.state,
               );
               this.setState({
-                resizingElement: resizeElement ? resizeElement.element : null
+                resizingElement: resizeElement ? resizeElement.element : null,
               });
 
               if (resizeElement) {
                 resizeHandle = resizeElement.resizeHandle;
                 document.documentElement.style.cursor = getCursorForResizingElement(
-                  resizeElement
+                  resizeElement,
                 );
                 isResizingElements = true;
               } else {
@@ -835,7 +837,7 @@ export class App extends React.Component<any, AppState> {
                     elements = [
                       ...elements.map(element => ({
                         ...element,
-                        isSelected: false
+                        isSelected: false,
                       })),
                       ...elements
                         .filter(element => element.isSelected)
@@ -843,7 +845,7 @@ export class App extends React.Component<any, AppState> {
                           const newElement = duplicateElement(element);
                           newElement.isSelected = true;
                           return newElement;
-                        })
+                        }),
                     ];
                   }
                 }
@@ -858,7 +860,7 @@ export class App extends React.Component<any, AppState> {
               if (!e.altKey) {
                 const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                   x,
-                  y
+                  y,
                 );
                 if (snappedToCenterPosition) {
                   element.x = snappedToCenterPosition.elementCenterX;
@@ -882,22 +884,22 @@ export class App extends React.Component<any, AppState> {
                         ...newTextElement(
                           element,
                           text,
-                          this.state.currentItemFont
+                          this.state.currentItemFont,
                         ),
-                        isSelected: true
-                      }
+                        isSelected: true,
+                      },
                     ];
                   }
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
-                    elementType: "selection"
+                    elementType: "selection",
                   });
-                }
+                },
               });
               this.setState({
                 elementType: "selection",
-                editingElement: element
+                editingElement: element,
               });
               return;
             }
@@ -940,72 +942,88 @@ export class App extends React.Component<any, AppState> {
                 const selectedElements = elements.filter(el => el.isSelected);
                 if (selectedElements.length === 1) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  let deltaX = 0;
-                  let deltaY = 0;
+                  const deltaX = x - lastX;
+                  const deltaY = y - lastY;
                   const element = selectedElements[0];
                   switch (resizeHandle) {
                     case "nw":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
+
                       if (e.shiftKey) {
-                        element.y += element.height - element.width;
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          resizePerfectLineForNWHandler(element, x, y);
+                        } else {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        }
                       } else {
-                        const deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                        element.height -= deltaY;
+                        element.y += deltaY;
                       }
                       break;
                     case "ne":
-                      element.width += x - lastX;
+                      element.width += deltaX;
                       if (e.shiftKey) {
                         element.y += element.height - element.width;
                         element.height = element.width;
                       } else {
-                        deltaY = lastY - y;
-                        element.height += deltaY;
-                        element.y -= deltaY;
+                        element.height -= deltaY;
+                        element.y += deltaY;
                       }
                       break;
                     case "sw":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
                       if (e.shiftKey) {
                         element.height = element.width;
                       } else {
-                        element.height += y - lastY;
+                        element.height += deltaY;
                       }
                       break;
                     case "se":
-                      element.width += x - lastX;
                       if (e.shiftKey) {
-                        element.height = element.width;
+                        if (
+                          element.type === "arrow" ||
+                          element.type === "line"
+                        ) {
+                          const { width, height } = getPerfectElementSize(
+                            element.type,
+                            x - element.x,
+                            y - element.y,
+                          );
+                          element.width = width;
+                          element.height = height;
+                        } else {
+                          element.width += deltaX;
+                          element.height = element.width;
+                        }
                       } else {
-                        element.height += y - lastY;
+                        element.width += deltaX;
+                        element.height += deltaY;
                       }
                       break;
                     case "n":
-                      deltaY = lastY - y;
-                      element.height += deltaY;
-                      element.y -= deltaY;
+                      element.height -= deltaY;
+                      element.y += deltaY;
                       break;
                     case "w":
-                      deltaX = lastX - x;
-                      element.width += deltaX;
-                      element.x -= deltaX;
+                      element.width -= deltaX;
+                      element.x += deltaX;
                       break;
                     case "s":
-                      element.height += y - lastY;
+                      element.height += deltaY;
                       break;
                     case "e":
-                      element.width += x - lastX;
+                      element.width += deltaX;
                       break;
                   }
 
                   document.documentElement.style.cursor = getCursorForResizingElement(
-                    { element, resizeHandle }
+                    { element, resizeHandle },
                   );
                   el.x = element.x;
                   el.y = element.y;
@@ -1056,12 +1074,23 @@ export class App extends React.Component<any, AppState> {
                 CANVAS_WINDOW_OFFSET_TOP -
                 draggingElement.y -
                 this.state.scrollY;
-              draggingElement.width = width;
-              // Make a perfect square or circle when shift is enabled
-              draggingElement.height =
-                e.shiftKey && this.state.elementType !== "selection"
-                  ? Math.abs(width) * Math.sign(height)
-                  : height;
+
+              if (e.shiftKey) {
+                let {
+                  width: newWidth,
+                  height: newHeight,
+                } = getPerfectElementSize(
+                  this.state.elementType,
+                  width,
+                  height,
+                );
+                draggingElement.width = newWidth;
+                draggingElement.height = newHeight;
+              } else {
+                draggingElement.width = width;
+                draggingElement.height = height;
+              }
+
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
@@ -1070,7 +1099,7 @@ export class App extends React.Component<any, AppState> {
                 }
                 const elementsWithinSelection = getElementsWithinSelection(
                   elements,
-                  draggingElement
+                  draggingElement,
                 );
                 elementsWithinSelection.forEach(element => {
                   element.isSelected = true;
@@ -1086,7 +1115,7 @@ export class App extends React.Component<any, AppState> {
                 draggingElement,
                 resizingElement,
                 elementType,
-                elementLocked
+                elementLocked,
               } = this.state;
 
               lastMouseUp = null;
@@ -1101,7 +1130,7 @@ export class App extends React.Component<any, AppState> {
                 // remove invisible element which was added in onMouseDown
                 elements = elements.slice(0, -1);
                 this.setState({
-                  draggingElement: null
+                  draggingElement: null,
                 });
                 this.forceUpdate();
                 return;
@@ -1150,7 +1179,7 @@ export class App extends React.Component<any, AppState> {
 
                 this.setState({
                   draggingElement: null,
-                  elementType: "selection"
+                  elementType: "selection",
                 });
               }
 
@@ -1185,10 +1214,10 @@ export class App extends React.Component<any, AppState> {
                       "hachure",
                       1,
                       1,
-                      100
+                      100,
                     ),
                     "", // default text
-                    this.state.currentItemFont // default font
+                    this.state.currentItemFont, // default font
                   );
 
             this.setState({ editingElement: element });
@@ -1198,7 +1227,7 @@ export class App extends React.Component<any, AppState> {
 
             if (elementAtPosition && isTextElement(elementAtPosition)) {
               elements = elements.filter(
-                element => element.id !== elementAtPosition.id
+                element => element.id !== elementAtPosition.id,
               );
               this.forceUpdate();
 
@@ -1219,7 +1248,7 @@ export class App extends React.Component<any, AppState> {
             } else if (!e.altKey) {
               const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                 x,
-                y
+                y,
               );
 
               if (snappedToCenterPosition) {
@@ -1244,16 +1273,16 @@ export class App extends React.Component<any, AppState> {
                       // we need to recreate the element to update dimensions &
                       //  position
                       ...newTextElement(element, text, element.font),
-                      isSelected: true
-                    }
+                      isSelected: true,
+                    },
                   ];
                 }
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
-                  elementType: "selection"
+                  elementType: "selection",
                 });
-              }
+              },
             });
           }}
           onMouseMove={e => {
@@ -1267,11 +1296,11 @@ export class App extends React.Component<any, AppState> {
               const resizeElement = getElementWithResizeHandler(
                 elements,
                 { x, y },
-                this.state
+                this.state,
               );
               if (resizeElement && resizeElement.resizeHandle) {
                 document.documentElement.style.cursor = getCursorForResizingElement(
-                  resizeElement
+                  resizeElement,
                 );
                 return;
               }
@@ -1299,7 +1328,7 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
     this.setState(state => ({
       scrollX: state.scrollX - deltaX,
-      scrollY: state.scrollY - deltaY
+      scrollY: state.scrollY - deltaY,
     }));
   };
 
@@ -1356,7 +1385,7 @@ export class App extends React.Component<any, AppState> {
           duplicate.x += dx - minX;
           duplicate.y += dy - minY;
           return duplicate;
-        })
+        }),
       ];
       this.forceUpdate();
     }
@@ -1371,7 +1400,7 @@ export class App extends React.Component<any, AppState> {
         elementClickedInside.y + elementClickedInside.height / 2;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
-        y - elementCenterY
+        y - elementCenterY,
       );
       const isSnappedToCenter =
         distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
@@ -1399,15 +1428,15 @@ export class App extends React.Component<any, AppState> {
     renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
-      viewBackgroundColor: this.state.viewBackgroundColor
+      viewBackgroundColor: this.state.viewBackgroundColor,
     });
     this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(
         history.generateCurrentEntry(
           pickAppStatePropertiesForHistory(this.state),
-          elements
-        )
+          elements,
+        ),
       );
     }
   }
@@ -1425,7 +1454,7 @@ class TopErrorBoundary extends React.Component {
     return {
       hasError: true,
       localStorage: JSON.stringify({ ...localStorage }),
-      stack: error.stack
+      stack: error.stack,
     };
   }
 
@@ -1443,7 +1472,7 @@ class TopErrorBoundary extends React.Component {
     } catch {}
 
     window.open(
-      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`
+      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,
     );
   }
 
@@ -1511,5 +1540,5 @@ ReactDOM.render(
   <TopErrorBoundary>
     <AppWithTrans />
   </TopErrorBoundary>,
-  rootElement
+  rootElement,
 );
