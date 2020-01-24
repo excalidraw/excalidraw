@@ -10,23 +10,18 @@ export function LanguageList<T>({
   currentLanguage: string;
 }) {
   return (
-    <ul>
-      {languages.map((language, idx) => (
-        <li
-          key={idx}
-          className={currentLanguage === language.lng ? "current" : ""}
-        >
-          <a
-            href="/"
-            onClick={e => {
-              onClick(language.lng);
-              e.preventDefault();
-            }}
-          >
+    <React.Fragment>
+      <select
+        className="language-select"
+        onChange={({ target }) => onClick(target.value)}
+        value={currentLanguage}
+      >
+        {languages.map(language => (
+          <option key={language.lng} value={language.lng}>
             {language.label}
-          </a>
-        </li>
-      ))}
-    </ul>
+          </option>
+        ))}
+      </select>
+    </React.Fragment>
   );
 }
