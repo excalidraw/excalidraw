@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import { renderScene } from "../renderer/renderScene";
+import { distance } from "../utils";
 
 export function getExportCanvasPreview(
   elements: readonly ExcalidrawElement[],
@@ -39,10 +40,6 @@ export function getExportCanvasPreview(
     subCanvasX2 = Math.max(subCanvasX2, x2);
     subCanvasY2 = Math.max(subCanvasY2, y2);
   });
-
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
-  }
 
   const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
   const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;

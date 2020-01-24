@@ -57,3 +57,33 @@ export function resizePerfectLineForNWHandler(
     element.y = anchorY - element.height;
   }
 }
+
+/**
+ * @returns {boolean} whether element was normalized
+ */
+export function normalizeDimensions(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawElement {
+  if (
+    !element ||
+    (element.width >= 0 && element.height >= 0) ||
+    element.type === "line" ||
+    element.type === "arrow"
+  ) {
+    return false;
+  }
+
+  if (element.width < 0) {
+    element.width = Math.abs(element.width);
+    element.x -= element.width;
+  }
+
+  if (element.height < 0) {
+    element.height = Math.abs(element.height);
+    element.y -= element.height;
+  }
+
+  element.shape = null;
+
+  return true;
+}
