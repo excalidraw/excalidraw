@@ -86,3 +86,7 @@ export function removeSelection() {
     selection.removeAllRanges();
   }
 }
+
+export function distance(x: number, y: number) {
+  return Math.abs(x > y ? x - y : y - x);
+}
