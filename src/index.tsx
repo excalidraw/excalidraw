@@ -9,6 +9,7 @@ import {
   newTextElement,
   duplicateElement,
   resizeTest,
+  normalizeResizeHandle,
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
@@ -16,6 +17,7 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   resizePerfectLineForNWHandler,
+  normalizeDimensions,
 } from "./element";
 import {
   clearSelection,
@@ -38,7 +40,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
-import { isInputLike, debounce, capitalizeString } from "./utils";
+import { isInputLike, debounce, capitalizeString, distance } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -776,6 +778,9 @@ export class App extends React.Component<any, AppState> {
 
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
+            const originX = x;
+            const originY = y;
+
             let element = newElement(
               this.state.elementType,
               x,
@@ -945,16 +950,15 @@ export class App extends React.Component<any, AppState> {
                   const deltaX = x - lastX;
                   const deltaY = y - lastY;
                   const element = selectedElements[0];
+                  const isLinear =
+                    element.type === "line" || element.type === "arrow";
                   switch (resizeHandle) {
                     case "nw":
                       element.width -= deltaX;
                       element.x += deltaX;
 
                       if (e.shiftKey) {
-                        if (
-                          element.type === "arrow" ||
-                          element.type === "line"
-                        ) {
+                        if (isLinear) {
                           resizePerfectLineForNWHandler(element, x, y);
                         } else {
                           element.y += element.height - element.width;
@@ -986,10 +990,7 @@ export class App extends React.Component<any, AppState> {
                       break;
                     case "se":
                       if (e.shiftKey) {
-                        if (
-                          element.type === "arrow" ||
-                          element.type === "line"
-                        ) {
+                        if (isLinear) {
                           const { width, height } = getPerfectElementSize(
                             element.type,
                             x - element.x,
@@ -1021,6 +1022,11 @@ export class App extends React.Component<any, AppState> {
                       element.width += deltaX;
                       break;
                   }
+
+                  if (resizeHandle) {
+                    resizeHandle = normalizeResizeHandle(element, resizeHandle);
+                  }
+                  normalizeDimensions(element);
 
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     { element, resizeHandle },
@@ -1064,33 +1070,35 @@ export class App extends React.Component<any, AppState> {
               const draggingElement = this.state.draggingElement;
               if (!draggingElement) return;
 
-              let width =
-                e.clientX -
-                CANVAS_WINDOW_OFFSET_LEFT -
-                draggingElement.x -
-                this.state.scrollX;
-              let height =
-                e.clientY -
-                CANVAS_WINDOW_OFFSET_TOP -
-                draggingElement.y -
-                this.state.scrollY;
+              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
+              let width = distance(originX, x);
+              let height = distance(originY, y);
+
+              const isLinear =
+                this.state.elementType === "line" ||
+                this.state.elementType === "arrow";
+
+              if (isLinear && x < originX) width = -width;
+              if (isLinear && y < originY) height = -height;
 
               if (e.shiftKey) {
-                let {
-                  width: newWidth,
-                  height: newHeight,
-                } = getPerfectElementSize(
+                ({ width, height } = getPerfectElementSize(
                   this.state.elementType,
                   width,
-                  height,
-                );
-                draggingElement.width = newWidth;
-                draggingElement.height = newHeight;
-              } else {
-                draggingElement.width = width;
-                draggingElement.height = height;
+                  !isLinear && y < originY ? -height : height,
+                ));
+
+                if (!isLinear && height < 0) height = -height;
               }
 
+              if (!isLinear) {
+                draggingElement.x = x < originX ? originX - width : originX;
+                draggingElement.y = y < originY ? originY - height : originY;
+              }
+
+              draggingElement.width = width;
+              draggingElement.height = height;
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
@@ -1134,6 +1142,10 @@ export class App extends React.Component<any, AppState> {
                 });
                 this.forceUpdate();
                 return;
+              }
+
+              if (normalizeDimensions(draggingElement)) {
+                this.forceUpdate();
               }
 
               if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -1348,10 +1360,6 @@ export class App extends React.Component<any, AppState> {
 
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));
-
-      const distance = (x: number, y: number) => {
-        return Math.abs(x > y ? x - y : y - x);
-      };
 
       parsedElements.forEach(parsedElement => {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
