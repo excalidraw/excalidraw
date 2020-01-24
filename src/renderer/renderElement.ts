@@ -149,7 +149,7 @@ export function renderElement(
     const lineHeight = element.height / lines.length;
     const offset = element.height - element.baseline;
     for (let i = 0; i < lines.length; i++) {
-      context.fillText(lines[i], 0, ((i + 1) * lineHeight) - offset);
+      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
     }
     context.fillStyle = fillStyle;
     context.font = font;
