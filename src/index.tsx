@@ -1309,15 +1309,13 @@ export class App extends React.Component<any, AppState> {
             document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
         />
-        <div className="langBox">
-          <LanguageList
-            onClick={lng => {
-              i18n.changeLanguage(lng);
-            }}
-            languages={languages}
-            currentLanguage={parseDetectedLang(i18n.language)}
-          />
-        </div>
+        <LanguageList
+          onClick={lng => {
+            i18n.changeLanguage(lng);
+          }}
+          languages={languages}
+          currentLanguage={parseDetectedLang(i18n.language)}
+        />
       </div>
     );
   }
