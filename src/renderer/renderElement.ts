@@ -147,7 +147,7 @@ export function renderElement(
     // Canvas does not support multiline text by default
     const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
     const lineHeight = element.height / lines.length;
-    const offset = 9; // padding 4 x 2 + top border 1
+    const offset = element.height - element.baseline;
     for (let i = 0; i < lines.length; i++) {
       context.fillText(lines[i], 0, ((i + 1) * lineHeight) - offset);
     }
