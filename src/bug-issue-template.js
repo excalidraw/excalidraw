@@ -1,5 +1,5 @@
 export default `
-### Stack strace
+### Stack trace
 
 \`\`\`
 // paste stack trace here
