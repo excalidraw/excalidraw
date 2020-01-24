@@ -144,11 +144,13 @@ export function renderElement(
     context.font = element.font;
     const fillStyle = context.fillStyle;
     context.fillStyle = element.strokeColor;
-    context.fillText(
-      element.text,
-      0,
-      element.baseline || element.actualBoundingBoxAscent || 0,
-    );
+    // Canvas does not support multiline text by default
+    const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+    const lineHeight = element.height / lines.length;
+    const offset = element.height - element.baseline;
+    for (let i = 0; i < lines.length; i++) {
+      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+    }
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;
