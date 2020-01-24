@@ -9,7 +9,7 @@ export function resizeTest(
   element: ExcalidrawElement,
   x: number,
   y: number,
-  { scrollX, scrollY }: SceneScroll
+  { scrollX, scrollY }: SceneScroll,
 ): HandlerRectanglesRet | false {
   if (!element.isSelected || element.type === "text") return false;
 
@@ -36,7 +36,7 @@ export function resizeTest(
 export function getElementWithResizeHandler(
   elements: readonly ExcalidrawElement[],
   { x, y }: { x: number; y: number },
-  { scrollX, scrollY }: SceneScroll
+  { scrollX, scrollY }: SceneScroll,
 ) {
   return elements.reduce((result, element) => {
     if (result) {
@@ -44,7 +44,7 @@ export function getElementWithResizeHandler(
     }
     const resizeHandle = resizeTest(element, x, y, {
       scrollX,
-      scrollY
+      scrollY,
     });
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);

@@ -5,7 +5,7 @@ export {
   deleteSelectedElements,
   someElementIsSelected,
   getElementsWithinSelection,
-  getCommonAttributeOfSelectedElements
+  getCommonAttributeOfSelectedElements,
 } from "./selection";
 export {
   exportCanvas,
@@ -14,13 +14,13 @@ export {
   restoreFromLocalStorage,
   saveToLocalStorage,
   exportToBackend,
-  importFromBackend
+  importFromBackend,
 } from "./data";
 export {
   hasBackground,
   hasStroke,
   getElementAtPosition,
   getElementContainingPosition,
-  hasText
+  hasText,
 } from "./comparisons";
 export { createScene } from "./createScene";

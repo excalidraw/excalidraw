@@ -3,7 +3,7 @@ export {
   getElementAbsoluteCoords,
   getDiamondPoints,
   getArrowPoints,
-  getLinePoints
+  getLinePoints,
 } from "./bounds";
 
 export { handlerRectangles } from "./handlerRectangles";
@@ -15,5 +15,5 @@ export { redrawTextBoundingBox } from "./textElement";
 export {
   getPerfectElementSize,
   isInvisiblySmallElement,
-  resizePerfectLineForNWHandler
+  resizePerfectLineForNWHandler,
 } from "./sizeHelpers";

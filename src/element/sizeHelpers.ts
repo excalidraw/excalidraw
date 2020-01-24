@@ -10,7 +10,7 @@ export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
 export function getPerfectElementSize(
   elementType: string,
   width: number,
-  height: number
+  height: number,
 ): { width: number; height: number } {
   const absWidth = Math.abs(width);
   const absHeight = Math.abs(height);
@@ -33,7 +33,7 @@ export function getPerfectElementSize(
 export function resizePerfectLineForNWHandler(
   element: ExcalidrawElement,
   x: number,
-  y: number
+  y: number,
 ) {
   const anchorX = element.x + element.width;
   const anchorY = element.y + element.height;

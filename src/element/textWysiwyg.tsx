@@ -22,7 +22,7 @@ export function textWysiwyg({
   y,
   strokeColor,
   font,
-  onSubmit
+  onSubmit,
 }: TextWysiwygParams) {
   // Using contenteditable here as it has dynamic width.
   // But this solution has an issue — it allows to paste
@@ -45,7 +45,7 @@ export function textWysiwyg({
     padding: "4px",
     outline: "transparent",
     whiteSpace: "nowrap",
-    minHeight: "1em"
+    minHeight: "1em",
   });
 
   editable.onkeydown = ev => {

@@ -23,7 +23,7 @@ export function moveOneLeft<T>(elements: T[], indicesToMove: number[]) {
 
 export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
   const reversedIndicesToMove = indicesToMove.sort(
-    (a: number, b: number) => b - a
+    (a: number, b: number) => b - a,
   );
   let isSorted = true;
 
@@ -166,7 +166,7 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
 // And we are done!
 export function moveAllRight<T>(elements: T[], indicesToMove: number[]) {
   const reversedIndicesToMove = indicesToMove.sort(
-    (a: number, b: number) => b - a
+    (a: number, b: number) => b - a,
   );
 
   // Copy the elements to move
