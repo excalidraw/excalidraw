@@ -41,8 +41,17 @@
       "json/sort-package-json": false
     },
     "rules": {
+      "id-length": [
+        "error",
+        {
+          "exceptions": [
+            "x",
+            "y"
+          ]
+        }
+      ],
       "no-console": [
-        "warn",
+        "error",
         {
           "allow": [
             "warn",

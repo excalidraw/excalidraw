@@ -32,9 +32,9 @@ export function getElementAtPosition(
 ) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let i = elements.length - 1; i >= 0; --i) {
-    if (hitTest(elements[i], x, y)) {
-      hitElement = elements[i];
+  for (let index = elements.length - 1; index >= 0; --index) {
+    if (hitTest(elements[index], x, y)) {
+      hitElement = elements[index];
       break;
     }
   }
@@ -49,10 +49,10 @@ export function getElementContainingPosition(
 ) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let i = elements.length - 1; i >= 0; --i) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[i]);
+  for (let index = elements.length - 1; index >= 0; --index) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
     if (x1 < x && x < x2 && y1 < y && y < y2) {
-      hitElement = elements[i];
+      hitElement = elements[index];
       break;
     }
   }

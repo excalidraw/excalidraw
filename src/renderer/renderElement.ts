@@ -148,8 +148,8 @@ export function renderElement(
     const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
     const lineHeight = element.height / lines.length;
     const offset = element.height - element.baseline;
-    for (let i = 0; i < lines.length; i++) {
-      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+    for (let index = 0; index < lines.length; index++) {
+      context.fillText(lines[index], 0, (index + 1) * lineHeight - offset);
     }
     context.fillStyle = fillStyle;
     context.font = font;
