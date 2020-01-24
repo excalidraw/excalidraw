@@ -1318,7 +1318,6 @@ export class App extends React.Component<any, AppState> {
             currentLanguage={parseDetectedLang(i18n.language)}
           />
         </div>
-        <input id="backupClipboard" type="text" />
       </div>
     );
   }
