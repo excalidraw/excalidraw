@@ -120,26 +120,17 @@ export async function exportToBackend(
   if (json.id) {
     const url = new URL(window.location.href);
     url.searchParams.append("id", json.id);
-    let msg = "alerts.copiedToClipboard";
     try {
       await navigator.clipboard.writeText(url.toString());
+      window.alert(
+        i18n.t("alerts.copiedToClipboard", {
+          url: url.toString(),
+          interpolation: { escapeValue: false }
+        })
+      );
     } catch (err) {
-      msg = "alerts.shareableLink";
-      const backupClipboard = document.querySelector(
-        "#backupClipboard"
-      ) as HTMLInputElement;
-      if (backupClipboard) {
-        backupClipboard.value = url.toString();
-        backupClipboard.select();
-        document.execCommand("copy");
-      }
+      window.prompt(i18n.t("alerts.shareableLink"), url.toString());
     }
-    window.alert(
-      i18n.t(msg, {
-        url: url.toString(),
-        interpolation: { escapeValue: false }
-      })
-    );
   } else {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
   }

@@ -53,7 +53,7 @@
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
     "copiedToClipboard": "Copied to clipboard: {{url}}",
-    "shareableLink": "Link to share: {{url}}"
+    "shareableLink": "Link to share"
   },
   "toolBar": {
     "selection": "Selection",
