@@ -14,7 +14,7 @@ export function Popover({
   left,
   top,
   onCloseRequest,
-  fitInViewport = false
+  fitInViewport = false,
 }: Props) {
   const popoverRef = useRef<HTMLDivElement>(null);
 

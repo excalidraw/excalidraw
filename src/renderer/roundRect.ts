@@ -14,7 +14,7 @@ export function roundRect(
   y: number,
   width: number,
   height: number,
-  radius: number
+  radius: number,
 ) {
   context.beginPath();
   context.moveTo(x + radius, y);
@@ -25,7 +25,7 @@ export function roundRect(
     x + width,
     y + height,
     x + width - radius,
-    y + height
+    y + height,
   );
   context.lineTo(x + radius, y + height);
   context.quadraticCurveTo(x, y + height, x, y + height - radius);

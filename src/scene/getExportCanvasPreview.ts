@@ -9,7 +9,7 @@ export function getExportCanvasPreview(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    scale = 1
+    scale = 1,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -18,13 +18,13 @@ export function getExportCanvasPreview(
   },
   createCanvas: (width: number, height: number) => any = function(
     width,
-    height
+    height,
   ) {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
     return tempCanvas;
-  }
+  },
 ) {
   // calculate smallest area to fit the contents in
   let subCanvasX1 = Infinity;
@@ -56,14 +56,14 @@ export function getExportCanvasPreview(
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: 0,
-      scrollY: 0
+      scrollY: 0,
     },
     {
       offsetX: -subCanvasX1 + exportPadding,
       offsetY: -subCanvasY1 + exportPadding,
       renderScrollbars: false,
-      renderSelection: false
-    }
+      renderSelection: false,
+    },
   );
   return tempCanvas;
 }

@@ -17,7 +17,7 @@ function RowStack({ children, gap, align, justifyContent }: StackProps) {
         {
           "--gap": gap,
           alignItems: align,
-          justifyContent
+          justifyContent,
         } as React.CSSProperties
       }
     >
@@ -34,7 +34,7 @@ function ColStack({ children, gap, align, justifyContent }: StackProps) {
         {
           "--gap": gap,
           justifyItems: align,
-          justifyContent
+          justifyContent,
         } as React.CSSProperties
       }
     >
@@ -45,5 +45,5 @@ function ColStack({ children, gap, align, justifyContent }: StackProps) {
 
 export default {
   Row: RowStack,
-  Col: ColStack
+  Col: ColStack,
 };
