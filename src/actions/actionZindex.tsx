@@ -3,7 +3,7 @@ import {
   moveOneLeft,
   moveOneRight,
   moveAllLeft,
-  moveAllRight
+  moveAllRight,
 } from "../zindex";
 import { getSelectedIndices } from "../scene";
 import { KEYS } from "../keys";
@@ -13,13 +13,13 @@ export const actionSendBackward: Action = {
   perform: (elements, appState) => {
     return {
       elements: moveOneLeft([...elements], getSelectedIndices(elements)),
-      appState
+      appState,
     };
   },
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   keyTest: event =>
-    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyB"
+    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyB",
 };
 
 export const actionBringForward: Action = {
@@ -27,13 +27,13 @@ export const actionBringForward: Action = {
   perform: (elements, appState) => {
     return {
       elements: moveOneRight([...elements], getSelectedIndices(elements)),
-      appState
+      appState,
     };
   },
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   keyTest: event =>
-    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyF"
+    event[KEYS.META] && event.shiftKey && event.altKey && event.code === "KeyF",
 };
 
 export const actionSendToBack: Action = {
@@ -41,11 +41,11 @@ export const actionSendToBack: Action = {
   perform: (elements, appState) => {
     return {
       elements: moveAllLeft([...elements], getSelectedIndices(elements)),
-      appState
+      appState,
     };
   },
   contextItemLabel: "labels.sendToBack",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyB"
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyB",
 };
 
 export const actionBringToFront: Action = {
@@ -53,9 +53,9 @@ export const actionBringToFront: Action = {
   perform: (elements, appState) => {
     return {
       elements: moveAllRight([...elements], getSelectedIndices(elements)),
-      appState
+      appState,
     };
   },
   contextItemLabel: "labels.bringToFront",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyF"
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyF",
 };

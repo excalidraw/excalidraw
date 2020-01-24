@@ -8,7 +8,7 @@ export const hasBackground = (elements: readonly ExcalidrawElement[]) =>
       element.isSelected &&
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
-        element.type === "diamond")
+        element.type === "diamond"),
   );
 
 export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
@@ -19,7 +19,7 @@ export const hasStroke = (elements: readonly ExcalidrawElement[]) =>
         element.type === "ellipse" ||
         element.type === "diamond" ||
         element.type === "arrow" ||
-        element.type === "line")
+        element.type === "line"),
   );
 
 export const hasText = (elements: readonly ExcalidrawElement[]) =>
@@ -28,7 +28,7 @@ export const hasText = (elements: readonly ExcalidrawElement[]) =>
 export function getElementAtPosition(
   elements: readonly ExcalidrawElement[],
   x: number,
-  y: number
+  y: number,
 ) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -45,7 +45,7 @@ export function getElementAtPosition(
 export function getElementContainingPosition(
   elements: readonly ExcalidrawElement[],
   x: number,
-  y: number
+  y: number,
 ) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)

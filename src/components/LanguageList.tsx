@@ -3,7 +3,7 @@ import React from "react";
 export function LanguageList<T>({
   onClick,
   languages,
-  currentLanguage
+  currentLanguage,
 }: {
   languages: { lng: string; label: string }[];
   onClick: (value: string) => void;

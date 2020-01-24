@@ -83,8 +83,8 @@ export default {
           options={options}
           onCloseRequest={handleClose}
         />,
-        getContextMenuNode()
+        getContextMenuNode(),
       );
     }
-  }
+  },
 };

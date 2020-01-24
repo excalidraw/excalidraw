@@ -15,7 +15,7 @@ export const actionChangeProjectName: Action = {
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
     />
-  )
+  ),
 };
 
 export const actionChangeExportBackground: Action = {
@@ -34,7 +34,7 @@ export const actionChangeExportBackground: Action = {
       />{" "}
       {t("labels.withBackground")}
     </label>
-  )
+  ),
 };
 
 export const actionSaveScene: Action = {
@@ -51,7 +51,7 @@ export const actionSaveScene: Action = {
       aria-label={t("buttons.save")}
       onClick={() => updateData(null)}
     />
-  )
+  ),
 };
 
 export const actionLoadScene: Action = {
@@ -59,7 +59,7 @@ export const actionLoadScene: Action = {
   perform: (
     elements,
     appState,
-    { elements: loadedElements, appState: loadedAppState }
+    { elements: loadedElements, appState: loadedAppState },
   ) => {
     return { elements: loadedElements, appState: loadedAppState };
   },
@@ -77,5 +77,5 @@ export const actionLoadScene: Action = {
           .catch(err => console.error(err));
       }}
     />
-  )
+  ),
 };

@@ -20,7 +20,7 @@ export const actionChangeViewBackgroundColor: Action = {
         />
       </div>
     );
-  }
+  },
 };
 
 export const actionClearCanvas: Action = {
@@ -28,7 +28,7 @@ export const actionClearCanvas: Action = {
   perform: () => {
     return {
       elements: [],
-      appState: getDefaultAppState()
+      appState: getDefaultAppState(),
     };
   },
   PanelComponent: ({ updateData, t }) => (
@@ -47,5 +47,5 @@ export const actionClearCanvas: Action = {
         }
       }}
     />
-  )
+  ),
 };

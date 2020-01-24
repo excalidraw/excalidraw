@@ -25,7 +25,7 @@ const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
 type ExportCB = (
   elements: readonly ExcalidrawElement[],
-  scale?: number
+  scale?: number,
 ) => void;
 
 export function ExportDialog({
@@ -36,7 +36,7 @@ export function ExportDialog({
   syncActionResult,
   onExportToPng,
   onExportToClipboard,
-  onExportToBackend
+  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -69,7 +69,7 @@ export function ExportDialog({
       exportBackground,
       viewBackgroundColor,
       exportPadding,
-      scale
+      scale,
     });
     previewNode?.appendChild(canvas);
     return () => {
@@ -81,7 +81,7 @@ export function ExportDialog({
     exportBackground,
     exportPadding,
     viewBackgroundColor,
-    scale
+    scale,
   ]);
 
   function handleClose() {
@@ -141,7 +141,7 @@ export function ExportDialog({
                   elements,
                   appState,
                   syncActionResult,
-                  t
+                  t,
                 )}
                 <Stack.Col gap={1}>
                   <div className="ExportDialog__scales">
@@ -165,7 +165,7 @@ export function ExportDialog({
                     elements,
                     appState,
                     syncActionResult,
-                    t
+                    t,
                   )}
                   {someElementIsSelected && (
                     <div>

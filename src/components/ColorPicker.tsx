@@ -9,7 +9,7 @@ import "./ColorPicker.css";
 const Picker = function({
   colors,
   color,
-  onChange
+  onChange,
 }: {
   colors: string[];
   color: string | null;
@@ -53,7 +53,7 @@ const Picker = function({
 
 function ColorInput({
   color,
-  onChange
+  onChange,
 }: {
   color: string | null;
   onChange: (color: string) => void;
@@ -90,7 +90,7 @@ function ColorInput({
 export function ColorPicker({
   type,
   color,
-  onChange
+  onChange,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -149,7 +149,7 @@ const colors = {
     "#ebfbee",
     "#f4fce3",
     "#fff9db",
-    "#fff4e6"
+    "#fff4e6",
   ],
   // Shade 6
   elementBackground: [
@@ -167,7 +167,7 @@ const colors = {
     "#40c057",
     "#82c91e",
     "#fab005",
-    "#fd7e14"
+    "#fd7e14",
   ],
   // Shade 9
   elementStroke: [
@@ -185,6 +185,6 @@ const colors = {
     "#2b8a3e",
     "#5c940d",
     "#e67700",
-    "#d9480f"
-  ]
+    "#d9480f",
+  ],
 };

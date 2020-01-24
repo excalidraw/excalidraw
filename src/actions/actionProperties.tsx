@@ -9,7 +9,7 @@ import { AppState } from "../../src/types";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
-  callback: (element: ExcalidrawElement) => ExcalidrawElement
+  callback: (element: ExcalidrawElement) => ExcalidrawElement,
 ) => {
   return elements.map(element => {
     if (element.isSelected) {
@@ -23,7 +23,7 @@ const getFormValue = function<T>(
   editingElement: AppState["editingElement"],
   elements: readonly ExcalidrawElement[],
   getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue?: T
+  defaultValue?: T,
 ): T | null {
   return (
     (editingElement && getAttribute(editingElement)) ??
@@ -40,9 +40,9 @@ export const actionChangeStrokeColor: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        strokeColor: value
+        strokeColor: value,
       })),
-      appState: { ...appState, currentItemStrokeColor: value }
+      appState: { ...appState, currentItemStrokeColor: value },
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -54,12 +54,12 @@ export const actionChangeStrokeColor: Action = {
           appState.editingElement,
           elements,
           element => element.strokeColor,
-          appState.currentItemStrokeColor
+          appState.currentItemStrokeColor,
         )}
         onChange={updateData}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeBackgroundColor: Action = {
@@ -69,9 +69,9 @@ export const actionChangeBackgroundColor: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        backgroundColor: value
+        backgroundColor: value,
       })),
-      appState: { ...appState, currentItemBackgroundColor: value }
+      appState: { ...appState, currentItemBackgroundColor: value },
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -83,12 +83,12 @@ export const actionChangeBackgroundColor: Action = {
           appState.editingElement,
           elements,
           element => element.backgroundColor,
-          appState.currentItemBackgroundColor
+          appState.currentItemBackgroundColor,
         )}
         onChange={updateData}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeFillStyle: Action = {
@@ -98,8 +98,8 @@ export const actionChangeFillStyle: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        fillStyle: value
-      }))
+        fillStyle: value,
+      })),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -109,19 +109,19 @@ export const actionChangeFillStyle: Action = {
         options={[
           { value: "solid", text: t("labels.solid") },
           { value: "hachure", text: t("labels.hachure") },
-          { value: "cross-hatch", text: t("labels.crossHatch") }
+          { value: "cross-hatch", text: t("labels.crossHatch") },
         ]}
         value={getFormValue(
           appState.editingElement,
           elements,
-          element => element.fillStyle
+          element => element.fillStyle,
         )}
         onChange={value => {
           updateData(value);
         }}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeStrokeWidth: Action = {
@@ -131,8 +131,8 @@ export const actionChangeStrokeWidth: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        strokeWidth: value
-      }))
+        strokeWidth: value,
+      })),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -142,17 +142,17 @@ export const actionChangeStrokeWidth: Action = {
         options={[
           { value: 1, text: t("labels.thin") },
           { value: 2, text: t("labels.bold") },
-          { value: 4, text: t("labels.extraBold") }
+          { value: 4, text: t("labels.extraBold") },
         ]}
         value={getFormValue(
           appState.editingElement,
           elements,
-          element => element.strokeWidth
+          element => element.strokeWidth,
         )}
         onChange={value => updateData(value)}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeSloppiness: Action = {
@@ -162,8 +162,8 @@ export const actionChangeSloppiness: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        roughness: value
-      }))
+        roughness: value,
+      })),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -173,17 +173,17 @@ export const actionChangeSloppiness: Action = {
         options={[
           { value: 0, text: t("labels.architect") },
           { value: 1, text: t("labels.artist") },
-          { value: 3, text: t("labels.cartoonist") }
+          { value: 3, text: t("labels.cartoonist") },
         ]}
         value={getFormValue(
           appState.editingElement,
           elements,
-          element => element.roughness
+          element => element.roughness,
         )}
         onChange={value => updateData(value)}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeOpacity: Action = {
@@ -193,8 +193,8 @@ export const actionChangeOpacity: Action = {
       elements: changeProperty(elements, el => ({
         ...el,
         shape: null,
-        opacity: value
-      }))
+        opacity: value,
+      })),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -210,12 +210,12 @@ export const actionChangeOpacity: Action = {
             appState.editingElement,
             elements,
             element => element.opacity,
-            100 /* default opacity */
+            100 /* default opacity */,
           ) ?? undefined
         }
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeFontSize: Action = {
@@ -227,14 +227,14 @@ export const actionChangeFontSize: Action = {
           const element: ExcalidrawTextElement = {
             ...el,
             shape: null,
-            font: `${value}px ${el.font.split("px ")[1]}`
+            font: `${value}px ${el.font.split("px ")[1]}`,
           };
           redrawTextBoundingBox(element);
           return element;
         }
 
         return el;
-      })
+      }),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -245,17 +245,17 @@ export const actionChangeFontSize: Action = {
           { value: 16, text: t("labels.small") },
           { value: 20, text: t("labels.medium") },
           { value: 28, text: t("labels.large") },
-          { value: 36, text: t("labels.veryLarge") }
+          { value: 36, text: t("labels.veryLarge") },
         ]}
         value={getFormValue(
           appState.editingElement,
           elements,
-          element => isTextElement(element) && +element.font.split("px ")[0]
+          element => isTextElement(element) && +element.font.split("px ")[0],
         )}
         onChange={value => updateData(value)}
       />
     </>
-  )
+  ),
 };
 
 export const actionChangeFontFamily: Action = {
@@ -267,14 +267,14 @@ export const actionChangeFontFamily: Action = {
           const element: ExcalidrawTextElement = {
             ...el,
             shape: null,
-            font: `${el.font.split("px ")[0]}px ${value}`
+            font: `${el.font.split("px ")[0]}px ${value}`,
           };
           redrawTextBoundingBox(element);
           return element;
         }
 
         return el;
-      })
+      }),
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
@@ -284,15 +284,15 @@ export const actionChangeFontFamily: Action = {
         options={[
           { value: "Virgil", text: t("labels.handDrawn") },
           { value: "Helvetica", text: t("labels.normal") },
-          { value: "Cascadia", text: t("labels.code") }
+          { value: "Cascadia", text: t("labels.code") },
         ]}
         value={getFormValue(
           appState.editingElement,
           elements,
-          element => isTextElement(element) && element.font.split("px ")[1]
+          element => isTextElement(element) && element.font.split("px ")[1],
         )}
         onChange={value => updateData(value)}
       />
     </>
-  )
+  ),
 };
