@@ -13,6 +13,7 @@ import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
 import { useTranslation } from "react-i18next";
+import { KEYS } from "../keys";
 
 const probablySupportsClipboard =
   "toBlob" in HTMLCanvasElement.prototype &&
@@ -54,6 +55,9 @@ export function ExportDialog({
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
+  const pngButton = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -84,9 +88,36 @@ export function ExportDialog({
     scale,
   ]);
 
+  useEffect(() => {
+    if (modalIsShown) {
+      pngButton.current?.focus();
+    }
+  }, [modalIsShown]);
+
   function handleClose() {
     setModalIsShown(false);
     setExportSelected(someElementIsSelected);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === KEYS.TAB) {
+      const { activeElement } = document;
+      if (e.shiftKey) {
+        if (activeElement === pngButton.current) {
+          closeButton.current?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (activeElement === closeButton.current) {
+          pngButton.current?.focus();
+          e.preventDefault();
+        }
+        if (activeElement === onlySelectedInput.current) {
+          closeButton.current?.focus();
+          e.preventDefault();
+        }
+      }
+    }
   }
 
   return (
@@ -99,13 +130,22 @@ export function ExportDialog({
         title={t("buttons.export")}
       />
       {modalIsShown && (
-        <Modal maxWidth={640} onCloseRequest={handleClose}>
-          <div className="ExportDialog__dialog">
+        <Modal
+          maxWidth={640}
+          onCloseRequest={handleClose}
+          labelledBy="export-title"
+        >
+          <div className="ExportDialog__dialog" onKeyDown={handleKeyDown}>
             <Island padding={4}>
-              <button className="ExportDialog__close" onClick={handleClose}>
+              <button
+                className="ExportDialog__close"
+                onClick={handleClose}
+                aria-label="Close"
+                ref={closeButton}
+              >
                 ╳
               </button>
-              <h2>{t("buttons.export")}</h2>
+              <h2 id="export-title">{t("buttons.export")}</h2>
               <div className="ExportDialog__preview" ref={previewRef}></div>
               <div className="ExportDialog__actions">
                 <Stack.Row gap={2}>
@@ -115,6 +155,7 @@ export function ExportDialog({
                     title={t("buttons.exportToPng")}
                     aria-label={t("buttons.exportToPng")}
                     onClick={() => onExportToPng(exportedElements, scale)}
+                    ref={pngButton}
                   />
                   {probablySupportsClipboard && (
                     <ToolButton
@@ -177,6 +218,7 @@ export function ExportDialog({
                           onChange={e =>
                             setExportSelected(e.currentTarget.checked)
                           }
+                          ref={onlySelectedInput}
                         />{" "}
                         {t("labels.onlySelected")}
                       </label>
