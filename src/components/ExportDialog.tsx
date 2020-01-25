@@ -128,7 +128,7 @@ export function ExportDialog({
         onClick={() => setModalIsShown(true)}
         icon={exportFile}
         type="button"
-        aria-label="Show export dialog"
+        aria-label={t("buttons.export")}
         title={t("buttons.export")}
         ref={triggerButton}
       />
@@ -143,7 +143,7 @@ export function ExportDialog({
               <button
                 className="ExportDialog__close"
                 onClick={handleClose}
-                aria-label="Close"
+                aria-label={t("buttons.close")}
                 ref={closeButton}
               >
                 ╳
