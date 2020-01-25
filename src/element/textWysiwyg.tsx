@@ -7,6 +7,7 @@ type TextWysiwygParams = {
   y: number;
   strokeColor: string;
   font: string;
+  opacity: number;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -23,6 +24,7 @@ export function textWysiwyg({
   y,
   strokeColor,
   font,
+  opacity,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -38,6 +40,7 @@ export function textWysiwyg({
   Object.assign(editable.style, {
     color: strokeColor,
     position: "absolute",
+    opacity: opacity / 100,
     top: y + "px",
     left: x + "px",
     transform: "translate(-50%, -50%)",
