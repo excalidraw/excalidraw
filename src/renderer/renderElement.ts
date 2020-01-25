@@ -119,7 +119,11 @@ export function renderElement(
         //    \
         generator.line(x3, y3, x2, y2, options),
         // generate lines
-        generator.curve(points),
+        generator.curve(points, {
+          curveFitting: 0.95,
+          curveTightness: 0,
+          curveStepCount: 9,
+        }),
         //    /
         generator.line(x4, y4, x2, y2, options),
       ];
