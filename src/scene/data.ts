@@ -128,7 +128,7 @@ export async function loadFromJSON() {
   }
   const { elements, appState } = updateAppState(contents);
   return new Promise<DataState>(resolve => {
-    resolve(restore(elements, appState));
+    resolve(restore(elements, { ...appState, ...calculateScroll(elements) }));
   });
 }
 
