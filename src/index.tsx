@@ -136,6 +136,9 @@ function pickAppStatePropertiesForHistory(
   };
 }
 
+let cursorX = 0;
+let cursorY = 0;
+
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -229,7 +232,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("mousemove", this.getCurrentCursorPosition);
+    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
 
@@ -262,7 +265,7 @@ export class App extends React.Component<any, AppState> {
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
       "mousemove",
-      this.getCurrentCursorPosition,
+      this.updateCurrentCursorPosition,
       false,
     );
     window.removeEventListener("resize", this.onResize, false);
@@ -275,8 +278,9 @@ export class App extends React.Component<any, AppState> {
     this.forceUpdate();
   };
 
-  private getCurrentCursorPosition = (e: MouseEvent) => {
-    this.setState({ cursorX: e.x, cursorY: e.y });
+  private updateCurrentCursorPosition = (e: MouseEvent) => {
+    cursorX = e.x;
+    cursorY = e.y;
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -1397,12 +1401,12 @@ export class App extends React.Component<any, AppState> {
       const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
 
       const dx =
-        this.state.cursorX -
+        cursorX -
         this.state.scrollX -
         CANVAS_WINDOW_OFFSET_LEFT -
         elementsCenterX;
       const dy =
-        this.state.cursorY -
+        cursorY -
         this.state.scrollY -
         CANVAS_WINDOW_OFFSET_TOP -
         elementsCenterY;
