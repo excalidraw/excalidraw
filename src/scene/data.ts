@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, cleanAppStateForExport } from "../appState";
 
 import { AppState } from "../types";
 import { ExportType } from "./types";
@@ -33,7 +33,9 @@ export function serializeAsJSON(
     version: 1,
     source: window.location.origin,
     elements: elements.map(({ shape, ...el }) => el),
-    appState: appState || getDefaultAppState(),
+    appState: appState
+      ? cleanAppStateForExport(appState)
+      : getDefaultAppState(),
   });
 }
 

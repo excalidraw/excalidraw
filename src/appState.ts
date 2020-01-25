@@ -28,3 +28,14 @@ export function getDefaultAppState(): AppState {
     name: DEFAULT_PROJECT_NAME,
   };
 }
+
+export function cleanAppStateForExport(appState: AppState) {
+  return {
+    ...appState,
+    draggingElement: null,
+    resizingElement: null,
+    multiElement: null,
+    editingElement: null,
+    pathSegmentCircle: null,
+  };
+}
