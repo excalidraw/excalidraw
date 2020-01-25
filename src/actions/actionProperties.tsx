@@ -47,9 +47,10 @@ export const actionChangeStrokeColor: Action = {
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>{t("labels.stroke")}</h5>
+      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
         type="elementStroke"
+        label={t("labels.stroke")}
         color={getFormValue(
           appState.editingElement,
           elements,
@@ -76,9 +77,10 @@ export const actionChangeBackgroundColor: Action = {
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
     <>
-      <h5>{t("labels.background")}</h5>
+      <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
         type="elementBackground"
+        label={t("labels.background")}
         color={getFormValue(
           appState.editingElement,
           elements,
@@ -103,14 +105,15 @@ export const actionChangeFillStyle: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.fill")}</h5>
+    <fieldset>
+      <legend>{t("labels.fill")}</legend>
       <ButtonSelect
         options={[
           { value: "solid", text: t("labels.solid") },
           { value: "hachure", text: t("labels.hachure") },
           { value: "cross-hatch", text: t("labels.crossHatch") },
         ]}
+        group="fill"
         value={getFormValue(
           appState.editingElement,
           elements,
@@ -120,7 +123,7 @@ export const actionChangeFillStyle: Action = {
           updateData(value);
         }}
       />
-    </>
+    </fieldset>
   ),
 };
 
@@ -136,9 +139,10 @@ export const actionChangeStrokeWidth: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.strokeWidth")}</h5>
+    <fieldset>
+      <legend>{t("labels.strokeWidth")}</legend>
       <ButtonSelect
+        group="stroke-width"
         options={[
           { value: 1, text: t("labels.thin") },
           { value: 2, text: t("labels.bold") },
@@ -151,7 +155,7 @@ export const actionChangeStrokeWidth: Action = {
         )}
         onChange={value => updateData(value)}
       />
-    </>
+    </fieldset>
   ),
 };
 
@@ -167,9 +171,10 @@ export const actionChangeSloppiness: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.sloppiness")}</h5>
+    <fieldset>
+      <legend>{t("labels.sloppiness")}</legend>
       <ButtonSelect
+        group="sloppiness"
         options={[
           { value: 0, text: t("labels.architect") },
           { value: 1, text: t("labels.artist") },
@@ -182,7 +187,7 @@ export const actionChangeSloppiness: Action = {
         )}
         onChange={value => updateData(value)}
       />
-    </>
+    </fieldset>
   ),
 };
 
@@ -198,8 +203,8 @@ export const actionChangeOpacity: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.opacity")}</h5>
+    <label className="control-label">
+      {t("labels.opacity")}
       <input
         type="range"
         min="0"
@@ -214,7 +219,7 @@ export const actionChangeOpacity: Action = {
           ) ?? undefined
         }
       />
-    </>
+    </label>
   ),
 };
 
@@ -238,9 +243,10 @@ export const actionChangeFontSize: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.fontSize")}</h5>
+    <fieldset>
+      <legend>{t("labels.fontSize")}</legend>
       <ButtonSelect
+        group="font-size"
         options={[
           { value: 16, text: t("labels.small") },
           { value: 20, text: t("labels.medium") },
@@ -254,7 +260,7 @@ export const actionChangeFontSize: Action = {
         )}
         onChange={value => updateData(value)}
       />
-    </>
+    </fieldset>
   ),
 };
 
@@ -278,9 +284,10 @@ export const actionChangeFontFamily: Action = {
     };
   },
   PanelComponent: ({ elements, appState, updateData, t }) => (
-    <>
-      <h5>{t("labels.fontFamily")}</h5>
+    <fieldset>
+      <legend>{t("labels.fontFamily")}</legend>
       <ButtonSelect
+        group="font-family"
         options={[
           { value: "Virgil", text: t("labels.handDrawn") },
           { value: "Helvetica", text: t("labels.normal") },
@@ -293,6 +300,6 @@ export const actionChangeFontFamily: Action = {
         )}
         onChange={value => updateData(value)}
       />
-    </>
+    </fieldset>
   ),
 };
