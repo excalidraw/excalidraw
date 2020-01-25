@@ -930,19 +930,21 @@ export class App extends React.Component<any, AppState> {
                 multiElement.isSelected = true;
                 multiElement.points.push([e.clientX - x, e.clientY - y]);
                 multiElement.shape = null;
-                this.forceUpdate();
+                this.setState({ draggingElement: multiElement });
               } else {
                 element.isSelected = true;
                 element.points.push([0, 0]);
                 element.shape = null;
                 elements = [...elements, element];
-                this.setState({ multiElement: element });
+                this.setState({
+                  multiElement: element,
+                  draggingElement: element,
+                });
               }
-              return;
+            } else {
+              elements = [...elements, element];
+              this.setState({ multiElement: null, draggingElement: element });
             }
-
-            elements = [...elements, element];
-            this.setState({ draggingElement: element });
 
             let lastX = x;
             let lastY = y;
@@ -1097,7 +1099,7 @@ export class App extends React.Component<any, AppState> {
                           (a, b) => a[0] - b[0],
                         );
 
-                        for (let i = 0; i < points.length; ++i) {
+                        for (let i = 1; i < points.length; ++i) {
                           const pnt = points[i];
                           pnt[0] += deltaX / (len - i);
                         }
@@ -1183,6 +1185,20 @@ export class App extends React.Component<any, AppState> {
 
               draggingElement.width = width;
               draggingElement.height = height;
+
+              if (this.state.elementType === "arrow") {
+                const dx = x - draggingElement.x;
+                const dy = y - draggingElement.y;
+                if (draggingElement.points.length === 1) {
+                  draggingElement.points.push([dx, dy]);
+                } else if (draggingElement.points.length > 1) {
+                  const pnt =
+                    draggingElement.points[draggingElement.points.length - 1];
+                  pnt[0] = dx;
+                  pnt[1] = dy;
+                }
+              }
+
               draggingElement.shape = null;
 
               if (this.state.elementType === "selection") {
