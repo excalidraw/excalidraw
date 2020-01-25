@@ -18,7 +18,7 @@
     "opacity": "Sichtbarkeit",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftart",
-    "onlySelected": "Only selected",
+    "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
     "handDrawn": "Handschrift",
     "normal": "Normal",
@@ -51,7 +51,7 @@
     "couldNotCreateShareableLink": "Konnte keinen teilbaren Link erstellen.",
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
-    "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome browser.",
+    "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "copiedToClipboard": "In Zwischenablage kopiert: {{url}}"
   },
   "toolBar": {
