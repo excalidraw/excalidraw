@@ -37,7 +37,9 @@ export function serializeAsJSON(
   });
 }
 
-function calculateScroll(elements: readonly ExcalidrawElement[]) {
+function calculateScroll(
+  elements: readonly ExcalidrawElement[],
+): { scrollX: number; scrollY: number } {
   // Bounding box of all elements
   let top = Number.MAX_SAFE_INTEGER;
   let left = Number.MAX_SAFE_INTEGER;
