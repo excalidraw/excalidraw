@@ -19,7 +19,7 @@
   },
   "description": "",
   "devDependencies": {
-    "@types/jest": "24.9.0",
+    "@types/jest": "24.9.1",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.17",
     "@types/react-color": "3.0.1",
