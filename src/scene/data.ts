@@ -37,6 +37,39 @@ export function serializeAsJSON(
   });
 }
 
+function calculateScroll(elements: ExcalidrawElement[]) {
+  // Bounding box of all elements
+  let top = Number.MAX_SAFE_INTEGER;
+  let left = Number.MAX_SAFE_INTEGER;
+  let bottom = -Number.MAX_SAFE_INTEGER;
+  let right = -Number.MAX_SAFE_INTEGER;
+
+  for (const element of elements) {
+    left = Math.min(
+      left,
+      element.width > 0 ? element.x : element.x + element.width,
+    );
+    top = Math.min(
+      top,
+      element.height > 0 ? element.y : element.y + element.height,
+    );
+    right = Math.max(
+      right,
+      element.width > 0 ? element.x + element.width : element.x,
+    );
+    bottom = Math.max(
+      bottom,
+      element.height > 0 ? element.y + element.height : element.y,
+    );
+  }
+  const centerX = left + (right - left) / 2;
+  const centerY = top + (bottom - top) / 2;
+  return {
+    scrollX: window.innerWidth / 2 - centerX,
+    scrollY: window.innerHeight / 2 - centerY,
+  };
+}
+
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -126,7 +159,7 @@ export async function exportToBackend(
 }
 
 export async function importFromBackend(id: string | null) {
-  let elements: readonly ExcalidrawElement[] = [];
+  let elements: ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
   const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
     data.clone().json(),
@@ -140,6 +173,10 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
+
+  const { scrollX, scrollY } = calculateScroll(elements);
+  appState.scrollX = scrollX;
+  appState.scrollY = scrollY;
   return restore(elements, appState);
 }
 
