@@ -58,6 +58,7 @@ export function ExportDialog({
   const pngButton = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const onlySelectedInput = useRef<HTMLInputElement>(null);
+  const triggerButton = useRef<HTMLButtonElement>(null);
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -97,6 +98,7 @@ export function ExportDialog({
   function handleClose() {
     setModalIsShown(false);
     setExportSelected(someElementIsSelected);
+    triggerButton.current?.focus();
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -128,6 +130,7 @@ export function ExportDialog({
         type="button"
         aria-label="Show export dialog"
         title={t("buttons.export")}
+        ref={triggerButton}
       />
       {modalIsShown && (
         <Modal
