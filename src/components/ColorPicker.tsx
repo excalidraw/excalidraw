@@ -10,10 +10,12 @@ const Picker = function({
   colors,
   color,
   onChange,
+  label,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
+  label: string;
 }) {
   return (
     <div className="color-picker">
@@ -42,6 +44,7 @@ const Picker = function({
         </div>
         <ColorInput
           color={color}
+          label={label}
           onChange={color => {
             onChange(color);
           }}
@@ -54,9 +57,11 @@ const Picker = function({
 function ColorInput({
   color,
   onChange,
+  label,
 }: {
   color: string | null;
   onChange: (color: string) => void;
+  label: string;
 }) {
   const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
   const [innerValue, setInnerValue] = React.useState(color);
@@ -71,7 +76,7 @@ function ColorInput({
       <input
         spellCheck={false}
         className="color-picker-input"
-        aria-label="Hex color code"
+        aria-label={label}
         onChange={e => {
           const value = e.target.value;
           if (value.match(colorRegex)) {
@@ -91,10 +96,12 @@ export function ColorPicker({
   type,
   color,
   onChange,
+  label,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
   onChange: (color: string) => void;
+  label: string;
 }) {
   const [isActive, setActive] = React.useState(false);
 
@@ -103,12 +110,13 @@ export function ColorPicker({
       <div className="color-picker-control-container">
         <button
           className="color-picker-label-swatch"
-          aria-label="Change color"
+          aria-label={label}
           style={color ? { backgroundColor: color } : undefined}
           onClick={() => setActive(!isActive)}
         />
         <ColorInput
           color={color}
+          label={label}
           onChange={color => {
             onChange(color);
           }}
@@ -123,6 +131,7 @@ export function ColorPicker({
               onChange={changedColor => {
                 onChange(changedColor);
               }}
+              label={label}
             />
           </Popover>
         ) : null}

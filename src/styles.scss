@@ -33,24 +33,52 @@ body {
   display: flex;
   flex-direction: column;
 
-  h5 {
+  h3,
+  legend,
+  .control-label {
     margin-top: 0.333rem;
-    margin-bottom: 0.333em;
+    margin-bottom: 0.333rem;
     font-size: 0.75rem;
     color: var(--text-color-primary);
+    font-weight: bold;
+    display: block;
   }
 
-  h5:first-child {
+  .control-label input {
+    display: block;
+    width: 100%;
+  }
+
+  h3:first-child,
+  legend:first-child,
+  .control-label:first-child {
     margin-top: 0;
+  }
+
+  legend {
+    padding: 0;
   }
 
   .buttonList {
     flex-wrap: wrap;
 
-    button {
+    label {
       margin-right: 0.25rem;
       font-size: 0.75rem;
+      display: inline-block;
     }
+
+    input[type="radio"] {
+      opacity: 0;
+      position: absolute;
+    }
+  }
+
+  fieldset {
+    margin: 0;
+    margin-top: 0.333rem;
+    padding: 0;
+    border: none;
   }
 }
 
@@ -65,7 +93,8 @@ input:focus {
   box-shadow: 0 0 0 2px #a5d8ff;
 }
 
-button {
+button,
+.buttonList label {
   background-color: #e9ecef;
   border: 0;
   border-radius: 4px;
@@ -92,7 +121,8 @@ button {
   }
 }
 
-.active {
+.active,
+.buttonList label.active {
   background-color: #ced4da;
   &:hover {
     background-color: #ced4da;
@@ -215,4 +245,14 @@ button {
   &:active {
     background-color: #ced4da;
   }
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; /* added line */
 }
