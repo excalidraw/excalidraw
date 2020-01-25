@@ -37,6 +37,41 @@ export function serializeAsJSON(
   });
 }
 
+function calculateScroll(
+  elements: readonly ExcalidrawElement[],
+): { scrollX: number; scrollY: number } {
+  // Bounding box of all elements
+  let top = Number.MAX_SAFE_INTEGER;
+  let left = Number.MAX_SAFE_INTEGER;
+  let bottom = -Number.MAX_SAFE_INTEGER;
+  let right = -Number.MAX_SAFE_INTEGER;
+
+  for (const element of elements) {
+    left = Math.min(
+      left,
+      element.width > 0 ? element.x : element.x + element.width,
+    );
+    top = Math.min(
+      top,
+      element.height > 0 ? element.y : element.y + element.height,
+    );
+    right = Math.max(
+      right,
+      element.width > 0 ? element.x + element.width : element.x,
+    );
+    bottom = Math.max(
+      bottom,
+      element.height > 0 ? element.y + element.height : element.y,
+    );
+  }
+  const centerX = left + (right - left) / 2;
+  const centerY = top + (bottom - top) / 2;
+  return {
+    scrollX: window.innerWidth / 2 - centerX,
+    scrollY: window.innerHeight / 2 - centerY,
+  };
+}
+
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -95,7 +130,7 @@ export async function loadFromJSON() {
   }
   const { elements, appState } = updateAppState(contents);
   return new Promise<DataState>(resolve => {
-    resolve(restore(elements, appState));
+    resolve(restore(elements, { ...appState, ...calculateScroll(elements) }));
   });
 }
 
@@ -140,7 +175,7 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
-  return restore(elements, appState);
+  return restore(elements, { ...appState, ...calculateScroll(elements) });
 }
 
 export async function exportCanvas(
