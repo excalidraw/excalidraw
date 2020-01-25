@@ -12,6 +12,7 @@ export const actionChangeProjectName: Action = {
   },
   PanelComponent: ({ appState, updateData }) => (
     <EditableText
+      label="File title"
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
     />
