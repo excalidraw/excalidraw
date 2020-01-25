@@ -7,28 +7,24 @@
   user-select: none;
   margin: -0.25rem 0 0 0.125rem;
   padding: 0.25rem 0;
-  background-color: #f2f2f2;
-  border: 1px solid #bcbcbc;
-}
-
-.context-menu__option {
-  width: 9.5rem;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
 }
 
 .context-menu-option {
   position: relative;
   width: 100%;
   margin: 0;
+  padding: 0.25rem 0.5rem;
   text-align: left;
   border-radius: 0;
-  padding-left: 1.25rem;
-  background-color: #f2f2f2;
+  background-color: #e9ecef;
   border: none;
 }
 
 .context-menu-option:hover {
   color: #fff;
-  background-color: #4e95f5;
+  background-color: #1971c2;
 }
 
 .context-menu-option:focus {
