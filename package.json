@@ -26,7 +26,7 @@
     "@types/react-dom": "16.9.5",
     "eslint-plugin-json-format": "2.0.1",
     "husky": "4.2.1",
-    "lint-staged": "10.0.0",
+    "lint-staged": "10.0.2",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
     "rewire": "4.0.1",
