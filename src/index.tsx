@@ -126,11 +126,18 @@ function pickAppStatePropertiesForHistory(
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFillStyle: appState.currentItemFillStyle,
+    currentItemStrokeWidth: appState.currentItemStrokeWidth,
+    currentItemRoughness: appState.currentItemRoughness,
+    currentItemOpacity: appState.currentItemOpacity,
     currentItemFont: appState.currentItemFont,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };
 }
+
+let cursorX = 0;
+let cursorY = 0;
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -225,7 +232,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("mousemove", this.getCurrentCursorPosition);
+    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
 
@@ -258,7 +265,7 @@ export class App extends React.Component<any, AppState> {
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
       "mousemove",
-      this.getCurrentCursorPosition,
+      this.updateCurrentCursorPosition,
       false,
     );
     window.removeEventListener("resize", this.onResize, false);
@@ -271,8 +278,9 @@ export class App extends React.Component<any, AppState> {
     this.forceUpdate();
   };
 
-  private getCurrentCursorPosition = (e: MouseEvent) => {
-    this.setState({ cursorX: e.x, cursorY: e.y });
+  private updateCurrentCursorPosition = (e: MouseEvent) => {
+    cursorX = e.x;
+    cursorY = e.y;
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -791,10 +799,10 @@ export class App extends React.Component<any, AppState> {
               y,
               this.state.currentItemStrokeColor,
               this.state.currentItemBackgroundColor,
-              "hachure",
-              1,
-              1,
-              100,
+              this.state.currentItemFillStyle,
+              this.state.currentItemStrokeWidth,
+              this.state.currentItemRoughness,
+              this.state.currentItemOpacity,
             );
 
             if (isTextElement(element)) {
@@ -892,6 +900,7 @@ export class App extends React.Component<any, AppState> {
                 x: textX,
                 y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
+                opacity: this.state.currentItemOpacity,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
                   if (text) {
@@ -1234,10 +1243,10 @@ export class App extends React.Component<any, AppState> {
                       y,
                       this.state.currentItemStrokeColor,
                       this.state.currentItemBackgroundColor,
-                      "hachure",
-                      1,
-                      1,
-                      100,
+                      this.state.currentItemFillStyle,
+                      this.state.currentItemStrokeWidth,
+                      this.state.currentItemRoughness,
+                      this.state.currentItemOpacity,
                     ),
                     "", // default text
                     this.state.currentItemFont, // default font
@@ -1296,6 +1305,7 @@ export class App extends React.Component<any, AppState> {
               y: textY,
               strokeColor: element.strokeColor,
               font: element.font,
+              opacity: this.state.currentItemOpacity,
               onSubmit: text => {
                 if (text) {
                   elements = [
@@ -1391,12 +1401,12 @@ export class App extends React.Component<any, AppState> {
       const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
 
       const dx =
-        this.state.cursorX -
+        cursorX -
         this.state.scrollX -
         CANVAS_WINDOW_OFFSET_LEFT -
         elementsCenterX;
       const dy =
-        this.state.cursorY -
+        cursorY -
         this.state.scrollY -
         CANVAS_WINDOW_OFFSET_TOP -
         elementsCenterY;

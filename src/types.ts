@@ -11,6 +11,10 @@ export type AppState = {
   exportBackground: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
+  currentItemFillStyle: string;
+  currentItemStrokeWidth: number;
+  currentItemRoughness: number;
+  currentItemOpacity: number;
   currentItemFont: string;
   viewBackgroundColor: string;
   scrollX: number;
