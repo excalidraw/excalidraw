@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import { renderScene } from "../renderer/renderScene";
+import { distance } from "../utils";
 
 export function getExportCanvasPreview(
   elements: readonly ExcalidrawElement[],
@@ -9,7 +10,7 @@ export function getExportCanvasPreview(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    scale = 1
+    scale = 1,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -18,13 +19,13 @@ export function getExportCanvasPreview(
   },
   createCanvas: (width: number, height: number) => any = function(
     width,
-    height
+    height,
   ) {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
     return tempCanvas;
-  }
+  },
 ) {
   // calculate smallest area to fit the contents in
   let subCanvasX1 = Infinity;
@@ -40,10 +41,6 @@ export function getExportCanvasPreview(
     subCanvasY2 = Math.max(subCanvasY2, y2);
   });
 
-  function distance(x: number, y: number) {
-    return Math.abs(x > y ? x - y : y - x);
-  }
-
   const width = distance(subCanvasX1, subCanvasX2) + exportPadding * 2;
   const height = distance(subCanvasY1, subCanvasY2) + exportPadding * 2;
   const tempCanvas: any = createCanvas(width, height);
@@ -56,14 +53,14 @@ export function getExportCanvasPreview(
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: 0,
-      scrollY: 0
+      scrollY: 0,
     },
     {
       offsetX: -subCanvasX1 + exportPadding,
       offsetY: -subCanvasY1 + exportPadding,
       renderScrollbars: false,
-      renderSelection: false
-    }
+      renderSelection: false,
+    },
   );
   return tempCanvas;
 }

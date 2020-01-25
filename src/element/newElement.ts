@@ -16,7 +16,7 @@ export function newElement(
   roughness: number,
   opacity: number,
   width = 0,
-  height = 0
+  height = 0,
 ) {
   const element = {
     id: nanoid(),
@@ -33,7 +33,7 @@ export function newElement(
     opacity,
     isSelected: false,
     seed: randomSeed(),
-    shape: null as Drawable | Drawable[] | null
+    shape: null as Drawable | Drawable[] | null,
   };
   return element;
 }
@@ -41,7 +41,7 @@ export function newElement(
 export function newTextElement(
   element: ExcalidrawElement,
   text: string,
-  font: string
+  font: string,
 ) {
   const metrics = measureText(text, font);
   const textElement: ExcalidrawTextElement = {
@@ -54,7 +54,7 @@ export function newTextElement(
     y: element.y - metrics.height / 2,
     width: metrics.width,
     height: metrics.height,
-    baseline: metrics.baseline
+    baseline: metrics.baseline,
   };
 
   return textElement;

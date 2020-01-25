@@ -3,7 +3,7 @@ import "./ExportDialog.css";
 import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
-import { ToolIcon } from "./ToolIcon";
+import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, downloadFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
@@ -25,7 +25,7 @@ const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
 type ExportCB = (
   elements: readonly ExcalidrawElement[],
-  scale?: number
+  scale?: number,
 ) => void;
 
 export function ExportDialog({
@@ -36,7 +36,7 @@ export function ExportDialog({
   syncActionResult,
   onExportToPng,
   onExportToClipboard,
-  onExportToBackend
+  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -52,7 +52,7 @@ export function ExportDialog({
   const [modalIsShown, setModalIsShown] = useState(false);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
-  const previeRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
@@ -64,12 +64,12 @@ export function ExportDialog({
   }, [someElementIsSelected]);
 
   useEffect(() => {
-    const previewNode = previeRef.current;
+    const previewNode = previewRef.current;
     const canvas = getExportCanvasPreview(exportedElements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
-      scale
+      scale,
     });
     previewNode?.appendChild(canvas);
     return () => {
@@ -81,7 +81,7 @@ export function ExportDialog({
     exportBackground,
     exportPadding,
     viewBackgroundColor,
-    scale
+    scale,
   ]);
 
   function handleClose() {
@@ -91,7 +91,7 @@ export function ExportDialog({
 
   return (
     <>
-      <ToolIcon
+      <ToolButton
         onClick={() => setModalIsShown(true)}
         icon={exportFile}
         type="button"
@@ -106,10 +106,10 @@ export function ExportDialog({
                 ╳
               </button>
               <h2>{t("buttons.export")}</h2>
-              <div className="ExportDialog__preview" ref={previeRef}></div>
+              <div className="ExportDialog__preview" ref={previewRef}></div>
               <div className="ExportDialog__actions">
                 <Stack.Row gap={2}>
-                  <ToolIcon
+                  <ToolButton
                     type="button"
                     icon={downloadFile}
                     title={t("buttons.exportToPng")}
@@ -117,7 +117,7 @@ export function ExportDialog({
                     onClick={() => onExportToPng(exportedElements, scale)}
                   />
                   {probablySupportsClipboard && (
-                    <ToolIcon
+                    <ToolButton
                       type="button"
                       icon={clipboard}
                       title={t("buttons.copyToClipboard")}
@@ -127,7 +127,7 @@ export function ExportDialog({
                       }
                     />
                   )}
-                  <ToolIcon
+                  <ToolButton
                     type="button"
                     icon={link}
                     title={t("buttons.getShareableLink")}
@@ -141,18 +141,19 @@ export function ExportDialog({
                   elements,
                   appState,
                   syncActionResult,
-                  t
+                  t,
                 )}
                 <Stack.Col gap={1}>
                   <div className="ExportDialog__scales">
                     <Stack.Row gap={1} align="baseline">
                       {scales.map(s => (
-                        <ToolIcon
+                        <ToolButton
                           key={s}
                           size="s"
                           type="radio"
                           icon={"x" + s}
                           name="export-canvas-scale"
+                          aria-label="Export"
                           id="export-canvas-scale"
                           checked={scale === s}
                           onChange={() => setScale(s)}
@@ -165,7 +166,7 @@ export function ExportDialog({
                     elements,
                     appState,
                     syncActionResult,
-                    t
+                    t,
                   )}
                   {someElementIsSelected && (
                     <div>

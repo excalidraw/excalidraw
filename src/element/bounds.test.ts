@@ -13,7 +13,7 @@ const _ce = ({ x, y, w, h }: { x: number; y: number; w: number; h: number }) =>
     x,
     y,
     width: w,
-    height: h
+    height: h,
   } as ExcalidrawElement);
 
 describe("getElementAbsoluteCoords", () => {
@@ -29,14 +29,14 @@ describe("getElementAbsoluteCoords", () => {
 
   it("test x2 coordinate if width is positive or zero", () => {
     const [, , x2] = getElementAbsoluteCoords(
-      _ce({ x: 10, y: 0, w: 10, h: 0 })
+      _ce({ x: 10, y: 0, w: 10, h: 0 }),
     );
     expect(x2).toEqual(20);
   });
 
   it("test x2 coordinate if width is negative", () => {
     const [, , x2] = getElementAbsoluteCoords(
-      _ce({ x: 10, y: 0, w: -10, h: 0 })
+      _ce({ x: 10, y: 0, w: -10, h: 0 }),
     );
     expect(x2).toEqual(10);
   });
@@ -53,14 +53,14 @@ describe("getElementAbsoluteCoords", () => {
 
   it("test y2 coordinate if height is positive or zero", () => {
     const [, , , y2] = getElementAbsoluteCoords(
-      _ce({ x: 0, y: 10, w: 0, h: 10 })
+      _ce({ x: 0, y: 10, w: 0, h: 10 }),
     );
     expect(y2).toEqual(20);
   });
 
   it("test y2 coordinate if height is negative", () => {
     const [, , , y2] = getElementAbsoluteCoords(
-      _ce({ x: 0, y: 10, w: 0, h: -10 })
+      _ce({ x: 0, y: 10, w: 0, h: -10 }),
     );
     expect(y2).toEqual(10);
   });

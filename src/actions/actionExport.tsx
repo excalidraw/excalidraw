@@ -3,7 +3,7 @@ import { Action } from "./types";
 import { EditableText } from "../components/EditableText";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
-import { ToolIcon } from "../components/ToolIcon";
+import { ToolButton } from "../components/ToolButton";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
@@ -15,7 +15,7 @@ export const actionChangeProjectName: Action = {
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
     />
-  )
+  ),
 };
 
 export const actionChangeExportBackground: Action = {
@@ -34,7 +34,7 @@ export const actionChangeExportBackground: Action = {
       />{" "}
       {t("labels.withBackground")}
     </label>
-  )
+  ),
 };
 
 export const actionSaveScene: Action = {
@@ -44,14 +44,14 @@ export const actionSaveScene: Action = {
     return {};
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={save}
       title={t("buttons.save")}
       aria-label={t("buttons.save")}
       onClick={() => updateData(null)}
     />
-  )
+  ),
 };
 
 export const actionLoadScene: Action = {
@@ -59,12 +59,12 @@ export const actionLoadScene: Action = {
   perform: (
     elements,
     appState,
-    { elements: loadedElements, appState: loadedAppState }
+    { elements: loadedElements, appState: loadedAppState },
   ) => {
     return { elements: loadedElements, appState: loadedAppState };
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={load}
       title={t("buttons.load")}
@@ -77,5 +77,5 @@ export const actionLoadScene: Action = {
           .catch(err => console.error(err));
       }}
     />
-  )
+  ),
 };

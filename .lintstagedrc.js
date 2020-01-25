@@ -11,5 +11,5 @@ module.exports = {
       files.filter(file => !cli.isPathIgnored(file)).join(" ")
     );
   },
-  "*.{js,css,scss,json,md,ts,tsx,html,yml}": ["prettier --write"]
+  "*.{js,css,scss,json,md,ts,tsx,html,yml}": ["prettier --write"],
 };
