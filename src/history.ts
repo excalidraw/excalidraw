@@ -8,14 +8,14 @@ class SceneHistory {
 
   generateCurrentEntry(
     appState: Partial<AppState>,
-    elements: readonly ExcalidrawElement[]
+    elements: readonly ExcalidrawElement[],
   ) {
     return JSON.stringify({
       appState,
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
-        isSelected: false
-      }))
+        isSelected: false,
+      })),
     });
   }
 

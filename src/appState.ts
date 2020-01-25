@@ -15,12 +15,16 @@ export function getDefaultAppState(): AppState {
     exportBackground: true,
     currentItemStrokeColor: "#000000",
     currentItemBackgroundColor: "transparent",
+    currentItemFillStyle: "hachure",
+    currentItemStrokeWidth: 1,
+    currentItemRoughness: 1,
+    currentItemOpacity: 100,
     currentItemFont: "20px Virgil",
     viewBackgroundColor: "#ffffff",
     scrollX: 0,
     scrollY: 0,
     cursorX: 0,
     cursorY: 0,
-    name: DEFAULT_PROJECT_NAME
+    name: DEFAULT_PROJECT_NAME,
   };
 }

@@ -3,20 +3,20 @@ import { getElementAbsoluteCoords } from "../element";
 
 export function getElementsWithinSelection(
   elements: readonly ExcalidrawElement[],
-  selection: ExcalidrawElement
+  selection: ExcalidrawElement,
 ) {
   const [
     selectionX1,
     selectionY1,
     selectionX2,
-    selectionY2
+    selectionY2,
   ] = getElementAbsoluteCoords(selection);
   return elements.filter(element => {
     const [
       elementX1,
       elementY1,
       elementX2,
-      elementY2
+      elementY2,
     ] = getElementAbsoluteCoords(element);
 
     return (
@@ -62,14 +62,14 @@ export const someElementIsSelected = (elements: readonly ExcalidrawElement[]) =>
  */
 export function getCommonAttributeOfSelectedElements<T>(
   elements: readonly ExcalidrawElement[],
-  getAttribute: (element: ExcalidrawElement) => T
+  getAttribute: (element: ExcalidrawElement) => T,
 ): T | null {
   const attributes = Array.from(
     new Set(
       elements
         .filter(element => element.isSelected)
-        .map(element => getAttribute(element))
-    )
+        .map(element => getAttribute(element)),
+    ),
   );
   return attributes.length === 1 ? attributes[0] : null;
 }

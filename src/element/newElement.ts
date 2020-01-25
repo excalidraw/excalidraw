@@ -17,7 +17,7 @@ export function newElement(
   roughness: number,
   opacity: number,
   width = 0,
-  height = 0
+  height = 0,
 ) {
   let points = [] as Point[];
   const element = {
@@ -36,7 +36,7 @@ export function newElement(
     isSelected: false,
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,
-    points
+    points,
   };
   return element;
 }
@@ -44,7 +44,7 @@ export function newElement(
 export function newTextElement(
   element: ExcalidrawElement,
   text: string,
-  font: string
+  font: string,
 ) {
   const metrics = measureText(text, font);
   const textElement: ExcalidrawTextElement = {
@@ -57,7 +57,7 @@ export function newTextElement(
     y: element.y - metrics.height / 2,
     width: metrics.width,
     height: metrics.height,
-    baseline: metrics.baseline
+    baseline: metrics.baseline,
   };
 
   return textElement;

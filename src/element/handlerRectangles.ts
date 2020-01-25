@@ -6,7 +6,7 @@ type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
 export function handlerRectangles(
   element: ExcalidrawElement,
-  { scrollX, scrollY }: SceneScroll
+  { scrollX, scrollY }: SceneScroll,
 ) {
   let elementX2 = 0;
   let elementY2 = 0;
@@ -15,7 +15,7 @@ export function handlerRectangles(
   let minimumSize = 40;
   if (element.type === "arrow") {
     [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
-      element
+      element,
     );
   } else {
     elementX1 = element.x;
@@ -35,14 +35,14 @@ export function handlerRectangles(
       elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
       elementY1 - margin + scrollY + marginY,
       8,
-      8
+      8,
     ];
 
     handlers["s"] = [
       elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
       elementY2 - margin + scrollY - marginY,
       8,
-      8
+      8,
     ];
   }
 
@@ -51,14 +51,14 @@ export function handlerRectangles(
       elementX1 - margin + scrollX + marginX,
       elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
       8,
-      8
+      8,
     ];
 
     handlers["e"] = [
       elementX2 - margin + scrollX - marginX,
       elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
       8,
-      8
+      8,
     ];
   }
 
@@ -66,38 +66,38 @@ export function handlerRectangles(
     elementX1 - margin + scrollX + marginX,
     elementY1 - margin + scrollY + marginY,
     8,
-    8
+    8,
   ]; // nw
   handlers["ne"] = [
     elementX2 - margin + scrollX - marginX,
     elementY1 - margin + scrollY + marginY,
     8,
-    8
+    8,
   ]; // ne
   handlers["sw"] = [
     elementX1 - margin + scrollX + marginX,
     elementY2 - margin + scrollY - marginY,
     8,
-    8
+    8,
   ]; // sw
   handlers["se"] = [
     elementX2 - margin + scrollX - marginX,
     elementY2 - margin + scrollY - marginY,
     8,
-    8
+    8,
   ]; // se
 
   if (element.type === "line") {
     return {
       nw: handlers.nw,
-      se: handlers.se
+      se: handlers.se,
     } as typeof handlers;
   } else if (element.type === "arrow") {
     return {
       n: handlers.n,
       s: handlers.s,
       w: handlers.w,
-      e: handlers.e
+      e: handlers.e,
     } as typeof handlers;
   }
 

@@ -15,7 +15,7 @@ export function capitalizeString(str: string) {
 }
 
 export function isInputLike(
-  target: Element | EventTarget | null
+  target: Element | EventTarget | null,
 ): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
@@ -54,7 +54,7 @@ export function measureText(text: string, font: string) {
 
 export function debounce<T extends any[]>(
   fn: (...args: T) => void,
-  timeout: number
+  timeout: number,
 ) {
   let handle = 0;
   let lastArgs: T;
@@ -85,4 +85,8 @@ export function removeSelection() {
   if (selection) {
     selection.removeAllRanges();
   }
+}
+
+export function distance(x: number, y: number) {
+  return Math.abs(x > y ? x - y : y - x);
 }

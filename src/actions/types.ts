@@ -11,7 +11,7 @@ export type ActionResult = {
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  formData: any
+  formData: any,
 ) => ActionResult;
 
 export type UpdaterFn = (res: ActionResult) => void;
@@ -30,7 +30,7 @@ export interface Action {
   keyTest?: (
     event: KeyboardEvent,
     elements?: readonly ExcalidrawElement[],
-    appState?: AppState
+    appState?: AppState,
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
@@ -44,19 +44,19 @@ export interface ActionsManagerInterface {
   handleKeyDown: (
     event: KeyboardEvent,
     elements: readonly ExcalidrawElement[],
-    appState: AppState
+    appState: AppState,
   ) => ActionResult | {};
   getContextMenuItems: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    actionFilter: ActionFilterFn
+    actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
   renderAction: (
     name: string,
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    t: TFunction
+    t: TFunction,
   ) => React.ReactElement | null;
 }

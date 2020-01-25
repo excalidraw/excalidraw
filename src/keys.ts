@@ -11,7 +11,7 @@ export const KEYS = {
     return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
       ? "metaKey"
       : "ctrlKey";
-  }
+  },
 };
 
 export function isArrowKey(keyCode: string) {

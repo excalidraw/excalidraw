@@ -7,10 +7,10 @@ export const actionDeleteSelected: Action = {
   perform: (elements, appState) => {
     return {
       elements: deleteSelectedElements(elements),
-      appState: { ...appState, multiElement: null }
+      appState: { ...appState, multiElement: null },
     };
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
-  keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE
+  keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
 };

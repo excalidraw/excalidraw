@@ -4,7 +4,7 @@ import { ExcalidrawElement } from "./types";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getLinePoints
+  getLinePoints,
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
@@ -16,7 +16,7 @@ function isElementDraggableFromInside(element: ExcalidrawElement): boolean {
 export function hitTest(
   element: ExcalidrawElement,
   x: number,
-  y: number
+  y: number,
 ): boolean {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
@@ -96,7 +96,7 @@ export function hitTest(
       bottomX,
       bottomY,
       leftX,
-      leftY
+      leftY,
     ] = getDiamondPoints(element);
 
     if (isElementDraggableFromInside(element)) {
@@ -187,7 +187,7 @@ const pointInBezierEquation = (
   p1: number,
   p2: number,
   p3: number,
-  M: number
+  M: number,
 ) => {
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
   const equation = (t: number) =>
