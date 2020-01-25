@@ -8,6 +8,7 @@ type TextWysiwygParams = {
   strokeColor: string;
   font: string;
   onSubmit: (text: string) => void;
+  onCancel: () => void;
 };
 
 // When WYSIWYG text ends with white spaces, the text gets vertically misaligned
@@ -23,6 +24,7 @@ export function textWysiwyg({
   strokeColor,
   font,
   onSubmit,
+  onCancel,
 }: TextWysiwygParams) {
   // Using contenteditable here as it has dynamic width.
   // But this solution has an issue — it allows to paste
@@ -84,6 +86,8 @@ export function textWysiwyg({
   function handleSubmit() {
     if (editable.innerText) {
       onSubmit(trimText(editable.innerText));
+    } else {
+      onCancel();
     }
     cleanup();
   }

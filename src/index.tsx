@@ -875,6 +875,14 @@ export class App extends React.Component<any, AppState> {
                 }
               }
 
+              const resetSelection = () => {
+                this.setState({
+                  draggingElement: null,
+                  editingElement: null,
+                  elementType: "selection",
+                });
+              };
+
               textWysiwyg({
                 initText: "",
                 x: textX,
@@ -895,11 +903,10 @@ export class App extends React.Component<any, AppState> {
                       },
                     ];
                   }
-                  this.setState({
-                    draggingElement: null,
-                    editingElement: null,
-                    elementType: "selection",
-                  });
+                  resetSelection();
+                },
+                onCancel: () => {
+                  resetSelection();
                 },
               });
               this.setState({
@@ -1271,6 +1278,14 @@ export class App extends React.Component<any, AppState> {
               }
             }
 
+            const resetSelection = () => {
+              this.setState({
+                draggingElement: null,
+                editingElement: null,
+                elementType: "selection",
+              });
+            };
+
             textWysiwyg({
               initText: element.text,
               x: textX,
@@ -1289,11 +1304,10 @@ export class App extends React.Component<any, AppState> {
                     },
                   ];
                 }
-                this.setState({
-                  draggingElement: null,
-                  editingElement: null,
-                  elementType: "selection",
-                });
+                resetSelection();
+              },
+              onCancel: () => {
+                resetSelection();
               },
             });
           }}
