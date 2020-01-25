@@ -35,7 +35,10 @@
     "extraBold": "Extra Bold",
     "architect": "Architect",
     "artist": "Artist",
-    "cartoonist": "Cartoonist"
+    "cartoonist": "Cartoonist",
+    "fileTitle": "File title",
+    "colorPicker": "Color picker",
+    "canvasBackground": "Canvas background"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
@@ -44,7 +47,8 @@
     "copyToClipboard": "Copy to clipboard",
     "save": "Save",
     "load": "Load",
-    "getShareableLink": "Get shareable link"
+    "getShareableLink": "Get shareable link",
+    "close": "Close"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
