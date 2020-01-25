@@ -4,7 +4,7 @@ export {
   actionBringForward,
   actionBringToFront,
   actionSendBackward,
-  actionSendToBack
+  actionSendToBack,
 } from "./actionZindex";
 export { actionSelectAll } from "./actionSelectAll";
 export {
@@ -15,19 +15,19 @@ export {
   actionChangeSloppiness,
   actionChangeOpacity,
   actionChangeFontSize,
-  actionChangeFontFamily
+  actionChangeFontFamily,
 } from "./actionProperties";
 
 export {
   actionChangeViewBackgroundColor,
-  actionClearCanvas
+  actionClearCanvas,
 } from "./actionCanvas";
 
 export {
   actionChangeProjectName,
   actionChangeExportBackground,
   actionSaveScene,
-  actionLoadScene
+  actionLoadScene,
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";

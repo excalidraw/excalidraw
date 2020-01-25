@@ -9,7 +9,7 @@ type FixedSideContainerProps = {
 
 export function FixedSideContainer({
   children,
-  side
+  side,
 }: FixedSideContainerProps) {
   return (
     <div className={"FixedSideContainer FixedSideContainer_side_" + side}>

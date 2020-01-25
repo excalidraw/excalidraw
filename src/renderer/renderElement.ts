@@ -3,7 +3,7 @@ import { isTextElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
-  getLinePoints
+  getLinePoints,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
@@ -11,7 +11,7 @@ import { Drawable } from "roughjs/bin/core";
 export function renderElement(
   element: ExcalidrawElement,
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D
+  context: CanvasRenderingContext2D,
 ) {
   const generator = rc.generator;
   if (element.type === "selection") {
@@ -30,7 +30,7 @@ export function renderElement(
         fillStyle: element.fillStyle,
         strokeWidth: element.strokeWidth,
         roughness: element.roughness,
-        seed: element.seed
+        seed: element.seed,
       });
     }
 
@@ -47,14 +47,14 @@ export function renderElement(
         bottomX,
         bottomY,
         leftX,
-        leftY
+        leftY,
       ] = getDiamondPoints(element);
       element.shape = generator.polygon(
         [
           [topX, topY],
           [rightX, rightY],
           [bottomX, bottomY],
-          [leftX, leftY]
+          [leftX, leftY],
         ],
         {
           stroke: element.strokeColor,
@@ -65,8 +65,8 @@ export function renderElement(
           fillStyle: element.fillStyle,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
-          seed: element.seed
-        }
+          seed: element.seed,
+        },
       );
     }
 
@@ -90,8 +90,8 @@ export function renderElement(
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
-          curveFitting: 1
-        }
+          curveFitting: 1,
+        },
       );
     }
 
@@ -104,7 +104,7 @@ export function renderElement(
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
       roughness: element.roughness,
-      seed: element.seed
+      seed: element.seed,
     };
 
     if (!element.shape) {
@@ -114,7 +114,7 @@ export function renderElement(
         // -----
         generator.line(x1, y1, x2, y2, options),
         //    /
-        generator.line(x4, y4, x2, y2, options)
+        generator.line(x4, y4, x2, y2, options),
       ];
     }
 
@@ -128,7 +128,7 @@ export function renderElement(
       stroke: element.strokeColor,
       strokeWidth: element.strokeWidth,
       roughness: element.roughness,
-      seed: element.seed
+      seed: element.seed,
     };
 
     if (!element.shape) {
@@ -144,11 +144,13 @@ export function renderElement(
     context.font = element.font;
     const fillStyle = context.fillStyle;
     context.fillStyle = element.strokeColor;
-    context.fillText(
-      element.text,
-      0,
-      element.baseline || element.actualBoundingBoxAscent || 0
-    );
+    // Canvas does not support multiline text by default
+    const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+    const lineHeight = element.height / lines.length;
+    const offset = element.height - element.baseline;
+    for (let i = 0; i < lines.length; i++) {
+      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+    }
     context.fillStyle = fillStyle;
     context.font = font;
     context.globalAlpha = 1;

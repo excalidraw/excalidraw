@@ -4,7 +4,7 @@ export function ButtonSelect<T>({
   options,
   value,
   onChange,
-  group
+  group,
 }: {
   options: { value: T; text: string }[];
   value: T | null;

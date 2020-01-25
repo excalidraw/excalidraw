@@ -16,7 +16,7 @@ export function Modal(props: {
         {props.children}
       </div>
     </div>,
-    modalRoot
+    modalRoot,
   );
 }
 

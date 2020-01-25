@@ -27,19 +27,54 @@ interface DataState {
 
 export function serializeAsJSON(
   elements: readonly ExcalidrawElement[],
-  appState?: AppState
+  appState?: AppState,
 ): string {
   return JSON.stringify({
     version: 1,
     source: window.location.origin,
     elements: elements.map(({ shape, ...el }) => el),
-    appState: appState || getDefaultAppState()
+    appState: appState || getDefaultAppState(),
   });
+}
+
+function calculateScroll(
+  elements: readonly ExcalidrawElement[],
+): { scrollX: number; scrollY: number } {
+  // Bounding box of all elements
+  let top = Number.MAX_SAFE_INTEGER;
+  let left = Number.MAX_SAFE_INTEGER;
+  let bottom = -Number.MAX_SAFE_INTEGER;
+  let right = -Number.MAX_SAFE_INTEGER;
+
+  for (const element of elements) {
+    left = Math.min(
+      left,
+      element.width > 0 ? element.x : element.x + element.width,
+    );
+    top = Math.min(
+      top,
+      element.height > 0 ? element.y : element.y + element.height,
+    );
+    right = Math.max(
+      right,
+      element.width > 0 ? element.x + element.width : element.x,
+    );
+    bottom = Math.max(
+      bottom,
+      element.height > 0 ? element.y + element.height : element.y,
+    );
+  }
+  const centerX = left + (right - left) / 2;
+  const centerY = top + (bottom - top) / 2;
+  return {
+    scrollX: window.innerWidth / 2 - centerX,
+    scrollY: window.innerHeight / 2 - centerY,
+  };
 }
 
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
-  appState: AppState
+  appState: AppState,
 ) {
   const serialized = serializeAsJSON(elements, appState);
 
@@ -48,9 +83,9 @@ export async function saveAsJSON(
     new Blob([serialized], { type: "application/json" }),
     {
       fileName: name,
-      description: "Excalidraw file"
+      description: "Excalidraw file",
     },
-    (window as any).handle
+    (window as any).handle,
   );
 }
 
@@ -72,7 +107,7 @@ export async function loadFromJSON() {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: ["json"],
-    mimeTypes: ["application/json"]
+    mimeTypes: ["application/json"],
   });
   if (blob.handle) {
     (window as any).handle = blob.handle;
@@ -95,18 +130,18 @@ export async function loadFromJSON() {
   }
   const { elements, appState } = updateAppState(contents);
   return new Promise<DataState>(resolve => {
-    resolve(restore(elements, appState));
+    resolve(restore(elements, { ...appState, ...calculateScroll(elements) }));
   });
 }
 
 export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
-  appState: AppState
+  appState: AppState,
 ) {
   const response = await fetch(BACKEND_POST, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: serializeAsJSON(elements, appState)
+    body: serializeAsJSON(elements, appState),
   });
   const json = await response.json();
   if (json.id) {
@@ -117,8 +152,8 @@ export async function exportToBackend(
     window.alert(
       i18n.t("alerts.copiedToClipboard", {
         url: url.toString(),
-        interpolation: { escapeValue: false }
-      })
+        interpolation: { escapeValue: false },
+      }),
     );
   } else {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
@@ -129,7 +164,7 @@ export async function importFromBackend(id: string | null) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
   const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
-    data.clone().json()
+    data.clone().json(),
   );
   if (response != null) {
     try {
@@ -140,7 +175,7 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
-  return restore(elements, appState);
+  return restore(elements, { ...appState, ...calculateScroll(elements) });
 }
 
 export async function exportCanvas(
@@ -152,14 +187,14 @@ export async function exportCanvas(
     exportPadding = 10,
     viewBackgroundColor,
     name,
-    scale = 1
+    scale = 1,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
-  }
+  },
 ) {
   if (!elements.length)
     return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));
@@ -169,7 +204,7 @@ export async function exportCanvas(
     exportBackground,
     viewBackgroundColor,
     exportPadding,
-    scale
+    scale,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
@@ -180,7 +215,7 @@ export async function exportCanvas(
       if (blob) {
         await fileSave(blob, {
           fileName: fileName,
-          description: "Excalidraw image"
+          description: "Excalidraw image",
         });
       }
     });
@@ -190,7 +225,7 @@ export async function exportCanvas(
       tempCanvas.toBlob(async function(blob: any) {
         try {
           await navigator.clipboard.write([
-            new window.ClipboardItem({ "image/png": blob })
+            new window.ClipboardItem({ "image/png": blob }),
           ]);
         } catch (err) {
           window.alert(errorMsg);
@@ -213,7 +248,7 @@ export async function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState
+  savedState: AppState,
 ): DataState {
   return {
     elements: savedElements.map(element => ({
@@ -225,9 +260,9 @@ function restore(
       opacity:
         element.opacity === null || element.opacity === undefined
           ? 100
-          : element.opacity
+          : element.opacity,
     })),
-    appState: savedState
+    appState: savedState,
   };
 }
 
@@ -239,7 +274,7 @@ export function restoreFromLocalStorage() {
   if (savedElements) {
     try {
       elements = JSON.parse(savedElements).map(
-        ({ shape, ...element }: ExcalidrawElement) => element
+        ({ shape, ...element }: ExcalidrawElement) => element,
       );
     } catch (e) {
       // Do nothing because elements array is already empty
@@ -260,7 +295,7 @@ export function restoreFromLocalStorage() {
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
-  state: AppState
+  state: AppState,
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));

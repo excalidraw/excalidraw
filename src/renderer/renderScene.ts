@@ -8,7 +8,7 @@ import { SceneState } from "../scene/types";
 import {
   getScrollBars,
   SCROLLBAR_COLOR,
-  SCROLLBAR_WIDTH
+  SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
 import { renderElement } from "./renderElement";
@@ -23,13 +23,13 @@ export function renderScene(
     offsetX,
     offsetY,
     renderScrollbars = true,
-    renderSelection = true
+    renderSelection = true,
   }: {
     offsetX?: number;
     offsetY?: number;
     renderScrollbars?: boolean;
     renderSelection?: boolean;
-  } = {}
+  } = {},
 ) {
   if (!canvas) return;
   const context = canvas.getContext("2d")!;
@@ -53,7 +53,7 @@ export function renderScene(
   sceneState = {
     ...sceneState,
     scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY
+    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
   };
 
   elements.forEach(element => {
@@ -65,19 +65,19 @@ export function renderScene(
         // If canvas is scaled for high pixelDeviceRatio width and height
         // setted in the `style` attribute
         parseInt(canvas.style.width) || canvas.width,
-        parseInt(canvas.style.height) || canvas.height
+        parseInt(canvas.style.height) || canvas.height,
       )
     ) {
       return;
     }
     context.translate(
       element.x + sceneState.scrollX,
-      element.y + sceneState.scrollY
+      element.y + sceneState.scrollY,
     );
     renderElement(element, rc, context);
     context.translate(
       -element.x - sceneState.scrollX,
-      -element.y - sceneState.scrollY
+      -element.y - sceneState.scrollY,
     );
   });
 
@@ -91,7 +91,7 @@ export function renderScene(
         elementX1,
         elementY1,
         elementX2,
-        elementY2
+        elementY2,
       ] = getElementAbsoluteCoords(element);
       const lineDash = context.getLineDash();
       context.setLineDash([8, 4]);
@@ -99,7 +99,7 @@ export function renderScene(
         elementX1 - margin + sceneState.scrollX,
         elementY1 - margin + sceneState.scrollY,
         elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2
+        elementY2 - elementY1 + margin * 2,
       );
       context.setLineDash(lineDash);
     });
@@ -118,7 +118,7 @@ export function renderScene(
       context.canvas.width / window.devicePixelRatio,
       context.canvas.height / window.devicePixelRatio,
       sceneState.scrollX,
-      sceneState.scrollY
+      sceneState.scrollY,
     );
 
     const strokeStyle = context.strokeStyle;
@@ -132,7 +132,7 @@ export function renderScene(
           scrollBar.y,
           scrollBar.width,
           scrollBar.height,
-          SCROLLBAR_WIDTH / 2
+          SCROLLBAR_WIDTH / 2,
         );
     });
     context.strokeStyle = strokeStyle;
@@ -145,7 +145,7 @@ function isVisibleElement(
   scrollX: number,
   scrollY: number,
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
 ) {
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   x1 += scrollX;

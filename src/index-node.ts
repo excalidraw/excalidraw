@@ -17,7 +17,7 @@ const elements = [
     roughness: 1,
     opacity: 100,
     isSelected: false,
-    seed: 749612521
+    seed: 749612521,
   },
   {
     id: "7W-iw5pEBPTU3eaCaLtFo",
@@ -33,7 +33,7 @@ const elements = [
     roughness: 1,
     opacity: 100,
     isSelected: false,
-    seed: 952056308
+    seed: 952056308,
   },
   {
     id: "kqKI231mvTrcsYo2DkUsR",
@@ -52,8 +52,8 @@ const elements = [
     seed: 1683771448,
     text: "test",
     font: "20px Virgil",
-    baseline: 22
-  }
+    baseline: 22,
+  },
 ];
 
 registerFont("./public/FG_Virgil.ttf", { family: "Virgil" });
@@ -62,9 +62,9 @@ const canvas = getExportCanvasPreview(
   {
     exportBackground: true,
     viewBackgroundColor: "#ffffff",
-    scale: 1
+    scale: 1,
   },
-  createCanvas
+  createCanvas,
 );
 
 const fs = require("fs");

@@ -23,7 +23,7 @@ export function moveOneLeft<T>(elements: T[], indicesToMove: number[]) {
 
 export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
   const reversedIndicesToMove = indicesToMove.sort(
-    (a: number, b: number) => b - a
+    (a: number, b: number) => b - a,
   );
   let isSorted = true;
 
@@ -80,7 +80,7 @@ export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
 // [_, _, a, b, d, e, g]
 //
 // At this point, we can fill back the leftmost elements with the array we saved at
-// the beggining
+// the beginning
 //
 //        |1       |0
 // [c, f, a, b, d, e, g]
@@ -158,7 +158,7 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
 // [a, b, d, e, g, _, _]
 //
 // At this point, we can fill back the rightmost elements with the array we saved at
-// the beggining
+// the beginning
 //
 //        |0       |1
 // [a, b, d, e, g, c, f]
@@ -166,7 +166,7 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
 // And we are done!
 export function moveAllRight<T>(elements: T[], indicesToMove: number[]) {
   const reversedIndicesToMove = indicesToMove.sort(
-    (a: number, b: number) => b - a
+    (a: number, b: number) => b - a,
   );
 
   // Copy the elements to move
