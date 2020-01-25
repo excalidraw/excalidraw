@@ -37,7 +37,7 @@ export function serializeAsJSON(
   });
 }
 
-function calculateScroll(elements: ExcalidrawElement[]) {
+function calculateScroll(elements: readonly ExcalidrawElement[]) {
   // Bounding box of all elements
   let top = Number.MAX_SAFE_INTEGER;
   let left = Number.MAX_SAFE_INTEGER;
@@ -159,7 +159,7 @@ export async function exportToBackend(
 }
 
 export async function importFromBackend(id: string | null) {
-  let elements: ExcalidrawElement[] = [];
+  let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
   const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
     data.clone().json(),
@@ -173,11 +173,7 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
-
-  const { scrollX, scrollY } = calculateScroll(elements);
-  appState.scrollX = scrollX;
-  appState.scrollY = scrollY;
-  return restore(elements, appState);
+  return restore(elements, { ...appState, ...calculateScroll(elements) });
 }
 
 export async function exportCanvas(

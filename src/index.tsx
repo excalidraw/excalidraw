@@ -234,7 +234,7 @@ export class App extends React.Component<any, AppState> {
 
     if (searchParams.get("id") != null) {
       data = await importFromBackend(searchParams.get("id"));
-      //window.history.replaceState({}, "Excalidraw", window.location.origin);
+      window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();
     }
