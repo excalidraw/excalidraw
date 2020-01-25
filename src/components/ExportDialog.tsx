@@ -197,7 +197,7 @@ export function ExportDialog({
                           type="radio"
                           icon={"x" + s}
                           name="export-canvas-scale"
-                          aria-label="Export"
+                          aria-label={`Scale ${s} x`}
                           id="export-canvas-scale"
                           checked={scale === s}
                           onChange={() => setScale(s)}
