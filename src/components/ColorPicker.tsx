@@ -24,7 +24,7 @@ const Picker = function({
       <div className="color-picker-content">
         <div className="colors-gallery">
           {colors.map(color => (
-            <div
+            <button
               className="color-picker-swatch"
               onClick={() => {
                 onChange(color);
@@ -39,7 +39,7 @@ const Picker = function({
               ) : (
                 undefined
               )}
-            </div>
+            </button>
           ))}
         </div>
         <ColorInput
