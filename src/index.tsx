@@ -928,7 +928,10 @@ export class App extends React.Component<any, AppState> {
                 const { multiElement } = this.state;
                 const { x, y } = multiElement;
                 multiElement.isSelected = true;
-                multiElement.points.push([e.clientX - x, e.clientY - y]);
+                multiElement.points.push([
+                  e.clientX - x - this.state.scrollX,
+                  e.clientY - y - this.state.scrollY,
+                ]);
                 multiElement.shape = null;
                 this.setState({ draggingElement: multiElement });
               } else {
@@ -1187,13 +1190,23 @@ export class App extends React.Component<any, AppState> {
               draggingElement.height = height;
 
               if (this.state.elementType === "arrow") {
-                const dx = x - draggingElement.x;
-                const dy = y - draggingElement.y;
-                if (draggingElement.points.length === 1) {
-                  draggingElement.points.push([dx, dy]);
-                } else if (draggingElement.points.length > 1) {
-                  const pnt =
-                    draggingElement.points[draggingElement.points.length - 1];
+                draggingOccurred = true;
+                const points = draggingElement.points;
+                let dx = x - draggingElement.x;
+                let dy = y - draggingElement.y;
+
+                if (e.shiftKey && points.length === 2) {
+                  ({ width: dx, height: dy } = getPerfectElementSize(
+                    this.state.elementType,
+                    dx,
+                    dy,
+                  ));
+                }
+
+                if (points.length === 1) {
+                  points.push([dx, dy]);
+                } else if (points.length > 1) {
+                  const pnt = points[points.length - 1];
                   pnt[0] = dx;
                   pnt[1] = dy;
                 }
@@ -1231,7 +1244,18 @@ export class App extends React.Component<any, AppState> {
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
-              if (elementType === "arrow" && multiElement) {
+              if (elementType === "arrow") {
+                if (
+                  draggingOccurred &&
+                  multiElement !== null &&
+                  multiElement.points.length <= 2
+                ) {
+                  this.setState({
+                    draggingElement: null,
+                    multiElement: null,
+                    elementType: "selection",
+                  });
+                }
                 return;
               }
 
