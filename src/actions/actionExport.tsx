@@ -10,8 +10,9 @@ export const actionChangeProjectName: Action = {
   perform: (elements, appState, value) => {
     return { appState: { ...appState, name: value } };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, t }) => (
     <EditableText
+      label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
     />
