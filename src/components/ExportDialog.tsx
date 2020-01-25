@@ -13,7 +13,6 @@ import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
 import { useTranslation } from "react-i18next";
-import { KEYS } from "../keys";
 
 const probablySupportsClipboard =
   "toBlob" in HTMLCanvasElement.prototype &&
@@ -29,7 +28,7 @@ type ExportCB = (
   scale?: number,
 ) => void;
 
-export function ExportDialog({
+function ExportModal({
   elements,
   appState,
   exportPadding = 10,
@@ -38,6 +37,7 @@ export function ExportDialog({
   onExportToPng,
   onExportToClipboard,
   onExportToBackend,
+  onCloseRequest,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -47,18 +47,14 @@ export function ExportDialog({
   onExportToPng: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
+  onCloseRequest: () => void;
 }) {
   const { t } = useTranslation();
   const someElementIsSelected = elements.some(element => element.isSelected);
-  const [modalIsShown, setModalIsShown] = useState(false);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
-  const pngButton = useRef<HTMLButtonElement>(null);
-  const closeButton = useRef<HTMLButtonElement>(null);
-  const onlySelectedInput = useRef<HTMLInputElement>(null);
-  const triggerButton = useRef<HTMLButtonElement>(null);
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -81,7 +77,6 @@ export function ExportDialog({
       previewNode?.removeChild(canvas);
     };
   }, [
-    modalIsShown,
     exportedElements,
     exportBackground,
     exportPadding,
@@ -89,38 +84,113 @@ export function ExportDialog({
     scale,
   ]);
 
-  useEffect(() => {
-    if (modalIsShown) {
-      pngButton.current?.focus();
-    }
-  }, [modalIsShown]);
+  return (
+    <div className="ExportDialog__dialog">
+      <Island padding={4}>
+        <button className="ExportDialog__close" onClick={onCloseRequest}>
+          ╳
+        </button>
+        <h2>{t("buttons.export")}</h2>
+        <div className="ExportDialog__preview" ref={previewRef}></div>
+        <div className="ExportDialog__actions">
+          <Stack.Row gap={2}>
+            <ToolButton
+              type="button"
+              icon={downloadFile}
+              title={t("buttons.exportToPng")}
+              aria-label={t("buttons.exportToPng")}
+              onClick={() => onExportToPng(exportedElements, scale)}
+            />
+            {probablySupportsClipboard && (
+              <ToolButton
+                type="button"
+                icon={clipboard}
+                title={t("buttons.copyToClipboard")}
+                aria-label={t("buttons.copyToClipboard")}
+                onClick={() => onExportToClipboard(exportedElements, scale)}
+              />
+            )}
+            <ToolButton
+              type="button"
+              icon={link}
+              title={t("buttons.getShareableLink")}
+              aria-label={t("buttons.getShareableLink")}
+              onClick={() => onExportToBackend(exportedElements)}
+            />
+          </Stack.Row>
 
-  function handleClose() {
-    setModalIsShown(false);
-    setExportSelected(someElementIsSelected);
-    triggerButton.current?.focus();
-  }
+          {actionManager.renderAction(
+            "changeProjectName",
+            elements,
+            appState,
+            syncActionResult,
+            t,
+          )}
+          <Stack.Col gap={1}>
+            <div className="ExportDialog__scales">
+              <Stack.Row gap={1} align="baseline">
+                {scales.map(s => (
+                  <ToolButton
+                    key={s}
+                    size="s"
+                    type="radio"
+                    icon={"x" + s}
+                    name="export-canvas-scale"
+                    aria-label="Export"
+                    id="export-canvas-scale"
+                    checked={scale === s}
+                    onChange={() => setScale(s)}
+                  />
+                ))}
+              </Stack.Row>
+            </div>
+            {actionManager.renderAction(
+              "changeExportBackground",
+              elements,
+              appState,
+              syncActionResult,
+              t,
+            )}
+            {someElementIsSelected && (
+              <div>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={exportSelected}
+                    onChange={e => setExportSelected(e.currentTarget.checked)}
+                  />{" "}
+                  {t("labels.onlySelected")}
+                </label>
+              </div>
+            )}
+          </Stack.Col>
+        </div>
+      </Island>
+    </div>
+  );
+}
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === KEYS.TAB) {
-      const { activeElement } = document;
-      if (e.shiftKey) {
-        if (activeElement === pngButton.current) {
-          closeButton.current?.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (activeElement === closeButton.current) {
-          pngButton.current?.focus();
-          e.preventDefault();
-        }
-        if (activeElement === onlySelectedInput.current) {
-          closeButton.current?.focus();
-          e.preventDefault();
-        }
-      }
-    }
-  }
+export function ExportDialog({
+  elements,
+  appState,
+  exportPadding = 10,
+  actionManager,
+  syncActionResult,
+  onExportToPng,
+  onExportToClipboard,
+  onExportToBackend,
+}: {
+  appState: AppState;
+  elements: readonly ExcalidrawElement[];
+  exportPadding?: number;
+  actionManager: ActionsManagerInterface;
+  syncActionResult: UpdaterFn;
+  onExportToPng: ExportCB;
+  onExportToClipboard: ExportCB;
+  onExportToBackend: ExportCB;
+}) {
+  const { t } = useTranslation();
+  const [modalIsShown, setModalIsShown] = useState(false);
 
   return (
     <>
@@ -133,104 +203,18 @@ export function ExportDialog({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Modal
-          maxWidth={640}
-          onCloseRequest={handleClose}
-          labelledBy="export-title"
-        >
-          <div className="ExportDialog__dialog" onKeyDown={handleKeyDown}>
-            <Island padding={4}>
-              <button
-                className="ExportDialog__close"
-                onClick={handleClose}
-                aria-label={t("buttons.close")}
-                ref={closeButton}
-              >
-                ╳
-              </button>
-              <h2 id="export-title">{t("buttons.export")}</h2>
-              <div className="ExportDialog__preview" ref={previewRef}></div>
-              <div className="ExportDialog__actions">
-                <Stack.Row gap={2}>
-                  <ToolButton
-                    type="button"
-                    icon={downloadFile}
-                    title={t("buttons.exportToPng")}
-                    aria-label={t("buttons.exportToPng")}
-                    onClick={() => onExportToPng(exportedElements, scale)}
-                    ref={pngButton}
-                  />
-                  {probablySupportsClipboard && (
-                    <ToolButton
-                      type="button"
-                      icon={clipboard}
-                      title={t("buttons.copyToClipboard")}
-                      aria-label={t("buttons.copyToClipboard")}
-                      onClick={() =>
-                        onExportToClipboard(exportedElements, scale)
-                      }
-                    />
-                  )}
-                  <ToolButton
-                    type="button"
-                    icon={link}
-                    title={t("buttons.getShareableLink")}
-                    aria-label={t("buttons.getShareableLink")}
-                    onClick={() => onExportToBackend(exportedElements)}
-                  />
-                </Stack.Row>
-
-                {actionManager.renderAction(
-                  "changeProjectName",
-                  elements,
-                  appState,
-                  syncActionResult,
-                  t,
-                )}
-                <Stack.Col gap={1}>
-                  <div className="ExportDialog__scales">
-                    <Stack.Row gap={1} align="baseline">
-                      {scales.map(s => (
-                        <ToolButton
-                          key={s}
-                          size="s"
-                          type="radio"
-                          icon={"x" + s}
-                          name="export-canvas-scale"
-                          aria-label={`Scale ${s} x`}
-                          id="export-canvas-scale"
-                          checked={scale === s}
-                          onChange={() => setScale(s)}
-                        />
-                      ))}
-                    </Stack.Row>
-                  </div>
-                  {actionManager.renderAction(
-                    "changeExportBackground",
-                    elements,
-                    appState,
-                    syncActionResult,
-                    t,
-                  )}
-                  {someElementIsSelected && (
-                    <div>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={exportSelected}
-                          onChange={e =>
-                            setExportSelected(e.currentTarget.checked)
-                          }
-                          ref={onlySelectedInput}
-                        />{" "}
-                        {t("labels.onlySelected")}
-                      </label>
-                    </div>
-                  )}
-                </Stack.Col>
-              </div>
-            </Island>
-          </div>
+        <Modal maxWidth={640} onCloseRequest={() => setModalIsShown(false)}>
+          <ExportModal
+            elements={elements}
+            appState={appState}
+            exportPadding={exportPadding}
+            actionManager={actionManager}
+            syncActionResult={syncActionResult}
+            onExportToPng={onExportToPng}
+            onExportToClipboard={onExportToClipboard}
+            onExportToBackend={onExportToBackend}
+            onCloseRequest={() => setModalIsShown(false)}
+          />
         </Modal>
       )}
     </>
