@@ -120,6 +120,7 @@ export const actionChangeFillStyle: Action = {
           appState.editingElement,
           elements,
           element => element.fillStyle,
+          appState.currentItemFillStyle,
         )}
         onChange={value => {
           updateData(value);
@@ -155,6 +156,7 @@ export const actionChangeStrokeWidth: Action = {
           appState.editingElement,
           elements,
           element => element.strokeWidth,
+          appState.currentItemStrokeWidth,
         )}
         onChange={value => updateData(value)}
       />
@@ -188,6 +190,7 @@ export const actionChangeSloppiness: Action = {
           appState.editingElement,
           elements,
           element => element.roughness,
+          appState.currentItemRoughness,
         )}
         onChange={value => updateData(value)}
       />
@@ -220,7 +223,7 @@ export const actionChangeOpacity: Action = {
             appState.editingElement,
             elements,
             element => element.opacity,
-            100 /* default opacity */,
+            appState.currentItemOpacity,
           ) ?? undefined
         }
       />
@@ -268,6 +271,7 @@ export const actionChangeFontSize: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && +element.font.split("px ")[0],
+          +(appState.currentItemFont || "20px Virgil").split("px ")[0],
         )}
         onChange={value => updateData(value)}
       />
@@ -314,6 +318,7 @@ export const actionChangeFontFamily: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && element.font.split("px ")[1],
+          (appState.currentItemFont || "20px Virgil").split("px ")[1],
         )}
         onChange={value => updateData(value)}
       />
