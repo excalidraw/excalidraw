@@ -53,7 +53,7 @@
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
-    "urlCopiedClipboardSuccess": "Link foi copiado para área de transferência"
+    "urlCopiedClipboardSuccess": "O link foi copiado no clipboard"
   },
   "toolBar": {
     "selection": "Seleção",
