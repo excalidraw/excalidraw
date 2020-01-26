@@ -1,6 +1,7 @@
 export { newElement, newTextElement, duplicateElement } from "./newElement";
 export {
   getElementAbsoluteCoords,
+  getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
   getLinePoints,
