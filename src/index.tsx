@@ -496,7 +496,12 @@ export class App extends React.Component<any, AppState> {
     return (
       <LockIcon
         checked={elementLocked}
-        onChange={() => this.setState({ elementLocked: !elementLocked })}
+        onChange={() => {
+          this.setState({
+            elementLocked: !elementLocked,
+            elementType: elementLocked ? "selection" : this.state.elementType,
+          });
+        }}
       />
     );
   }
