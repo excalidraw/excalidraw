@@ -227,7 +227,6 @@ export async function exportCanvas(
       if (blob) {
         await fileSave(blob, {
           fileName: fileName,
-          description: "Excalidraw image",
         });
       }
     });
