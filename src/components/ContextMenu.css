@@ -11,19 +11,17 @@
   border: 1px solid #bcbcbc;
 }
 
-.context-menu__option {
-  width: 9.5rem;
-}
-
 .context-menu-option {
   position: relative;
   width: 100%;
+  min-width: 9.5rem;
   margin: 0;
+  padding: 0.25rem 1rem 0.25rem 1.25rem;
   text-align: left;
   border-radius: 0;
-  padding-left: 1.25rem;
   background-color: #f2f2f2;
   border: none;
+  white-space: nowrap;
 }
 
 .context-menu-option:hover {
