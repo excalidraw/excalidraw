@@ -27,8 +27,9 @@ const getFormValue = function<T>(
 ): T | null {
   return (
     (editingElement && getAttribute(editingElement)) ??
-    getCommonAttributeOfSelectedElements(elements, getAttribute) ??
-    defaultValue ??
+    (elements.some(element => element.isSelected)
+      ? getCommonAttributeOfSelectedElements(elements, getAttribute)
+      : defaultValue) ??
     null
   );
 };
