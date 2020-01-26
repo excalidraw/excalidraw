@@ -19,7 +19,8 @@ export function isInputLike(
 ): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLInputElement ||
+    (target instanceof HTMLInputElement &&
+      ["text", "number"].includes(target.type)) ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
   );

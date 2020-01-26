@@ -103,8 +103,13 @@ const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
+  GRABBING: "grabbing",
 };
-
+const MOUSE_BUTTON = {
+  MAIN: 0,
+  WHEEL: 1,
+  SECONDARY: 2,
+};
 let lastCanvasWidth = -1;
 let lastCanvasHeight = -1;
 
@@ -232,6 +237,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("keyup", this.onKeyUp, { passive: true });
     document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
@@ -354,6 +360,24 @@ export class App extends React.Component<any, AppState> {
           this.setState(data.appState);
         }
       }
+    } else if (event.key === KEYS.SPACE) {
+      this.setState({ panMode: true });
+      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    }
+  };
+
+  private onKeyUp = (event: KeyboardEvent) => {
+    if (event.key === KEYS.SPACE) {
+      if (this.state.elementType === "selection") {
+        resetCursor();
+      } else {
+        elements = clearSelection(elements);
+        document.documentElement.style.cursor =
+          this.state.elementType === "text"
+            ? CURSOR_TYPE.TEXT
+            : CURSOR_TYPE.CROSSHAIR;
+      }
+      this.setState({ panMode: false });
     }
   };
 
@@ -732,7 +756,7 @@ export class App extends React.Component<any, AppState> {
             }
 
             // pan canvas on wheel button drag
-            if (e.button === 1) {
+            if (e.button === MOUSE_BUTTON.WHEEL || this.state.panMode) {
               let { clientX: lastX, clientY: lastY } = e;
               const onMouseMove = (e: MouseEvent) => {
                 document.documentElement.style.cursor = `grabbing`;
@@ -759,7 +783,7 @@ export class App extends React.Component<any, AppState> {
             }
 
             // only handle left mouse button
-            if (e.button !== 0) return;
+            if (e.button !== MOUSE_BUTTON.MAIN) return;
             // fixes mousemove causing selection of UI texts #32
             e.preventDefault();
             // Preventing the event above disables default behavior
@@ -1321,6 +1345,9 @@ export class App extends React.Component<any, AppState> {
             });
           }}
           onMouseMove={e => {
+            if (this.state.panMode) {
+              return;
+            }
             const hasDeselectedButton = Boolean(e.buttons);
             if (hasDeselectedButton || this.state.elementType !== "selection") {
               return;
