@@ -88,5 +88,5 @@ export function removeSelection() {
 }
 
 export function distance(x: number, y: number) {
-  return Math.abs(x > y ? x - y : y - x);
+  return Math.abs(x - y);
 }

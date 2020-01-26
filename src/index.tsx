@@ -13,7 +13,7 @@ import {
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords,
+  getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
   resizePerfectLineForNWHandler,
@@ -1388,24 +1388,10 @@ export class App extends React.Component<any, AppState> {
     ) {
       elements = clearSelection(elements);
 
-      let subCanvasX1 = Infinity;
-      let subCanvasX2 = -Infinity;
-      let subCanvasY1 = Infinity;
-      let subCanvasY2 = -Infinity;
+      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
 
-      const minX = Math.min(...parsedElements.map(element => element.x));
-      const minY = Math.min(...parsedElements.map(element => element.y));
-
-      parsedElements.forEach(parsedElement => {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
-        subCanvasX1 = Math.min(subCanvasX1, x1);
-        subCanvasY1 = Math.min(subCanvasY1, y1);
-        subCanvasX2 = Math.max(subCanvasX2, x2);
-        subCanvasY2 = Math.max(subCanvasY2, y2);
-      });
-
-      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
-      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
+      const elementsCenterX = distance(minX, maxX) / 2;
+      const elementsCenterY = distance(minY, maxY) / 2;
 
       const dx =
         cursorX -
