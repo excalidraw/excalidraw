@@ -180,7 +180,7 @@ export class App extends React.Component<any, AppState> {
   private syncActionResult = (res: ActionResult) => {
     if (res.elements !== undefined) {
       elements = res.elements;
-      this.forceUpdate();
+      this.setState({});
     }
 
     if (res.appState !== undefined) {
@@ -199,7 +199,7 @@ export class App extends React.Component<any, AppState> {
       ),
     );
     elements = deleteSelectedElements(elements);
-    this.forceUpdate();
+    this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
@@ -225,6 +225,14 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced();
     this.saveDebounced.flush();
   };
+
+  public shouldComponentUpdate() {
+    if (!history.isRecording()) {
+      this.componentDidUpdate();
+      return false;
+    }
+    return true;
+  }
 
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
@@ -253,7 +261,7 @@ export class App extends React.Component<any, AppState> {
     if (data.appState) {
       this.setState(data.appState);
     } else {
-      this.forceUpdate();
+      this.setState({});
     }
   }
 
@@ -275,7 +283,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
-    this.forceUpdate();
+    this.setState({});
   };
 
   private updateCurrentCursorPosition = (e: MouseEvent) => {
@@ -286,7 +294,7 @@ export class App extends React.Component<any, AppState> {
   private onKeyDown = (event: KeyboardEvent) => {
     if (event.key === KEYS.ESCAPE) {
       elements = clearSelection(elements);
-      this.forceUpdate();
+      this.setState({});
       this.setState({ elementType: "selection" });
       if (window.document.activeElement instanceof HTMLElement) {
         window.document.activeElement.blur();
@@ -320,7 +328,7 @@ export class App extends React.Component<any, AppState> {
         }
         return el;
       });
-      this.forceUpdate();
+      this.setState({});
       event.preventDefault();
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
@@ -525,7 +533,7 @@ export class App extends React.Component<any, AppState> {
                 elements = clearSelection(elements);
                 document.documentElement.style.cursor =
                   value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                this.forceUpdate();
+                this.setState({});
               }}
             ></ToolButton>
           );
@@ -703,7 +711,7 @@ export class App extends React.Component<any, AppState> {
             if (!element.isSelected) {
               elements = clearSelection(elements);
               element.isSelected = true;
-              this.forceUpdate();
+              this.setState({});
             }
 
             ContextMenu.push({
@@ -745,6 +753,8 @@ export class App extends React.Component<any, AppState> {
                 let deltaY = lastY - e.clientY;
                 lastX = e.clientX;
                 lastY = e.clientY;
+                // We don't want to save history when panning around
+                history.skipRecording();
                 this.setState(state => ({
                   scrollX: state.scrollX - deltaX,
                   scrollY: state.scrollY - deltaY,
@@ -949,6 +959,8 @@ export class App extends React.Component<any, AppState> {
               if (isOverHorizontalScrollBar) {
                 const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
                 const dx = x - lastX;
+                // We don't want to save history when scrolling
+                history.skipRecording();
                 this.setState(state => ({ scrollX: state.scrollX - dx }));
                 lastX = x;
                 return;
@@ -957,6 +969,8 @@ export class App extends React.Component<any, AppState> {
               if (isOverVerticalScrollBar) {
                 const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
                 const dy = y - lastY;
+                // We don't want to save history when scrolling
+                history.skipRecording();
                 this.setState(state => ({ scrollY: state.scrollY - dy }));
                 lastY = y;
                 return;
@@ -1059,7 +1073,7 @@ export class App extends React.Component<any, AppState> {
                   lastY = y;
                   // We don't want to save history when resizing an element
                   history.skipRecording();
-                  this.forceUpdate();
+                  this.setState({});
                   return;
                 }
               }
@@ -1080,7 +1094,7 @@ export class App extends React.Component<any, AppState> {
                   lastY = y;
                   // We don't want to save history when dragging an element to initially size it
                   history.skipRecording();
-                  this.forceUpdate();
+                  this.setState({});
                   return;
                 }
               }
@@ -1135,7 +1149,7 @@ export class App extends React.Component<any, AppState> {
               }
               // We don't want to save history when moving an element
               history.skipRecording();
-              this.forceUpdate();
+              this.setState({});
             };
 
             const onMouseUp = (e: MouseEvent) => {
@@ -1160,12 +1174,11 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                 });
-                this.forceUpdate();
                 return;
               }
 
               if (normalizeDimensions(draggingElement)) {
-                this.forceUpdate();
+                this.setState({});
               }
 
               if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -1196,7 +1209,7 @@ export class App extends React.Component<any, AppState> {
               if (draggingElement === null) {
                 // if no element is clicked, clear the selection and redraw
                 elements = clearSelection(elements);
-                this.forceUpdate();
+                this.setState({});
                 return;
               }
 
@@ -1216,7 +1229,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               history.resumeRecording();
-              this.forceUpdate();
+              this.setState({});
             };
 
             lastMouseUp = onMouseUp;
@@ -1226,7 +1239,7 @@ export class App extends React.Component<any, AppState> {
 
             // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
             history.skipRecording();
-            this.forceUpdate();
+            this.setState({});
           }}
           onDoubleClick={e => {
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1261,7 +1274,7 @@ export class App extends React.Component<any, AppState> {
               elements = elements.filter(
                 element => element.id !== elementAtPosition.id,
               );
-              this.forceUpdate();
+              this.setState({});
 
               textX =
                 this.state.scrollX +
@@ -1363,6 +1376,8 @@ export class App extends React.Component<any, AppState> {
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const { deltaX, deltaY } = e;
+    // We don't want to save history when panning around
+    history.skipRecording();
     this.setState(state => ({
       scrollX: state.scrollX - deltaX,
       scrollY: state.scrollY - deltaY,
@@ -1420,7 +1435,7 @@ export class App extends React.Component<any, AppState> {
           return duplicate;
         }),
       ];
-      this.forceUpdate();
+      this.setState({});
     }
   };
 
