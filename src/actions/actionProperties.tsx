@@ -184,7 +184,7 @@ export const actionChangeSloppiness: Action = {
         options={[
           { value: 0, text: t("labels.architect") },
           { value: 1, text: t("labels.artist") },
-          { value: 3, text: t("labels.cartoonist") },
+          { value: 2, text: t("labels.cartoonist") },
         ]}
         value={getFormValue(
           appState.editingElement,
