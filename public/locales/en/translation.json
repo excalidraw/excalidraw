@@ -66,6 +66,6 @@
     "arrow": "Arrow",
     "line": "Line",
     "text": "Text",
-    "lock": "Lock the currently selected element"
+    "lock": "Keep selected tool active after drawing"
   }
 }
