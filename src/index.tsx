@@ -1382,9 +1382,9 @@ export class App extends React.Component<any, AppState> {
       elements = clearSelection(elements);
 
       let subCanvasX1 = Infinity;
-      let subCanvasX2 = 0;
+      let subCanvasX2 = -Infinity;
       let subCanvasY1 = Infinity;
-      let subCanvasY2 = 0;
+      let subCanvasY2 = -Infinity;
 
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));
