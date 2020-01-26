@@ -43,7 +43,7 @@ export function LockIcon(props: LockIconProps) {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   return (
-    <label className={`ToolIcon ${sizeCn}`} title={props.title}>
+    <label className={`ToolIcon ToolIcon__lock ${sizeCn}`} title={props.title}>
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"
@@ -51,6 +51,7 @@ export function LockIcon(props: LockIconProps) {
         id={props.id}
         onChange={props.onChange}
         checked={props.checked}
+        aria-label={props.title}
       />
       <div className="ToolIcon__icon">
         {props.checked ? ICONS.CHECKED : ICONS.UNCHECKED}

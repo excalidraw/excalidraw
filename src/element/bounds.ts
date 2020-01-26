@@ -57,3 +57,20 @@ export function getLinePoints(element: ExcalidrawElement) {
 
   return [x1, y1, x2, y2];
 }
+
+export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  elements.forEach(element => {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    minX = Math.min(minX, x1);
+    minY = Math.min(minY, y1);
+    maxX = Math.max(maxX, x2);
+    maxY = Math.max(maxY, y2);
+  });
+
+  return [minX, minY, maxX, maxY];
+}
