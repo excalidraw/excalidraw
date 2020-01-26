@@ -214,10 +214,8 @@ button,
   }
 }
 
-.language-select {
+.dropdown-select {
   position: absolute;
-  right: 0;
-  bottom: 0;
   min-width: 5.5rem;
   height: 2rem;
   margin-bottom: 0.5em;
@@ -245,6 +243,20 @@ button,
   &:active {
     background-color: #ced4da;
   }
+}
+
+.language-select {
+  @extend .dropdown-select;
+  right: 0;
+  bottom: 0;
+}
+
+.stored-ids-select {
+  @extend .dropdown-select;
+  padding: 0.5em 0.5em 0.5em 1.7em;
+  bottom: 0;
+  left: 0;
+  background-position: left 0.7em top 50%, 0 0;
 }
 
 .visually-hidden {

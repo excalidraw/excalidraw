@@ -11,6 +11,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import i18n from "../i18n";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
+const LOCAL_STORAGE_ID_KEY = "excalidraw-id";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
@@ -299,4 +300,35 @@ export function saveToLocalStorage(
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
+}
+
+/**
+ * Returns the list of ids in Local Storage
+ * @returns array
+ */
+export function loadedIds(): string[] {
+  const storeIds = localStorage.getItem(LOCAL_STORAGE_ID_KEY);
+  if (storeIds) {
+    try {
+      return JSON.parse(storeIds);
+    } catch (e) {
+      console.error("Could not parse previously stored ids");
+      return [];
+    }
+  }
+  return [];
+}
+
+/**
+ * Append id to the list in Local Storage if not there yet
+ * @param id string
+ */
+export function addToLoadedIds(id: string): void {
+  const ids = [...loadedIds()];
+
+  if (ids.indexOf(id) < 0) {
+    ids.push(id);
+  }
+
+  localStorage.setItem(LOCAL_STORAGE_ID_KEY, JSON.stringify(ids));
 }

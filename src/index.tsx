@@ -34,6 +34,8 @@ import {
   hasText,
   exportCanvas,
   importFromBackend,
+  addToLoadedIds,
+  loadedIds,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -86,6 +88,7 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
+import { StoredIdsList } from "./components/StoredIdsList";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -226,21 +229,11 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  public async componentDidMount() {
-    document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.onPaste);
-    document.addEventListener("cut", this.onCut);
-
-    document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
-    window.addEventListener("resize", this.onResize, false);
-    window.addEventListener("unload", this.onUnload, false);
-
+  private async setAppState(id: string | null) {
     let data;
-    const searchParams = new URLSearchParams(window.location.search);
-
-    if (searchParams.get("id") != null) {
-      data = await importFromBackend(searchParams.get("id"));
+    if (id != null) {
+      data = await importFromBackend(id);
+      addToLoadedIds(id);
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();
@@ -255,6 +248,22 @@ export class App extends React.Component<any, AppState> {
     } else {
       this.forceUpdate();
     }
+  }
+
+  public async componentDidMount() {
+    document.addEventListener("copy", this.onCopy);
+    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("cut", this.onCut);
+
+    document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
+    window.addEventListener("resize", this.onResize, false);
+    window.addEventListener("unload", this.onUnload, false);
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+
+    this.setAppState(id);
   }
 
   public componentWillUnmount() {
@@ -1356,8 +1365,18 @@ export class App extends React.Component<any, AppState> {
           languages={languages}
           currentLanguage={parseDetectedLang(i18n.language)}
         />
+
+        {this.renderIdsDropdown()}
       </div>
     );
+  }
+
+  private renderIdsDropdown() {
+    const ids = loadedIds();
+    if (ids.length === 0) {
+      return;
+    }
+    return <StoredIdsList ids={ids} onChange={id => this.setAppState(id)} />;
   }
 
   private handleWheel = (e: WheelEvent) => {
