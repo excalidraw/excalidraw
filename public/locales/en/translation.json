@@ -38,7 +38,8 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "File title",
     "colorPicker": "Color picker",
-    "canvasBackground": "Canvas background"
+    "canvasBackground": "Canvas background",
+    "drawingCanvas": "Drawing Canvas"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
@@ -48,7 +49,8 @@
     "save": "Save",
     "load": "Load",
     "getShareableLink": "Get shareable link",
-    "close": "Close"
+    "close": "Close",
+    "selectLanguage": "Select Language"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -67,5 +69,10 @@
     "line": "Line",
     "text": "Text",
     "lock": "Keep selected tool active after drawing"
+  },
+  "headings": {
+    "canvasActions": "Canvas actions",
+    "selectedShapeActions": "Selected shape actions",
+    "shapes": "Shapes"
   }
 }
