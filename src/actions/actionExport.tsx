@@ -3,15 +3,16 @@ import { Action } from "./types";
 import { EditableText } from "../components/EditableText";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
-import { ToolIcon } from "../components/ToolIcon";
+import { ToolButton } from "../components/ToolButton";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
   perform: (elements, appState, value) => {
     return { appState: { ...appState, name: value } };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, t }) => (
     <EditableText
+      label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
     />
@@ -44,7 +45,7 @@ export const actionSaveScene: Action = {
     return {};
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={save}
       title={t("buttons.save")}
@@ -64,7 +65,7 @@ export const actionLoadScene: Action = {
     return { elements: loadedElements, appState: loadedAppState };
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={load}
       title={t("buttons.load")}

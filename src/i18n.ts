@@ -15,6 +15,7 @@ export function parseDetectedLang(lng: string | undefined): string {
 }
 
 export const languages = [
+  { lng: "de", label: "Deutsch" },
   { lng: "en", label: "English" },
   { lng: "es", label: "Español" },
   { lng: "fr", label: "Français" },

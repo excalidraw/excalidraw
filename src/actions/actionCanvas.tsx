@@ -3,17 +3,18 @@ import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
 import { trash } from "../components/icons";
-import { ToolIcon } from "../components/ToolIcon";
+import { ToolButton } from "../components/ToolButton";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
   perform: (elements, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
-  PanelComponent: ({ appState, updateData }) => {
+  PanelComponent: ({ appState, updateData, t }) => {
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
+          label={t("labels.canvasBackground")}
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={color => updateData(color)}
@@ -32,7 +33,7 @@ export const actionClearCanvas: Action = {
     };
   },
   PanelComponent: ({ updateData, t }) => (
-    <ToolIcon
+    <ToolButton
       type="button"
       icon={trash}
       title={t("buttons.clearReset")}

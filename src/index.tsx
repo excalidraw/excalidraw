@@ -80,7 +80,7 @@ import { getDefaultAppState } from "./appState";
 import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
-import { ToolIcon } from "./components/ToolIcon";
+import { ToolButton } from "./components/ToolButton";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
@@ -126,11 +126,18 @@ function pickAppStatePropertiesForHistory(
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFillStyle: appState.currentItemFillStyle,
+    currentItemStrokeWidth: appState.currentItemStrokeWidth,
+    currentItemRoughness: appState.currentItemRoughness,
+    currentItemOpacity: appState.currentItemOpacity,
     currentItemFont: appState.currentItemFont,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };
 }
+
+let cursorX = 0;
+let cursorY = 0;
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -225,7 +232,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("mousemove", this.getCurrentCursorPosition);
+    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
 
@@ -258,7 +265,7 @@ export class App extends React.Component<any, AppState> {
     document.removeEventListener("keydown", this.onKeyDown, false);
     document.removeEventListener(
       "mousemove",
-      this.getCurrentCursorPosition,
+      this.updateCurrentCursorPosition,
       false,
     );
     window.removeEventListener("resize", this.onResize, false);
@@ -271,8 +278,9 @@ export class App extends React.Component<any, AppState> {
     this.forceUpdate();
   };
 
-  private getCurrentCursorPosition = (e: MouseEvent) => {
-    this.setState({ cursorX: e.x, cursorY: e.y });
+  private updateCurrentCursorPosition = (e: MouseEvent) => {
+    cursorX = e.x;
+    cursorY = e.y;
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -501,7 +509,7 @@ export class App extends React.Component<any, AppState> {
         {SHAPES.map(({ value, icon }, index) => {
           const label = t(`toolBar.${value}`);
           return (
-            <ToolIcon
+            <ToolButton
               key={value}
               type="radio"
               icon={icon}
@@ -510,6 +518,8 @@ export class App extends React.Component<any, AppState> {
               title={`${capitalizeString(label)} — ${
                 capitalizeString(value)[0]
               }, ${index + 1}`}
+              aria-label={capitalizeString(label)}
+              aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
                 this.setState({ elementType: value });
                 elements = clearSelection(elements);
@@ -517,7 +527,7 @@ export class App extends React.Component<any, AppState> {
                   value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
                 this.forceUpdate();
               }}
-            ></ToolIcon>
+            ></ToolButton>
           );
         })}
         {this.renderShapeLock()}
@@ -610,6 +620,7 @@ export class App extends React.Component<any, AppState> {
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
               <div className="App-right-menu">
+                <h2 className="visually-hidden">Canvas actions</h2>
                 <Island padding={4}>{this.renderCanvasActions()}</Island>
               </div>
               <div className="App-right-menu">
@@ -618,6 +629,7 @@ export class App extends React.Component<any, AppState> {
             </Stack.Col>
             <Stack.Col gap={4} align="start">
               <Island padding={1}>
+                <h2 className="visually-hidden">Shapes</h2>
                 <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
               </Island>
             </Stack.Col>
@@ -787,10 +799,10 @@ export class App extends React.Component<any, AppState> {
               y,
               this.state.currentItemStrokeColor,
               this.state.currentItemBackgroundColor,
-              "hachure",
-              1,
-              1,
-              100,
+              this.state.currentItemFillStyle,
+              this.state.currentItemStrokeWidth,
+              this.state.currentItemRoughness,
+              this.state.currentItemOpacity,
             );
 
             if (isTextElement(element)) {
@@ -875,11 +887,20 @@ export class App extends React.Component<any, AppState> {
                 }
               }
 
+              const resetSelection = () => {
+                this.setState({
+                  draggingElement: null,
+                  editingElement: null,
+                  elementType: "selection",
+                });
+              };
+
               textWysiwyg({
                 initText: "",
                 x: textX,
                 y: textY,
                 strokeColor: this.state.currentItemStrokeColor,
+                opacity: this.state.currentItemOpacity,
                 font: this.state.currentItemFont,
                 onSubmit: text => {
                   if (text) {
@@ -895,11 +916,10 @@ export class App extends React.Component<any, AppState> {
                       },
                     ];
                   }
-                  this.setState({
-                    draggingElement: null,
-                    editingElement: null,
-                    elementType: "selection",
-                  });
+                  resetSelection();
+                },
+                onCancel: () => {
+                  resetSelection();
                 },
               });
               this.setState({
@@ -1223,10 +1243,10 @@ export class App extends React.Component<any, AppState> {
                       y,
                       this.state.currentItemStrokeColor,
                       this.state.currentItemBackgroundColor,
-                      "hachure",
-                      1,
-                      1,
-                      100,
+                      this.state.currentItemFillStyle,
+                      this.state.currentItemStrokeWidth,
+                      this.state.currentItemRoughness,
+                      this.state.currentItemOpacity,
                     ),
                     "", // default text
                     this.state.currentItemFont, // default font
@@ -1271,12 +1291,21 @@ export class App extends React.Component<any, AppState> {
               }
             }
 
+            const resetSelection = () => {
+              this.setState({
+                draggingElement: null,
+                editingElement: null,
+                elementType: "selection",
+              });
+            };
+
             textWysiwyg({
               initText: element.text,
               x: textX,
               y: textY,
               strokeColor: element.strokeColor,
               font: element.font,
+              opacity: this.state.currentItemOpacity,
               onSubmit: text => {
                 if (text) {
                   elements = [
@@ -1289,11 +1318,10 @@ export class App extends React.Component<any, AppState> {
                     },
                   ];
                 }
-                this.setState({
-                  draggingElement: null,
-                  editingElement: null,
-                  elementType: "selection",
-                });
+                resetSelection();
+              },
+              onCancel: () => {
+                resetSelection();
               },
             });
           }}
@@ -1373,12 +1401,12 @@ export class App extends React.Component<any, AppState> {
       const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
 
       const dx =
-        this.state.cursorX -
+        cursorX -
         this.state.scrollX -
         CANVAS_WINDOW_OFFSET_LEFT -
         elementsCenterX;
       const dy =
-        this.state.cursorY -
+        cursorY -
         this.state.scrollY -
         CANVAS_WINDOW_OFFSET_TOP -
         elementsCenterY;

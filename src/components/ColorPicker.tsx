@@ -2,6 +2,9 @@ import React from "react";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.css";
+import { KEYS } from "../keys";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
@@ -10,105 +13,169 @@ const Picker = function({
   colors,
   color,
   onChange,
+  onClose,
+  label,
+  t,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
+  onClose: () => void;
+  label: string;
+  t: TFunction;
 }) {
+  const firstItem = React.useRef<HTMLButtonElement>();
+  const colorInput = React.useRef<HTMLInputElement>();
+
+  React.useEffect(() => {
+    // After the component is first mounted
+    // focus on first input
+    if (firstItem.current) firstItem.current.focus();
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === KEYS.TAB) {
+      const { activeElement } = document;
+      if (e.shiftKey) {
+        if (activeElement === firstItem.current) {
+          colorInput.current?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (activeElement === colorInput.current) {
+          firstItem.current?.focus();
+          e.preventDefault();
+        }
+      }
+    } else if (e.key === KEYS.ESCAPE) {
+      onClose();
+      e.nativeEvent.stopImmediatePropagation();
+    }
+  };
+
   return (
-    <div className="color-picker">
+    <div
+      className="color-picker"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("labels.colorPicker")}
+      onKeyDown={handleKeyDown}
+    >
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div className="color-picker-content">
         <div className="colors-gallery">
-          {colors.map(color => (
-            <div
+          {colors.map((color, i) => (
+            <button
               className="color-picker-swatch"
               onClick={() => {
                 onChange(color);
               }}
               title={color}
-              tabIndex={0}
+              aria-label={color}
               style={{ backgroundColor: color }}
               key={color}
+              ref={el => {
+                if (i === 0 && el) firstItem.current = el;
+              }}
             >
               {color === "transparent" ? (
                 <div className="color-picker-transparent"></div>
               ) : (
                 undefined
               )}
-            </div>
+            </button>
           ))}
         </div>
         <ColorInput
           color={color}
+          label={label}
           onChange={color => {
             onChange(color);
           }}
+          ref={colorInput}
         />
       </div>
     </div>
   );
 };
 
-function ColorInput({
-  color,
-  onChange,
-}: {
-  color: string | null;
-  onChange: (color: string) => void;
-}) {
-  const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
-  const [innerValue, setInnerValue] = React.useState(color);
+const ColorInput = React.forwardRef(
+  (
+    {
+      color,
+      onChange,
+      label,
+    }: {
+      color: string | null;
+      onChange: (color: string) => void;
+      label: string;
+    },
+    ref,
+  ) => {
+    const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
+    const [innerValue, setInnerValue] = React.useState(color);
+    const inputRef = React.useRef(null);
 
-  React.useEffect(() => {
-    setInnerValue(color);
-  }, [color]);
+    React.useEffect(() => {
+      setInnerValue(color);
+    }, [color]);
 
-  return (
-    <div className="color-input-container">
-      <div className="color-picker-hash">#</div>
-      <input
-        spellCheck={false}
-        className="color-picker-input"
-        aria-label="Hex color code"
-        onChange={e => {
-          const value = e.target.value;
-          if (value.match(colorRegex)) {
-            onChange(value === "transparent" ? "transparent" : "#" + value);
-          }
-          setInnerValue(value);
-        }}
-        value={(innerValue || "").replace(/^#/, "")}
-        onPaste={e => onChange(e.clipboardData.getData("text"))}
-        onBlur={() => setInnerValue(color)}
-      />
-    </div>
-  );
-}
+    React.useImperativeHandle(ref, () => inputRef.current);
+
+    return (
+      <div className="color-input-container">
+        <div className="color-picker-hash">#</div>
+        <input
+          spellCheck={false}
+          className="color-picker-input"
+          aria-label={label}
+          onChange={e => {
+            const value = e.target.value;
+            if (value.match(colorRegex)) {
+              onChange(value === "transparent" ? "transparent" : "#" + value);
+            }
+            setInnerValue(value);
+          }}
+          value={(innerValue || "").replace(/^#/, "")}
+          onPaste={e => onChange(e.clipboardData.getData("text"))}
+          onBlur={() => setInnerValue(color)}
+          ref={inputRef}
+        />
+      </div>
+    );
+  },
+);
 
 export function ColorPicker({
   type,
   color,
   onChange,
+  label,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
   onChange: (color: string) => void;
+  label: string;
 }) {
+  const { t } = useTranslation();
+
   const [isActive, setActive] = React.useState(false);
+  const pickerButton = React.useRef<HTMLButtonElement>(null);
 
   return (
     <div>
       <div className="color-picker-control-container">
         <button
           className="color-picker-label-swatch"
-          aria-label="Change color"
+          aria-label={label}
           style={color ? { backgroundColor: color } : undefined}
           onClick={() => setActive(!isActive)}
+          ref={pickerButton}
         />
         <ColorInput
           color={color}
+          label={label}
           onChange={color => {
             onChange(color);
           }}
@@ -123,6 +190,12 @@ export function ColorPicker({
               onChange={changedColor => {
                 onChange(changedColor);
               }}
+              onClose={() => {
+                setActive(false);
+                pickerButton.current?.focus();
+              }}
+              label={label}
+              t={t}
             />
           </Popover>
         ) : null}

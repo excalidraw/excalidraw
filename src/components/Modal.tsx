@@ -2,15 +2,30 @@ import "./Modal.css";
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { KEYS } from "../keys";
 
 export function Modal(props: {
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
+  labelledBy: string;
 }) {
   const modalRoot = useBodyRoot();
+
+  const handleKeydown = (e: React.KeyboardEvent) => {
+    if (e.key === KEYS.ESCAPE) {
+      e.nativeEvent.stopImmediatePropagation();
+      props.onCloseRequest();
+    }
+  };
   return createPortal(
-    <div className="Modal">
+    <div
+      className="Modal"
+      role="dialog"
+      aria-modal="true"
+      onKeyDown={handleKeydown}
+      aria-labelledby={props.labelledBy}
+    >
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div className="Modal__content" style={{ maxWidth: props.maxWidth }}>
         {props.children}

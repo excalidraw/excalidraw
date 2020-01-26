@@ -12,6 +12,7 @@ export const KEYS = {
       ? "metaKey"
       : "ctrlKey";
   },
+  TAB: "Tab",
 };
 
 export function isArrowKey(keyCode: string) {
