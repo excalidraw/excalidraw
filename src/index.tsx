@@ -143,6 +143,9 @@ function pickAppStatePropertiesForHistory(
 
 let cursorX = 0;
 let cursorY = 0;
+let isHoldingSpace: boolean = false;
+let isPanning: boolean = false;
+let isHoldingMouseButton: boolean = false;
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -227,6 +230,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onUnload = () => {
+    isHoldingSpace = false;
     this.saveDebounced();
     this.saveDebounced.flush();
   };
@@ -360,8 +364,8 @@ export class App extends React.Component<any, AppState> {
           this.setState(data.appState);
         }
       }
-    } else if (event.key === KEYS.SPACE) {
-      this.setState({ panMode: true });
+    } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
+      isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
   };
@@ -377,7 +381,7 @@ export class App extends React.Component<any, AppState> {
             ? CURSOR_TYPE.TEXT
             : CURSOR_TYPE.CROSSHAIR;
       }
-      this.setState({ panMode: false });
+      isHoldingSpace = false;
     }
   };
 
@@ -755,11 +759,19 @@ export class App extends React.Component<any, AppState> {
               lastMouseUp(e);
             }
 
-            // pan canvas on wheel button drag
-            if (e.button === MOUSE_BUTTON.WHEEL || this.state.panMode) {
+            if (isPanning) return;
+
+            // pan canvas on wheel button drag or space+drag
+            if (
+              !isHoldingMouseButton &&
+              (e.button === MOUSE_BUTTON.WHEEL ||
+                (e.button === MOUSE_BUTTON.MAIN && isHoldingSpace))
+            ) {
+              isHoldingMouseButton = true;
+              isPanning = true;
+              document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
               let { clientX: lastX, clientY: lastY } = e;
               const onMouseMove = (e: MouseEvent) => {
-                document.documentElement.style.cursor = `grabbing`;
                 let deltaX = lastX - e.clientX;
                 let deltaY = lastY - e.clientY;
                 lastX = e.clientX;
@@ -771,7 +783,9 @@ export class App extends React.Component<any, AppState> {
               };
               const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
                 lastMouseUp = null;
-                resetCursor();
+                isPanning = false;
+                isHoldingMouseButton = false;
+                if (!isHoldingSpace) resetCursor();
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
               });
@@ -781,6 +795,9 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mouseup", onMouseUp);
               return;
             }
+
+            isHoldingMouseButton = true;
+            if (isHoldingSpace) return;
 
             // only handle left mouse button
             if (e.button !== MOUSE_BUTTON.MAIN) return;
@@ -1166,6 +1183,7 @@ export class App extends React.Component<any, AppState> {
               } = this.state;
 
               lastMouseUp = null;
+              isHoldingMouseButton = false;
               window.removeEventListener("mousemove", onMouseMove);
               window.removeEventListener("mouseup", onMouseUp);
 
@@ -1345,9 +1363,7 @@ export class App extends React.Component<any, AppState> {
             });
           }}
           onMouseMove={e => {
-            if (this.state.panMode) {
-              return;
-            }
+            if (isHoldingSpace || isPanning) return;
             const hasDeselectedButton = Boolean(e.buttons);
             if (hasDeselectedButton || this.state.elementType !== "selection") {
               return;

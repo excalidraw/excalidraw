@@ -22,5 +22,4 @@ export type AppState = {
   cursorX: number;
   cursorY: number;
   name: string;
-  panMode: boolean;
 };

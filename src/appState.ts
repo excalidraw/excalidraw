@@ -24,6 +24,5 @@ export function getDefaultAppState(): AppState {
     cursorX: 0,
     cursorY: 0,
     name: DEFAULT_PROJECT_NAME,
-    panMode: false,
   };
 }
