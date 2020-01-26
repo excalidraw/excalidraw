@@ -288,7 +288,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
       elements = clearSelection(elements);
       this.forceUpdate();
       this.setState({ elementType: "selection" });
@@ -385,17 +385,10 @@ export class App extends React.Component<any, AppState> {
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
     const { t } = this.props;
     const { elementType, editingElement } = this.state;
-    const selectedElements = elements.filter(el => el.isSelected);
-    const hasSelectedElements = selectedElements.length > 0;
-    const isTextToolSelected = elementType === "text";
-    const isShapeToolSelected = elementType !== "selection";
-    const isEditingText = editingElement && editingElement.type === "text";
-    if (
-      !hasSelectedElements &&
-      !isShapeToolSelected &&
-      !isTextToolSelected &&
-      !isEditingText
-    ) {
+    const targetElements = editingElement
+      ? [editingElement]
+      : elements.filter(el => el.isSelected);
+    if (!targetElements.length && elementType === "selection") {
       return null;
     }
 
@@ -409,9 +402,8 @@ export class App extends React.Component<any, AppState> {
             this.syncActionResult,
             t,
           )}
-
-          {(hasBackground(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -428,12 +420,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasStroke(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -450,11 +441,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected || isEditingText) && (
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -471,7 +462,6 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
@@ -500,7 +490,12 @@ export class App extends React.Component<any, AppState> {
     return (
       <LockIcon
         checked={elementLocked}
-        onChange={() => this.setState({ elementLocked: !elementLocked })}
+        onChange={() => {
+          this.setState({
+            elementLocked: !elementLocked,
+            elementType: elementLocked ? "selection" : this.state.elementType,
+          });
+        }}
       />
     );
   }
@@ -1400,9 +1395,9 @@ export class App extends React.Component<any, AppState> {
       elements = clearSelection(elements);
 
       let subCanvasX1 = Infinity;
-      let subCanvasX2 = 0;
+      let subCanvasX2 = -Infinity;
       let subCanvasY1 = Infinity;
-      let subCanvasY2 = 0;
+      let subCanvasY2 = -Infinity;
 
       const minX = Math.min(...parsedElements.map(element => element.x));
       const minY = Math.min(...parsedElements.map(element => element.y));

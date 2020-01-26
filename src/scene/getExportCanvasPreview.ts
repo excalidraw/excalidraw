@@ -29,9 +29,9 @@ export function getExportCanvasPreview(
 ) {
   // calculate smallest area to fit the contents in
   let subCanvasX1 = Infinity;
-  let subCanvasX2 = 0;
+  let subCanvasX2 = -Infinity;
   let subCanvasY1 = Infinity;
-  let subCanvasY2 = 0;
+  let subCanvasY2 = -Infinity;
 
   elements.forEach(element => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
