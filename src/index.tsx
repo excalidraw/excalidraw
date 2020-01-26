@@ -340,12 +340,14 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (shape === "text") {
-        document.documentElement.style.cursor = CURSOR_TYPE.TEXT;
-      } else {
-        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+      if (!isHoldingSpace) {
+        document.documentElement.style.cursor =
+          shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
       }
+
       this.setState({ elementType: shape });
+      elements = clearSelection(elements);
+      this.setState({});
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       event.preventDefault();
 
@@ -380,6 +382,7 @@ export class App extends React.Component<any, AppState> {
           this.state.elementType === "text"
             ? CURSOR_TYPE.TEXT
             : CURSOR_TYPE.CROSSHAIR;
+        this.setState({});
       }
       isHoldingSpace = false;
     }
@@ -785,7 +788,6 @@ export class App extends React.Component<any, AppState> {
                 lastMouseUp = null;
                 isPanning = false;
                 isHoldingMouseButton = false;
-                if (!isHoldingSpace) resetCursor();
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
               });
