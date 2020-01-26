@@ -14,9 +14,9 @@ export function getScrollBars(
   scrollY: number,
 ) {
   let minX = Infinity;
-  let maxX = 0;
+  let maxX = -Infinity;
   let minY = Infinity;
-  let maxY = 0;
+  let maxY = -Infinity;
 
   elements.forEach(element => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
