@@ -38,7 +38,8 @@
     "cartoonist": "Caricatura",
     "fileTitle": "Título del archivo",
     "colorPicker": "Selector de color",
-    "canvasBackground": "Fondo del lienzo"
+    "canvasBackground": "Fondo del lienzo",
+    "drawingCanvas": "Lienzo de dibujo"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -49,7 +50,8 @@
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
     "showExportDialog": "Mostrar diálogo para exportar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "selectLanguage": "Select Language"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -66,6 +68,12 @@
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Línea",
-    "text": "Texto"
+    "text": "Texto",
+    "lock": "Mantener la herramienta seleccionada activa después de dibujar"
+  },
+  "headings": {
+    "canvasActions": "Acciones del lienzo",
+    "selectedShapeActions": "Acciones de la forma seleccionada",
+    "shapes": "Formas"
   }
 }
