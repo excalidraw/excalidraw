@@ -43,7 +43,7 @@ export function LockIcon(props: LockIconProps) {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   return (
-    <label className={`ToolIcon ${sizeCn}`} title={props.title}>
+    <label className={`ToolIcon ToolIcon__lock ${sizeCn}`} title={props.title}>
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"

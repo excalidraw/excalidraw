@@ -60,3 +60,25 @@
     box-shadow: 0 0 0 2px #a5d8ff;
   }
 }
+
+.ToolIcon.ToolIcon__lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.1rem;
+
+  .ToolIcon__icon {
+    background-color: transparent;
+    width: 2rem;
+    height: 2em;
+  }
+  &:hover .ToolIcon__icon {
+    background-color: transparent;
+  }
+  &:active .ToolIcon__icon {
+    background-color: transparent;
+  }
+  &:focus .ToolIcon__icon {
+    box-shadow: none;
+  }
+}

@@ -481,21 +481,6 @@ export class App extends React.Component<any, AppState> {
     );
   }
 
-  private renderShapeLock() {
-    const { elementLocked } = this.state;
-    return (
-      <LockIcon
-        checked={elementLocked}
-        onChange={() => {
-          this.setState({
-            elementLocked: !elementLocked,
-            elementType: elementLocked ? "selection" : this.state.elementType,
-          });
-        }}
-      />
-    );
-  }
-
   private renderShapesSwitcher() {
     const { t } = this.props;
 
@@ -627,9 +612,17 @@ export class App extends React.Component<any, AppState> {
                   <h2 className="visually-hidden">Shapes</h2>
                   <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
                 </Island>
-                <Island padding={1}>
-                  <Stack.Row gap={1}>{this.renderShapeLock()}</Stack.Row>
-                </Island>
+                <LockIcon
+                  checked={this.state.elementLocked}
+                  onChange={() => {
+                    this.setState({
+                      elementLocked: !this.state.elementLocked,
+                      elementType: this.state.elementLocked
+                        ? "selection"
+                        : this.state.elementType,
+                    });
+                  }}
+                />
               </Stack.Row>
             </Stack.Col>
             <div />
