@@ -86,6 +86,10 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
+import {
+  ShareableLinkProvider,
+  ShareableLinkContextDispatch,
+} from "./providers/ShareableLink";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -538,74 +542,88 @@ export class App extends React.Component<any, AppState> {
   private renderCanvasActions() {
     const { t } = this.props;
     return (
-      <Stack.Col gap={4}>
-        <Stack.Row justifyContent={"space-between"}>
-          {this.actionManager.renderAction(
-            "loadScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-            t,
-          )}
-          {this.actionManager.renderAction(
-            "saveScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-            t,
-          )}
-          <ExportDialog
-            elements={elements}
-            appState={this.state}
-            actionManager={this.actionManager}
-            syncActionResult={this.syncActionResult}
-            onExportToPng={(exportedElements, scale) => {
-              if (this.canvas)
-                exportCanvas("png", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-            }}
-            onExportToClipboard={(exportedElements, scale) => {
-              if (this.canvas)
-                exportCanvas("clipboard", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-            }}
-            onExportToBackend={exportedElements => {
-              if (this.canvas)
-                exportCanvas(
-                  "backend",
-                  exportedElements.map(element => ({
-                    ...element,
-                    isSelected: false,
-                  })),
-                  this.canvas,
-                  this.state,
-                );
-            }}
-          />
-          {this.actionManager.renderAction(
-            "clearCanvas",
-            elements,
-            this.state,
-            this.syncActionResult,
-            t,
-          )}
-        </Stack.Row>
-        {this.actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
-          this.state,
-          this.syncActionResult,
-          t,
+      <ShareableLinkContextDispatch.Consumer>
+        {sharebleLinkDispatch => (
+          <Stack.Col gap={4}>
+            <Stack.Row justifyContent={"space-between"}>
+              {this.actionManager.renderAction(
+                "loadScene",
+                elements,
+                this.state,
+                this.syncActionResult,
+                t,
+              )}
+              {this.actionManager.renderAction(
+                "saveScene",
+                elements,
+                this.state,
+                this.syncActionResult,
+                t,
+              )}
+              <ExportDialog
+                elements={elements}
+                appState={this.state}
+                actionManager={this.actionManager}
+                syncActionResult={this.syncActionResult}
+                onExportToPng={(exportedElements, scale) => {
+                  if (this.canvas)
+                    exportCanvas("png", exportedElements, this.canvas, {
+                      exportBackground: this.state.exportBackground,
+                      name: this.state.name,
+                      viewBackgroundColor: this.state.viewBackgroundColor,
+                      scale,
+                    });
+                }}
+                onExportToClipboard={(exportedElements, scale) => {
+                  if (this.canvas)
+                    exportCanvas("clipboard", exportedElements, this.canvas, {
+                      exportBackground: this.state.exportBackground,
+                      name: this.state.name,
+                      viewBackgroundColor: this.state.viewBackgroundColor,
+                      scale,
+                    });
+                }}
+                onExportToBackend={exportedElements => {
+                  if (this.canvas) {
+                    sharebleLinkDispatch({ type: "userRequested" });
+                    sharebleLinkDispatch({ type: "fetch" });
+                    exportCanvas(
+                      "backend",
+                      exportedElements.map(element => ({
+                        ...element,
+                        isSelected: false,
+                      })),
+                      this.canvas,
+                      this.state,
+                    )
+                      .then(result => {
+                        sharebleLinkDispatch({ type: "success", url: result });
+                      })
+                      .catch(err => {
+                        sharebleLinkDispatch({ type: "fail" });
+                        window.alert(err);
+                      });
+                  }
+                }}
+              />
+              {this.actionManager.renderAction(
+                "clearCanvas",
+                elements,
+                this.state,
+                this.syncActionResult,
+                t,
+              )}
+            </Stack.Row>
+            {this.actionManager.renderAction(
+              "changeViewBackgroundColor",
+              elements,
+              this.state,
+              this.syncActionResult,
+              t,
+            )}
+          </Stack.Col>
         )}
-      </Stack.Col>
+      </ShareableLinkContextDispatch.Consumer>
     );
   }
 
@@ -1571,7 +1589,9 @@ class TopErrorBoundary extends React.Component {
 
 ReactDOM.render(
   <TopErrorBoundary>
-    <AppWithTrans />
+    <ShareableLinkProvider>
+      <AppWithTrans />
+    </ShareableLinkProvider>
   </TopErrorBoundary>,
   rootElement,
 );

@@ -38,7 +38,8 @@
     "cartoonist": "Caricatura",
     "fileTitle": "Título del archivo",
     "colorPicker": "Selector de color",
-    "canvasBackground": "Fondo del lienzo"
+    "canvasBackground": "Fondo del lienzo",
+    "loading": "Recuperando..."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -57,7 +58,8 @@
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
-    "copiedToClipboard": "Copiado en el portapapeles: {{url}}"
+    "copiedToClipboard": "Copiado en el portapapeles: {{url}}",
+    "urlCopiedClipboardSuccess": "El enlace fue copiado en el portapapeles"
   },
   "toolBar": {
     "selection": "Selección",

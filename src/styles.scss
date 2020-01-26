@@ -255,3 +255,20 @@ button,
   clip: rect(1px, 1px, 1px, 1px);
   white-space: nowrap; /* added line */
 }
+
+.copyExportUrlWrapper {
+  display: table;
+  input,
+  span {
+    display: table-cell;
+  }
+}
+
+.copyExportUrlInput {
+  width: 17em;
+  font-size: 1rem;
+  color: #343a40;
+  border: 0px;
+  outline: none;
+  height: 1.75em;
+}

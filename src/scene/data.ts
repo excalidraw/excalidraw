@@ -144,20 +144,15 @@ export async function exportToBackend(
     body: serializeAsJSON(elements, appState),
   });
   const json = await response.json();
+
   if (json.id) {
     const url = new URL(window.location.href);
     url.searchParams.append("id", json.id);
-
-    await navigator.clipboard.writeText(url.toString());
-    window.alert(
-      i18n.t("alerts.copiedToClipboard", {
-        url: url.toString(),
-        interpolation: { escapeValue: false },
-      }),
-    );
-  } else {
-    window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
+    return Promise.resolve(url.toString());
   }
+  return Promise.reject(
+    new Error(i18n.t("alerts.couldNotCreateShareableLink")),
+  );
 }
 
 export async function importFromBackend(id: string | null) {
@@ -239,7 +234,9 @@ export async function exportCanvas(
     if (exportBackground) {
       appState.viewBackgroundColor = viewBackgroundColor;
     }
-    exportToBackend(elements, appState);
+    return new Promise<any>(resolve =>
+      resolve(exportToBackend(elements, appState)),
+    );
   }
 
   // clean up the DOM

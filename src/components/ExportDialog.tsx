@@ -15,6 +15,9 @@ import Stack from "./Stack";
 import { useTranslation } from "react-i18next";
 import { KEYS } from "../keys";
 
+import { useSharebleLink } from "../providers/ShareableLink";
+import { CopyExportUrlInput } from "../components/CopyExportUrlInput";
+
 const probablySupportsClipboard =
   "toBlob" in HTMLCanvasElement.prototype &&
   "clipboard" in navigator &&
@@ -59,6 +62,7 @@ function ExportModal({
   const pngButton = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const onlySelectedInput = useRef<HTMLInputElement>(null);
+  const [shareLinkState, shareLinkDispatch] = useSharebleLink();
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -91,6 +95,12 @@ function ExportModal({
   useEffect(() => {
     pngButton.current?.focus();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      shareLinkDispatch({ type: "reset" });
+    };
+  }, [shareLinkDispatch]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === KEYS.TAB) {
@@ -152,15 +162,21 @@ function ExportModal({
               aria-label={t("buttons.getShareableLink")}
               onClick={() => onExportToBackend(exportedElements)}
             />
+            {shareLinkState.userResquested && !shareLinkState.error && (
+              <CopyExportUrlInput
+                fetching={shareLinkState.fetching}
+                url={shareLinkState.url}
+              />
+            )}
           </Stack.Row>
-
-          {actionManager.renderAction(
-            "changeProjectName",
-            elements,
-            appState,
-            syncActionResult,
-            t,
-          )}
+          {(!shareLinkState.userResquested || shareLinkState.error) &&
+            actionManager.renderAction(
+              "changeProjectName",
+              elements,
+              appState,
+              syncActionResult,
+              t,
+            )}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={1} align="baseline">
