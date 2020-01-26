@@ -245,6 +245,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
+    window.addEventListener("blur", this.onUnload, false);
 
     let data;
     const searchParams = new URLSearchParams(window.location.search);
@@ -280,6 +281,7 @@ export class App extends React.Component<any, AppState> {
     );
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
+    window.removeEventListener("blur", this.onUnload, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -783,17 +785,20 @@ export class App extends React.Component<any, AppState> {
                   scrollY: state.scrollY - deltaY,
                 }));
               };
-              const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
+              const teardown = (lastMouseUp = () => {
                 lastMouseUp = null;
                 isPanning = false;
                 isHoldingMouseButton = false;
+                if (!isHoldingSpace) resetCursor();
                 window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
+                window.removeEventListener("mouseup", teardown);
+                window.removeEventListener("blur", teardown);
               });
+              window.addEventListener("blur", teardown);
               window.addEventListener("mousemove", onMouseMove, {
                 passive: true,
               });
-              window.addEventListener("mouseup", onMouseUp);
+              window.addEventListener("mouseup", teardown);
               return;
             }
 
