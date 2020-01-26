@@ -35,7 +35,8 @@
     "extraBold": "Très épais",
     "architect": "Architecte",
     "artist": "Artiste",
-    "cartoonist": "Cartooniste"
+    "cartoonist": "Cartooniste",
+    "loading": "Chargement..."
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -52,7 +53,7 @@
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
-    "copiedToClipboard": "Copié dans le presse-papier: {{url}}"
+    "urlCopiedClipboardSuccess": "Le lien a été copié dans le presse-papiers"
   },
   "toolBar": {
     "selection": "Sélection",

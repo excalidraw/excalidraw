@@ -35,7 +35,8 @@
     "extraBold": "Muito espesso",
     "architect": "Arquitecto",
     "artist": "Artista",
-    "cartoonist": "Caricaturista"
+    "cartoonist": "Caricaturista",
+    "loading": "Carregando..."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -52,7 +53,7 @@
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
-    "copiedToClipboard": "Copiado no clipboard: {{url}}"
+    "urlCopiedClipboardSuccess": "Link foi copiado para área de transferência"
   },
   "toolBar": {
     "selection": "Seleção",

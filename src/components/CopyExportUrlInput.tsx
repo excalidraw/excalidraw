@@ -39,18 +39,16 @@ export function CopyExportUrlInput({
         id="urlToCopy"
         value={!fetching ? url : t("labels.loading").toString()}
       />
-      <span>
-        <button
-          className="ToolIcon_type_button ToolIcon ToolIcon_size_m"
-          disabled={fetching}
-          onClick={copyHandler}
-          id="copyClipboardButton"
-        >
-          <div className="ToolIcon__icon" aria-hidden="true">
-            {clipboard}
-          </div>
-        </button>
-      </span>
+      <button
+        className="ToolIcon_type_button ToolIcon ToolIcon_size_m"
+        disabled={fetching}
+        onClick={copyHandler}
+        id="copyClipboardButton"
+      >
+        <div className="ToolIcon__icon" aria-hidden="true">
+          {clipboard}
+        </div>
+      </button>
     </div>
   );
 }

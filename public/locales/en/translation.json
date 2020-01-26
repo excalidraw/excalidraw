@@ -57,8 +57,7 @@
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
-    "copiedToClipboard": "Copied to clipboard: {{url}}",
-    "urlCopiedClipboardSuccess": "Link was copy to clipboard"
+    "urlCopiedClipboardSuccess": "Link was copied to clipboard"
   },
   "toolBar": {
     "selection": "Selection",

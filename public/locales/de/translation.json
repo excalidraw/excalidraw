@@ -2,10 +2,10 @@
   "alerts": {
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
-    "copiedToClipboard": "In Zwischenablage kopiert: {{url}}",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "couldNotCreateShareableLink": "Konnte keinen teilbaren Link erstellen.",
-    "importBackendFailed": "Import vom Server ist fehlgeschlagen."
+    "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
+    "urlCopiedClipboardSuccess": "Der Link wurde in die Zwischenablage kopiert"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -52,7 +52,8 @@
     "strokeWidth": "Strichstärke",
     "thin": "Dünn",
     "veryLarge": "Sehr Groß",
-    "withBackground": "Mit Hintergrund"
+    "withBackground": "Mit Hintergrund",
+    "loading": "Wird geladen..."
   },
   "toolBar": {
     "arrow": "Pfeil",
