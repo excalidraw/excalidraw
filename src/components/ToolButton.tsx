@@ -50,12 +50,11 @@ export const ToolButton = React.forwardRef(function(
     );
 
   return (
-    <label className="ToolIcon">
+    <label className="ToolIcon" title={props.title}>
       <input
         className={`ToolIcon_type_radio ${sizeCn}`}
         type="radio"
         name={props.name}
-        title={props.title}
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         id={props.id}
