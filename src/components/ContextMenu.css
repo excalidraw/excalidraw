@@ -15,11 +15,12 @@
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 1rem 0.25rem 0.5rem;
   text-align: left;
   border-radius: 0;
   background-color: #e9ecef;
   border: none;
+  white-space: nowrap;
 }
 
 .context-menu-option:hover {
