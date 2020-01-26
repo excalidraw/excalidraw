@@ -538,7 +538,7 @@ export class App extends React.Component<any, AppState> {
   private renderCanvasActions() {
     const { t } = this.props;
     return (
-      <Stack.Col gap={4}>
+      <Stack.Col gap={2}>
         <Stack.Row justifyContent={"space-between"}>
           {this.actionManager.renderAction(
             "loadScene",
@@ -598,6 +598,13 @@ export class App extends React.Component<any, AppState> {
             t,
           )}
         </Stack.Row>
+        <LanguageList
+          onClick={lng => {
+            i18n.changeLanguage(lng);
+          }}
+          languages={languages}
+          currentLanguage={parseDetectedLang(i18n.language)}
+        />
         {this.actionManager.renderAction(
           "changeViewBackgroundColor",
           elements,
@@ -1348,13 +1355,6 @@ export class App extends React.Component<any, AppState> {
             const hitElement = getElementAtPosition(elements, x, y);
             document.documentElement.style.cursor = hitElement ? "move" : "";
           }}
-        />
-        <LanguageList
-          onClick={lng => {
-            i18n.changeLanguage(lng);
-          }}
-          languages={languages}
-          currentLanguage={parseDetectedLang(i18n.language)}
         />
       </div>
     );
