@@ -525,7 +525,6 @@ export class App extends React.Component<any, AppState> {
             ></ToolButton>
           );
         })}
-        {this.renderShapeLock()}
       </>
     );
   }
@@ -623,10 +622,15 @@ export class App extends React.Component<any, AppState> {
               </div>
             </Stack.Col>
             <Stack.Col gap={4} align="start">
-              <Island padding={1}>
-                <h2 className="visually-hidden">Shapes</h2>
-                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-              </Island>
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden">Shapes</h2>
+                  <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+                </Island>
+                <Island padding={1}>
+                  <Stack.Row gap={1}>{this.renderShapeLock()}</Stack.Row>
+                </Island>
+              </Stack.Row>
             </Stack.Col>
             <div />
           </div>
