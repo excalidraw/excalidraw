@@ -284,7 +284,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
       elements = clearSelection(elements);
       this.forceUpdate();
       this.setState({ elementType: "selection" });
