@@ -6,6 +6,7 @@ import { selectNode, removeSelection } from "../utils";
 type Props = {
   value: string;
   onChange: (value: string) => void;
+  label: string;
 };
 
 export class EditableText extends Component<Props> {
@@ -33,6 +34,8 @@ export class EditableText extends Component<Props> {
         contentEditable="true"
         data-type="wysiwyg"
         className="project-name"
+        role="textbox"
+        aria-label={this.props.label}
         onBlur={this.handleBlur}
         onKeyDown={this.handleKeyDown}
         onFocus={this.handleFocus}

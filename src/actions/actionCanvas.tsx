@@ -10,11 +10,11 @@ export const actionChangeViewBackgroundColor: Action = {
   perform: (elements, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
-  PanelComponent: ({ appState, updateData }) => {
+  PanelComponent: ({ appState, updateData, t }) => {
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
-          label="Canvas Background"
+          label={t("labels.canvasBackground")}
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={color => updateData(color)}

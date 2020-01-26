@@ -13,7 +13,7 @@ import {
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
-  getElementAbsoluteCoords,
+  getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
   resizePerfectLineForNWHandler,
@@ -183,7 +183,7 @@ export class App extends React.Component<any, AppState> {
   private syncActionResult = (res: ActionResult) => {
     if (res.elements !== undefined) {
       elements = res.elements;
-      this.forceUpdate();
+      this.setState({});
     }
 
     if (res.appState !== undefined) {
@@ -202,7 +202,7 @@ export class App extends React.Component<any, AppState> {
       ),
     );
     elements = deleteSelectedElements(elements);
-    this.forceUpdate();
+    this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
@@ -229,6 +229,14 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
+  public shouldComponentUpdate() {
+    if (!history.isRecording()) {
+      this.componentDidUpdate();
+      return false;
+    }
+    return true;
+  }
+
   private async setAppState(id: string | null) {
     let data;
     if (id != null) {
@@ -246,7 +254,7 @@ export class App extends React.Component<any, AppState> {
     if (data.appState) {
       this.setState(data.appState);
     } else {
-      this.forceUpdate();
+      this.setState({});
     }
   }
 
@@ -284,7 +292,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
-    this.forceUpdate();
+    this.setState({});
   };
 
   private updateCurrentCursorPosition = (e: MouseEvent) => {
@@ -293,9 +301,9 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
       elements = clearSelection(elements);
-      this.forceUpdate();
+      this.setState({});
       this.setState({ elementType: "selection" });
       if (window.document.activeElement instanceof HTMLElement) {
         window.document.activeElement.blur();
@@ -329,7 +337,7 @@ export class App extends React.Component<any, AppState> {
         }
         return el;
       });
-      this.forceUpdate();
+      this.setState({});
       event.preventDefault();
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
@@ -390,17 +398,10 @@ export class App extends React.Component<any, AppState> {
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
     const { t } = this.props;
     const { elementType, editingElement } = this.state;
-    const selectedElements = elements.filter(el => el.isSelected);
-    const hasSelectedElements = selectedElements.length > 0;
-    const isTextToolSelected = elementType === "text";
-    const isShapeToolSelected = elementType !== "selection";
-    const isEditingText = editingElement && editingElement.type === "text";
-    if (
-      !hasSelectedElements &&
-      !isShapeToolSelected &&
-      !isTextToolSelected &&
-      !isEditingText
-    ) {
+    const targetElements = editingElement
+      ? [editingElement]
+      : elements.filter(el => el.isSelected);
+    if (!targetElements.length && elementType === "selection") {
       return null;
     }
 
@@ -414,9 +415,8 @@ export class App extends React.Component<any, AppState> {
             this.syncActionResult,
             t,
           )}
-
-          {(hasBackground(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -433,12 +433,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasStroke(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -455,11 +454,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected || isEditingText) && (
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -476,7 +475,6 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
@@ -497,16 +495,6 @@ export class App extends React.Component<any, AppState> {
           )}
         </div>
       </Island>
-    );
-  }
-
-  private renderShapeLock() {
-    const { elementLocked } = this.state;
-    return (
-      <LockIcon
-        checked={elementLocked}
-        onChange={() => this.setState({ elementLocked: !elementLocked })}
-      />
     );
   }
 
@@ -534,12 +522,11 @@ export class App extends React.Component<any, AppState> {
                 elements = clearSelection(elements);
                 document.documentElement.style.cursor =
                   value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                this.forceUpdate();
+                this.setState({});
               }}
             ></ToolButton>
           );
         })}
-        {this.renderShapeLock()}
       </>
     );
   }
@@ -637,10 +624,23 @@ export class App extends React.Component<any, AppState> {
               </div>
             </Stack.Col>
             <Stack.Col gap={4} align="start">
-              <Island padding={1}>
-                <h2 className="visually-hidden">Shapes</h2>
-                <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-              </Island>
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden">Shapes</h2>
+                  <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
+                </Island>
+                <LockIcon
+                  checked={this.state.elementLocked}
+                  onChange={() => {
+                    this.setState({
+                      elementLocked: !this.state.elementLocked,
+                      elementType: this.state.elementLocked
+                        ? "selection"
+                        : this.state.elementType,
+                    });
+                  }}
+                />
+              </Stack.Row>
             </Stack.Col>
             <div />
           </div>
@@ -712,7 +712,7 @@ export class App extends React.Component<any, AppState> {
             if (!element.isSelected) {
               elements = clearSelection(elements);
               element.isSelected = true;
-              this.forceUpdate();
+              this.setState({});
             }
 
             ContextMenu.push({
@@ -754,6 +754,8 @@ export class App extends React.Component<any, AppState> {
                 let deltaY = lastY - e.clientY;
                 lastX = e.clientX;
                 lastY = e.clientY;
+                // We don't want to save history when panning around
+                history.skipRecording();
                 this.setState(state => ({
                   scrollX: state.scrollX - deltaX,
                   scrollY: state.scrollY - deltaY,
@@ -958,6 +960,8 @@ export class App extends React.Component<any, AppState> {
               if (isOverHorizontalScrollBar) {
                 const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
                 const dx = x - lastX;
+                // We don't want to save history when scrolling
+                history.skipRecording();
                 this.setState(state => ({ scrollX: state.scrollX - dx }));
                 lastX = x;
                 return;
@@ -966,6 +970,8 @@ export class App extends React.Component<any, AppState> {
               if (isOverVerticalScrollBar) {
                 const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
                 const dy = y - lastY;
+                // We don't want to save history when scrolling
+                history.skipRecording();
                 this.setState(state => ({ scrollY: state.scrollY - dy }));
                 lastY = y;
                 return;
@@ -1068,7 +1074,7 @@ export class App extends React.Component<any, AppState> {
                   lastY = y;
                   // We don't want to save history when resizing an element
                   history.skipRecording();
-                  this.forceUpdate();
+                  this.setState({});
                   return;
                 }
               }
@@ -1089,7 +1095,7 @@ export class App extends React.Component<any, AppState> {
                   lastY = y;
                   // We don't want to save history when dragging an element to initially size it
                   history.skipRecording();
-                  this.forceUpdate();
+                  this.setState({});
                   return;
                 }
               }
@@ -1144,7 +1150,7 @@ export class App extends React.Component<any, AppState> {
               }
               // We don't want to save history when moving an element
               history.skipRecording();
-              this.forceUpdate();
+              this.setState({});
             };
 
             const onMouseUp = (e: MouseEvent) => {
@@ -1169,12 +1175,11 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                 });
-                this.forceUpdate();
                 return;
               }
 
               if (normalizeDimensions(draggingElement)) {
-                this.forceUpdate();
+                this.setState({});
               }
 
               if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -1205,7 +1210,7 @@ export class App extends React.Component<any, AppState> {
               if (draggingElement === null) {
                 // if no element is clicked, clear the selection and redraw
                 elements = clearSelection(elements);
-                this.forceUpdate();
+                this.setState({});
                 return;
               }
 
@@ -1225,7 +1230,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               history.resumeRecording();
-              this.forceUpdate();
+              this.setState({});
             };
 
             lastMouseUp = onMouseUp;
@@ -1235,7 +1240,7 @@ export class App extends React.Component<any, AppState> {
 
             // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
             history.skipRecording();
-            this.forceUpdate();
+            this.setState({});
           }}
           onDoubleClick={e => {
             const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1270,7 +1275,7 @@ export class App extends React.Component<any, AppState> {
               elements = elements.filter(
                 element => element.id !== elementAtPosition.id,
               );
-              this.forceUpdate();
+              this.setState({});
 
               textX =
                 this.state.scrollX +
@@ -1382,6 +1387,8 @@ export class App extends React.Component<any, AppState> {
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const { deltaX, deltaY } = e;
+    // We don't want to save history when panning around
+    history.skipRecording();
     this.setState(state => ({
       scrollX: state.scrollX - deltaX,
       scrollY: state.scrollY - deltaY,
@@ -1400,24 +1407,10 @@ export class App extends React.Component<any, AppState> {
     ) {
       elements = clearSelection(elements);
 
-      let subCanvasX1 = Infinity;
-      let subCanvasX2 = 0;
-      let subCanvasY1 = Infinity;
-      let subCanvasY2 = 0;
+      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
 
-      const minX = Math.min(...parsedElements.map(element => element.x));
-      const minY = Math.min(...parsedElements.map(element => element.y));
-
-      parsedElements.forEach(parsedElement => {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(parsedElement);
-        subCanvasX1 = Math.min(subCanvasX1, x1);
-        subCanvasY1 = Math.min(subCanvasY1, y1);
-        subCanvasX2 = Math.max(subCanvasX2, x2);
-        subCanvasY2 = Math.max(subCanvasY2, y2);
-      });
-
-      const elementsCenterX = distance(subCanvasX1, subCanvasX2) / 2;
-      const elementsCenterY = distance(subCanvasY1, subCanvasY2) / 2;
+      const elementsCenterX = distance(minX, maxX) / 2;
+      const elementsCenterY = distance(minY, maxY) / 2;
 
       const dx =
         cursorX -
@@ -1439,7 +1432,7 @@ export class App extends React.Component<any, AppState> {
           return duplicate;
         }),
       ];
-      this.forceUpdate();
+      this.setState({});
     }
   };
 
