@@ -345,9 +345,8 @@ export class App extends React.Component<any, AppState> {
           shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
       }
 
-      this.setState({ elementType: shape });
       elements = clearSelection(elements);
-      this.setState({});
+      this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       event.preventDefault();
 
