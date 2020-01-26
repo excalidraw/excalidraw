@@ -630,6 +630,7 @@ export class App extends React.Component<any, AppState> {
                         : this.state.elementType,
                     });
                   }}
+                  title={t("toolBar.lock")}
                 />
               </Stack.Row>
             </Stack.Col>

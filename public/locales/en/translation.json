@@ -65,6 +65,7 @@
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
-    "text": "Text"
+    "text": "Text",
+    "lock": "Keep selected tool active after drawing"
   }
 }
