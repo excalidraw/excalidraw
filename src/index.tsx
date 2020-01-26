@@ -405,9 +405,9 @@ export class App extends React.Component<any, AppState> {
             this.syncActionResult,
             t,
           )}
-
-          {(hasBackground(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasSelectedElements
+            ? selectedElements.some(element => hasBackground(element.type))
+            : hasBackground(elementType)) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -424,12 +424,12 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasStroke(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasSelectedElements
+            ? selectedElements.some(element => hasStroke(element.type))
+            : hasStroke(elementType)) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -446,11 +446,12 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected || isEditingText) && (
+          {(hasSelectedElements
+            ? selectedElements.some(element => hasText(element.type))
+            : hasText(elementType)) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -467,7 +468,6 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
