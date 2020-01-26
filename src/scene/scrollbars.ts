@@ -1,5 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords } from "../element";
+import { getCommonBounds } from "../element";
 
 const SCROLLBAR_MIN_SIZE = 15;
 const SCROLLBAR_MARGIN = 4;
@@ -13,23 +13,13 @@ export function getScrollBars(
   scrollX: number,
   scrollY: number,
 ) {
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minY = Infinity;
-  let maxY = -Infinity;
-
-  elements.forEach(element => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    minX = Math.min(minX, x1);
-    minY = Math.min(minY, y1);
-    maxX = Math.max(maxX, x2);
-    maxY = Math.max(maxY, y2);
-  });
+  let [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
   minX += scrollX;
   maxX += scrollX;
   minY += scrollY;
   maxY += scrollY;
+
   const leftOverflow = Math.max(-minX, 0);
   const rightOverflow = Math.max(-(canvasWidth - maxX), 0);
   const topOverflow = Math.max(-minY, 0);
