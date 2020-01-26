@@ -381,17 +381,10 @@ export class App extends React.Component<any, AppState> {
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
     const { t } = this.props;
     const { elementType, editingElement } = this.state;
-    const selectedElements = elements.filter(el => el.isSelected);
-    const hasSelectedElements = selectedElements.length > 0;
-    const isTextToolSelected = elementType === "text";
-    const isShapeToolSelected = elementType !== "selection";
-    const isEditingText = editingElement && editingElement.type === "text";
-    if (
-      !hasSelectedElements &&
-      !isShapeToolSelected &&
-      !isTextToolSelected &&
-      !isEditingText
-    ) {
+    const targetElements = editingElement
+      ? [editingElement]
+      : elements.filter(el => el.isSelected);
+    if (!targetElements.length && elementType === "selection") {
       return null;
     }
 
@@ -405,9 +398,8 @@ export class App extends React.Component<any, AppState> {
             this.syncActionResult,
             t,
           )}
-
-          {(hasBackground(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeBackgroundColor",
@@ -424,12 +416,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasStroke(elements) ||
-            (isShapeToolSelected && !isTextToolSelected)) && (
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeStrokeWidth",
@@ -446,11 +437,11 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
-          {(hasText(elements) || isTextToolSelected || isEditingText) && (
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
             <>
               {this.actionManager.renderAction(
                 "changeFontSize",
@@ -467,7 +458,6 @@ export class App extends React.Component<any, AppState> {
                 this.syncActionResult,
                 t,
               )}
-              <hr />
             </>
           )}
 
