@@ -144,25 +144,31 @@ export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  const response = await fetch(BACKEND_POST, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: serializeAsJSON(elements, appState),
-  });
-  const json = await response.json();
-  if (json.id) {
-    const url = new URL(window.location.href);
-    url.searchParams.append("id", json.id);
+  let response;
+  try {
+    response = await fetch(BACKEND_POST, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: serializeAsJSON(elements, appState),
+    });
+    const json = await response.json();
+    if (json.id) {
+      const url = new URL(window.location.href);
+      url.searchParams.append("id", json.id);
 
-    await navigator.clipboard.writeText(url.toString());
-    window.alert(
-      i18n.t("alerts.copiedToClipboard", {
-        url: url.toString(),
-        interpolation: { escapeValue: false },
-      }),
-    );
-  } else {
+      await navigator.clipboard.writeText(url.toString());
+      window.alert(
+        i18n.t("alerts.copiedToClipboard", {
+          url: url.toString(),
+          interpolation: { escapeValue: false },
+        }),
+      );
+    } else {
+      window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
+    }
+  } catch (e) {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
+    return;
   }
 }
 
