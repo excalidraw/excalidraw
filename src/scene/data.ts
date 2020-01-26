@@ -27,14 +27,20 @@ interface DataState {
 
 export function serializeAsJSON(
   elements: readonly ExcalidrawElement[],
-  appState?: AppState,
+  appState: AppState,
 ): string {
-  return JSON.stringify({
-    version: 1,
-    source: window.location.origin,
-    elements: elements.map(({ shape, ...el }) => el),
-    appState: appState || getDefaultAppState(),
-  });
+  return JSON.stringify(
+    {
+      type: "excalidraw",
+      version: 1,
+      appState: {
+        viewBackgroundColor: appState.viewBackgroundColor,
+      },
+      elements: elements.map(({ shape, isSelected, ...el }) => el),
+    },
+    null,
+    2,
+  );
 }
 
 function calculateScroll(
