@@ -7,25 +7,26 @@
   user-select: none;
   margin: -0.25rem 0 0 0.125rem;
   padding: 0.25rem 0;
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
+  background-color: #f2f2f2;
+  border: 1px solid #bcbcbc;
 }
 
 .context-menu-option {
   position: relative;
   width: 100%;
+  min-width: 9.5rem;
   margin: 0;
-  padding: 0.25rem 1rem 0.25rem 0.5rem;
+  padding: 0.25rem 1rem 0.25rem 1.25rem;
   text-align: left;
   border-radius: 0;
-  background-color: #e9ecef;
+  background-color: #f2f2f2;
   border: none;
   white-space: nowrap;
 }
 
 .context-menu-option:hover {
   color: #fff;
-  background-color: #1971c2;
+  background-color: #4e95f5;
 }
 
 .context-menu-option:focus {
