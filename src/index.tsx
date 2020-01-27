@@ -226,12 +226,12 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  public shouldComponentUpdate() {
+  public shouldComponentUpdate(props: any, nextState: AppState) {
     if (!history.isRecording()) {
       // temporary hack to fix #592
-      setTimeout(() => {
-        this.componentDidUpdate();
-      });
+      // eslint-disable-next-line react/no-direct-mutation-state
+      this.state = nextState;
+      this.componentDidUpdate();
       return false;
     }
     return true;
