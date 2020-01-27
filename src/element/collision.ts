@@ -5,6 +5,7 @@ import {
   getDiamondPoints,
   getElementAbsoluteCoords,
   getLinePoints,
+  getArrowAbsoluteBounds,
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
@@ -154,6 +155,9 @@ export function hitTest(
     // for arrow shape, return false
     if (shape.length < 3) return false;
 
+    const [x1, y1, x2, y2] = getArrowAbsoluteBounds(element);
+    if (x < x1 || y < y1 - 40 || x > x2 || y > y2 + 40) return false;
+
     const relX = x - element.x;
     const relY = y - element.y;
 
@@ -183,33 +187,27 @@ export function hitTest(
 }
 
 const pointInBezierEquation = (
-  p0: number,
-  p1: number,
-  p2: number,
-  p3: number,
-  M: number,
+  p0: Point,
+  p1: Point,
+  p2: Point,
+  p3: Point,
+  [mx, my]: Point,
 ) => {
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number) =>
-    Math.pow(1 - t, 3) * p3 +
-    3 * t * Math.pow(1 - t, 2) * p2 +
-    3 * Math.pow(t, 2) * (1 - t) * p1 +
-    p0 * Math.pow(t, 3);
+  const equation = (t: number, idx: number) =>
+    Math.pow(1 - t, 3) * p3[idx] +
+    3 * t * Math.pow(1 - t, 2) * p2[idx] +
+    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+    p0[idx] * Math.pow(t, 3);
 
-  // debug
-  // let min = Infinity;
-  // let minT = 1.1;
-
-  const epsilon = 3;
+  const epsilon = 20;
   // go through t in increments of 0.01
   let t = 0;
   while (t <= 1.0) {
-    const diff = Math.abs(M - equation(t));
+    const tx = equation(t, 0);
+    const ty = equation(t, 1);
 
-    // if (diff < min) {
-    //   min = diff;
-    //   minT = t;
-    // }
+    const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
 
     if (diff < epsilon) {
       return true;
@@ -217,8 +215,6 @@ const pointInBezierEquation = (
 
     t += 0.01;
   }
-
-  // console.log({ min, minT, eq: equation(minT) });
 
   return false;
 };
@@ -229,14 +225,14 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
 
   // set start position as (0,0) just in case
   // move operation does not exist (unlikely but it is worth safekeeping it)
-  let p0: Point = [0, 0];
+  let currentP: Point = [0, 0];
 
   return ops.some(({ op, data }) => {
     // There are only four operation types:
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
       // change starting point
-      p0 = data as Point;
+      currentP = data as Point;
       // move operation does not draw anything; so, it always
       // returns false
     } else if (op === "bcurveTo") {
@@ -247,17 +243,22 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
       const p2 = [data[2], data[3]] as Point;
       const p3 = [data[4], data[5]] as Point;
 
+      const p0 = currentP;
+      currentP = p3;
+
+      // skip the curve if point is outside the domain of the curve
+      if (x < p0[0] || x > p3[0]) {
+        return false;
+      }
+
       // check if points are on the curve
       // cubic bezier curves require four parameters
       // the first parameter is the last stored position (p0)
-      let retVal =
-        pointInBezierEquation(p0[0], p1[0], p2[0], p3[0], x) &&
-        pointInBezierEquation(p0[1], p1[1], p2[1], p3[1], y);
+      let retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
 
       // set end point of bezier curve as the new starting point for
       // upcoming operations as each operation is based on the last drawn
       // position of the previous operation
-      p0 = p3;
       return retVal;
     } else if (op === "lineTo") {
       // TODO: Implement this
