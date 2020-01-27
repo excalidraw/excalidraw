@@ -1,5 +1,7 @@
 import { ExcalidrawElement } from "./types";
 import { rotate } from "../math";
+import { Drawable } from "roughjs/bin/core";
+import { Point } from "roughjs/bin/geometry";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -33,20 +35,65 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 }
 
 export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
-  if (element.points.length < 2) {
+  if (element.points.length < 2 || !element.shape) {
     return [element.x, element.y, element.x, element.y];
   }
-  let minX = Infinity,
-    minY = Infinity,
-    maxX = 0,
-    maxY = 0;
-  element.points.forEach(pnt => {
-    minX = Math.min(minX, pnt[0]);
-    minY = Math.min(minY, pnt[1]);
 
-    maxX = Math.max(maxX, pnt[0]);
-    maxY = Math.max(maxY, pnt[1]);
-  });
+  const shape = element.shape as Drawable[];
+
+  const ops = shape[1].sets[0].ops;
+
+  let currentP: Point = [0, 0];
+
+  const { minX, minY, maxX, maxY } = ops.reduce(
+    (limits, { op, data }) => {
+      // There are only four operation types:
+      // move, bcurveTo, lineTo, and curveTo
+      if (op === "move") {
+        // change starting point
+        currentP = data as Point;
+        // move operation does not draw anything; so, it always
+        // returns false
+      } else if (op === "bcurveTo") {
+        // create points from bezier curve
+        // bezier curve stores data as a flattened array of three positions
+        // [x1, y1, x2, y2, x3, y3]
+        const p1 = [data[0], data[1]] as Point;
+        const p2 = [data[2], data[3]] as Point;
+        const p3 = [data[4], data[5]] as Point;
+
+        const p0 = currentP;
+        currentP = p3;
+
+        const equation = (t: number, idx: number) =>
+          Math.pow(1 - t, 3) * p3[idx] +
+          3 * t * Math.pow(1 - t, 2) * p2[idx] +
+          3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+          p0[idx] * Math.pow(t, 3);
+
+        let t = 0;
+        while (t <= 1.0) {
+          const x = equation(t, 0);
+          const y = equation(t, 1);
+
+          limits.minX = Math.min(limits.minX, x);
+          limits.minY = Math.min(limits.minY, y);
+
+          limits.maxX = Math.max(limits.maxX, x);
+          limits.maxY = Math.max(limits.maxY, y);
+
+          t += 0.1;
+        }
+      } else if (op === "lineTo") {
+        // TODO: Implement this
+      } else if (op === "qcurveTo") {
+        // TODO: Implement this
+      }
+      return limits;
+    },
+    { minX: Infinity, minY: Infinity, maxX: 0, maxY: 0 },
+  );
+
   return [
     minX + element.x,
     minY + element.y,

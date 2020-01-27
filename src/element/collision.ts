@@ -163,9 +163,9 @@ export function hitTest(
 
     // hit test curve and lien segments for arrow
     return (
-      hitTestRoughShape(shape[0].sets, relX, relY) ||
-      hitTestRoughShape(shape[1].sets, relX, relY) ||
-      hitTestRoughShape(shape[2].sets, relX, relY)
+      // hitTestRoughShape(shape[0].sets, relX, relY) ||
+      hitTestRoughShape(shape[1].sets, relX, relY) || false
+      // hitTestRoughShape(shape[2].sets, relX, relY)
     );
   } else if (element.type === "line") {
     const [x1, y1, x2, y2] = getLinePoints(element);
@@ -227,7 +227,7 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
   // move operation does not exist (unlikely but it is worth safekeeping it)
   let currentP: Point = [0, 0];
 
-  return ops.some(({ op, data }) => {
+  return ops.some(({ op, data }, idx) => {
     // There are only four operation types:
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
@@ -245,11 +245,6 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
 
       const p0 = currentP;
       currentP = p3;
-
-      // skip the curve if point is outside the domain of the curve
-      if (x < p0[0] || x > p3[0]) {
-        return false;
-      }
 
       // check if points are on the curve
       // cubic bezier curves require four parameters
