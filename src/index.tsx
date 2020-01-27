@@ -306,12 +306,21 @@ export class App extends React.Component<any, AppState> {
       this.setState({});
       this.setState({ elementType: "selection" });
       event.preventDefault();
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur();
+      }
       return;
     }
-    if (window.document.activeElement instanceof HTMLElement) {
-      window.document.activeElement.blur();
+
+    if (event.target instanceof HTMLElement) {
+      if (isToolIcon(event.target as HTMLElement)) {
+        event.target.focus();
+      }
     }
-    if (isInputLike(event.target) && !isToolIcon(event.target)) return;
+
+    if (isInputLike(event.target) && !isToolIcon(event.target)) {
+      return;
+    }
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
