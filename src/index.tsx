@@ -307,11 +307,15 @@ export class App extends React.Component<any, AppState> {
     }
     if (isInputLike(event.target)) return;
 
-    const data = this.actionManager.handleKeyDown(event, elements, this.state);
-    this.syncActionResult(data);
+    const actionResult = this.actionManager.handleKeyDown(
+      event,
+      elements,
+      this.state,
+    );
 
-    if (data.elements !== undefined || data.appState !== undefined) {
-      return;
+    if (actionResult) {
+      this.syncActionResult(actionResult);
+      if (actionResult) return;
     }
 
     const shape = findShapeByKey(event.key);
@@ -371,18 +375,20 @@ export class App extends React.Component<any, AppState> {
   private removeWheelEventListener: (() => void) | undefined;
 
   private copyToClipboard = () => {
-    if (navigator.clipboard) {
-      const text = JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      );
+    const text = JSON.stringify(
+      elements
+        .filter(element => element.isSelected)
+        .map(({ shape, ...el }) => el),
+    );
+    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
       navigator.clipboard.writeText(text);
+    } else {
+      document.execCommand("copy");
     }
   };
 
   private pasteFromClipboard = () => {
-    if (navigator.clipboard) {
+    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
       navigator.clipboard
         .readText()
         .then(text => this.addElementsFromPaste(text));

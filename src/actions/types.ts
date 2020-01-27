@@ -45,7 +45,7 @@ export interface ActionsManagerInterface {
     event: KeyboardEvent,
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-  ) => ActionResult | {};
+  ) => ActionResult | null;
   getContextMenuItems: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
