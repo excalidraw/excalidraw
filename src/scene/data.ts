@@ -4,7 +4,10 @@ import { getDefaultAppState } from "../appState";
 
 import { AppState } from "../types";
 import { ExportType } from "./types";
-import { getExportCanvasPreview } from "./getExportCanvasPreview";
+import {
+  getExportCanvasPreview,
+  getExportSvgPreview,
+} from "./getExportCanvasPreview";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { getCommonBounds } from "../element";
@@ -193,6 +196,14 @@ export async function exportCanvas(
   if (!elements.length)
     return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));
   // calculate smallest area to fit the contents in
+
+  if (type === "svg") {
+    const tempSvg = getExportSvgPreview(elements);
+    await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
+      fileName: `${name}.svg`,
+    });
+    return;
+  }
 
   const tempCanvas = getExportCanvasPreview(elements, {
     exportBackground,

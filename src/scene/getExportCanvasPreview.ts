@@ -1,7 +1,7 @@
 import rough from "roughjs/bin/rough";
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
-import { renderScene } from "../renderer/renderScene";
+import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance } from "../utils";
 
 export function getExportCanvasPreview(
@@ -52,4 +52,15 @@ export function getExportCanvasPreview(
     },
   );
   return tempCanvas;
+}
+
+export function getExportSvgPreview(
+  elements: readonly ExcalidrawElement[],
+): SVGSVGElement {
+  const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svgRoot.setAttribute("version", "1.1");
+  svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  const rsvg = rough.svg(svgRoot);
+  renderSceneToSvg(elements, rsvg, svgRoot);
+  return svgRoot;
 }

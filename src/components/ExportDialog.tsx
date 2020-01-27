@@ -36,6 +36,7 @@ function ExportModal({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
   onCloseRequest,
@@ -46,6 +47,7 @@ function ExportModal({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
@@ -136,6 +138,13 @@ function ExportModal({
               onClick={() => onExportToPng(exportedElements, scale)}
               ref={pngButton}
             />
+            <ToolButton
+              type="button"
+              icon={downloadFile}
+              title={t("buttons.exportToSvg")}
+              aria-label={t("buttons.exportToSvg")}
+              onClick={() => onExportToSvg(exportedElements, scale)}
+            />
             {probablySupportsClipboard && (
               <ToolButton
                 type="button"
@@ -213,6 +222,7 @@ export function ExportDialog({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -222,6 +232,7 @@ export function ExportDialog({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) {
@@ -257,6 +268,7 @@ export function ExportDialog({
             actionManager={actionManager}
             syncActionResult={syncActionResult}
             onExportToPng={onExportToPng}
+            onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
