@@ -796,9 +796,9 @@ export class App extends React.Component<any, AppState> {
               // fixes mousemove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
-              //  of defocusing potentially focused input, which is what we want
-              //  when clicking inside the canvas.
-              if (isInputLike(document.activeElement)) {
+              //  of defocusing potentially focused element, which is what we
+              //  want when clicking inside the canvas.
+              if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur();
               }
 
