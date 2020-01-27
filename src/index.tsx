@@ -228,7 +228,10 @@ export class App extends React.Component<any, AppState> {
 
   public shouldComponentUpdate() {
     if (!history.isRecording()) {
-      this.componentDidUpdate();
+      // temporary hack to fix #592
+      setTimeout(() => {
+        this.componentDidUpdate();
+      });
       return false;
     }
     return true;
