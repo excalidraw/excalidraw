@@ -40,7 +40,13 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
-import { isInputLike, debounce, capitalizeString, distance } from "./utils";
+import {
+  isInputLike,
+  isToolIcon,
+  debounce,
+  capitalizeString,
+  distance,
+} from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -299,13 +305,13 @@ export class App extends React.Component<any, AppState> {
       elements = clearSelection(elements);
       this.setState({});
       this.setState({ elementType: "selection" });
-      if (window.document.activeElement instanceof HTMLElement) {
-        window.document.activeElement.blur();
-      }
       event.preventDefault();
       return;
     }
-    if (isInputLike(event.target)) return;
+    if (window.document.activeElement instanceof HTMLElement) {
+      window.document.activeElement.blur();
+    }
+    if (isInputLike(event.target) && !isToolIcon(event.target)) return;
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
