@@ -131,7 +131,7 @@ const ColorInput = React.forwardRef(
           className="color-picker-input"
           aria-label={label}
           onChange={e => {
-            const value = e.target.value;
+            const value = e.target.value.toLowerCase();
             if (value.match(colorRegex)) {
               onChange(value === "transparent" ? "transparent" : "#" + value);
             }
