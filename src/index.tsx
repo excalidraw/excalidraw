@@ -314,9 +314,7 @@ export class App extends React.Component<any, AppState> {
 
     if (isToolIcon(event.target)) event.target.focus();
 
-    if (isInputLike(event.target) && !isToolIcon(event.target)) {
-      return;
-    }
+    if (isInputLike(event.target)) return;
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
