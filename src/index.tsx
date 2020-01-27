@@ -312,11 +312,7 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    if (event.target instanceof HTMLElement) {
-      if (isToolIcon(event.target as HTMLElement)) {
-        event.target.focus();
-      }
-    }
+    if (isToolIcon(event.target)) event.target.focus();
 
     if (isInputLike(event.target) && !isToolIcon(event.target)) {
       return;

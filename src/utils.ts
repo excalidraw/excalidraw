@@ -36,9 +36,10 @@ export function isInputLike(
   );
 }
 
-export function isToolIcon(target: HTMLElement | null): boolean {
-  if (target && target.className) return target.className.includes("ToolIcon");
-  return false;
+export function isToolIcon(
+  target: Element | EventTarget | null,
+): target is HTMLElement {
+  return target instanceof HTMLElement && target.className.includes("ToolIcon");
 }
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
