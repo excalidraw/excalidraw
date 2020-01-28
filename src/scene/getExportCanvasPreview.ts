@@ -77,6 +77,21 @@ export function getExportSvgPreview(
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
+  svgRoot.innerHTML = `
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Virgil";
+        src: url("${new URL("/FG_Virgil.ttf", window.location.href).href}");
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url("${new URL("/Cascadia.ttf", window.location.href).href}");
+      }
+    </style>
+  </defs>
+  `;
+
   // render backgroiund rect
   if (exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
