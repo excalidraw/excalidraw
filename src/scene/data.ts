@@ -4,7 +4,7 @@ import { getDefaultAppState } from "../appState";
 
 import { AppState } from "../types";
 import { ExportType } from "./types";
-import { exportToCanvas, exportToSvg } from "./getExportCanvasPreview";
+import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { getCommonBounds } from "../element";

@@ -1,4 +1,4 @@
-import { exportToCanvas } from "../src/scene/getExportCanvasPreview";
+import { exportToCanvas } from "./scene/export";
 
 const { registerFont, createCanvas } = require("canvas");
 
