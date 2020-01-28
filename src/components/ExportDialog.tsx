@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, downloadFile, link } from "./icons";
+import { clipboard, exportFile, downloadFile, svgFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -140,7 +140,7 @@ function ExportModal({
             />
             <ToolButton
               type="button"
-              icon={downloadFile}
+              icon={svgFile}
               title={t("buttons.exportToSvg")}
               aria-label={t("buttons.exportToSvg")}
               onClick={() => onExportToSvg(exportedElements, scale)}
