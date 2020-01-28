@@ -172,10 +172,6 @@ export function renderSceneToSvg(
   if (!svgRoot) {
     return;
   }
-  // clear svg root
-  while (svgRoot.lastChild) {
-    svgRoot.removeChild(svgRoot.lastChild);
-  }
   // render elements
   elements.forEach(element => {
     renderElementToSvg(

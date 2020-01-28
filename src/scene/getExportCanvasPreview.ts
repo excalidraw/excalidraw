@@ -66,14 +66,28 @@ export function getExportSvgPreview(
     viewBackgroundColor: string;
   },
 ): SVGSVGElement {
+  // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height = distance(minY, maxY) + exportPadding * 2;
 
+  // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  // render backgroiund rect
+  if (exportBackground && viewBackgroundColor) {
+    const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+    rect.setAttribute("x", "0");
+    rect.setAttribute("y", "0");
+    rect.setAttribute("width", `${width}`);
+    rect.setAttribute("height", `${height}`);
+    rect.setAttribute("fill", viewBackgroundColor);
+    svgRoot.appendChild(rect);
+  }
+
   const rsvg = rough.svg(svgRoot);
   renderSceneToSvg(elements, rsvg, svgRoot, {
     offsetX: -minX + exportPadding,
