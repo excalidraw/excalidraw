@@ -130,7 +130,7 @@ function ExportModal({
         <div className="ExportDialog__preview" ref={previewRef}></div>
         <div className="ExportDialog__actions">
           <Stack.Col gap={1}>
-            <Stack.Row gap={1}>
+            <Stack.Row gap={2}>
               <ToolButton
                 type="button"
                 icon={downloadFile}
@@ -174,7 +174,7 @@ function ExportModal({
           )}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
-              <Stack.Row gap={1} align="baseline">
+              <Stack.Row gap={2} align="baseline">
                 {scales.map(s => (
                   <ToolButton
                     key={s}
