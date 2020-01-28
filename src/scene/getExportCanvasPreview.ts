@@ -56,11 +56,28 @@ export function getExportCanvasPreview(
 
 export function getExportSvgPreview(
   elements: readonly ExcalidrawElement[],
+  {
+    exportBackground,
+    exportPadding = 10,
+    viewBackgroundColor,
+  }: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    viewBackgroundColor: string;
+  },
 ): SVGSVGElement {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const width = distance(minX, maxX) + exportPadding * 2;
+  const height = distance(minY, maxY) + exportPadding * 2;
+
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
+  svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot);
+  renderSceneToSvg(elements, rsvg, svgRoot, {
+    offsetX: -minX + exportPadding,
+    offsetY: -minY + exportPadding,
+  });
   return svgRoot;
 }

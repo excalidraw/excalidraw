@@ -198,7 +198,11 @@ export async function exportCanvas(
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
-    const tempSvg = getExportSvgPreview(elements);
+    const tempSvg = getExportSvgPreview(elements, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+    });
     await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
       fileName: `${name}.svg`,
     });
