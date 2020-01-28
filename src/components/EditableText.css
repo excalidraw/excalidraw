@@ -2,8 +2,9 @@
   display: inline-block;
   cursor: pointer;
   border: none;
-  padding: 0.25rem;
-  margin: -0.25rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
 }

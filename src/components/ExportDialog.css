@@ -50,9 +50,3 @@
   align-items: baseline;
   justify-content: flex-end;
 }
-
-.ExportDialog__name {
-  line-height: 2.5rem;
-  height: 2.5rem;
-  padding: 0 0.5rem;
-}
