@@ -9,6 +9,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
+import { SVG_NS } from "../utils";
 
 function generateElement(
   element: ExcalidrawElement,
@@ -225,25 +226,27 @@ export function renderElementToSvg(
     }
     default: {
       if (isTextElement(element)) {
-        throw new Error("Unimplemented type " + element.type);
-        // TODO:
-        // const opacity = `${element.opacity / 100}`;
-        // context.globalAlpha = element.opacity / 100;
-        // const font = context.font;
-        // context.font = element.font;
-        // const fillStyle = context.fillStyle;
-        // context.fillStyle = element.strokeColor;
-        // // Canvas does not support multiline text by default
-        // const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        // const lineHeight = element.height / lines.length;
-        // const offset = element.height - element.baseline;
-        // for (let i = 0; i < lines.length; i++) {
-        //   context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
-        // }
-        // context.fillStyle = fillStyle;
-        // context.font = font;
-        // context.globalAlpha = 1;
-        // break;
+        const opacity = `${element.opacity / 100}`;
+        const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+        node.setAttribute("stroke-opacity", opacity);
+        node.setAttribute("fill-opacity", opacity);
+        node.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${offsetY || 0})`,
+        );
+        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lineHeight = element.height / lines.length;
+        const offset = element.height - element.baseline;
+        for (let i = 0; i < lines.length; i++) {
+          const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
+          text.textContent = lines[i];
+          text.setAttribute("x", "0");
+          text.setAttribute("y", `${(i + 1) * lineHeight - offset}`);
+          text.setAttribute("font-family", element.font);
+          text.setAttribute("fill", element.strokeColor);
+          node.appendChild(text);
+        }
+        svgRoot.appendChild(node);
       } else {
         throw new Error("Unimplemented type " + element.type);
       }
