@@ -51,6 +51,7 @@ export function LockIcon(props: LockIconProps) {
         id={props.id}
         onChange={props.onChange}
         checked={props.checked}
+        aria-label={props.title}
       />
       <div className="ToolIcon__icon">
         {props.checked ? ICONS.CHECKED : ICONS.UNCHECKED}

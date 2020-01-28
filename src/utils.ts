@@ -14,14 +14,25 @@ export function capitalizeString(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function isToolIcon(
+  target: Element | EventTarget | null,
+): target is HTMLElement {
+  return target instanceof HTMLElement && target.className.includes("ToolIcon");
+}
+
 export function isInputLike(
   target: Element | EventTarget | null,
-): target is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement {
+): target is
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement
+  | HTMLDivElement {
   return (
-    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
+    ((target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement) &&
+    !isToolIcon(target)
   );
 }
 

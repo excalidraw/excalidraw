@@ -99,7 +99,6 @@
   border-radius: 0px 4px 4px 0px;
   float: left;
   padding-left: 0.5em;
-  text-transform: lowercase;
 }
 
 .color-picker-label-swatch {
@@ -107,14 +106,4 @@
   width: 1.875rem;
   margin-right: 0.25rem;
   border: 1px solid #dee2e6;
-}
-
-.color-picker-swatch-input {
-  font-size: 1rem;
-  display: inline-block;
-  width: 6.25rem;
-  border-radius: 2px;
-  padding: 0.125em 0.25em;
-  border: 1px solid #dee2e6;
-  text-transform: lowercase;
 }
