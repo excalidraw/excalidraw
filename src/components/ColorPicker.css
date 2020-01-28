@@ -88,8 +88,9 @@
 }
 
 .color-picker-input {
-  width: 6.25em;
+  width: 7rem;
   font-size: 1rem;
+  font-family: Cascadia;
   color: #343a40;
   border: 0px;
   outline: none;
