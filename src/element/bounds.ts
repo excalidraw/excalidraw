@@ -76,8 +76,8 @@ export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
           const x = equation(t, 0);
           const y = equation(t, 1);
 
-          limits.minX = Math.min(limits.minX, x);
           limits.minY = Math.min(limits.minY, y);
+          limits.minX = Math.min(limits.minX, x);
 
           limits.maxX = Math.max(limits.maxX, x);
           limits.maxY = Math.max(limits.maxY, y);
@@ -91,7 +91,7 @@ export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
       }
       return limits;
     },
-    { minX: Infinity, minY: Infinity, maxX: 0, maxY: 0 },
+    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
   );
 
   return [

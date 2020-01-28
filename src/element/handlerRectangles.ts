@@ -12,6 +12,9 @@ export function handlerRectangles(
   let elementY2 = 0;
   let elementX1 = Infinity;
   let elementY1 = Infinity;
+  let marginX = -8;
+  let marginY = -8;
+
   let minimumSize = 40;
   if (element.type === "arrow") {
     [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
@@ -22,13 +25,13 @@ export function handlerRectangles(
     elementX2 = element.x + element.width;
     elementY1 = element.y;
     elementY2 = element.y + element.height;
+
+    marginX = element.width < 0 ? 8 : -8;
+    marginY = element.height < 0 ? 8 : -8;
   }
 
   const margin = 4;
   const handlers = {} as { [T in Sides]: number[] };
-
-  const marginX = element.width < 0 ? 8 : -8;
-  const marginY = element.height < 0 ? 8 : -8;
 
   if (Math.abs(elementX2 - elementX1) > minimumSize) {
     handlers["n"] = [
@@ -94,12 +97,36 @@ export function handlerRectangles(
     } as typeof handlers;
   } else if (element.type === "arrow") {
     if (element.points.length === 2) {
-      return {
-        ne: handlers.ne,
-        sw: handlers.sw,
-        nw: handlers.nw,
-        se: handlers.se,
-      } as typeof handlers;
+      // only check the last point because starting point is always (0,0)
+      const [, p1] = element.points;
+
+      if (p1[0] >= 0 && p1[1] <= 0) {
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
+      }
+
+      if (p1[0] >= 0 && p1[1] >= 0) {
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
+      }
+
+      if (p1[0] < 0 && p1[1] >= 0) {
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
+      }
+
+      if (p1[0] <= 0 && p1[1] <= 0) {
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
+      }
     }
 
     return {
