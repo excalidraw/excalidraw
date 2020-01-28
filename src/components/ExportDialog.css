@@ -40,7 +40,7 @@
 
 .ExportDialog__actions {
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: space-between;
   flex-wrap: wrap;
 }
@@ -49,4 +49,10 @@
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
+}
+
+.ExportDialog__name {
+  line-height: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
 }

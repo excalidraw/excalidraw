@@ -7,6 +7,7 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  className?: string;
 };
 
 export class EditableText extends Component<Props> {
@@ -33,7 +34,7 @@ export class EditableText extends Component<Props> {
         suppressContentEditableWarning
         contentEditable="true"
         data-type="wysiwyg"
-        className="project-name"
+        className={this.props.className || "EditableText"}
         role="textbox"
         aria-label={this.props.label}
         onBlur={this.handleBlur}
