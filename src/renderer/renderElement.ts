@@ -243,12 +243,20 @@ export function renderElementToSvg(
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
         const offset = element.height - element.baseline;
+        const fontSplit = element.font.split(" ").filter(d => !!d.trim());
+        let fontFamily = fontSplit[0];
+        let fontSize = "20px";
+        if (fontSplit.length > 1) {
+          fontFamily = fontSplit[1];
+          fontSize = fontSplit[0];
+        }
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", "0");
           text.setAttribute("y", `${(i + 1) * lineHeight - offset}`);
-          text.setAttribute("font-family", element.font);
+          text.setAttribute("font-family", fontFamily);
+          text.setAttribute("font-size", fontSize);
           text.setAttribute("fill", element.strokeColor);
           node.appendChild(text);
         }
