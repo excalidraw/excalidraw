@@ -199,9 +199,11 @@ export function renderElementToSvg(
     case "line": {
       generateElement(element, generator);
       const node = rsvg.draw(element.shape as Drawable);
-      const opacity = `${element.opacity / 100}`;
-      node.setAttribute("stroke-opacity", opacity);
-      node.setAttribute("fill-opacity", opacity);
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${offsetY || 0})`,
@@ -211,11 +213,13 @@ export function renderElementToSvg(
     }
     case "arrow": {
       generateElement(element, generator);
-      const opacity = `${element.opacity / 100}`;
+      const opacity = element.opacity / 100;
       (element.shape as Drawable[]).forEach(shape => {
         const node = rsvg.draw(shape);
-        node.setAttribute("stroke-opacity", opacity);
-        node.setAttribute("fill-opacity", opacity);
+        if (opacity !== 1) {
+          node.setAttribute("stroke-opacity", `${opacity}`);
+          node.setAttribute("fill-opacity", `${opacity}`);
+        }
         node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${offsetY || 0})`,
@@ -226,10 +230,12 @@ export function renderElementToSvg(
     }
     default: {
       if (isTextElement(element)) {
-        const opacity = `${element.opacity / 100}`;
+        const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
-        node.setAttribute("stroke-opacity", opacity);
-        node.setAttribute("fill-opacity", opacity);
+        if (opacity !== 1) {
+          node.setAttribute("stroke-opacity", `${opacity}`);
+          node.setAttribute("fill-opacity", `${opacity}`);
+        }
         node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${offsetY || 0})`,
