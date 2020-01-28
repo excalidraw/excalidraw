@@ -25,7 +25,12 @@ type ToolButtonProps =
 
 const DEFAULT_SIZE: ToolIconSize = "m";
 
-export function ToolButton(props: ToolButtonProps) {
+export const ToolButton = React.forwardRef(function(
+  props: ToolButtonProps,
+  ref,
+) {
+  const innerRef = React.useRef(null);
+  React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   if (props.type === "button")
@@ -36,6 +41,7 @@ export function ToolButton(props: ToolButtonProps) {
         aria-label={props["aria-label"]}
         type="button"
         onClick={props.onClick}
+        ref={innerRef}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
           {props.icon}
@@ -44,19 +50,19 @@ export function ToolButton(props: ToolButtonProps) {
     );
 
   return (
-    <label className="ToolIcon">
+    <label className="ToolIcon" title={props.title}>
       <input
         className={`ToolIcon_type_radio ${sizeCn}`}
         type="radio"
         name={props.name}
-        title={props.title}
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         id={props.id}
         onChange={props.onChange}
         checked={props.checked}
+        ref={innerRef}
       />
       <div className="ToolIcon__icon">{props.icon}</div>
     </label>
   );
-}
+});
