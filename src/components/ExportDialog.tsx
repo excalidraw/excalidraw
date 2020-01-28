@@ -126,7 +126,7 @@ function ExportModal({
         >
           ╳
         </button>
-        <h2 id="export-title">{t("buttons.export")}</h2>
+        <h1 id="export-title">{t("buttons.export")}</h1>
         <div className="ExportDialog__preview" ref={previewRef}></div>
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>

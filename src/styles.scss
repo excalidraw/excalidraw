@@ -20,6 +20,12 @@ body {
   color: var(--text-color-primary);
 }
 
+h1 {
+  font-family: "Virgil";
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
 .container {
   display: flex;
   position: fixed;
