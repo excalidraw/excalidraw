@@ -86,6 +86,7 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
+import { Point } from "roughjs/bin/geometry";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -993,6 +994,41 @@ export class App extends React.Component<any, AppState> {
                 lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
               }
 
+              let resizeArrowFn:
+                | ((
+                    element: ExcalidrawElement,
+                    p1: Point,
+                    deltaX: number,
+                    deltaY: number,
+                    shiftKey: boolean,
+                  ) => void)
+                | null = null;
+              const arrowResizeOrigin = (
+                element: ExcalidrawElement,
+                p1: Point,
+                deltaX: number,
+                deltaY: number,
+                shiftKey: boolean,
+              ) => {
+                if (shiftKey) {
+                }
+                element.x += deltaX;
+                element.y += deltaY;
+                p1[0] -= deltaX;
+                p1[1] -= deltaY;
+              };
+
+              const arrowResizeEnd = (
+                element: ExcalidrawElement,
+                p1: Point,
+                deltaX: number,
+                deltaY: number,
+                shiftKey: boolean,
+              ) => {
+                p1[0] += deltaX;
+                p1[1] += deltaY;
+              };
+
               const onMouseMove = (e: MouseEvent) => {
                 const target = e.target;
                 if (!(target instanceof HTMLElement)) {
@@ -1031,57 +1067,142 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        element.width -= deltaX;
-                        element.x += deltaX;
+                        if (
+                          element.type === "arrow" &&
+                          element.points.length === 2
+                        ) {
+                          const [, p1] = element.points;
 
-                        if (e.shiftKey) {
-                          if (isLinear) {
-                            resizePerfectLineForNWHandler(element, x, y);
-                          } else {
-                            element.y += element.height - element.width;
-                            element.height = element.width;
+                          if (!resizeArrowFn) {
+                            if (p1[0] <= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
                           }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            e.shiftKey,
+                          );
                         } else {
-                          element.height -= deltaY;
-                          element.y += deltaY;
+                          element.width -= deltaX;
+                          element.x += deltaX;
+
+                          if (e.shiftKey) {
+                            if (isLinear) {
+                              resizePerfectLineForNWHandler(element, x, y);
+                            } else {
+                              element.y += element.height - element.width;
+                              element.height = element.width;
+                            }
+                          } else {
+                            element.height -= deltaY;
+                            element.y += deltaY;
+                          }
                         }
                         break;
                       case "ne":
-                        element.width += deltaX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
+                        if (
+                          element.type === "arrow" &&
+                          element.points.length === 2
+                        ) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] >= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            e.shiftKey,
+                          );
                         } else {
-                          element.height -= deltaY;
-                          element.y += deltaY;
+                          element.width += deltaX;
+                          if (e.shiftKey) {
+                            element.y += element.height - element.width;
+                            element.height = element.width;
+                          } else {
+                            element.height -= deltaY;
+                            element.y += deltaY;
+                          }
                         }
                         break;
                       case "sw":
-                        element.width -= deltaX;
-                        element.x += deltaX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
+                        if (
+                          element.type === "arrow" &&
+                          element.points.length === 2
+                        ) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] <= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            e.shiftKey,
+                          );
                         } else {
-                          element.height += deltaY;
+                          element.width -= deltaX;
+                          element.x += deltaX;
+                          if (e.shiftKey) {
+                            element.height = element.width;
+                          } else {
+                            element.height += deltaY;
+                          }
                         }
                         break;
                       case "se":
-                        if (e.shiftKey) {
-                          if (isLinear) {
-                            const { width, height } = getPerfectElementSize(
-                              element.type,
-                              x - element.x,
-                              y - element.y,
-                            );
-                            element.width = width;
-                            element.height = height;
+                        if (
+                          element.type === "arrow" &&
+                          element.points.length === 2
+                        ) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] >= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            e.shiftKey,
+                          );
+                        } else {
+                          if (e.shiftKey) {
+                            if (isLinear) {
+                              const { width, height } = getPerfectElementSize(
+                                element.type,
+                                x - element.x,
+                                y - element.y,
+                              );
+                              element.width = width;
+                              element.height = height;
+                            } else {
+                              element.width += deltaX;
+                              element.height = element.width;
+                            }
                           } else {
                             element.width += deltaX;
-                            element.height = element.width;
+                            element.height += deltaY;
                           }
-                        } else {
-                          element.width += deltaX;
-                          element.height += deltaY;
                         }
                         break;
                       case "n": {
@@ -1282,6 +1403,7 @@ export class App extends React.Component<any, AppState> {
                   elementLocked,
                 } = this.state;
 
+                resizeArrowFn = null;
                 lastMouseUp = null;
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
