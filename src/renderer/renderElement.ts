@@ -18,25 +18,23 @@ function generateElement(
   if (!element.shape) {
     switch (element.type) {
       case "rectangle":
-        if (!element.shape) {
-          element.shape = generator.rectangle(
-            0,
-            0,
-            element.width,
-            element.height,
-            {
-              stroke: element.strokeColor,
-              fill:
-                element.backgroundColor === "transparent"
-                  ? undefined
-                  : element.backgroundColor,
-              fillStyle: element.fillStyle,
-              strokeWidth: element.strokeWidth,
-              roughness: element.roughness,
-              seed: element.seed,
-            },
-          );
-        }
+        element.shape = generator.rectangle(
+          0,
+          0,
+          element.width,
+          element.height,
+          {
+            stroke: element.strokeColor,
+            fill:
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor,
+            fillStyle: element.fillStyle,
+            strokeWidth: element.strokeWidth,
+            roughness: element.roughness,
+            seed: element.seed,
+          },
+        );
         break;
       case "diamond": {
         const [
@@ -213,6 +211,7 @@ export function renderElementToSvg(
     }
     case "arrow": {
       generateElement(element, generator);
+      const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
       (element.shape as Drawable[]).forEach(shape => {
         const node = rsvg.draw(shape);
@@ -224,8 +223,9 @@ export function renderElementToSvg(
           "transform",
           `translate(${offsetX || 0} ${offsetY || 0})`,
         );
-        svgRoot.appendChild(node);
+        group.appendChild(node);
       });
+      svgRoot.appendChild(group);
       break;
     }
     default: {
