@@ -82,11 +82,11 @@ export function getExportSvgPreview(
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("${new URL("/FG_Virgil.ttf", window.location.href).href}");
+        src: url("https://excalidraw.com/FG_Virgil.ttf");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("${new URL("/Cascadia.ttf", window.location.href).href}");
+        src: url("https://excalidraw.com/Cascadia.ttf");
       }
     </style>
   </defs>
