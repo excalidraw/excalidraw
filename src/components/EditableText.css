@@ -1,11 +1,13 @@
 .project-name {
-  display: inline-block;
+  display: flex;
   cursor: pointer;
   border: none;
   padding: 0.25rem;
-  margin: -0.25rem;
+  margin: 0.75rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
+  flex: 1;
+  justify-content: center;
 }
 
 .project-name:hover {

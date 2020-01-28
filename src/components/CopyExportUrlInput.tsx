@@ -16,6 +16,8 @@ export function CopyExportUrlInput({
     const url = document.getElementById("urlToCopy") as HTMLInputElement;
     if (url) {
       navigator.clipboard.writeText(url.value);
+      url.select();
+      url.focus();
       setWasCopy(true);
     }
     e.preventDefault();

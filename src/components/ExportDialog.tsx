@@ -137,7 +137,7 @@ function ExportModal({
         <h2 id="export-title">{t("buttons.export")}</h2>
         <div className="ExportDialog__preview" ref={previewRef}></div>
         <div className="ExportDialog__actions">
-          <Stack.Row gap={2}>
+          <div className="ExportActions__options">
             <ToolButton
               type="button"
               icon={downloadFile}
@@ -168,16 +168,16 @@ function ExportModal({
                 url={shareLinkState.url}
               />
             )}
-          </Stack.Row>
-          {(!shareLinkState.userResquested || shareLinkState.error) &&
-            actionManager.renderAction(
-              "changeProjectName",
-              elements,
-              appState,
-              syncActionResult,
-              t,
-            )}
-          <Stack.Col gap={1}>
+            {(!shareLinkState.userResquested || shareLinkState.error) &&
+              actionManager.renderAction(
+                "changeProjectName",
+                elements,
+                appState,
+                syncActionResult,
+                t,
+              )}
+          </div>
+          <div className="ExportScales__wrapper">
             <div className="ExportDialog__scales">
               <Stack.Row gap={1} align="baseline">
                 {scales.map(s => (
@@ -215,7 +215,7 @@ function ExportModal({
                 </label>
               </div>
             )}
-          </Stack.Col>
+          </div>
         </div>
       </Island>
     </div>

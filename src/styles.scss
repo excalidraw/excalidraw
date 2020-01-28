@@ -256,17 +256,27 @@ button,
 }
 
 .copyExportUrlWrapper {
-  display: contents;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
+  display: flex;
+  flex: 1;
 }
 
 .copyExportUrlInput {
   font-size: 1rem;
   color: #343a40;
-  border: 0px;
   outline: none;
-  height: 40px;
-  width: auto;
+  flex: 1;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  border: none;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.copyExportUrlInput:hover {
+  background-color: #eee;
+}
+
+.copyExportUrlInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px steelblue;
 }

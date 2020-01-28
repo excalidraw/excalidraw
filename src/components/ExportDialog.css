@@ -40,13 +40,22 @@
 
 .ExportDialog__actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
 }
 
-.ExportDialog__scales {
+.ExportActions__options {
   display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
+  align-items: center;
+  flex: 2;
+}
+.ExportScales__wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 22px;
+}
+.ExportActions__options > button {
+  margin: 2px;
+}
+.ExportDialog__scales .Stack_horizontal {
+  margin-bottom: 0.25rem;
 }
