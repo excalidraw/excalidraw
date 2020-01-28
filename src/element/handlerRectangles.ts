@@ -93,6 +93,15 @@ export function handlerRectangles(
       se: handlers.se,
     } as typeof handlers;
   } else if (element.type === "arrow") {
+    if (element.points.length === 2) {
+      return {
+        ne: handlers.ne,
+        sw: handlers.sw,
+        nw: handlers.nw,
+        se: handlers.se,
+      } as typeof handlers;
+    }
+
     return {
       n: handlers.n,
       s: handlers.s,

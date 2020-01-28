@@ -125,18 +125,6 @@ export function renderElement(
       ];
     }
 
-    if (element.isSelected) {
-      // draw segment endpoints when element is selected
-      points.forEach(p => {
-        rc.ellipse(p[0], p[1], 10, 10, {
-          fillStyle: "solid",
-          fill: "#ffffff",
-          strokeWidth: 2,
-          roughness: 0,
-        });
-      });
-    }
-
     context.globalAlpha = element.opacity / 100;
     (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
     context.globalAlpha = 1;

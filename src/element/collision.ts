@@ -156,16 +156,16 @@ export function hitTest(
     if (shape.length < 3) return false;
 
     const [x1, y1, x2, y2] = getArrowAbsoluteBounds(element);
-    if (x < x1 || y < y1 - 40 || x > x2 || y > y2 + 40) return false;
+    if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) return false;
 
     const relX = x - element.x;
     const relY = y - element.y;
 
     // hit test curve and lien segments for arrow
     return (
-      // hitTestRoughShape(shape[0].sets, relX, relY) ||
-      hitTestRoughShape(shape[1].sets, relX, relY) || false
-      // hitTestRoughShape(shape[2].sets, relX, relY)
+      hitTestRoughShape(shape[0].sets, relX, relY) ||
+      hitTestRoughShape(shape[1].sets, relX, relY) ||
+      hitTestRoughShape(shape[2].sets, relX, relY)
     );
   } else if (element.type === "line") {
     const [x1, y1, x2, y2] = getLinePoints(element);

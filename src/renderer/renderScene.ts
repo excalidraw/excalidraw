@@ -115,16 +115,6 @@ export function renderScene(
     }
   }
 
-  if (pathSegmentCircle) {
-    rc.ellipse(pathSegmentCircle.x, pathSegmentCircle.y, 10, 10, {
-      fillStyle: "solid",
-      fill: "#ffffff",
-      stroke: pathSegmentCircle.overlappingPoint === -1 ? "#000000" : "#22a7f0",
-      strokeWidth: 2,
-      roughness: 0,
-    });
-  }
-
   if (renderScrollbars) {
     const scrollBars = getScrollBars(
       elements,
