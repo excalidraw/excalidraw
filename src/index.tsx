@@ -311,11 +311,15 @@ export class App extends React.Component<any, AppState> {
     }
     if (isInputLike(event.target)) return;
 
-    const data = this.actionManager.handleKeyDown(event, elements, this.state);
-    this.syncActionResult(data);
+    const actionResult = this.actionManager.handleKeyDown(
+      event,
+      elements,
+      this.state,
+    );
 
-    if (data.elements !== undefined || data.appState !== undefined) {
-      return;
+    if (actionResult) {
+      this.syncActionResult(actionResult);
+      if (actionResult) return;
     }
 
     const shape = findShapeByKey(event.key);
@@ -375,18 +379,20 @@ export class App extends React.Component<any, AppState> {
   private removeWheelEventListener: (() => void) | undefined;
 
   private copyToClipboard = () => {
-    if (navigator.clipboard) {
-      const text = JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      );
+    const text = JSON.stringify(
+      elements
+        .filter(element => element.isSelected)
+        .map(({ shape, ...el }) => el),
+    );
+    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
       navigator.clipboard.writeText(text);
+    } else {
+      document.execCommand("copy");
     }
   };
 
   private pasteFromClipboard = () => {
-    if (navigator.clipboard) {
+    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
       navigator.clipboard
         .readText()
         .then(text => this.addElementsFromPaste(text));
@@ -572,6 +578,16 @@ export class App extends React.Component<any, AppState> {
                       viewBackgroundColor: this.state.viewBackgroundColor,
                       scale,
                     });
+                }}
+                onExportToSvg={(exportedElements, scale) => {
+                  if (this.canvas) {
+                    exportCanvas("svg", exportedElements, this.canvas, {
+                      exportBackground: this.state.exportBackground,
+                      name: this.state.name,
+                      viewBackgroundColor: this.state.viewBackgroundColor,
+                      scale,
+                    });
+                  }
                 }}
                 onExportToBackend={exportedElements => {
                   if (this.canvas) {
@@ -808,9 +824,9 @@ export class App extends React.Component<any, AppState> {
               // fixes mousemove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
-              //  of defocusing potentially focused input, which is what we want
-              //  when clicking inside the canvas.
-              if (isInputLike(document.activeElement)) {
+              //  of defocusing potentially focused element, which is what we
+              //  want when clicking inside the canvas.
+              if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur();
               }
 
@@ -1506,7 +1522,10 @@ export class App extends React.Component<any, AppState> {
   }
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(elements, this.state);
+    saveToLocalStorage(
+      elements.filter(x => x.type !== "selection"),
+      this.state,
+    );
   }, 300);
 
   componentDidUpdate() {

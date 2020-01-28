@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, downloadFile, link } from "./icons";
+import { clipboard, exportFile, downloadFile, svgFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { getExportCanvasPreview } from "../scene/getExportCanvasPreview";
+import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
@@ -39,6 +39,7 @@ function ExportModal({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
   onCloseRequest,
@@ -49,6 +50,7 @@ function ExportModal({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
@@ -74,7 +76,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = getExportCanvasPreview(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -145,6 +147,13 @@ function ExportModal({
               aria-label={t("buttons.exportToPng")}
               onClick={() => onExportToPng(exportedElements, scale)}
               ref={pngButton}
+            />
+            <ToolButton
+              type="button"
+              icon={svgFile}
+              title={t("buttons.exportToSvg")}
+              aria-label={t("buttons.exportToSvg")}
+              onClick={() => onExportToSvg(exportedElements, scale)}
             />
             {probablySupportsClipboard && (
               <ToolButton
@@ -229,6 +238,7 @@ export function ExportDialog({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -238,6 +248,7 @@ export function ExportDialog({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) {
@@ -273,6 +284,7 @@ export function ExportDialog({
             actionManager={actionManager}
             syncActionResult={syncActionResult}
             onExportToPng={onExportToPng}
+            onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
