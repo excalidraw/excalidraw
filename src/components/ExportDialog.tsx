@@ -8,7 +8,7 @@ import { clipboard, exportFile, downloadFile, svgFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { getExportCanvasPreview } from "../scene/getExportCanvasPreview";
+import { exportToCanvas } from "../scene/getExportCanvasPreview";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
@@ -72,7 +72,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = getExportCanvasPreview(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,

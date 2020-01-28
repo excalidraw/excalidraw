@@ -1,4 +1,4 @@
-import { getExportCanvasPreview } from "../src/scene/getExportCanvasPreview";
+import { exportToCanvas } from "../src/scene/getExportCanvasPreview";
 
 const { registerFont, createCanvas } = require("canvas");
 
@@ -58,7 +58,7 @@ const elements = [
 
 registerFont("./public/FG_Virgil.ttf", { family: "Virgil" });
 registerFont("./public/Cascadia.ttf", { family: "Cascadia" });
-const canvas = getExportCanvasPreview(
+const canvas = exportToCanvas(
   elements as any,
   {
     exportBackground: true,

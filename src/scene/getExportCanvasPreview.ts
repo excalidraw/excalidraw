@@ -4,7 +4,7 @@ import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 
-export function getExportCanvasPreview(
+export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
   {
     exportBackground,
@@ -54,7 +54,7 @@ export function getExportCanvasPreview(
   return tempCanvas;
 }
 
-export function getExportSvgPreview(
+export function exportToSvg(
   elements: readonly ExcalidrawElement[],
   {
     exportBackground,
