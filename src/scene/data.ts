@@ -25,6 +25,7 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 interface DataState {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
+  selectedId?: string;
 }
 
 export function serializeAsJSON(

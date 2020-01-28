@@ -22,4 +22,5 @@ export type AppState = {
   cursorX: number;
   cursorY: number;
   name: string;
+  selectedId?: string;
 };

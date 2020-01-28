@@ -15,7 +15,7 @@ export function StoredIdsList({
     <React.Fragment>
       <select
         className="stored-ids-select"
-        onChange={({ target }) => onChange(target.value)}
+        onChange={({ currentTarget }) => onChange(currentTarget.value)}
         value={currentId}
       >
         {ids.map(id => (

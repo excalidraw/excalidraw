@@ -242,9 +242,11 @@ export class App extends React.Component<any, AppState> {
 
   private async setAppState(id: string | null) {
     let data;
+    let selectedId;
     if (id != null) {
       data = await importFromBackend(id);
       addToLoadedIds(id);
+      selectedId = id;
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();
@@ -255,7 +257,7 @@ export class App extends React.Component<any, AppState> {
     }
 
     if (data.appState) {
-      this.setState(data.appState);
+      this.setState({ ...data.appState, selectedId });
     } else {
       this.setState({});
     }
@@ -1416,8 +1418,8 @@ export class App extends React.Component<any, AppState> {
             languages={languages}
             currentLanguage={parseDetectedLang(i18n.language)}
           />
+          {this.renderIdsDropdown()}
         </footer>
-        {this.renderIdsDropdown()}
       </div>
     );
   }
@@ -1427,7 +1429,13 @@ export class App extends React.Component<any, AppState> {
     if (ids.length === 0) {
       return;
     }
-    return <StoredIdsList ids={ids} onChange={id => this.setAppState(id)} />;
+    return (
+      <StoredIdsList
+        ids={ids}
+        currentId={this.state.selectedId}
+        onChange={id => this.setAppState(id)}
+      />
+    );
   }
 
   private handleWheel = (e: WheelEvent) => {

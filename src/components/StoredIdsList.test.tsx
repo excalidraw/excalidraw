@@ -29,7 +29,7 @@ describe("<StoredIdsList/>", () => {
   describe("Can handle id selection when", () => {
     it("onChange method is called when select option has changed", async () => {
       const select = wrapper.find("select") as any;
-      const mockedEvenet = { target: { value: "1" } };
+      const mockedEvenet = { currentTarget: { value: "1" } };
       await select.invoke("onChange")(mockedEvenet);
       expect(props.onChange.mock.calls.length).toBe(1);
     });
