@@ -31,11 +31,6 @@ export function getDefaultAppState(): AppState {
 
 export function cleanAppStateForExport(appState: AppState) {
   return {
-    ...appState,
-    draggingElement: null,
-    resizingElement: null,
-    multiElement: null,
-    editingElement: null,
-    pathSegmentCircle: null,
+    viewBackgroundColor: appState.viewBackgroundColor,
   };
 }
