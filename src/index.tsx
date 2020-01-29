@@ -240,7 +240,7 @@ export class App extends React.Component<any, AppState> {
     return true;
   }
 
-  private async setAppState(id: string | null) {
+  private async loadScene(id: string | null) {
     let data;
     let selectedId;
     if (id != null) {
@@ -276,7 +276,7 @@ export class App extends React.Component<any, AppState> {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
-    this.setAppState(id);
+    this.loadScene(id);
   }
 
   public componentWillUnmount() {
@@ -1433,7 +1433,7 @@ export class App extends React.Component<any, AppState> {
       <StoredIdsList
         ids={ids}
         currentId={this.state.selectedId}
-        onChange={id => this.setAppState(id)}
+        onChange={id => this.loadScene(id)}
       />
     );
   }
