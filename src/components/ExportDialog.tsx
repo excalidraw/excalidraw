@@ -129,39 +129,41 @@ function ExportModal({
         <h2 id="export-title">{t("buttons.export")}</h2>
         <div className="ExportDialog__preview" ref={previewRef}></div>
         <div className="ExportDialog__actions">
-          <Stack.Row gap={2}>
-            <ToolButton
-              type="button"
-              label="PNG"
-              title={t("buttons.exportToPng")}
-              aria-label={t("buttons.exportToPng")}
-              onClick={() => onExportToPng(exportedElements, scale)}
-              ref={pngButton}
-            />
-            <ToolButton
-              type="button"
-              label="SVG"
-              title={t("buttons.exportToSvg")}
-              aria-label={t("buttons.exportToSvg")}
-              onClick={() => onExportToSvg(exportedElements, scale)}
-            />
-            {probablySupportsClipboard && (
+          <Stack.Col gap={1}>
+            <Stack.Row gap={2}>
               <ToolButton
                 type="button"
-                icon={clipboard}
-                title={t("buttons.copyToClipboard")}
-                aria-label={t("buttons.copyToClipboard")}
-                onClick={() => onExportToClipboard(exportedElements, scale)}
+                label="PNG"
+                title={t("buttons.exportToPng")}
+                aria-label={t("buttons.exportToPng")}
+                onClick={() => onExportToPng(exportedElements, scale)}
+                ref={pngButton}
               />
-            )}
-            <ToolButton
-              type="button"
-              icon={link}
-              title={t("buttons.getShareableLink")}
-              aria-label={t("buttons.getShareableLink")}
-              onClick={() => onExportToBackend(exportedElements)}
-            />
-          </Stack.Row>
+              <ToolButton
+                type="button"
+                label="SVG"
+                title={t("buttons.exportToSvg")}
+                aria-label={t("buttons.exportToSvg")}
+                onClick={() => onExportToSvg(exportedElements, scale)}
+              />
+              {probablySupportsClipboard && (
+                <ToolButton
+                  type="button"
+                  icon={clipboard}
+                  title={t("buttons.copyToClipboard")}
+                  aria-label={t("buttons.copyToClipboard")}
+                  onClick={() => onExportToClipboard(exportedElements, scale)}
+                />
+              )}
+              <ToolButton
+                type="button"
+                icon={link}
+                title={t("buttons.getShareableLink")}
+                aria-label={t("buttons.getShareableLink")}
+                onClick={() => onExportToBackend(exportedElements)}
+              />
+            </Stack.Row>
+          </Stack.Col>
 
           {actionManager.renderAction(
             "changeProjectName",
@@ -172,7 +174,7 @@ function ExportModal({
           )}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
-              <Stack.Row gap={1} align="baseline">
+              <Stack.Row gap={2} align="baseline">
                 {scales.map(s => (
                   <ToolButton
                     key={s}
@@ -257,7 +259,7 @@ export function ExportDialog({
       />
       {modalIsShown && (
         <Modal
-          maxWidth={640}
+          maxWidth={800}
           onCloseRequest={handleClose}
           labelledBy="export-title"
         >
