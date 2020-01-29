@@ -259,7 +259,7 @@ export function ExportDialog({
       />
       {modalIsShown && (
         <Modal
-          maxWidth={640}
+          maxWidth={800}
           onCloseRequest={handleClose}
           labelledBy="export-title"
         >
