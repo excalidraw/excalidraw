@@ -15,8 +15,8 @@ export {
   saveToLocalStorage,
   exportToBackend,
   importFromBackend,
-  addToLoadedIds,
-  loadedIds,
+  addToLoadedScenes,
+  loadedScenes,
 } from "./data";
 export {
   hasBackground,

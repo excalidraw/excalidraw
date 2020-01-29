@@ -34,8 +34,8 @@ import {
   hasText,
   exportCanvas,
   importFromBackend,
-  addToLoadedIds,
-  loadedIds,
+  addToLoadedScenes,
+  loadedScenes,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -88,7 +88,7 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
-import { StoredIdsList } from "./components/StoredIdsList";
+import { StoredScenesList } from "./components/StoredScenesList";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -245,7 +245,7 @@ export class App extends React.Component<any, AppState> {
     let selectedId;
     if (id != null) {
       data = await importFromBackend(id);
-      addToLoadedIds(id);
+      addToLoadedScenes(id);
       selectedId = id;
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
@@ -1435,13 +1435,13 @@ export class App extends React.Component<any, AppState> {
   }
 
   private renderIdsDropdown() {
-    const ids = loadedIds();
-    if (ids.length === 0) {
+    const scenes = loadedScenes();
+    if (scenes.length === 0) {
       return;
     }
     return (
-      <StoredIdsList
-        ids={ids}
+      <StoredScenesList
+        scenes={scenes}
         currentId={this.state.selectedId}
         onChange={id => this.loadScene(id)}
       />
