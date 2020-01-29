@@ -7,9 +7,9 @@ const cli = new CLIEngine({});
 module.exports = {
   "*.{js,ts,tsx}": files => {
     return (
-      "eslint --max-warnings=0 " +
+      "eslint --fix" +
       files.filter(file => !cli.isPathIgnored(file)).join(" ")
     );
   },
-  "*.{js,css,scss,json,md,ts,tsx,html,yml}": ["prettier --write"],
+  "*.{css,scss,json,md,html,yml}": ["prettier --write"],
 };

@@ -60,7 +60,7 @@
     "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",
-    "fix:code": "npm run prettier -- --write",
+    "fix:code": "npm run test:code -- --fix",
     "fix:other": "npm run prettier -- --write",
     "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",

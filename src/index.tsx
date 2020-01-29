@@ -189,7 +189,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target)) {return;}
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -203,7 +203,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target)) {return;}
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -215,7 +215,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target)) {return;}
     const paste = e.clipboardData?.getData("text") || "";
     this.addElementsFromPaste(paste);
     e.preventDefault();
@@ -305,7 +305,7 @@ export class App extends React.Component<any, AppState> {
       event.preventDefault();
       return;
     }
-    if (isInputLike(event.target)) return;
+    if (isInputLike(event.target)) {return;}
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
@@ -315,7 +315,7 @@ export class App extends React.Component<any, AppState> {
 
     if (actionResult) {
       this.syncActionResult(actionResult);
-      if (actionResult) return;
+      if (actionResult) {return;}
     }
 
     const shape = findShapeByKey(event.key);
@@ -327,10 +327,10 @@ export class App extends React.Component<any, AppState> {
       elements = elements.map(el => {
         if (el.isSelected) {
           const element = { ...el };
-          if (event.key === KEYS.ARROW_LEFT) element.x -= step;
-          else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
-          else if (event.key === KEYS.ARROW_UP) element.y -= step;
-          else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          if (event.key === KEYS.ARROW_LEFT) {element.x -= step;}
+          else if (event.key === KEYS.ARROW_RIGHT) {element.x += step;}
+          else if (event.key === KEYS.ARROW_UP) {element.y -= step;}
+          else if (event.key === KEYS.ARROW_DOWN) {element.y += step;}
           return element;
         }
         return el;
@@ -557,12 +557,12 @@ export class App extends React.Component<any, AppState> {
             syncActionResult={this.syncActionResult}
             onExportToPng={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas("png", exportedElements, this.canvas, {
+                {exportCanvas("png", exportedElements, this.canvas, {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale,
-                });
+                });}
             }}
             onExportToSvg={(exportedElements, scale) => {
               if (this.canvas) {
@@ -576,16 +576,16 @@ export class App extends React.Component<any, AppState> {
             }}
             onExportToClipboard={(exportedElements, scale) => {
               if (this.canvas)
-                exportCanvas("clipboard", exportedElements, this.canvas, {
+                {exportCanvas("clipboard", exportedElements, this.canvas, {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale,
-                });
+                });}
             }}
             onExportToBackend={exportedElements => {
               if (this.canvas)
-                exportCanvas(
+                {exportCanvas(
                   "backend",
                   exportedElements.map(element => ({
                     ...element,
@@ -593,7 +593,7 @@ export class App extends React.Component<any, AppState> {
                   })),
                   this.canvas,
                   this.state,
-                );
+                );}
             }}
           />
           {this.actionManager.renderAction(
@@ -802,7 +802,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               // only handle left mouse button
-              if (e.button !== 0) return;
+              if (e.button !== 0) {return;}
               // fixes mousemove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
@@ -1137,7 +1137,7 @@ export class App extends React.Component<any, AppState> {
                 // It is very important to read this.state within each move event,
                 // otherwise we would read a stale one!
                 const draggingElement = this.state.draggingElement;
-                if (!draggingElement) return;
+                if (!draggingElement) {return;}
 
                 const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
@@ -1148,8 +1148,8 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) width = -width;
-                if (isLinear && y < originY) height = -height;
+                if (isLinear && x < originX) {width = -width;}
+                if (isLinear && y < originY) {height = -height;}
 
                 if (e.shiftKey) {
                   ({ width, height } = getPerfectElementSize(
@@ -1158,7 +1158,7 @@ export class App extends React.Component<any, AppState> {
                     !isLinear && y < originY ? -height : height,
                   ));
 
-                  if (!isLinear && height < 0) height = -height;
+                  if (!isLinear && height < 0) {height = -height;}
                 }
 
                 if (!isLinear) {
