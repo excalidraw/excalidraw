@@ -1,4 +1,4 @@
-import "./EditableText.css";
+import "./ProjectName.css";
 
 import React, { Component } from "react";
 import { selectNode, removeSelection } from "../utils";
@@ -9,7 +9,7 @@ type Props = {
   label: string;
 };
 
-export class EditableText extends Component<Props> {
+export class ProjectName extends Component<Props> {
   private handleFocus = (e: React.FocusEvent<HTMLElement>) => {
     selectNode(e.currentTarget);
   };
@@ -33,7 +33,7 @@ export class EditableText extends Component<Props> {
         suppressContentEditableWarning
         contentEditable="true"
         data-type="wysiwyg"
-        className="project-name"
+        className="ProjectName"
         role="textbox"
         aria-label={this.props.label}
         onBlur={this.handleBlur}

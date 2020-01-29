@@ -41,6 +41,7 @@
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
     "export": "Exporter",
     "exportToPng": "Exporter en PNG",
+    "exportToSvg": "Exporter en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
     "save": "Sauvegarder",
     "load": "Ouvrir",

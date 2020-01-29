@@ -1,6 +1,6 @@
 import React from "react";
 import { Action } from "./types";
-import { EditableText } from "../components/EditableText";
+import { ProjectName } from "../components/ProjectName";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
@@ -11,7 +11,7 @@ export const actionChangeProjectName: Action = {
     return { appState: { ...appState, name: value } };
   },
   PanelComponent: ({ appState, updateData, t }) => (
-    <EditableText
+    <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}

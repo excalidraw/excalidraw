@@ -575,6 +575,16 @@ export class App extends React.Component<any, AppState> {
                   scale,
                 });
             }}
+            onExportToSvg={(exportedElements, scale) => {
+              if (this.canvas) {
+                exportCanvas("svg", exportedElements, this.canvas, {
+                  exportBackground: this.state.exportBackground,
+                  name: this.state.name,
+                  viewBackgroundColor: this.state.viewBackgroundColor,
+                  scale,
+                });
+              }
+            }}
             onExportToClipboard={(exportedElements, scale) => {
               if (this.canvas)
                 exportCanvas("clipboard", exportedElements, this.canvas, {
@@ -1520,7 +1530,10 @@ export class App extends React.Component<any, AppState> {
   }
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(elements, this.state);
+    saveToLocalStorage(
+      elements.filter(x => x.type !== "selection"),
+      this.state,
+    );
   }, 300);
 
   componentDidUpdate() {

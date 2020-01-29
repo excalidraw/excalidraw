@@ -5,9 +5,10 @@ import React from "react";
 type ToolIconSize = "s" | "m";
 
 type ToolButtonBaseProps = {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   "aria-label": string;
   "aria-keyshortcuts"?: string;
+  label?: string;
   title?: string;
   name?: string;
   id?: string;
@@ -44,7 +45,7 @@ export const ToolButton = React.forwardRef(function(
         ref={innerRef}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
-          {props.icon}
+          {props.icon || props.label}
         </div>
       </button>
     );
