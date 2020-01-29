@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, downloadFile, svgFile, link } from "./icons";
+import { clipboard, exportFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -142,7 +142,7 @@ function ExportModal({
           <div className="ExportActions__options">
             <ToolButton
               type="button"
-              icon={downloadFile}
+              label="PNG"
               title={t("buttons.exportToPng")}
               aria-label={t("buttons.exportToPng")}
               onClick={() => onExportToPng(exportedElements, scale)}
@@ -150,7 +150,7 @@ function ExportModal({
             />
             <ToolButton
               type="button"
-              icon={svgFile}
+              label="SVG"
               title={t("buttons.exportToSvg")}
               aria-label={t("buttons.exportToSvg")}
               onClick={() => onExportToSvg(exportedElements, scale)}
@@ -188,7 +188,7 @@ function ExportModal({
           </div>
           <div className="ExportScales__wrapper">
             <div className="ExportDialog__scales">
-              <Stack.Row gap={1} align="baseline">
+              <Stack.Row gap={2} align="baseline">
                 {scales.map(s => (
                   <ToolButton
                     key={s}
@@ -273,7 +273,7 @@ export function ExportDialog({
       />
       {modalIsShown && (
         <Modal
-          maxWidth={640}
+          maxWidth={800}
           onCloseRequest={handleClose}
           labelledBy="export-title"
         >

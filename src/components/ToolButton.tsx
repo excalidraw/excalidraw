@@ -1,13 +1,14 @@
 import "./ToolIcon.scss";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 type ToolIconSize = "s" | "m";
 
 type ToolButtonBaseProps = {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   "aria-label": string;
   "aria-keyshortcuts"?: string;
+  label?: string;
   title?: string;
   name?: string;
   id?: string;
@@ -29,9 +30,24 @@ export const ToolButton = React.forwardRef(function(
   props: ToolButtonProps,
   ref,
 ) {
-  const innerRef = React.useRef(null);
+  const innerRef = React.useRef<HTMLInputElement | HTMLButtonElement | null>(
+    null,
+  );
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
+
+  const prevChecked = React.useRef<boolean>(
+    "checked" in props && props.checked,
+  );
+
+  useEffect(() => {
+    if (props.type !== "button") {
+      if (props.checked && !prevChecked.current && innerRef.current) {
+        innerRef.current.focus();
+      }
+      prevChecked.current = props.checked;
+    }
+  });
 
   if (props.type === "button")
     return (
@@ -41,10 +57,10 @@ export const ToolButton = React.forwardRef(function(
         aria-label={props["aria-label"]}
         type="button"
         onClick={props.onClick}
-        ref={innerRef}
+        ref={node => (innerRef.current = node)}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
-          {props.icon}
+          {props.icon || props.label}
         </div>
       </button>
     );
@@ -60,7 +76,7 @@ export const ToolButton = React.forwardRef(function(
         id={props.id}
         onChange={props.onChange}
         checked={props.checked}
-        ref={innerRef}
+        ref={node => (innerRef.current = node)}
       />
       <div className="ToolIcon__icon">{props.icon}</div>
     </label>

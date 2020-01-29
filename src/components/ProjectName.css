@@ -10,11 +10,11 @@
   justify-content: center;
 }
 
-.project-name:hover {
+.ProjectName:hover {
   background-color: #eee;
 }
 
-.project-name:focus {
+.ProjectName:focus {
   outline: none;
   box-shadow: 0 0 0 2px steelblue;
 }
