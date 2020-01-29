@@ -40,13 +40,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
-import {
-  isInputLike,
-  isToolIcon,
-  debounce,
-  capitalizeString,
-  distance,
-} from "./utils";
+import { isInputLike, debounce, capitalizeString, distance } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -311,8 +305,6 @@ export class App extends React.Component<any, AppState> {
       }
       return;
     }
-
-    if (isToolIcon(event.target)) event.target.focus();
 
     if (isInputLike(event.target)) return;
 

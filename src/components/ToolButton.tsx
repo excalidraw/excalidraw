@@ -1,6 +1,6 @@
 import "./ToolIcon.scss";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 type ToolIconSize = "s" | "m";
 
@@ -29,9 +29,17 @@ export const ToolButton = React.forwardRef(function(
   props: ToolButtonProps,
   ref,
 ) {
-  const innerRef = React.useRef(null);
+  const innerRef = React.useRef<any>(null);
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
+
+  useEffect(() => {
+    if (props.type !== "button") {
+      if (props.checked && innerRef.current) {
+        innerRef.current.focus();
+      }
+    }
+  });
 
   if (props.type === "button")
     return (
