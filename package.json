@@ -24,7 +24,6 @@
     "@types/react": "16.9.19",
     "@types/react-color": "3.0.1",
     "@types/react-dom": "16.9.5",
-    "eslint-plugin-json-format": "2.0.1",
     "husky": "4.2.1",
     "lint-staged": "10.0.3",
     "node-sass": "4.13.1",
@@ -34,12 +33,6 @@
   },
   "eslintConfig": {
     "extends": "react-app",
-    "plugins": [
-      "json-format"
-    ],
-    "settings": {
-      "json/sort-package-json": false
-    },
     "rules": {
       "no-console": [
         "warn",
