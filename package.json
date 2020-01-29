@@ -28,7 +28,6 @@
     "@types/react-dom": "16.9.5",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.2",
-    "eslint-plugin-json-format": "2.0.1",
     "husky": "4.2.1",
     "lint-staged": "10.0.3",
     "node-sass": "4.13.1",
