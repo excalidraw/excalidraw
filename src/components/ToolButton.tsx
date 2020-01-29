@@ -33,11 +33,16 @@ export const ToolButton = React.forwardRef(function(
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
+  const prevChecked = React.useRef<boolean>(
+    "checked" in props && props.checked,
+  );
+
   useEffect(() => {
     if (props.type !== "button") {
-      if (props.checked && innerRef.current) {
+      if (props.checked && !prevChecked.current) {
         innerRef.current.focus();
       }
+      prevChecked.current = props.checked;
     }
   });
 
