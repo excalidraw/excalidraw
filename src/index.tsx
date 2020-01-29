@@ -299,13 +299,12 @@ export class App extends React.Component<any, AppState> {
       elements = clearSelection(elements);
       this.setState({});
       this.setState({ elementType: "selection" });
-      event.preventDefault();
       if (window.document.activeElement instanceof HTMLElement) {
         window.document.activeElement.blur();
       }
+      event.preventDefault();
       return;
     }
-
     if (isInputLike(event.target)) return;
 
     const actionResult = this.actionManager.handleKeyDown(
