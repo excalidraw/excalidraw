@@ -34,8 +34,9 @@
   "eslintConfig": {
     "extends": "react-app",
     "rules": {
+      "curly": "error",
       "no-console": [
-        "warn",
+        "error",
         {
           "allow": [
             "warn",
@@ -58,12 +59,15 @@
     "build": "react-scripts build",
     "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
-    "fix": "npm run prettier -- --write",
+    "fix": "npm run fix:other && npm run fix:code",
+    "fix:code": "npm run prettier -- --write",
+    "fix:other": "npm run prettier -- --write",
     "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:code": "npm run prettier -- --list-different"
+    "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "test:other": "npm run prettier -- --list-different"
   },
   "version": "1.0.0",
   "license": "MIT",
