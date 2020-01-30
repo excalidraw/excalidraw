@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, downloadFile, link } from "./icons";
+import { clipboard, exportFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { getExportCanvasPreview } from "../scene/getExportCanvasPreview";
+import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
 
@@ -36,6 +36,7 @@ function ExportModal({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
   onCloseRequest,
@@ -46,6 +47,7 @@ function ExportModal({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
@@ -70,7 +72,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = getExportCanvasPreview(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -127,32 +129,41 @@ function ExportModal({
         <h2 id="export-title">{t("buttons.export")}</h2>
         <div className="ExportDialog__preview" ref={previewRef}></div>
         <div className="ExportDialog__actions">
-          <Stack.Row gap={2}>
-            <ToolButton
-              type="button"
-              icon={downloadFile}
-              title={t("buttons.exportToPng")}
-              aria-label={t("buttons.exportToPng")}
-              onClick={() => onExportToPng(exportedElements, scale)}
-              ref={pngButton}
-            />
-            {probablySupportsClipboard && (
+          <Stack.Col gap={1}>
+            <Stack.Row gap={2}>
               <ToolButton
                 type="button"
-                icon={clipboard}
-                title={t("buttons.copyToClipboard")}
-                aria-label={t("buttons.copyToClipboard")}
-                onClick={() => onExportToClipboard(exportedElements, scale)}
+                label="PNG"
+                title={t("buttons.exportToPng")}
+                aria-label={t("buttons.exportToPng")}
+                onClick={() => onExportToPng(exportedElements, scale)}
+                ref={pngButton}
               />
-            )}
-            <ToolButton
-              type="button"
-              icon={link}
-              title={t("buttons.getShareableLink")}
-              aria-label={t("buttons.getShareableLink")}
-              onClick={() => onExportToBackend(exportedElements)}
-            />
-          </Stack.Row>
+              <ToolButton
+                type="button"
+                label="SVG"
+                title={t("buttons.exportToSvg")}
+                aria-label={t("buttons.exportToSvg")}
+                onClick={() => onExportToSvg(exportedElements, scale)}
+              />
+              {probablySupportsClipboard && (
+                <ToolButton
+                  type="button"
+                  icon={clipboard}
+                  title={t("buttons.copyToClipboard")}
+                  aria-label={t("buttons.copyToClipboard")}
+                  onClick={() => onExportToClipboard(exportedElements, scale)}
+                />
+              )}
+              <ToolButton
+                type="button"
+                icon={link}
+                title={t("buttons.getShareableLink")}
+                aria-label={t("buttons.getShareableLink")}
+                onClick={() => onExportToBackend(exportedElements)}
+              />
+            </Stack.Row>
+          </Stack.Col>
 
           {actionManager.renderAction(
             "changeProjectName",
@@ -163,7 +174,7 @@ function ExportModal({
           )}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
-              <Stack.Row gap={1} align="baseline">
+              <Stack.Row gap={2} align="baseline">
                 {scales.map(s => (
                   <ToolButton
                     key={s}
@@ -213,6 +224,7 @@ export function ExportDialog({
   actionManager,
   syncActionResult,
   onExportToPng,
+  onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -222,6 +234,7 @@ export function ExportDialog({
   actionManager: ActionsManagerInterface;
   syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
+  onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) {
@@ -246,7 +259,7 @@ export function ExportDialog({
       />
       {modalIsShown && (
         <Modal
-          maxWidth={640}
+          maxWidth={800}
           onCloseRequest={handleClose}
           labelledBy="export-title"
         >
@@ -257,6 +270,7 @@ export function ExportDialog({
             actionManager={actionManager}
             syncActionResult={syncActionResult}
             onExportToPng={onExportToPng}
+            onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}

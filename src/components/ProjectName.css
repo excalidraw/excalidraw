@@ -1,18 +1,19 @@
-.project-name {
+.ProjectName {
   display: inline-block;
   cursor: pointer;
   border: none;
-  padding: 0.25rem;
-  margin: -0.25rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
 }
 
-.project-name:hover {
+.ProjectName:hover {
   background-color: #eee;
 }
 
-.project-name:focus {
+.ProjectName:focus {
   outline: none;
   box-shadow: 0 0 0 2px steelblue;
 }
