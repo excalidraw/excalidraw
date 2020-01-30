@@ -40,7 +40,13 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
-import { isInputLike, debounce, capitalizeString, distance } from "./utils";
+import {
+  isInputLike,
+  debounce,
+  capitalizeString,
+  distance,
+  distance2d,
+} from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -98,6 +104,7 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+const DRAGGING_THRESHOLD = 10; // 10px
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -1064,6 +1071,16 @@ export class App extends React.Component<any, AppState> {
                   this.setState(state => ({ scrollY: state.scrollY - dy }));
                   lastY = y;
                   return;
+                }
+
+                // for arrows, don't start dragging until a given threshold
+                //  to ensure we don't create a 2-point arrow by mistake when
+                //  user clicks mouse in a way that it moves a tiny bit (thus
+                //  triggering mousemove)
+                if (!draggingOccurred && this.state.elementType === "arrow") {
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                  if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD)
+                    return;
                 }
 
                 if (isResizingElements && this.state.resizingElement) {
