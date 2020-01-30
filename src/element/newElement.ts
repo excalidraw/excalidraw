@@ -19,7 +19,6 @@ export function newElement(
   width = 0,
   height = 0,
 ) {
-  let points = [] as Point[];
   const element = {
     id: nanoid(),
     type,
@@ -36,7 +35,7 @@ export function newElement(
     isSelected: false,
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,
-    points,
+    points: [] as Point[],
   };
   return element;
 }
