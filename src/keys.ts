@@ -13,6 +13,7 @@ export const KEYS = {
       : "ctrlKey";
   },
   TAB: "Tab",
+  SPACE: " ",
 };
 
 export function isArrowKey(keyCode: string) {
