@@ -213,13 +213,13 @@ button,
   }
 }
 
-.language-select {
+.dropdown-select {
   position: absolute;
+  margin-bottom: 0.5em;
+  margin-right: 0.5em;
+  height: 1.5rem;
   right: 0;
   bottom: 0;
-  height: 1.5rem;
-  margin-bottom: 0.5rem;
-  margin-right: 0.5rem;
   padding: 0 1.5rem 0 0.5rem;
   background-color: #e9ecef;
   border-radius: var(--space-factor);
@@ -243,6 +243,21 @@ button,
   &:active {
     background-color: #ced4da;
   }
+}
+
+.language-select {
+  @extend .dropdown-select;
+  right: 0;
+  bottom: 0;
+}
+
+.stored-ids-select {
+  @extend .dropdown-select;
+  padding: 0 0.5em 0 1.7em;
+  bottom: 0;
+  left: 0;
+  background-position: left 0.7em top 50%, 0 0;
+  margin-left: 0.5em;
 }
 
 .visually-hidden {

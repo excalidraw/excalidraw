@@ -45,7 +45,8 @@
     "copyToClipboard": "Copier dans le presse-papier",
     "save": "Sauvegarder",
     "load": "Ouvrir",
-    "getShareableLink": "Obtenir un lien de partage"
+    "getShareableLink": "Obtenir un lien de partage",
+    "previouslyLoadedScenes": "Scènes précédemment chargées"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
