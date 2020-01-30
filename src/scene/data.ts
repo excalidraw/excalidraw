@@ -150,7 +150,6 @@ export async function exportToBackend(
     }
   } catch (e) {
     window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
-    return;
   }
 }
 

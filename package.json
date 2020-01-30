@@ -54,6 +54,7 @@
           ]
         }
       ],
+      "no-useless-return": "error",
       "prettier/prettier": "error"
     }
   },
