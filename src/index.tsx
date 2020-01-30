@@ -34,6 +34,8 @@ import {
   hasText,
   exportCanvas,
   importFromBackend,
+  addToLoadedScenes,
+  loadedScenes,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -86,6 +88,7 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
+import { StoredScenesList } from "./components/StoredScenesList";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -243,21 +246,13 @@ export class App extends React.Component<any, AppState> {
     return true;
   }
 
-  public async componentDidMount() {
-    document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.onPaste);
-    document.addEventListener("cut", this.onCut);
-
-    document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
-    window.addEventListener("resize", this.onResize, false);
-    window.addEventListener("unload", this.onUnload, false);
-
+  private async loadScene(id: string | null) {
     let data;
-    const searchParams = new URLSearchParams(window.location.search);
-
-    if (searchParams.get("id") != null) {
-      data = await importFromBackend(searchParams.get("id"));
+    let selectedId;
+    if (id != null) {
+      data = await importFromBackend(id);
+      addToLoadedScenes(id);
+      selectedId = id;
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();
@@ -268,10 +263,26 @@ export class App extends React.Component<any, AppState> {
     }
 
     if (data.appState) {
-      this.setState(data.appState);
+      this.setState({ ...data.appState, selectedId });
     } else {
       this.setState({});
     }
+  }
+
+  public async componentDidMount() {
+    document.addEventListener("copy", this.onCopy);
+    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("cut", this.onCut);
+
+    document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
+    window.addEventListener("resize", this.onResize, false);
+    window.addEventListener("unload", this.onUnload, false);
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+
+    this.loadScene(id);
   }
 
   public componentWillUnmount() {
@@ -809,6 +820,7 @@ export class App extends React.Component<any, AppState> {
                 const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
                   lastMouseUp = null;
                   resetCursor();
+                  history.resumeRecording();
                   window.removeEventListener("mousemove", onMouseMove);
                   window.removeEventListener("mouseup", onMouseUp);
                 });
@@ -1237,6 +1249,7 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                   });
+                  history.resumeRecording();
                   return;
                 }
 
@@ -1278,6 +1291,7 @@ export class App extends React.Component<any, AppState> {
                   // if no element is clicked, clear the selection and redraw
                   elements = clearSelection(elements);
                   this.setState({});
+                  history.resumeRecording();
                   return;
                 }
 
@@ -1445,8 +1459,23 @@ export class App extends React.Component<any, AppState> {
             languages={languages}
             currentLanguage={parseDetectedLang(i18n.language)}
           />
+          {this.renderIdsDropdown()}
         </footer>
       </div>
+    );
+  }
+
+  private renderIdsDropdown() {
+    const scenes = loadedScenes();
+    if (scenes.length === 0) {
+      return;
+    }
+    return (
+      <StoredScenesList
+        scenes={scenes}
+        currentId={this.state.selectedId}
+        onChange={id => this.loadScene(id)}
+      />
     );
   }
 
@@ -1455,10 +1484,15 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
     // We don't want to save history when panning around
     history.skipRecording();
-    this.setState(state => ({
-      scrollX: state.scrollX - deltaX,
-      scrollY: state.scrollY - deltaY,
-    }));
+    this.setState(
+      state => ({
+        scrollX: state.scrollX - deltaX,
+        scrollY: state.scrollY - deltaY,
+      }),
+      () => {
+        history.resumeRecording();
+      },
+    );
   };
 
   private addElementsFromPaste = (paste: string) => {
