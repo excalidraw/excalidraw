@@ -12,6 +12,7 @@
     "copyToClipboard": "In die Zwischenablage kopieren",
     "export": "Export",
     "exportToPng": "Als PNG exportieren",
+    "exportToSvg": "Als SVG exportieren",
     "getShareableLink": "Teilbaren Link erhalten",
     "load": "Laden",
     "save": "Speichern"

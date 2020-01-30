@@ -45,6 +45,7 @@
     "clearReset": "Clear the canvas & reset background color",
     "export": "Export",
     "exportToPng": "Export to PNG",
+    "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
     "save": "Save",
     "load": "Load",

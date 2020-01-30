@@ -40,7 +40,7 @@
 
 .ExportDialog__actions {
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: space-between;
   flex-wrap: wrap;
 }

@@ -1,4 +1,5 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { RoughSVG } from "roughjs/bin/svg";
 
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
@@ -11,7 +12,7 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import { renderElement } from "./renderElement";
+import { renderElement, renderElementToSvg } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
@@ -153,4 +154,32 @@ function isVisibleElement(
   x2 += scrollX;
   y2 += scrollY;
   return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
+}
+
+// This should be only called for exporting purposes
+export function renderSceneToSvg(
+  elements: readonly ExcalidrawElement[],
+  rsvg: RoughSVG,
+  svgRoot: SVGElement,
+  {
+    offsetX = 0,
+    offsetY = 0,
+  }: {
+    offsetX?: number;
+    offsetY?: number;
+  } = {},
+) {
+  if (!svgRoot) {
+    return;
+  }
+  // render elements
+  elements.forEach(element => {
+    renderElementToSvg(
+      element,
+      rsvg,
+      svgRoot,
+      element.x + offsetX,
+      element.y + offsetY,
+    );
+  });
 }

@@ -45,6 +45,7 @@
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
+    "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
     "save": "Guardar",
     "load": "Cargar",
