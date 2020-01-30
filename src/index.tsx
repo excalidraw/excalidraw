@@ -97,6 +97,15 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+function setCursorForShape(shape: string) {
+  if (shape === "selection") {
+    resetCursor();
+  } else {
+    document.documentElement.style.cursor =
+      shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+  }
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -832,7 +841,9 @@ export class App extends React.Component<any, AppState> {
                   lastMouseUp = null;
                   isPanning = false;
                   isHoldingMouseButton = false;
-                  if (!isHoldingSpace) resetCursor();
+                  if (!isHoldingSpace) {
+                    setCursorForShape(this.state.elementType);
+                  }
                   window.removeEventListener("mousemove", onMouseMove);
                   window.removeEventListener("mouseup", teardown);
                   window.removeEventListener("blur", teardown);
