@@ -11,7 +11,9 @@ export function resizeTest(
   y: number,
   { scrollX, scrollY }: SceneScroll,
 ): HandlerRectanglesRet | false {
-  if (!element.isSelected || element.type === "text") {return false;}
+  if (!element.isSelected || element.type === "text") {
+    return false;
+  }
 
   const handlers = handlerRectangles(element, { scrollX, scrollY });
 

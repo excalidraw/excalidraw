@@ -24,6 +24,9 @@
     "@types/react": "16.9.19",
     "@types/react-color": "3.0.1",
     "@types/react-dom": "16.9.5",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.1",
     "lint-staged": "10.0.3",
     "node-sass": "4.13.1",
@@ -32,7 +35,13 @@
     "typescript": "3.7.5"
   },
   "eslintConfig": {
-    "extends": "react-app",
+    "extends": [
+      "prettier",
+      "react-app"
+    ],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
       "curly": "error",
       "no-console": [
@@ -44,7 +53,8 @@
             "info"
           ]
         }
-      ]
+      ],
+      "prettier/prettier": "error"
     }
   },
   "homepage": "https://excalidraw.com",
@@ -62,7 +72,7 @@
     "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
     "fix:other": "npm run prettier -- --write",
-    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
+    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",

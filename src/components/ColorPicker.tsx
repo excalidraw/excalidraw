@@ -30,7 +30,9 @@ const Picker = function({
   React.useEffect(() => {
     // After the component is first mounted
     // focus on first input
-    if (firstItem.current) {firstItem.current.focus();}
+    if (firstItem.current) {
+      firstItem.current.focus();
+    }
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -76,7 +78,9 @@ const Picker = function({
               style={{ backgroundColor: color }}
               key={color}
               ref={el => {
-                if (i === 0 && el) {firstItem.current = el;}
+                if (i === 0 && el) {
+                  firstItem.current = el;
+                }
               }}
             >
               {color === "transparent" ? (

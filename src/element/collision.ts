@@ -100,8 +100,12 @@ export function hitTest(
 
     if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
-      if (topY > bottomY) {[bottomY, topY] = [topY, bottomY];}
-      if (rightX < leftX) {[leftX, rightX] = [rightX, leftX];}
+      if (topY > bottomY) {
+        [bottomY, topY] = [topY, bottomY];
+      }
+      if (rightX < leftX) {
+        [leftX, rightX] = [rightX, leftX];
+      }
 
       topY -= lineThreshold;
       bottomY += lineThreshold;

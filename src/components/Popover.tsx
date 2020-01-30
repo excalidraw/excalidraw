@@ -42,7 +42,9 @@ export function Popover({
         onClick={onCloseRequest}
         onContextMenu={e => {
           e.preventDefault();
-          if (onCloseRequest) {onCloseRequest();}
+          if (onCloseRequest) {
+            onCloseRequest();
+          }
         }}
       />
       {children}

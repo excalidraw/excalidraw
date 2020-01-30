@@ -32,7 +32,9 @@ export function renderScene(
     renderSelection?: boolean;
   } = {},
 ) {
-  if (!canvas) {return;}
+  if (!canvas) {
+    return;
+  }
   const context = canvas.getContext("2d")!;
 
   const fillStyle = context.fillStyle;
@@ -126,15 +128,16 @@ export function renderScene(
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
     [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
-      if (scrollBar)
-        {roundRect(
+      if (scrollBar) {
+        roundRect(
           context,
           scrollBar.x,
           scrollBar.y,
           scrollBar.width,
           scrollBar.height,
           SCROLLBAR_WIDTH / 2,
-        );}
+        );
+      }
     });
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;

@@ -190,8 +190,9 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length)
-    {return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));}
+  if (!elements.length) {
+    return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));
+  }
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
@@ -248,7 +249,9 @@ export async function exportCanvas(
   }
 
   // clean up the DOM
-  if (tempCanvas !== canvas) {tempCanvas.remove();}
+  if (tempCanvas !== canvas) {
+    tempCanvas.remove();
+  }
 }
 
 function restore(
