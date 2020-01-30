@@ -51,7 +51,8 @@
     "load": "Load",
     "getShareableLink": "Get shareable link",
     "close": "Close",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "previouslyLoadedScenes": "Previously loaded scenes"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

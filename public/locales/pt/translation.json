@@ -45,7 +45,8 @@
     "copyToClipboard": "Copiar para o clipboard",
     "save": "Guardar",
     "load": "Carregar",
-    "getShareableLink": "Obter um link de partilha"
+    "getShareableLink": "Obter um link de partilha",
+    "previouslyLoadedScenes": "Cenas carregadas anteriormente"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
