@@ -90,18 +90,23 @@ function generateElement(
         );
         break;
       case "arrow": {
-        const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
         const options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
+        // points array can be empty in the beginning, so it is important to add
+        // initial position to it
+        const points: Point[] = element.points.length
+          ? element.points
+          : [[0, 0]];
         element.shape = [
           //    \
           generator.line(x3, y3, x2, y2, options),
           // -----
-          generator.line(x1, y1, x2, y2, options),
+          generator.curve(points, options),
           //    /
           generator.line(x4, y4, x2, y2, options),
         ];
@@ -147,31 +152,7 @@ export function renderElement(
       break;
     }
     case "arrow": {
-      const options = {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness,
-        seed: element.seed,
-      };
-
-      // points array can be empty in the beginning, so it is important to add
-      // initial position to it
-      const points =
-        element.points.length > 0 ? element.points : ([[0, 0]] as Point[]);
-
-      if (!element.shape) {
-        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-
-        element.shape = [
-          //    \
-          generator.line(x3, y3, x2, y2, options),
-          // generate lines
-          generator.curve(points, options),
-          //    /
-          generator.line(x4, y4, x2, y2, options),
-        ];
-      }
-
+      generateElement(element, generator);
       context.globalAlpha = element.opacity / 100;
       (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
       context.globalAlpha = 1;
