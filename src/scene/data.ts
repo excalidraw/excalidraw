@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { getDefaultAppState } from "../appState";
 
 import { AppState } from "../types";
-import { ExportType } from "./types";
+import { ExportType, PreviousScene } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
@@ -12,6 +12,7 @@ import { getCommonBounds } from "../element";
 import i18n from "../i18n";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
+const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
@@ -24,6 +25,7 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 interface DataState {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
+  selectedId?: number;
 }
 
 export function serializeAsJSON(
@@ -304,4 +306,44 @@ export function saveToLocalStorage(
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
+}
+
+/**
+ * Returns the list of ids in Local Storage
+ * @returns array
+ */
+export function loadedScenes(): PreviousScene[] {
+  const storedPreviousScenes = localStorage.getItem(
+    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
+  );
+  if (storedPreviousScenes) {
+    try {
+      return JSON.parse(storedPreviousScenes);
+    } catch (e) {
+      console.error("Could not parse previously stored ids");
+      return [];
+    }
+  }
+  return [];
+}
+
+/**
+ * Append id to the list of Previous Scenes in Local Storage if not there yet
+ * @param id string
+ */
+export function addToLoadedScenes(id: string): void {
+  const scenes = [...loadedScenes()];
+  const newScene = scenes.every(scene => scene.id !== id);
+
+  if (newScene) {
+    scenes.push({
+      timestamp: Date.now(),
+      id,
+    });
+  }
+
+  localStorage.setItem(
+    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
+    JSON.stringify(scenes),
+  );
 }
