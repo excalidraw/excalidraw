@@ -1039,12 +1039,9 @@ export class App extends React.Component<any, AppState> {
               } else if (this.state.elementType === "arrow") {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
-                  const { x, y } = multiElement;
+                  const { x: rx, y: ry } = multiElement;
                   multiElement.isSelected = true;
-                  multiElement.points.push([
-                    e.clientX - x - this.state.scrollX,
-                    e.clientY - y - this.state.scrollY,
-                  ]);
+                  multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
                   this.setState({ draggingElement: multiElement });
                 } else {
@@ -1075,18 +1072,22 @@ export class App extends React.Component<any, AppState> {
                     p1: Point,
                     deltaX: number,
                     deltaY: number,
-                    shiftKey: boolean,
+                    mouseX: number,
+                    mouseY: number,
+                    perfect: boolean,
                   ) => void)
                 | null = null;
+
               const arrowResizeOrigin = (
                 element: ExcalidrawElement,
                 p1: Point,
                 deltaX: number,
                 deltaY: number,
-                shiftKey: boolean,
+                mouseX: number,
+                mouseY: number,
+                perfect: boolean,
               ) => {
-                if (shiftKey) {
-                }
+                // TODO: Implement perfect sizing for origin
                 element.x += deltaX;
                 element.y += deltaY;
                 p1[0] -= deltaX;
@@ -1098,10 +1099,22 @@ export class App extends React.Component<any, AppState> {
                 p1: Point,
                 deltaX: number,
                 deltaY: number,
-                shiftKey: boolean,
+                mouseX: number,
+                mouseY: number,
+                perfect: boolean,
               ) => {
-                p1[0] += deltaX;
-                p1[1] += deltaY;
+                if (perfect) {
+                  const { width, height } = getPerfectElementSize(
+                    "arrow",
+                    mouseX - element.x,
+                    mouseY - element.y,
+                  );
+                  p1[0] = width;
+                  p1[1] = height;
+                } else {
+                  p1[0] += deltaX;
+                  p1[1] += deltaY;
+                }
               };
 
               const onMouseMove = (e: MouseEvent) => {
@@ -1159,7 +1172,7 @@ export class App extends React.Component<any, AppState> {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
-                            if (p1[0] <= 0) {
+                            if (p1[0] < 0 || p1[1] === 0) {
                               resizeArrowFn = arrowResizeEnd;
                             } else {
                               resizeArrowFn = arrowResizeOrigin;
@@ -1170,6 +1183,8 @@ export class App extends React.Component<any, AppState> {
                             p1,
                             deltaX,
                             deltaY,
+                            x,
+                            y,
                             e.shiftKey,
                           );
                         } else {
@@ -1207,6 +1222,8 @@ export class App extends React.Component<any, AppState> {
                             p1,
                             deltaX,
                             deltaY,
+                            x,
+                            y,
                             e.shiftKey,
                           );
                         } else {
@@ -1238,6 +1255,8 @@ export class App extends React.Component<any, AppState> {
                             p1,
                             deltaX,
                             deltaY,
+                            x,
+                            y,
                             e.shiftKey,
                           );
                         } else {
@@ -1257,7 +1276,7 @@ export class App extends React.Component<any, AppState> {
                         ) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
-                            if (p1[0] >= 0) {
+                            if (p1[0] > 0 || p1[1] === 0) {
                               resizeArrowFn = arrowResizeEnd;
                             } else {
                               resizeArrowFn = arrowResizeOrigin;
@@ -1268,6 +1287,8 @@ export class App extends React.Component<any, AppState> {
                             p1,
                             deltaX,
                             deltaY,
+                            x,
+                            y,
                             e.shiftKey,
                           );
                         } else {

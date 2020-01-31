@@ -148,10 +148,12 @@ function isVisibleElement(
   canvasHeight: number,
 ) {
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  x1 += scrollX;
-  y1 += scrollY;
-  x2 += scrollX;
-  y2 += scrollY;
+  if (element.type !== "arrow") {
+    x1 += scrollX;
+    y1 += scrollY;
+    x2 += scrollX;
+    y2 += scrollY;
+  }
   return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
 }
 
