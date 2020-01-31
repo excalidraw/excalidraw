@@ -102,8 +102,8 @@ export function handlerRectangles(
 
       if (p1[0] === 0 || p1[1] === 0) {
         return {
-          nw: handlers.ne,
-          se: handlers.sw,
+          nw: handlers.nw,
+          se: handlers.se,
         } as typeof handlers;
       }
 

@@ -1088,10 +1088,28 @@ export class App extends React.Component<any, AppState> {
                 perfect: boolean,
               ) => {
                 // TODO: Implement perfect sizing for origin
-                element.x += deltaX;
-                element.y += deltaY;
-                p1[0] -= deltaX;
-                p1[1] -= deltaY;
+                if (perfect) {
+                  const absPx = p1[0] + element.x;
+                  const absPy = p1[1] + element.y;
+
+                  let { width, height } = getPerfectElementSize(
+                    "arrow",
+                    mouseX - element.x - p1[0],
+                    mouseY - element.y - p1[1],
+                  );
+
+                  const dx = element.x + width + p1[0];
+                  const dy = element.y + height + p1[1];
+                  element.x = dx;
+                  element.y = dy;
+                  p1[0] = absPx - element.x;
+                  p1[1] = absPy - element.y;
+                } else {
+                  element.x += deltaX;
+                  element.y += deltaY;
+                  p1[0] -= deltaX;
+                  p1[1] -= deltaY;
+                }
               };
 
               const arrowResizeEnd = (
@@ -1172,7 +1190,7 @@ export class App extends React.Component<any, AppState> {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
-                            if (p1[0] < 0 || p1[1] === 0) {
+                            if (p1[0] <= 0 || p1[1] < 0) {
                               resizeArrowFn = arrowResizeEnd;
                             } else {
                               resizeArrowFn = arrowResizeOrigin;
@@ -1276,7 +1294,7 @@ export class App extends React.Component<any, AppState> {
                         ) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
-                            if (p1[0] > 0 || p1[1] === 0) {
+                            if (p1[0] > 0 || p1[1] > 0) {
                               resizeArrowFn = arrowResizeEnd;
                             } else {
                               resizeArrowFn = arrowResizeOrigin;
