@@ -76,7 +76,10 @@ export function renderScene(
       element.y + sceneState.scrollY,
     );
     renderElement(element, rc, context);
-    context.resetTransform();
+    context.translate(
+      -element.x - sceneState.scrollX,
+      -element.y - sceneState.scrollY,
+    );
   });
 
   if (renderSelection) {
@@ -104,11 +107,9 @@ export function renderScene(
 
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       const handlers = handlerRectangles(selectedElements[0], sceneState);
-      Object.values(handlers)
-        .filter(handler => handler !== undefined)
-        .forEach(handler => {
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-        });
+      Object.values(handlers).forEach(handler => {
+        context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+      });
     }
   }
 
@@ -148,20 +149,11 @@ function isVisibleElement(
   canvasHeight: number,
 ) {
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  if (element.type !== "arrow") {
-    x1 += scrollX;
-    y1 += scrollY;
-    x2 += scrollX;
-    y2 += scrollY;
-    return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
-  } else {
-    return (
-      x2 + scrollX >= 0 &&
-      x1 + scrollX <= canvasWidth &&
-      y2 + scrollY >= 0 &&
-      y1 + scrollY <= canvasHeight
-    );
-  }
+  x1 += scrollX;
+  y1 += scrollY;
+  x2 += scrollX;
+  y2 += scrollY;
+  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
 }
 
 // This should be only called for exporting purposes

@@ -3,7 +3,6 @@ import { ExcalidrawElement } from "./element/types";
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  multiElement: ExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: ExcalidrawElement | null;

@@ -7,7 +7,6 @@ export function getDefaultAppState(): AppState {
   return {
     draggingElement: null,
     resizingElement: null,
-    multiElement: null,
     editingElement: null,
     elementType: "selection",
     elementLocked: false,
@@ -25,11 +24,5 @@ export function getDefaultAppState(): AppState {
     cursorX: 0,
     cursorY: 0,
     name: DEFAULT_PROJECT_NAME,
-  };
-}
-
-export function cleanAppStateForExport(appState: AppState) {
-  return {
-    viewBackgroundColor: appState.viewBackgroundColor,
   };
 }

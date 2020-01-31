@@ -17,7 +17,6 @@ export function resizeTest(
 
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key as HandlerRectanglesRet]!;
-    if (!handler) return false;
 
     return (
       x + scrollX >= handler[0] &&
