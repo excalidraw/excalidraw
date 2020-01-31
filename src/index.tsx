@@ -387,19 +387,27 @@ export class App extends React.Component<any, AppState> {
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       event.preventDefault();
 
+      if (
+        this.state.resizingElement ||
+        this.state.multiElement ||
+        this.state.editingElement
+      ) {
+        return;
+      }
+
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState({ ...data.appState, elementType: "selection" });
+          this.setState({ ...data.appState });
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState({ ...data.appState, elementType: "selection" });
+          this.setState({ ...data.appState });
         }
       }
     } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
@@ -1633,9 +1641,15 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
 
-              // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-              history.skipRecording();
-              this.setState({});
+              if (
+                !this.state.multiElement ||
+                (this.state.multiElement &&
+                  this.state.multiElement.points.length < 2)
+              ) {
+                // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
+                history.skipRecording();
+                this.setState({});
+              }
             }}
             onDoubleClick={e => {
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
