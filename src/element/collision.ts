@@ -147,7 +147,7 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow") {
-    if (element.shape === null) {
+    if (!element.shape) {
       return false;
     }
     const shape = element.shape as Drawable[];
