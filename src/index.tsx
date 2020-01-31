@@ -384,27 +384,21 @@ export class App extends React.Component<any, AppState> {
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
-    } else if (
-      (event[KEYS.META] && event.code === "KeyZ") ||
-      // support undo/redo for AZERTY keyboards
-      (event[KEYS.META] && event.code === "KeyW")
-    ) {
+      // Undo action
+    } else if (event[KEYS.META] && event.key === "z") {
       event.preventDefault();
-
-      if (event.shiftKey) {
-        // Redo action
-        const data = history.redoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState(data.appState);
-        }
-      } else {
-        // undo action
-        const data = history.undoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState(data.appState);
-        }
+      const data = history.undoOnce();
+      if (data !== null) {
+        elements = data.elements;
+        this.setState(data.appState);
+      }
+      // Redo action
+    } else if (event[KEYS.META] && event.key === "Z") {
+      event.preventDefault();
+      const data = history.redoOnce();
+      if (data !== null) {
+        elements = data.elements;
+        this.setState(data.appState);
       }
     } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
       isHoldingSpace = true;
