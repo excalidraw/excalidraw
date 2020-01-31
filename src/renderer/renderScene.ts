@@ -155,7 +155,12 @@ function isVisibleElement(
     y2 += scrollY;
     return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
   } else {
-    return true;
+    return (
+      x2 + scrollX >= 0 &&
+      x1 + scrollX <= canvasWidth &&
+      y2 + scrollY >= 0 &&
+      y1 + scrollY <= canvasHeight
+    );
   }
 }
 
