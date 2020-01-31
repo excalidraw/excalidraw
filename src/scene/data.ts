@@ -158,13 +158,18 @@ export async function exportToBackend(
 export async function importFromBackend(id: string | null) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
-  const response = await fetch(`${BACKEND_GET}${id}.json`).then(data =>
-    data.clone().json(),
-  );
-  if (response != null) {
+  const data = await fetch(`${BACKEND_GET}${id}.json`)
+    .then(response => {
+      if (!response.ok) {
+        window.alert(i18n.t("alerts.importBackendFailed"));
+      }
+      return response;
+    })
+    .then(response => response.clone().json());
+  if (data != null) {
     try {
-      elements = response.elements || elements;
-      appState = response.appState || appState;
+      elements = data.elements || elements;
+      appState = data.appState || appState;
     } catch (error) {
       window.alert(t("alerts.importBackendFailed"));
       console.error(error);
