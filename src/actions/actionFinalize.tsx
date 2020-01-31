@@ -7,7 +7,12 @@ export const actionFinalize: Action = {
   perform: (elements, appState) => {
     return {
       elements: clearSelection(elements),
-      appState: { ...appState, elementType: "selection", multiElement: null },
+      appState: {
+        ...appState,
+        elementType: "selection",
+        draggingElement: null,
+        multiElement: null,
+      },
     };
   },
   keyTest: (event, appState) =>
