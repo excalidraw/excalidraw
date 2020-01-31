@@ -1841,7 +1841,7 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    renderScene(elements, null, this.rc!, this.canvas!, {
+    renderScene(elements, this.rc!, this.canvas!, {
       scrollX: this.state.scrollX,
       scrollY: this.state.scrollY,
       viewBackgroundColor: this.state.viewBackgroundColor,

@@ -291,7 +291,6 @@ export function restoreFromLocalStorage() {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
-      appState.pathSegmentCircle = null;
     } catch (e) {
       // Do nothing because appState is already null
     }

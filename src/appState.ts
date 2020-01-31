@@ -8,7 +8,6 @@ export function getDefaultAppState(): AppState {
     draggingElement: null,
     resizingElement: null,
     multiElement: null,
-    pathSegmentCircle: null,
     editingElement: null,
     elementType: "selection",
     elementLocked: false,

@@ -16,7 +16,6 @@ import { renderElement, renderElementToSvg } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
-  pathSegmentCircle: { x: number; y: number; overlappingPoint: number } | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,

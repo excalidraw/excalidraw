@@ -1,18 +1,9 @@
 import { ExcalidrawElement } from "./element/types";
-import { Point } from "roughjs/bin/geometry";
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawElement | null;
-  pathSegmentCircle: {
-    x: number;
-    y: number;
-    arrow: ExcalidrawElement;
-    segment: number;
-    point: Point;
-    overlappingPoint: number;
-  } | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: ExcalidrawElement | null;

@@ -37,7 +37,6 @@ export function exportToCanvas(
 
   renderScene(
     elements,
-    null,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
