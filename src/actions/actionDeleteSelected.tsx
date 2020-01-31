@@ -7,7 +7,7 @@ export const actionDeleteSelected: Action = {
   perform: (elements, appState) => {
     return {
       elements: deleteSelectedElements(elements),
-      appState: { ...appState, multiElement: null },
+      appState: { ...appState, elementType: "selection", multiElement: null },
     };
   },
   contextItemLabel: "labels.delete",

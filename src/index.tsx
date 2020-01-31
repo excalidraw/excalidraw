@@ -1045,7 +1045,7 @@ export class App extends React.Component<any, AppState> {
                   multiElement.shape = null;
                   this.setState({ draggingElement: multiElement });
                 } else {
-                  element.isSelected = true;
+                  element.isSelected = false;
                   element.points.push([0, 0]);
                   element.shape = null;
                   elements = [...elements, element];
@@ -1519,11 +1519,13 @@ export class App extends React.Component<any, AppState> {
                   if (!draggingOccurred && !multiElement) {
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
+                    this.state.draggingElement!.isSelected = true;
                     this.setState({
                       draggingElement: null,
                       elementType: "selection",
                     });
                   }
+                  history.resumeRecording();
                   return;
                 }
 
