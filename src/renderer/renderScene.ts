@@ -153,8 +153,10 @@ function isVisibleElement(
     y1 += scrollY;
     x2 += scrollX;
     y2 += scrollY;
+    return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
+  } else {
+    return true;
   }
-  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
 }
 
 // This should be only called for exporting purposes
