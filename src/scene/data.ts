@@ -267,6 +267,15 @@ function restore(
         element.opacity === null || element.opacity === undefined
           ? 100
           : element.opacity,
+      points:
+        element.type === "arrow"
+          ? Array.isArray(element.points)
+            ? element.points
+            : [
+                [0, 0],
+                [element.width, element.height],
+              ]
+          : [],
     })),
     appState: savedState,
   };

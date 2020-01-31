@@ -99,9 +99,10 @@ function generateElement(
         };
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
-        const points: Point[] = element.points.length
-          ? element.points
-          : [[0, 0]];
+        const points: Point[] =
+          Array.isArray(element.points) && element.points.length
+            ? element.points
+            : [[0, 0]];
         element.shape = [
           //    \
           generator.line(x3, y3, x2, y2, options),
