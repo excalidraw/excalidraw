@@ -1,23 +1,11 @@
-# Logs
-logs
+.DS_Store
+.vscode
 *.log
+build
+logs
+node_modules
 npm-debug.log*
+static
 yarn-debug.log*
 yarn-error.log*
-
-# Build artifacts
-build
-
-# Dependency directories
-node_modules/
-
-# lock file
 yarn.lock
-
-# Editors
-.vscode/
-
-.DS_Store
-
-# build files
-static/
