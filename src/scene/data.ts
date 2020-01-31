@@ -9,7 +9,7 @@ import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { getCommonBounds } from "../element";
 
-import i18n from "../i18n";
+import { t } from "../i18n";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
@@ -142,16 +142,15 @@ export async function exportToBackend(
 
       await navigator.clipboard.writeText(url.toString());
       window.alert(
-        i18n.t("alerts.copiedToClipboard", {
+        t("alerts.copiedToClipboard", {
           url: url.toString(),
-          interpolation: { escapeValue: false },
         }),
       );
     } else {
-      window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
+      window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (e) {
-    window.alert(i18n.t("alerts.couldNotCreateShareableLink"));
+    window.alert(t("alerts.couldNotCreateShareableLink"));
     return;
   }
 }
@@ -167,7 +166,7 @@ export async function importFromBackend(id: string | null) {
       elements = response.elements || elements;
       appState = response.appState || appState;
     } catch (error) {
-      window.alert(i18n.t("alerts.importBackendFailed"));
+      window.alert(t("alerts.importBackendFailed"));
       console.error(error);
     }
   }
@@ -193,7 +192,7 @@ export async function exportCanvas(
   },
 ) {
   if (!elements.length)
-    return window.alert(i18n.t("alerts.cannotExportEmptyCanvas"));
+    return window.alert(t("alerts.cannotExportEmptyCanvas"));
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
@@ -227,7 +226,7 @@ export async function exportCanvas(
       }
     });
   } else if (type === "clipboard") {
-    const errorMsg = i18n.t("alerts.couldNotCopyToClipboard");
+    const errorMsg = t("alerts.couldNotCopyToClipboard");
     try {
       tempCanvas.toBlob(async function(blob: any) {
         try {

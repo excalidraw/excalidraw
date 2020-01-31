@@ -11,8 +11,8 @@ import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
 import Stack from "./Stack";
+import { t } from "../i18n";
 
-import { useTranslation } from "react-i18next";
 import { KEYS } from "../keys";
 
 const probablySupportsClipboard =
@@ -52,7 +52,6 @@ function ExportModal({
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
 }) {
-  const { t } = useTranslation();
   const someElementIsSelected = elements.some(element => element.isSelected);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
@@ -170,7 +169,6 @@ function ExportModal({
             elements,
             appState,
             syncActionResult,
-            t,
           )}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
@@ -195,7 +193,6 @@ function ExportModal({
               elements,
               appState,
               syncActionResult,
-              t,
             )}
             {someElementIsSelected && (
               <div>
@@ -238,7 +235,6 @@ export function ExportDialog({
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) {
-  const { t } = useTranslation();
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
 
