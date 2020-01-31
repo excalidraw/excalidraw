@@ -392,14 +392,14 @@ export class App extends React.Component<any, AppState> {
         const data = history.redoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState(data.appState);
+          this.setState({ ...data.appState, elementType: "selection" });
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState(data.appState);
+          this.setState({ ...data.appState, elementType: "selection" });
         }
       }
     } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
@@ -1534,6 +1534,9 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mouseup", onMouseUp);
 
                 if (elementType === "arrow") {
+                  if (draggingElement!.points.length > 1) {
+                    history.resumeRecording();
+                  }
                   if (!draggingOccurred && !multiElement) {
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
@@ -1543,7 +1546,6 @@ export class App extends React.Component<any, AppState> {
                       elementType: "selection",
                     });
                   }
-                  history.resumeRecording();
                   return;
                 }
 
