@@ -1618,6 +1618,10 @@ export class App extends React.Component<any, AppState> {
                     draggingElement: null,
                     elementType: "selection",
                   });
+                } else {
+                  this.setState({
+                    draggingElement: null,
+                  });
                 }
 
                 history.resumeRecording();
