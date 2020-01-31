@@ -23,8 +23,6 @@ export {
   actionClearCanvas,
 } from "./actionCanvas";
 
-export { actionFinalize } from "./actionFinalize";
-
 export {
   actionChangeProjectName,
   actionChangeExportBackground,

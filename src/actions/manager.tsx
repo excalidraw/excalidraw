@@ -34,7 +34,7 @@ export class ActionManager implements ActionsManagerInterface {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action => action.keyTest && action.keyTest(event, appState, elements),
+        action => action.keyTest && action.keyTest(event, elements, appState),
       );
 
     if (data.length === 0) return null;

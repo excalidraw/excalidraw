@@ -42,13 +42,7 @@ import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
-import {
-  isInputLike,
-  debounce,
-  capitalizeString,
-  distance,
-  distance2d,
-} from "./utils";
+import { isInputLike, debounce, capitalizeString, distance } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
 import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
@@ -82,7 +76,6 @@ import {
   actionSaveScene,
   actionCopyStyles,
   actionPasteStyles,
-  actionFinalize,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -95,7 +88,6 @@ import { ExportDialog } from "./components/ExportDialog";
 import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
 import i18n, { languages, parseDetectedLang } from "./i18n";
-import { Point } from "roughjs/bin/geometry";
 import { StoredScenesList } from "./components/StoredScenesList";
 
 let { elements } = createScene();
@@ -117,7 +109,6 @@ function setCursorForShape(shape: string) {
   }
 }
 
-const DRAGGING_THRESHOLD = 10; // 10px
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -177,7 +168,6 @@ export class App extends React.Component<any, AppState> {
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
-    this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
     this.actionManager.registerAction(actionBringToFront);
@@ -338,7 +328,17 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) return;
+    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
+      elements = clearSelection(elements);
+      this.setState({});
+      this.setState({ elementType: "selection" });
+      if (window.document.activeElement instanceof HTMLElement) {
+        window.document.activeElement.blur();
+      }
+      event.preventDefault();
+      return;
+    }
+    if (isInputLike(event.target)) return;
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
@@ -387,27 +387,19 @@ export class App extends React.Component<any, AppState> {
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       event.preventDefault();
 
-      if (
-        this.state.resizingElement ||
-        this.state.multiElement ||
-        this.state.editingElement
-      ) {
-        return;
-      }
-
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState({ ...data.appState });
+          this.setState(data.appState);
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState({ ...data.appState });
+          this.setState(data.appState);
         }
       }
     } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
@@ -578,7 +570,7 @@ export class App extends React.Component<any, AppState> {
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
-                this.setState({ elementType: value, multiElement: null });
+                this.setState({ elementType: value });
                 elements = clearSelection(elements);
                 document.documentElement.style.cursor =
                   value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
@@ -1044,27 +1036,10 @@ export class App extends React.Component<any, AppState> {
                   editingElement: element,
                 });
                 return;
-              } else if (this.state.elementType === "arrow") {
-                if (this.state.multiElement) {
-                  const { multiElement } = this.state;
-                  const { x: rx, y: ry } = multiElement;
-                  multiElement.isSelected = true;
-                  multiElement.points.push([x - rx, y - ry]);
-                  multiElement.shape = null;
-                  this.setState({ draggingElement: multiElement });
-                } else {
-                  element.isSelected = false;
-                  element.points.push([0, 0]);
-                  element.shape = null;
-                  elements = [...elements, element];
-                  this.setState({
-                    draggingElement: element,
-                  });
-                }
-              } else {
-                elements = [...elements, element];
-                this.setState({ multiElement: null, draggingElement: element });
               }
+
+              elements = [...elements, element];
+              this.setState({ draggingElement: element });
 
               let lastX = x;
               let lastY = y;
@@ -1073,75 +1048,6 @@ export class App extends React.Component<any, AppState> {
                 lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
                 lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
               }
-
-              let resizeArrowFn:
-                | ((
-                    element: ExcalidrawElement,
-                    p1: Point,
-                    deltaX: number,
-                    deltaY: number,
-                    mouseX: number,
-                    mouseY: number,
-                    perfect: boolean,
-                  ) => void)
-                | null = null;
-
-              const arrowResizeOrigin = (
-                element: ExcalidrawElement,
-                p1: Point,
-                deltaX: number,
-                deltaY: number,
-                mouseX: number,
-                mouseY: number,
-                perfect: boolean,
-              ) => {
-                // TODO: Implement perfect sizing for origin
-                if (perfect) {
-                  const absPx = p1[0] + element.x;
-                  const absPy = p1[1] + element.y;
-
-                  let { width, height } = getPerfectElementSize(
-                    "arrow",
-                    mouseX - element.x - p1[0],
-                    mouseY - element.y - p1[1],
-                  );
-
-                  const dx = element.x + width + p1[0];
-                  const dy = element.y + height + p1[1];
-                  element.x = dx;
-                  element.y = dy;
-                  p1[0] = absPx - element.x;
-                  p1[1] = absPy - element.y;
-                } else {
-                  element.x += deltaX;
-                  element.y += deltaY;
-                  p1[0] -= deltaX;
-                  p1[1] -= deltaY;
-                }
-              };
-
-              const arrowResizeEnd = (
-                element: ExcalidrawElement,
-                p1: Point,
-                deltaX: number,
-                deltaY: number,
-                mouseX: number,
-                mouseY: number,
-                perfect: boolean,
-              ) => {
-                if (perfect) {
-                  const { width, height } = getPerfectElementSize(
-                    "arrow",
-                    mouseX - element.x,
-                    mouseY - element.y,
-                  );
-                  p1[0] = width;
-                  p1[1] = height;
-                } else {
-                  p1[0] += deltaX;
-                  p1[1] += deltaY;
-                }
-              };
 
               const onMouseMove = (e: MouseEvent) => {
                 const target = e.target;
@@ -1169,16 +1075,6 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                // for arrows, don't start dragging until a given threshold
-                //  to ensure we don't create a 2-point arrow by mistake when
-                //  user clicks mouse in a way that it moves a tiny bit (thus
-                //  triggering mousemove)
-                if (!draggingOccurred && this.state.elementType === "arrow") {
-                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD)
-                    return;
-                }
-
                 if (isResizingElements && this.state.resizingElement) {
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
@@ -1191,217 +1087,73 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
-                          const [, p1] = element.points;
-
-                          if (!resizeArrowFn) {
-                            if (p1[0] < 0 || p1[1] < 0) {
-                              resizeArrowFn = arrowResizeEnd;
-                            } else {
-                              resizeArrowFn = arrowResizeOrigin;
-                            }
-                          }
-                          resizeArrowFn(
-                            element,
-                            p1,
-                            deltaX,
-                            deltaY,
-                            x,
-                            y,
-                            e.shiftKey,
-                          );
-                        } else {
-                          element.width -= deltaX;
-                          element.x += deltaX;
-
-                          if (e.shiftKey) {
-                            if (isLinear) {
-                              resizePerfectLineForNWHandler(element, x, y);
-                            } else {
-                              element.y += element.height - element.width;
-                              element.height = element.width;
-                            }
-                          } else {
-                            element.height -= deltaY;
-                            element.y += deltaY;
-                          }
-                        }
-                        break;
-                      case "ne":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
-                          const [, p1] = element.points;
-                          if (!resizeArrowFn) {
-                            if (p1[0] >= 0) {
-                              resizeArrowFn = arrowResizeEnd;
-                            } else {
-                              resizeArrowFn = arrowResizeOrigin;
-                            }
-                          }
-                          resizeArrowFn(
-                            element,
-                            p1,
-                            deltaX,
-                            deltaY,
-                            x,
-                            y,
-                            e.shiftKey,
-                          );
-                        } else {
-                          element.width += deltaX;
-                          if (e.shiftKey) {
-                            element.y += element.height - element.width;
-                            element.height = element.width;
-                          } else {
-                            element.height -= deltaY;
-                            element.y += deltaY;
-                          }
-                        }
-                        break;
-                      case "sw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
-                          const [, p1] = element.points;
-                          if (!resizeArrowFn) {
-                            if (p1[0] <= 0) {
-                              resizeArrowFn = arrowResizeEnd;
-                            } else {
-                              resizeArrowFn = arrowResizeOrigin;
-                            }
-                          }
-                          resizeArrowFn(
-                            element,
-                            p1,
-                            deltaX,
-                            deltaY,
-                            x,
-                            y,
-                            e.shiftKey,
-                          );
-                        } else {
-                          element.width -= deltaX;
-                          element.x += deltaX;
-                          if (e.shiftKey) {
-                            element.height = element.width;
-                          } else {
-                            element.height += deltaY;
-                          }
-                        }
-                        break;
-                      case "se":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
-                          const [, p1] = element.points;
-                          if (!resizeArrowFn) {
-                            if (p1[0] > 0 || p1[1] > 0) {
-                              resizeArrowFn = arrowResizeEnd;
-                            } else {
-                              resizeArrowFn = arrowResizeOrigin;
-                            }
-                          }
-                          resizeArrowFn(
-                            element,
-                            p1,
-                            deltaX,
-                            deltaY,
-                            x,
-                            y,
-                            e.shiftKey,
-                          );
-                        } else {
-                          if (e.shiftKey) {
-                            if (isLinear) {
-                              const { width, height } = getPerfectElementSize(
-                                element.type,
-                                x - element.x,
-                                y - element.y,
-                              );
-                              element.width = width;
-                              element.height = height;
-                            } else {
-                              element.width += deltaX;
-                              element.height = element.width;
-                            }
-                          } else {
-                            element.width += deltaX;
-                            element.height += deltaY;
-                          }
-                        }
-                        break;
-                      case "n": {
-                        element.height -= deltaY;
-                        element.y += deltaY;
-
-                        if (element.points.length > 0) {
-                          const len = element.points.length;
-
-                          const points = [...element.points].sort(
-                            (a, b) => a[1] - b[1],
-                          );
-
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[1] -= deltaY / (len - i);
-                          }
-                        }
-                        break;
-                      }
-                      case "w": {
                         element.width -= deltaX;
                         element.x += deltaX;
 
-                        if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[0] - b[0],
-                          );
-
-                          for (let i = 0; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[0] -= deltaX / (len - i);
+                        if (e.shiftKey) {
+                          if (isLinear) {
+                            resizePerfectLineForNWHandler(element, x, y);
+                          } else {
+                            element.y += element.height - element.width;
+                            element.height = element.width;
                           }
+                        } else {
+                          element.height -= deltaY;
+                          element.y += deltaY;
                         }
                         break;
-                      }
-                      case "s": {
-                        element.height += deltaY;
-                        if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[1] - b[1],
-                          );
-
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[1] += deltaY / (len - i);
-                          }
-                        }
-                        break;
-                      }
-                      case "e": {
+                      case "ne":
                         element.width += deltaX;
-                        if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[0] - b[0],
-                          );
-
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[0] += deltaX / (len - i);
-                          }
+                        if (e.shiftKey) {
+                          element.y += element.height - element.width;
+                          element.height = element.width;
+                        } else {
+                          element.height -= deltaY;
+                          element.y += deltaY;
                         }
                         break;
-                      }
+                      case "sw":
+                        element.width -= deltaX;
+                        element.x += deltaX;
+                        if (e.shiftKey) {
+                          element.height = element.width;
+                        } else {
+                          element.height += deltaY;
+                        }
+                        break;
+                      case "se":
+                        if (e.shiftKey) {
+                          if (isLinear) {
+                            const { width, height } = getPerfectElementSize(
+                              element.type,
+                              x - element.x,
+                              y - element.y,
+                            );
+                            element.width = width;
+                            element.height = height;
+                          } else {
+                            element.width += deltaX;
+                            element.height = element.width;
+                          }
+                        } else {
+                          element.width += deltaX;
+                          element.height += deltaY;
+                        }
+                        break;
+                      case "n":
+                        element.height -= deltaY;
+                        element.y += deltaY;
+                        break;
+                      case "w":
+                        element.width -= deltaX;
+                        element.x += deltaX;
+                        break;
+                      case "s":
+                        element.height += deltaY;
+                        break;
+                      case "e":
+                        element.width += deltaX;
+                        break;
                     }
 
                     if (resizeHandle) {
@@ -1483,30 +1235,6 @@ export class App extends React.Component<any, AppState> {
 
                 draggingElement.width = width;
                 draggingElement.height = height;
-
-                if (this.state.elementType === "arrow") {
-                  draggingOccurred = true;
-                  const points = draggingElement.points;
-                  let dx = x - draggingElement.x;
-                  let dy = y - draggingElement.y;
-
-                  if (e.shiftKey && points.length === 2) {
-                    ({ width: dx, height: dy } = getPerfectElementSize(
-                      this.state.elementType,
-                      dx,
-                      dy,
-                    ));
-                  }
-
-                  if (points.length === 1) {
-                    points.push([dx, dy]);
-                  } else if (points.length > 1) {
-                    const pnt = points[points.length - 1];
-                    pnt[0] = dx;
-                    pnt[1] = dy;
-                  }
-                }
-
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
@@ -1530,32 +1258,14 @@ export class App extends React.Component<any, AppState> {
                 const {
                   draggingElement,
                   resizingElement,
-                  multiElement,
                   elementType,
                   elementLocked,
                 } = this.state;
 
-                resizeArrowFn = null;
                 lastMouseUp = null;
                 isHoldingMouseButton = false;
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
-
-                if (elementType === "arrow") {
-                  if (draggingElement!.points.length > 1) {
-                    history.resumeRecording();
-                  }
-                  if (!draggingOccurred && !multiElement) {
-                    this.setState({ multiElement: this.state.draggingElement });
-                  } else if (draggingOccurred && !multiElement) {
-                    this.state.draggingElement!.isSelected = true;
-                    this.setState({
-                      draggingElement: null,
-                      elementType: "selection",
-                    });
-                  }
-                  return;
-                }
 
                 if (
                   elementType !== "selection" &&
@@ -1641,15 +1351,9 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
 
-              if (
-                !this.state.multiElement ||
-                (this.state.multiElement &&
-                  this.state.multiElement.points.length < 2)
-              ) {
-                // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-                history.skipRecording();
-                this.setState({});
-              }
+              // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
+              history.skipRecording();
+              this.setState({});
             }}
             onDoubleClick={e => {
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
