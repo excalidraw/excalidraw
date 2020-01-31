@@ -100,12 +100,27 @@ function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+function setCursorForShape(shape: string) {
+  if (shape === "selection") {
+    resetCursor();
+  } else {
+    document.documentElement.style.cursor =
+      shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+  }
+}
+
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
+  GRABBING: "grabbing",
+};
+const MOUSE_BUTTON = {
+  MAIN: 0,
+  WHEEL: 1,
+  SECONDARY: 2,
 };
 
 let lastCanvasWidth = -1;
@@ -141,6 +156,9 @@ function pickAppStatePropertiesForHistory(
 
 let cursorX = 0;
 let cursorY = 0;
+let isHoldingSpace: boolean = false;
+let isPanning: boolean = false;
+let isHoldingMouseButton: boolean = false;
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -231,6 +249,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onUnload = () => {
+    isHoldingSpace = false;
     this.saveDebounced();
     this.saveDebounced.flush();
   };
@@ -275,9 +294,11 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
+    document.addEventListener("keyup", this.onKeyUp, { passive: true });
     document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
+    window.addEventListener("blur", this.onUnload, false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -298,6 +319,7 @@ export class App extends React.Component<any, AppState> {
     );
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
+    window.removeEventListener("blur", this.onUnload, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -371,11 +393,11 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (shape === "text") {
-        document.documentElement.style.cursor = CURSOR_TYPE.TEXT;
-      } else {
-        document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+      if (!isHoldingSpace) {
+        document.documentElement.style.cursor =
+          shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
       }
+      elements = clearSelection(elements);
       this.setState({ elementType: shape });
     } else if (event[KEYS.META] && event.code === "KeyZ") {
       event.preventDefault();
@@ -395,6 +417,25 @@ export class App extends React.Component<any, AppState> {
           this.setState(data.appState);
         }
       }
+    } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
+      isHoldingSpace = true;
+      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    }
+  };
+
+  private onKeyUp = (event: KeyboardEvent) => {
+    if (event.key === KEYS.SPACE) {
+      if (this.state.elementType === "selection") {
+        resetCursor();
+      } else {
+        elements = clearSelection(elements);
+        document.documentElement.style.cursor =
+          this.state.elementType === "text"
+            ? CURSOR_TYPE.TEXT
+            : CURSOR_TYPE.CROSSHAIR;
+        this.setState({});
+      }
+      isHoldingSpace = false;
     }
   };
 
@@ -801,11 +842,19 @@ export class App extends React.Component<any, AppState> {
                 lastMouseUp(e);
               }
 
-              // pan canvas on wheel button drag
-              if (e.button === 1) {
+              if (isPanning) return;
+
+              // pan canvas on wheel button drag or space+drag
+              if (
+                !isHoldingMouseButton &&
+                (e.button === MOUSE_BUTTON.WHEEL ||
+                  (e.button === MOUSE_BUTTON.MAIN && isHoldingSpace))
+              ) {
+                isHoldingMouseButton = true;
+                isPanning = true;
+                document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
                 let { clientX: lastX, clientY: lastY } = e;
                 const onMouseMove = (e: MouseEvent) => {
-                  document.documentElement.style.cursor = `grabbing`;
                   let deltaX = lastX - e.clientX;
                   let deltaY = lastY - e.clientY;
                   lastX = e.clientX;
@@ -817,22 +866,28 @@ export class App extends React.Component<any, AppState> {
                     scrollY: state.scrollY - deltaY,
                   }));
                 };
-                const onMouseUp = (lastMouseUp = (e: MouseEvent) => {
+                const teardown = (lastMouseUp = () => {
                   lastMouseUp = null;
-                  resetCursor();
+                  isPanning = false;
+                  isHoldingMouseButton = false;
+                  if (!isHoldingSpace) {
+                    setCursorForShape(this.state.elementType);
+                  }
                   history.resumeRecording();
                   window.removeEventListener("mousemove", onMouseMove);
-                  window.removeEventListener("mouseup", onMouseUp);
+                  window.removeEventListener("mouseup", teardown);
+                  window.removeEventListener("blur", teardown);
                 });
+                window.addEventListener("blur", teardown);
                 window.addEventListener("mousemove", onMouseMove, {
                   passive: true,
                 });
-                window.addEventListener("mouseup", onMouseUp);
+                window.addEventListener("mouseup", teardown);
                 return;
               }
 
               // only handle left mouse button
-              if (e.button !== 0) {
+              if (e.button !== MOUSE_BUTTON.MAIN) {
                 return;
               }
               // fixes mousemove causing selection of UI texts #32
@@ -1236,6 +1291,7 @@ export class App extends React.Component<any, AppState> {
                 } = this.state;
 
                 lastMouseUp = null;
+                isHoldingMouseButton = false;
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
 
@@ -1307,6 +1363,10 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                     elementType: "selection",
+                  });
+                } else {
+                  this.setState({
+                    draggingElement: null,
                   });
                 }
 
@@ -1421,6 +1481,7 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onMouseMove={e => {
+              if (isHoldingSpace || isPanning) return;
               const hasDeselectedButton = Boolean(e.buttons);
               if (
                 hasDeselectedButton ||
