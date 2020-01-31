@@ -35,14 +35,6 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 }
 
 export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
-  if (!Array.isArray(element.points)) {
-    return [
-      element.x,
-      element.y,
-      element.x + element.width,
-      element.y + element.height,
-    ];
-  }
   if (element.points.length < 2 || !element.shape) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
