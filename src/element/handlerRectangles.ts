@@ -96,12 +96,6 @@ export function handlerRectangles(
       se: handlers.se,
     } as typeof handlers;
   } else if (element.type === "arrow") {
-    if (!Array.isArray(element.points)) {
-      return {
-        nw: handlers.nw,
-        se: handlers.se,
-      } as typeof handlers;
-    }
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;

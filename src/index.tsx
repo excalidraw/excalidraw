@@ -1541,10 +1541,7 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
 
-                if (
-                  elementType === "arrow" &&
-                  Array.isArray(draggingElement!.points)
-                ) {
+                if (elementType === "arrow") {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
                   }
