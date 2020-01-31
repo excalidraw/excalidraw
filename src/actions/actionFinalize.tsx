@@ -5,6 +5,9 @@ import { clearSelection } from "../scene";
 export const actionFinalize: Action = {
   name: "finalize",
   perform: (elements, appState) => {
+    if (window.document.activeElement instanceof HTMLElement) {
+      window.document.activeElement.blur();
+    }
     return {
       elements: clearSelection(elements),
       appState: {
