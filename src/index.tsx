@@ -1190,7 +1190,7 @@ export class App extends React.Component<any, AppState> {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
-                            if (p1[0] <= 0 || p1[1] < 0) {
+                            if (p1[0] < 0 || p1[1] < 0) {
                               resizeArrowFn = arrowResizeEnd;
                             } else {
                               resizeArrowFn = arrowResizeOrigin;
