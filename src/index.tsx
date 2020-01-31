@@ -82,6 +82,7 @@ import {
   actionSaveScene,
   actionCopyStyles,
   actionPasteStyles,
+  actionFinalize,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -176,6 +177,7 @@ export class App extends React.Component<any, AppState> {
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
+    this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
     this.actionManager.registerAction(actionBringToFront);
@@ -336,17 +338,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
-      elements = clearSelection(elements);
-      this.setState({});
-      this.setState({ elementType: "selection" });
-      if (window.document.activeElement instanceof HTMLElement) {
-        window.document.activeElement.blur();
-      }
-      event.preventDefault();
-      return;
-    }
-    if (isInputLike(event.target)) return;
+    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) return;
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
@@ -1061,7 +1053,6 @@ export class App extends React.Component<any, AppState> {
                   element.shape = null;
                   elements = [...elements, element];
                   this.setState({
-                    multiElement: element,
                     draggingElement: element,
                   });
                 }
@@ -1504,14 +1495,11 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mouseup", onMouseUp);
 
                 if (elementType === "arrow") {
-                  if (
-                    draggingOccurred &&
-                    multiElement !== null &&
-                    multiElement.points.length <= 2
-                  ) {
+                  if (!draggingOccurred && !multiElement) {
+                    this.setState({ multiElement: this.state.draggingElement });
+                  } else if (draggingOccurred && !multiElement) {
                     this.setState({
                       draggingElement: null,
-                      multiElement: null,
                       elementType: "selection",
                     });
                   }
