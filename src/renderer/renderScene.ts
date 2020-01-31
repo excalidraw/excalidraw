@@ -76,7 +76,10 @@ export function renderScene(
       element.y + sceneState.scrollY,
     );
     renderElement(element, rc, context);
-    context.resetTransform();
+    context.translate(
+      -element.x - sceneState.scrollX,
+      -element.y - sceneState.scrollY,
+    );
   });
 
   if (renderSelection) {

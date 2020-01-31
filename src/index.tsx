@@ -1193,7 +1193,6 @@ export class App extends React.Component<any, AppState> {
                       case "nw":
                         if (
                           element.type === "arrow" &&
-                          Array.isArray(element.points) &&
                           element.points.length === 2
                         ) {
                           const [, p1] = element.points;
@@ -1234,7 +1233,6 @@ export class App extends React.Component<any, AppState> {
                       case "ne":
                         if (
                           element.type === "arrow" &&
-                          Array.isArray(element.points) &&
                           element.points.length === 2
                         ) {
                           const [, p1] = element.points;
@@ -1268,7 +1266,6 @@ export class App extends React.Component<any, AppState> {
                       case "sw":
                         if (
                           element.type === "arrow" &&
-                          Array.isArray(element.points) &&
                           element.points.length === 2
                         ) {
                           const [, p1] = element.points;
@@ -1301,7 +1298,6 @@ export class App extends React.Component<any, AppState> {
                       case "se":
                         if (
                           element.type === "arrow" &&
-                          Array.isArray(element.points) &&
                           element.points.length === 2
                         ) {
                           const [, p1] = element.points;
@@ -1345,10 +1341,7 @@ export class App extends React.Component<any, AppState> {
                         element.height -= deltaY;
                         element.y += deltaY;
 
-                        if (
-                          Array.isArray(element.points) &&
-                          element.points.length > 0
-                        ) {
+                        if (element.points.length > 0) {
                           const len = element.points.length;
 
                           const points = [...element.points].sort(
@@ -1366,10 +1359,7 @@ export class App extends React.Component<any, AppState> {
                         element.width -= deltaX;
                         element.x += deltaX;
 
-                        if (
-                          Array.isArray(element.points) &&
-                          element.points.length > 0
-                        ) {
+                        if (element.points.length > 0) {
                           const len = element.points.length;
                           const points = [...element.points].sort(
                             (a, b) => a[0] - b[0],
@@ -1384,10 +1374,7 @@ export class App extends React.Component<any, AppState> {
                       }
                       case "s": {
                         element.height += deltaY;
-                        if (
-                          Array.isArray(element.points) &&
-                          element.points.length > 0
-                        ) {
+                        if (element.points.length > 0) {
                           const len = element.points.length;
                           const points = [...element.points].sort(
                             (a, b) => a[1] - b[1],
@@ -1402,10 +1389,7 @@ export class App extends React.Component<any, AppState> {
                       }
                       case "e": {
                         element.width += deltaX;
-                        if (
-                          Array.isArray(element.points) &&
-                          element.points.length > 0
-                        ) {
+                        if (element.points.length > 0) {
                           const len = element.points.length;
                           const points = [...element.points].sort(
                             (a, b) => a[0] - b[0],
