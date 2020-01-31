@@ -3,8 +3,7 @@ import { Popover } from "./Popover";
 
 import "./ColorPicker.css";
 import { KEYS } from "../keys";
-import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import { t } from "../i18n";
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
@@ -15,14 +14,12 @@ const Picker = function({
   onChange,
   onClose,
   label,
-  t,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
   label: string;
-  t: TFunction;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
   const colorInput = React.useRef<HTMLInputElement>();
@@ -158,8 +155,6 @@ export function ColorPicker({
   onChange: (color: string) => void;
   label: string;
 }) {
-  const { t } = useTranslation();
-
   const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -195,7 +190,6 @@ export function ColorPicker({
                 pickerButton.current?.focus();
               }}
               label={label}
-              t={t}
             />
           </Popover>
         ) : null}
