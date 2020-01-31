@@ -161,7 +161,7 @@ export async function importFromBackend(id: string | null) {
   const data = await fetch(`${BACKEND_GET}${id}.json`)
     .then(response => {
       if (!response.ok) {
-        window.alert(i18n.t("alerts.importBackendFailed"));
+        window.alert(t("alerts.importBackendFailed"));
       }
       return response;
     })
