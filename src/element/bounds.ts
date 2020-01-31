@@ -122,10 +122,7 @@ export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
 export function getArrowPoints(element: ExcalidrawElement) {
   const points = element.points;
   const [x1, y1] = points.length >= 2 ? points[points.length - 2] : [0, 0];
-  const [x2, y2] =
-    element.points.length >= 1
-      ? points[points.length - 1]
-      : [element.width, element.height];
+  const [x2, y2] = points[points.length - 1];
 
   const size = 30; // pixels
   const distance = Math.hypot(x2 - x1, y2 - y1);
