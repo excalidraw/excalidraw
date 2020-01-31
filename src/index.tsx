@@ -843,10 +843,10 @@ export class App extends React.Component<any, AppState> {
                   lastY = e.clientY;
                   // We don't want to save history when panning around
                   history.skipRecording();
-                  this.setState(state => ({
-                    scrollX: state.scrollX - deltaX,
-                    scrollY: state.scrollY - deltaY,
-                  }));
+                  this.setState({
+                    scrollX: this.state.scrollX - deltaX,
+                    scrollY: this.state.scrollY - deltaY,
+                  });
                 };
                 const teardown = (lastMouseUp = () => {
                   lastMouseUp = null;
@@ -855,7 +855,6 @@ export class App extends React.Component<any, AppState> {
                   if (!isHoldingSpace) {
                     setCursorForShape(this.state.elementType);
                   }
-                  history.resumeRecording();
                   window.removeEventListener("mousemove", onMouseMove);
                   window.removeEventListener("mouseup", teardown);
                   window.removeEventListener("blur", teardown);
@@ -1060,7 +1059,7 @@ export class App extends React.Component<any, AppState> {
                   const dx = x - lastX;
                   // We don't want to save history when scrolling
                   history.skipRecording();
-                  this.setState(state => ({ scrollX: state.scrollX - dx }));
+                  this.setState({ scrollX: this.state.scrollX - dx });
                   lastX = x;
                   return;
                 }
@@ -1070,7 +1069,7 @@ export class App extends React.Component<any, AppState> {
                   const dy = y - lastY;
                   // We don't want to save history when scrolling
                   history.skipRecording();
-                  this.setState(state => ({ scrollY: state.scrollY - dy }));
+                  this.setState({ scrollY: this.state.scrollY - dy });
                   lastY = y;
                   return;
                 }
@@ -1277,7 +1276,6 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                   });
-                  history.resumeRecording();
                   return;
                 }
 
@@ -1319,7 +1317,6 @@ export class App extends React.Component<any, AppState> {
                   // if no element is clicked, clear the selection and redraw
                   elements = clearSelection(elements);
                   this.setState({});
-                  history.resumeRecording();
                   return;
                 }
 
@@ -1341,9 +1338,6 @@ export class App extends React.Component<any, AppState> {
                     draggingElement: null,
                   });
                 }
-
-                history.resumeRecording();
-                this.setState({});
               };
 
               lastMouseUp = onMouseUp;
@@ -1517,15 +1511,10 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
     // We don't want to save history when panning around
     history.skipRecording();
-    this.setState(
-      state => ({
-        scrollX: state.scrollX - deltaX,
-        scrollY: state.scrollY - deltaY,
-      }),
-      () => {
-        history.resumeRecording();
-      },
-    );
+    this.setState({
+      scrollX: this.state.scrollX - deltaX,
+      scrollY: this.state.scrollY - deltaY,
+    });
   };
 
   private addElementsFromPaste = (paste: string) => {
@@ -1619,6 +1608,8 @@ export class App extends React.Component<any, AppState> {
           elements,
         ),
       );
+    } else {
+      history.resumeRecording();
     }
   }
 }
