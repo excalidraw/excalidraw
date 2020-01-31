@@ -5,7 +5,6 @@ export {
   getDiamondPoints,
   getArrowPoints,
   getLinePoints,
-  getArrowAbsoluteBounds,
 } from "./bounds";
 
 export { handlerRectangles } from "./handlerRectangles";

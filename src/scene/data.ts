@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState, cleanAppStateForExport } from "../appState";
+import { getDefaultAppState } from "../appState";
 
 import { AppState } from "../types";
 import { ExportType, PreviousScene } from "./types";
@@ -24,7 +24,7 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 interface DataState {
   elements: readonly ExcalidrawElement[];
-  appState: AppState | null;
+  appState: AppState;
   selectedId?: number;
 }
 
@@ -36,9 +36,10 @@ export function serializeAsJSON(
     {
       type: "excalidraw",
       version: 1,
-      source: window.location.origin,
+      appState: {
+        viewBackgroundColor: appState.viewBackgroundColor,
+      },
       elements: elements.map(({ shape, isSelected, ...el }) => el),
-      appState: cleanAppStateForExport(appState),
     },
     null,
     2,
@@ -254,7 +255,7 @@ export async function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState | null,
+  savedState: AppState,
 ): DataState {
   return {
     elements: savedElements.map(element => ({
@@ -290,7 +291,7 @@ export function restoreFromLocalStorage() {
   let appState = null;
   if (savedState) {
     try {
-      appState = JSON.parse(savedState) as AppState;
+      appState = JSON.parse(savedState);
     } catch (e) {
       // Do nothing because appState is already null
     }
