@@ -6,10 +6,6 @@ import { PreviousScene } from "../scene/types";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: (key: any) => key }),
-}));
-
 function setup(props: any) {
   const currentProps = {
     ...props,
