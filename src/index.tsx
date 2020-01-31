@@ -384,7 +384,11 @@ export class App extends React.Component<any, AppState> {
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
-    } else if (event[KEYS.META] && event.code === "KeyZ") {
+    } else if (
+      (event[KEYS.META] && event.code === "KeyZ") ||
+      // support undo/redo for AZERTY keyboards
+      (event[KEYS.META] && event.code === "KeyW")
+    ) {
       event.preventDefault();
 
       if (event.shiftKey) {
