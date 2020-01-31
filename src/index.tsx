@@ -85,9 +85,8 @@ import { FixedSideContainer } from "./components/FixedSideContainer";
 import { ToolButton } from "./components/ToolButton";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
-import { withTranslation } from "react-i18next";
 import { LanguageList } from "./components/LanguageList";
-import i18n, { languages, parseDetectedLang } from "./i18n";
+import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 
 let { elements } = createScene();
@@ -448,7 +447,6 @@ export class App extends React.Component<any, AppState> {
   };
 
   private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { t } = this.props;
     const { elementType, editingElement } = this.state;
     const targetElements = editingElement
       ? [editingElement]
@@ -465,7 +463,6 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
           {(hasBackground(elementType) ||
             targetElements.some(element => hasBackground(element.type))) && (
@@ -475,7 +472,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
 
               {this.actionManager.renderAction(
@@ -483,7 +479,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
             </>
           )}
@@ -496,7 +491,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
 
               {this.actionManager.renderAction(
@@ -504,7 +498,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
             </>
           )}
@@ -517,7 +510,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
 
               {this.actionManager.renderAction(
@@ -525,7 +517,6 @@ export class App extends React.Component<any, AppState> {
                 elements,
                 this.state,
                 this.syncActionResult,
-                t,
               )}
             </>
           )}
@@ -535,7 +526,6 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
 
           {this.actionManager.renderAction(
@@ -543,7 +533,6 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
         </div>
       </Island>
@@ -551,8 +540,6 @@ export class App extends React.Component<any, AppState> {
   }
 
   private renderShapesSwitcher() {
-    const { t } = this.props;
-
     return (
       <>
         {SHAPES.map(({ value, icon }, index) => {
@@ -584,7 +571,6 @@ export class App extends React.Component<any, AppState> {
   }
 
   private renderCanvasActions() {
-    const { t } = this.props;
     return (
       <Stack.Col gap={4}>
         <Stack.Row justifyContent={"space-between"}>
@@ -593,14 +579,12 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
           {this.actionManager.renderAction(
             "saveScene",
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
           <ExportDialog
             elements={elements}
@@ -653,7 +637,6 @@ export class App extends React.Component<any, AppState> {
             elements,
             this.state,
             this.syncActionResult,
-            t,
           )}
         </Stack.Row>
         {this.actionManager.renderAction(
@@ -661,7 +644,6 @@ export class App extends React.Component<any, AppState> {
           elements,
           this.state,
           this.syncActionResult,
-          t,
         )}
       </Stack.Col>
     );
@@ -670,7 +652,6 @@ export class App extends React.Component<any, AppState> {
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
-    const { t } = this.props;
 
     return (
       <div className="container">
@@ -779,7 +760,6 @@ export class App extends React.Component<any, AppState> {
                       this.state,
                       this.syncActionResult,
                       action => this.canvasOnlyActions.includes(action),
-                      t,
                     ),
                   ],
                   top: e.clientY,
@@ -809,7 +789,6 @@ export class App extends React.Component<any, AppState> {
                     this.state,
                     this.syncActionResult,
                     action => !this.canvasOnlyActions.includes(action),
-                    t,
                   ),
                 ],
                 top: e.clientY,
@@ -1480,11 +1459,12 @@ export class App extends React.Component<any, AppState> {
         </main>
         <footer role="contentinfo">
           <LanguageList
-            onClick={lng => {
-              i18n.changeLanguage(lng);
+            onChange={lng => {
+              setLanguage(lng);
+              this.setState({});
             }}
             languages={languages}
-            currentLanguage={parseDetectedLang(i18n.language)}
+            currentLanguage={getLanguage()}
           />
           {this.renderIdsDropdown()}
         </footer>
@@ -1614,8 +1594,6 @@ export class App extends React.Component<any, AppState> {
   }
 }
 
-const AppWithTrans = withTranslation()(App);
-
 const rootElement = document.getElementById("root");
 
 class TopErrorBoundary extends React.Component {
@@ -1710,7 +1688,7 @@ class TopErrorBoundary extends React.Component {
 
 ReactDOM.render(
   <TopErrorBoundary>
-    <AppWithTrans />
+    <App />
   </TopErrorBoundary>,
   rootElement,
 );

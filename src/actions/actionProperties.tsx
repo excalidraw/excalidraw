@@ -6,6 +6,7 @@ import { ButtonSelect } from "../components/ButtonSelect";
 import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
+import { t } from "../i18n";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -46,7 +47,7 @@ export const actionChangeStrokeColor: Action = {
       appState: { ...appState, currentItemStrokeColor: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
@@ -76,7 +77,7 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
@@ -106,7 +107,7 @@ export const actionChangeFillStyle: Action = {
       appState: { ...appState, currentItemFillStyle: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fill")}</legend>
       <ButtonSelect
@@ -142,7 +143,7 @@ export const actionChangeStrokeWidth: Action = {
       appState: { ...appState, currentItemStrokeWidth: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
       <ButtonSelect
@@ -176,7 +177,7 @@ export const actionChangeSloppiness: Action = {
       appState: { ...appState, currentItemRoughness: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
       <ButtonSelect
@@ -210,7 +211,7 @@ export const actionChangeOpacity: Action = {
       appState: { ...appState, currentItemOpacity: value },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <label className="control-label">
       {t("labels.opacity")}
       <input
@@ -256,7 +257,7 @@ export const actionChangeFontSize: Action = {
       },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
       <ButtonSelect
@@ -304,7 +305,7 @@ export const actionChangeFontFamily: Action = {
       },
     };
   },
-  PanelComponent: ({ elements, appState, updateData, t }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontFamily")}</legend>
       <ButtonSelect

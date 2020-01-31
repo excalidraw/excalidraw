@@ -4,13 +4,14 @@ import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
 import { trash } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+import { t } from "../i18n";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
   perform: (elements, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
-  PanelComponent: ({ appState, updateData, t }) => {
+  PanelComponent: ({ appState, updateData }) => {
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -32,7 +33,7 @@ export const actionClearCanvas: Action = {
       appState: getDefaultAppState(),
     };
   },
-  PanelComponent: ({ updateData, t }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={trash}
