@@ -842,7 +842,9 @@ export class App extends React.Component<any, AppState> {
                 lastMouseUp(e);
               }
 
-              if (isPanning) return;
+              if (isPanning) {
+                return;
+              }
 
               // pan canvas on wheel button drag or space+drag
               if (
@@ -1481,7 +1483,9 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onMouseMove={e => {
-              if (isHoldingSpace || isPanning) return;
+              if (isHoldingSpace || isPanning) {
+                return;
+              }
               const hasDeselectedButton = Boolean(e.buttons);
               if (
                 hasDeselectedButton ||
