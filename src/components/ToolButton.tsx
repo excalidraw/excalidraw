@@ -13,6 +13,7 @@ type ToolButtonBaseProps = {
   name?: string;
   id?: string;
   size?: ToolIconSize;
+  keyBindingLabel?: string;
 };
 
 type ToolButtonProps =
@@ -63,7 +64,12 @@ export const ToolButton = React.forwardRef(function(
         checked={props.checked}
         ref={innerRef}
       />
-      <div className="ToolIcon__icon">{props.icon}</div>
+      <div className="ToolIcon__icon">
+        {props.icon}
+        {props.keyBindingLabel && (
+          <span className="ToolIcon__keybinding">{props.keyBindingLabel}</span>
+        )}
+      </div>
     </label>
   );
 });

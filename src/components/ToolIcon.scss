@@ -83,3 +83,12 @@
     box-shadow: none;
   }
 }
+
+.ToolIcon__keybinding {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 0.5em;
+  color: #adb5bd; // OC GRAY 5
+  font-family: Arial, Helvetica, sans-serif;
+}
