@@ -30,11 +30,11 @@ export function isInputLike(
   | HTMLSelectElement
   | HTMLDivElement {
   return (
-    ((target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement) &&
-    !isToolIcon(target)
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
   );
 }
 
@@ -102,4 +102,10 @@ export function removeSelection() {
 
 export function distance(x: number, y: number) {
   return Math.abs(x - y);
+}
+
+export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+  const xd = x2 - x1;
+  const yd = y2 - y1;
+  return Math.sqrt(xd * xd + yd * yd);
 }

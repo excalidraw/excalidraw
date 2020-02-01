@@ -107,3 +107,11 @@
   margin-right: 0.25rem;
   border: 1px solid #dee2e6;
 }
+
+.color-picker-keybinding {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.7em;
+  color: #ccc;
+}
