@@ -267,13 +267,7 @@ function restore(
         // if point array is empty, add one point to the arrow
         // this is used as fail safe to convert incoming data to a valid
         // arrow. In the new arrow, width and height are not being usde
-        points =
-          element.points.length > 0
-            ? element.points
-            : [
-                [0, 0],
-                [element.width, element.height],
-              ];
+        points = element.points.length > 0 ? element.points : [[0, 0]];
       } else {
         // convert old arrow type to a new one
         // old arrow spec used width and height
