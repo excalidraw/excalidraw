@@ -10,6 +10,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import { getCommonBounds } from "../element";
 
 import i18n from "../i18n";
+import { Point } from "roughjs/bin/geometry";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
@@ -257,26 +258,37 @@ function restore(
   savedState: AppState | null,
 ): DataState {
   return {
-    elements: savedElements.map(element => ({
-      ...element,
-      id: element.id || nanoid(),
-      fillStyle: element.fillStyle || "hachure",
-      strokeWidth: element.strokeWidth || 1,
-      roughness: element.roughness || 1,
-      opacity:
-        element.opacity === null || element.opacity === undefined
-          ? 100
-          : element.opacity,
-      points:
-        element.type === "arrow"
-          ? Array.isArray(element.points)
-            ? element.points
-            : [
-                [0, 0],
-                [element.width, element.height],
-              ]
-          : [],
-    })),
+    elements: savedElements.map(element => {
+      let points: Point[] = [];
+      if (element.type === "arrow") {
+        if (Array.isArray(element.points)) {
+          // if point array is empty, add one point to the arrow
+          // this is used as fail safe to convert incoming data to a valid
+          // arrow. In the new arrow, width and height are not being usde
+          points = element.points.length > 0 ? element.points : [[0, 0]];
+        } else {
+          // convert old arrow type to a new one
+          // old arrow spec used width and height
+          // to determine the endpoints
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        }
+      }
+      return {
+        ...element,
+        id: element.id || nanoid(),
+        fillStyle: element.fillStyle || "hachure",
+        strokeWidth: element.strokeWidth || 1,
+        roughness: element.roughness || 1,
+        opacity:
+          element.opacity === null || element.opacity === undefined
+            ? 100
+            : element.opacity,
+        points,
+      };
+    }),
     appState: savedState,
   };
 }
