@@ -558,6 +558,7 @@ export class App extends React.Component<any, AppState> {
               title={`${capitalizeString(label)} — ${
                 capitalizeString(value)[0]
               }, ${index + 1}`}
+              keyBindingLabel={`${index + 1}`}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
