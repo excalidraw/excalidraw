@@ -36,6 +36,7 @@ import {
   importFromBackend,
   addToLoadedScenes,
   loadedScenes,
+  calculateScrollCenter,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -1764,6 +1765,16 @@ export class App extends React.Component<any, AppState> {
             currentLanguage={getLanguage()}
           />
           {this.renderIdsDropdown()}
+          {this.state.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                this.setState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
         </footer>
       </div>
     );
@@ -1872,11 +1883,20 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    renderScene(elements, this.rc!, this.canvas!, {
-      scrollX: this.state.scrollX,
-      scrollY: this.state.scrollY,
-      viewBackgroundColor: this.state.viewBackgroundColor,
-    });
+    const atLeastOneVisibleElement = renderScene(
+      elements,
+      this.rc!,
+      this.canvas!,
+      {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    );
+    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
+    if (this.state.scrolledOutside !== scrolledOutside) {
+      this.setState({ scrolledOutside: scrolledOutside });
+    }
     this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(

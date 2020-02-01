@@ -22,6 +22,7 @@ export type AppState = {
   scrollY: number;
   cursorX: number;
   cursorY: number;
+  scrolledOutside: boolean;
   name: string;
   selectedId?: string;
 };
