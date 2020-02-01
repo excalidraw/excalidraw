@@ -14,7 +14,7 @@ export const actionCopyStyles: Action = {
     return {};
   },
   contextItemLabel: "labels.copyStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyC",
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "C",
   contextMenuOrder: 0,
 };
 
@@ -46,6 +46,6 @@ export const actionPasteStyles: Action = {
     };
   },
   contextItemLabel: "labels.pasteStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyV",
+  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,
 };

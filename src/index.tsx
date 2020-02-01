@@ -383,7 +383,8 @@ export class App extends React.Component<any, AppState> {
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
-    } else if (event[KEYS.META] && event.code === "KeyZ") {
+      // Undo action
+    } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
 
       if (
