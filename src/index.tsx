@@ -378,8 +378,7 @@ export class App extends React.Component<any, AppState> {
       this.state.draggingElement === null
     ) {
       if (!isHoldingSpace) {
-        document.documentElement.style.cursor =
-          shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+        setCursorForShape(shape);
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
