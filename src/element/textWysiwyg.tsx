@@ -39,7 +39,7 @@ export function textWysiwyg({
 
   Object.assign(editable.style, {
     color: strokeColor,
-    position: "fixed",
+    position: "absolute",
     opacity: opacity / 100,
     top: y + "px",
     left: x + "px",
