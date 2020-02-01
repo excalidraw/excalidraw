@@ -18,8 +18,7 @@ export const actionSendBackward: Action = {
   },
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
-  keyTest: event =>
-    event[KEYS.META] && event.shiftKey && event.altKey && event.key === "B",
+  keyTest: event => event[KEYS.META] && event.altKey && event.key === "B",
 };
 
 export const actionBringForward: Action = {
@@ -32,8 +31,7 @@ export const actionBringForward: Action = {
   },
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
-  keyTest: event =>
-    event[KEYS.META] && event.shiftKey && event.altKey && event.key === "F",
+  keyTest: event => event[KEYS.META] && event.altKey && event.key === "F",
 };
 
 export const actionSendToBack: Action = {
