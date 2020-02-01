@@ -10,6 +10,7 @@ import { Drawable } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SVG_NS } from "../utils";
+import rough from "roughjs/bin/rough";
 
 function generateElement(
   element: ExcalidrawElement,
@@ -35,6 +36,21 @@ function generateElement(
             seed: element.seed,
           },
         );
+
+        const canvas = document.createElement("canvas");
+        canvas.width = (element.width + 20) * window.devicePixelRatio;
+        canvas.height = (element.height + 20) * window.devicePixelRatio;
+        var context = canvas.getContext("2d")!;
+        context.scale(window.devicePixelRatio, window.devicePixelRatio);
+        context.translate(10, 10);
+
+        var rc2 = rough.canvas(canvas);
+        context.globalAlpha = element.opacity / 100;
+        rc2.draw(element.shape as Drawable);
+        context.globalAlpha = 1;
+        (element as any).canvas = canvas;
+        context.translate(-10, -10);
+
         break;
       case "diamond": {
         const [
@@ -140,9 +156,17 @@ export function renderElement(
     case "ellipse":
     case "line": {
       generateElement(element, generator);
-      context.globalAlpha = element.opacity / 100;
-      rc.draw(element.shape as Drawable);
-      context.globalAlpha = 1;
+      if ((element as any).canvas) {
+        context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+        context.translate(-10, -10);
+        context.drawImage((element as any).canvas, 0, 0);
+        context.translate(10, 10);
+        context.scale(window.devicePixelRatio, window.devicePixelRatio);
+      } else {
+        context.globalAlpha = element.opacity / 100;
+        rc.draw(element.shape as Drawable);
+        context.globalAlpha = 1;
+      }
       break;
     }
     case "arrow": {

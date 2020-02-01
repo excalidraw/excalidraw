@@ -1573,7 +1573,9 @@ export class App extends React.Component<any, AppState> {
 
   private saveDebounced = debounce(() => {
     saveToLocalStorage(
-      elements.filter(x => x.type !== "selection"),
+      (elements as any)
+        .filter((x: any) => x.type !== "selection")
+        .map(({ canvas, shape, ...rest }: any) => ({ ...rest })),
       this.state,
     );
   }, 300);
