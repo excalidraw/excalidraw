@@ -58,7 +58,7 @@ const ZOOM_STEP = 0.1;
 
 function getNormalizedZoom(zoom: number): number {
   const normalizedZoom = parseFloat(zoom.toFixed(2));
-  const clampedZoom = Math.max(0, Math.min(normalizedZoom, 2));
+  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
   return clampedZoom;
 }
 
