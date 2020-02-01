@@ -7,6 +7,7 @@ import {
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
+import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SVG_NS } from "../utils";
@@ -89,18 +90,23 @@ function generateElement(
         );
         break;
       case "arrow": {
-        const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
         const options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
+        // points array can be empty in the beginning, so it is important to add
+        // initial position to it
+        const points: Point[] = element.points.length
+          ? element.points
+          : [[0, 0]];
         element.shape = [
           //    \
           generator.line(x3, y3, x2, y2, options),
           // -----
-          generator.line(x1, y1, x2, y2, options),
+          generator.curve(points, options),
           //    /
           generator.line(x4, y4, x2, y2, options),
         ];
@@ -169,7 +175,6 @@ export function renderElement(
         context.fillStyle = fillStyle;
         context.font = font;
         context.globalAlpha = 1;
-        break;
       } else {
         throw new Error("Unimplemented type " + element.type);
       }

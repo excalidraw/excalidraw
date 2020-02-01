@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, cleanAppStateForExport } from "../appState";
 
 import { AppState } from "../types";
 import { ExportType, PreviousScene } from "./types";
@@ -9,6 +9,7 @@ import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { getCommonBounds } from "../element";
 
+import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -24,7 +25,7 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 interface DataState {
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: AppState | null;
   selectedId?: number;
 }
 
@@ -36,10 +37,9 @@ export function serializeAsJSON(
     {
       type: "excalidraw",
       version: 1,
-      appState: {
-        viewBackgroundColor: appState.viewBackgroundColor,
-      },
+      source: window.location.origin,
       elements: elements.map(({ shape, isSelected, ...el }) => el),
+      appState: cleanAppStateForExport(appState),
     },
     null,
     2,
@@ -118,9 +118,7 @@ export async function loadFromJSON() {
   }
   const { elements, appState } = updateAppState(contents);
   return new Promise<DataState>(resolve => {
-    resolve(
-      restore(elements, { ...appState, ...calculateScrollCenter(elements) }),
-    );
+    resolve(restore(elements, appState, { scrollToContent: true }));
   });
 }
 
@@ -175,7 +173,7 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
-  return restore(elements, { ...appState, ...calculateScrollCenter(elements) });
+  return restore(elements, appState, { scrollToContent: true });
 }
 
 export async function exportCanvas(
@@ -259,10 +257,29 @@ export async function exportCanvas(
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState,
+  savedState: AppState | null,
+  opts?: { scrollToContent: boolean },
 ): DataState {
-  return {
-    elements: savedElements.map(element => ({
+  const elements = savedElements.map(element => {
+    let points: Point[] = [];
+    if (element.type === "arrow") {
+      if (Array.isArray(element.points)) {
+        // if point array is empty, add one point to the arrow
+        // this is used as fail safe to convert incoming data to a valid
+        // arrow. In the new arrow, width and height are not being usde
+        points = element.points.length > 0 ? element.points : [[0, 0]];
+      } else {
+        // convert old arrow type to a new one
+        // old arrow spec used width and height
+        // to determine the endpoints
+        points = [
+          [0, 0],
+          [element.width, element.height],
+        ];
+      }
+    }
+
+    return {
       ...element,
       id: element.id || nanoid(),
       fillStyle: element.fillStyle || "hachure",
@@ -272,7 +289,16 @@ function restore(
         element.opacity === null || element.opacity === undefined
           ? 100
           : element.opacity,
-    })),
+      points,
+    };
+  });
+
+  if (opts?.scrollToContent && savedState) {
+    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+  }
+
+  return {
+    elements: elements,
     appState: savedState,
   };
 }
@@ -295,7 +321,7 @@ export function restoreFromLocalStorage() {
   let appState = null;
   if (savedState) {
     try {
-      appState = JSON.parse(savedState);
+      appState = JSON.parse(savedState) as AppState;
     } catch (e) {
       // Do nothing because appState is already null
     }
