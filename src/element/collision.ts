@@ -87,7 +87,6 @@ export function hitTest(
   } else if (element.type === "diamond") {
     x -= element.x;
     y -= element.y;
-    /* eslint-disable prefer-const */
     let [
       topX,
       topY,
@@ -98,7 +97,6 @@ export function hitTest(
       leftX,
       leftY,
     ] = getDiamondPoints(element);
-    /* eslint-enable prefer-const */
 
     if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally

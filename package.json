@@ -52,7 +52,12 @@
       ],
       "no-else-return": "error",
       "no-useless-return": "error",
-      "prefer-const": "error",
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "all"
+        }
+      ],
       "prefer-template": "error",
       "prettier/prettier": "error"
     }
