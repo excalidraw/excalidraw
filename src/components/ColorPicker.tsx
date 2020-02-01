@@ -115,8 +115,9 @@ const Picker = function({
               onClick={() => {
                 onChange(color);
               }}
-              title={color}
+              title={`${color} — ${keyBindings[i].toUpperCase()}`}
               aria-label={color}
+              aria-keyshortcuts={keyBindings[i]}
               style={{ backgroundColor: color }}
               key={color}
               ref={el => {
