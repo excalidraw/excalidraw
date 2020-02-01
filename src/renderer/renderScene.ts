@@ -32,7 +32,7 @@ export function renderScene(
     renderSelection?: boolean;
   } = {},
 ) {
-  if (!canvas) return;
+  if (!canvas) return false;
   const context = canvas.getContext("2d")!;
 
   const fillStyle = context.fillStyle;
@@ -57,6 +57,7 @@ export function renderScene(
     scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
   };
 
+  let atLeastOneVisibleElement = false;
   elements.forEach(element => {
     if (
       !isVisibleElement(
@@ -71,6 +72,7 @@ export function renderScene(
     ) {
       return;
     }
+    atLeastOneVisibleElement = true;
     context.translate(
       element.x + sceneState.scrollX,
       element.y + sceneState.scrollY,
@@ -141,6 +143,8 @@ export function renderScene(
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
   }
+
+  return atLeastOneVisibleElement;
 }
 
 function isVisibleElement(
