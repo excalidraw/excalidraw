@@ -8,7 +8,7 @@ import { Point } from "roughjs/bin/geometry";
 // We can't just always normalize it since we need to remember the fact that an arrow
 // is pointing left or right.
 export function getElementAbsoluteCoords(element: ExcalidrawElement) {
-  if (element.type === "arrow") {
+  if (element.type === "arrow" || element.type === "line") {
     return getArrowAbsoluteBounds(element);
   }
   return [
@@ -58,7 +58,8 @@ export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
 
   const shape = element.shape as Drawable[];
 
-  const ops = shape[1].sets[0].ops;
+  // first element is always the curve
+  const ops = shape[0].sets[0].ops;
 
   let currentP: Point = [0, 0];
 

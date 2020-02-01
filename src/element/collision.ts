@@ -4,7 +4,6 @@ import { ExcalidrawElement } from "./types";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getLinePoints,
   getArrowAbsoluteBounds,
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
@@ -146,14 +145,11 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
         lineThreshold
     );
-  } else if (element.type === "arrow") {
+  } else if (element.type === "arrow" || element.type === "line") {
     if (!element.shape) {
       return false;
     }
     const shape = element.shape as Drawable[];
-    // If shape does not consist of curve and two line segments
-    // for arrow shape, return false
-    if (shape.length < 3) return false;
 
     const [x1, y1, x2, y2] = getArrowAbsoluteBounds(element);
     if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) return false;
@@ -161,19 +157,8 @@ export function hitTest(
     const relX = x - element.x;
     const relY = y - element.y;
 
-    // hit test curve and lien segments for arrow
-    return (
-      hitTestRoughShape(shape[0].sets, relX, relY) ||
-      hitTestRoughShape(shape[1].sets, relX, relY) ||
-      hitTestRoughShape(shape[2].sets, relX, relY)
-    );
-  } else if (element.type === "line") {
-    const [x1, y1, x2, y2] = getLinePoints(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
-
-    return distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold;
+    // hit thest all "subshapes" of the linear element
+    return shape.some(s => hitTestRoughShape(s.sets, relX, relY));
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 

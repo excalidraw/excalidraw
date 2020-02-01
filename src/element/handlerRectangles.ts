@@ -16,7 +16,7 @@ export function handlerRectangles(
   let marginY = -8;
 
   let minimumSize = 40;
-  if (element.type === "arrow") {
+  if (element.type === "arrow" || element.type === "line") {
     [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
       element,
     );
@@ -90,12 +90,7 @@ export function handlerRectangles(
     8,
   ]; // se
 
-  if (element.type === "line") {
-    return {
-      nw: handlers.nw,
-      se: handlers.se,
-    } as typeof handlers;
-  } else if (element.type === "arrow") {
+  if (element.type === "arrow" || element.type === "line") {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;
