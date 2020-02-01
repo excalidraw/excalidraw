@@ -374,7 +374,6 @@ export class App extends React.Component<any, AppState> {
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
       !event.ctrlKey &&
-      !event.shiftKey &&
       !event.altKey &&
       !event.metaKey &&
       this.state.draggingElement === null
@@ -564,6 +563,7 @@ export class App extends React.Component<any, AppState> {
               title={`${capitalizeString(label)} — ${
                 capitalizeString(value)[0]
               }, ${index + 1}`}
+              keyBindingLabel={`${index + 1}`}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
