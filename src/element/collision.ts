@@ -87,7 +87,7 @@ export function hitTest(
   } else if (element.type === "diamond") {
     x -= element.x;
     y -= element.y;
-
+    /* eslint-disable prefer-const */
     let [
       topX,
       topY,
@@ -98,6 +98,7 @@ export function hitTest(
       leftX,
       leftY,
     ] = getDiamondPoints(element);
+    /* eslint-enable prefer-const */
 
     if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
@@ -255,7 +256,7 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
       // check if points are on the curve
       // cubic bezier curves require four parameters
       // the first parameter is the last stored position (p0)
-      let retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
+      const retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
 
       // set end point of bezier curve as the new starting point for
       // upcoming operations as each operation is based on the last drawn

@@ -846,8 +846,8 @@ export class App extends React.Component<any, AppState> {
                 document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
                 let { clientX: lastX, clientY: lastY } = e;
                 const onMouseMove = (e: MouseEvent) => {
-                  let deltaX = lastX - e.clientX;
-                  let deltaY = lastY - e.clientY;
+                  const deltaX = lastX - e.clientX;
+                  const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
                   // We don't want to save history when panning around
@@ -1102,7 +1102,7 @@ export class App extends React.Component<any, AppState> {
                   const absPx = p1[0] + element.x;
                   const absPy = p1[1] + element.y;
 
-                  let { width, height } = getPerfectElementSize(
+                  const { width, height } = getPerfectElementSize(
                     "arrow",
                     mouseX - element.x - p1[0],
                     mouseY - element.y - p1[1],

@@ -52,6 +52,7 @@
       ],
       "no-else-return": "error",
       "no-useless-return": "error",
+      "prefer-const": "error",
       "prefer-template": "error",
       "prettier/prettier": "error"
     }
