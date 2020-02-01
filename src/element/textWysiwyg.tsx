@@ -73,14 +73,6 @@ export function textWysiwyg({
     }
   };
   editable.onblur = handleSubmit;
-  // override paste to disallow non-textual data, and replace newlines
-  editable.onpaste = ev => {
-    ev.preventDefault();
-    try {
-      const text = ev.clipboardData!.getData("text").replace(/\n+/g, " ");
-      editable.textContent = text;
-    } catch {}
-  };
 
   function stopEvent(ev: Event) {
     ev.stopPropagation();
@@ -98,7 +90,6 @@ export function textWysiwyg({
   function cleanup() {
     editable.onblur = null;
     editable.onkeydown = null;
-    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }
