@@ -30,13 +30,18 @@ const Picker = function({
   label: string;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
+  const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
     // After the component is first mounted
     // focus on first input
-    if (firstItem.current) firstItem.current.focus();
+    if (activeItem.current) {
+      activeItem.current.focus();
+    } else if (firstItem.current) {
+      firstItem.current.focus();
+    }
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -79,17 +84,15 @@ const Picker = function({
         (gallery!.current!.children![nextIndex] as any).focus();
       }
       e.preventDefault();
-      e.nativeEvent.stopImmediatePropagation();
     } else if (keyBindings.includes(e.key.toLowerCase())) {
       const index = keyBindings.indexOf(e.key.toLowerCase());
       (gallery!.current!.children![index] as any).focus();
-      onChange(colors[index]);
       e.preventDefault();
-      e.nativeEvent.stopImmediatePropagation();
-    } else if (e.key === KEYS.ESCAPE) {
+    } else if (e.key === KEYS.ESCAPE || e.key === KEYS.ENTER) {
+      e.preventDefault();
       onClose();
-      e.nativeEvent.stopImmediatePropagation();
     }
+    e.nativeEvent.stopImmediatePropagation();
   };
 
   return (
@@ -109,22 +112,26 @@ const Picker = function({
             if (el) gallery.current = el;
           }}
         >
-          {colors.map((color, i) => (
+          {colors.map((_color, i) => (
             <button
               className="color-picker-swatch"
               onClick={() => {
-                onChange(color);
+                onChange(_color);
               }}
-              title={`${color} — ${keyBindings[i].toUpperCase()}`}
-              aria-label={color}
+              title={`${_color} — ${keyBindings[i].toUpperCase()}`}
+              aria-label={_color}
               aria-keyshortcuts={keyBindings[i]}
-              style={{ backgroundColor: color }}
-              key={color}
+              style={{ backgroundColor: _color }}
+              key={_color}
               ref={el => {
-                if (i === 0 && el) firstItem.current = el;
+                if (el && i === 0) firstItem.current = el;
+                if (el && _color === color) activeItem.current = el;
+              }}
+              onFocus={() => {
+                onChange(_color);
               }}
             >
-              {color === "transparent" ? (
+              {_color === "transparent" ? (
                 <div className="color-picker-transparent"></div>
               ) : (
                 undefined
