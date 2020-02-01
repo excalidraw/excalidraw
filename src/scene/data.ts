@@ -46,7 +46,7 @@ export function serializeAsJSON(
   );
 }
 
-function calculateScrollCenter(
+export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
 ): { scrollX: number; scrollY: number } {
   let [x1, y1, x2, y2] = getCommonBounds(elements);

@@ -17,6 +17,7 @@ export {
   importFromBackend,
   addToLoadedScenes,
   loadedScenes,
+  calculateScrollCenter,
 } from "./data";
 export {
   hasBackground,
