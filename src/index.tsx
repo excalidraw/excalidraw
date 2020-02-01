@@ -377,7 +377,6 @@ export class App extends React.Component<any, AppState> {
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
       !event.ctrlKey &&
-      !event.shiftKey &&
       !event.altKey &&
       !event.metaKey &&
       this.state.draggingElement === null
