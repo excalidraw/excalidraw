@@ -31,6 +31,7 @@ export function isInputLike(
   | HTMLDivElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
