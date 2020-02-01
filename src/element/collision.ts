@@ -61,9 +61,8 @@ export function hitTest(
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
-    } else {
-      return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
     }
+    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
@@ -189,9 +188,8 @@ export function hitTest(
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
-  } else {
-    throw new Error(`Unimplemented type ${element.type}`);
   }
+  throw new Error(`Unimplemented type ${element.type}`);
 }
 
 const pointInBezierEquation = (

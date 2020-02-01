@@ -50,6 +50,7 @@
           ]
         }
       ],
+      "no-else-return": "error",
       "no-useless-return": "error",
       "prefer-template": "error",
       "prettier/prettier": "error"
