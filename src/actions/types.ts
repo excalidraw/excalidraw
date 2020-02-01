@@ -27,8 +27,8 @@ export interface Action {
   keyPriority?: number;
   keyTest?: (
     event: KeyboardEvent,
-    elements?: readonly ExcalidrawElement[],
-    appState?: AppState,
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
