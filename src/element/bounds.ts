@@ -139,15 +139,6 @@ export function getArrowPoints(element: ExcalidrawElement) {
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getLinePoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
-
-  return [x1, y1, x2, y2];
-}
-
 export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
   let minX = Infinity;
   let maxX = -Infinity;

@@ -4,7 +4,6 @@ export {
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
-  getLinePoints,
   getArrowAbsoluteBounds,
 } from "./bounds";
 

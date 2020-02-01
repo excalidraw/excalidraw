@@ -87,7 +87,6 @@ function generateElement(
         break;
       case "line":
       case "arrow": {
-        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
         const options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
@@ -100,8 +99,13 @@ function generateElement(
           ? element.points
           : [[0, 0]];
 
+        // curve is always the first element
+        // this simplifies finding the curve for an element
         element.shape = [generator.curve(points, options)];
+
+        // add lines only in arrow
         if (element.type === "arrow") {
+          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
           element.shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
