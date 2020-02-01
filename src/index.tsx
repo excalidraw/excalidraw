@@ -78,6 +78,8 @@ import {
   actionChangeFontFamily,
   actionChangeViewBackgroundColor,
   actionClearCanvas,
+  actionZoomIn,
+  actionZoomOut,
   actionChangeProjectName,
   actionChangeExportBackground,
   actionLoadScene,
@@ -140,9 +142,6 @@ const MOUSE_BUTTON = {
   SECONDARY: 2,
 };
 
-let lastCanvasWidth = -1;
-let lastCanvasHeight = -1;
-
 let lastMouseUp: ((e: any) => void) | null = null;
 
 export function viewportCoordsToSceneCoords(
@@ -168,6 +167,7 @@ function pickAppStatePropertiesForHistory(
     currentItemFont: appState.currentItemFont,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
+    zoom: appState.zoom,
   };
 }
 
@@ -204,6 +204,8 @@ export class App extends React.Component<any, AppState> {
 
     this.actionManager.registerAction(actionChangeViewBackgroundColor);
     this.actionManager.registerAction(actionClearCanvas);
+    this.actionManager.registerAction(actionZoomIn);
+    this.actionManager.registerAction(actionZoomOut);
 
     this.actionManager.registerAction(actionChangeProjectName);
     this.actionManager.registerAction(actionChangeExportBackground);
@@ -475,8 +477,6 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private removeWheelEventListener: (() => void) | undefined;
-
   private copyToAppClipboard = () => {
     copyToAppClipboard(elements);
   };
@@ -695,9 +695,38 @@ export class App extends React.Component<any, AppState> {
     );
   }
 
+  private renderZoomActions() {
+    return (
+      <Stack.Col gap={1}>
+        <Stack.Row gap={1} align="center">
+          {this.actionManager.renderAction(
+            "zoomIn",
+            elements,
+            this.state,
+            this.syncActionResult,
+          )}
+          {this.actionManager.renderAction(
+            "zoomOut",
+            elements,
+            this.state,
+            this.syncActionResult,
+          )}
+          <div style={{ marginLeft: 4 }}>
+            {(this.state.zoom * 100).toFixed(0)}%
+          </div>
+        </Stack.Row>
+      </Stack.Col>
+    );
+  }
+
   public render() {
-    const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
-    const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const canvasDOMWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
+    const canvasDOMHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+
+    const canvasScale = window.devicePixelRatio;
+
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
       <div className="container">
@@ -749,43 +778,37 @@ export class App extends React.Component<any, AppState> {
             </section>
             <div />
           </div>
+          <div className="App-menu App-menu_bottom">
+            <Stack.Col gap={2}>
+              <section aria-labelledby="canvas-zoom-actions-title">
+                <h2 className="visually-hidden" id="canvas-zoom-actions-title">
+                  {t("headings.canvasActions")}
+                </h2>
+                <Island padding={1}>{this.renderZoomActions()}</Island>
+              </section>
+            </Stack.Col>
+          </div>
         </FixedSideContainer>
         <main>
           <canvas
             id="canvas"
             style={{
-              width: canvasWidth,
-              height: canvasHeight,
+              width: canvasDOMWidth,
+              height: canvasDOMHeight,
             }}
-            width={canvasWidth * window.devicePixelRatio}
-            height={canvasHeight * window.devicePixelRatio}
+            width={canvasWidth}
+            height={canvasHeight}
             ref={canvas => {
-              if (this.canvas === null) {
+              // canvas is null when unmounting
+              if (canvas !== null) {
                 this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas!);
-              }
-              if (this.removeWheelEventListener) {
-                this.removeWheelEventListener();
-                this.removeWheelEventListener = undefined;
-              }
-              if (canvas) {
-                canvas.addEventListener("wheel", this.handleWheel, {
+                this.rc = rough.canvas(this.canvas);
+
+                this.canvas.addEventListener("wheel", this.handleWheel, {
                   passive: false,
                 });
-                this.removeWheelEventListener = () =>
-                  canvas.removeEventListener("wheel", this.handleWheel);
-                // Whenever React sets the width/height of the canvas element,
-                // the context loses the scale transform. We need to re-apply it
-                if (
-                  canvasWidth !== lastCanvasWidth ||
-                  canvasHeight !== lastCanvasHeight
-                ) {
-                  lastCanvasWidth = canvasWidth;
-                  lastCanvasHeight = canvasHeight;
-                  canvas
-                    .getContext("2d")!
-                    .scale(window.devicePixelRatio, window.devicePixelRatio);
-                }
+              } else {
+                this.canvas?.removeEventListener("wheel", this.handleWheel);
               }
             }}
             onContextMenu={e => {
@@ -1945,6 +1968,7 @@ export class App extends React.Component<any, AppState> {
         scrollX: this.state.scrollX,
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
+        zoom: 1,
       },
     );
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;

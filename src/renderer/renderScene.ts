@@ -2,7 +2,11 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
 import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords, handlerRectangles } from "../element";
+import {
+  getElementAbsoluteCoords,
+  handlerRectangles,
+  isTextElement,
+} from "../element";
 
 import { roundRect } from "./roundRect";
 import { SceneState } from "../scene/types";
@@ -35,8 +39,17 @@ export function renderScene(
   if (!canvas) {
     return false;
   }
+
+  // Use offsets insteads of scrolls if available
+  sceneState = {
+    ...sceneState,
+    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
+    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
+  };
+
   const context = canvas.getContext("2d")!;
 
+  // Paint background
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
@@ -53,28 +66,22 @@ export function renderScene(
   }
   context.fillStyle = fillStyle;
 
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
-  };
+  // Fake zoom by scaling elements
+  const scaledElements = elements.map(element =>
+    getScaledElement(element, sceneState.zoom),
+  );
 
-  let atLeastOneVisibleElement = false;
-  elements.forEach(element => {
-    if (
-      !isVisibleElement(
-        element,
-        sceneState.scrollX,
-        sceneState.scrollY,
-        // If canvas is scaled for high pixelDeviceRatio width and height
-        // setted in the `style` attribute
-        parseInt(canvas.style.width) || canvas.width,
-        parseInt(canvas.style.height) || canvas.height,
-      )
-    ) {
-      return;
-    }
-    atLeastOneVisibleElement = true;
+  // Paint visible elements
+  const visibleElements = scaledElements.filter(element =>
+    isVisibleElement(
+      element,
+      sceneState.scrollX,
+      sceneState.scrollY,
+      canvas.width,
+      canvas.height,
+    ),
+  );
+  visibleElements.forEach(element => {
     context.translate(
       element.x + sceneState.scrollX,
       element.y + sceneState.scrollY,
@@ -86,12 +93,14 @@ export function renderScene(
     );
   });
 
+  // Paint selection
   if (renderSelection) {
-    const selectedElements = elements.filter(el => el.isSelected);
+    const selectedElements = scaledElements.filter(
+      element => element.isSelected,
+    );
+    const margin = 8;
 
     selectedElements.forEach(element => {
-      const margin = 4;
-
       const [
         elementX1,
         elementY1,
@@ -103,12 +112,13 @@ export function renderScene(
       context.strokeRect(
         elementX1 - margin + sceneState.scrollX,
         elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2,
+        elementX2 - elementX1 + margin,
+        elementY2 - elementY1 + margin,
       );
       context.setLineDash(lineDash);
     });
 
+    // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       const handlers = handlerRectangles(selectedElements[0], sceneState);
       Object.values(handlers)
@@ -119,9 +129,10 @@ export function renderScene(
     }
   }
 
+  // Paint scrollbars
   if (renderScrollbars) {
     const scrollBars = getScrollBars(
-      elements,
+      scaledElements,
       context.canvas.width / window.devicePixelRatio,
       context.canvas.height / window.devicePixelRatio,
       sceneState.scrollX,
@@ -147,7 +158,7 @@ export function renderScene(
     context.fillStyle = fillStyle;
   }
 
-  return atLeastOneVisibleElement;
+  return visibleElements.length > 0;
 }
 
 function isVisibleElement(
@@ -199,4 +210,46 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
+}
+
+function getScaledElement(
+  element: ExcalidrawElement,
+  scale: number,
+): ExcalidrawElement {
+  switch (element.type) {
+    case "selection": {
+      const scaledElement = { ...element };
+      scaledElement.width *= scale;
+      scaledElement.height *= scale;
+      return scaledElement;
+    }
+    case "rectangle":
+    case "diamond":
+    case "ellipse":
+    case "line": {
+      const scaledElement = { ...element };
+      scaledElement.width *= scale;
+      scaledElement.height *= scale;
+      scaledElement.strokeWidth *= scale;
+      return scaledElement;
+    }
+    case "arrow": {
+      const scaledElement = { ...element };
+      scaledElement.width *= scale;
+      scaledElement.height *= scale;
+      scaledElement.strokeWidth *= scale;
+      return scaledElement;
+    }
+    default: {
+      if (isTextElement(element)) {
+        const scaledElement = { ...element };
+        const fontSize = parseFloat(scaledElement.font);
+        scaledElement.font = `${fontSize * scale}px ${
+          scaledElement.font.split("px ")[1]
+        }`;
+        return scaledElement;
+      }
+      throw new Error("Unimplemented type " + element.type);
+    }
+  }
 }

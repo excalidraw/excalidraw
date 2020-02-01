@@ -5,6 +5,7 @@ export type SceneState = {
   scrollY: number;
   // null indicates transparent bg
   viewBackgroundColor: string | null;
+  zoom: number;
 };
 
 export type SceneScroll = {
