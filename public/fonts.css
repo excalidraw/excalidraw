@@ -1,0 +1,13 @@
+/* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
+@font-face {
+  font-family: "Virgil";
+  src: url("FG_Virgil.ttf");
+  font-display: swap;
+}
+
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("Cascadia.ttf");
+  font-display: swap;
+}

@@ -39,7 +39,7 @@ export function textWysiwyg({
 
   Object.assign(editable.style, {
     color: strokeColor,
-    position: "absolute",
+    position: "fixed",
     opacity: opacity / 100,
     top: y + "px",
     left: x + "px",
@@ -48,7 +48,9 @@ export function textWysiwyg({
     display: "inline-block",
     font: font,
     padding: "4px",
-    outline: "transparent",
+    // This needs to have "1px solid" otherwise the carret doesn't show up
+    // the first time on Safari and Chrome!
+    outline: "1px solid transparent",
     whiteSpace: "nowrap",
     minHeight: "1em",
   });
@@ -73,14 +75,6 @@ export function textWysiwyg({
     }
   };
   editable.onblur = handleSubmit;
-  // override paste to disallow non-textual data, and replace newlines
-  editable.onpaste = ev => {
-    ev.preventDefault();
-    try {
-      const text = ev.clipboardData!.getData("text").replace(/\n+/g, " ");
-      editable.textContent = text;
-    } catch {}
-  };
 
   function stopEvent(ev: Event) {
     ev.stopPropagation();
@@ -98,7 +92,6 @@ export function textWysiwyg({
   function cleanup() {
     editable.onblur = null;
     editable.onkeydown = null;
-    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }

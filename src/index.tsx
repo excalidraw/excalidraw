@@ -48,6 +48,7 @@ import {
   capitalizeString,
   distance,
   distance2d,
+  isToolIcon,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -219,7 +220,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -233,7 +234,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -245,7 +246,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
     const paste = e.clipboardData?.getData("text") || "";
     this.addElementsFromPaste(paste);
     e.preventDefault();
@@ -378,8 +379,7 @@ export class App extends React.Component<any, AppState> {
       this.state.draggingElement === null
     ) {
       if (!isHoldingSpace) {
-        document.documentElement.style.cursor =
-          shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+        setCursorForShape(shape);
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
