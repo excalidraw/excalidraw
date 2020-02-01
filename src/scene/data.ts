@@ -118,9 +118,7 @@ export async function loadFromJSON() {
   }
   const { elements, appState } = updateAppState(contents);
   return new Promise<DataState>(resolve => {
-    resolve(
-      restore(elements, { ...appState, ...calculateScrollCenter(elements) }),
-    );
+    resolve(restore(elements, appState, { scrollToContent: true }));
   });
 }
 
@@ -175,7 +173,7 @@ export async function importFromBackend(id: string | null) {
       console.error(error);
     }
   }
-  return restore(elements, { ...appState, ...calculateScrollCenter(elements) });
+  return restore(elements, appState, { scrollToContent: true });
 }
 
 export async function exportCanvas(
@@ -260,39 +258,53 @@ export async function exportCanvas(
 function restore(
   savedElements: readonly ExcalidrawElement[],
   savedState: AppState | null,
+  opts?: { scrollToContent: boolean },
 ): DataState {
-  return {
-    elements: savedElements.map(element => {
-      let points: Point[] = [];
-      if (element.type === "arrow") {
-        if (Array.isArray(element.points)) {
-          // if point array is empty, add one point to the arrow
-          // this is used as fail safe to convert incoming data to a valid
-          // arrow. In the new arrow, width and height are not being usde
-          points = element.points.length > 0 ? element.points : [[0, 0]];
-        } else {
-          // convert old arrow type to a new one
-          // old arrow spec used width and height
-          // to determine the endpoints
-          points = [
-            [0, 0],
-            [element.width, element.height],
-          ];
-        }
+  const elements = savedElements.map(element => {
+    let points: Point[] = [];
+    if (element.type === "arrow") {
+      if (Array.isArray(element.points)) {
+        // if point array is empty, add one point to the arrow
+        // this is used as fail safe to convert incoming data to a valid
+        // arrow. In the new arrow, width and height are not being usde
+        points =
+          element.points.length > 0
+            ? element.points
+            : [
+                [0, 0],
+                [element.width, element.height],
+              ];
+      } else {
+        // convert old arrow type to a new one
+        // old arrow spec used width and height
+        // to determine the endpoints
+        points = [
+          [0, 0],
+          [element.width, element.height],
+        ];
       }
-      return {
-        ...element,
-        id: element.id || nanoid(),
-        fillStyle: element.fillStyle || "hachure",
-        strokeWidth: element.strokeWidth || 1,
-        roughness: element.roughness || 1,
-        opacity:
-          element.opacity === null || element.opacity === undefined
-            ? 100
-            : element.opacity,
-        points,
-      };
-    }),
+    }
+
+    return {
+      ...element,
+      id: element.id || nanoid(),
+      fillStyle: element.fillStyle || "hachure",
+      strokeWidth: element.strokeWidth || 1,
+      roughness: element.roughness || 1,
+      opacity:
+        element.opacity === null || element.opacity === undefined
+          ? 100
+          : element.opacity,
+      points,
+    };
+  });
+
+  if (opts?.scrollToContent && savedState) {
+    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+  }
+
+  return {
+    elements: elements,
     appState: savedState,
   };
 }
