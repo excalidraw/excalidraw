@@ -8,6 +8,14 @@ import { t } from "../i18n";
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
 
+// Unfortunately, we can't detect keyboard layout in the browser. So this will
+// only work well for QWERTY but not AZERTY or others...
+const keyBindings = [
+  ["1", "2", "3", "4", "5"],
+  ["q", "w", "e", "r", "t"],
+  ["a", "s", "d", "f", "g"],
+].flat();
+
 const Picker = function({
   colors,
   color,
@@ -22,6 +30,7 @@ const Picker = function({
   label: string;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
+  const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
@@ -44,6 +53,39 @@ const Picker = function({
           e.preventDefault();
         }
       }
+    } else if (
+      e.key === KEYS.ARROW_RIGHT ||
+      e.key === KEYS.ARROW_LEFT ||
+      e.key === KEYS.ARROW_UP ||
+      e.key === KEYS.ARROW_DOWN
+    ) {
+      const { activeElement } = document;
+      const index = Array.prototype.indexOf.call(
+        gallery!.current!.children,
+        activeElement,
+      );
+      if (index !== -1) {
+        const length = gallery!.current!.children.length;
+        const nextIndex =
+          e.key === KEYS.ARROW_RIGHT
+            ? (index + 1) % length
+            : e.key === KEYS.ARROW_LEFT
+            ? (length + index - 1) % length
+            : e.key === KEYS.ARROW_DOWN
+            ? (index + 5) % length
+            : e.key === KEYS.ARROW_UP
+            ? (length + index - 5) % length
+            : index;
+        (gallery!.current!.children![nextIndex] as any).focus();
+      }
+      e.preventDefault();
+      e.nativeEvent.stopImmediatePropagation();
+    } else if (keyBindings.includes(e.key.toLowerCase())) {
+      const index = keyBindings.indexOf(e.key.toLowerCase());
+      (gallery!.current!.children![index] as any).focus();
+      onChange(colors[index]);
+      e.preventDefault();
+      e.nativeEvent.stopImmediatePropagation();
     } else if (e.key === KEYS.ESCAPE) {
       onClose();
       e.nativeEvent.stopImmediatePropagation();
@@ -61,7 +103,12 @@ const Picker = function({
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div className="color-picker-content">
-        <div className="colors-gallery">
+        <div
+          className="colors-gallery"
+          ref={el => {
+            if (el) gallery.current = el;
+          }}
+        >
           {colors.map((color, i) => (
             <button
               className="color-picker-swatch"
@@ -81,6 +128,7 @@ const Picker = function({
               ) : (
                 undefined
               )}
+              <span className="color-picker-keybinding">{keyBindings[i]}</span>
             </button>
           ))}
         </div>
