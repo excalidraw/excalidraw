@@ -88,6 +88,7 @@ body {
   margin: 1px;
 }
 
+.buttonList label:focus-within,
 input:focus {
   outline: transparent;
   box-shadow: 0 0 0 2px #a5d8ff;
