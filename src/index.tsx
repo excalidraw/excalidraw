@@ -298,6 +298,11 @@ export class App extends React.Component<any, AppState> {
     const id = searchParams.get("id");
 
     this.loadScene(id);
+
+    const initialLanguage = localStorage.getItem("i18nextLng");
+    if (initialLanguage) {
+      document.documentElement.lang = initialLanguage;
+    }
   }
 
   public componentWillUnmount() {
@@ -1488,6 +1493,7 @@ export class App extends React.Component<any, AppState> {
           <LanguageList
             onClick={lng => {
               i18n.changeLanguage(lng);
+              document.documentElement.lang = lng;
             }}
             languages={languages}
             currentLanguage={parseDetectedLang(i18n.language)}
