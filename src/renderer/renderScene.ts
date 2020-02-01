@@ -98,7 +98,7 @@ export function renderScene(
     const selectedElements = scaledElements.filter(
       element => element.isSelected,
     );
-    const margin = 8;
+    const margin = 4;
 
     selectedElements.forEach(element => {
       const [
@@ -112,8 +112,8 @@ export function renderScene(
       context.strokeRect(
         elementX1 - margin + sceneState.scrollX,
         elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin,
-        elementY2 - elementY1 + margin,
+        elementX2 - elementX1 + margin * 2,
+        elementY2 - elementY1 + margin * 2,
       );
       context.setLineDash(lineDash);
     });
