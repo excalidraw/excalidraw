@@ -4,13 +4,14 @@ import { ProjectName } from "../components/ProjectName";
 import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+import { t } from "../i18n";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
   perform: (elements, appState, value) => {
     return { appState: { ...appState, name: value } };
   },
-  PanelComponent: ({ appState, updateData, t }) => (
+  PanelComponent: ({ appState, updateData }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
@@ -24,7 +25,7 @@ export const actionChangeExportBackground: Action = {
   perform: (elements, appState, value) => {
     return { appState: { ...appState, exportBackground: value } };
   },
-  PanelComponent: ({ appState, updateData, t }) => (
+  PanelComponent: ({ appState, updateData }) => (
     <label>
       <input
         type="checkbox"
@@ -44,7 +45,7 @@ export const actionSaveScene: Action = {
     saveAsJSON(elements, appState).catch(err => console.error(err));
     return {};
   },
-  PanelComponent: ({ updateData, t }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={save}
@@ -64,7 +65,7 @@ export const actionLoadScene: Action = {
   ) => {
     return { elements: loadedElements, appState: loadedAppState };
   },
-  PanelComponent: ({ updateData, t }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={load}

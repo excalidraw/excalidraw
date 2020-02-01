@@ -1,7 +1,6 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { TFunction } from "i18next";
 
 export type ActionResult = {
   elements?: ExcalidrawElement[];
@@ -23,7 +22,6 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData: any) => void;
-    t: TFunction;
   }>;
   perform: ActionFn;
   keyPriority?: number;
@@ -57,6 +55,5 @@ export interface ActionsManagerInterface {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    t: TFunction,
   ) => React.ReactElement | null;
 }

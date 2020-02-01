@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { PreviousScene } from "../scene/types";
+import { t } from "../i18n";
 
 interface StoredScenesListProps {
   scenes: PreviousScene[];
@@ -13,8 +13,6 @@ export function StoredScenesList({
   currentId,
   onChange,
 }: StoredScenesListProps) {
-  const { t } = useTranslation();
-
   return (
     <React.Fragment>
       <select
