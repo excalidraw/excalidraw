@@ -30,11 +30,10 @@ export function isInputLike(
   | HTMLSelectElement
   | HTMLDivElement {
   return (
-    ((target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement) &&
-    !isToolIcon(target)
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
   );
 }
 
