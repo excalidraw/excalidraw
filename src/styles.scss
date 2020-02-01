@@ -1,19 +1,5 @@
 @import "./theme.css";
 
-/* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
-@font-face {
-  font-family: "Virgil";
-  src: url("/FG_Virgil.ttf");
-  font-display: swap;
-}
-
-/* https://github.com/microsoft/cascadia-code */
-@font-face {
-  font-family: "Cascadia";
-  src: url("/Cascadia.ttf");
-  font-display: swap;
-}
-
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -88,6 +74,7 @@ body {
   margin: 1px;
 }
 
+.buttonList label:focus-within,
 input:focus {
   outline: transparent;
   box-shadow: 0 0 0 2px #a5d8ff;
@@ -268,4 +255,12 @@ button,
   clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
   white-space: nowrap; /* added line */
+}
+
+.scroll-back-to-content {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  padding: 10px 20px;
 }

@@ -7,7 +7,7 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { TFunction } from "i18next";
+import { t } from "../i18n";
 
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
@@ -34,7 +34,7 @@ export class ActionManager implements ActionsManagerInterface {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action => action.keyTest && action.keyTest(event, elements, appState),
+        action => action.keyTest && action.keyTest(event, appState, elements),
       );
 
     if (data.length === 0) {
@@ -50,7 +50,6 @@ export class ActionManager implements ActionsManagerInterface {
     appState: AppState,
     updater: UpdaterFn,
     actionFilter: ActionFilterFn = action => action,
-    t?: TFunction,
   ) {
     return Object.values(this.actions)
       .filter(actionFilter)
@@ -61,10 +60,7 @@ export class ActionManager implements ActionsManagerInterface {
           (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
       )
       .map(action => ({
-        label:
-          t && action.contextItemLabel
-            ? t(action.contextItemLabel)
-            : action.contextItemLabel!,
+        label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
           updater(action.perform(elements, appState, null));
         },
@@ -76,7 +72,6 @@ export class ActionManager implements ActionsManagerInterface {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     updater: UpdaterFn,
-    t: TFunction,
   ) {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
@@ -90,7 +85,6 @@ export class ActionManager implements ActionsManagerInterface {
           elements={elements}
           appState={appState}
           updateData={updateData}
-          t={t}
         />
       );
     }

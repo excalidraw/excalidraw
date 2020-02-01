@@ -3,11 +3,18 @@ import { Popover } from "./Popover";
 
 import "./ColorPicker.css";
 import { KEYS } from "../keys";
-import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import { t } from "../i18n";
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
+
+// Unfortunately, we can't detect keyboard layout in the browser. So this will
+// only work well for QWERTY but not AZERTY or others...
+const keyBindings = [
+  ["1", "2", "3", "4", "5"],
+  ["q", "w", "e", "r", "t"],
+  ["a", "s", "d", "f", "g"],
+].flat();
 
 const Picker = function({
   colors,
@@ -15,22 +22,24 @@ const Picker = function({
   onChange,
   onClose,
   label,
-  t,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
   label: string;
-  t: TFunction;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
+  const activeItem = React.useRef<HTMLButtonElement>();
+  const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
     // After the component is first mounted
     // focus on first input
-    if (firstItem.current) {
+    if (activeItem.current) {
+      activeItem.current.focus();
+    } else if (firstItem.current) {
       firstItem.current.focus();
     }
   }, []);
@@ -49,10 +58,41 @@ const Picker = function({
           e.preventDefault();
         }
       }
-    } else if (e.key === KEYS.ESCAPE) {
+    } else if (
+      e.key === KEYS.ARROW_RIGHT ||
+      e.key === KEYS.ARROW_LEFT ||
+      e.key === KEYS.ARROW_UP ||
+      e.key === KEYS.ARROW_DOWN
+    ) {
+      const { activeElement } = document;
+      const index = Array.prototype.indexOf.call(
+        gallery!.current!.children,
+        activeElement,
+      );
+      if (index !== -1) {
+        const length = gallery!.current!.children.length;
+        const nextIndex =
+          e.key === KEYS.ARROW_RIGHT
+            ? (index + 1) % length
+            : e.key === KEYS.ARROW_LEFT
+            ? (length + index - 1) % length
+            : e.key === KEYS.ARROW_DOWN
+            ? (index + 5) % length
+            : e.key === KEYS.ARROW_UP
+            ? (length + index - 5) % length
+            : index;
+        (gallery!.current!.children![nextIndex] as any).focus();
+      }
+      e.preventDefault();
+    } else if (keyBindings.includes(e.key.toLowerCase())) {
+      const index = keyBindings.indexOf(e.key.toLowerCase());
+      (gallery!.current!.children![index] as any).focus();
+      e.preventDefault();
+    } else if (e.key === KEYS.ESCAPE || e.key === KEYS.ENTER) {
+      e.preventDefault();
       onClose();
-      e.nativeEvent.stopImmediatePropagation();
     }
+    e.nativeEvent.stopImmediatePropagation();
   };
 
   return (
@@ -66,28 +106,43 @@ const Picker = function({
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div className="color-picker-content">
-        <div className="colors-gallery">
-          {colors.map((color, i) => (
+        <div
+          className="colors-gallery"
+          ref={el => {
+            if (el) {
+              gallery.current = el;
+            }
+          }}
+        >
+          {colors.map((_color, i) => (
             <button
               className="color-picker-swatch"
               onClick={() => {
-                onChange(color);
+                onChange(_color);
               }}
-              title={color}
-              aria-label={color}
-              style={{ backgroundColor: color }}
-              key={color}
+              title={`${_color} — ${keyBindings[i].toUpperCase()}`}
+              aria-label={_color}
+              aria-keyshortcuts={keyBindings[i]}
+              style={{ backgroundColor: _color }}
+              key={_color}
               ref={el => {
-                if (i === 0 && el) {
+                if (el && i === 0) {
                   firstItem.current = el;
                 }
+                if (el && _color === color) {
+                  activeItem.current = el;
+                }
+              }}
+              onFocus={() => {
+                onChange(_color);
               }}
             >
-              {color === "transparent" ? (
+              {_color === "transparent" ? (
                 <div className="color-picker-transparent"></div>
               ) : (
                 undefined
               )}
+              <span className="color-picker-keybinding">{keyBindings[i]}</span>
             </button>
           ))}
         </div>
@@ -137,7 +192,7 @@ const ColorInput = React.forwardRef(
           onChange={e => {
             const value = e.target.value.toLowerCase();
             if (value.match(colorRegex)) {
-              onChange(value === "transparent" ? "transparent" : "#" + value);
+              onChange(value === "transparent" ? "transparent" : `#${value}`);
             }
             setInnerValue(value);
           }}
@@ -162,8 +217,6 @@ export function ColorPicker({
   onChange: (color: string) => void;
   label: string;
 }) {
-  const { t } = useTranslation();
-
   const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -199,7 +252,6 @@ export function ColorPicker({
                 pickerButton.current?.focus();
               }}
               label={label}
-              t={t}
             />
           </Popover>
         ) : null}
