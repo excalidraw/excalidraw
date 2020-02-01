@@ -219,8 +219,11 @@ function getScaledElement(
   switch (element.type) {
     case "selection": {
       const scaledElement = { ...element };
+      scaledElement.x *= scale;
+      scaledElement.y *= scale;
       scaledElement.width *= scale;
       scaledElement.height *= scale;
+      scaledElement.strokeWidth *= scale;
       return scaledElement;
     }
     case "rectangle":
@@ -228,6 +231,8 @@ function getScaledElement(
     case "ellipse":
     case "line": {
       const scaledElement = { ...element };
+      scaledElement.x *= scale;
+      scaledElement.y *= scale;
       scaledElement.width *= scale;
       scaledElement.height *= scale;
       scaledElement.strokeWidth *= scale;
@@ -235,14 +240,22 @@ function getScaledElement(
     }
     case "arrow": {
       const scaledElement = { ...element };
+      scaledElement.x *= scale;
+      scaledElement.y *= scale;
       scaledElement.width *= scale;
       scaledElement.height *= scale;
       scaledElement.strokeWidth *= scale;
+      scaledElement.points = scaledElement.points.map(([x, y]) => [
+        x * scale,
+        y * scale,
+      ]);
       return scaledElement;
     }
     default: {
       if (isTextElement(element)) {
         const scaledElement = { ...element };
+        scaledElement.x *= scale;
+        scaledElement.y *= scale;
         const fontSize = parseFloat(scaledElement.font);
         scaledElement.font = `${fontSize * scale}px ${
           scaledElement.font.split("px ")[1]
