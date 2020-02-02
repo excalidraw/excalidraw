@@ -15,7 +15,7 @@ export function handlerRectangles(
   let marginX = -8;
   let marginY = -8;
 
-  let minimumSize = 40;
+  const minimumSize = 40;
   if (element.type === "arrow" || element.type === "line") {
     [
       elementX1,
