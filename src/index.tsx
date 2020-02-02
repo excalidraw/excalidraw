@@ -1787,9 +1787,6 @@ export class App extends React.Component<any, AppState> {
               const hitElement = getElementAtPosition(elements, x, y);
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
-            onDragOver={e => {
-              e.preventDefault();
-            }}
             onDrop={e => {
               const file = e.dataTransfer.files[0];
               if (file?.type === "application/json") {
