@@ -11,6 +11,14 @@ interface Hint {
 }
 
 const getHints = ({ elementType, multiMode, resizingElements }: Hint) => {
+  if (elementType === "arrow" || elementType === "line") {
+    if (!multiMode) {
+      return t("hints.linearElement");
+    } else {
+      return t("hints.linearElementMulti");
+    }
+  }
+
   if (resizingElements.length === 1) {
     const resizingElement = resizingElements[0];
     if (
@@ -21,14 +29,6 @@ const getHints = ({ elementType, multiMode, resizingElements }: Hint) => {
       return null;
     }
     return t("hints.resize");
-  }
-
-  if (elementType === "arrow" || elementType === "line") {
-    if (!multiMode) {
-      return t("hints.linearElement");
-    } else {
-      return t("hints.linearElementMulti");
-    }
   }
 
   return null;
