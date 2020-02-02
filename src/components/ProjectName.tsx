@@ -16,7 +16,9 @@ export class ProjectName extends Component<Props> {
 
   private handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const value = e.currentTarget.innerText.trim();
-    if (value !== this.props.value) this.props.onChange(value);
+    if (value !== this.props.value) {
+      this.props.onChange(value);
+    }
     removeSelection();
   };
 

@@ -35,7 +35,7 @@ export const ToolButton = React.forwardRef(function(
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
-  if (props.type === "button")
+  if (props.type === "button") {
     return (
       <button
         className={`ToolIcon_type_button ToolIcon ${sizeCn}`}
@@ -50,6 +50,7 @@ export const ToolButton = React.forwardRef(function(
         </div>
       </button>
     );
+  }
 
   return (
     <label className="ToolIcon" title={props.title}>

@@ -109,7 +109,9 @@ const Picker = function({
         <div
           className="colors-gallery"
           ref={el => {
-            if (el) gallery.current = el;
+            if (el) {
+              gallery.current = el;
+            }
           }}
         >
           {colors.map((_color, i) => (
@@ -124,8 +126,12 @@ const Picker = function({
               style={{ backgroundColor: _color }}
               key={_color}
               ref={el => {
-                if (el && i === 0) firstItem.current = el;
-                if (el && _color === color) activeItem.current = el;
+                if (el && i === 0) {
+                  firstItem.current = el;
+                }
+                if (el && _color === color) {
+                  activeItem.current = el;
+                }
               }}
               onFocus={() => {
                 onChange(_color);
@@ -186,7 +192,7 @@ const ColorInput = React.forwardRef(
           onChange={e => {
             const value = e.target.value.toLowerCase();
             if (value.match(colorRegex)) {
-              onChange(value === "transparent" ? "transparent" : "#" + value);
+              onChange(value === "transparent" ? "transparent" : `#${value}`);
             }
             setInnerValue(value);
           }}

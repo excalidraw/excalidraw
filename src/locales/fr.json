@@ -46,7 +46,8 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "previouslyLoadedScenes": "Scènes précédemment chargées"
+    "previouslyLoadedScenes": "Scènes précédemment chargées",
+    "scrollBackToContent": "Revenir au contenu"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",

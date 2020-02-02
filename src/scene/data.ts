@@ -49,7 +49,7 @@ export function serializeAsJSON(
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
 ): { scrollX: number; scrollY: number } {
-  let [x1, y1, x2, y2] = getCommonBounds(elements);
+  const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
@@ -149,7 +149,6 @@ export async function exportToBackend(
     }
   } catch (e) {
     window.alert(t("alerts.couldNotCreateShareableLink"));
-    return;
   }
 }
 
@@ -194,8 +193,9 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length)
+  if (!elements.length) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
+  }
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
@@ -252,7 +252,9 @@ export async function exportCanvas(
   }
 
   // clean up the DOM
-  if (tempCanvas !== canvas) tempCanvas.remove();
+  if (tempCanvas !== canvas) {
+    tempCanvas.remove();
+  }
 }
 
 function restore(

@@ -178,7 +178,7 @@ function ExportModal({
                     key={s}
                     size="s"
                     type="radio"
-                    icon={"x" + s}
+                    icon={`x${s}`}
                     name="export-canvas-scale"
                     aria-label={`Scale ${s} x`}
                     id="export-canvas-scale"
