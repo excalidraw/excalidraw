@@ -76,8 +76,16 @@ export async function saveAsJSON(
     (window as any).handle,
   );
 }
-
 export async function loadFromJSON() {
+  const blob = await fileOpen({
+    description: "Excalidraw files",
+    extensions: ["json"],
+    mimeTypes: ["application/json"],
+  });
+  return loadFromBlob(blob);
+}
+
+export async function loadFromBlob(blob: any) {
   const updateAppState = (contents: string) => {
     const defaultAppState = getDefaultAppState();
     let elements = [];
@@ -92,11 +100,6 @@ export async function loadFromJSON() {
     return { elements, appState };
   };
 
-  const blob = await fileOpen({
-    description: "Excalidraw files",
-    extensions: ["json"],
-    mimeTypes: ["application/json"],
-  });
   if (blob.handle) {
     (window as any).handle = blob.handle;
   }

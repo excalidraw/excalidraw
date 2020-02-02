@@ -10,6 +10,7 @@ export {
 export {
   exportCanvas,
   loadFromJSON,
+  loadFromBlob,
   saveAsJSON,
   restoreFromLocalStorage,
   saveToLocalStorage,
