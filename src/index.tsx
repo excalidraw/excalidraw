@@ -1968,7 +1968,7 @@ export class App extends React.Component<any, AppState> {
         scrollX: this.state.scrollX,
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
-        zoom: 1,
+        zoom: this.state.zoom,
       },
     );
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
