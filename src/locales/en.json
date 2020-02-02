@@ -79,8 +79,8 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "linearElement": "Click points on the canvas instead of dragging to draw multiple points",
-    "linearElementMulti": "In multi point mode you can click or drag points",
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

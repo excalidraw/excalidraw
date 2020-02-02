@@ -26,4 +26,5 @@ export type AppState = {
   name: string;
   selectedId?: string;
   showHints: boolean;
+  isResizing: boolean;
 };

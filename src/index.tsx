@@ -1186,6 +1186,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isResizingElements && this.state.resizingElement) {
+                  this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
@@ -1541,6 +1542,7 @@ export class App extends React.Component<any, AppState> {
               };
 
               const onMouseUp = (e: MouseEvent) => {
+                this.setState({ isResizing: false });
                 const {
                   draggingElement,
                   resizingElement,
@@ -1796,7 +1798,8 @@ export class App extends React.Component<any, AppState> {
             <HintViewer
               elementType={this.state.elementType}
               multiMode={this.state.multiElement !== null}
-              resizingElements={elements.filter(e => e.isSelected)}
+              isResizing={this.state.isResizing}
+              elements={elements}
             />
           )}
           <LanguageList
