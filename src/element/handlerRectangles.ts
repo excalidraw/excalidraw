@@ -15,7 +15,7 @@ export function handlerRectangles(
   let marginX = -8;
   let marginY = -8;
 
-  let minimumSize = 40;
+  const minimumSize = 40;
   if (element.type === "arrow") {
     [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
       element,

@@ -37,7 +37,9 @@ export class ActionManager implements ActionsManagerInterface {
         action => action.keyTest && action.keyTest(event, appState, elements),
       );
 
-    if (data.length === 0) return null;
+    if (data.length === 0) {
+      return null;
+    }
 
     event.preventDefault();
     return data[0].perform(elements, appState, null);
