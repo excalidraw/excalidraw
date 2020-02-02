@@ -35,7 +35,7 @@ export function renderScene(
     renderScrollbars?: boolean;
     renderSelection?: boolean;
   } = {},
-) {
+): boolean {
   if (!canvas) {
     return false;
   }
