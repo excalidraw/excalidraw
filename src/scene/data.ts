@@ -126,7 +126,9 @@ export async function loadFromBlob(blob: any) {
     })();
   }
   const { elements, appState } = updateAppState(contents);
-  if (!elements.length) return Promise.reject("Cannot load invalid json");
+  if (!elements.length) {
+    return Promise.reject("Cannot load invalid json");
+  }
   return new Promise<DataState>(resolve => {
     resolve(restore(elements, appState, { scrollToContent: true }));
   });
