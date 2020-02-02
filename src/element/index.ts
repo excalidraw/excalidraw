@@ -23,3 +23,4 @@ export {
   resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./sizeHelpers";
+export { getScaledElement } from "./scale";

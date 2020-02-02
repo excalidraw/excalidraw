@@ -5,7 +5,7 @@ import { ExcalidrawElement } from "../element/types";
 import {
   getElementAbsoluteCoords,
   handlerRectangles,
-  isTextElement,
+  getScaledElement,
 } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -158,6 +158,16 @@ export function renderScene(
     context.fillStyle = fillStyle;
   }
 
+  // Reset context transform matrix
+  context.setTransform(
+    window.devicePixelRatio,
+    0,
+    0,
+    window.devicePixelRatio,
+    0,
+    0,
+  );
+
   return visibleElements.length > 0;
 }
 
@@ -210,59 +220,4 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
-}
-
-function getScaledElement(
-  element: ExcalidrawElement,
-  scale: number,
-): ExcalidrawElement {
-  switch (element.type) {
-    case "selection": {
-      const scaledElement = { ...element };
-      scaledElement.x *= scale;
-      scaledElement.y *= scale;
-      scaledElement.width *= scale;
-      scaledElement.height *= scale;
-      scaledElement.strokeWidth *= scale;
-      return scaledElement;
-    }
-    case "rectangle":
-    case "diamond":
-    case "ellipse":
-    case "line": {
-      const scaledElement = { ...element };
-      scaledElement.x *= scale;
-      scaledElement.y *= scale;
-      scaledElement.width *= scale;
-      scaledElement.height *= scale;
-      scaledElement.strokeWidth *= scale;
-      return scaledElement;
-    }
-    case "arrow": {
-      const scaledElement = { ...element };
-      scaledElement.x *= scale;
-      scaledElement.y *= scale;
-      scaledElement.width *= scale;
-      scaledElement.height *= scale;
-      scaledElement.strokeWidth *= scale;
-      scaledElement.points = scaledElement.points.map(([x, y]) => [
-        x * scale,
-        y * scale,
-      ]);
-      return scaledElement;
-    }
-    default: {
-      if (isTextElement(element)) {
-        const scaledElement = { ...element };
-        scaledElement.x *= scale;
-        scaledElement.y *= scale;
-        const fontSize = parseFloat(scaledElement.font);
-        scaledElement.font = `${fontSize * scale}px ${
-          scaledElement.font.split("px ")[1]
-        }`;
-        return scaledElement;
-      }
-      throw new Error("Unimplemented type " + element.type);
-    }
-  }
 }
