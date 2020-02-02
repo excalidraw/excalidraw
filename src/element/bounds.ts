@@ -5,17 +5,15 @@ import { Point } from "roughjs/bin/geometry";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-// We can't just always normalize it since we need to remember the fact that an arrow
-// is pointing left or right.
 export function getElementAbsoluteCoords(element: ExcalidrawElement) {
   if (element.type === "arrow" || element.type === "line") {
-    return getArrowAbsoluteBounds(element);
+    return getLinearElementAbsoluteBounds(element);
   }
   return [
-    element.width >= 0 ? element.x : element.x + element.width, // x1
-    element.height >= 0 ? element.y : element.y + element.height, // y1
-    element.width >= 0 ? element.x + element.width : element.x, // x2
-    element.height >= 0 ? element.y + element.height : element.y, // y2
+    element.x,
+    element.y,
+    element.x + element.width,
+    element.y + element.height,
   ];
 }
 
@@ -34,7 +32,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
+export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
   if (element.points.length < 2 || !element.shape) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {

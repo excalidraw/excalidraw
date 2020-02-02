@@ -4,7 +4,7 @@ import { ExcalidrawElement } from "./types";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getArrowAbsoluteBounds,
+  getLinearElementAbsoluteBounds,
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
@@ -151,7 +151,7 @@ export function hitTest(
     }
     const shape = element.shape as Drawable[];
 
-    const [x1, y1, x2, y2] = getArrowAbsoluteBounds(element);
+    const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
     if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) return false;
 
     const relX = x - element.x;

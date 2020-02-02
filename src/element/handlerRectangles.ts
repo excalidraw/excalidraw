@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { SceneScroll } from "../scene/types";
-import { getArrowAbsoluteBounds } from "./bounds";
+import { getLinearElementAbsoluteBounds } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -17,9 +17,12 @@ export function handlerRectangles(
 
   let minimumSize = 40;
   if (element.type === "arrow" || element.type === "line") {
-    [elementX1, elementY1, elementX2, elementY2] = getArrowAbsoluteBounds(
-      element,
-    );
+    [
+      elementX1,
+      elementY1,
+      elementX2,
+      elementY2,
+    ] = getLinearElementAbsoluteBounds(element);
   } else {
     elementX1 = element.x;
     elementX2 = element.x + element.width;

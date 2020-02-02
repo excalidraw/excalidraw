@@ -7,7 +7,7 @@ import { ExportType, PreviousScene } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
-import { getCommonBounds } from "../element";
+import { getCommonBounds, normalizeDimensions } from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
@@ -288,6 +288,8 @@ function restore(
       } else {
         points = element.points;
       }
+    } else {
+      normalizeDimensions(element);
     }
 
     return {
