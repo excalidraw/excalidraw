@@ -61,9 +61,8 @@ export function hitTest(
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
-    } else {
-      return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
     }
+    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
@@ -88,7 +87,6 @@ export function hitTest(
   } else if (element.type === "diamond") {
     x -= element.x;
     y -= element.y;
-
     let [
       topX,
       topY,
@@ -102,8 +100,12 @@ export function hitTest(
 
     if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
-      if (topY > bottomY) [bottomY, topY] = [topY, bottomY];
-      if (rightX < leftX) [leftX, rightX] = [rightX, leftX];
+      if (topY > bottomY) {
+        [bottomY, topY] = [topY, bottomY];
+      }
+      if (rightX < leftX) {
+        [leftX, rightX] = [rightX, leftX];
+      }
 
       topY -= lineThreshold;
       bottomY += lineThreshold;
@@ -153,10 +155,14 @@ export function hitTest(
     const shape = element.shape as Drawable[];
     // If shape does not consist of curve and two line segments
     // for arrow shape, return false
-    if (shape.length < 3) return false;
+    if (shape.length < 3) {
+      return false;
+    }
 
     const [x1, y1, x2, y2] = getArrowAbsoluteBounds(element);
-    if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) return false;
+    if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) {
+      return false;
+    }
 
     const relX = x - element.x;
     const relY = y - element.y;
@@ -181,9 +187,8 @@ export function hitTest(
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
-  } else {
-    throw new Error("Unimplemented type " + element.type);
   }
+  throw new Error(`Unimplemented type ${element.type}`);
 }
 
 const pointInBezierEquation = (
@@ -249,7 +254,7 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
       // check if points are on the curve
       // cubic bezier curves require four parameters
       // the first parameter is the last stored position (p0)
-      let retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
+      const retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
 
       // set end point of bezier curve as the new starting point for
       // upcoming operations as each operation is based on the last drawn

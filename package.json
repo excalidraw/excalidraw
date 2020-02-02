@@ -20,6 +20,9 @@
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.5",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.1",
     "lint-staged": "10.0.3",
     "node-sass": "4.13.1",
@@ -28,10 +31,17 @@
     "typescript": "3.7.5"
   },
   "eslintConfig": {
-    "extends": "react-app",
+    "extends": [
+      "prettier",
+      "react-app"
+    ],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
+      "curly": "error",
       "no-console": [
-        "warn",
+        "error",
         {
           "allow": [
             "warn",
@@ -39,7 +49,17 @@
             "info"
           ]
         }
-      ]
+      ],
+      "no-else-return": "error",
+      "no-useless-return": "error",
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "all"
+        }
+      ],
+      "prefer-template": "error",
+      "prettier/prettier": "error"
     }
   },
   "homepage": "https://excalidraw.com",
@@ -54,12 +74,15 @@
     "build": "react-scripts build",
     "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
-    "fix": "npm run prettier -- --write",
-    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
+    "fix": "npm run fix:other && npm run fix:code",
+    "fix:code": "npm run test:code -- --fix",
+    "fix:other": "npm run prettier -- --write",
+    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:code": "npm run prettier -- --list-different"
+    "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "test:other": "npm run prettier -- --list-different"
   },
   "version": "1.0.0",
   "license": "MIT",

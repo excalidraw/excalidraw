@@ -43,12 +43,12 @@ export function t(path: string, replacement?: { [key: string]: string }) {
     findPartsForData(currentLanguage.data, parts) ||
     findPartsForData(fallbackLanguage.data, parts);
   if (translation === undefined) {
-    throw new Error("Can't find translation for " + path);
+    throw new Error(`Can't find translation for ${path}`);
   }
 
   if (replacement) {
     for (var key in replacement) {
-      translation = translation.replace("{{" + key + "}}", replacement[key]);
+      translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }
   return translation;
