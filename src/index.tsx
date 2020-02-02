@@ -37,6 +37,7 @@ import {
   addToLoadedScenes,
   loadedScenes,
   calculateScrollCenter,
+  loadFromBlob,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -310,6 +311,8 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
     window.addEventListener("blur", this.onUnload, false);
+    window.addEventListener("dragover", e => e.preventDefault(), false);
+    window.addEventListener("drop", e => e.preventDefault(), false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -1783,6 +1786,19 @@ export class App extends React.Component<any, AppState> {
               }
               const hitElement = getElementAtPosition(elements, x, y);
               document.documentElement.style.cursor = hitElement ? "move" : "";
+            }}
+            onDrop={e => {
+              const file = e.dataTransfer.files[0];
+              if (file?.type === "application/json") {
+                loadFromBlob(file)
+                  .then(({ elements, appState }) =>
+                    this.syncActionResult({
+                      elements,
+                      appState,
+                    } as ActionResult),
+                  )
+                  .catch(err => console.error(err));
+              }
             }}
           >
             {t("labels.drawingCanvas")}
