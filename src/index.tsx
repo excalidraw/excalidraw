@@ -545,7 +545,7 @@ export class App extends React.Component<any, AppState> {
 
   private getElementsWithZoomScale = (
     elements: readonly ExcalidrawElement[],
-  ): ExcalidrawElement[] => {
+  ): readonly ExcalidrawElement[] => {
     return elements.map(element => getScaledElement(element, this.state.zoom));
   };
 
