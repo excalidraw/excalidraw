@@ -44,6 +44,7 @@ import {
 import { renderScene } from "./renderer";
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
+import { SceneScroll } from "./scene/types";
 
 import {
   isInputLike,
@@ -541,6 +542,18 @@ export class App extends React.Component<any, AppState> {
 
   private getCommonBounds = (elements: readonly ExcalidrawElement[]) => {
     return getCommonBounds(this.getElementsWithZoomScale(elements));
+  };
+
+  private getElementWithResizeHandler = (
+    elements: readonly ExcalidrawElement[],
+    { x, y }: { x: number; y: number },
+    { scrollX, scrollY }: SceneScroll,
+  ) => {
+    return getElementWithResizeHandler(
+      this.getElementsWithZoomScale(elements),
+      { x, y },
+      { scrollX, scrollY },
+    );
   };
 
   private getElementsWithZoomScale = (
@@ -1067,7 +1080,7 @@ export class App extends React.Component<any, AppState> {
               let hitElement: ExcalidrawElement | null = null;
               let elementIsAddedToSelection = false;
               if (this.state.elementType === "selection") {
-                const resizeElement = getElementWithResizeHandler(
+                const resizeElement = this.getElementWithResizeHandler(
                   elements,
                   { x, y },
                   this.state,
@@ -1897,7 +1910,7 @@ export class App extends React.Component<any, AppState> {
               const selectedElements = elements.filter(e => e.isSelected)
                 .length;
               if (selectedElements === 1) {
-                const resizeElement = getElementWithResizeHandler(
+                const resizeElement = this.getElementWithResizeHandler(
                   elements,
                   { x, y },
                   this.state,
