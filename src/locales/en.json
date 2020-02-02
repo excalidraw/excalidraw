@@ -77,5 +77,10 @@
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
     "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click points on the canvas instead of dragging to draw multiple points",
+    "linearElementMulti": "In multi point mode you can click or drag points",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

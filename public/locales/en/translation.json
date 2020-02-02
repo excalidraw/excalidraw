@@ -76,5 +76,9 @@
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
     "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click points on the canvas instead of dragging to draw multiple points",
+    "linearElementMulti": "Now, you can drag arrows to add new points"
   }
 }

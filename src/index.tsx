@@ -98,6 +98,7 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
+import { HintViewer } from "./components/HintViewer";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -1756,6 +1757,11 @@ export class App extends React.Component<any, AppState> {
           </canvas>
         </main>
         <footer role="contentinfo">
+          <HintViewer
+            elementType={this.state.elementType}
+            multiMode={this.state.multiElement !== null}
+            resizingElements={elements.filter(e => e.isSelected)}
+          />
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
