@@ -277,6 +277,17 @@ function restore(
           [element.width, element.height],
         ];
       }
+    } else if (element.type === "line") {
+      // old spec, pre-arrows
+      // old spec, post-arrows
+      if (!Array.isArray(element.points) || element.points.length === 0) {
+        points = [
+          [0, 0],
+          [element.width, element.height],
+        ];
+      } else {
+        points = element.points;
+      }
     }
 
     return {
