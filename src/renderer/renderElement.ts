@@ -41,8 +41,8 @@ function generateElement(
         canvas.width = (element.width + 20) * window.devicePixelRatio;
         canvas.height = (element.height + 20) * window.devicePixelRatio;
         var context = canvas.getContext("2d")!;
-        context.scale(window.devicePixelRatio, window.devicePixelRatio);
         context.translate(10, 10);
+        context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
         var rc2 = rough.canvas(canvas);
         context.globalAlpha = element.opacity / 100;
