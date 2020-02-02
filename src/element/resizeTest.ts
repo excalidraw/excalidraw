@@ -11,13 +11,17 @@ export function resizeTest(
   y: number,
   { scrollX, scrollY }: SceneScroll,
 ): HandlerRectanglesRet | false {
-  if (!element.isSelected || element.type === "text") return false;
+  if (!element.isSelected || element.type === "text") {
+    return false;
+  }
 
   const handlers = handlerRectangles(element, { scrollX, scrollY });
 
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key as HandlerRectanglesRet]!;
-    if (!handler) return false;
+    if (!handler) {
+      return false;
+    }
 
     return (
       x + scrollX >= handler[0] &&
