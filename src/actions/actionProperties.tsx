@@ -219,6 +219,19 @@ export const actionChangeOpacity: Action = {
         min="0"
         max="100"
         onChange={e => updateData(+e.target.value)}
+        onWheel={e => {
+          const target = e.target as HTMLInputElement;
+          const STEP = 1;
+          const MAX = 100;
+          const MIN = 0;
+          const value = +target.value;
+
+          if (e.deltaY < 0 && value < MAX) {
+            updateData(value + STEP);
+          } else if (e.deltaY > 0 && value > MIN) {
+            updateData(value - STEP);
+          }
+        }}
         value={
           getFormValue(
             appState.editingElement,
