@@ -85,7 +85,6 @@ import {
   actionCopyStyles,
   actionPasteStyles,
   actionFinalize,
-  actionToggleHints,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -207,7 +206,6 @@ export class App extends React.Component<any, AppState> {
 
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
-    this.actionManager.registerAction(actionToggleHints);
 
     this.canvasOnlyActions = [actionSelectAll];
   }
@@ -1794,14 +1792,13 @@ export class App extends React.Component<any, AppState> {
           </canvas>
         </main>
         <footer role="contentinfo">
-          {this.state.showHints && (
-            <HintViewer
-              elementType={this.state.elementType}
-              multiMode={this.state.multiElement !== null}
-              isResizing={this.state.isResizing}
-              elements={elements}
-            />
-          )}
+          <HintViewer
+            elementType={this.state.elementType}
+            multiMode={this.state.multiElement !== null}
+            isResizing={this.state.isResizing}
+            elements={elements}
+          />
+
           <LanguageList
             onChange={lng => {
               setLanguage(lng);

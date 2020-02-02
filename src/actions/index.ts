@@ -32,6 +32,4 @@ export {
   actionLoadScene,
 } from "./actionExport";
 
-export { actionToggleHints } from "./actionToggleHints";
-
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";

@@ -26,7 +26,6 @@ export function getDefaultAppState(): AppState {
     cursorY: 0,
     scrolledOutside: false,
     name: DEFAULT_PROJECT_NAME,
-    showHints: true,
     isResizing: false,
   };
 }
