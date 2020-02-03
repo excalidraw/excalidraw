@@ -26,6 +26,9 @@ const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
+const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
+const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/post/";
+
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
 // part of `AppState`.
@@ -175,16 +178,16 @@ export async function exportToBackend(
   const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
 
   try {
-    // TODO: uncomment following
-    // const response = await fetch(BACKEND_POST, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: encrypted,
-    // });
-    // const json = await response.json();
+    const response = await fetch(BACKEND_V2_POST, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      mode: "no-cors",
+      body: encrypted,
+    });
+    const json = await response.json();
     // TODO: comment following
-    const json = {id: '1234'}
-    console.log("new Uint8Array([" + new Uint8Array(encrypted).join(",") + "])");
+    // const json = {id: '1234'}
+    // console.log("new Uint8Array([" + new Uint8Array(encrypted).join(",") + "])");
 
     if (json.id) {
       const url = new URL(window.location.href);
@@ -203,6 +206,7 @@ export async function exportToBackend(
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (e) {
+    console.error(e);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
 }
