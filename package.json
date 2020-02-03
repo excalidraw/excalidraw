@@ -24,7 +24,7 @@
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.1",
-    "lint-staged": "10.0.3",
+    "lint-staged": "10.0.7",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
     "rewire": "4.0.1",
