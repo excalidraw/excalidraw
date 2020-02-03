@@ -36,6 +36,8 @@ import {
   importFromBackend,
   addToLoadedScenes,
   loadedScenes,
+  calculateScrollCenter,
+  loadFromBlob,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -97,6 +99,7 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
+import { HintViewer } from "./components/HintViewer";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -220,7 +223,9 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+      return;
+    }
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -234,7 +239,9 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+      return;
+    }
     e.clipboardData?.setData(
       "text/plain",
       JSON.stringify(
@@ -246,7 +253,9 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
+    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+      return;
+    }
     const paste = e.clipboardData?.getData("text") || "";
     this.addElementsFromPaste(paste);
     e.preventDefault();
@@ -303,6 +312,8 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
     window.addEventListener("blur", this.onUnload, false);
+    window.addEventListener("dragover", e => e.preventDefault(), false);
+    window.addEventListener("drop", e => e.preventDefault(), false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -338,7 +349,9 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) return;
+    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) {
+      return;
+    }
 
     const actionResult = this.actionManager.handleKeyDown(
       event,
@@ -348,7 +361,9 @@ export class App extends React.Component<any, AppState> {
 
     if (actionResult) {
       this.syncActionResult(actionResult);
-      if (actionResult) return;
+      if (actionResult) {
+        return;
+      }
     }
 
     const shape = findShapeByKey(event.key);
@@ -360,10 +375,15 @@ export class App extends React.Component<any, AppState> {
       elements = elements.map(el => {
         if (el.isSelected) {
           const element = { ...el };
-          if (event.key === KEYS.ARROW_LEFT) element.x -= step;
-          else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
-          else if (event.key === KEYS.ARROW_UP) element.y -= step;
-          else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          if (event.key === KEYS.ARROW_LEFT) {
+            element.x -= step;
+          } else if (event.key === KEYS.ARROW_RIGHT) {
+            element.x += step;
+          } else if (event.key === KEYS.ARROW_UP) {
+            element.y -= step;
+          } else if (event.key === KEYS.ARROW_DOWN) {
+            element.y += step;
+          }
           return element;
         }
         return el;
@@ -373,7 +393,6 @@ export class App extends React.Component<any, AppState> {
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
       !event.ctrlKey &&
-      !event.shiftKey &&
       !event.altKey &&
       !event.metaKey &&
       this.state.draggingElement === null
@@ -383,7 +402,8 @@ export class App extends React.Component<any, AppState> {
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
-    } else if (event[KEYS.META] && event.code === "KeyZ") {
+      // Undo action
+    } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
 
       if (
@@ -562,6 +582,7 @@ export class App extends React.Component<any, AppState> {
               title={`${capitalizeString(label)} — ${
                 capitalizeString(value)[0]
               }, ${index + 1}`}
+              keyBindingLabel={`${index + 1}`}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={`${label[0]} ${index + 1}`}
               onChange={() => {
@@ -600,13 +621,14 @@ export class App extends React.Component<any, AppState> {
             actionManager={this.actionManager}
             syncActionResult={this.syncActionResult}
             onExportToPng={(exportedElements, scale) => {
-              if (this.canvas)
+              if (this.canvas) {
                 exportCanvas("png", exportedElements, this.canvas, {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale,
                 });
+              }
             }}
             onExportToSvg={(exportedElements, scale) => {
               if (this.canvas) {
@@ -619,16 +641,17 @@ export class App extends React.Component<any, AppState> {
               }
             }}
             onExportToClipboard={(exportedElements, scale) => {
-              if (this.canvas)
+              if (this.canvas) {
                 exportCanvas("clipboard", exportedElements, this.canvas, {
                   exportBackground: this.state.exportBackground,
                   name: this.state.name,
                   viewBackgroundColor: this.state.viewBackgroundColor,
                   scale,
                 });
+              }
             }}
             onExportToBackend={exportedElements => {
-              if (this.canvas)
+              if (this.canvas) {
                 exportCanvas(
                   "backend",
                   exportedElements.map(element => ({
@@ -638,6 +661,7 @@ export class App extends React.Component<any, AppState> {
                   this.canvas,
                   this.state,
                 );
+              }
             }}
           />
           {this.actionManager.renderAction(
@@ -811,7 +835,9 @@ export class App extends React.Component<any, AppState> {
                 lastMouseUp(e);
               }
 
-              if (isPanning) return;
+              if (isPanning) {
+                return;
+              }
 
               // pan canvas on wheel button drag or space+drag
               if (
@@ -824,8 +850,8 @@ export class App extends React.Component<any, AppState> {
                 document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
                 let { clientX: lastX, clientY: lastY } = e;
                 const onMouseMove = (e: MouseEvent) => {
-                  let deltaX = lastX - e.clientX;
-                  let deltaY = lastY - e.clientY;
+                  const deltaX = lastX - e.clientX;
+                  const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
                   // We don't want to save history when panning around
@@ -855,7 +881,9 @@ export class App extends React.Component<any, AppState> {
               }
 
               // only handle left mouse button
-              if (e.button !== MOUSE_BUTTON.MAIN) return;
+              if (e.button !== MOUSE_BUTTON.MAIN) {
+                return;
+              }
               // fixes mousemove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
@@ -1078,7 +1106,7 @@ export class App extends React.Component<any, AppState> {
                   const absPx = p1[0] + element.x;
                   const absPy = p1[1] + element.y;
 
-                  let { width, height } = getPerfectElementSize(
+                  const { width, height } = getPerfectElementSize(
                     "arrow",
                     mouseX - element.x - p1[0],
                     mouseY - element.y - p1[1],
@@ -1153,11 +1181,13 @@ export class App extends React.Component<any, AppState> {
                 //  triggering mousemove)
                 if (!draggingOccurred && this.state.elementType === "arrow") {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
-                  if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD)
+                  if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
+                  }
                 }
 
                 if (isResizingElements && this.state.resizingElement) {
+                  this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
@@ -1430,7 +1460,9 @@ export class App extends React.Component<any, AppState> {
                 // It is very important to read this.state within each move event,
                 // otherwise we would read a stale one!
                 const draggingElement = this.state.draggingElement;
-                if (!draggingElement) return;
+                if (!draggingElement) {
+                  return;
+                }
 
                 const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
@@ -1441,8 +1473,12 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) width = -width;
-                if (isLinear && y < originY) height = -height;
+                if (isLinear && x < originX) {
+                  width = -width;
+                }
+                if (isLinear && y < originY) {
+                  height = -height;
+                }
 
                 if (e.shiftKey) {
                   ({ width, height } = getPerfectElementSize(
@@ -1451,7 +1487,9 @@ export class App extends React.Component<any, AppState> {
                     !isLinear && y < originY ? -height : height,
                   ));
 
-                  if (!isLinear && height < 0) height = -height;
+                  if (!isLinear && height < 0) {
+                    height = -height;
+                  }
                 }
 
                 if (!isLinear) {
@@ -1505,6 +1543,7 @@ export class App extends React.Component<any, AppState> {
               };
 
               const onMouseUp = (e: MouseEvent) => {
+                this.setState({ isResizing: false });
                 const {
                   draggingElement,
                   resizingElement,
@@ -1722,7 +1761,9 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onMouseMove={e => {
-              if (isHoldingSpace || isPanning) return;
+              if (isHoldingSpace || isPanning) {
+                return;
+              }
               const hasDeselectedButton = Boolean(e.buttons);
               if (
                 hasDeselectedButton ||
@@ -1749,11 +1790,31 @@ export class App extends React.Component<any, AppState> {
               const hitElement = getElementAtPosition(elements, x, y);
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
+            onDrop={e => {
+              const file = e.dataTransfer.files[0];
+              if (file?.type === "application/json") {
+                loadFromBlob(file)
+                  .then(({ elements, appState }) =>
+                    this.syncActionResult({
+                      elements,
+                      appState,
+                    } as ActionResult),
+                  )
+                  .catch(err => console.error(err));
+              }
+            }}
           >
             {t("labels.drawingCanvas")}
           </canvas>
         </main>
         <footer role="contentinfo">
+          <HintViewer
+            elementType={this.state.elementType}
+            multiMode={this.state.multiElement !== null}
+            isResizing={this.state.isResizing}
+            elements={elements}
+          />
+
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
@@ -1763,6 +1824,16 @@ export class App extends React.Component<any, AppState> {
             currentLanguage={getLanguage()}
           />
           {this.renderIdsDropdown()}
+          {this.state.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                this.setState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
         </footer>
       </div>
     );
@@ -1871,11 +1942,20 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    renderScene(elements, this.rc!, this.canvas!, {
-      scrollX: this.state.scrollX,
-      scrollY: this.state.scrollY,
-      viewBackgroundColor: this.state.viewBackgroundColor,
-    });
+    const atLeastOneVisibleElement = renderScene(
+      elements,
+      this.rc!,
+      this.canvas!,
+      {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    );
+    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
+    if (this.state.scrolledOutside !== scrolledOutside) {
+      this.setState({ scrolledOutside: scrolledOutside });
+    }
     this.saveDebounced();
     if (history.isRecording()) {
       history.pushEntry(

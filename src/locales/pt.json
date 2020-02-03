@@ -46,7 +46,8 @@
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
-    "previouslyLoadedScenes": "Cenas carregadas anteriormente"
+    "previouslyLoadedScenes": "Cenas carregadas anteriormente",
+    "scrollBackToContent": "Voltar ao conteúdo"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",

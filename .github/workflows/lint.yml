@@ -17,6 +17,7 @@ jobs:
       - name: Install and lint
         run: |
           npm ci
+          npm run test:other
           npm run test:code
         env:
           CI: true

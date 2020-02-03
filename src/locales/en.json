@@ -52,7 +52,8 @@
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select Language",
-    "previouslyLoadedScenes": "Previously loaded scenes"
+    "previouslyLoadedScenes": "Previously loaded scenes",
+    "scrollBackToContent": "Scroll back to content"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -76,5 +77,10 @@
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
     "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

@@ -10,6 +10,7 @@ export {
 export {
   exportCanvas,
   loadFromJSON,
+  loadFromBlob,
   saveAsJSON,
   restoreFromLocalStorage,
   saveToLocalStorage,
@@ -17,6 +18,7 @@ export {
   importFromBackend,
   addToLoadedScenes,
   loadedScenes,
+  calculateScrollCenter,
 } from "./data";
 export {
   hasBackground,

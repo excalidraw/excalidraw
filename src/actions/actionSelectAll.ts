@@ -9,5 +9,5 @@ export const actionSelectAll: Action = {
     };
   },
   contextItemLabel: "labels.selectAll",
-  keyTest: event => event[KEYS.META] && event.code === "KeyA",
+  keyTest: event => event[KEYS.META] && event.key === "a",
 };

@@ -176,7 +176,7 @@ export function renderElement(
         context.font = font;
         context.globalAlpha = 1;
       } else {
-        throw new Error("Unimplemented type " + element.type);
+        throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }
@@ -267,7 +267,7 @@ export function renderElementToSvg(
         }
         svgRoot.appendChild(node);
       } else {
-        throw new Error("Unimplemented type " + element.type);
+        throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }

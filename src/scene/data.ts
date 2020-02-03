@@ -24,6 +24,9 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 (window as any).handle = null;
 
 interface DataState {
+  type?: string;
+  version?: string;
+  source?: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState | null;
   selectedId?: number;
@@ -46,10 +49,10 @@ export function serializeAsJSON(
   );
 }
 
-function calculateScrollCenter(
+export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
 ): { scrollX: number; scrollY: number } {
-  let [x1, y1, x2, y2] = getCommonBounds(elements);
+  const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
@@ -76,14 +79,25 @@ export async function saveAsJSON(
     (window as any).handle,
   );
 }
-
 export async function loadFromJSON() {
+  const blob = await fileOpen({
+    description: "Excalidraw files",
+    extensions: ["json"],
+    mimeTypes: ["application/json"],
+  });
+  return loadFromBlob(blob);
+}
+
+export async function loadFromBlob(blob: any) {
   const updateAppState = (contents: string) => {
     const defaultAppState = getDefaultAppState();
     let elements = [];
     let appState = defaultAppState;
     try {
       const data = JSON.parse(contents);
+      if (data.type !== "excalidraw") {
+        throw new Error("Cannot load invalid json");
+      }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
     } catch (e) {
@@ -92,11 +106,6 @@ export async function loadFromJSON() {
     return { elements, appState };
   };
 
-  const blob = await fileOpen({
-    description: "Excalidraw files",
-    extensions: ["json"],
-    mimeTypes: ["application/json"],
-  });
   if (blob.handle) {
     (window as any).handle = blob.handle;
   }
@@ -117,6 +126,9 @@ export async function loadFromJSON() {
     })();
   }
   const { elements, appState } = updateAppState(contents);
+  if (!elements.length) {
+    return Promise.reject("Cannot load invalid json");
+  }
   return new Promise<DataState>(resolve => {
     resolve(restore(elements, appState, { scrollToContent: true }));
   });
@@ -149,7 +161,6 @@ export async function exportToBackend(
     }
   } catch (e) {
     window.alert(t("alerts.couldNotCreateShareableLink"));
-    return;
   }
 }
 
@@ -194,8 +205,9 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length)
+  if (!elements.length) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
+  }
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
@@ -252,7 +264,9 @@ export async function exportCanvas(
   }
 
   // clean up the DOM
-  if (tempCanvas !== canvas) tempCanvas.remove();
+  if (tempCanvas !== canvas) {
+    tempCanvas.remove();
+  }
 }
 
 function restore(

@@ -13,6 +13,7 @@ type ToolButtonBaseProps = {
   name?: string;
   id?: string;
   size?: ToolIconSize;
+  keyBindingLabel?: string;
 };
 
 type ToolButtonProps =
@@ -34,7 +35,7 @@ export const ToolButton = React.forwardRef(function(
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
-  if (props.type === "button")
+  if (props.type === "button") {
     return (
       <button
         className={`ToolIcon_type_button ToolIcon ${sizeCn}`}
@@ -49,6 +50,7 @@ export const ToolButton = React.forwardRef(function(
         </div>
       </button>
     );
+  }
 
   return (
     <label className="ToolIcon" title={props.title}>
@@ -63,7 +65,12 @@ export const ToolButton = React.forwardRef(function(
         checked={props.checked}
         ref={innerRef}
       />
-      <div className="ToolIcon__icon">{props.icon}</div>
+      <div className="ToolIcon__icon">
+        {props.icon}
+        {props.keyBindingLabel && (
+          <span className="ToolIcon__keybinding">{props.keyBindingLabel}</span>
+        )}
+      </div>
     </label>
   );
 });
