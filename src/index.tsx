@@ -99,6 +99,7 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
+import { HintViewer } from "./components/HintViewer";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -1186,6 +1187,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isResizingElements && this.state.resizingElement) {
+                  this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
@@ -1541,6 +1543,7 @@ export class App extends React.Component<any, AppState> {
               };
 
               const onMouseUp = (e: MouseEvent) => {
+                this.setState({ isResizing: false });
                 const {
                   draggingElement,
                   resizingElement,
@@ -1805,6 +1808,13 @@ export class App extends React.Component<any, AppState> {
           </canvas>
         </main>
         <footer role="contentinfo">
+          <HintViewer
+            elementType={this.state.elementType}
+            multiMode={this.state.multiElement !== null}
+            isResizing={this.state.isResizing}
+            elements={elements}
+          />
+
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
