@@ -218,10 +218,12 @@ export const actionChangeOpacity: Action = {
         type="range"
         min="0"
         max="100"
+        step="10"
         onChange={e => updateData(+e.target.value)}
         onWheel={e => {
+          e.stopPropagation();
           const target = e.target as HTMLInputElement;
-          const STEP = 1;
+          const STEP = 10;
           const MAX = 100;
           const MIN = 0;
           const value = +target.value;
