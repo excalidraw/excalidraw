@@ -218,6 +218,7 @@ export const actionChangeOpacity: Action = {
         type="range"
         min="0"
         max="100"
+        step="10"
         onChange={e => updateData(+e.target.value)}
         value={
           getFormValue(
