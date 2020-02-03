@@ -25,4 +25,5 @@ export type AppState = {
   scrolledOutside: boolean;
   name: string;
   selectedId?: string;
+  isResizing: boolean;
 };
