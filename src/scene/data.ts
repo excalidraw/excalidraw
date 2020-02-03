@@ -24,6 +24,9 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 (window as any).handle = null;
 
 interface DataState {
+  type?: string;
+  version?: string;
+  source?: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState | null;
   selectedId?: number;
@@ -92,6 +95,9 @@ export async function loadFromBlob(blob: any) {
     let appState = defaultAppState;
     try {
       const data = JSON.parse(contents);
+      if (data.type !== "excalidraw") {
+        throw new Error("Cannot load invalid json");
+      }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
     } catch (e) {
@@ -120,6 +126,9 @@ export async function loadFromBlob(blob: any) {
     })();
   }
   const { elements, appState } = updateAppState(contents);
+  if (!elements.length) {
+    return Promise.reject("Cannot load invalid json");
+  }
   return new Promise<DataState>(resolve => {
     resolve(restore(elements, appState, { scrollToContent: true }));
   });
