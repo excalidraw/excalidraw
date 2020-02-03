@@ -15,11 +15,7 @@ import { t } from "../i18n";
 
 import { KEYS } from "../keys";
 
-const probablySupportsClipboard =
-  "toBlob" in HTMLCanvasElement.prototype &&
-  "clipboard" in navigator &&
-  "write" in navigator.clipboard &&
-  "ClipboardItem" in window;
+import { probablySupportsClipboardBlob } from "../clipboard";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -145,7 +141,7 @@ function ExportModal({
                 aria-label={t("buttons.exportToSvg")}
                 onClick={() => onExportToSvg(exportedElements, scale)}
               />
-              {probablySupportsClipboard && (
+              {probablySupportsClipboardBlob && (
                 <ToolButton
                   type="button"
                   icon={clipboard}
