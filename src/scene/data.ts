@@ -11,6 +11,10 @@ import { getCommonBounds, normalizeDimensions } from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
+import {
+  copyTextToSystemClipboard,
+  copyCanvasToClipboardAsPng,
+} from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
@@ -150,12 +154,16 @@ export async function exportToBackend(
       const url = new URL(window.location.href);
       url.searchParams.append("id", json.id);
 
-      await navigator.clipboard.writeText(url.toString());
-      window.alert(
-        t("alerts.copiedToClipboard", {
-          url: url.toString(),
-        }),
-      );
+      try {
+        await copyTextToSystemClipboard(url.toString());
+        window.alert(
+          t("alerts.copiedToClipboard", {
+            url: url.toString(),
+          }),
+        );
+      } catch (err) {
+        // TODO: link will be displayed for user to copy manually in later PR
+      }
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
@@ -241,19 +249,10 @@ export async function exportCanvas(
       }
     });
   } else if (type === "clipboard") {
-    const errorMsg = t("alerts.couldNotCopyToClipboard");
     try {
-      tempCanvas.toBlob(async function(blob: any) {
-        try {
-          await navigator.clipboard.write([
-            new window.ClipboardItem({ "image/png": blob }),
-          ]);
-        } catch (err) {
-          window.alert(errorMsg);
-        }
-      });
+      copyCanvasToClipboardAsPng(tempCanvas);
     } catch (err) {
-      window.alert(errorMsg);
+      window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
     const appState = getDefaultAppState();
