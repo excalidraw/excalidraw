@@ -1458,7 +1458,6 @@ export class App extends React.Component<any, AppState> {
                     });
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when dragging an element to initially size it
                     this.setState({});
                     return;
                   }
