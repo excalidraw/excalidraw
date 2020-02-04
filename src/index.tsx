@@ -16,7 +16,6 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
-  resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./element";
 import {
@@ -46,11 +45,11 @@ import { ExcalidrawElement } from "./element/types";
 
 import {
   isInputLike,
+  isWritableElement,
   debounce,
   capitalizeString,
   distance,
   distance2d,
-  isToolIcon,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -100,6 +99,12 @@ import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
+
+import {
+  getAppClipboard,
+  copyToAppClipboard,
+  parseClipboardEvent,
+} from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -223,42 +228,61 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
     this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
-      return;
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      elementUnderCursor instanceof HTMLCanvasElement &&
+      !isWritableElement(target)
+    ) {
+      const data = parseClipboardEvent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        this.setState({});
+      }
+      e.preventDefault();
     }
-    const paste = e.clipboardData?.getData("text") || "";
-    this.addElementsFromPaste(paste);
-    e.preventDefault();
   };
 
   private onUnload = () => {
@@ -453,24 +477,14 @@ export class App extends React.Component<any, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private copyToClipboard = () => {
-    const text = JSON.stringify(
-      elements
-        .filter(element => element.isSelected)
-        .map(({ shape, ...el }) => el),
-    );
-    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      document.execCommand("copy");
-    }
+  private copyToAppClipboard = () => {
+    copyToAppClipboard(elements);
   };
 
   private pasteFromClipboard = () => {
-    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
-      navigator.clipboard
-        .readText()
-        .then(text => this.addElementsFromPaste(text));
+    const data = getAppClipboard();
+    if (data.elements) {
+      this.addElementsFromPaste(data.elements);
     }
   };
 
@@ -810,7 +824,7 @@ export class App extends React.Component<any, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: t("labels.copy"),
-                    action: this.copyToClipboard,
+                    action: this.copyToAppClipboard,
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
@@ -1050,7 +1064,10 @@ export class App extends React.Component<any, AppState> {
                   editingElement: element,
                 });
                 return;
-              } else if (this.state.elementType === "arrow") {
+              } else if (
+                this.state.elementType === "arrow" ||
+                this.state.elementType === "line"
+              ) {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
@@ -1107,7 +1124,7 @@ export class App extends React.Component<any, AppState> {
                   const absPy = p1[1] + element.y;
 
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x - p1[0],
                     mouseY - element.y - p1[1],
                   );
@@ -1137,7 +1154,7 @@ export class App extends React.Component<any, AppState> {
               ) => {
                 if (perfect) {
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x,
                     mouseY - element.y,
                   );
@@ -1179,7 +1196,11 @@ export class App extends React.Component<any, AppState> {
                 //  to ensure we don't create a 2-point arrow by mistake when
                 //  user clicks mouse in a way that it moves a tiny bit (thus
                 //  triggering mousemove)
-                if (!draggingOccurred && this.state.elementType === "arrow") {
+                if (
+                  !draggingOccurred &&
+                  (this.state.elementType === "arrow" ||
+                    this.state.elementType === "line")
+                ) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
                   if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
@@ -1199,10 +1220,7 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
@@ -1226,12 +1244,8 @@ export class App extends React.Component<any, AppState> {
                           element.x += deltaX;
 
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              resizePerfectLineForNWHandler(element, x, y);
-                            } else {
-                              element.y += element.height - element.width;
-                              element.height = element.width;
-                            }
+                            element.y += element.height - element.width;
+                            element.height = element.width;
                           } else {
                             element.height -= deltaY;
                             element.y += deltaY;
@@ -1239,10 +1253,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "ne":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] >= 0) {
@@ -1272,10 +1283,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "sw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] <= 0) {
@@ -1304,10 +1312,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "se":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] > 0 || p1[1] > 0) {
@@ -1327,18 +1332,8 @@ export class App extends React.Component<any, AppState> {
                           );
                         } else {
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              const { width, height } = getPerfectElementSize(
-                                element.type,
-                                x - element.x,
-                                y - element.y,
-                              );
-                              element.width = width;
-                              element.height = height;
-                            } else {
-                              element.width += deltaX;
-                              element.height = element.width;
-                            }
+                            element.width += deltaX;
+                            element.height = element.width;
                           } else {
                             element.width += deltaX;
                             element.height += deltaY;
@@ -1473,34 +1468,7 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) {
-                  width = -width;
-                }
-                if (isLinear && y < originY) {
-                  height = -height;
-                }
-
-                if (e.shiftKey) {
-                  ({ width, height } = getPerfectElementSize(
-                    this.state.elementType,
-                    width,
-                    !isLinear && y < originY ? -height : height,
-                  ));
-
-                  if (!isLinear && height < 0) {
-                    height = -height;
-                  }
-                }
-
-                if (!isLinear) {
-                  draggingElement.x = x < originX ? originX - width : originX;
-                  draggingElement.y = y < originY ? originY - height : originY;
-                }
-
-                draggingElement.width = width;
-                draggingElement.height = height;
-
-                if (this.state.elementType === "arrow") {
+                if (isLinear) {
                   draggingOccurred = true;
                   const points = draggingElement.points;
                   let dx = x - draggingElement.x;
@@ -1521,6 +1489,24 @@ export class App extends React.Component<any, AppState> {
                     pnt[0] = dx;
                     pnt[1] = dy;
                   }
+                } else {
+                  if (e.shiftKey) {
+                    ({ width, height } = getPerfectElementSize(
+                      this.state.elementType,
+                      width,
+                      y < originY ? -height : height,
+                    ));
+
+                    if (height < 0) {
+                      height = -height;
+                    }
+                  }
+
+                  draggingElement.x = x < originX ? originX - width : originX;
+                  draggingElement.y = y < originY ? originY - height : originY;
+
+                  draggingElement.width = width;
+                  draggingElement.height = height;
                 }
 
                 draggingElement.shape = null;
@@ -1558,7 +1544,7 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
 
-                if (elementType === "arrow") {
+                if (elementType === "arrow" || elementType === "line") {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
                   }
@@ -1864,45 +1850,34 @@ export class App extends React.Component<any, AppState> {
     });
   };
 
-  private addElementsFromPaste = (paste: string) => {
-    let parsedElements;
-    try {
-      parsedElements = JSON.parse(paste);
-    } catch (e) {}
-    if (
-      Array.isArray(parsedElements) &&
-      parsedElements.length > 0 &&
-      parsedElements[0].type // need to implement a better check here...
-    ) {
-      elements = clearSelection(elements);
+  private addElementsFromPaste = (
+    clipboardElements: readonly ExcalidrawElement[],
+  ) => {
+    elements = clearSelection(elements);
 
-      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
+    const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
-      const elementsCenterX = distance(minX, maxX) / 2;
-      const elementsCenterY = distance(minY, maxY) / 2;
+    const elementsCenterX = distance(minX, maxX) / 2;
+    const elementsCenterY = distance(minY, maxY) / 2;
 
-      const dx =
-        cursorX -
-        this.state.scrollX -
-        CANVAS_WINDOW_OFFSET_LEFT -
-        elementsCenterX;
-      const dy =
-        cursorY -
-        this.state.scrollY -
-        CANVAS_WINDOW_OFFSET_TOP -
-        elementsCenterY;
+    const dx =
+      cursorX -
+      this.state.scrollX -
+      CANVAS_WINDOW_OFFSET_LEFT -
+      elementsCenterX;
+    const dy =
+      cursorY - this.state.scrollY - CANVAS_WINDOW_OFFSET_TOP - elementsCenterY;
 
-      elements = [
-        ...elements,
-        ...parsedElements.map(parsedElement => {
-          const duplicate = duplicateElement(parsedElement);
-          duplicate.x += dx - minX;
-          duplicate.y += dy - minY;
-          return duplicate;
-        }),
-      ];
-      this.setState({});
-    }
+    elements = [
+      ...elements,
+      ...clipboardElements.map(clipboardElements => {
+        const duplicate = duplicateElement(clipboardElements);
+        duplicate.x += dx - minX;
+        duplicate.y += dy - minY;
+        return duplicate;
+      }),
+    ];
+    this.setState({});
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {

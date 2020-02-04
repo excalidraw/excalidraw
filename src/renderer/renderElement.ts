@@ -1,10 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
-import {
-  getDiamondPoints,
-  getArrowPoints,
-  getLinePoints,
-} from "../element/bounds";
+import { getDiamondPoints, getArrowPoints } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
@@ -89,8 +85,8 @@ function generateElement(
           },
         );
         break;
+      case "line":
       case "arrow": {
-        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
         const options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
@@ -102,25 +98,21 @@ function generateElement(
         const points: Point[] = element.points.length
           ? element.points
           : [[0, 0]];
-        element.shape = [
-          //    \
-          generator.line(x3, y3, x2, y2, options),
-          // -----
-          generator.curve(points, options),
-          //    /
-          generator.line(x4, y4, x2, y2, options),
-        ];
-        break;
-      }
-      case "line": {
-        const [x1, y1, x2, y2] = getLinePoints(element);
-        const options = {
-          stroke: element.strokeColor,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        };
-        element.shape = generator.line(x1, y1, x2, y2, options);
+
+        // curve is always the first element
+        // this simplifies finding the curve for an element
+        element.shape = [generator.curve(points, options)];
+
+        // add lines only in arrow
+        if (element.type === "arrow") {
+          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+          element.shape.push(
+            ...[
+              generator.line(x3, y3, x2, y2, options),
+              generator.line(x4, y4, x2, y2, options),
+            ],
+          );
+        }
         break;
       }
     }
@@ -144,13 +136,12 @@ export function renderElement(
     case "rectangle":
     case "diamond":
     case "ellipse":
-    case "line": {
       generateElement(element, generator);
       context.globalAlpha = element.opacity / 100;
       rc.draw(element.shape as Drawable);
       context.globalAlpha = 1;
       break;
-    }
+    case "line":
     case "arrow": {
       generateElement(element, generator);
       context.globalAlpha = element.opacity / 100;
