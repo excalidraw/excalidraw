@@ -47,13 +47,11 @@ export interface ActionsManagerInterface {
   getContextMenuItems: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn,
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
   renderAction: (
     name: string,
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn,
   ) => React.ReactElement | null;
 }

@@ -30,7 +30,6 @@ function ExportModal({
   appState,
   exportPadding = 10,
   actionManager,
-  syncActionResult,
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
@@ -41,7 +40,6 @@ function ExportModal({
   elements: readonly ExcalidrawElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
-  syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -160,12 +158,7 @@ function ExportModal({
             </Stack.Row>
           </Stack.Col>
 
-          {actionManager.renderAction(
-            "changeProjectName",
-            elements,
-            appState,
-            syncActionResult,
-          )}
+          {actionManager.renderAction("changeProjectName", elements, appState)}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={2} align="baseline">
@@ -188,7 +181,6 @@ function ExportModal({
               "changeExportBackground",
               elements,
               appState,
-              syncActionResult,
             )}
             {someElementIsSelected && (
               <div>
@@ -215,7 +207,6 @@ export function ExportDialog({
   appState,
   exportPadding = 10,
   actionManager,
-  syncActionResult,
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
@@ -225,7 +216,6 @@ export function ExportDialog({
   elements: readonly ExcalidrawElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
-  syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -260,7 +250,6 @@ export function ExportDialog({
             appState={appState}
             exportPadding={exportPadding}
             actionManager={actionManager}
-            syncActionResult={syncActionResult}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}

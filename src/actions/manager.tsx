@@ -4,6 +4,7 @@ import {
   ActionsManagerInterface,
   UpdaterFn,
   ActionFilterFn,
+  ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -12,13 +13,9 @@ import { t } from "../i18n";
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
 
-  updater:
-    | ((elements: ExcalidrawElement[], appState: AppState) => void)
-    | null = null;
+  updater: UpdaterFn;
 
-  setUpdater(
-    updater: (elements: ExcalidrawElement[], appState: AppState) => void,
-  ) {
+  constructor(updater: (res: ActionResult) => void) {
     this.updater = updater;
   }
 
@@ -48,7 +45,6 @@ export class ActionManager implements ActionsManagerInterface {
   getContextMenuItems(
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn,
     actionFilter: ActionFilterFn = action => action,
   ) {
     return Object.values(this.actions)
@@ -62,7 +58,7 @@ export class ActionManager implements ActionsManagerInterface {
       .map(action => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          updater(action.perform(elements, appState, null));
+          this.updater(action.perform(elements, appState, null));
         },
       }));
   }
@@ -71,13 +67,12 @@ export class ActionManager implements ActionsManagerInterface {
     name: string,
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    updater: UpdaterFn,
   ) {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState: any) => {
-        updater(action.perform(elements, appState, formState));
+        this.updater(action.perform(elements, appState, formState));
       };
 
       return (

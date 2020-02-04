@@ -180,40 +180,22 @@ let isHoldingMouseButton: boolean = false;
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: AppState;
-  syncActionResult: any;
   canvas: HTMLCanvasElement | null;
   setAppState: any;
 }
 
 const LayerUI = React.memo(
-  ({
-    actionManager,
-    appState,
-    setAppState,
-    syncActionResult,
-    canvas,
-  }: LayerUIProps) => {
+  ({ actionManager, appState, setAppState, canvas }: LayerUIProps) => {
     function renderCanvasActions() {
       return (
         <Stack.Col gap={4}>
           <Stack.Row justifyContent={"space-between"}>
-            {actionManager.renderAction(
-              "loadScene",
-              elements,
-              appState,
-              syncActionResult,
-            )}
-            {actionManager.renderAction(
-              "saveScene",
-              elements,
-              appState,
-              syncActionResult,
-            )}
+            {actionManager.renderAction("loadScene", elements, appState)}
+            {actionManager.renderAction("saveScene", elements, appState)}
             <ExportDialog
               elements={elements}
               appState={appState}
               actionManager={actionManager}
-              syncActionResult={syncActionResult}
               onExportToPng={(exportedElements, scale) => {
                 if (canvas) {
                   exportCanvas("png", exportedElements, canvas, {
@@ -258,18 +240,12 @@ const LayerUI = React.memo(
                 }
               }}
             />
-            {actionManager.renderAction(
-              "clearCanvas",
-              elements,
-              appState,
-              syncActionResult,
-            )}
+            {actionManager.renderAction("clearCanvas", elements, appState)}
           </Stack.Row>
           {actionManager.renderAction(
             "changeViewBackgroundColor",
             elements,
             appState,
-            syncActionResult,
           )}
         </Stack.Col>
       );
@@ -293,7 +269,6 @@ const LayerUI = React.memo(
               "changeStrokeColor",
               elements,
               appState,
-              syncActionResult,
             )}
             {(hasBackground(elementType) ||
               targetElements.some(element => hasBackground(element.type))) && (
@@ -302,14 +277,12 @@ const LayerUI = React.memo(
                   "changeBackgroundColor",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
 
                 {actionManager.renderAction(
                   "changeFillStyle",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
               </>
             )}
@@ -321,14 +294,12 @@ const LayerUI = React.memo(
                   "changeStrokeWidth",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
 
                 {actionManager.renderAction(
                   "changeSloppiness",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
               </>
             )}
@@ -340,30 +311,22 @@ const LayerUI = React.memo(
                   "changeFontSize",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
 
                 {actionManager.renderAction(
                   "changeFontFamily",
                   elements,
                   appState,
-                  syncActionResult,
                 )}
               </>
             )}
 
-            {actionManager.renderAction(
-              "changeOpacity",
-              elements,
-              appState,
-              syncActionResult,
-            )}
+            {actionManager.renderAction("changeOpacity", elements, appState)}
 
             {actionManager.renderAction(
               "deleteSelectedElements",
               elements,
               appState,
-              syncActionResult,
             )}
           </div>
         </Island>
@@ -460,10 +423,11 @@ export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
 
-  actionManager: ActionManager = new ActionManager();
+  actionManager: ActionManager;
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
+    this.actionManager = new ActionManager(this.syncActionResult);
     this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
@@ -771,7 +735,6 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          syncActionResult={this.syncActionResult}
         />
         <main>
           <canvas
@@ -827,7 +790,6 @@ export class App extends React.Component<any, AppState> {
                     ...this.actionManager.getContextMenuItems(
                       elements,
                       this.state,
-                      this.syncActionResult,
                       action => this.canvasOnlyActions.includes(action),
                     ),
                   ],
@@ -856,7 +818,6 @@ export class App extends React.Component<any, AppState> {
                   ...this.actionManager.getContextMenuItems(
                     elements,
                     this.state,
-                    this.syncActionResult,
                     action => !this.canvasOnlyActions.includes(action),
                   ),
                 ],
