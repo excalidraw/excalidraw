@@ -1759,13 +1759,14 @@ export class App extends React.Component<any, AppState> {
 
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
               if (this.state.multiElement) {
-                const originX = this.state.multiElement.x;
-                const originY = this.state.multiElement.y;
-                const points = this.state.multiElement.points;
+                const { multiElement } = this.state;
+                const originX = multiElement.x;
+                const originY = multiElement.y;
+                const points = multiElement.points;
                 const pnt = points[points.length - 1];
                 pnt[0] = x - originX;
                 pnt[1] = y - originY;
-                this.state.multiElement.shape = null;
+                multiElement.shape = null;
                 this.setState({});
                 return;
               }
