@@ -45,11 +45,11 @@ import { ExcalidrawElement } from "./element/types";
 
 import {
   isInputLike,
+  isWritableElement,
   debounce,
   capitalizeString,
   distance,
   distance2d,
-  isToolIcon,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -99,6 +99,12 @@ import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
+
+import {
+  getAppClipboard,
+  copyToAppClipboard,
+  parseClipboardEvent,
+} from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -222,42 +228,61 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
     this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
-      return;
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      elementUnderCursor instanceof HTMLCanvasElement &&
+      !isWritableElement(target)
+    ) {
+      const data = parseClipboardEvent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        this.setState({});
+      }
+      e.preventDefault();
     }
-    const paste = e.clipboardData?.getData("text") || "";
-    this.addElementsFromPaste(paste);
-    e.preventDefault();
   };
 
   private onUnload = () => {
@@ -452,24 +477,14 @@ export class App extends React.Component<any, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private copyToClipboard = () => {
-    const text = JSON.stringify(
-      elements
-        .filter(element => element.isSelected)
-        .map(({ shape, ...el }) => el),
-    );
-    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      document.execCommand("copy");
-    }
+  private copyToAppClipboard = () => {
+    copyToAppClipboard(elements);
   };
 
   private pasteFromClipboard = () => {
-    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
-      navigator.clipboard
-        .readText()
-        .then(text => this.addElementsFromPaste(text));
+    const data = getAppClipboard();
+    if (data.elements) {
+      this.addElementsFromPaste(data.elements);
     }
   };
 
@@ -809,7 +824,7 @@ export class App extends React.Component<any, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: t("labels.copy"),
-                    action: this.copyToClipboard,
+                    action: this.copyToAppClipboard,
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
@@ -1835,45 +1850,34 @@ export class App extends React.Component<any, AppState> {
     });
   };
 
-  private addElementsFromPaste = (paste: string) => {
-    let parsedElements;
-    try {
-      parsedElements = JSON.parse(paste);
-    } catch (e) {}
-    if (
-      Array.isArray(parsedElements) &&
-      parsedElements.length > 0 &&
-      parsedElements[0].type // need to implement a better check here...
-    ) {
-      elements = clearSelection(elements);
+  private addElementsFromPaste = (
+    clipboardElements: readonly ExcalidrawElement[],
+  ) => {
+    elements = clearSelection(elements);
 
-      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
+    const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
-      const elementsCenterX = distance(minX, maxX) / 2;
-      const elementsCenterY = distance(minY, maxY) / 2;
+    const elementsCenterX = distance(minX, maxX) / 2;
+    const elementsCenterY = distance(minY, maxY) / 2;
 
-      const dx =
-        cursorX -
-        this.state.scrollX -
-        CANVAS_WINDOW_OFFSET_LEFT -
-        elementsCenterX;
-      const dy =
-        cursorY -
-        this.state.scrollY -
-        CANVAS_WINDOW_OFFSET_TOP -
-        elementsCenterY;
+    const dx =
+      cursorX -
+      this.state.scrollX -
+      CANVAS_WINDOW_OFFSET_LEFT -
+      elementsCenterX;
+    const dy =
+      cursorY - this.state.scrollY - CANVAS_WINDOW_OFFSET_TOP - elementsCenterY;
 
-      elements = [
-        ...elements,
-        ...parsedElements.map(parsedElement => {
-          const duplicate = duplicateElement(parsedElement);
-          duplicate.x += dx - minX;
-          duplicate.y += dy - minY;
-          return duplicate;
-        }),
-      ];
-      this.setState({});
-    }
+    elements = [
+      ...elements,
+      ...clipboardElements.map(clipboardElements => {
+        const duplicate = duplicateElement(clipboardElements);
+        duplicate.x += dx - minX;
+        duplicate.y += dy - minY;
+        return duplicate;
+      }),
+    ];
+    this.setState({});
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
