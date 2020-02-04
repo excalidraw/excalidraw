@@ -37,6 +37,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     resizingElement,
     multiElement,
     editingElement,
+    selectionElement,
     isResizing,
     ...exportedState
   } = appState;
