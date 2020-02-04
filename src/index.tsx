@@ -177,6 +177,281 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isHoldingMouseButton: boolean = false;
 
+interface LayerUIProps {
+  actionManager: ActionManager;
+  appState: AppState;
+  syncActionResult: any;
+  canvas: HTMLCanvasElement | null;
+  setAppState: any;
+}
+
+const LayerUI = ({
+  actionManager,
+  appState,
+  setAppState,
+  syncActionResult,
+  canvas,
+}: LayerUIProps) => {
+  function renderCanvasActions() {
+    return (
+      <Stack.Col gap={4}>
+        <Stack.Row justifyContent={"space-between"}>
+          {actionManager.renderAction(
+            "loadScene",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+          {actionManager.renderAction(
+            "saveScene",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+          <ExportDialog
+            elements={elements}
+            appState={appState}
+            actionManager={actionManager}
+            syncActionResult={syncActionResult}
+            onExportToPng={(exportedElements, scale) => {
+              if (canvas) {
+                exportCanvas("png", exportedElements, canvas, {
+                  exportBackground: appState.exportBackground,
+                  name: appState.name,
+                  viewBackgroundColor: appState.viewBackgroundColor,
+                  scale,
+                });
+              }
+            }}
+            onExportToSvg={(exportedElements, scale) => {
+              if (canvas) {
+                exportCanvas("svg", exportedElements, canvas, {
+                  exportBackground: appState.exportBackground,
+                  name: appState.name,
+                  viewBackgroundColor: appState.viewBackgroundColor,
+                  scale,
+                });
+              }
+            }}
+            onExportToClipboard={(exportedElements, scale) => {
+              if (canvas) {
+                exportCanvas("clipboard", exportedElements, canvas, {
+                  exportBackground: appState.exportBackground,
+                  name: appState.name,
+                  viewBackgroundColor: appState.viewBackgroundColor,
+                  scale,
+                });
+              }
+            }}
+            onExportToBackend={exportedElements => {
+              if (canvas) {
+                exportCanvas(
+                  "backend",
+                  exportedElements.map(element => ({
+                    ...element,
+                    isSelected: false,
+                  })),
+                  canvas,
+                  appState,
+                );
+              }
+            }}
+          />
+          {actionManager.renderAction(
+            "clearCanvas",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+        </Stack.Row>
+        {actionManager.renderAction(
+          "changeViewBackgroundColor",
+          elements,
+          appState,
+          syncActionResult,
+        )}
+      </Stack.Col>
+    );
+  }
+
+  function renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
+    const { elementType, editingElement } = appState;
+    const targetElements = editingElement
+      ? [editingElement]
+      : elements.filter(el => el.isSelected);
+    if (!targetElements.length && elementType === "selection") {
+      return null;
+    }
+
+    return (
+      <Island padding={4}>
+        <div className="panelColumn">
+          {actionManager.renderAction(
+            "changeStrokeColor",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
+            <>
+              {actionManager.renderAction(
+                "changeBackgroundColor",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+
+              {actionManager.renderAction(
+                "changeFillStyle",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+            </>
+          )}
+
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
+            <>
+              {actionManager.renderAction(
+                "changeStrokeWidth",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+
+              {actionManager.renderAction(
+                "changeSloppiness",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+            </>
+          )}
+
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
+            <>
+              {actionManager.renderAction(
+                "changeFontSize",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+
+              {actionManager.renderAction(
+                "changeFontFamily",
+                elements,
+                appState,
+                syncActionResult,
+              )}
+            </>
+          )}
+
+          {actionManager.renderAction(
+            "changeOpacity",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+
+          {actionManager.renderAction(
+            "deleteSelectedElements",
+            elements,
+            appState,
+            syncActionResult,
+          )}
+        </div>
+      </Island>
+    );
+  }
+
+  function renderShapesSwitcher() {
+    return (
+      <>
+        {SHAPES.map(({ value, icon }, index) => {
+          const label = t(`toolBar.${value}`);
+          return (
+            <ToolButton
+              key={value}
+              type="radio"
+              icon={icon}
+              checked={appState.elementType === value}
+              name="editor-current-shape"
+              title={`${capitalizeString(label)} — ${
+                capitalizeString(value)[0]
+              }, ${index + 1}`}
+              keyBindingLabel={`${index + 1}`}
+              aria-label={capitalizeString(label)}
+              aria-keyshortcuts={`${label[0]} ${index + 1}`}
+              onChange={() => {
+                setAppState({ elementType: value, multiElement: null });
+                elements = clearSelection(elements);
+                document.documentElement.style.cursor =
+                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+                setAppState({});
+              }}
+            ></ToolButton>
+          );
+        })}
+      </>
+    );
+  }
+
+  return (
+    <FixedSideContainer side="top">
+      <div className="App-menu App-menu_top">
+        <Stack.Col gap={4} align="end">
+          <section
+            className="App-right-menu"
+            aria-labelledby="canvas-actions-title"
+          >
+            <h2 className="visually-hidden" id="canvas-actions-title">
+              {t("headings.canvasActions")}
+            </h2>
+            <Island padding={4}>{renderCanvasActions()}</Island>
+          </section>
+          <section
+            className="App-right-menu"
+            aria-labelledby="selected-shape-title"
+          >
+            <h2 className="visually-hidden" id="selected-shape-title">
+              {t("headings.selectedShapeActions")}
+            </h2>
+            {renderSelectedShapeActions(elements)}
+          </section>
+        </Stack.Col>
+        <section aria-labelledby="shapes-title">
+          <Stack.Col gap={4} align="start">
+            <Stack.Row gap={1}>
+              <Island padding={1}>
+                <h2 className="visually-hidden" id="shapes-title">
+                  {t("headings.shapes")}
+                </h2>
+                <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+              </Island>
+              <LockIcon
+                checked={appState.elementLocked}
+                onChange={() => {
+                  setAppState({
+                    elementLocked: !appState.elementLocked,
+                    elementType: appState.elementLocked
+                      ? "selection"
+                      : appState.elementType,
+                  });
+                }}
+                title={t("toolBar.lock")}
+              />
+            </Stack.Row>
+          </Stack.Col>
+        </section>
+        <div />
+      </div>
+    </FixedSideContainer>
+  );
+};
+
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -488,212 +763,9 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType, editingElement } = this.state;
-    const targetElements = editingElement
-      ? [editingElement]
-      : elements.filter(el => el.isSelected);
-    if (!targetElements.length && elementType === "selection") {
-      return null;
-    }
-
-    return (
-      <Island padding={4}>
-        <div className="panelColumn">
-          {this.actionManager.renderAction(
-            "changeStrokeColor",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {(hasBackground(elementType) ||
-            targetElements.some(element => hasBackground(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeBackgroundColor",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFillStyle",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasStroke(elementType) ||
-            targetElements.some(element => hasStroke(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeStrokeWidth",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeSloppiness",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasText(elementType) ||
-            targetElements.some(element => hasText(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeFontSize",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFontFamily",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {this.actionManager.renderAction(
-            "changeOpacity",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-
-          {this.actionManager.renderAction(
-            "deleteSelectedElements",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </div>
-      </Island>
-    );
-  }
-
-  private renderShapesSwitcher() {
-    return (
-      <>
-        {SHAPES.map(({ value, icon }, index) => {
-          const label = t(`toolBar.${value}`);
-          return (
-            <ToolButton
-              key={value}
-              type="radio"
-              icon={icon}
-              checked={this.state.elementType === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${
-                capitalizeString(value)[0]
-              }, ${index + 1}`}
-              keyBindingLabel={`${index + 1}`}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={`${label[0]} ${index + 1}`}
-              onChange={() => {
-                this.setState({ elementType: value, multiElement: null });
-                elements = clearSelection(elements);
-                document.documentElement.style.cursor =
-                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                this.setState({});
-              }}
-            ></ToolButton>
-          );
-        })}
-      </>
-    );
-  }
-
-  private renderCanvasActions() {
-    return (
-      <Stack.Col gap={4}>
-        <Stack.Row justifyContent={"space-between"}>
-          {this.actionManager.renderAction(
-            "loadScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {this.actionManager.renderAction(
-            "saveScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          <ExportDialog
-            elements={elements}
-            appState={this.state}
-            actionManager={this.actionManager}
-            syncActionResult={this.syncActionResult}
-            onExportToPng={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("png", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToSvg={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("svg", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToClipboard={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("clipboard", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToBackend={exportedElements => {
-              if (this.canvas) {
-                exportCanvas(
-                  "backend",
-                  exportedElements.map(element => ({
-                    ...element,
-                    isSelected: false,
-                  })),
-                  this.canvas,
-                  this.state,
-                );
-              }
-            }}
-          />
-          {this.actionManager.renderAction(
-            "clearCanvas",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </Stack.Row>
-        {this.actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
-          this.state,
-          this.syncActionResult,
-        )}
-      </Stack.Col>
-    );
-  }
+  setAppState = (obj: any) => {
+    this.setState(obj);
+  };
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
@@ -701,55 +773,13 @@ export class App extends React.Component<any, AppState> {
 
     return (
       <div className="container">
-        <FixedSideContainer side="top">
-          <div className="App-menu App-menu_top">
-            <Stack.Col gap={4} align="end">
-              <section
-                className="App-right-menu"
-                aria-labelledby="canvas-actions-title"
-              >
-                <h2 className="visually-hidden" id="canvas-actions-title">
-                  {t("headings.canvasActions")}
-                </h2>
-                <Island padding={4}>{this.renderCanvasActions()}</Island>
-              </section>
-              <section
-                className="App-right-menu"
-                aria-labelledby="selected-shape-title"
-              >
-                <h2 className="visually-hidden" id="selected-shape-title">
-                  {t("headings.selectedShapeActions")}
-                </h2>
-                {this.renderSelectedShapeActions(elements)}
-              </section>
-            </Stack.Col>
-            <section aria-labelledby="shapes-title">
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island padding={1}>
-                    <h2 className="visually-hidden" id="shapes-title">
-                      {t("headings.shapes")}
-                    </h2>
-                    <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-                  </Island>
-                  <LockIcon
-                    checked={this.state.elementLocked}
-                    onChange={() => {
-                      this.setState({
-                        elementLocked: !this.state.elementLocked,
-                        elementType: this.state.elementLocked
-                          ? "selection"
-                          : this.state.elementType,
-                      });
-                    }}
-                    title={t("toolBar.lock")}
-                  />
-                </Stack.Row>
-              </Stack.Col>
-            </section>
-            <div />
-          </div>
-        </FixedSideContainer>
+        <LayerUI
+          canvas={this.canvas}
+          appState={this.state}
+          setAppState={this.setAppState}
+          actionManager={this.actionManager}
+          syncActionResult={this.syncActionResult}
+        />
         <main>
           <canvas
             id="canvas"
