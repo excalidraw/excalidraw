@@ -1542,7 +1542,6 @@ export class App extends React.Component<any, AppState> {
               };
 
               const onMouseUp = (e: MouseEvent) => {
-                this.setState({ isResizing: false });
                 const {
                   draggingElement,
                   resizingElement,
@@ -1550,6 +1549,8 @@ export class App extends React.Component<any, AppState> {
                   elementType,
                   elementLocked,
                 } = this.state;
+
+                this.setState({ isResizing: false, resizingElement: null });
 
                 resizeArrowFn = null;
                 lastMouseUp = null;
