@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
-  elements?: ExcalidrawElement[];
+  elements?: readonly ExcalidrawElement[];
   appState?: AppState;
 };
 

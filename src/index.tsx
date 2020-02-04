@@ -183,7 +183,7 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: any;
   elements: readonly ExcalidrawElement[];
-  setElements: (elements: ExcalidrawElement[]) => void;
+  setElements: (elements: readonly ExcalidrawElement[]) => void;
 }
 
 const LayerUI = React.memo(
@@ -433,6 +433,7 @@ const LayerUI = React.memo(
         resizingElement,
         multiElement,
         editingElement,
+        selectionElement,
         isResizing,
         cursorX,
         cursorY,
@@ -760,7 +761,7 @@ export class App extends React.Component<any, AppState> {
     this.setState(obj);
   };
 
-  setElements = (elements_: ExcalidrawElement[]) => {
+  setElements = (elements_: readonly ExcalidrawElement[]) => {
     elements = elements_;
     this.setState({});
   };
@@ -1109,6 +1110,11 @@ export class App extends React.Component<any, AppState> {
                     draggingElement: element,
                   });
                 }
+              } else if (element.type === "selection") {
+                this.setState({
+                  selectionElement: element,
+                  draggingElement: element,
+                });
               } else {
                 elements = [...elements, element];
                 this.setState({ multiElement: null, draggingElement: element });
@@ -1528,7 +1534,7 @@ export class App extends React.Component<any, AppState> {
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey) {
+                  if (!e.shiftKey && elements.some(el => el.isSelected)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1640,7 +1646,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (elementType === "selection") {
-                  elements = elements.slice(0, -1);
+                  this.setState({ selectionElement: null });
                 } else if (!elementLocked) {
                   draggingElement.isSelected = true;
                 }
@@ -1950,6 +1956,7 @@ export class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     const atLeastOneVisibleElement = renderScene(
       elements,
+      this.state.selectionElement,
       this.rc!,
       this.canvas!,
       {

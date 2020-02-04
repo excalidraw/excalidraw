@@ -9,7 +9,7 @@ import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
-import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
+import { ActionsManagerInterface } from "../actions/types";
 import Stack from "./Stack";
 import { t } from "../i18n";
 

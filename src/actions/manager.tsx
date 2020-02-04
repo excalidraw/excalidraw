@@ -4,7 +4,6 @@ import {
   ActionsManagerInterface,
   UpdaterFn,
   ActionFilterFn,
-  ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
