@@ -50,6 +50,7 @@
           ]
         }
       ],
+      "no-else-return": "warn",
       "no-useless-return": "warn",
       "prefer-const": [
         "warn",
