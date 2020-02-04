@@ -32,6 +32,7 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  commitToHistory?: boolean;
 }
 
 export interface ActionsManagerInterface {

@@ -427,7 +427,9 @@ export class App extends React.Component<any, AppState> {
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
-    this.actionManager = new ActionManager(this.syncActionResult);
+    this.actionManager = new ActionManager(this.syncActionResult, () => {
+      history.resumeRecording();
+    });
     this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);

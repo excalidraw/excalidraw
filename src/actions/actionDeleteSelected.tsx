@@ -12,5 +12,6 @@ export const actionDeleteSelected: Action = {
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
+  commitToHistory: true,
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
 };
