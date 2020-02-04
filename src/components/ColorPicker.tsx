@@ -4,6 +4,7 @@ import { Popover } from "./Popover";
 import "./ColorPicker.css";
 import { KEYS } from "../keys";
 import { t } from "../i18n";
+import { isWritableElement } from "../utils";
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
@@ -84,7 +85,10 @@ const Picker = function({
         (gallery!.current!.children![nextIndex] as any).focus();
       }
       e.preventDefault();
-    } else if (keyBindings.includes(e.key.toLowerCase())) {
+    } else if (
+      keyBindings.includes(e.key.toLowerCase()) &&
+      !isWritableElement(e.target)
+    ) {
       const index = keyBindings.indexOf(e.key.toLowerCase());
       (gallery!.current!.children![index] as any).focus();
       e.preventDefault();
@@ -200,9 +204,6 @@ const ColorInput = React.forwardRef(
           onPaste={e => onChange(e.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
-          onKeyDown={e => {
-            e.stopPropagation();
-          }}
           onFocus={e => {
             e.target.select();
           }}
