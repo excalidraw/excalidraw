@@ -185,272 +185,276 @@ interface LayerUIProps {
   setAppState: any;
 }
 
-const LayerUI = ({
-  actionManager,
-  appState,
-  setAppState,
-  syncActionResult,
-  canvas,
-}: LayerUIProps) => {
-  function renderCanvasActions() {
-    return (
-      <Stack.Col gap={4}>
-        <Stack.Row justifyContent={"space-between"}>
+const LayerUI = React.memo(
+  ({
+    actionManager,
+    appState,
+    setAppState,
+    syncActionResult,
+    canvas,
+  }: LayerUIProps) => {
+    function renderCanvasActions() {
+      return (
+        <Stack.Col gap={4}>
+          <Stack.Row justifyContent={"space-between"}>
+            {actionManager.renderAction(
+              "loadScene",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+            {actionManager.renderAction(
+              "saveScene",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+            <ExportDialog
+              elements={elements}
+              appState={appState}
+              actionManager={actionManager}
+              syncActionResult={syncActionResult}
+              onExportToPng={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("png", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToSvg={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("svg", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToClipboard={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("clipboard", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToBackend={exportedElements => {
+                if (canvas) {
+                  exportCanvas(
+                    "backend",
+                    exportedElements.map(element => ({
+                      ...element,
+                      isSelected: false,
+                    })),
+                    canvas,
+                    appState,
+                  );
+                }
+              }}
+            />
+            {actionManager.renderAction(
+              "clearCanvas",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+          </Stack.Row>
           {actionManager.renderAction(
-            "loadScene",
+            "changeViewBackgroundColor",
             elements,
             appState,
             syncActionResult,
           )}
-          {actionManager.renderAction(
-            "saveScene",
-            elements,
-            appState,
-            syncActionResult,
-          )}
-          <ExportDialog
-            elements={elements}
-            appState={appState}
-            actionManager={actionManager}
-            syncActionResult={syncActionResult}
-            onExportToPng={(exportedElements, scale) => {
-              if (canvas) {
-                exportCanvas("png", exportedElements, canvas, {
-                  exportBackground: appState.exportBackground,
-                  name: appState.name,
-                  viewBackgroundColor: appState.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToSvg={(exportedElements, scale) => {
-              if (canvas) {
-                exportCanvas("svg", exportedElements, canvas, {
-                  exportBackground: appState.exportBackground,
-                  name: appState.name,
-                  viewBackgroundColor: appState.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToClipboard={(exportedElements, scale) => {
-              if (canvas) {
-                exportCanvas("clipboard", exportedElements, canvas, {
-                  exportBackground: appState.exportBackground,
-                  name: appState.name,
-                  viewBackgroundColor: appState.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToBackend={exportedElements => {
-              if (canvas) {
-                exportCanvas(
-                  "backend",
-                  exportedElements.map(element => ({
-                    ...element,
-                    isSelected: false,
-                  })),
-                  canvas,
-                  appState,
-                );
-              }
-            }}
-          />
-          {actionManager.renderAction(
-            "clearCanvas",
-            elements,
-            appState,
-            syncActionResult,
-          )}
-        </Stack.Row>
-        {actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
-          appState,
-          syncActionResult,
-        )}
-      </Stack.Col>
-    );
-  }
+        </Stack.Col>
+      );
+    }
 
-  function renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType, editingElement } = appState;
-    const targetElements = editingElement
-      ? [editingElement]
-      : elements.filter(el => el.isSelected);
-    if (!targetElements.length && elementType === "selection") {
-      return null;
+    function renderSelectedShapeActions(
+      elements: readonly ExcalidrawElement[],
+    ) {
+      const { elementType, editingElement } = appState;
+      const targetElements = editingElement
+        ? [editingElement]
+        : elements.filter(el => el.isSelected);
+      if (!targetElements.length && elementType === "selection") {
+        return null;
+      }
+
+      return (
+        <Island padding={4}>
+          <div className="panelColumn">
+            {actionManager.renderAction(
+              "changeStrokeColor",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+            {(hasBackground(elementType) ||
+              targetElements.some(element => hasBackground(element.type))) && (
+              <>
+                {actionManager.renderAction(
+                  "changeBackgroundColor",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+
+                {actionManager.renderAction(
+                  "changeFillStyle",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+              </>
+            )}
+
+            {(hasStroke(elementType) ||
+              targetElements.some(element => hasStroke(element.type))) && (
+              <>
+                {actionManager.renderAction(
+                  "changeStrokeWidth",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+
+                {actionManager.renderAction(
+                  "changeSloppiness",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+              </>
+            )}
+
+            {(hasText(elementType) ||
+              targetElements.some(element => hasText(element.type))) && (
+              <>
+                {actionManager.renderAction(
+                  "changeFontSize",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+
+                {actionManager.renderAction(
+                  "changeFontFamily",
+                  elements,
+                  appState,
+                  syncActionResult,
+                )}
+              </>
+            )}
+
+            {actionManager.renderAction(
+              "changeOpacity",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+
+            {actionManager.renderAction(
+              "deleteSelectedElements",
+              elements,
+              appState,
+              syncActionResult,
+            )}
+          </div>
+        </Island>
+      );
+    }
+
+    function renderShapesSwitcher() {
+      return (
+        <>
+          {SHAPES.map(({ value, icon }, index) => {
+            const label = t(`toolBar.${value}`);
+            return (
+              <ToolButton
+                key={value}
+                type="radio"
+                icon={icon}
+                checked={appState.elementType === value}
+                name="editor-current-shape"
+                title={`${capitalizeString(label)} — ${
+                  capitalizeString(value)[0]
+                }, ${index + 1}`}
+                keyBindingLabel={`${index + 1}`}
+                aria-label={capitalizeString(label)}
+                aria-keyshortcuts={`${label[0]} ${index + 1}`}
+                onChange={() => {
+                  setAppState({ elementType: value, multiElement: null });
+                  elements = clearSelection(elements);
+                  document.documentElement.style.cursor =
+                    value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+                  setAppState({});
+                }}
+              ></ToolButton>
+            );
+          })}
+        </>
+      );
     }
 
     return (
-      <Island padding={4}>
-        <div className="panelColumn">
-          {actionManager.renderAction(
-            "changeStrokeColor",
-            elements,
-            appState,
-            syncActionResult,
-          )}
-          {(hasBackground(elementType) ||
-            targetElements.some(element => hasBackground(element.type))) && (
-            <>
-              {actionManager.renderAction(
-                "changeBackgroundColor",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-
-              {actionManager.renderAction(
-                "changeFillStyle",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasStroke(elementType) ||
-            targetElements.some(element => hasStroke(element.type))) && (
-            <>
-              {actionManager.renderAction(
-                "changeStrokeWidth",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-
-              {actionManager.renderAction(
-                "changeSloppiness",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasText(elementType) ||
-            targetElements.some(element => hasText(element.type))) && (
-            <>
-              {actionManager.renderAction(
-                "changeFontSize",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-
-              {actionManager.renderAction(
-                "changeFontFamily",
-                elements,
-                appState,
-                syncActionResult,
-              )}
-            </>
-          )}
-
-          {actionManager.renderAction(
-            "changeOpacity",
-            elements,
-            appState,
-            syncActionResult,
-          )}
-
-          {actionManager.renderAction(
-            "deleteSelectedElements",
-            elements,
-            appState,
-            syncActionResult,
-          )}
-        </div>
-      </Island>
-    );
-  }
-
-  function renderShapesSwitcher() {
-    return (
-      <>
-        {SHAPES.map(({ value, icon }, index) => {
-          const label = t(`toolBar.${value}`);
-          return (
-            <ToolButton
-              key={value}
-              type="radio"
-              icon={icon}
-              checked={appState.elementType === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${
-                capitalizeString(value)[0]
-              }, ${index + 1}`}
-              keyBindingLabel={`${index + 1}`}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={`${label[0]} ${index + 1}`}
-              onChange={() => {
-                setAppState({ elementType: value, multiElement: null });
-                elements = clearSelection(elements);
-                document.documentElement.style.cursor =
-                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                setAppState({});
-              }}
-            ></ToolButton>
-          );
-        })}
-      </>
-    );
-  }
-
-  return (
-    <FixedSideContainer side="top">
-      <div className="App-menu App-menu_top">
-        <Stack.Col gap={4} align="end">
-          <section
-            className="App-right-menu"
-            aria-labelledby="canvas-actions-title"
-          >
-            <h2 className="visually-hidden" id="canvas-actions-title">
-              {t("headings.canvasActions")}
-            </h2>
-            <Island padding={4}>{renderCanvasActions()}</Island>
-          </section>
-          <section
-            className="App-right-menu"
-            aria-labelledby="selected-shape-title"
-          >
-            <h2 className="visually-hidden" id="selected-shape-title">
-              {t("headings.selectedShapeActions")}
-            </h2>
-            {renderSelectedShapeActions(elements)}
-          </section>
-        </Stack.Col>
-        <section aria-labelledby="shapes-title">
-          <Stack.Col gap={4} align="start">
-            <Stack.Row gap={1}>
-              <Island padding={1}>
-                <h2 className="visually-hidden" id="shapes-title">
-                  {t("headings.shapes")}
-                </h2>
-                <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
-              </Island>
-              <LockIcon
-                checked={appState.elementLocked}
-                onChange={() => {
-                  setAppState({
-                    elementLocked: !appState.elementLocked,
-                    elementType: appState.elementLocked
-                      ? "selection"
-                      : appState.elementType,
-                  });
-                }}
-                title={t("toolBar.lock")}
-              />
-            </Stack.Row>
+      <FixedSideContainer side="top">
+        <div className="App-menu App-menu_top">
+          <Stack.Col gap={4} align="end">
+            <section
+              className="App-right-menu"
+              aria-labelledby="canvas-actions-title"
+            >
+              <h2 className="visually-hidden" id="canvas-actions-title">
+                {t("headings.canvasActions")}
+              </h2>
+              <Island padding={4}>{renderCanvasActions()}</Island>
+            </section>
+            <section
+              className="App-right-menu"
+              aria-labelledby="selected-shape-title"
+            >
+              <h2 className="visually-hidden" id="selected-shape-title">
+                {t("headings.selectedShapeActions")}
+              </h2>
+              {renderSelectedShapeActions(elements)}
+            </section>
           </Stack.Col>
-        </section>
-        <div />
-      </div>
-    </FixedSideContainer>
-  );
-};
+          <section aria-labelledby="shapes-title">
+            <Stack.Col gap={4} align="start">
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden" id="shapes-title">
+                    {t("headings.shapes")}
+                  </h2>
+                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                </Island>
+                <LockIcon
+                  checked={appState.elementLocked}
+                  onChange={() => {
+                    setAppState({
+                      elementLocked: !appState.elementLocked,
+                      elementType: appState.elementLocked
+                        ? "selection"
+                        : appState.elementType,
+                    });
+                  }}
+                  title={t("toolBar.lock")}
+                />
+              </Stack.Row>
+            </Stack.Col>
+          </section>
+          <div />
+        </div>
+      </FixedSideContainer>
+    );
+  },
+);
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -565,17 +569,6 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced();
     this.saveDebounced.flush();
   };
-
-  public shouldComponentUpdate(props: any, nextState: AppState) {
-    if (!history.isRecording()) {
-      // temporary hack to fix #592
-      // eslint-disable-next-line react/no-direct-mutation-state
-      this.state = nextState;
-      this.componentDidUpdate();
-      return false;
-    }
-    return true;
-  }
 
   private async loadScene(id: string | null) {
     let data;
@@ -898,8 +891,7 @@ export class App extends React.Component<any, AppState> {
                   const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
-                  // We don't want to save history when panning around
-                  history.skipRecording();
+
                   this.setState({
                     scrollX: this.state.scrollX - deltaX,
                     scrollY: this.state.scrollY - deltaY,
@@ -1147,7 +1139,6 @@ export class App extends React.Component<any, AppState> {
                 mouseY: number,
                 perfect: boolean,
               ) => {
-                // TODO: Implement perfect sizing for origin
                 if (perfect) {
                   const absPx = p1[0] + element.x;
                   const absPy = p1[1] + element.y;
@@ -1204,8 +1195,6 @@ export class App extends React.Component<any, AppState> {
                 if (isOverHorizontalScrollBar) {
                   const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
                   const dx = x - lastX;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollX: this.state.scrollX - dx });
                   lastX = x;
                   return;
@@ -1214,8 +1203,6 @@ export class App extends React.Component<any, AppState> {
                 if (isOverVerticalScrollBar) {
                   const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
                   const dy = y - lastY;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollY: this.state.scrollY - dy });
                   lastY = y;
                   return;
@@ -1453,8 +1440,6 @@ export class App extends React.Component<any, AppState> {
 
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when resizing an element
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1475,7 +1460,6 @@ export class App extends React.Component<any, AppState> {
                     lastX = x;
                     lastY = y;
                     // We don't want to save history when dragging an element to initially size it
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1552,8 +1536,6 @@ export class App extends React.Component<any, AppState> {
                     element.isSelected = true;
                   });
                 }
-                // We don't want to save history when moving an element
-                history.skipRecording();
                 this.setState({});
               };
 
@@ -1612,6 +1594,10 @@ export class App extends React.Component<any, AppState> {
                   this.setState({});
                 }
 
+                if (resizingElement) {
+                  history.resumeRecording();
+                }
+
                 if (
                   resizingElement &&
                   isInvisiblySmallElement(resizingElement)
@@ -1662,10 +1648,12 @@ export class App extends React.Component<any, AppState> {
                     draggingElement: null,
                     elementType: "selection",
                   });
+                  history.resumeRecording();
                 } else {
                   this.setState({
                     draggingElement: null,
                   });
+                  history.resumeRecording();
                 }
               };
 
@@ -1673,16 +1661,6 @@ export class App extends React.Component<any, AppState> {
 
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
-
-              if (
-                !this.state.multiElement ||
-                (this.state.multiElement &&
-                  this.state.multiElement.points.length < 2)
-              ) {
-                // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-                history.skipRecording();
-                this.setState({});
-              }
             }}
             onDoubleClick={e => {
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1892,8 +1870,7 @@ export class App extends React.Component<any, AppState> {
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const { deltaX, deltaY } = e;
-    // We don't want to save history when panning around
-    history.skipRecording();
+
     this.setState({
       scrollX: this.state.scrollX - deltaX,
       scrollY: this.state.scrollY - deltaY,
@@ -1989,8 +1966,7 @@ export class App extends React.Component<any, AppState> {
           elements,
         ),
       );
-    } else {
-      history.resumeRecording();
+      history.skipRecording();
     }
   }
 }
