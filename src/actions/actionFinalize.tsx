@@ -1,7 +1,6 @@
 import { Action } from "./types";
 import { KEYS } from "../keys";
 import { clearSelection } from "../scene";
-import { ExcalidrawElement } from "../element/types";
 
 export const actionFinalize: Action = {
   name: "finalize",
@@ -17,7 +16,7 @@ export const actionFinalize: Action = {
       appState.multiElement.shape = null;
     }
     return {
-      elements: clearSelection(elements) as readonly ExcalidrawElement[],
+      elements: clearSelection(elements),
       appState: {
         ...appState,
         elementType: "selection",
