@@ -1,6 +1,10 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState, cleanAppStateForExport } from "../appState";
+import {
+  getDefaultAppState,
+  cleanAppStateForExport,
+  clearAppStateForLocalStorage,
+} from "../appState";
 
 import { AppState } from "../types";
 import { ExportType, PreviousScene } from "./types";
@@ -358,10 +362,13 @@ export function restoreFromLocalStorage() {
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
-  state: AppState,
+  appState: AppState,
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
-  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY_STATE,
+    JSON.stringify(clearAppStateForLocalStorage(appState)),
+  );
 }
 
 /**

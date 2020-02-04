@@ -30,6 +30,18 @@ export function getDefaultAppState(): AppState {
   };
 }
 
+export function clearAppStateForLocalStorage(appState: AppState) {
+  const {
+    draggingElement,
+    resizingElement,
+    multiElement,
+    editingElement,
+    isResizing,
+    ...exportedState
+  } = appState;
+  return exportedState;
+}
+
 export function cleanAppStateForExport(appState: AppState) {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
