@@ -697,7 +697,11 @@ export class App extends React.Component<any, AppState> {
     } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
 
-      if (this.state.multiElement) {
+      if (
+        this.state.multiElement ||
+        this.state.resizingElement ||
+        this.state.editingElement
+      ) {
         return;
       }
 
