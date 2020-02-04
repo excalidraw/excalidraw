@@ -182,10 +182,19 @@ interface LayerUIProps {
   appState: AppState;
   canvas: HTMLCanvasElement | null;
   setAppState: any;
+  elements: readonly ExcalidrawElement[];
+  setElements: (elements: ExcalidrawElement[]) => void;
 }
 
 const LayerUI = React.memo(
-  ({ actionManager, appState, setAppState, canvas }: LayerUIProps) => {
+  ({
+    actionManager,
+    appState,
+    setAppState,
+    canvas,
+    elements,
+    setElements,
+  }: LayerUIProps) => {
     function renderCanvasActions() {
       return (
         <Stack.Col gap={4}>
@@ -353,7 +362,7 @@ const LayerUI = React.memo(
                 aria-keyshortcuts={`${label[0]} ${index + 1}`}
                 onChange={() => {
                   setAppState({ elementType: value, multiElement: null });
-                  elements = clearSelection(elements);
+                  setElements(clearSelection(elements));
                   document.documentElement.style.cursor =
                     value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
                   setAppState({});
@@ -415,6 +424,30 @@ const LayerUI = React.memo(
           <div />
         </div>
       </FixedSideContainer>
+    );
+  },
+  (prev, next) => {
+    const getNecessaryObj = (appState: AppState): Partial<AppState> => {
+      const {
+        draggingElement,
+        resizingElement,
+        multiElement,
+        editingElement,
+        isResizing,
+        cursorX,
+        cursorY,
+        ...ret
+      } = appState;
+      return ret;
+    };
+    const prevAppState = getNecessaryObj(prev.appState);
+    const nextAppState = getNecessaryObj(next.appState);
+
+    const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+
+    return (
+      prev.elements === next.elements &&
+      keys.every(k => prevAppState[k] === nextAppState[k])
     );
   },
 );
@@ -722,6 +755,11 @@ export class App extends React.Component<any, AppState> {
     this.setState(obj);
   };
 
+  setElements = (elements_: ExcalidrawElement[]) => {
+    elements = elements_;
+    this.setState({});
+  };
+
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
     const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
@@ -733,6 +771,8 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
+          elements={elements}
+          setElements={this.setElements}
         />
         <main>
           <canvas
