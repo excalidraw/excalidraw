@@ -16,7 +16,6 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
-  resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./element";
 import {
@@ -1050,7 +1049,10 @@ export class App extends React.Component<any, AppState> {
                   editingElement: element,
                 });
                 return;
-              } else if (this.state.elementType === "arrow") {
+              } else if (
+                this.state.elementType === "arrow" ||
+                this.state.elementType === "line"
+              ) {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
@@ -1107,7 +1109,7 @@ export class App extends React.Component<any, AppState> {
                   const absPy = p1[1] + element.y;
 
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x - p1[0],
                     mouseY - element.y - p1[1],
                   );
@@ -1137,7 +1139,7 @@ export class App extends React.Component<any, AppState> {
               ) => {
                 if (perfect) {
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x,
                     mouseY - element.y,
                   );
@@ -1179,7 +1181,11 @@ export class App extends React.Component<any, AppState> {
                 //  to ensure we don't create a 2-point arrow by mistake when
                 //  user clicks mouse in a way that it moves a tiny bit (thus
                 //  triggering mousemove)
-                if (!draggingOccurred && this.state.elementType === "arrow") {
+                if (
+                  !draggingOccurred &&
+                  (this.state.elementType === "arrow" ||
+                    this.state.elementType === "line")
+                ) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
                   if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
@@ -1199,10 +1205,7 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
@@ -1226,12 +1229,8 @@ export class App extends React.Component<any, AppState> {
                           element.x += deltaX;
 
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              resizePerfectLineForNWHandler(element, x, y);
-                            } else {
-                              element.y += element.height - element.width;
-                              element.height = element.width;
-                            }
+                            element.y += element.height - element.width;
+                            element.height = element.width;
                           } else {
                             element.height -= deltaY;
                             element.y += deltaY;
@@ -1239,10 +1238,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "ne":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] >= 0) {
@@ -1272,10 +1268,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "sw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] <= 0) {
@@ -1304,10 +1297,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "se":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] > 0 || p1[1] > 0) {
@@ -1327,18 +1317,8 @@ export class App extends React.Component<any, AppState> {
                           );
                         } else {
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              const { width, height } = getPerfectElementSize(
-                                element.type,
-                                x - element.x,
-                                y - element.y,
-                              );
-                              element.width = width;
-                              element.height = height;
-                            } else {
-                              element.width += deltaX;
-                              element.height = element.width;
-                            }
+                            element.width += deltaX;
+                            element.height = element.width;
                           } else {
                             element.width += deltaX;
                             element.height += deltaY;
@@ -1473,34 +1453,7 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) {
-                  width = -width;
-                }
-                if (isLinear && y < originY) {
-                  height = -height;
-                }
-
-                if (e.shiftKey) {
-                  ({ width, height } = getPerfectElementSize(
-                    this.state.elementType,
-                    width,
-                    !isLinear && y < originY ? -height : height,
-                  ));
-
-                  if (!isLinear && height < 0) {
-                    height = -height;
-                  }
-                }
-
-                if (!isLinear) {
-                  draggingElement.x = x < originX ? originX - width : originX;
-                  draggingElement.y = y < originY ? originY - height : originY;
-                }
-
-                draggingElement.width = width;
-                draggingElement.height = height;
-
-                if (this.state.elementType === "arrow") {
+                if (isLinear) {
                   draggingOccurred = true;
                   const points = draggingElement.points;
                   let dx = x - draggingElement.x;
@@ -1521,6 +1474,24 @@ export class App extends React.Component<any, AppState> {
                     pnt[0] = dx;
                     pnt[1] = dy;
                   }
+                } else {
+                  if (e.shiftKey) {
+                    ({ width, height } = getPerfectElementSize(
+                      this.state.elementType,
+                      width,
+                      y < originY ? -height : height,
+                    ));
+
+                    if (height < 0) {
+                      height = -height;
+                    }
+                  }
+
+                  draggingElement.x = x < originX ? originX - width : originX;
+                  draggingElement.y = y < originY ? originY - height : originY;
+
+                  draggingElement.width = width;
+                  draggingElement.height = height;
                 }
 
                 draggingElement.shape = null;
@@ -1558,7 +1529,7 @@ export class App extends React.Component<any, AppState> {
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
 
-                if (elementType === "arrow") {
+                if (elementType === "arrow" || elementType === "line") {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
                   }
