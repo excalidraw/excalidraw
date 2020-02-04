@@ -1074,7 +1074,6 @@ export class App extends React.Component<any, AppState> {
                   multiElement.isSelected = true;
                   multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
-                  this.setState({ draggingElement: multiElement });
                 } else {
                   element.isSelected = false;
                   element.points.push([0, 0]);
@@ -1548,7 +1547,13 @@ export class App extends React.Component<any, AppState> {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
                   }
-                  if (!draggingOccurred && !multiElement) {
+                  if (!draggingOccurred && draggingElement && !multiElement) {
+                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    draggingElement.points.push([
+                      x - draggingElement.x,
+                      y - draggingElement.y,
+                    ]);
+                    draggingElement.shape = null;
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
@@ -1751,13 +1756,28 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
               const hasDeselectedButton = Boolean(e.buttons);
+
+              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              if (this.state.multiElement) {
+                const { multiElement } = this.state;
+                const originX = multiElement.x;
+                const originY = multiElement.y;
+                const points = multiElement.points;
+                const pnt = points[points.length - 1];
+                pnt[0] = x - originX;
+                pnt[1] = y - originY;
+                multiElement.shape = null;
+                this.setState({});
+                return;
+              }
+
               if (
                 hasDeselectedButton ||
                 this.state.elementType !== "selection"
               ) {
                 return;
               }
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
               const selectedElements = elements.filter(e => e.isSelected)
                 .length;
               if (selectedElements === 1) {
