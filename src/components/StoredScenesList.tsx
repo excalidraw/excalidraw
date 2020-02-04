@@ -17,8 +17,8 @@ export function StoredScenesList({
     <select
       className="stored-ids-select"
       onChange={({ currentTarget }) => {
-        const scene = scenes[currentTarget.value as unknown as number];
-        onChange(scene.id, scene.k)
+        const scene = scenes[(currentTarget.value as unknown) as number];
+        onChange(scene.id, scene.k);
       }}
       value={currentId}
       title={t("buttons.previouslyLoadedScenes")}

@@ -311,8 +311,7 @@ export class App extends React.Component<any, AppState> {
       data = await importFromBackend(id, k);
       addToLoadedScenes(id, k);
       selectedId = id;
-      // TODO: uncomment
-      // window.history.replaceState({}, "Excalidraw", window.location.origin);
+      window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
       data = restoreFromLocalStorage();
     }
@@ -349,12 +348,13 @@ export class App extends React.Component<any, AppState> {
       // Backwards compatibility with legacy url format
       this.loadScene(id, undefined);
     } else {
-      const match = window.location.hash.match(/^#json=([0-9]+),([a-zA-Z0-9_-]+)$/);
+      const match = window.location.hash.match(
+        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+      );
       if (match) {
         this.loadScene(match[1], match[2]);
       }
     }
-
   }
 
   public componentWillUnmount() {

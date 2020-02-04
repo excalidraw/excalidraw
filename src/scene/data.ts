@@ -23,11 +23,10 @@ import {
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
 const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
-const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/post/";
+const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -155,10 +154,10 @@ export async function exportToBackend(
   const key = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
-      length: 128
+      length: 128,
     },
     true, // extractable
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
   // The iv is set to 0. We are never going to reuse the same key so we don't
   // need to have an iv. (I hope that's correct...)
@@ -168,10 +167,10 @@ export async function exportToBackend(
   const encrypted = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv: iv
+      iv: iv,
     },
     key,
-    encoded
+    encoded,
   );
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
@@ -180,8 +179,6 @@ export async function exportToBackend(
   try {
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      mode: "no-cors",
       body: encrypted,
     });
     const json = await response.json();
@@ -193,7 +190,7 @@ export async function exportToBackend(
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = 'json=' + json.id + ',' + exportedKey.k!;
+      url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
 
       try {
@@ -211,23 +208,24 @@ export async function exportToBackend(
   }
 }
 
-export async function importFromBackend(id: string | null, k: string | undefined) {
+export async function importFromBackend(
+  id: string | null,
+  k: string | undefined,
+) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
 
   try {
-    const response = await fetch(`${BACKEND_GET}${id}.json`)
-    // TODO: uncomment the following block
-    // if (!response.ok) {
-    //   window.alert(t("alerts.importBackendFailed"));
-    //   return restore(elements, { ...appState, ...calculateScrollCenter(elements) });
-    // }
+    const response = await fetch(
+      k ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+    );
+    if (!response.ok) {
+      window.alert(t("alerts.importBackendFailed"));
+      return restore(elements, appState, { scrollToContent: true });
+    }
     let data;
     if (k) {
-      // TODO: uncomment next line and comment line after
-      // const buffer = await response.arrayBuffer();
-      const buffer: any = new Uint8Array([202,191,73,59,84,92,50,53,212,83,106,18,187,251,136,23,197,137,178,66,92,217,210,60,220,121,223,220,1,216,115,130,54,114,138,179,52,150,145,182,142,253,86,115,194,56,115,195,184,189,98,191,10,78,182,150,153,243,107,71,122,38,21,252,246,165,82,178,240,152,169,16,226,82,13,129,246,182,144,115,193,232,18,79,165,196,119,59,177,137,5,117,3,169,81,127,181,42,123,150,196,133,85,90,87,114,196,54,27,143,176,238,91,197,150,134,178,34,40,71,29,123,30,39,193,117,125,153,94,127,222,105,149,188,240,135,210,35,122,128,139,58,35,167,85,214,63,25,110,150,200,178,111,226,204,185,175,207,42,190,21,248,141,22,167,145,179,207,93,38,10,250,48,82,35,41,59,234,9,217,165,28,192,138,216,103,221,215,5,55,120,240,245,179,12,16,241,198,183,60,240,190,213,115,55,241,235,180,170,116,231,220,207,95,138,2,146,230,125,49,108,163,168,106,254,83,12,164,183,72,221,159,91,106,194,185,9,229,253,78,205,131,227,51,241,143,251,55,248,95,192,4,195,1,63,125,182,188,174,74,160,29,64,219,239,153,250,238,46,210,56,10,101,102,15,150,30,32,94,126,69,204,144,199,36,160,158,235,61,186,122,52,156,119,102,218,17,234,50,133,167,149,40,214,85,99,164,112,0,253,121,123,31,213,174,173,124,153,243,20,164,140,93,125,178,209,221,106,229,56,149,146,130,10,246,92,195,206,15,175,36,107,226,97,204,244,114,83,50,108,167,21,125,48,121,220,149,171,161,34,18,205,81,37,47,157,23,225,119,234,134,32,144,118,52,217,222,24,67,112,129,200,27,63,88,134,30,127,135,77,80,69,145,208,231,76,12,49,172,188,31,24,154,115,25,173,226,169,139,120,204,32,92,209,233,233,16,63,38,108,203,169,117,238,140,3,20,89,92,200,120,22,23,15,63,255,145,80,78,238,49,48,201,245,117,138,152,49,40,0,72,159,34,189,63,26,183,253,212,253,143,40,249,131,91,89,110,26,128,20,148,16,98,226,218,2,145,72,170]).buffer;
-
+      const buffer = await response.arrayBuffer();
       const key = await window.crypto.subtle.importKey(
         "jwk",
         {
@@ -235,26 +233,29 @@ export async function importFromBackend(id: string | null, k: string | undefined
           ext: true,
           k: k,
           key_ops: ["encrypt", "decrypt"],
-          kty: "oct"
+          kty: "oct",
         },
         {
           name: "AES-GCM",
-          length: 128
+          length: 128,
         },
         false, // extractable
-        ["decrypt"]
+        ["decrypt"],
       );
       const iv = new Uint8Array(12);
       const decrypted = await window.crypto.subtle.decrypt(
         {
           name: "AES-GCM",
-          iv: iv
+          iv: iv,
         },
         key,
-        buffer
+        buffer,
       );
       // We need to convert the decrypted array buffer to a string
-      const string = String.fromCharCode.apply(null, (new Uint8Array(decrypted) as any));
+      const string = String.fromCharCode.apply(
+        null,
+        new Uint8Array(decrypted) as any,
+      );
       data = JSON.parse(string);
     } else {
       // Legacy format
@@ -267,12 +268,8 @@ export async function importFromBackend(id: string | null, k: string | undefined
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
   } finally {
-    return restore(elements, { ...appState, ...calculateScrollCenter(elements) });
+    return restore(elements, appState, { scrollToContent: true });
   }
-<<<<<<< HEAD
-  return restore(elements, appState, { scrollToContent: true });
-=======
->>>>>>> Add encryption
 }
 
 export async function exportCanvas(
@@ -478,7 +475,7 @@ export function addToLoadedScenes(id: string, k: string | undefined): void {
     scenes.push({
       timestamp: Date.now(),
       id,
-      k
+      k,
     });
   }
 
