@@ -700,7 +700,8 @@ export class App extends React.Component<any, AppState> {
       if (
         this.state.multiElement ||
         this.state.resizingElement ||
-        this.state.editingElement
+        this.state.editingElement ||
+        this.state.draggingElement
       ) {
         return;
       }
