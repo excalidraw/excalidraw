@@ -8,6 +8,13 @@ export const actionFinalize: Action = {
     if (window.document.activeElement instanceof HTMLElement) {
       window.document.activeElement.blur();
     }
+    if (appState.multiElement) {
+      appState.multiElement.points = appState.multiElement.points.slice(
+        0,
+        appState.multiElement.points.length - 1,
+      );
+      appState.multiElement.shape = null;
+    }
     return {
       elements: clearSelection(elements),
       appState: {
