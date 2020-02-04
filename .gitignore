@@ -10,3 +10,5 @@ yarn-debug.log*
 yarn-error.log*
 yarn.lock
 cypress/snapshots/**/__diff_output__/**
+cypress/videos
+cypress/screenshots
