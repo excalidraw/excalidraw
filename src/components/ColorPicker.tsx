@@ -200,6 +200,12 @@ const ColorInput = React.forwardRef(
           onPaste={e => onChange(e.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
+          onKeyDown={e => {
+            e.stopPropagation();
+          }}
+          onFocus={e => {
+            e.target.select();
+          }}
         />
       </div>
     );
