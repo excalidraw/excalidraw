@@ -40,8 +40,8 @@ const Picker = function({
     // focus on first input
     if (activeItem.current) {
       activeItem.current.focus();
-    } else if (firstItem.current) {
-      firstItem.current.focus();
+    } else if (colorInput.current) {
+      colorInput.current.focus();
     }
   }, []);
 
