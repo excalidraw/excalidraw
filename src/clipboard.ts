@@ -62,10 +62,8 @@ export function parseClipboardEvent(
     const text = e.clipboardData?.getData("text/plain").trim();
     if (text && !PREFER_APP_CLIPBOARD) {
       return { text };
-      // eslint-disable-next-line no-else-return
-    } else {
-      return getAppClipboard();
     }
+    return getAppClipboard();
   } catch (e) {}
 
   return {};
