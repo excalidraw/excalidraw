@@ -15,10 +15,7 @@ class SceneHistory {
       appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
-        isSelected: false,
         shape: null,
-        // TODO: This is a temporary fix.
-        // This should be integral to the multi point behavior
         points:
           appState.multiElement && appState.multiElement.id === element.id
             ? element.points.slice(0, element.points.length - 1)
