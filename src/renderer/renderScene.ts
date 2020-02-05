@@ -61,6 +61,12 @@ export function renderScene(
   function resetContextScale() {
     context.setTransform(contextScale, 0, 0, contextScale, 0, 0);
   }
+  function getXPositionWithSceneState(x: number) {
+    return (x + sceneState.scrollX) * sceneState.zoom;
+  }
+  function getYPositionWithSceneState(y: number) {
+    return (y + sceneState.scrollY) * sceneState.zoom;
+  }
 
   // Paint background
   const fillStyle = context.fillStyle;
@@ -119,9 +125,8 @@ export function renderScene(
   // Pain selected elements
   if (renderSelection) {
     const selectedElements = elements.filter(element => element.isSelected);
-    const margin = 4;
+    const dashledLinePadding = 4;
 
-    scaleContextToZoom();
     selectedElements.forEach(element => {
       const [
         elementX1,
@@ -129,28 +134,36 @@ export function renderScene(
         elementX2,
         elementY2,
       ] = getElementAbsoluteCoords(element);
-      const lineDash = context.getLineDash();
+
+      const elementWidth = (elementX2 - elementX1) * sceneState.zoom;
+      const elementHeight = (elementY2 - elementY1) * sceneState.zoom;
+
+      const elementX1InCanvas = getXPositionWithSceneState(elementX1);
+      const elementY1InCanvas = getYPositionWithSceneState(elementY1);
+
+      const initialLineDash = context.getLineDash();
       context.setLineDash([8, 4]);
       context.strokeRect(
-        elementX1 - margin + sceneState.scrollX,
-        elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2,
+        elementX1InCanvas - dashledLinePadding,
+        elementY1InCanvas - dashledLinePadding,
+        elementWidth + dashledLinePadding * 2,
+        elementHeight + dashledLinePadding * 2,
       );
-      context.setLineDash(lineDash);
+      context.setLineDash(initialLineDash);
     });
-    resetContextScale();
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      scaleContextToZoom();
-      const handlers = handlerRectangles(selectedElements[0], sceneState);
+      const handlers = handlerRectangles(selectedElements[0], {
+        scrollX: sceneState.scrollX,
+        scrollY: sceneState.scrollY,
+        zoom: sceneState.zoom,
+      });
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
-      resetContextScale();
     }
   }
 

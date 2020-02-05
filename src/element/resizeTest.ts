@@ -1,7 +1,8 @@
+import { SceneState } from "../scene/types";
+import { AppState } from "../types";
 import { ExcalidrawElement } from "./types";
 
 import { handlerRectangles } from "./handlerRectangles";
-import { SceneScroll } from "../scene/types";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -9,13 +10,21 @@ export function resizeTest(
   element: ExcalidrawElement,
   x: number,
   y: number,
-  { scrollX, scrollY }: SceneScroll,
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: SceneState["scrollX"];
+    scrollY: SceneState["scrollY"];
+    zoom: SceneState["zoom"];
+  },
 ): HandlerRectanglesRet | false {
   if (!element.isSelected || element.type === "text") {
     return false;
   }
 
-  const handlers = handlerRectangles(element, { scrollX, scrollY });
+  const handlers = handlerRectangles(element, { scrollX, scrollY, zoom });
 
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key as HandlerRectanglesRet]!;
@@ -41,7 +50,7 @@ export function resizeTest(
 export function getElementWithResizeHandler(
   elements: readonly ExcalidrawElement[],
   { x, y }: { x: number; y: number },
-  { scrollX, scrollY }: SceneScroll,
+  { scrollX, scrollY, zoom }: AppState,
 ) {
   return elements.reduce((result, element) => {
     if (result) {
@@ -50,6 +59,7 @@ export function getElementWithResizeHandler(
     const resizeHandle = resizeTest(element, x, y, {
       scrollX,
       scrollY,
+      zoom,
     });
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
