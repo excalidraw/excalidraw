@@ -44,6 +44,23 @@ export function clearAppStateForLocalStorage(appState: AppState) {
   return exportedState;
 }
 
+export function clearAppStatePropertiesForHistory(
+  appState: AppState,
+): Partial<AppState> {
+  return {
+    exportBackground: appState.exportBackground,
+    currentItemStrokeColor: appState.currentItemStrokeColor,
+    currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFillStyle: appState.currentItemFillStyle,
+    currentItemStrokeWidth: appState.currentItemStrokeWidth,
+    currentItemRoughness: appState.currentItemRoughness,
+    currentItemOpacity: appState.currentItemOpacity,
+    currentItemFont: appState.currentItemFont,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    name: appState.name,
+  };
+}
+
 export function cleanAppStateForExport(appState: AppState) {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,

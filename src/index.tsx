@@ -154,23 +154,6 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
-function pickAppStatePropertiesForHistory(
-  appState: AppState,
-): Partial<AppState> {
-  return {
-    exportBackground: appState.exportBackground,
-    currentItemStrokeColor: appState.currentItemStrokeColor,
-    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-    currentItemFillStyle: appState.currentItemFillStyle,
-    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-    currentItemRoughness: appState.currentItemRoughness,
-    currentItemOpacity: appState.currentItemOpacity,
-    currentItemFont: appState.currentItemFont,
-    viewBackgroundColor: appState.viewBackgroundColor,
-    name: appState.name,
-  };
-}
-
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -1974,7 +1957,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(pickAppStatePropertiesForHistory(this.state), elements);
+      history.pushEntry(this.state, elements);
       history.skipRecording();
     }
   }

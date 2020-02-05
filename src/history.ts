@@ -1,17 +1,18 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
+import { clearAppStatePropertiesForHistory } from "./appState";
 
 class SceneHistory {
-  private recording: boolean = false;
+  private recording: boolean = true;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
   private generateEntry(
-    appState: Partial<AppState>,
+    appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) {
     return JSON.stringify({
-      appState,
+      appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
         isSelected: false,
@@ -19,17 +20,14 @@ class SceneHistory {
         // TODO: This is a temporary fix.
         // This should be integral to the multi point behavior
         points:
-          element.type === "arrow" || element.type === "line"
+          appState.multiElement && appState.multiElement.id === element.id
             ? element.points.slice(0, element.points.length - 1)
             : element.points,
       })),
     });
   }
 
-  pushEntry(
-    appState: Partial<AppState>,
-    elements: readonly ExcalidrawElement[],
-  ) {
+  pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
     const newEntry = this.generateEntry(appState, elements);
     if (
       this.stateHistory.length > 0 &&
