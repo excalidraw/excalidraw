@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
-  elements?: ExcalidrawElement[];
+  elements?: readonly ExcalidrawElement[];
   appState?: AppState;
 };
 
@@ -32,6 +32,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  commitToHistory?: (
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {
@@ -39,21 +43,9 @@ export interface ActionsManagerInterface {
     [keyProp: string]: Action;
   };
   registerAction: (action: Action) => void;
-  handleKeyDown: (
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => ActionResult | null;
+  handleKeyDown: (event: KeyboardEvent) => ActionResult | null;
   getContextMenuItems: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
-  renderAction: (
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-  ) => React.ReactElement | null;
+  renderAction: (name: string) => React.ReactElement | null;
 }
