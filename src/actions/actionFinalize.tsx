@@ -16,7 +16,7 @@ export const actionFinalize: Action = {
         appState.multiElement.points.length - 1,
       );
       if (isInvisiblySmallElement(appState.multiElement)) {
-        newElements = newElements.slice(0, elements.length - 2);
+        newElements = newElements.slice(0, -1);
       }
       appState.multiElement.shape = null;
     }
