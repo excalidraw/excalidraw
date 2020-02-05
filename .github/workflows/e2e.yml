@@ -19,6 +19,9 @@ jobs:
         with:
           start: npm start
           wait-on: "http://localhost:3000"
+          # If screenshot snapshots are failing add
+          # the following to ignore them:
+          env: failOnSnapshotDiff=false
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
