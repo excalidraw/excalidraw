@@ -1544,7 +1544,11 @@ export class App extends React.Component<any, AppState> {
                   elementLocked,
                 } = this.state;
 
-                this.setState({ isResizing: false, resizingElement: null });
+                this.setState({
+                  isResizing: false,
+                  resizingElement: null,
+                  selectionElement: null,
+                });
 
                 resizeArrowFn = null;
                 lastMouseUp = null;
@@ -1634,9 +1638,7 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                if (elementType === "selection") {
-                  this.setState({ selectionElement: null });
-                } else if (!elementLocked) {
+                if (!elementLocked) {
                   draggingElement.isSelected = true;
                 }
 
