@@ -302,12 +302,14 @@ export class App extends React.Component<any, AppState> {
     return true;
   }
 
-  private async loadScene(id: string | null) {
+  private async loadScene(id: string | null, k: string | undefined) {
     let data;
     let selectedId;
     if (id != null) {
-      data = await importFromBackend(id);
-      addToLoadedScenes(id);
+      // k is the private key used to decrypt the content from the server, take
+      // extra care not to leak it
+      data = await importFromBackend(id, k);
+      addToLoadedScenes(id, k);
       selectedId = id;
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
@@ -342,7 +344,17 @@ export class App extends React.Component<any, AppState> {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
-    this.loadScene(id);
+    if (id) {
+      // Backwards compatibility with legacy url format
+      this.loadScene(id, undefined);
+    } else {
+      const match = window.location.hash.match(
+        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+      );
+      if (match) {
+        this.loadScene(match[1], match[2]);
+      }
+    }
   }
 
   public componentWillUnmount() {
@@ -1854,7 +1866,7 @@ export class App extends React.Component<any, AppState> {
       <StoredScenesList
         scenes={scenes}
         currentId={this.state.selectedId}
-        onChange={id => this.loadScene(id)}
+        onChange={(id, k) => this.loadScene(id, k)}
       />
     );
   }

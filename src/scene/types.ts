@@ -18,6 +18,7 @@ export interface Scene {
 
 export interface PreviousScene {
   id: string;
+  k?: string;
   timestamp: number;
 }
 
