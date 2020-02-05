@@ -33,10 +33,10 @@ export function resizeTest(
     }
 
     return (
-      x + scrollX >= handler[0] &&
-      x + scrollX <= handler[0] + handler[2] &&
-      y + scrollY >= handler[1] &&
-      y + scrollY <= handler[1] + handler[3]
+      (x + scrollX) * zoom >= handler[0] &&
+      (x + scrollX) * zoom <= handler[0] + handler[2] &&
+      (y + scrollY) * zoom >= handler[1] &&
+      (y + scrollY) * zoom <= handler[1] + handler[3]
     );
   });
 
