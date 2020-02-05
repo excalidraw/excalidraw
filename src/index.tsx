@@ -995,6 +995,7 @@ export class App extends React.Component<any, AppState> {
                     // state of the box
                     if (!hitElement.isSelected) {
                       hitElement.isSelected = true;
+                      elements = elements.slice();
                       elementIsAddedToSelection = true;
                     }
 
