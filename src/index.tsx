@@ -949,8 +949,11 @@ export class App extends React.Component<any, AppState> {
                 e.clientY / window.devicePixelRatio,
                 canvasWidth / window.devicePixelRatio,
                 canvasHeight / window.devicePixelRatio,
-                this.state.scrollX,
-                this.state.scrollY,
+                {
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  zoom: this.state.zoom,
+                },
               );
 
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);

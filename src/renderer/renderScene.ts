@@ -89,13 +89,11 @@ export function renderScene(
 
   // Paint visible elements
   const visibleElements = elements.filter(element =>
-    isVisibleElement(
-      element,
-      sceneState.scrollX,
-      sceneState.scrollY,
-      canvas.width,
-      canvas.height,
-    ),
+    isVisibleElement(element, canvas.width, canvas.height, {
+      scrollX: sceneState.scrollX,
+      scrollY: sceneState.scrollY,
+      zoom: sceneState.zoom,
+    }),
   );
   scaleContextToZoom();
   visibleElements.forEach(element => {
@@ -175,8 +173,11 @@ export function renderScene(
       elements,
       canvas.width / contextScale,
       canvas.height / contextScale,
-      sceneState.scrollX,
-      sceneState.scrollY,
+      {
+        scrollX: sceneState.scrollX,
+        scrollY: sceneState.scrollY,
+        zoom: sceneState.zoom,
+      },
     );
 
     const strokeStyle = context.strokeStyle;
@@ -203,24 +204,24 @@ export function renderScene(
 
 function isVisibleElement(
   element: ExcalidrawElement,
-  scrollX: number,
-  scrollY: number,
   canvasWidth: number,
   canvasHeight: number,
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: SceneState["scrollX"];
+    scrollY: SceneState["scrollY"];
+    zoom: SceneState["zoom"];
+  },
 ) {
-  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  if (element.type !== "arrow") {
-    x1 += scrollX;
-    y1 += scrollY;
-    x2 += scrollX;
-    y2 += scrollY;
-    return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
-  }
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   return (
-    x2 + scrollX >= 0 &&
-    x1 + scrollX <= canvasWidth &&
-    y2 + scrollY >= 0 &&
-    y1 + scrollY <= canvasHeight
+    (x2 + scrollX) * zoom >= 0 &&
+    (x1 + scrollX) * zoom <= canvasWidth &&
+    (y2 + scrollY) * zoom >= 0 &&
+    (y1 + scrollY) * zoom <= canvasHeight
   );
 }
 
