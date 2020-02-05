@@ -45,6 +45,7 @@ import { ExcalidrawElement } from "./element/types";
 
 import {
   isWritableElement,
+  isInputLike,
   debounce,
   capitalizeString,
   distance,
