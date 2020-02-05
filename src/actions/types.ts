@@ -32,7 +32,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
-  commitToHistory?: boolean;
+  commitToHistory?: (
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {

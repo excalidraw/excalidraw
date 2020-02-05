@@ -41,7 +41,10 @@ export class ActionManager implements ActionsManagerInterface {
     }
 
     event.preventDefault();
-    if (data[0].commitToHistory === true) {
+    if (
+      data[0].commitToHistory &&
+      data[0].commitToHistory(appState, elements)
+    ) {
       this.resumeHistoryRecording();
     }
     return data[0].perform(elements, appState, null);
@@ -63,7 +66,10 @@ export class ActionManager implements ActionsManagerInterface {
       .map(action => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          if (action.commitToHistory === true) {
+          if (
+            action.commitToHistory &&
+            action.commitToHistory(appState, elements)
+          ) {
             this.resumeHistoryRecording();
           }
           this.updater(action.perform(elements, appState, null));
@@ -80,7 +86,10 @@ export class ActionManager implements ActionsManagerInterface {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState: any) => {
-        if (action.commitToHistory === true) {
+        if (
+          action.commitToHistory &&
+          action.commitToHistory(appState, elements) === true
+        ) {
           this.resumeHistoryRecording();
         }
         this.updater(action.perform(elements, appState, formState));

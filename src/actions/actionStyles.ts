@@ -45,7 +45,7 @@ export const actionPasteStyles: Action = {
       }),
     };
   },
-  commitToHistory: true,
+  commitToHistory: () => true,
   contextItemLabel: "labels.pasteStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,

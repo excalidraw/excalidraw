@@ -23,12 +23,12 @@ export const actionChangeViewBackgroundColor: Action = {
       </div>
     );
   },
-  commitToHistory: true,
+  commitToHistory: () => true,
 };
 
 export const actionClearCanvas: Action = {
   name: "clearCanvas",
-  commitToHistory: true,
+  commitToHistory: () => true,
   perform: () => {
     return {
       elements: [],

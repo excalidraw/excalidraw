@@ -1651,16 +1651,17 @@ export class App extends React.Component<any, AppState> {
                   draggingElement.isSelected = true;
                 }
 
+                if (elements.some(el => el.isSelected)) {
+                  history.resumeRecording();
+                }
+
                 if (!elementLocked) {
                   resetCursor();
-
-                  history.resumeRecording();
                   this.setState({
                     draggingElement: null,
                     elementType: "selection",
                   });
                 } else {
-                  history.resumeRecording();
                   this.setState({
                     draggingElement: null,
                   });

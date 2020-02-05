@@ -2,7 +2,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 class SceneHistory {
-  private recording: boolean = true;
+  private recording: boolean = false;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
