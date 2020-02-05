@@ -1972,12 +1972,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(
-        history.generateCurrentEntry(
-          pickAppStatePropertiesForHistory(this.state),
-          elements,
-        ),
-      );
+      history.pushEntry(pickAppStatePropertiesForHistory(this.state), elements);
       history.skipRecording();
     }
   }

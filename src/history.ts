@@ -6,7 +6,7 @@ class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(
+  private generateEntry(
     appState: Partial<AppState>,
     elements: readonly ExcalidrawElement[],
   ) {
@@ -26,7 +26,11 @@ class SceneHistory {
     });
   }
 
-  pushEntry(newEntry: string) {
+  pushEntry(
+    appState: Partial<AppState>,
+    elements: readonly ExcalidrawElement[],
+  ) {
+    const newEntry = this.generateEntry(appState, elements);
     if (
       this.stateHistory.length > 0 &&
       this.stateHistory[this.stateHistory.length - 1] === newEntry
