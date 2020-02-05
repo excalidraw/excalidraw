@@ -9,7 +9,7 @@ import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
-import { ActionsManagerInterface, UpdaterFn } from "../actions/types";
+import { ActionsManagerInterface } from "../actions/types";
 import Stack from "./Stack";
 import { t } from "../i18n";
 
@@ -30,7 +30,6 @@ function ExportModal({
   appState,
   exportPadding = 10,
   actionManager,
-  syncActionResult,
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
@@ -41,7 +40,6 @@ function ExportModal({
   elements: readonly ExcalidrawElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
-  syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -160,12 +158,7 @@ function ExportModal({
             </Stack.Row>
           </Stack.Col>
 
-          {actionManager.renderAction(
-            "changeProjectName",
-            elements,
-            appState,
-            syncActionResult,
-          )}
+          {actionManager.renderAction("changeProjectName")}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={2} align="baseline">
@@ -184,12 +177,7 @@ function ExportModal({
                 ))}
               </Stack.Row>
             </div>
-            {actionManager.renderAction(
-              "changeExportBackground",
-              elements,
-              appState,
-              syncActionResult,
-            )}
+            {actionManager.renderAction("changeExportBackground")}
             {someElementIsSelected && (
               <div>
                 <label>
@@ -215,7 +203,6 @@ export function ExportDialog({
   appState,
   exportPadding = 10,
   actionManager,
-  syncActionResult,
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
@@ -225,7 +212,6 @@ export function ExportDialog({
   elements: readonly ExcalidrawElement[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
-  syncActionResult: UpdaterFn;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -260,7 +246,6 @@ export function ExportDialog({
             appState={appState}
             exportPadding={exportPadding}
             actionManager={actionManager}
-            syncActionResult={syncActionResult}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}

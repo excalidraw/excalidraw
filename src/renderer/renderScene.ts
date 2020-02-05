@@ -16,6 +16,7 @@ import { renderElement, renderElementToSvg } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
+  selectionElement: ExcalidrawElement | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -85,6 +86,18 @@ export function renderScene(
       -element.y - sceneState.scrollY,
     );
   });
+
+  if (selectionElement) {
+    context.translate(
+      selectionElement.x + sceneState.scrollX,
+      selectionElement.y + sceneState.scrollY,
+    );
+    renderElement(selectionElement, rc, context);
+    context.translate(
+      -selectionElement.x - sceneState.scrollX,
+      -selectionElement.y - sceneState.scrollY,
+    );
+  }
 
   if (renderSelection) {
     const selectedElements = elements.filter(el => el.isSelected);

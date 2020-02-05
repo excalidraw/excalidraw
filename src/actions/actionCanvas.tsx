@@ -8,7 +8,7 @@ import { t } from "../i18n";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
-  perform: (elements, appState, value) => {
+  perform: (_, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
   },
   PanelComponent: ({ appState, updateData }) => {
@@ -23,10 +23,12 @@ export const actionChangeViewBackgroundColor: Action = {
       </div>
     );
   },
+  commitToHistory: () => true,
 };
 
 export const actionClearCanvas: Action = {
   name: "clearCanvas",
+  commitToHistory: () => true,
   perform: () => {
     return {
       elements: [],
