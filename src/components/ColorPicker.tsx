@@ -204,9 +204,6 @@ const ColorInput = React.forwardRef(
           onPaste={e => onChange(e.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
-          onFocus={e => {
-            e.target.select();
-          }}
         />
       </div>
     );
