@@ -5,7 +5,7 @@ import { t } from "../i18n";
 interface StoredScenesListProps {
   scenes: PreviousScene[];
   currentId?: string;
-  onChange: (selectedId: string) => {};
+  onChange: (selectedId: string, k?: string) => {};
 }
 
 export function StoredScenesList({
@@ -14,19 +14,20 @@ export function StoredScenesList({
   onChange,
 }: StoredScenesListProps) {
   return (
-    <React.Fragment>
-      <select
-        className="stored-ids-select"
-        onChange={({ currentTarget }) => onChange(currentTarget.value)}
-        value={currentId}
-        title={t("buttons.previouslyLoadedScenes")}
-      >
-        {scenes.map(scene => (
-          <option key={scene.id} value={scene.id}>
-            id={scene.id}
-          </option>
-        ))}
-      </select>
-    </React.Fragment>
+    <select
+      className="stored-ids-select"
+      onChange={({ currentTarget }) => {
+        const scene = scenes[(currentTarget.value as unknown) as number];
+        onChange(scene.id, scene.k);
+      }}
+      value={currentId}
+      title={t("buttons.previouslyLoadedScenes")}
+    >
+      {scenes.map((scene, i) => (
+        <option key={i} value={i}>
+          id={scene.id}
+        </option>
+      ))}
+    </select>
   );
 }
