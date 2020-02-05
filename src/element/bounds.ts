@@ -125,8 +125,15 @@ export function getArrowPoints(element: ExcalidrawElement) {
 
   const size = 30; // pixels
   const distance = Math.hypot(x2 - x1, y2 - y1);
+  const arrowLength = element.points.reduce((total, [cx, cy], idx, points) => {
+    const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
+    return total + Math.hypot(cx - px, cy - py);
+  }, 0);
+
   // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  const minSize = Math.min(size, distance / 2);
+  // This value is selected by minizing a minmum size with the whole length of the arrow
+  // intead of last segment of the arrow
+  const minSize = Math.min(size, arrowLength / 2);
   const xs = x2 - ((x2 - x1) / distance) * minSize;
   const ys = y2 - ((y2 - y1) / distance) * minSize;
 
