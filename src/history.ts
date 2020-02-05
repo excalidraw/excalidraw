@@ -18,7 +18,7 @@ class SceneHistory {
         shape: null,
         points:
           appState.multiElement && appState.multiElement.id === element.id
-            ? element.points.slice(0, element.points.length - 1)
+            ? element.points.slice(0, -1)
             : element.points,
       })),
     });

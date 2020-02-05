@@ -495,6 +495,7 @@ export class App extends React.Component<any, AppState> {
     }
     copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
+    history.resumeRecording();
     this.setState({});
     e.preventDefault();
   };
@@ -541,6 +542,7 @@ export class App extends React.Component<any, AppState> {
         element.isSelected = true;
 
         elements = [...clearSelection(elements), element];
+        history.resumeRecording();
         this.setState({});
       }
       e.preventDefault();
@@ -570,6 +572,7 @@ export class App extends React.Component<any, AppState> {
     }
 
     if (data.appState) {
+      history.resumeRecording();
       this.setState({ ...data.appState, selectedId });
     } else {
       this.setState({});
@@ -1063,6 +1066,7 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    history.resumeRecording();
                     resetSelection();
                   },
                   onCancel: () => {
@@ -1751,6 +1755,7 @@ export class App extends React.Component<any, AppState> {
                       },
                     ];
                   }
+                  history.resumeRecording();
                   resetSelection();
                 },
                 onCancel: () => {
@@ -1903,6 +1908,7 @@ export class App extends React.Component<any, AppState> {
         return duplicate;
       }),
     ];
+    history.resumeRecording();
     this.setState({});
   };
 
