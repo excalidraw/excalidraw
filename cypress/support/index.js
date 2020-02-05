@@ -2,7 +2,7 @@ import { addMatchImageSnapshotCommand } from "cypress-image-snapshot/command";
 
 import "./commands";
 addMatchImageSnapshotCommand({
-  failureThreshold: 0.0,
+  failureThreshold: 0.02,
   failureThresholdType: "percent",
 });
 
