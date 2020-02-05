@@ -62,6 +62,10 @@ export function renderScene(
     context.setTransform(contextScale, 0, 0, contextScale, 0, 0);
   }
 
+  // When drawing elements on the canvas that take full width of height we should not take into account the scale
+  const normalizedCanvasWidth = canvas.width / contextScale;
+  const normalizedCanvasHeight = canvas.height / contextScale;
+
   // Helpers for transforming coordinates based on scene state
   function getXPositionWithSceneState(x: number): number {
     return (x + sceneState.scrollX) * sceneState.zoom;
@@ -78,18 +82,18 @@ export function renderScene(
       sceneState.viewBackgroundColor.length === 5 ||
       sceneState.viewBackgroundColor.length === 9;
     if (hasTransparence) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
     context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   }
   context.fillStyle = fillStyle;
 
   // Paint visible elements
   const visibleElements = elements.filter(element =>
-    isVisibleElement(element, canvas.width, canvas.height, {
+    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
       scrollX: sceneState.scrollX,
       scrollY: sceneState.scrollY,
       zoom: sceneState.zoom,
@@ -171,8 +175,8 @@ export function renderScene(
   if (renderScrollbars) {
     const scrollBars = getScrollBars(
       elements,
-      canvas.width / contextScale,
-      canvas.height / contextScale,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
       {
         scrollX: sceneState.scrollX,
         scrollY: sceneState.scrollY,
