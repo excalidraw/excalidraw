@@ -15,6 +15,13 @@ class SceneHistory {
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
         isSelected: false,
+        shape: null,
+        // TODO: This is a temporary fix.
+        // This should be integral to the multi point behavior
+        points:
+          element.type === "arrow" || element.type === "line"
+            ? element.points.slice(0, element.points.length - 1)
+            : element.points,
       })),
     });
   }
