@@ -28,4 +28,5 @@ export type AppState = {
   name: string;
   selectedId?: string;
   isResizing: boolean;
+  zoom: number;
 };

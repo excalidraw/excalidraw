@@ -44,6 +44,7 @@ export function exportToCanvas(
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: 0,
       scrollY: 0,
+      zoom: 1,
     },
     {
       offsetX: -minX + exportPadding,
