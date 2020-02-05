@@ -574,6 +574,8 @@ export class App extends React.Component<any, AppState> {
       );
       if (match) {
         this.loadScene(match[1], match[2]);
+      } else {
+        this.loadScene(null, undefined);
       }
     }
   }
@@ -606,7 +608,11 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) {
+    if (
+      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+      // case: using arrows to move between buttons
+      (isArrowKey(event.key) && isInputLike(event.target))
+    ) {
       return;
     }
 
@@ -652,6 +658,9 @@ export class App extends React.Component<any, AppState> {
     ) {
       if (!isHoldingSpace) {
         setCursorForShape(shape);
+      }
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
       }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
