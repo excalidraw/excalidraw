@@ -1636,7 +1636,10 @@ export class App extends React.Component<any, AppState> {
                   draggingElement.isSelected = true;
                 }
 
-                if (elements.some(el => el.isSelected)) {
+                if (
+                  elementType !== "selection" ||
+                  elements.some(el => el.isSelected)
+                ) {
                   history.resumeRecording();
                 }
 
