@@ -31,7 +31,7 @@ describe("Panning", () => {
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangle", {
       clip: region,
-      failureThreshold: 0.03,
+      failureThreshold: 0.04,
       failureThresholdType: "percent",
     });
     // pan
@@ -42,7 +42,7 @@ describe("Panning", () => {
     );
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangle", {
       clip: region,
-      failureThreshold: 0.03,
+      failureThreshold: 0.04,
       failureThresholdType: "percent",
     });
   });
@@ -55,7 +55,7 @@ describe("Panning", () => {
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangleWheel", {
       clip: region,
-      failureThreshold: 0.03,
+      failureThreshold: 0.04,
       failureThresholdType: "percent",
     });
     // pan
@@ -66,7 +66,7 @@ describe("Panning", () => {
     );
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangleWheel", {
       clip: region,
-      failureThreshold: 0.03,
+      failureThreshold: 0.04,
       failureThresholdType: "percent",
     });
   });

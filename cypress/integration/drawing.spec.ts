@@ -23,7 +23,7 @@ describe("Drawing", () => {
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("rectangleArtist", {
       clip: region,
-      failureThreshold: 0.03,
+      failureThreshold: 0.04,
       failureThresholdType: "percent",
     });
     // for catching any mistake we also compare architect sloppiness
