@@ -78,6 +78,7 @@ class SceneHistory {
     }
 
     const currentEntry = this.stateHistory.pop();
+
     const entryToRestore = this.stateHistory[this.stateHistory.length - 1];
 
     if (currentEntry !== undefined) {

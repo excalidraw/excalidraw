@@ -1568,6 +1568,7 @@ export class App extends React.Component<any, AppState> {
                 if (elementType === "arrow" || elementType === "line") {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
+                    this.setState({});
                   }
                   if (!draggingOccurred && draggingElement && !multiElement) {
                     const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1606,6 +1607,7 @@ export class App extends React.Component<any, AppState> {
 
                 if (resizingElement) {
                   history.resumeRecording();
+                  this.setState({});
                 }
 
                 if (
