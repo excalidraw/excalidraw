@@ -44,7 +44,6 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
-  isInputLike,
   isWritableElement,
   debounce,
   capitalizeString,
