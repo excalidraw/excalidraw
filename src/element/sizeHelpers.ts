@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "./types";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
   if (element.type === "arrow" || element.type === "line") {
-    return element.points.length === 0;
+    return element.points.length < 2;
   }
   return element.width === 0 && element.height === 0;
 }
