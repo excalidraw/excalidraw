@@ -624,7 +624,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) {
+    if (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) {
       return;
     }
 
