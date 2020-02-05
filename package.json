@@ -39,9 +39,9 @@
       "prettier"
     ],
     "rules": {
-      "curly": "error",
+      "curly": "warn",
       "no-console": [
-        "error",
+        "warn",
         {
           "allow": [
             "warn",
@@ -50,16 +50,16 @@
           ]
         }
       ],
-      "no-else-return": "error",
-      "no-useless-return": "error",
+      "no-else-return": "warn",
+      "no-useless-return": "warn",
       "prefer-const": [
-        "error",
+        "warn",
         {
           "destructuring": "all"
         }
       ],
-      "prefer-template": "error",
-      "prettier/prettier": "error"
+      "prefer-template": "warn",
+      "prettier/prettier": "warn"
     }
   },
   "homepage": "https://excalidraw.com",
