@@ -353,6 +353,8 @@ export class App extends React.Component<any, AppState> {
       );
       if (match) {
         this.loadScene(match[1], match[2]);
+      } else {
+        this.loadScene(null, undefined);
       }
     }
   }
