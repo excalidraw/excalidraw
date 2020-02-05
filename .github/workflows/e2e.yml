@@ -22,8 +22,8 @@ jobs:
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
-          name: cypress-screenshots
-          path: cypress/screenshots
+          name: cypress-snapshots
+          path: cypress/snapshots
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
