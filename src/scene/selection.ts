@@ -30,13 +30,15 @@ export function getElementsWithinSelection(
 }
 
 export function clearSelection(elements: readonly ExcalidrawElement[]) {
-  const newElements = [...elements];
-
-  newElements.forEach(element => {
-    element.isSelected = false;
+  let someWasSelected = false;
+  elements.forEach(element => {
+    if (element.isSelected) {
+      someWasSelected = true;
+      element.isSelected = false;
+    }
   });
 
-  return newElements;
+  return someWasSelected ? elements.slice() : elements;
 }
 
 export function deleteSelectedElements(elements: readonly ExcalidrawElement[]) {
