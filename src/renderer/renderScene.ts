@@ -61,10 +61,12 @@ export function renderScene(
   function resetContextScale() {
     context.setTransform(contextScale, 0, 0, contextScale, 0, 0);
   }
-  function getXPositionWithSceneState(x: number) {
+
+  // Helpers for transforming coordinates based on scene state
+  function getXPositionWithSceneState(x: number): number {
     return (x + sceneState.scrollX) * sceneState.zoom;
   }
-  function getYPositionWithSceneState(y: number) {
+  function getYPositionWithSceneState(y: number): number {
     return (y + sceneState.scrollY) * sceneState.zoom;
   }
 
@@ -171,8 +173,8 @@ export function renderScene(
   if (renderScrollbars) {
     const scrollBars = getScrollBars(
       elements,
-      context.canvas.width / window.devicePixelRatio,
-      context.canvas.height / window.devicePixelRatio,
+      canvas.width / contextScale,
+      canvas.height / contextScale,
       sceneState.scrollX,
       sceneState.scrollY,
     );
