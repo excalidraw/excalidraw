@@ -28,6 +28,7 @@ export function isInputLike(
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLSelectElement
+  | HTMLBRElement
   | HTMLDivElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
@@ -35,6 +36,22 @@ export function isInputLike(
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
+  );
+}
+
+export function isWritableElement(
+  target: Element | EventTarget | null,
+): target is
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLBRElement
+  | HTMLDivElement {
+  return (
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
+    target instanceof HTMLTextAreaElement ||
+    (target instanceof HTMLInputElement &&
+      (target.type === "text" || target.type === "number"))
   );
 }
 

@@ -5,17 +5,15 @@ import { Point } from "roughjs/bin/geometry";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-// We can't just always normalize it since we need to remember the fact that an arrow
-// is pointing left or right.
 export function getElementAbsoluteCoords(element: ExcalidrawElement) {
-  if (element.type === "arrow") {
-    return getArrowAbsoluteBounds(element);
+  if (element.type === "arrow" || element.type === "line") {
+    return getLinearElementAbsoluteBounds(element);
   }
   return [
-    element.width >= 0 ? element.x : element.x + element.width, // x1
-    element.height >= 0 ? element.y : element.y + element.height, // y1
-    element.width >= 0 ? element.x + element.width : element.x, // x2
-    element.height >= 0 ? element.y + element.height : element.y, // y2
+    element.x,
+    element.y,
+    element.x + element.width,
+    element.y + element.height,
   ];
 }
 
@@ -34,7 +32,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
+export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
   if (element.points.length < 2 || !element.shape) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
@@ -58,7 +56,8 @@ export function getArrowAbsoluteBounds(element: ExcalidrawElement) {
 
   const shape = element.shape as Drawable[];
 
-  const ops = shape[1].sets[0].ops;
+  // first element is always the curve
+  const ops = shape[0].sets[0].ops;
 
   let currentP: Point = [0, 0];
 
@@ -126,8 +125,15 @@ export function getArrowPoints(element: ExcalidrawElement) {
 
   const size = 30; // pixels
   const distance = Math.hypot(x2 - x1, y2 - y1);
+  const arrowLength = element.points.reduce((total, [cx, cy], idx, points) => {
+    const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
+    return total + Math.hypot(cx - px, cy - py);
+  }, 0);
+
   // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  const minSize = Math.min(size, distance / 2);
+  // This value is selected by minizing a minmum size with the whole length of the arrow
+  // intead of last segment of the arrow
+  const minSize = Math.min(size, arrowLength / 2);
   const xs = x2 - ((x2 - x1) / distance) * minSize;
   const ys = y2 - ((y2 - y1) / distance) * minSize;
 
@@ -136,15 +142,6 @@ export function getArrowPoints(element: ExcalidrawElement) {
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
   return [x2, y2, x3, y3, x4, y4];
-}
-
-export function getLinePoints(element: ExcalidrawElement) {
-  const x1 = 0;
-  const y1 = 0;
-  const x2 = element.width;
-  const y2 = element.height;
-
-  return [x1, y1, x2, y2];
 }
 
 export function getCommonBounds(elements: readonly ExcalidrawElement[]) {

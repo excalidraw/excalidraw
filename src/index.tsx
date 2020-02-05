@@ -16,7 +16,6 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
-  resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./element";
 import {
@@ -45,12 +44,12 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
+  isWritableElement,
   isInputLike,
   debounce,
   capitalizeString,
   distance,
   distance2d,
-  isToolIcon,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -101,6 +100,12 @@ import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
+import {
+  getAppClipboard,
+  copyToAppClipboard,
+  parseClipboardEvent,
+} from "./clipboard";
+
 let { elements } = createScene();
 const { history } = createHistory();
 
@@ -149,37 +154,267 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
-function pickAppStatePropertiesForHistory(
-  appState: AppState,
-): Partial<AppState> {
-  return {
-    exportBackground: appState.exportBackground,
-    currentItemStrokeColor: appState.currentItemStrokeColor,
-    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-    currentItemFillStyle: appState.currentItemFillStyle,
-    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-    currentItemRoughness: appState.currentItemRoughness,
-    currentItemOpacity: appState.currentItemOpacity,
-    currentItemFont: appState.currentItemFont,
-    viewBackgroundColor: appState.viewBackgroundColor,
-    name: appState.name,
-  };
-}
-
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isHoldingMouseButton: boolean = false;
 
+interface LayerUIProps {
+  actionManager: ActionManager;
+  appState: AppState;
+  canvas: HTMLCanvasElement | null;
+  setAppState: any;
+  elements: readonly ExcalidrawElement[];
+  setElements: (elements: readonly ExcalidrawElement[]) => void;
+}
+
+const LayerUI = React.memo(
+  ({
+    actionManager,
+    appState,
+    setAppState,
+    canvas,
+    elements,
+    setElements,
+  }: LayerUIProps) => {
+    function renderCanvasActions() {
+      return (
+        <Stack.Col gap={4}>
+          <Stack.Row justifyContent={"space-between"}>
+            {actionManager.renderAction("loadScene")}
+            {actionManager.renderAction("saveScene")}
+            <ExportDialog
+              elements={elements}
+              appState={appState}
+              actionManager={actionManager}
+              onExportToPng={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("png", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToSvg={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("svg", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToClipboard={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("clipboard", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToBackend={exportedElements => {
+                if (canvas) {
+                  exportCanvas(
+                    "backend",
+                    exportedElements.map(element => ({
+                      ...element,
+                      isSelected: false,
+                    })),
+                    canvas,
+                    appState,
+                  );
+                }
+              }}
+            />
+            {actionManager.renderAction("clearCanvas")}
+          </Stack.Row>
+          {actionManager.renderAction("changeViewBackgroundColor")}
+        </Stack.Col>
+      );
+    }
+
+    function renderSelectedShapeActions(
+      elements: readonly ExcalidrawElement[],
+    ) {
+      const { elementType, editingElement } = appState;
+      const targetElements = editingElement
+        ? [editingElement]
+        : elements.filter(el => el.isSelected);
+      if (!targetElements.length && elementType === "selection") {
+        return null;
+      }
+
+      return (
+        <Island padding={4}>
+          <div className="panelColumn">
+            {actionManager.renderAction("changeStrokeColor")}
+            {(hasBackground(elementType) ||
+              targetElements.some(element => hasBackground(element.type))) && (
+              <>
+                {actionManager.renderAction("changeBackgroundColor")}
+
+                {actionManager.renderAction("changeFillStyle")}
+              </>
+            )}
+
+            {(hasStroke(elementType) ||
+              targetElements.some(element => hasStroke(element.type))) && (
+              <>
+                {actionManager.renderAction("changeStrokeWidth")}
+
+                {actionManager.renderAction("changeSloppiness")}
+              </>
+            )}
+
+            {(hasText(elementType) ||
+              targetElements.some(element => hasText(element.type))) && (
+              <>
+                {actionManager.renderAction("changeFontSize")}
+
+                {actionManager.renderAction("changeFontFamily")}
+              </>
+            )}
+
+            {actionManager.renderAction("changeOpacity")}
+
+            {actionManager.renderAction("deleteSelectedElements")}
+          </div>
+        </Island>
+      );
+    }
+
+    function renderShapesSwitcher() {
+      return (
+        <>
+          {SHAPES.map(({ value, icon }, index) => {
+            const label = t(`toolBar.${value}`);
+            return (
+              <ToolButton
+                key={value}
+                type="radio"
+                icon={icon}
+                checked={appState.elementType === value}
+                name="editor-current-shape"
+                title={`${capitalizeString(label)} — ${
+                  capitalizeString(value)[0]
+                }, ${index + 1}`}
+                keyBindingLabel={`${index + 1}`}
+                aria-label={capitalizeString(label)}
+                aria-keyshortcuts={`${label[0]} ${index + 1}`}
+                onChange={() => {
+                  setAppState({ elementType: value, multiElement: null });
+                  setElements(clearSelection(elements));
+                  document.documentElement.style.cursor =
+                    value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+                  setAppState({});
+                }}
+              ></ToolButton>
+            );
+          })}
+        </>
+      );
+    }
+
+    return (
+      <FixedSideContainer side="top">
+        <div className="App-menu App-menu_top">
+          <Stack.Col gap={4} align="end">
+            <section
+              className="App-right-menu"
+              aria-labelledby="canvas-actions-title"
+            >
+              <h2 className="visually-hidden" id="canvas-actions-title">
+                {t("headings.canvasActions")}
+              </h2>
+              <Island padding={4}>{renderCanvasActions()}</Island>
+            </section>
+            <section
+              className="App-right-menu"
+              aria-labelledby="selected-shape-title"
+            >
+              <h2 className="visually-hidden" id="selected-shape-title">
+                {t("headings.selectedShapeActions")}
+              </h2>
+              {renderSelectedShapeActions(elements)}
+            </section>
+          </Stack.Col>
+          <section aria-labelledby="shapes-title">
+            <Stack.Col gap={4} align="start">
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden" id="shapes-title">
+                    {t("headings.shapes")}
+                  </h2>
+                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                </Island>
+                <LockIcon
+                  checked={appState.elementLocked}
+                  onChange={() => {
+                    setAppState({
+                      elementLocked: !appState.elementLocked,
+                      elementType: appState.elementLocked
+                        ? "selection"
+                        : appState.elementType,
+                    });
+                  }}
+                  title={t("toolBar.lock")}
+                />
+              </Stack.Row>
+            </Stack.Col>
+          </section>
+          <div />
+        </div>
+      </FixedSideContainer>
+    );
+  },
+  (prev, next) => {
+    const getNecessaryObj = (appState: AppState): Partial<AppState> => {
+      const {
+        draggingElement,
+        resizingElement,
+        multiElement,
+        editingElement,
+        isResizing,
+        cursorX,
+        cursorY,
+        ...ret
+      } = appState;
+      return ret;
+    };
+    const prevAppState = getNecessaryObj(prev.appState);
+    const nextAppState = getNecessaryObj(next.appState);
+
+    const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+
+    return (
+      prev.elements === next.elements &&
+      keys.every(k => prevAppState[k] === nextAppState[k])
+    );
+  },
+);
+
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
 
-  actionManager: ActionManager = new ActionManager();
+  actionManager: ActionManager;
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => {
+        history.resumeRecording();
+      },
+      () => this.state,
+      () => elements,
+    );
     this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
@@ -223,42 +458,63 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
+    history.resumeRecording();
     this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
+    if (isWritableElement(e.target)) {
       return;
     }
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    copyToAppClipboard(elements);
     e.preventDefault();
   };
   private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) {
-      return;
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      elementUnderCursor instanceof HTMLCanvasElement &&
+      !isWritableElement(target)
+    ) {
+      const data = parseClipboardEvent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        history.resumeRecording();
+        this.setState({});
+      }
+      e.preventDefault();
     }
-    const paste = e.clipboardData?.getData("text") || "";
-    this.addElementsFromPaste(paste);
-    e.preventDefault();
   };
 
   private onUnload = () => {
@@ -267,23 +523,14 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  public shouldComponentUpdate(props: any, nextState: AppState) {
-    if (!history.isRecording()) {
-      // temporary hack to fix #592
-      // eslint-disable-next-line react/no-direct-mutation-state
-      this.state = nextState;
-      this.componentDidUpdate();
-      return false;
-    }
-    return true;
-  }
-
-  private async loadScene(id: string | null) {
+  private async loadScene(id: string | null, k: string | undefined) {
     let data;
     let selectedId;
     if (id != null) {
-      data = await importFromBackend(id);
-      addToLoadedScenes(id);
+      // k is the private key used to decrypt the content from the server, take
+      // extra care not to leak it
+      data = await importFromBackend(id, k);
+      addToLoadedScenes(id, k);
       selectedId = id;
       window.history.replaceState({}, "Excalidraw", window.location.origin);
     } else {
@@ -295,6 +542,7 @@ export class App extends React.Component<any, AppState> {
     }
 
     if (data.appState) {
+      history.resumeRecording();
       this.setState({ ...data.appState, selectedId });
     } else {
       this.setState({});
@@ -318,7 +566,19 @@ export class App extends React.Component<any, AppState> {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
-    this.loadScene(id);
+    if (id) {
+      // Backwards compatibility with legacy url format
+      this.loadScene(id, undefined);
+    } else {
+      const match = window.location.hash.match(
+        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+      );
+      if (match) {
+        this.loadScene(match[1], match[2]);
+      } else {
+        this.loadScene(null, undefined);
+      }
+    }
   }
 
   public componentWillUnmount() {
@@ -349,15 +609,15 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (isInputLike(event.target) && event.key !== KEYS.ESCAPE) {
+    if (
+      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+      // case: using arrows to move between buttons
+      (isArrowKey(event.key) && isInputLike(event.target))
+    ) {
       return;
     }
 
-    const actionResult = this.actionManager.handleKeyDown(
-      event,
-      elements,
-      this.state,
-    );
+    const actionResult = this.actionManager.handleKeyDown(event);
 
     if (actionResult) {
       this.syncActionResult(actionResult);
@@ -400,6 +660,9 @@ export class App extends React.Component<any, AppState> {
       if (!isHoldingSpace) {
         setCursorForShape(shape);
       }
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       elements = clearSelection(elements);
       this.setState({ elementType: shape });
       // Undo action
@@ -407,9 +670,10 @@ export class App extends React.Component<any, AppState> {
       event.preventDefault();
 
       if (
-        this.state.resizingElement ||
         this.state.multiElement ||
-        this.state.editingElement
+        this.state.resizingElement ||
+        this.state.editingElement ||
+        this.state.draggingElement
       ) {
         return;
       }
@@ -453,233 +717,25 @@ export class App extends React.Component<any, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private copyToClipboard = () => {
-    const text = JSON.stringify(
-      elements
-        .filter(element => element.isSelected)
-        .map(({ shape, ...el }) => el),
-    );
-    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      document.execCommand("copy");
-    }
+  private copyToAppClipboard = () => {
+    copyToAppClipboard(elements);
   };
 
   private pasteFromClipboard = () => {
-    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
-      navigator.clipboard
-        .readText()
-        .then(text => this.addElementsFromPaste(text));
+    const data = getAppClipboard();
+    if (data.elements) {
+      this.addElementsFromPaste(data.elements);
     }
   };
 
-  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType, editingElement } = this.state;
-    const targetElements = editingElement
-      ? [editingElement]
-      : elements.filter(el => el.isSelected);
-    if (!targetElements.length && elementType === "selection") {
-      return null;
-    }
+  setAppState = (obj: any) => {
+    this.setState(obj);
+  };
 
-    return (
-      <Island padding={4}>
-        <div className="panelColumn">
-          {this.actionManager.renderAction(
-            "changeStrokeColor",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {(hasBackground(elementType) ||
-            targetElements.some(element => hasBackground(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeBackgroundColor",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFillStyle",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasStroke(elementType) ||
-            targetElements.some(element => hasStroke(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeStrokeWidth",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeSloppiness",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasText(elementType) ||
-            targetElements.some(element => hasText(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeFontSize",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFontFamily",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {this.actionManager.renderAction(
-            "changeOpacity",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-
-          {this.actionManager.renderAction(
-            "deleteSelectedElements",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </div>
-      </Island>
-    );
-  }
-
-  private renderShapesSwitcher() {
-    return (
-      <>
-        {SHAPES.map(({ value, icon }, index) => {
-          const label = t(`toolBar.${value}`);
-          return (
-            <ToolButton
-              key={value}
-              type="radio"
-              icon={icon}
-              checked={this.state.elementType === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${
-                capitalizeString(value)[0]
-              }, ${index + 1}`}
-              keyBindingLabel={`${index + 1}`}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={`${label[0]} ${index + 1}`}
-              onChange={() => {
-                this.setState({ elementType: value, multiElement: null });
-                elements = clearSelection(elements);
-                document.documentElement.style.cursor =
-                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                this.setState({});
-              }}
-            ></ToolButton>
-          );
-        })}
-      </>
-    );
-  }
-
-  private renderCanvasActions() {
-    return (
-      <Stack.Col gap={4}>
-        <Stack.Row justifyContent={"space-between"}>
-          {this.actionManager.renderAction(
-            "loadScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {this.actionManager.renderAction(
-            "saveScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          <ExportDialog
-            elements={elements}
-            appState={this.state}
-            actionManager={this.actionManager}
-            syncActionResult={this.syncActionResult}
-            onExportToPng={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("png", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToSvg={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("svg", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToClipboard={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("clipboard", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToBackend={exportedElements => {
-              if (this.canvas) {
-                exportCanvas(
-                  "backend",
-                  exportedElements.map(element => ({
-                    ...element,
-                    isSelected: false,
-                  })),
-                  this.canvas,
-                  this.state,
-                );
-              }
-            }}
-          />
-          {this.actionManager.renderAction(
-            "clearCanvas",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </Stack.Row>
-        {this.actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
-          this.state,
-          this.syncActionResult,
-        )}
-      </Stack.Col>
-    );
-  }
+  setElements = (elements_: readonly ExcalidrawElement[]) => {
+    elements = elements_;
+    this.setState({});
+  };
 
   public render() {
     const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
@@ -687,55 +743,14 @@ export class App extends React.Component<any, AppState> {
 
     return (
       <div className="container">
-        <FixedSideContainer side="top">
-          <div className="App-menu App-menu_top">
-            <Stack.Col gap={4} align="end">
-              <section
-                className="App-right-menu"
-                aria-labelledby="canvas-actions-title"
-              >
-                <h2 className="visually-hidden" id="canvas-actions-title">
-                  {t("headings.canvasActions")}
-                </h2>
-                <Island padding={4}>{this.renderCanvasActions()}</Island>
-              </section>
-              <section
-                className="App-right-menu"
-                aria-labelledby="selected-shape-title"
-              >
-                <h2 className="visually-hidden" id="selected-shape-title">
-                  {t("headings.selectedShapeActions")}
-                </h2>
-                {this.renderSelectedShapeActions(elements)}
-              </section>
-            </Stack.Col>
-            <section aria-labelledby="shapes-title">
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island padding={1}>
-                    <h2 className="visually-hidden" id="shapes-title">
-                      {t("headings.shapes")}
-                    </h2>
-                    <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-                  </Island>
-                  <LockIcon
-                    checked={this.state.elementLocked}
-                    onChange={() => {
-                      this.setState({
-                        elementLocked: !this.state.elementLocked,
-                        elementType: this.state.elementLocked
-                          ? "selection"
-                          : this.state.elementType,
-                      });
-                    }}
-                    title={t("toolBar.lock")}
-                  />
-                </Stack.Row>
-              </Stack.Col>
-            </section>
-            <div />
-          </div>
-        </FixedSideContainer>
+        <LayerUI
+          canvas={this.canvas}
+          appState={this.state}
+          setAppState={this.setAppState}
+          actionManager={this.actionManager}
+          elements={elements}
+          setElements={this.setElements}
+        />
         <main>
           <canvas
             id="canvas"
@@ -787,11 +802,8 @@ export class App extends React.Component<any, AppState> {
                       label: t("labels.paste"),
                       action: () => this.pasteFromClipboard(),
                     },
-                    ...this.actionManager.getContextMenuItems(
-                      elements,
-                      this.state,
-                      this.syncActionResult,
-                      action => this.canvasOnlyActions.includes(action),
+                    ...this.actionManager.getContextMenuItems(action =>
+                      this.canvasOnlyActions.includes(action),
                     ),
                   ],
                   top: e.clientY,
@@ -810,16 +822,13 @@ export class App extends React.Component<any, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: t("labels.copy"),
-                    action: this.copyToClipboard,
+                    action: this.copyToAppClipboard,
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
                     action: () => this.pasteFromClipboard(),
                   },
                   ...this.actionManager.getContextMenuItems(
-                    elements,
-                    this.state,
-                    this.syncActionResult,
                     action => !this.canvasOnlyActions.includes(action),
                   ),
                 ],
@@ -854,8 +863,7 @@ export class App extends React.Component<any, AppState> {
                   const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
-                  // We don't want to save history when panning around
-                  history.skipRecording();
+
                   this.setState({
                     scrollX: this.state.scrollX - deltaX,
                     scrollY: this.state.scrollY - deltaY,
@@ -969,6 +977,7 @@ export class App extends React.Component<any, AppState> {
                     // state of the box
                     if (!hitElement.isSelected) {
                       hitElement.isSelected = true;
+                      elements = elements.slice();
                       elementIsAddedToSelection = true;
                     }
 
@@ -1039,6 +1048,7 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    history.resumeRecording();
                     resetSelection();
                   },
                   onCancel: () => {
@@ -1050,14 +1060,16 @@ export class App extends React.Component<any, AppState> {
                   editingElement: element,
                 });
                 return;
-              } else if (this.state.elementType === "arrow") {
+              } else if (
+                this.state.elementType === "arrow" ||
+                this.state.elementType === "line"
+              ) {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
                   multiElement.isSelected = true;
                   multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
-                  this.setState({ draggingElement: multiElement });
                 } else {
                   element.isSelected = false;
                   element.points.push([0, 0]);
@@ -1067,6 +1079,11 @@ export class App extends React.Component<any, AppState> {
                     draggingElement: element,
                   });
                 }
+              } else if (element.type === "selection") {
+                this.setState({
+                  selectionElement: element,
+                  draggingElement: element,
+                });
               } else {
                 elements = [...elements, element];
                 this.setState({ multiElement: null, draggingElement: element });
@@ -1101,13 +1118,12 @@ export class App extends React.Component<any, AppState> {
                 mouseY: number,
                 perfect: boolean,
               ) => {
-                // TODO: Implement perfect sizing for origin
                 if (perfect) {
                   const absPx = p1[0] + element.x;
                   const absPy = p1[1] + element.y;
 
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x - p1[0],
                     mouseY - element.y - p1[1],
                   );
@@ -1137,7 +1153,7 @@ export class App extends React.Component<any, AppState> {
               ) => {
                 if (perfect) {
                   const { width, height } = getPerfectElementSize(
-                    "arrow",
+                    element.type,
                     mouseX - element.x,
                     mouseY - element.y,
                   );
@@ -1158,8 +1174,6 @@ export class App extends React.Component<any, AppState> {
                 if (isOverHorizontalScrollBar) {
                   const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
                   const dx = x - lastX;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollX: this.state.scrollX - dx });
                   lastX = x;
                   return;
@@ -1168,8 +1182,6 @@ export class App extends React.Component<any, AppState> {
                 if (isOverVerticalScrollBar) {
                   const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
                   const dy = y - lastY;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollY: this.state.scrollY - dy });
                   lastY = y;
                   return;
@@ -1179,7 +1191,11 @@ export class App extends React.Component<any, AppState> {
                 //  to ensure we don't create a 2-point arrow by mistake when
                 //  user clicks mouse in a way that it moves a tiny bit (thus
                 //  triggering mousemove)
-                if (!draggingOccurred && this.state.elementType === "arrow") {
+                if (
+                  !draggingOccurred &&
+                  (this.state.elementType === "arrow" ||
+                    this.state.elementType === "line")
+                ) {
                   const { x, y } = viewportCoordsToSceneCoords(e, this.state);
                   if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
@@ -1199,10 +1215,7 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
 
                           if (!resizeArrowFn) {
@@ -1226,12 +1239,8 @@ export class App extends React.Component<any, AppState> {
                           element.x += deltaX;
 
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              resizePerfectLineForNWHandler(element, x, y);
-                            } else {
-                              element.y += element.height - element.width;
-                              element.height = element.width;
-                            }
+                            element.y += element.height - element.width;
+                            element.height = element.width;
                           } else {
                             element.height -= deltaY;
                             element.y += deltaY;
@@ -1239,10 +1248,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "ne":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] >= 0) {
@@ -1272,10 +1278,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "sw":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] <= 0) {
@@ -1304,10 +1307,7 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "se":
-                        if (
-                          element.type === "arrow" &&
-                          element.points.length === 2
-                        ) {
+                        if (isLinear && element.points.length === 2) {
                           const [, p1] = element.points;
                           if (!resizeArrowFn) {
                             if (p1[0] > 0 || p1[1] > 0) {
@@ -1327,18 +1327,8 @@ export class App extends React.Component<any, AppState> {
                           );
                         } else {
                           if (e.shiftKey) {
-                            if (isLinear) {
-                              const { width, height } = getPerfectElementSize(
-                                element.type,
-                                x - element.x,
-                                y - element.y,
-                              );
-                              element.width = width;
-                              element.height = height;
-                            } else {
-                              element.width += deltaX;
-                              element.height = element.width;
-                            }
+                            element.width += deltaX;
+                            element.height = element.width;
                           } else {
                             element.width += deltaX;
                             element.height += deltaY;
@@ -1429,8 +1419,6 @@ export class App extends React.Component<any, AppState> {
 
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when resizing an element
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1450,8 +1438,6 @@ export class App extends React.Component<any, AppState> {
                     });
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when dragging an element to initially size it
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1473,34 +1459,7 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) {
-                  width = -width;
-                }
-                if (isLinear && y < originY) {
-                  height = -height;
-                }
-
-                if (e.shiftKey) {
-                  ({ width, height } = getPerfectElementSize(
-                    this.state.elementType,
-                    width,
-                    !isLinear && y < originY ? -height : height,
-                  ));
-
-                  if (!isLinear && height < 0) {
-                    height = -height;
-                  }
-                }
-
-                if (!isLinear) {
-                  draggingElement.x = x < originX ? originX - width : originX;
-                  draggingElement.y = y < originY ? originY - height : originY;
-                }
-
-                draggingElement.width = width;
-                draggingElement.height = height;
-
-                if (this.state.elementType === "arrow") {
+                if (isLinear) {
                   draggingOccurred = true;
                   const points = draggingElement.points;
                   let dx = x - draggingElement.x;
@@ -1521,12 +1480,30 @@ export class App extends React.Component<any, AppState> {
                     pnt[0] = dx;
                     pnt[1] = dy;
                   }
+                } else {
+                  if (e.shiftKey) {
+                    ({ width, height } = getPerfectElementSize(
+                      this.state.elementType,
+                      width,
+                      y < originY ? -height : height,
+                    ));
+
+                    if (height < 0) {
+                      height = -height;
+                    }
+                  }
+
+                  draggingElement.x = x < originX ? originX - width : originX;
+                  draggingElement.y = y < originY ? originY - height : originY;
+
+                  draggingElement.width = width;
+                  draggingElement.height = height;
                 }
 
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey) {
+                  if (!e.shiftKey && elements.some(el => el.isSelected)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1537,13 +1514,10 @@ export class App extends React.Component<any, AppState> {
                     element.isSelected = true;
                   });
                 }
-                // We don't want to save history when moving an element
-                history.skipRecording();
                 this.setState({});
               };
 
               const onMouseUp = (e: MouseEvent) => {
-                this.setState({ isResizing: false });
                 const {
                   draggingElement,
                   resizingElement,
@@ -1552,17 +1526,30 @@ export class App extends React.Component<any, AppState> {
                   elementLocked,
                 } = this.state;
 
+                this.setState({
+                  isResizing: false,
+                  resizingElement: null,
+                  selectionElement: null,
+                });
+
                 resizeArrowFn = null;
                 lastMouseUp = null;
                 isHoldingMouseButton = false;
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
 
-                if (elementType === "arrow") {
+                if (elementType === "arrow" || elementType === "line") {
                   if (draggingElement!.points.length > 1) {
                     history.resumeRecording();
+                    this.setState({});
                   }
-                  if (!draggingOccurred && !multiElement) {
+                  if (!draggingOccurred && draggingElement && !multiElement) {
+                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    draggingElement.points.push([
+                      x - draggingElement.x,
+                      y - draggingElement.y,
+                    ]);
+                    draggingElement.shape = null;
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
@@ -1588,6 +1575,11 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (normalizeDimensions(draggingElement)) {
+                  this.setState({});
+                }
+
+                if (resizingElement) {
+                  history.resumeRecording();
                   this.setState({});
                 }
 
@@ -1628,15 +1620,19 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                if (elementType === "selection") {
-                  elements = elements.slice(0, -1);
-                } else if (!elementLocked) {
+                if (!elementLocked) {
                   draggingElement.isSelected = true;
+                }
+
+                if (
+                  elementType !== "selection" ||
+                  elements.some(el => el.isSelected)
+                ) {
+                  history.resumeRecording();
                 }
 
                 if (!elementLocked) {
                   resetCursor();
-
                   this.setState({
                     draggingElement: null,
                     elementType: "selection",
@@ -1652,16 +1648,6 @@ export class App extends React.Component<any, AppState> {
 
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
-
-              if (
-                !this.state.multiElement ||
-                (this.state.multiElement &&
-                  this.state.multiElement.points.length < 2)
-              ) {
-                // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-                history.skipRecording();
-                this.setState({});
-              }
             }}
             onDoubleClick={e => {
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
@@ -1753,6 +1739,7 @@ export class App extends React.Component<any, AppState> {
                       },
                     ];
                   }
+                  history.resumeRecording();
                   resetSelection();
                 },
                 onCancel: () => {
@@ -1765,13 +1752,28 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
               const hasDeselectedButton = Boolean(e.buttons);
+
+              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              if (this.state.multiElement) {
+                const { multiElement } = this.state;
+                const originX = multiElement.x;
+                const originY = multiElement.y;
+                const points = multiElement.points;
+                const pnt = points[points.length - 1];
+                pnt[0] = x - originX;
+                pnt[1] = y - originY;
+                multiElement.shape = null;
+                this.setState({});
+                return;
+              }
+
               if (
                 hasDeselectedButton ||
                 this.state.elementType !== "selection"
               ) {
                 return;
               }
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
               const selectedElements = elements.filter(e => e.isSelected)
                 .length;
               if (selectedElements === 1) {
@@ -1848,7 +1850,7 @@ export class App extends React.Component<any, AppState> {
       <StoredScenesList
         scenes={scenes}
         currentId={this.state.selectedId}
-        onChange={id => this.loadScene(id)}
+        onChange={(id, k) => this.loadScene(id, k)}
       />
     );
   }
@@ -1856,53 +1858,42 @@ export class App extends React.Component<any, AppState> {
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const { deltaX, deltaY } = e;
-    // We don't want to save history when panning around
-    history.skipRecording();
+
     this.setState({
       scrollX: this.state.scrollX - deltaX,
       scrollY: this.state.scrollY - deltaY,
     });
   };
 
-  private addElementsFromPaste = (paste: string) => {
-    let parsedElements;
-    try {
-      parsedElements = JSON.parse(paste);
-    } catch (e) {}
-    if (
-      Array.isArray(parsedElements) &&
-      parsedElements.length > 0 &&
-      parsedElements[0].type // need to implement a better check here...
-    ) {
-      elements = clearSelection(elements);
+  private addElementsFromPaste = (
+    clipboardElements: readonly ExcalidrawElement[],
+  ) => {
+    elements = clearSelection(elements);
 
-      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
+    const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
-      const elementsCenterX = distance(minX, maxX) / 2;
-      const elementsCenterY = distance(minY, maxY) / 2;
+    const elementsCenterX = distance(minX, maxX) / 2;
+    const elementsCenterY = distance(minY, maxY) / 2;
 
-      const dx =
-        cursorX -
-        this.state.scrollX -
-        CANVAS_WINDOW_OFFSET_LEFT -
-        elementsCenterX;
-      const dy =
-        cursorY -
-        this.state.scrollY -
-        CANVAS_WINDOW_OFFSET_TOP -
-        elementsCenterY;
+    const dx =
+      cursorX -
+      this.state.scrollX -
+      CANVAS_WINDOW_OFFSET_LEFT -
+      elementsCenterX;
+    const dy =
+      cursorY - this.state.scrollY - CANVAS_WINDOW_OFFSET_TOP - elementsCenterY;
 
-      elements = [
-        ...elements,
-        ...parsedElements.map(parsedElement => {
-          const duplicate = duplicateElement(parsedElement);
-          duplicate.x += dx - minX;
-          duplicate.y += dy - minY;
-          return duplicate;
-        }),
-      ];
-      this.setState({});
-    }
+    elements = [
+      ...elements,
+      ...clipboardElements.map(clipboardElements => {
+        const duplicate = duplicateElement(clipboardElements);
+        duplicate.x += dx - minX;
+        duplicate.y += dy - minY;
+        return duplicate;
+      }),
+    ];
+    history.resumeRecording();
+    this.setState({});
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
@@ -1944,6 +1935,7 @@ export class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     const atLeastOneVisibleElement = renderScene(
       elements,
+      this.state.selectionElement,
       this.rc!,
       this.canvas!,
       {
@@ -1958,14 +1950,8 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(
-        history.generateCurrentEntry(
-          pickAppStatePropertiesForHistory(this.state),
-          elements,
-        ),
-      );
-    } else {
-      history.resumeRecording();
+      history.pushEntry(this.state, elements);
+      history.skipRecording();
     }
   }
 }

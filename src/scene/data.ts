@@ -1,22 +1,32 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState, cleanAppStateForExport } from "../appState";
+import {
+  getDefaultAppState,
+  cleanAppStateForExport,
+  clearAppStateForLocalStorage,
+} from "../appState";
 
 import { AppState } from "../types";
 import { ExportType, PreviousScene } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
-import { getCommonBounds } from "../element";
+import { getCommonBounds, normalizeDimensions } from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
+import {
+  copyTextToSystemClipboard,
+  copyCanvasToClipboardAsPng,
+} from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
+
+const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
+const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -138,53 +148,128 @@ export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  let response;
+  const json = serializeAsJSON(elements, appState);
+  const encoded = new TextEncoder().encode(json);
+
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true, // extractable
+    ["encrypt", "decrypt"],
+  );
+  // The iv is set to 0. We are never going to reuse the same key so we don't
+  // need to have an iv. (I hope that's correct...)
+  const iv = new Uint8Array(12);
+  // We use symmetric encryption. AES-GCM is the recommended algorithm and
+  // includes checks that the ciphertext has not been modified by an attacker.
+  const encrypted = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    key,
+    encoded,
+  );
+  // We use jwk encoding to be able to extract just the base64 encoded key.
+  // We will hardcode the rest of the attributes when importing back the key.
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+
   try {
-    response = await fetch(BACKEND_POST, {
+    const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: serializeAsJSON(elements, appState),
+      body: encrypted,
     });
     const json = await response.json();
+    // TODO: comment following
+    // const json = {id: '1234'}
+    // console.log("new Uint8Array([" + new Uint8Array(encrypted).join(",") + "])");
+
     if (json.id) {
       const url = new URL(window.location.href);
-      url.searchParams.append("id", json.id);
+      // We need to store the key (and less importantly the id) as hash instead
+      // of queryParam in order to never send it to the server
+      url.hash = `json=${json.id},${exportedKey.k!}`;
+      const urlString = url.toString();
 
-      await navigator.clipboard.writeText(url.toString());
-      window.alert(
-        t("alerts.copiedToClipboard", {
-          url: url.toString(),
-        }),
-      );
+      try {
+        await copyTextToSystemClipboard(urlString);
+        window.alert(t("alerts.copiedToClipboard", { url: urlString }));
+      } catch (err) {
+        // TODO: link will be displayed for user to copy manually in later PR
+      }
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (e) {
+    console.error(e);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
 }
 
-export async function importFromBackend(id: string | null) {
+export async function importFromBackend(
+  id: string | null,
+  k: string | undefined,
+) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
-  const data = await fetch(`${BACKEND_GET}${id}.json`)
-    .then(response => {
-      if (!response.ok) {
-        window.alert(t("alerts.importBackendFailed"));
-      }
-      return response;
-    })
-    .then(response => response.clone().json());
-  if (data != null) {
-    try {
-      elements = data.elements || elements;
-      appState = data.appState || appState;
-    } catch (error) {
+
+  try {
+    const response = await fetch(
+      k ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+    );
+    if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      console.error(error);
+      return restore(elements, appState, { scrollToContent: true });
     }
+    let data;
+    if (k) {
+      const buffer = await response.arrayBuffer();
+      const key = await window.crypto.subtle.importKey(
+        "jwk",
+        {
+          alg: "A128GCM",
+          ext: true,
+          k: k,
+          key_ops: ["encrypt", "decrypt"],
+          kty: "oct",
+        },
+        {
+          name: "AES-GCM",
+          length: 128,
+        },
+        false, // extractable
+        ["decrypt"],
+      );
+      const iv = new Uint8Array(12);
+      const decrypted = await window.crypto.subtle.decrypt(
+        {
+          name: "AES-GCM",
+          iv: iv,
+        },
+        key,
+        buffer,
+      );
+      // We need to convert the decrypted array buffer to a string
+      const string = String.fromCharCode.apply(
+        null,
+        new Uint8Array(decrypted) as any,
+      );
+      data = JSON.parse(string);
+    } else {
+      // Legacy format
+      data = await response.json();
+    }
+
+    elements = data.elements || elements;
+    appState = data.appState || appState;
+  } catch (error) {
+    window.alert(t("alerts.importBackendFailed"));
+    console.error(error);
+  } finally {
+    return restore(elements, appState, { scrollToContent: true });
   }
-  return restore(elements, appState, { scrollToContent: true });
 }
 
 export async function exportCanvas(
@@ -241,19 +326,10 @@ export async function exportCanvas(
       }
     });
   } else if (type === "clipboard") {
-    const errorMsg = t("alerts.couldNotCopyToClipboard");
     try {
-      tempCanvas.toBlob(async function(blob: any) {
-        try {
-          await navigator.clipboard.write([
-            new window.ClipboardItem({ "image/png": blob }),
-          ]);
-        } catch (err) {
-          window.alert(errorMsg);
-        }
-      });
+      copyCanvasToClipboardAsPng(tempCanvas);
     } catch (err) {
-      window.alert(errorMsg);
+      window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
     const appState = getDefaultAppState();
@@ -291,6 +367,19 @@ function restore(
           [element.width, element.height],
         ];
       }
+    } else if (element.type === "line") {
+      // old spec, pre-arrows
+      // old spec, post-arrows
+      if (!Array.isArray(element.points) || element.points.length === 0) {
+        points = [
+          [0, 0],
+          [element.width, element.height],
+        ];
+      } else {
+        points = element.points;
+      }
+    } else {
+      normalizeDimensions(element);
     }
 
     return {
@@ -346,10 +435,18 @@ export function restoreFromLocalStorage() {
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
-  state: AppState,
+  appState: AppState,
 ) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
-  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(
+      elements.map(({ shape, ...element }: ExcalidrawElement) => element),
+    ),
+  );
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY_STATE,
+    JSON.stringify(clearAppStateForLocalStorage(appState)),
+  );
 }
 
 /**
@@ -375,7 +472,7 @@ export function loadedScenes(): PreviousScene[] {
  * Append id to the list of Previous Scenes in Local Storage if not there yet
  * @param id string
  */
-export function addToLoadedScenes(id: string): void {
+export function addToLoadedScenes(id: string, k: string | undefined): void {
   const scenes = [...loadedScenes()];
   const newScene = scenes.every(scene => scene.id !== id);
 
@@ -383,6 +480,7 @@ export function addToLoadedScenes(id: string): void {
     scenes.push({
       timestamp: Date.now(),
       id,
+      k,
     });
   }
 

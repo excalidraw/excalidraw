@@ -27,6 +27,37 @@ export function getDefaultAppState(): AppState {
     scrolledOutside: false,
     name: DEFAULT_PROJECT_NAME,
     isResizing: false,
+    selectionElement: null,
+  };
+}
+
+export function clearAppStateForLocalStorage(appState: AppState) {
+  const {
+    draggingElement,
+    resizingElement,
+    multiElement,
+    editingElement,
+    selectionElement,
+    isResizing,
+    ...exportedState
+  } = appState;
+  return exportedState;
+}
+
+export function clearAppStatePropertiesForHistory(
+  appState: AppState,
+): Partial<AppState> {
+  return {
+    exportBackground: appState.exportBackground,
+    currentItemStrokeColor: appState.currentItemStrokeColor,
+    currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFillStyle: appState.currentItemFillStyle,
+    currentItemStrokeWidth: appState.currentItemStrokeWidth,
+    currentItemRoughness: appState.currentItemRoughness,
+    currentItemOpacity: appState.currentItemOpacity,
+    currentItemFont: appState.currentItemFont,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    name: appState.name,
   };
 }
 

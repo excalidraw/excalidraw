@@ -18,6 +18,7 @@ export const actionSendBackward: Action = {
   },
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
+  commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.altKey && event.key === "B",
 };
 
@@ -31,6 +32,7 @@ export const actionBringForward: Action = {
   },
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
+  commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.altKey && event.key === "F",
 };
 
@@ -43,6 +45,7 @@ export const actionSendToBack: Action = {
     };
   },
   contextItemLabel: "labels.sendToBack",
+  commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "B",
 };
 
@@ -54,6 +57,7 @@ export const actionBringToFront: Action = {
       appState,
     };
   },
+  commitToHistory: () => true,
   contextItemLabel: "labels.bringToFront",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "F",
 };

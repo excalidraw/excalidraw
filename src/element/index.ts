@@ -4,8 +4,7 @@ export {
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
-  getLinePoints,
-  getArrowAbsoluteBounds,
+  getLinearElementAbsoluteBounds,
 } from "./bounds";
 
 export { handlerRectangles } from "./handlerRectangles";

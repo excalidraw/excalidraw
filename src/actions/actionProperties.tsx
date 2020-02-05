@@ -47,6 +47,7 @@ export const actionChangeStrokeColor: Action = {
       appState: { ...appState, currentItemStrokeColor: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
@@ -77,6 +78,7 @@ export const actionChangeBackgroundColor: Action = {
       appState: { ...appState, currentItemBackgroundColor: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
@@ -107,6 +109,7 @@ export const actionChangeFillStyle: Action = {
       appState: { ...appState, currentItemFillStyle: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fill")}</legend>
@@ -143,6 +146,7 @@ export const actionChangeStrokeWidth: Action = {
       appState: { ...appState, currentItemStrokeWidth: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
@@ -177,6 +181,7 @@ export const actionChangeSloppiness: Action = {
       appState: { ...appState, currentItemRoughness: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
@@ -211,6 +216,7 @@ export const actionChangeOpacity: Action = {
       appState: { ...appState, currentItemOpacity: value },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <label className="control-label">
       {t("labels.opacity")}
@@ -272,6 +278,7 @@ export const actionChangeFontSize: Action = {
       },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
@@ -320,6 +327,7 @@ export const actionChangeFontFamily: Action = {
       },
     };
   },
+  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontFamily")}</legend>
