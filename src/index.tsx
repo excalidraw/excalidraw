@@ -181,8 +181,8 @@ const LayerUI = React.memo(
       return (
         <Stack.Col gap={4}>
           <Stack.Row justifyContent={"space-between"}>
-            {actionManager.renderAction("loadScene", elements, appState)}
-            {actionManager.renderAction("saveScene", elements, appState)}
+            {actionManager.renderAction("loadScene")}
+            {actionManager.renderAction("saveScene")}
             <ExportDialog
               elements={elements}
               appState={appState}
@@ -231,13 +231,9 @@ const LayerUI = React.memo(
                 }
               }}
             />
-            {actionManager.renderAction("clearCanvas", elements, appState)}
+            {actionManager.renderAction("clearCanvas")}
           </Stack.Row>
-          {actionManager.renderAction(
-            "changeViewBackgroundColor",
-            elements,
-            appState,
-          )}
+          {actionManager.renderAction("changeViewBackgroundColor")}
         </Stack.Col>
       );
     }
@@ -256,69 +252,37 @@ const LayerUI = React.memo(
       return (
         <Island padding={4}>
           <div className="panelColumn">
-            {actionManager.renderAction(
-              "changeStrokeColor",
-              elements,
-              appState,
-            )}
+            {actionManager.renderAction("changeStrokeColor")}
             {(hasBackground(elementType) ||
               targetElements.some(element => hasBackground(element.type))) && (
               <>
-                {actionManager.renderAction(
-                  "changeBackgroundColor",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeBackgroundColor")}
 
-                {actionManager.renderAction(
-                  "changeFillStyle",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeFillStyle")}
               </>
             )}
 
             {(hasStroke(elementType) ||
               targetElements.some(element => hasStroke(element.type))) && (
               <>
-                {actionManager.renderAction(
-                  "changeStrokeWidth",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeStrokeWidth")}
 
-                {actionManager.renderAction(
-                  "changeSloppiness",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeSloppiness")}
               </>
             )}
 
             {(hasText(elementType) ||
               targetElements.some(element => hasText(element.type))) && (
               <>
-                {actionManager.renderAction(
-                  "changeFontSize",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeFontSize")}
 
-                {actionManager.renderAction(
-                  "changeFontFamily",
-                  elements,
-                  appState,
-                )}
+                {actionManager.renderAction("changeFontFamily")}
               </>
             )}
 
-            {actionManager.renderAction("changeOpacity", elements, appState)}
+            {actionManager.renderAction("changeOpacity")}
 
-            {actionManager.renderAction(
-              "deleteSelectedElements",
-              elements,
-              appState,
-            )}
+            {actionManager.renderAction("deleteSelectedElements")}
           </div>
         </Island>
       );
@@ -415,7 +379,6 @@ const LayerUI = React.memo(
         resizingElement,
         multiElement,
         editingElement,
-        selectionElement,
         isResizing,
         cursorX,
         cursorY,
@@ -443,9 +406,14 @@ export class App extends React.Component<any, AppState> {
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
-    this.actionManager = new ActionManager(this.syncActionResult, () => {
-      history.resumeRecording();
-    });
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => {
+        history.resumeRecording();
+      },
+      () => this.state,
+      () => elements,
+    );
     this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
@@ -642,11 +610,7 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const actionResult = this.actionManager.handleKeyDown(
-      event,
-      elements,
-      this.state,
-    );
+    const actionResult = this.actionManager.handleKeyDown(event);
 
     if (actionResult) {
       this.syncActionResult(actionResult);
@@ -828,10 +792,8 @@ export class App extends React.Component<any, AppState> {
                       label: t("labels.paste"),
                       action: () => this.pasteFromClipboard(),
                     },
-                    ...this.actionManager.getContextMenuItems(
-                      elements,
-                      this.state,
-                      action => this.canvasOnlyActions.includes(action),
+                    ...this.actionManager.getContextMenuItems(action =>
+                      this.canvasOnlyActions.includes(action),
                     ),
                   ],
                   top: e.clientY,
@@ -857,8 +819,6 @@ export class App extends React.Component<any, AppState> {
                     action: () => this.pasteFromClipboard(),
                   },
                   ...this.actionManager.getContextMenuItems(
-                    elements,
-                    this.state,
                     action => !this.canvasOnlyActions.includes(action),
                   ),
                 ],

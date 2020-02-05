@@ -43,19 +43,9 @@ export interface ActionsManagerInterface {
     [keyProp: string]: Action;
   };
   registerAction: (action: Action) => void;
-  handleKeyDown: (
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => ActionResult | null;
+  handleKeyDown: (event: KeyboardEvent) => ActionResult | null;
   getContextMenuItems: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
-  renderAction: (
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => React.ReactElement | null;
+  renderAction: (name: string) => React.ReactElement | null;
 }

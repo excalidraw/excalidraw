@@ -158,7 +158,7 @@ function ExportModal({
             </Stack.Row>
           </Stack.Col>
 
-          {actionManager.renderAction("changeProjectName", elements, appState)}
+          {actionManager.renderAction("changeProjectName")}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={2} align="baseline">
@@ -177,11 +177,7 @@ function ExportModal({
                 ))}
               </Stack.Row>
             </div>
-            {actionManager.renderAction(
-              "changeExportBackground",
-              elements,
-              appState,
-            )}
+            {actionManager.renderAction("changeExportBackground")}
             {someElementIsSelected && (
               <div>
                 <label>
