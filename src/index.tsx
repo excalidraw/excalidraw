@@ -1654,16 +1654,16 @@ export class App extends React.Component<any, AppState> {
                 if (!elementLocked) {
                   resetCursor();
 
+                  history.resumeRecording();
                   this.setState({
                     draggingElement: null,
                     elementType: "selection",
                   });
-                  history.resumeRecording();
                 } else {
+                  history.resumeRecording();
                   this.setState({
                     draggingElement: null,
                   });
-                  history.resumeRecording();
                 }
               };
 
