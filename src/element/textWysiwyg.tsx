@@ -55,6 +55,40 @@ export function textWysiwyg({
     minHeight: "1em",
   });
 
+  editable.onpaste = ev => {
+    try {
+      const selection = window.getSelection();
+      if (!selection?.rangeCount) {
+        return;
+      }
+      selection.deleteFromDocument();
+
+      const lines = ev
+        .clipboardData!.getData("text")
+        .replace(/\r\n?/g, "\n")
+        .split("\n");
+
+      lines.reduce((node: Range | Text | HTMLBRElement, line, idx) => {
+        const textNode = document.createTextNode(line);
+        if (node instanceof Range) {
+          node.insertNode(textNode);
+        } else {
+          node.parentNode!.insertBefore(textNode, node.nextSibling);
+        }
+        if (typeof lines[idx + 1] === "string") {
+          const newlineNode = document.createElement("br");
+          textNode.parentNode!.insertBefore(newlineNode, textNode.nextSibling);
+          return newlineNode;
+        }
+        return textNode;
+      }, selection.getRangeAt(0));
+
+      ev.preventDefault();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   editable.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
@@ -92,6 +126,7 @@ export function textWysiwyg({
   function cleanup() {
     editable.onblur = null;
     editable.onkeydown = null;
+    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }
