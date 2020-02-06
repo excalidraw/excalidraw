@@ -46,6 +46,7 @@ import { ExcalidrawElement } from "./element/types";
 import {
   isWritableElement,
   isInputLike,
+  isToolIcon,
   debounce,
   capitalizeString,
   distance,
@@ -511,8 +512,8 @@ export class App extends React.Component<any, AppState> {
 
         elements = [...clearSelection(elements), element];
         history.resumeRecording();
-        this.setState({});
       }
+      this.selectShapeTool("selection");
       e.preventDefault();
     }
   };
@@ -657,14 +658,7 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (!isHoldingSpace) {
-        setCursorForShape(shape);
-      }
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-      elements = clearSelection(elements);
-      this.setState({ elementType: shape });
+      this.selectShapeTool(shape);
       // Undo action
     } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
@@ -727,6 +721,19 @@ export class App extends React.Component<any, AppState> {
       this.addElementsFromPaste(data.elements);
     }
   };
+
+  private selectShapeTool(elementType: AppState["elementType"]) {
+    if (!isHoldingSpace) {
+      setCursorForShape(elementType);
+    }
+    if (isToolIcon(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    if (elementType !== "selection") {
+      elements = clearSelection(elements);
+    }
+    this.setState({ elementType });
+  }
 
   setAppState = (obj: any) => {
     this.setState(obj);
