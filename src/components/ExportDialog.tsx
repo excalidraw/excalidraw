@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
+import { CopyExportUrlInput } from "./CopyExportUrlInput";
 import { clipboard, exportFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
@@ -20,9 +21,16 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
+const defaultUrlToCopy: string | undefined = undefined;
+
 type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
+) => void;
+
+type ExportCBWithCallback = (
+  elements: readonly ExcalidrawElement[],
+  callback: React.Dispatch<string | undefined>,
 ) => void;
 
 function ExportModal({
@@ -43,7 +51,7 @@ function ExportModal({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend: ExportCBWithCallback;
   onCloseRequest: () => void;
 }) {
   const someElementIsSelected = elements.some(element => element.isSelected);
@@ -54,6 +62,8 @@ function ExportModal({
   const pngButton = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const onlySelectedInput = useRef<HTMLInputElement>(null);
+
+  const [urlToCopy, setUrlToCopy] = useState(defaultUrlToCopy);
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -153,11 +163,13 @@ function ExportModal({
                 icon={link}
                 title={t("buttons.getShareableLink")}
                 aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
+                onClick={() =>
+                  onExportToBackend(exportedElements, setUrlToCopy)
+                }
               />
             </Stack.Row>
           </Stack.Col>
-
+          {urlToCopy && <CopyExportUrlInput url={urlToCopy} />}
           {actionManager.renderAction("changeProjectName")}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
@@ -215,7 +227,7 @@ export function ExportDialog({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend: ExportCBWithCallback;
 }) {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);

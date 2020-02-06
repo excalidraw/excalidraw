@@ -17,7 +17,11 @@ type ToolButtonBaseProps = {
 };
 
 type ToolButtonProps =
-  | (ToolButtonBaseProps & { type: "button"; onClick?(): void })
+  | (ToolButtonBaseProps & {
+      type: "button";
+      onClick?(): void;
+      disabled?: boolean;
+    })
   | (ToolButtonBaseProps & {
       type: "radio";
 
@@ -38,6 +42,7 @@ export const ToolButton = React.forwardRef(function(
   if (props.type === "button") {
     return (
       <button
+        disabled={props.disabled === undefined ? false : props.disabled}
         className={`ToolIcon_type_button ToolIcon ${sizeCn}`}
         title={props.title}
         aria-label={props["aria-label"]}

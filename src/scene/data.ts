@@ -147,6 +147,7 @@ export async function loadFromBlob(blob: any) {
 export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  setManualCopyUrl: React.Dispatch<string | undefined>,
 ) {
   const json = serializeAsJSON(elements, appState);
   const encoded = new TextEncoder().encode(json);
@@ -197,7 +198,7 @@ export async function exportToBackend(
         await copyTextToSystemClipboard(urlString);
         window.alert(t("alerts.copiedToClipboard", { url: urlString }));
       } catch (err) {
-        // TODO: link will be displayed for user to copy manually in later PR
+        setManualCopyUrl(urlString);
       }
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
@@ -288,6 +289,7 @@ export async function exportCanvas(
     name: string;
     scale?: number;
   },
+  setUrlToCopy?: React.Dispatch<string | undefined>,
 ) {
   if (!elements.length) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
@@ -335,7 +337,9 @@ export async function exportCanvas(
     if (exportBackground) {
       appState.viewBackgroundColor = viewBackgroundColor;
     }
-    exportToBackend(elements, appState);
+    if (setUrlToCopy) {
+      exportToBackend(elements, appState, setUrlToCopy);
+    }
   }
 
   // clean up the DOM

@@ -218,7 +218,7 @@ const LayerUI = React.memo(
                   });
                 }
               }}
-              onExportToBackend={exportedElements => {
+              onExportToBackend={(exportedElements, setUrlToCopy) => {
                 if (canvas) {
                   exportCanvas(
                     "backend",
@@ -228,6 +228,7 @@ const LayerUI = React.memo(
                     })),
                     canvas,
                     appState,
+                    setUrlToCopy,
                   );
                 }
               }}
