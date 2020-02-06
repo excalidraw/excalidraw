@@ -53,6 +53,7 @@ export function textWysiwyg({
     outline: "1px solid transparent",
     whiteSpace: "nowrap",
     minHeight: "1em",
+    backfaceVisibility: "hidden",
   });
 
   editable.onpaste = ev => {
