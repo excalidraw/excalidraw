@@ -10,6 +10,7 @@ export const languages = [
     label: "Norsk Bokmål",
     data: require("./locales/nb-no.json"),
   },
+  { lng: "pl", label: "Polski", data: require("./locales/pl.json") },
   { lng: "pt", label: "Português", data: require("./locales/pt.json") },
   { lng: "ru", label: "Русский", data: require("./locales/ru.json") },
 ];
