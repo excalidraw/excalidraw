@@ -252,8 +252,7 @@ export async function importFromBackend(
         buffer,
       );
       // We need to convert the decrypted array buffer to a string
-      const string = String.fromCharCode.apply(
-        null,
+      const string = new window.TextDecoder("utf-8").decode(
         new Uint8Array(decrypted) as any,
       );
       data = JSON.parse(string);
