@@ -63,25 +63,18 @@ export function textWysiwyg({
       }
       selection.deleteFromDocument();
 
-      const lines = ev
-        .clipboardData!.getData("text")
-        .replace(/\r\n?/g, "\n")
-        .split("\n");
+      const text = ev.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
 
-      lines.reduce((node: Range | Text | HTMLBRElement, line, idx) => {
-        const textNode = document.createTextNode(line);
-        if (node instanceof Range) {
-          node.insertNode(textNode);
-        } else {
-          node.parentNode!.insertBefore(textNode, node.nextSibling);
-        }
-        if (typeof lines[idx + 1] === "string") {
-          const newlineNode = document.createElement("br");
-          textNode.parentNode!.insertBefore(newlineNode, textNode.nextSibling);
-          return newlineNode;
-        }
-        return textNode;
-      }, selection.getRangeAt(0));
+      const span = document.createElement("span");
+      span.innerText = text;
+      const range = selection.getRangeAt(0);
+      range.insertNode(span);
+
+      // deselect
+      window.getSelection()!.removeAllRanges();
+      range.setStart(span, span.childNodes.length);
+      range.setEnd(span, span.childNodes.length);
+      selection.addRange(range);
 
       ev.preventDefault();
     } catch (err) {
