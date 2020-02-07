@@ -1820,7 +1820,7 @@ export class App extends React.Component<any, AppState> {
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
-              this.setState({});
+              this.setState({ lng });
             }}
             languages={languages}
             currentLanguage={getLanguage()}
