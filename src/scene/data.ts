@@ -123,17 +123,15 @@ export async function loadFromBlob(blob: any) {
   if ("text" in Blob) {
     contents = await blob.text();
   } else {
-    contents = await (async () => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.readAsText(blob, "utf8");
-        reader.onloadend = () => {
-          if (reader.readyState === FileReader.DONE) {
-            resolve(reader.result as string);
-          }
-        };
-      });
-    })();
+    contents = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.readAsText(blob, "utf8");
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          resolve(reader.result as string);
+        }
+      };
+    });
   }
   const { elements, appState } = updateAppState(contents);
   if (!elements.length) {
@@ -487,4 +485,24 @@ export function addToLoadedScenes(id: string, k: string | undefined): void {
     LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
     JSON.stringify(scenes),
   );
+}
+
+export async function loadScene(id: string | null, k?: string) {
+  let data;
+  let selectedId;
+  if (id != null) {
+    // k is the private key used to decrypt the content from the server, take
+    // extra care not to leak it
+    data = await importFromBackend(id, k);
+    addToLoadedScenes(id, k);
+    selectedId = id;
+    window.history.replaceState({}, "Excalidraw", window.location.origin);
+  } else {
+    data = restoreFromLocalStorage();
+  }
+
+  return {
+    elements: data.elements,
+    appState: data.appState && { ...data.appState, selectedId },
+  };
 }

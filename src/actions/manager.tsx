@@ -14,20 +14,16 @@ export class ActionManager implements ActionsManagerInterface {
 
   updater: UpdaterFn;
 
-  resumeHistoryRecording: () => void;
-
   getAppState: () => AppState;
 
   getElements: () => readonly ExcalidrawElement[];
 
   constructor(
     updater: UpdaterFn,
-    resumeHistoryRecording: () => void,
     getAppState: () => AppState,
     getElements: () => readonly ExcalidrawElement[],
   ) {
     this.updater = updater;
-    this.resumeHistoryRecording = resumeHistoryRecording;
     this.getAppState = getAppState;
     this.getElements = getElements;
   }
@@ -46,17 +42,18 @@ export class ActionManager implements ActionsManagerInterface {
       );
 
     if (data.length === 0) {
-      return null;
+      return false;
     }
 
     event.preventDefault();
-    if (
+    const commitToHistory =
       data[0].commitToHistory &&
-      data[0].commitToHistory(this.getAppState(), this.getElements())
-    ) {
-      this.resumeHistoryRecording();
-    }
-    return data[0].perform(this.getElements(), this.getAppState(), null);
+      data[0].commitToHistory(this.getAppState(), this.getElements());
+    this.updater(
+      data[0].perform(this.getElements(), this.getAppState(), null),
+      commitToHistory,
+    );
+    return true;
   }
 
   getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
@@ -71,14 +68,12 @@ export class ActionManager implements ActionsManagerInterface {
       .map(action => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          if (
+          const commitToHistory =
             action.commitToHistory &&
-            action.commitToHistory(this.getAppState(), this.getElements())
-          ) {
-            this.resumeHistoryRecording();
-          }
+            action.commitToHistory(this.getAppState(), this.getElements());
           this.updater(
             action.perform(this.getElements(), this.getAppState(), null),
+            commitToHistory,
           );
         },
       }));
@@ -89,15 +84,12 @@ export class ActionManager implements ActionsManagerInterface {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState: any) => {
-        if (
+        const commitToHistory =
           action.commitToHistory &&
-          action.commitToHistory(this.getAppState(), this.getElements()) ===
-            true
-        ) {
-          this.resumeHistoryRecording();
-        }
+          action.commitToHistory(this.getAppState(), this.getElements());
         this.updater(
           action.perform(this.getElements(), this.getAppState(), formState),
+          commitToHistory,
         );
       };
 
