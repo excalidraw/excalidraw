@@ -1,5 +1,6 @@
 import { AppState } from "./types";
 import { getDateTime } from "./utils";
+import { getLanguage } from "./i18n";
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 
@@ -28,6 +29,7 @@ export function getDefaultAppState(): AppState {
     name: DEFAULT_PROJECT_NAME,
     isResizing: false,
     selectionElement: null,
+    lng: getLanguage(),
   };
 }
 
