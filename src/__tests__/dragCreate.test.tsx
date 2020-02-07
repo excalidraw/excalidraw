@@ -17,7 +17,7 @@ beforeEach(() => {
 describe("add element to the scene when mouse dragging long enough", () => {
   it("rectangle", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Rectangle — R, 2");
     fireEvent.click(tool);
 
@@ -46,7 +46,7 @@ describe("add element to the scene when mouse dragging long enough", () => {
 
   it("ellipse", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Ellipse — E, 4");
     fireEvent.click(tool);
 
@@ -75,7 +75,7 @@ describe("add element to the scene when mouse dragging long enough", () => {
 
   it("diamond", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Diamond — D, 3");
     fireEvent.click(tool);
 
@@ -104,7 +104,7 @@ describe("add element to the scene when mouse dragging long enough", () => {
 
   it("arrow", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Arrow — A, 5");
     fireEvent.click(tool);
 
@@ -134,7 +134,7 @@ describe("add element to the scene when mouse dragging long enough", () => {
 
   it("line", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Line — L, 6");
     fireEvent.click(tool);
 
@@ -166,7 +166,7 @@ describe("add element to the scene when mouse dragging long enough", () => {
 describe("do not add element to the scene if size is too small", () => {
   it("rectangle", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Rectangle — R, 2");
     fireEvent.click(tool);
 
@@ -187,7 +187,7 @@ describe("do not add element to the scene if size is too small", () => {
 
   it("ellipse", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Ellipse — E, 4");
     fireEvent.click(tool);
 
@@ -208,7 +208,7 @@ describe("do not add element to the scene if size is too small", () => {
 
   it("diamond", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Diamond — D, 3");
     fireEvent.click(tool);
 
@@ -229,7 +229,7 @@ describe("do not add element to the scene if size is too small", () => {
 
   it("arrow", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Arrow — A, 5");
     fireEvent.click(tool);
 
@@ -253,7 +253,7 @@ describe("do not add element to the scene if size is too small", () => {
 
   it("line", () => {
     const { getByTitle, container } = render(<App />);
-    // select rectangle element
+    // select tool
     const tool = getByTitle("Line — L, 6");
     fireEvent.click(tool);
 
