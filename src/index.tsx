@@ -46,6 +46,7 @@ import { ExcalidrawElement } from "./element/types";
 import {
   isWritableElement,
   isInputLike,
+  isToolIcon,
   debounce,
   capitalizeString,
   distance,
@@ -100,11 +101,7 @@ import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
-import {
-  getAppClipboard,
-  copyToAppClipboard,
-  parseClipboardEvent,
-} from "./clipboard";
+import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -474,48 +471,6 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements);
     e.preventDefault();
   };
-  private onPaste = (e: ClipboardEvent) => {
-    // #686
-    const target = document.activeElement;
-    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
-    if (
-      elementUnderCursor instanceof HTMLCanvasElement &&
-      !isWritableElement(target)
-    ) {
-      const data = parseClipboardEvent(e);
-      if (data.elements) {
-        this.addElementsFromPaste(data.elements);
-      } else if (data.text) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
-          this.state,
-        );
-
-        const element = newTextElement(
-          newElement(
-            "text",
-            x,
-            y,
-            this.state.currentItemStrokeColor,
-            this.state.currentItemBackgroundColor,
-            this.state.currentItemFillStyle,
-            this.state.currentItemStrokeWidth,
-            this.state.currentItemRoughness,
-            this.state.currentItemOpacity,
-          ),
-          data.text,
-          this.state.currentItemFont,
-        );
-
-        element.isSelected = true;
-
-        elements = [...clearSelection(elements), element];
-        history.resumeRecording();
-        this.setState({});
-      }
-      e.preventDefault();
-    }
-  };
 
   private onUnload = () => {
     isHoldingSpace = false;
@@ -551,7 +506,7 @@ export class App extends React.Component<any, AppState> {
 
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("paste", this.pasteFromClipboard);
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -583,7 +538,7 @@ export class App extends React.Component<any, AppState> {
 
   public componentWillUnmount() {
     document.removeEventListener("copy", this.onCopy);
-    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
@@ -657,14 +612,7 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (!isHoldingSpace) {
-        setCursorForShape(shape);
-      }
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-      elements = clearSelection(elements);
-      this.setState({ elementType: shape });
+      this.selectShapeTool(shape);
       // Undo action
     } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
@@ -721,12 +669,64 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements);
   };
 
-  private pasteFromClipboard = () => {
-    const data = getAppClipboard();
-    if (data.elements) {
-      this.addElementsFromPaste(data.elements);
+  private pasteFromClipboard = async (e: ClipboardEvent | null) => {
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      // if no ClipboardEvent supplied, assume we're pasting via contextMenu
+      //  thus these checks don't make sense
+      !e ||
+      (elementUnderCursor instanceof HTMLCanvasElement &&
+        !isWritableElement(target))
+    ) {
+      const data = await getClipboardContent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        history.resumeRecording();
+      }
+      this.selectShapeTool("selection");
+      e?.preventDefault();
     }
   };
+
+  private selectShapeTool(elementType: AppState["elementType"]) {
+    if (!isHoldingSpace) {
+      setCursorForShape(elementType);
+    }
+    if (isToolIcon(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    if (elementType !== "selection") {
+      elements = clearSelection(elements);
+    }
+    this.setState({ elementType });
+  }
 
   setAppState = (obj: any) => {
     this.setState(obj);
@@ -800,7 +800,7 @@ export class App extends React.Component<any, AppState> {
                   options: [
                     navigator.clipboard && {
                       label: t("labels.paste"),
-                      action: () => this.pasteFromClipboard(),
+                      action: () => this.pasteFromClipboard(null),
                     },
                     ...this.actionManager.getContextMenuItems(action =>
                       this.canvasOnlyActions.includes(action),
@@ -826,7 +826,7 @@ export class App extends React.Component<any, AppState> {
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
-                    action: () => this.pasteFromClipboard(),
+                    action: () => this.pasteFromClipboard(null),
                   },
                   ...this.actionManager.getContextMenuItems(
                     action => !this.canvasOnlyActions.includes(action),

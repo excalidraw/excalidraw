@@ -1,4 +1,5 @@
 import { ExcalidrawElement } from "./element/types";
+import { SHAPES } from "./shapes";
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
@@ -8,7 +9,7 @@ export type AppState = {
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: ExcalidrawElement | null;
-  elementType: string;
+  elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
   currentItemStrokeColor: string;
