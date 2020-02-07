@@ -6,7 +6,7 @@
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
-    "sendBackward": "Pzenieś na spód",
+    "sendBackward": "Przenieś na spód",
     "delete": "Usuń",
     "copyStyles": "Kopiuj styl",
     "pasteStyles": "Użyj skopiowanego stylu",
@@ -30,7 +30,7 @@
     "solid": "Pełne",
     "hachure": "Linie",
     "crossHatch": "Zakreślenie",
-    "thin": "Cieńkie",
+    "thin": "Cienkie",
     "bold": "Grube",
     "extraBold": "Bardzo grube",
     "architect": "Dokładny",
@@ -56,17 +56,17 @@
     "scrollBackToContent": "Wróć do obszaru roboczego"
   },
   "alerts": {
-    "clearReset": "To spowodujue usunięcie wszyskiego z documentu. Czy chcesz kontunuować?",
+    "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
-    "importBackendFailed": "Wystąpił błąd podczas importu.",
-    "cannotExportEmptyCanvas": "Aby zapisać dokument, najpierw musisz coś narysować.",
-    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbój użyć Google Chrome.",
+    "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
+    "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
+    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
     "copiedToClipboard": "Skopiowano link: {{url}}"
   },
   "toolBar": {
     "selection": "Zaznaczenie",
     "rectangle": "Prostokąt",
-    "diamond": "Rąb",
+    "diamond": "Romb",
     "ellipse": "Elipsa",
     "arrow": "Strzałka",
     "line": "Linia",
@@ -76,11 +76,11 @@
   "headings": {
     "canvasActions": "Narzędzia",
     "selectedShapeActions": "Wybrane narzędzie",
-    "shapes": "Krztałty"
+    "shapes": "Kształty"
   },
   "hints": {
-    "linearElement": "Naciśnij by zrobić punkt, przeciagnij by narysować linię",
-    "linearElementMulti": "Naciśnij Escape albo Enter by zakończyć",
-    "resize": "Mozesz zachować proporcje trzymająć wcisięty SHIFT"
+    "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
+    "linearElementMulti": "Naciśnij Escape albo Enter, aby zakończyć",
+    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
   }
 }
