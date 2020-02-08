@@ -31,7 +31,6 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  loadedScenes,
   loadScene,
   calculateScrollCenter,
   loadFromBlob,
@@ -96,7 +95,6 @@ import { ExportDialog } from "./components/ExportDialog";
 import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
-import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
@@ -318,22 +316,6 @@ const LayerUI = React.memo(
       );
     }
 
-    function renderIdsDropdown() {
-      const scenes = loadedScenes();
-      if (scenes.length === 0) {
-        return;
-      }
-      return (
-        <StoredScenesList
-          scenes={scenes}
-          currentId={appState.selectedId}
-          onChange={async (id, k) =>
-            actionManager.updater(await loadScene(id, k))
-          }
-        />
-      );
-    }
-
     return (
       <>
         <FixedSideContainer side="top">
@@ -400,7 +382,6 @@ const LayerUI = React.memo(
             languages={languages}
             currentLanguage={language}
           />
-          {renderIdsDropdown()}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"

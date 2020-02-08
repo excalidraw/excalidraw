@@ -16,10 +16,4 @@ export interface Scene {
   elements: ExcalidrawTextElement[];
 }
 
-export interface PreviousScene {
-  id: string;
-  k?: string;
-  timestamp: number;
-}
-
 export type ExportType = "png" | "clipboard" | "backend" | "svg";
