@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: app.dockerfile
+    ports:
+      - "3000:3000"
+
+  cypress:
+    build:
+      context: .
+      dockerfile: cypress.dockerfile
+    depends_on:
+      - app
+    network_mode: "host"
+    command: npx cypress run --env updateSnapshots=true
+    volumes:
+      - ./cypress/snapshots:/usr/src/app/cypress/snapshots

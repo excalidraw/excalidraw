@@ -88,7 +88,8 @@
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:other": "npm run prettier -- --list-different",
-    "test:e2e": "cypress run"
+    "test:e2e": "cypress run",
+    "update:screenshots": "docker-compose up --abort-on-container-exit --exit-code-from cypress"
   },
   "version": "1.0.0",
   "license": "MIT",
