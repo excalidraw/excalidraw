@@ -65,7 +65,7 @@ export const SHAPES = [
     ),
     value: "text",
   },
-];
+] as const;
 
 export const shapesShortcutKeys = SHAPES.map((shape, index) => [
   shape.value[0],
@@ -73,12 +73,9 @@ export const shapesShortcutKeys = SHAPES.map((shape, index) => [
 ]).flat(1);
 
 export function findShapeByKey(key: string) {
-  const defaultElement = "selection";
-  return SHAPES.reduce((element, shape, index) => {
-    if (shape.value[0] !== key && key !== (index + 1).toString()) {
-      return element;
-    }
-
-    return shape.value;
-  }, defaultElement);
+  return (
+    SHAPES.find((shape, index) => {
+      return shape.value[0] === key || key === (index + 1).toString();
+    })?.value || "selection"
+  );
 }

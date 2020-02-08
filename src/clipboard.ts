@@ -3,6 +3,9 @@ import { ExcalidrawElement } from "./element/types";
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
 
+export const probablySupportsClipboardReadText =
+  "clipboard" in navigator && "readText" in navigator.clipboard;
+
 export const probablySupportsClipboardWriteText =
   "clipboard" in navigator && "writeText" in navigator.clipboard;
 
@@ -47,26 +50,33 @@ export function getAppClipboard(): {
     ) {
       return { elements: clipboardElements };
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error(err);
+  }
 
   return {};
 }
 
-export function parseClipboardEvent(
-  e: ClipboardEvent,
-): {
+export async function getClipboardContent(
+  e: ClipboardEvent | null,
+): Promise<{
   text?: string;
   elements?: readonly ExcalidrawElement[];
-} {
+}> {
   try {
-    const text = e.clipboardData?.getData("text/plain").trim();
+    const text = e
+      ? e.clipboardData?.getData("text/plain").trim()
+      : probablySupportsClipboardReadText &&
+        (await navigator.clipboard.readText());
+
     if (text && !PREFER_APP_CLIPBOARD) {
       return { text };
     }
-    return getAppClipboard();
-  } catch (e) {}
+  } catch (err) {
+    console.error(err);
+  }
 
-  return {};
+  return getAppClipboard();
 }
 
 export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {

@@ -61,7 +61,7 @@
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
-    "copiedToClipboard": "Copied to clipboard: {{url}}"
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Selection",
