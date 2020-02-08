@@ -1,3 +1,5 @@
+import "./CopyExportUrlInput.css";
+
 import React from "react";
 // import { t } from "../i18n";
 
@@ -5,51 +7,39 @@ import { ToolButton } from "./ToolButton";
 
 import { copy } from "./icons";
 
-const defaultUrlElementRef: HTMLInputElement | undefined = undefined;
+const defaultUrlElementRef: HTMLInputElement | null = null;
 
 export function CopyExportUrlInput({ url = "" }: { url: string }) {
-  const urlElement = React.useRef(defaultUrlElementRef);
+  const urlInput = React.useRef(defaultUrlElementRef);
   const [wasCopy, setWasCopy] = React.useState(false);
 
   const copyHandler = () => {
-    const url = document.getElementById("urlToCopy") as HTMLInputElement;
-    const tryExecCommand = () => {
+    if (urlInput.current) {
       try {
-        url.select();
+        urlInput.current.select();
         document.execCommand("copy");
         setWasCopy(true);
       } catch (err) {
         window.alert("couldNotCopyToClipboard");
       }
-    };
-    if (url) {
-      urlElement.current = url;
-      try {
-        navigator.clipboard.writeText(url.value);
-        setWasCopy(true);
-      } catch (err) {
-        tryExecCommand();
-      }
     }
   };
 
   React.useEffect(() => {
-    if (wasCopy && urlElement.current) {
-      urlElement.current.focus();
-      window.alert("rlCopiedClipboardSuccess");
+    if (wasCopy && urlInput.current) {
+      urlInput.current.focus();
+      window.alert("CopiedClipboardSuccess");
     }
-    return () => {
-      setWasCopy(false);
-    };
-  }, [wasCopy, urlElement]);
+  }, [wasCopy]);
 
   return (
-    <div className="copyExportUrlWrapper">
+    <span className="copyUrlInputWrapper">
       <input
         readOnly
-        className="copyExportUrlInput"
+        className="copyUrlInput"
         type="text"
         id="urlToCopy"
+        ref={urlInput}
         value={url}
       />
       <ToolButton
@@ -59,6 +49,6 @@ export function CopyExportUrlInput({ url = "" }: { url: string }) {
         aria-label="copyToClipboard"
         onClick={copyHandler}
       />
-    </div>
+    </span>
   );
 }

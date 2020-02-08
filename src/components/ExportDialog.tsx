@@ -170,7 +170,7 @@ function ExportModal({
             </Stack.Row>
           </Stack.Col>
           {urlToCopy && <CopyExportUrlInput url={urlToCopy} />}
-          {actionManager.renderAction("changeProjectName")}
+          {!urlToCopy && actionManager.renderAction("changeProjectName")}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={2} align="baseline">
