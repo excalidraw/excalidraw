@@ -59,8 +59,7 @@
     "couldNotCreateShareableLink": "Не удалось создать общедоступную ссылку.",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
-    "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
-    "copiedToClipboard": "Скопировано в буфер обмена: {{url}}"
+    "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome."
   },
   "toolBar": {
     "selection": "Выделение области",
