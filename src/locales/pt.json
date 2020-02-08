@@ -54,8 +54,7 @@
     "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
-    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
-    "copiedToClipboard": "Copiado no clipboard: {{url}}"
+    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome."
   },
   "toolBar": {
     "selection": "Seleção",

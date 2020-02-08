@@ -60,8 +60,7 @@
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
-    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
-    "copiedToClipboard": "Copiado en el portapapeles: {{url}}"
+    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador."
   },
   "toolBar": {
     "selection": "Selección",

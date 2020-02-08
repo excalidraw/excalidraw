@@ -15,10 +15,7 @@ import { getCommonBounds, normalizeDimensions } from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
-import {
-  copyTextToSystemClipboard,
-  copyCanvasToClipboardAsPng,
-} from "../clipboard";
+import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
@@ -191,12 +188,7 @@ export async function exportToBackend(
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
 
-      try {
-        await copyTextToSystemClipboard(urlString);
-        window.alert(t("alerts.copiedToClipboard", { url: urlString }));
-      } catch (err) {
-        // TODO: link will be displayed for user to copy manually in later PR
-      }
+      window.prompt(t("alerts.uploadedSecurly"), urlString);
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
