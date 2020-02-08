@@ -7,7 +7,7 @@ import {
 } from "../appState";
 
 import { AppState } from "../types";
-import { ExportType, PreviousScene } from "./types";
+import { ExportType } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
@@ -18,7 +18,6 @@ import { t } from "../i18n";
 import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
@@ -434,47 +433,6 @@ export function saveToLocalStorage(
   );
 }
 
-/**
- * Returns the list of ids in Local Storage
- * @returns array
- */
-export function loadedScenes(): PreviousScene[] {
-  const storedPreviousScenes = localStorage.getItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-  );
-  if (storedPreviousScenes) {
-    try {
-      return JSON.parse(storedPreviousScenes);
-    } catch (e) {
-      console.error("Could not parse previously stored ids");
-      return [];
-    }
-  }
-  return [];
-}
-
-/**
- * Append id to the list of Previous Scenes in Local Storage if not there yet
- * @param id string
- */
-export function addToLoadedScenes(id: string, k: string | undefined): void {
-  const scenes = [...loadedScenes()];
-  const newScene = scenes.every(scene => scene.id !== id);
-
-  if (newScene) {
-    scenes.push({
-      timestamp: Date.now(),
-      id,
-      k,
-    });
-  }
-
-  localStorage.setItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-    JSON.stringify(scenes),
-  );
-}
-
 export async function loadScene(id: string | null, k?: string) {
   let data;
   let selectedId;
@@ -482,7 +440,6 @@ export async function loadScene(id: string | null, k?: string) {
     // k is the private key used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, k);
-    addToLoadedScenes(id, k);
     selectedId = id;
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {

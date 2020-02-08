@@ -238,15 +238,6 @@ button,
   bottom: 0;
 }
 
-.stored-ids-select {
-  @extend .dropdown-select;
-  padding: 0 0.5em 0 1.7em;
-  bottom: 0;
-  left: 0;
-  background-position: left 0.7em top 50%, 0 0;
-  margin-left: 0.5em;
-}
-
 .visually-hidden {
   position: absolute !important;
   height: 1px;
