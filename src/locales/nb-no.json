@@ -60,8 +60,7 @@
     "couldNotCreateShareableLink": "Kunne ikke lage delbar lenke.",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
-    "copiedToClipboard": "Kopierte til utklippstavlen: {{url}}"
+    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome."
   },
   "toolBar": {
     "selection": "Velg",
