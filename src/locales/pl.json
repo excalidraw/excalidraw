@@ -60,8 +60,7 @@
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
-    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
-    "copiedToClipboard": "Skopiowano link: {{url}}"
+    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome."
   },
   "toolBar": {
     "selection": "Zaznaczenie",
