@@ -177,10 +177,6 @@ export async function exportToBackend(
       body: encrypted,
     });
     const json = await response.json();
-    // TODO: comment following
-    // const json = {id: '1234'}
-    // console.log("new Uint8Array([" + new Uint8Array(encrypted).join(",") + "])");
-
     if (json.id) {
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
@@ -188,7 +184,7 @@ export async function exportToBackend(
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
 
-      window.prompt(t("alerts.uploadedSecurly"), urlString);
+      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
