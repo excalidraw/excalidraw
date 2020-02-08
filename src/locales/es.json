@@ -52,8 +52,7 @@
     "getShareableLink": "Obtener enlace para compartir",
     "showExportDialog": "Mostrar diálogo para exportar",
     "close": "Cerrar",
-    "selectLanguage": "Seleccionar idioma",
-    "previouslyLoadedScenes": "Escenas previamente cargadas"
+    "selectLanguage": "Seleccionar idioma"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",

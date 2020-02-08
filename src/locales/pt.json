@@ -46,7 +46,6 @@
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
-    "previouslyLoadedScenes": "Cenas carregadas anteriormente",
     "scrollBackToContent": "Voltar ao conteúdo"
   },
   "alerts": {
