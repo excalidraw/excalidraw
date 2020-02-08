@@ -53,6 +53,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm run test:code` | Test for formatting with Prettier |
 | `npm run test:app`  | Test the app                      |
 | `npm run test`      | Run all tests                     |
+| `npm run test:e2e`  | Run E2E tests                     |
 
 ## Contributing
 
@@ -67,6 +68,12 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 - [Netlify](https://www.netlify.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
+
+### End-to-end tests
+
+We use [Cypress.io](https://www.cypress.io/) for our end-to-end tests, with [`cypress-image-snapshot`](https://github.com/palmerhq/cypress-image-snapshot) for visual testing of the drawing canvas.
+
+Since the image snapshots can vary from platform to platform, due to environment factors like font rendering, to generate new snapshots and update existing ones we have the `npm run update:screenshots` script, that uses Docker to spin up a Ubuntu environment like the one used on our CI pipeline, for consistency.
 
 ## Contributors
 
