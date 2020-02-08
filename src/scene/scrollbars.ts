@@ -1,6 +1,10 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
 import { SceneState } from "./types";
+import {
+  getXCoordinateWithSceneState,
+  getYCoordinateWithSceneState,
+} from "./transforms";
 
 const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;

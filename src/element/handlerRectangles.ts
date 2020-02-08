@@ -1,6 +1,11 @@
 import { ExcalidrawElement } from "./types";
 import { SceneState } from "../scene/types";
 
+import {
+  getXCoordinateWithSceneState,
+  getYCoordinateWithSceneState,
+} from "../scene/transforms";
+
 import { getElementAbsoluteCoords } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
@@ -17,13 +22,6 @@ export function handlerRectangles(
     zoom: SceneState["zoom"];
   },
 ) {
-  function getXPositionWithSceneState(x: number) {
-    return (x + scrollX) * zoom;
-  }
-  function getYPositionWithSceneState(y: number) {
-    return (y + scrollY) * zoom;
-  }
-
   const handlerWidth = 8;
   const handlerHeight = 8;
 
@@ -35,10 +33,10 @@ export function handlerRectangles(
   );
 
   // Apply scene state to positions
-  elementX1 = getXPositionWithSceneState(elementX1);
-  elementY1 = getYPositionWithSceneState(elementY1);
-  elementX2 = getXPositionWithSceneState(elementX2);
-  elementY2 = getYPositionWithSceneState(elementY2);
+  elementX1 = getXCoordinateWithSceneState(elementX1, { scrollX, zoom });
+  elementY1 = getYCoordinateWithSceneState(elementY1, { scrollY, zoom });
+  elementX2 = getXCoordinateWithSceneState(elementX2, { scrollX, zoom });
+  elementY2 = getYCoordinateWithSceneState(elementY2, { scrollY, zoom });
 
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;

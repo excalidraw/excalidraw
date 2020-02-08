@@ -11,6 +11,11 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
+import {
+  getXCoordinateWithSceneState,
+  getYCoordinateWithSceneState,
+  getZoomTranslation,
+} from "../scene/transforms";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 
@@ -46,32 +51,58 @@ export function renderScene(
 
   const context = canvas.getContext("2d")!;
 
-  // Handle context scaling for zoom
-  const contextScale = context.getTransform().a;
+  // Get initial scale transform as reference for later usage
+  const initialContextTransform = context.getTransform();
+
+  // When doing calculations based on canvas width we should used normalized one
+  const normalizedCanvasWidth =
+    canvas.width / getContextTransformScaleX(initialContextTransform);
+  const normalizedCanvasHeight =
+    canvas.height / getContextTransformScaleY(initialContextTransform);
+
+  // Handle zoom scaling
   function scaleContextToZoom() {
     context.setTransform(
-      contextScale * sceneState.zoom,
+      getContextTransformScaleX(initialContextTransform) * sceneState.zoom,
       0,
       0,
-      contextScale * sceneState.zoom,
-      0,
-      0,
+      getContextTransformScaleY(initialContextTransform) * sceneState.zoom,
+      getContextTransformTranslateX(context.getTransform()),
+      getContextTransformTranslateY(context.getTransform()),
     );
   }
   function resetContextScale() {
-    context.setTransform(contextScale, 0, 0, contextScale, 0, 0);
+    context.setTransform(
+      getContextTransformScaleX(initialContextTransform),
+      0,
+      0,
+      getContextTransformScaleY(initialContextTransform),
+      getContextTransformTranslateX(context.getTransform()),
+      getContextTransformTranslateY(context.getTransform()),
+    );
   }
 
-  // When drawing elements on the canvas that take full width of height we should not take into account the scale
-  const normalizedCanvasWidth = canvas.width / contextScale;
-  const normalizedCanvasHeight = canvas.height / contextScale;
-
-  // Helpers for transforming coordinates based on scene state
-  function getXPositionWithSceneState(x: number): number {
-    return (x + sceneState.scrollX) * sceneState.zoom;
+  // Handle zoom translation
+  function translateContextToZoom() {
+    const zoomContextTranslation = getZoomTranslation(canvas, sceneState.zoom);
+    context.setTransform(
+      getContextTransformScaleX(context.getTransform()),
+      0,
+      0,
+      getContextTransformScaleY(context.getTransform()),
+      zoomContextTranslation.x,
+      zoomContextTranslation.y,
+    );
   }
-  function getYPositionWithSceneState(y: number): number {
-    return (y + sceneState.scrollY) * sceneState.zoom;
+  function resetContextTranslate() {
+    context.setTransform(
+      getContextTransformScaleX(context.getTransform()),
+      0,
+      0,
+      getContextTransformScaleY(context.getTransform()),
+      getContextTransformScaleY(initialContextTransform),
+      getContextTransformScaleY(initialContextTransform),
+    );
   }
 
   // Paint background
@@ -100,6 +131,7 @@ export function renderScene(
     }),
   );
   scaleContextToZoom();
+  translateContextToZoom();
   visibleElements.forEach(element => {
     context.translate(
       element.x + sceneState.scrollX,
@@ -111,6 +143,7 @@ export function renderScene(
       -element.y - sceneState.scrollY,
     );
   });
+  resetContextTranslate();
   resetContextScale();
 
   // Pain selection element
@@ -128,6 +161,8 @@ export function renderScene(
 
   // Pain selected elements
   if (renderSelection) {
+    translateContextToZoom();
+
     const selectedElements = elements.filter(element => element.isSelected);
     const dashledLinePadding = 4;
 
@@ -142,8 +177,14 @@ export function renderScene(
       const elementWidth = (elementX2 - elementX1) * sceneState.zoom;
       const elementHeight = (elementY2 - elementY1) * sceneState.zoom;
 
-      const elementX1InCanvas = getXPositionWithSceneState(elementX1);
-      const elementY1InCanvas = getYPositionWithSceneState(elementY1);
+      const elementX1InCanvas = getXCoordinateWithSceneState(elementX1, {
+        scrollX: sceneState.scrollX,
+        zoom: sceneState.zoom,
+      });
+      const elementY1InCanvas = getYCoordinateWithSceneState(elementY1, {
+        scrollY: sceneState.scrollY,
+        zoom: sceneState.zoom,
+      });
 
       const initialLineDash = context.getLineDash();
       context.setLineDash([8, 4]);
@@ -169,6 +210,8 @@ export function renderScene(
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
     }
+
+    resetContextTranslate();
   }
 
   // Paint scrollbars
@@ -220,13 +263,15 @@ function isVisibleElement(
     zoom: SceneState["zoom"];
   },
 ) {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  return (
-    (x2 + scrollX) * zoom >= 0 &&
-    (x1 + scrollX) * zoom <= canvasWidth &&
-    (y2 + scrollY) * zoom >= 0 &&
-    (y1 + scrollY) * zoom <= canvasHeight
-  );
+  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // Apply scene state to positions
+  x1 = getXCoordinateWithSceneState(x1, { scrollX, zoom });
+  y1 = getYCoordinateWithSceneState(y1, { scrollY, zoom });
+  x2 = getXCoordinateWithSceneState(x2, { scrollX, zoom });
+  y2 = getYCoordinateWithSceneState(y2, { scrollY, zoom });
+
+  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
 }
 
 // This should be only called for exporting purposes
@@ -255,4 +300,17 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
+}
+
+function getContextTransformScaleX(transform: DOMMatrix): number {
+  return transform.a;
+}
+function getContextTransformScaleY(transform: DOMMatrix): number {
+  return transform.d;
+}
+function getContextTransformTranslateX(transform: DOMMatrix): number {
+  return transform.e;
+}
+function getContextTransformTranslateY(transform: DOMMatrix): number {
+  return transform.f;
 }

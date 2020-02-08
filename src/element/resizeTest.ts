@@ -2,6 +2,11 @@ import { SceneState } from "../scene/types";
 import { AppState } from "../types";
 import { ExcalidrawElement } from "./types";
 
+import {
+  getXCoordinateWithSceneState,
+  getYCoordinateWithSceneState,
+} from "../scene";
+
 import { handlerRectangles } from "./handlerRectangles";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
@@ -26,6 +31,15 @@ export function resizeTest(
 
   const handlers = handlerRectangles(element, { scrollX, scrollY, zoom });
 
+  const xWithSceneState = getXCoordinateWithSceneState(x, {
+    scrollX,
+    zoom,
+  });
+  const yWithSceneState = getYCoordinateWithSceneState(y, {
+    scrollY,
+    zoom,
+  });
+
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key as HandlerRectanglesRet]!;
     if (!handler) {
@@ -33,10 +47,10 @@ export function resizeTest(
     }
 
     return (
-      (x + scrollX) * zoom >= handler[0] &&
-      (x + scrollX) * zoom <= handler[0] + handler[2] &&
-      (y + scrollY) * zoom >= handler[1] &&
-      (y + scrollY) * zoom <= handler[1] + handler[3]
+      xWithSceneState >= handler[0] &&
+      xWithSceneState <= handler[0] + handler[2] &&
+      yWithSceneState >= handler[1] &&
+      yWithSceneState <= handler[1] + handler[3]
     );
   });
 
