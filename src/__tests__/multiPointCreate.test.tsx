@@ -1,0 +1,140 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { render, fireEvent } from "@testing-library/react";
+import { App } from "../index";
+import * as Renderer from "../renderer/renderScene";
+import { KEYS } from "../keys";
+
+// Unmount ReactDOM from root
+ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+
+const renderScene = jest.spyOn(Renderer, "renderScene");
+beforeEach(() => {
+  localStorage.clear();
+  renderScene.mockClear();
+});
+
+describe("remove shape in non linear elements", () => {
+  it("rectangle", () => {
+    const { getByTitle, container } = render(<App />);
+    // select tool
+    const tool = getByTitle("Rectangle — R, 2");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas")!;
+    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
+
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    const elements = renderScene.mock.calls[3][0];
+    expect(elements.length).toEqual(0);
+  });
+
+  it("ellipse", () => {
+    const { getByTitle, container } = render(<App />);
+    // select tool
+    const tool = getByTitle("Ellipse — E, 4");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas")!;
+    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
+
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    const elements = renderScene.mock.calls[3][0];
+    expect(elements.length).toEqual(0);
+  });
+
+  it("diamond", () => {
+    const { getByTitle, container } = render(<App />);
+    // select tool
+    const tool = getByTitle("Diamond — D, 3");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas")!;
+    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
+
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    const elements = renderScene.mock.calls[3][0];
+    expect(elements.length).toEqual(0);
+  });
+});
+
+describe("multi point mode in linear elements", () => {
+  it("arrow", () => {
+    const { getByTitle, container } = render(<App />);
+    // select tool
+    const tool = getByTitle("Arrow — A, 5");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas")!;
+    // first point is added on mouse down
+    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 30 });
+
+    // second point, enable multi point
+    fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.mouseMove(canvas, { clientX: 50, clientY: 60 });
+
+    // third point
+    fireEvent.mouseDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.mouseUp(canvas);
+    fireEvent.mouseMove(canvas, { clientX: 100, clientY: 140 });
+
+    // done
+    fireEvent.mouseDown(canvas);
+    fireEvent.mouseUp(canvas);
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
+
+    expect(renderScene).toHaveBeenCalledTimes(9);
+    const elements = renderScene.mock.calls[8][0];
+    expect(elements.length).toEqual(1);
+
+    expect(elements[0].type).toEqual("arrow");
+    expect(elements[0].x).toEqual(30);
+    expect(elements[0].y).toEqual(30);
+    expect(elements[0].points).toEqual([
+      [0, 0],
+      [20, 30],
+      [70, 110],
+    ]);
+  });
+
+  it("line", () => {
+    const { getByTitle, container } = render(<App />);
+    // select tool
+    const tool = getByTitle("Line — L, 6");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas")!;
+    // first point is added on mouse down
+    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 30 });
+
+    // second point, enable multi point
+    fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.mouseMove(canvas, { clientX: 50, clientY: 60 });
+
+    // third point
+    fireEvent.mouseDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.mouseUp(canvas);
+    fireEvent.mouseMove(canvas, { clientX: 100, clientY: 140 });
+
+    // done
+    fireEvent.mouseDown(canvas);
+    fireEvent.mouseUp(canvas);
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
+
+    expect(renderScene).toHaveBeenCalledTimes(9);
+    const elements = renderScene.mock.calls[8][0];
+    expect(elements.length).toEqual(1);
+
+    expect(elements[0].type).toEqual("line");
+    expect(elements[0].x).toEqual(30);
+    expect(elements[0].y).toEqual(30);
+    expect(elements[0].points).toEqual([
+      [0, 0],
+      [20, 30],
+      [70, 110],
+    ]);
+  });
+});
