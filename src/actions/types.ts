@@ -3,8 +3,8 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
-  elements?: readonly ExcalidrawElement[];
-  appState?: AppState;
+  elements?: readonly ExcalidrawElement[] | null;
+  appState?: AppState | null;
 };
 
 type ActionFn = (
@@ -13,7 +13,7 @@ type ActionFn = (
   formData: any,
 ) => ActionResult;
 
-export type UpdaterFn = (res: ActionResult) => void;
+export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export interface Action {
@@ -43,7 +43,7 @@ export interface ActionsManagerInterface {
     [keyProp: string]: Action;
   };
   registerAction: (action: Action) => void;
-  handleKeyDown: (event: KeyboardEvent) => ActionResult | null;
+  handleKeyDown: (event: KeyboardEvent) => boolean;
   getContextMenuItems: (
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];

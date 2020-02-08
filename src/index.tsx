@@ -23,7 +23,6 @@ import {
   deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
-  restoreFromLocalStorage,
   saveToLocalStorage,
   getElementAtPosition,
   createScene,
@@ -32,9 +31,8 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  importFromBackend,
-  addToLoadedScenes,
   loadedScenes,
+  loadScene,
   calculateScrollCenter,
   loadFromBlob,
 } from "./scene";
@@ -46,6 +44,7 @@ import { ExcalidrawElement } from "./element/types";
 import {
   isWritableElement,
   isInputLike,
+  isToolIcon,
   debounce,
   capitalizeString,
   distance,
@@ -100,11 +99,7 @@ import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
-import {
-  getAppClipboard,
-  copyToAppClipboard,
-  parseClipboardEvent,
-} from "./clipboard";
+import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -166,6 +161,7 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: any;
   elements: readonly ExcalidrawElement[];
+  language: string;
   setElements: (elements: readonly ExcalidrawElement[]) => void;
 }
 
@@ -176,6 +172,7 @@ const LayerUI = React.memo(
     setAppState,
     canvas,
     elements,
+    language,
     setElements,
   }: LayerUIProps) => {
     function renderCanvasActions() {
@@ -218,7 +215,7 @@ const LayerUI = React.memo(
                   });
                 }
               }}
-              onExportToBackend={(exportedElements, setUrlToCopy) => {
+              onExportToBackend={(exportedElements, setExportUrl) => {
                 if (canvas) {
                   exportCanvas(
                     "backend",
@@ -228,7 +225,7 @@ const LayerUI = React.memo(
                     })),
                     canvas,
                     appState,
-                    setUrlToCopy,
+                    setExportUrl,
                   );
                 }
               }}
@@ -322,56 +319,101 @@ const LayerUI = React.memo(
       );
     }
 
+    function renderIdsDropdown() {
+      const scenes = loadedScenes();
+      if (scenes.length === 0) {
+        return;
+      }
+      return (
+        <StoredScenesList
+          scenes={scenes}
+          currentId={appState.selectedId}
+          onChange={async (id, k) =>
+            actionManager.updater(await loadScene(id, k))
+          }
+        />
+      );
+    }
+
     return (
-      <FixedSideContainer side="top">
-        <div className="App-menu App-menu_top">
-          <Stack.Col gap={4} align="end">
-            <section
-              className="App-right-menu"
-              aria-labelledby="canvas-actions-title"
-            >
-              <h2 className="visually-hidden" id="canvas-actions-title">
-                {t("headings.canvasActions")}
-              </h2>
-              <Island padding={4}>{renderCanvasActions()}</Island>
-            </section>
-            <section
-              className="App-right-menu"
-              aria-labelledby="selected-shape-title"
-            >
-              <h2 className="visually-hidden" id="selected-shape-title">
-                {t("headings.selectedShapeActions")}
-              </h2>
-              {renderSelectedShapeActions(elements)}
-            </section>
-          </Stack.Col>
-          <section aria-labelledby="shapes-title">
-            <Stack.Col gap={4} align="start">
-              <Stack.Row gap={1}>
-                <Island padding={1}>
-                  <h2 className="visually-hidden" id="shapes-title">
-                    {t("headings.shapes")}
-                  </h2>
-                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
-                </Island>
-                <LockIcon
-                  checked={appState.elementLocked}
-                  onChange={() => {
-                    setAppState({
-                      elementLocked: !appState.elementLocked,
-                      elementType: appState.elementLocked
-                        ? "selection"
-                        : appState.elementType,
-                    });
-                  }}
-                  title={t("toolBar.lock")}
-                />
-              </Stack.Row>
+      <>
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            <Stack.Col gap={4} align="end">
+              <section
+                className="App-right-menu"
+                aria-labelledby="canvas-actions-title"
+              >
+                <h2 className="visually-hidden" id="canvas-actions-title">
+                  {t("headings.canvasActions")}
+                </h2>
+                <Island padding={4}>{renderCanvasActions()}</Island>
+              </section>
+              <section
+                className="App-right-menu"
+                aria-labelledby="selected-shape-title"
+              >
+                <h2 className="visually-hidden" id="selected-shape-title">
+                  {t("headings.selectedShapeActions")}
+                </h2>
+                {renderSelectedShapeActions(elements)}
+              </section>
             </Stack.Col>
-          </section>
-          <div />
-        </div>
-      </FixedSideContainer>
+            <section aria-labelledby="shapes-title">
+              <Stack.Col gap={4} align="start">
+                <Stack.Row gap={1}>
+                  <Island padding={1}>
+                    <h2 className="visually-hidden" id="shapes-title">
+                      {t("headings.shapes")}
+                    </h2>
+                    <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                  </Island>
+                  <LockIcon
+                    checked={appState.elementLocked}
+                    onChange={() => {
+                      setAppState({
+                        elementLocked: !appState.elementLocked,
+                        elementType: appState.elementLocked
+                          ? "selection"
+                          : appState.elementType,
+                      });
+                    }}
+                    title={t("toolBar.lock")}
+                  />
+                </Stack.Row>
+              </Stack.Col>
+            </section>
+            <div />
+          </div>
+        </FixedSideContainer>
+        <footer role="contentinfo">
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
+          <LanguageList
+            onChange={lng => {
+              setLanguage(lng);
+              setAppState({});
+            }}
+            languages={languages}
+            currentLanguage={language}
+          />
+          {renderIdsDropdown()}
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
+        </footer>
+      </>
     );
   },
   (prev, next) => {
@@ -394,6 +436,7 @@ const LayerUI = React.memo(
     const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
     return (
+      prev.language === next.language &&
       prev.elements === next.elements &&
       keys.every(k => prevAppState[k] === nextAppState[k])
     );
@@ -410,9 +453,6 @@ export class App extends React.Component<any, AppState> {
     super(props);
     this.actionManager = new ActionManager(
       this.syncActionResult,
-      () => {
-        history.resumeRecording();
-      },
       () => this.state,
       () => elements,
     );
@@ -447,13 +487,22 @@ export class App extends React.Component<any, AppState> {
     this.canvasOnlyActions = [actionSelectAll];
   }
 
-  private syncActionResult = (res: ActionResult) => {
-    if (res.elements !== undefined) {
+  private syncActionResult = (
+    res: ActionResult,
+    commitToHistory: boolean = true,
+  ) => {
+    if (res.elements) {
       elements = res.elements;
+      if (commitToHistory) {
+        history.resumeRecording();
+      }
       this.setState({});
     }
 
-    if (res.appState !== undefined) {
+    if (res.appState) {
+      if (commitToHistory) {
+        history.resumeRecording();
+      }
       this.setState({ ...res.appState });
     }
   };
@@ -475,48 +524,6 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements);
     e.preventDefault();
   };
-  private onPaste = (e: ClipboardEvent) => {
-    // #686
-    const target = document.activeElement;
-    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
-    if (
-      elementUnderCursor instanceof HTMLCanvasElement &&
-      !isWritableElement(target)
-    ) {
-      const data = parseClipboardEvent(e);
-      if (data.elements) {
-        this.addElementsFromPaste(data.elements);
-      } else if (data.text) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
-          this.state,
-        );
-
-        const element = newTextElement(
-          newElement(
-            "text",
-            x,
-            y,
-            this.state.currentItemStrokeColor,
-            this.state.currentItemBackgroundColor,
-            this.state.currentItemFillStyle,
-            this.state.currentItemStrokeWidth,
-            this.state.currentItemRoughness,
-            this.state.currentItemOpacity,
-          ),
-          data.text,
-          this.state.currentItemFont,
-        );
-
-        element.isSelected = true;
-
-        elements = [...clearSelection(elements), element];
-        history.resumeRecording();
-        this.setState({});
-      }
-      e.preventDefault();
-    }
-  };
 
   private onUnload = () => {
     isHoldingSpace = false;
@@ -524,35 +531,9 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  private async loadScene(id: string | null, k: string | undefined) {
-    let data;
-    let selectedId;
-    if (id != null) {
-      // k is the private key used to decrypt the content from the server, take
-      // extra care not to leak it
-      data = await importFromBackend(id, k);
-      addToLoadedScenes(id, k);
-      selectedId = id;
-      window.history.replaceState({}, "Excalidraw", window.location.origin);
-    } else {
-      data = restoreFromLocalStorage();
-    }
-
-    if (data.elements) {
-      elements = data.elements;
-    }
-
-    if (data.appState) {
-      history.resumeRecording();
-      this.setState({ ...data.appState, selectedId });
-    } else {
-      this.setState({});
-    }
-  }
-
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("paste", this.pasteFromClipboard);
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -569,22 +550,22 @@ export class App extends React.Component<any, AppState> {
 
     if (id) {
       // Backwards compatibility with legacy url format
-      this.loadScene(id, undefined);
+      this.syncActionResult(await loadScene(id));
     } else {
       const match = window.location.hash.match(
         /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
       );
       if (match) {
-        this.loadScene(match[1], match[2]);
+        this.syncActionResult(await loadScene(match[1], match[2]));
       } else {
-        this.loadScene(null, undefined);
+        this.syncActionResult(await loadScene(null));
       }
     }
   }
 
   public componentWillUnmount() {
     document.removeEventListener("copy", this.onCopy);
-    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
@@ -618,13 +599,8 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const actionResult = this.actionManager.handleKeyDown(event);
-
-    if (actionResult) {
-      this.syncActionResult(actionResult);
-      if (actionResult) {
-        return;
-      }
+    if (this.actionManager.handleKeyDown(event)) {
+      return;
     }
 
     const shape = findShapeByKey(event.key);
@@ -658,14 +634,7 @@ export class App extends React.Component<any, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (!isHoldingSpace) {
-        setCursorForShape(shape);
-      }
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-      elements = clearSelection(elements);
-      this.setState({ elementType: shape });
+      this.selectShapeTool(shape);
       // Undo action
     } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
@@ -722,12 +691,64 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements);
   };
 
-  private pasteFromClipboard = () => {
-    const data = getAppClipboard();
-    if (data.elements) {
-      this.addElementsFromPaste(data.elements);
+  private pasteFromClipboard = async (e: ClipboardEvent | null) => {
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      // if no ClipboardEvent supplied, assume we're pasting via contextMenu
+      //  thus these checks don't make sense
+      !e ||
+      (elementUnderCursor instanceof HTMLCanvasElement &&
+        !isWritableElement(target))
+    ) {
+      const data = await getClipboardContent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        history.resumeRecording();
+      }
+      this.selectShapeTool("selection");
+      e?.preventDefault();
     }
   };
+
+  private selectShapeTool(elementType: AppState["elementType"]) {
+    if (!isHoldingSpace) {
+      setCursorForShape(elementType);
+    }
+    if (isToolIcon(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    if (elementType !== "selection") {
+      elements = clearSelection(elements);
+    }
+    this.setState({ elementType });
+  }
 
   setAppState = (obj: any) => {
     this.setState(obj);
@@ -751,6 +772,7 @@ export class App extends React.Component<any, AppState> {
           actionManager={this.actionManager}
           elements={elements}
           setElements={this.setElements}
+          language={getLanguage()}
         />
         <main>
           <canvas
@@ -801,7 +823,7 @@ export class App extends React.Component<any, AppState> {
                   options: [
                     navigator.clipboard && {
                       label: t("labels.paste"),
-                      action: () => this.pasteFromClipboard(),
+                      action: () => this.pasteFromClipboard(null),
                     },
                     ...this.actionManager.getContextMenuItems(action =>
                       this.canvasOnlyActions.includes(action),
@@ -827,7 +849,7 @@ export class App extends React.Component<any, AppState> {
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
-                    action: () => this.pasteFromClipboard(),
+                    action: () => this.pasteFromClipboard(null),
                   },
                   ...this.actionManager.getContextMenuItems(
                     action => !this.canvasOnlyActions.includes(action),
@@ -1798,10 +1820,7 @@ export class App extends React.Component<any, AppState> {
               if (file?.type === "application/json") {
                 loadFromBlob(file)
                   .then(({ elements, appState }) =>
-                    this.syncActionResult({
-                      elements,
-                      appState,
-                    } as ActionResult),
+                    this.syncActionResult({ elements, appState }),
                   )
                   .catch(err => console.error(err));
               }
@@ -1810,49 +1829,7 @@ export class App extends React.Component<any, AppState> {
             {t("labels.drawingCanvas")}
           </canvas>
         </main>
-        <footer role="contentinfo">
-          <HintViewer
-            elementType={this.state.elementType}
-            multiMode={this.state.multiElement !== null}
-            isResizing={this.state.isResizing}
-            elements={elements}
-          />
-
-          <LanguageList
-            onChange={lng => {
-              setLanguage(lng);
-              this.setState({});
-            }}
-            languages={languages}
-            currentLanguage={getLanguage()}
-          />
-          {this.renderIdsDropdown()}
-          {this.state.scrolledOutside && (
-            <button
-              className="scroll-back-to-content"
-              onClick={() => {
-                this.setState({ ...calculateScrollCenter(elements) });
-              }}
-            >
-              {t("buttons.scrollBackToContent")}
-            </button>
-          )}
-        </footer>
       </div>
-    );
-  }
-
-  private renderIdsDropdown() {
-    const scenes = loadedScenes();
-    if (scenes.length === 0) {
-      return;
-    }
-    return (
-      <StoredScenesList
-        scenes={scenes}
-        currentId={this.state.selectedId}
-        onChange={(id, k) => this.loadScene(id, k)}
-      />
     );
   }
 

@@ -1,0 +1,57 @@
+.copyUrlInputWrapper {
+  display: flex;
+  height: 2.5rem;
+  flex: 1;
+}
+
+.copyUrlInput {
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  height: 2.3rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  font-size: 0.9rem;
+  flex: 1;
+  margin: 0.2rem 0.5rem;
+}
+
+.copyUrlInput:hover {
+  background-color: #eee;
+}
+
+.copyUrlInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px steelblue;
+}
+
+.CopyUrlDialog__close {
+  position: absolute;
+  right: calc(var(--space-factor) * 5);
+  top: calc(var(--space-factor) * 5);
+}
+
+.CopyUrlDialog__dialog {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: CopyUrlDialog__fade-in 0.1s ease-out 0.05s forwards;
+  position: relative;
+}
+
+.CopyUrlDialog__dialog p {
+  padding: 1.5rem 0.5rem;
+  text-align: justify;
+}
+
+@keyframes CopyUrlDialog__fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

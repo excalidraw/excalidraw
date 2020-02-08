@@ -18,6 +18,7 @@ export {
   importFromBackend,
   addToLoadedScenes,
   loadedScenes,
+  loadScene,
   calculateScrollCenter,
 } from "./data";
 export {

@@ -15,10 +15,7 @@ import { getCommonBounds, normalizeDimensions } from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
-import {
-  copyTextToSystemClipboard,
-  copyCanvasToClipboardAsPng,
-} from "../clipboard";
+import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
@@ -123,17 +120,15 @@ export async function loadFromBlob(blob: any) {
   if ("text" in Blob) {
     contents = await blob.text();
   } else {
-    contents = await (async () => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.readAsText(blob, "utf8");
-        reader.onloadend = () => {
-          if (reader.readyState === FileReader.DONE) {
-            resolve(reader.result as string);
-          }
-        };
-      });
-    })();
+    contents = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.readAsText(blob, "utf8");
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          resolve(reader.result as string);
+        }
+      };
+    });
   }
   const { elements, appState } = updateAppState(contents);
   if (!elements.length) {
@@ -147,7 +142,7 @@ export async function loadFromBlob(blob: any) {
 export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  setManualCopyUrl: React.Dispatch<string | undefined>,
+  setExportUrl: React.Dispatch<string>,
 ) {
   const json = serializeAsJSON(elements, appState);
   const encoded = new TextEncoder().encode(json);
@@ -193,13 +188,7 @@ export async function exportToBackend(
       // of queryParam in order to never send it to the server
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
-
-      try {
-        await copyTextToSystemClipboard(urlString);
-        window.alert(t("alerts.copiedToClipboard", { url: urlString }));
-      } catch (err) {
-        setManualCopyUrl(urlString);
-      }
+      setExportUrl(urlString);
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
@@ -289,7 +278,7 @@ export async function exportCanvas(
     name: string;
     scale?: number;
   },
-  setUrlToCopy?: React.Dispatch<string | undefined>,
+  setExportUrl?: React.Dispatch<string>,
 ) {
   if (!elements.length) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
@@ -337,8 +326,8 @@ export async function exportCanvas(
     if (exportBackground) {
       appState.viewBackgroundColor = viewBackgroundColor;
     }
-    if (setUrlToCopy) {
-      exportToBackend(elements, appState, setUrlToCopy);
+    if (setExportUrl) {
+      exportToBackend(elements, appState, setExportUrl);
     }
   }
 
@@ -491,4 +480,24 @@ export function addToLoadedScenes(id: string, k: string | undefined): void {
     LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
     JSON.stringify(scenes),
   );
+}
+
+export async function loadScene(id: string | null, k?: string) {
+  let data;
+  let selectedId;
+  if (id != null) {
+    // k is the private key used to decrypt the content from the server, take
+    // extra care not to leak it
+    data = await importFromBackend(id, k);
+    addToLoadedScenes(id, k);
+    selectedId = id;
+    window.history.replaceState({}, "Excalidraw", window.location.origin);
+  } else {
+    data = restoreFromLocalStorage();
+  }
+
+  return {
+    elements: data.elements,
+    appState: data.appState && { ...data.appState, selectedId },
+  };
 }

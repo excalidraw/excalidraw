@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { CopyExportUrlInput } from "./CopyExportUrlInput";
+import { CopyUrlDialog } from "./CopyUrlDialog";
 import { clipboard, exportFile, link } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
@@ -21,8 +21,6 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-const defaultUrlToCopy: string | undefined = undefined;
-
 type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
@@ -30,7 +28,7 @@ type ExportCB = (
 
 type ExportCBWithCallback = (
   elements: readonly ExcalidrawElement[],
-  callback: React.Dispatch<string | undefined>,
+  callback: React.Dispatch<any>,
 ) => void;
 
 function ExportModal({
@@ -63,7 +61,8 @@ function ExportModal({
   const closeButton = useRef<HTMLButtonElement>(null);
   const onlySelectedInput = useRef<HTMLInputElement>(null);
 
-  const [urlToCopy, setUrlToCopy] = useState(defaultUrlToCopy);
+  const [exportUrl, setExportUrl] = useState(null);
+  const [showExportUrlDialog, setShowExportUrlDialog] = useState(false);
 
   const exportedElements = exportSelected
     ? elements.filter(element => element.isSelected)
@@ -118,6 +117,16 @@ function ExportModal({
     }
   }
 
+  const handleCloseExportUrlDialog = React.useCallback(() => {
+    setShowExportUrlDialog(false);
+  }, []);
+
+  useEffect(() => {
+    if (exportUrl !== null) {
+      setShowExportUrlDialog(true);
+    }
+  }, [exportUrl]);
+
   return (
     <div className="ExportDialog__dialog" onKeyDown={handleKeyDown}>
       <Island padding={4}>
@@ -164,13 +173,17 @@ function ExportModal({
                 title={t("buttons.getShareableLink")}
                 aria-label={t("buttons.getShareableLink")}
                 onClick={() =>
-                  onExportToBackend(exportedElements, setUrlToCopy)
+                  onExportToBackend(exportedElements, setExportUrl)
                 }
               />
             </Stack.Row>
           </Stack.Col>
-          {urlToCopy && <CopyExportUrlInput url={urlToCopy} />}
-          {!urlToCopy && actionManager.renderAction("changeProjectName")}
+          <CopyUrlDialog
+            url={exportUrl}
+            showDialog={showExportUrlDialog}
+            onClose={handleCloseExportUrlDialog}
+          />
+          {actionManager.renderAction("changeProjectName")}
           <Stack.Col gap={1}>
             <div className="ExportDialog__scales">
               <Stack.Row gap={2} align="baseline">
