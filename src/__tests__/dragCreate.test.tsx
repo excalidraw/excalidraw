@@ -32,9 +32,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
+    const elements = renderScene.mock.calls[3][0];
 
     expect(elements.length).toEqual(1);
     expect(elements[0].type).toEqual("rectangle");
@@ -61,10 +61,10 @@ describe("add element to the scene when mouse dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
 
-    const elements = renderScene.mock.calls[4][0];
+    const elements = renderScene.mock.calls[3][0];
     expect(elements.length).toEqual(1);
     expect(elements[0].type).toEqual("ellipse");
     expect(elements[0].x).toEqual(30);
@@ -90,10 +90,10 @@ describe("add element to the scene when mouse dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
 
-    const elements = renderScene.mock.calls[4][0];
+    const elements = renderScene.mock.calls[3][0];
     expect(elements.length).toEqual(1);
     expect(elements[0].type).toEqual("diamond");
     expect(elements[0].x).toEqual(30);
@@ -119,9 +119,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
+    const elements = renderScene.mock.calls[3][0];
 
     expect(elements.length).toEqual(1);
     expect(elements[0].type).toEqual("arrow");
@@ -149,9 +149,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
+    const elements = renderScene.mock.calls[3][0];
 
     expect(elements.length).toEqual(1);
     expect(elements[0].type).toEqual("line");
@@ -178,9 +178,9 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    expect(renderScene.mock.calls[2][1]).toBeNull();
+    const elements = renderScene.mock.calls[2][0];
 
     expect(elements.length).toEqual(0);
   });
@@ -199,9 +199,9 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    expect(renderScene.mock.calls[2][1]).toBeNull();
+    const elements = renderScene.mock.calls[2][0];
 
     expect(elements.length).toEqual(0);
   });
@@ -220,9 +220,9 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    expect(renderScene.mock.calls[2][1]).toBeNull();
+    const elements = renderScene.mock.calls[2][0];
 
     expect(elements.length).toEqual(0);
   });
@@ -244,9 +244,9 @@ describe("do not add element to the scene if size is too small", () => {
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
+    const elements = renderScene.mock.calls[3][0];
 
     expect(elements.length).toEqual(0);
   });
@@ -268,9 +268,9 @@ describe("do not add element to the scene if size is too small", () => {
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene.mock.calls[3][1]).toBeNull();
+    const elements = renderScene.mock.calls[3][0];
 
     expect(elements.length).toEqual(0);
   });

@@ -25,8 +25,8 @@ describe("remove shape in non linear elements", () => {
     fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    const elements = renderScene.mock.calls[2][0];
     expect(elements.length).toEqual(0);
   });
 
@@ -40,8 +40,8 @@ describe("remove shape in non linear elements", () => {
     fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    const elements = renderScene.mock.calls[2][0];
     expect(elements.length).toEqual(0);
   });
 
@@ -55,8 +55,8 @@ describe("remove shape in non linear elements", () => {
     fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.mouseUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    const elements = renderScene.mock.calls[3][0];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    const elements = renderScene.mock.calls[2][0];
     expect(elements.length).toEqual(0);
   });
 });
@@ -86,8 +86,8 @@ describe("multi point mode in linear elements", () => {
     fireEvent.mouseUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(9);
-    const elements = renderScene.mock.calls[8][0];
+    expect(renderScene).toHaveBeenCalledTimes(8);
+    const elements = renderScene.mock.calls[7][0];
     expect(elements.length).toEqual(1);
 
     expect(elements[0].type).toEqual("arrow");
@@ -124,8 +124,8 @@ describe("multi point mode in linear elements", () => {
     fireEvent.mouseUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(9);
-    const elements = renderScene.mock.calls[8][0];
+    expect(renderScene).toHaveBeenCalledTimes(8);
+    const elements = renderScene.mock.calls[7][0];
     expect(elements.length).toEqual(1);
 
     expect(elements[0].type).toEqual("line");

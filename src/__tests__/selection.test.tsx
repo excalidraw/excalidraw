@@ -23,8 +23,8 @@ describe("selection element", () => {
     const canvas = container.querySelector("canvas")!;
     fireEvent.mouseDown(canvas, { clientX: 60, clientY: 100 });
 
-    expect(renderScene).toHaveBeenCalledTimes(2);
-    const selectionElement = renderScene.mock.calls[1][1]!;
+    expect(renderScene).toHaveBeenCalledTimes(1);
+    const selectionElement = renderScene.mock.calls[0][1]!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
     expect([selectionElement.x, selectionElement.y]).toEqual([60, 100]);
@@ -44,8 +44,8 @@ describe("selection element", () => {
     fireEvent.mouseDown(canvas, { clientX: 60, clientY: 100 });
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(3);
-    const selectionElement = renderScene.mock.calls[2][1]!;
+    expect(renderScene).toHaveBeenCalledTimes(2);
+    const selectionElement = renderScene.mock.calls[1][1]!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
     expect([selectionElement.x, selectionElement.y]).toEqual([60, 30]);
@@ -66,8 +66,8 @@ describe("selection element", () => {
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 30 });
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
-    const selectionElement = renderScene.mock.calls[3][1];
+    expect(renderScene).toHaveBeenCalledTimes(3);
+    const selectionElement = renderScene.mock.calls[2][1];
     expect(selectionElement).toBeNull();
   });
 });
