@@ -279,6 +279,10 @@ const LayerUI = React.memo(
             )}
 
             {actionManager.renderAction("changeOpacity")}
+            {actionManager.renderAction("sendToBack")}
+            {actionManager.renderAction("bringToFront")}
+            {actionManager.renderAction("sendBackward")}
+            {actionManager.renderAction("bringForward")}
 
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
