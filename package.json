@@ -89,7 +89,7 @@
     "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:other": "npm run prettier -- --list-different",
     "test:e2e": "cypress run --env failOnSnapshotDiff=false",
-    "update:screenshots": "docker-compose up --abort-on-container-exit --exit-code-from cypress"
+    "update:screenshots": "docker-compose build && docker-compose up --abort-on-container-exit --exit-code-from cypress"
   },
   "version": "1.0.0",
   "license": "MIT",
