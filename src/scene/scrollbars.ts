@@ -1,10 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
 import { SceneState } from "./types";
-import {
-  getXCoordinateWithSceneState,
-  getYCoordinateWithSceneState,
-} from "./transforms";
 
 const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
@@ -25,18 +21,12 @@ export function getScrollBars(
   },
 ) {
   // This is the bounding box of all the elements
-  let [
+  const [
     elementsMinX,
     elementsMinY,
     elementsMaxX,
     elementsMaxY,
   ] = getCommonBounds(elements);
-
-  // Apply zoom on elements coordinates
-  elementsMinX = elementsMinX * zoom;
-  elementsMinY = elementsMinY * zoom;
-  elementsMaxX = elementsMaxX * zoom;
-  elementsMaxY = elementsMaxY * zoom;
 
   // The viewport is the rectangle currently visible for the user
   const viewportMinX = -scrollX;
