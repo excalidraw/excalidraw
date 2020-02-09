@@ -280,12 +280,9 @@ const LayerUI = React.memo(
 
             {actionManager.renderAction("changeOpacity")}
 
-            <Stack.Row justifyContent={"space-between"}>
+            <Stack.Row>
               {actionManager.renderAction("sendToBack")}
               {actionManager.renderAction("sendBackward")}
-            </Stack.Row>
-
-            <Stack.Row justifyContent={"space-between"}>
               {actionManager.renderAction("bringToFront")}
               {actionManager.renderAction("bringForward")}
             </Stack.Row>
