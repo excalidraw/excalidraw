@@ -250,8 +250,16 @@ button,
 }
 
 .zIndexButton {
-  width: 26px;
   margin: 0 5px;
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .scroll-back-to-content {
