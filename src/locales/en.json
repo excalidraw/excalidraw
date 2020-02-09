@@ -39,7 +39,8 @@
     "fileTitle": "File title",
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas"
+    "drawingCanvas": "Drawing Canvas",
+    "layers": "Layers"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
