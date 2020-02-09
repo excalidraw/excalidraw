@@ -30,4 +30,5 @@ export { createScene } from "./createScene";
 export {
   getXCoordinateWithSceneState,
   getYCoordinateWithSceneState,
+  getZoomTranslation,
 } from "./transforms";

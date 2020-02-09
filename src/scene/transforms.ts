@@ -26,14 +26,35 @@ export function getYCoordinateWithSceneState(
   return (y + scrollY) * zoom;
 }
 
-// Translate so zoom origin is center of the canvas
-// The translation required is the difference in size based on zoom divided by 2 / scale
+// Calculate the difference of the canvas' center based on zoom level
 export function getZoomTranslation(
   canvas: HTMLCanvasElement,
+  prevZoom: SceneState["zoom"],
   zoom: SceneState["zoom"],
 ) {
-  const zoomTranslationX = (canvas.width - canvas.width * zoom) / 2;
-  const zoomTranslattionY = (canvas.height - canvas.height * zoom) / 2;
+  const context = canvas.getContext("2d");
+  if (context === null) {
+    return { x: 0, y: 0 };
+  }
 
-  return { x: zoomTranslationX, y: zoomTranslattionY };
+  const normalizedCanvasWidth = canvas.width / context.getTransform().a;
+  const normalizedCanvasHeight = canvas.height / context.getTransform().d;
+
+  const previousMiddleOfTheCanvas = {
+    x: (normalizedCanvasWidth / 2) * prevZoom,
+    y: (normalizedCanvasHeight / 2) * prevZoom,
+  };
+  const newMiddleOfTheCanvas = {
+    x: (normalizedCanvasWidth / 2) * zoom,
+    y: (normalizedCanvasHeight / 2) * zoom,
+  };
+  const diffMiddleOfTheCanvas = {
+    x: previousMiddleOfTheCanvas.x - newMiddleOfTheCanvas.x,
+    y: previousMiddleOfTheCanvas.y - newMiddleOfTheCanvas.y,
+  };
+
+  return {
+    x: parseFloat(diffMiddleOfTheCanvas.x.toFixed(8)),
+    y: parseFloat(diffMiddleOfTheCanvas.y.toFixed(8)),
+  };
 }

@@ -14,7 +14,6 @@ import {
 import {
   getXCoordinateWithSceneState,
   getYCoordinateWithSceneState,
-  getZoomTranslation,
 } from "../scene/transforms";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
@@ -82,29 +81,6 @@ export function renderScene(
     );
   }
 
-  // Handle zoom translation
-  function translateContextToZoom() {
-    const zoomContextTranslation = getZoomTranslation(canvas, sceneState.zoom);
-    context.setTransform(
-      getContextTransformScaleX(context.getTransform()),
-      0,
-      0,
-      getContextTransformScaleY(context.getTransform()),
-      zoomContextTranslation.x,
-      zoomContextTranslation.y,
-    );
-  }
-  function resetContextTranslate() {
-    context.setTransform(
-      getContextTransformScaleX(context.getTransform()),
-      0,
-      0,
-      getContextTransformScaleY(context.getTransform()),
-      getContextTransformScaleY(initialContextTransform),
-      getContextTransformScaleY(initialContextTransform),
-    );
-  }
-
   // Paint background
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -122,6 +98,32 @@ export function renderScene(
   }
   context.fillStyle = fillStyle;
 
+  scaleContextToZoom();
+  context.fillStyle = "lightyellow";
+  context.fillRect(
+    sceneState.scrollX,
+    sceneState.scrollY,
+    normalizedCanvasWidth,
+    normalizedCanvasHeight,
+  );
+  context.fillStyle = "lightblue";
+  context.fillRect(
+    normalizedCanvasWidth / 2 - 10 + sceneState.scrollX,
+    normalizedCanvasHeight / 2 - 10 + sceneState.scrollY,
+    20,
+    20,
+  );
+  context.fillStyle = fillStyle;
+  resetContextScale();
+  context.fillStyle = "lightgreen";
+  context.fillRect(
+    normalizedCanvasWidth / 2 - 5,
+    normalizedCanvasHeight / 2 - 5,
+    10,
+    10,
+  );
+  context.fillStyle = fillStyle;
+
   // Paint visible elements
   const visibleElements = elements.filter(element =>
     isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
@@ -131,7 +133,6 @@ export function renderScene(
     }),
   );
   scaleContextToZoom();
-  translateContextToZoom();
   visibleElements.forEach(element => {
     context.translate(
       element.x + sceneState.scrollX,
@@ -143,7 +144,6 @@ export function renderScene(
       -element.y - sceneState.scrollY,
     );
   });
-  resetContextTranslate();
   resetContextScale();
 
   // Pain selection element
@@ -161,8 +161,6 @@ export function renderScene(
 
   // Pain selected elements
   if (renderSelection) {
-    translateContextToZoom();
-
     const selectedElements = elements.filter(element => element.isSelected);
     const dashledLinePadding = 4;
 
@@ -210,8 +208,6 @@ export function renderScene(
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
     }
-
-    resetContextTranslate();
   }
 
   // Paint scrollbars

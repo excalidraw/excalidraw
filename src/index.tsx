@@ -34,6 +34,7 @@ import {
   loadScene,
   calculateScrollCenter,
   loadFromBlob,
+  getZoomTranslation,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -1942,15 +1943,37 @@ export class App extends React.Component<any, AppState> {
     );
   }, 300);
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: any, prevState: AppState) {
+    let localScrollX = this.state.scrollX;
+    let localScrollY = this.state.scrollY;
+
+    if (
+      this.canvas !== null &&
+      this.state.zoom !== 1 &&
+      prevState.zoom !== this.state.zoom
+    ) {
+      const { x, y } = getZoomTranslation(
+        this.canvas,
+        prevState.zoom,
+        this.state.zoom,
+      );
+
+      localScrollX = localScrollX + x;
+      localScrollY = localScrollY + y;
+
+      this.setState({
+        scrollX: localScrollX,
+        scrollY: localScrollY,
+      });
+    }
     const atLeastOneVisibleElement = renderScene(
       elements,
       this.state.selectionElement,
       this.rc!,
       this.canvas!,
       {
-        scrollX: this.state.scrollX,
-        scrollY: this.state.scrollY,
+        scrollX: localScrollX,
+        scrollY: localScrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
       },
