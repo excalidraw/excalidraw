@@ -279,10 +279,16 @@ const LayerUI = React.memo(
             )}
 
             {actionManager.renderAction("changeOpacity")}
-            {actionManager.renderAction("sendToBack")}
-            {actionManager.renderAction("bringToFront")}
-            {actionManager.renderAction("sendBackward")}
-            {actionManager.renderAction("bringForward")}
+
+            <Stack.Row justifyContent={"space-between"}>
+              {actionManager.renderAction("sendToBack")}
+              {actionManager.renderAction("sendBackward")}
+            </Stack.Row>
+
+            <Stack.Row justifyContent={"space-between"}>
+              {actionManager.renderAction("bringToFront")}
+              {actionManager.renderAction("bringForward")}
+            </Stack.Row>
 
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
