@@ -100,7 +100,7 @@ button,
   }
 
   &:active {
-    background-color: #ced4da;
+    background-color: #adb5bd;
   }
 
   &:disabled {
@@ -113,6 +113,9 @@ button,
   background-color: #ced4da;
   &:hover {
     background-color: #ced4da;
+  }
+  &:active {
+    background-color: #adb5bd;
   }
 }
 
@@ -250,8 +253,16 @@ button,
 }
 
 .zIndexButton {
-  width: 26px;
   margin: 0 5px;
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .scroll-back-to-content {
