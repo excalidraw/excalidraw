@@ -60,6 +60,9 @@
   &:focus + .ToolIcon__icon {
     box-shadow: 0 0 0 2px #a5d8ff;
   }
+  &:active + .ToolIcon__icon {
+    background-color: #adb5bd;
+  }
 }
 
 .ToolIcon.ToolIcon__lock {
@@ -91,4 +94,5 @@
   font-size: 0.5em;
   color: #adb5bd; // OC GRAY 5
   font-family: Arial, Helvetica, sans-serif;
+  user-select: none;
 }
