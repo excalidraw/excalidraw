@@ -87,6 +87,7 @@ button,
   border-radius: 4px;
   margin: 0.125rem 0;
   padding: 0.25rem;
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -246,6 +247,11 @@ button,
   clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
   white-space: nowrap; /* added line */
+}
+
+.zIndexButton {
+  width: 26px;
+  margin: 0 5px;
 }
 
 .scroll-back-to-content {
