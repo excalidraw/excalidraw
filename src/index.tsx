@@ -1030,7 +1030,6 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
-                    elementType: "selection",
                   });
                 };
 
@@ -1062,10 +1061,17 @@ export class App extends React.Component<any, AppState> {
                     resetSelection();
                   },
                 });
-                this.setState({
-                  elementType: "selection",
-                  editingElement: element,
-                });
+                if (!this.state.elementLocked) {
+                  resetCursor();
+                  this.setState({
+                    editingElement: element,
+                    elementType: "selection",
+                  });
+                } else {
+                  this.setState({
+                    editingElement: element,
+                  });
+                }
                 return;
               } else if (
                 this.state.elementType === "arrow" ||
@@ -1728,7 +1734,6 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
-                  elementType: "selection",
                 });
               };
 
