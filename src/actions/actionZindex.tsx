@@ -22,7 +22,11 @@ export const actionSendBackward: Action = {
   commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.altKey && event.key === "B",
   PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
+    <button
+      type="button"
+      className="zIndexButton"
+      onClick={e => updateData(null)}
+    >
       Send Backward
     </button>
   ),
@@ -41,7 +45,11 @@ export const actionBringForward: Action = {
   commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.altKey && event.key === "F",
   PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
+    <button
+      type="button"
+      className="zIndexButton"
+      onClick={e => updateData(null)}
+    >
       Bring Forward
     </button>
   ),
@@ -59,7 +67,11 @@ export const actionSendToBack: Action = {
   commitToHistory: () => true,
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "B",
   PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
+    <button
+      type="button"
+      className="zIndexButton"
+      onClick={e => updateData(null)}
+    >
       Send to Back
     </button>
   ),
@@ -77,7 +89,11 @@ export const actionBringToFront: Action = {
   contextItemLabel: "labels.bringToFront",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "F",
   PanelComponent: ({ updateData }) => (
-    <button type="button" onClick={e => updateData(null)}>
+    <button
+      type="button"
+      className="zIndexButton"
+      onClick={e => updateData(null)}
+    >
       Bring to Front
     </button>
   ),
