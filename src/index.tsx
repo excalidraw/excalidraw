@@ -48,6 +48,7 @@ import {
   capitalizeString,
   distance,
   distance2d,
+  resetCursor,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -101,10 +102,6 @@ import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
-
-function resetCursor() {
-  document.documentElement.style.cursor = "";
-}
 
 function setCursorForShape(shape: string) {
   if (shape === "selection") {
@@ -1563,10 +1560,17 @@ export class App extends React.Component<any, AppState> {
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
-                    this.setState({
-                      draggingElement: null,
-                      elementType: "selection",
-                    });
+                    if (!elementLocked) {
+                      resetCursor();
+                      this.setState({
+                        draggingElement: null,
+                        elementType: "selection",
+                      });
+                    } else {
+                      this.setState({
+                        draggingElement: null,
+                      });
+                    }
                   }
                   return;
                 }
