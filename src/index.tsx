@@ -275,6 +275,16 @@ const LayerUI = React.memo(
 
             {actionManager.renderAction("changeOpacity")}
 
+            <fieldset>
+              <legend>{t("labels.layers")}</legend>
+              <div className="buttonList">
+                {actionManager.renderAction("sendToBack")}
+                {actionManager.renderAction("sendBackward")}
+                {actionManager.renderAction("bringToFront")}
+                {actionManager.renderAction("bringForward")}
+              </div>
+            </fieldset>
+
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
         </Island>
