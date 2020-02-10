@@ -62,17 +62,48 @@ export function newTextElement(
   return textElement;
 }
 
-export function duplicateElement(element: ReturnType<typeof newElement>) {
-  const copy = {
-    ...element,
-  };
-  if ("points" in copy) {
-    copy.points = Array.isArray(element.points)
-      ? JSON.parse(JSON.stringify(element.points))
-      : element.points;
+// Simplified deep clone for the purpose of cloning ExcalidrawElement only
+//  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
+//
+// Adapted from https://github.com/lukeed/klona
+function _duplicateElement(val: any, depth: number = 0) {
+  if (val == null || typeof val !== "object") {
+    return val;
   }
 
-  delete copy.shape;
+  let k, tmp;
+  const str = Object.prototype.toString.call(val);
+
+  if (str === "[object Object]") {
+    tmp =
+      typeof val.constructor === "function"
+        ? Object.create(Object.getPrototypeOf(val))
+        : {};
+    for (k in val) {
+      if (val.hasOwnProperty(k)) {
+        // don't copy top-level shape property, which we want to regenerate
+        if (depth === 0 && k === "shape") {
+          continue;
+        }
+        tmp[k] = _duplicateElement(val[k], depth + 1);
+      }
+    }
+    return tmp;
+  }
+
+  if (str === "[object Array]") {
+    k = val.length;
+    for (tmp = new Array(k); k--; ) {
+      tmp[k] = _duplicateElement(val[k], depth + 1);
+    }
+    return tmp;
+  }
+
+  return val;
+}
+
+export function duplicateElement(element: ReturnType<typeof newElement>) {
+  const copy = _duplicateElement(element);
   copy.id = nanoid();
   copy.seed = randomSeed();
   return copy;

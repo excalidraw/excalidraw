@@ -30,6 +30,11 @@
     "rewire": "4.0.1",
     "typescript": "3.7.5"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|browser-nativefs)/)"
+    ]
+  },
   "eslintConfig": {
     "extends": [
       "prettier",
