@@ -48,6 +48,7 @@ import {
   capitalizeString,
   distance,
   distance2d,
+  resetCursor,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -101,10 +102,6 @@ import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
-
-function resetCursor() {
-  document.documentElement.style.cursor = "";
-}
 
 function setCursorForShape(shape: string) {
   if (shape === "selection") {
@@ -1014,6 +1011,12 @@ export class App extends React.Component<any, AppState> {
               }
 
               if (isTextElement(element)) {
+                // if we're currently still editing text, clicking outside
+                //  should only finalize it, not create another (irrespective
+                //  of state.elementLocked)
+                if (this.state.editingElement?.type === "text") {
+                  return;
+                }
                 let textX = e.clientX;
                 let textY = e.clientY;
                 if (!e.altKey) {
@@ -1033,7 +1036,6 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
-                    elementType: "selection",
                   });
                 };
 
@@ -1058,6 +1060,9 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    if (this.state.elementLocked) {
+                      setCursorForShape(this.state.elementType);
+                    }
                     history.resumeRecording();
                     resetSelection();
                   },
@@ -1065,10 +1070,17 @@ export class App extends React.Component<any, AppState> {
                     resetSelection();
                   },
                 });
-                this.setState({
-                  elementType: "selection",
-                  editingElement: element,
-                });
+                resetCursor();
+                if (!this.state.elementLocked) {
+                  this.setState({
+                    editingElement: element,
+                    elementType: "selection",
+                  });
+                } else {
+                  this.setState({
+                    editingElement: element,
+                  });
+                }
                 return;
               } else if (
                 this.state.elementType === "arrow" ||
@@ -1563,10 +1575,17 @@ export class App extends React.Component<any, AppState> {
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
-                    this.setState({
-                      draggingElement: null,
-                      elementType: "selection",
-                    });
+                    if (!elementLocked) {
+                      resetCursor();
+                      this.setState({
+                        draggingElement: null,
+                        elementType: "selection",
+                      });
+                    } else {
+                      this.setState({
+                        draggingElement: null,
+                      });
+                    }
                   }
                   return;
                 }
@@ -1660,6 +1679,8 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mouseup", onMouseUp);
             }}
             onDoubleClick={e => {
+              resetCursor();
+
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
               const elementAtPosition = getElementAtPosition(elements, x, y);
@@ -1724,7 +1745,6 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
-                  elementType: "selection",
                 });
               };
 
