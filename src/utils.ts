@@ -126,3 +126,7 @@ export function distance2d(x1: number, y1: number, x2: number, y2: number) {
   const yd = y2 - y1;
   return Math.sqrt(xd * xd + yd * yd);
 }
+
+export function resetCursor() {
+  document.documentElement.style.cursor = "";
+}
