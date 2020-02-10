@@ -81,6 +81,30 @@ export function renderScene(
     );
   }
 
+  // Handle scroll
+  function translateContextToScroll() {
+    context.setTransform(
+      getContextTransformScaleX(context.getTransform()),
+      0,
+      0,
+      getContextTransformScaleY(context.getTransform()),
+      getContextTransformTranslateX(initialContextTransform) +
+        sceneState.scrollX,
+      getContextTransformTranslateY(initialContextTransform) +
+        sceneState.scrollY,
+    );
+  }
+  function resetTranslateContext() {
+    context.setTransform(
+      getContextTransformScaleX(context.getTransform()),
+      0,
+      0,
+      getContextTransformScaleY(context.getTransform()),
+      getContextTransformTranslateX(initialContextTransform),
+      getContextTransformTranslateY(initialContextTransform),
+    );
+  }
+
   // Paint background
   const fillStyle = context.fillStyle;
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -98,32 +122,6 @@ export function renderScene(
   }
   context.fillStyle = fillStyle;
 
-  scaleContextToZoom();
-  context.fillStyle = "lightyellow";
-  context.fillRect(
-    sceneState.scrollX,
-    sceneState.scrollY,
-    normalizedCanvasWidth,
-    normalizedCanvasHeight,
-  );
-  context.fillStyle = "lightblue";
-  context.fillRect(
-    normalizedCanvasWidth / 2 - 10 + sceneState.scrollX,
-    normalizedCanvasHeight / 2 - 10 + sceneState.scrollY,
-    20,
-    20,
-  );
-  context.fillStyle = fillStyle;
-  resetContextScale();
-  context.fillStyle = "lightgreen";
-  context.fillRect(
-    normalizedCanvasWidth / 2 - 5,
-    normalizedCanvasHeight / 2 - 5,
-    10,
-    10,
-  );
-  context.fillStyle = fillStyle;
-
   // Paint visible elements
   const visibleElements = elements.filter(element =>
     isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
@@ -132,31 +130,24 @@ export function renderScene(
       zoom: sceneState.zoom,
     }),
   );
+
   scaleContextToZoom();
+  translateContextToScroll();
   visibleElements.forEach(element => {
-    context.translate(
-      element.x + sceneState.scrollX,
-      element.y + sceneState.scrollY,
-    );
+    context.translate(element.x, element.y);
     renderElement(element, rc, context);
-    context.translate(
-      -element.x - sceneState.scrollX,
-      -element.y - sceneState.scrollY,
-    );
+    context.translate(-element.x, -element.y);
   });
+  resetTranslateContext();
   resetContextScale();
 
   // Pain selection element
   if (selectionElement) {
-    context.translate(
-      selectionElement.x + sceneState.scrollX,
-      selectionElement.y + sceneState.scrollY,
-    );
+    translateContextToScroll();
+    context.translate(selectionElement.x, selectionElement.y);
     renderElement(selectionElement, rc, context);
-    context.translate(
-      -selectionElement.x - sceneState.scrollX,
-      -selectionElement.y - sceneState.scrollY,
-    );
+    context.translate(-selectionElement.x, -selectionElement.y);
+    resetTranslateContext();
   }
 
   // Pain selected elements

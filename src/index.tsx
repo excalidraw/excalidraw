@@ -1962,6 +1962,7 @@ export class App extends React.Component<any, AppState> {
         scrollY: localScrollY,
       });
     }
+
     const atLeastOneVisibleElement = renderScene(
       elements,
       this.state.selectionElement,

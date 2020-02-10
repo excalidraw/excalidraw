@@ -37,20 +37,13 @@ export function getZoomTranslation(
     return { x: 0, y: 0 };
   }
 
-  const normalizedCanvasWidth = canvas.width / context.getTransform().a;
-  const normalizedCanvasHeight = canvas.height / context.getTransform().d;
+  const normalizedCanvasWidth = canvas.width;
+  const normalizedCanvasHeight = canvas.height;
 
-  const previousMiddleOfTheCanvas = {
-    x: (normalizedCanvasWidth / 2) * prevZoom,
-    y: (normalizedCanvasHeight / 2) * prevZoom,
-  };
-  const newMiddleOfTheCanvas = {
-    x: (normalizedCanvasWidth / 2) * zoom,
-    y: (normalizedCanvasHeight / 2) * zoom,
-  };
+  const zoomDiff = prevZoom - zoom;
   const diffMiddleOfTheCanvas = {
-    x: previousMiddleOfTheCanvas.x - newMiddleOfTheCanvas.x,
-    y: previousMiddleOfTheCanvas.y - newMiddleOfTheCanvas.y,
+    x: (normalizedCanvasWidth * zoomDiff) / 2,
+    y: (normalizedCanvasHeight * zoomDiff) / 2,
   };
 
   return {
