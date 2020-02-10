@@ -1,13 +1,64 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
-import { getDiamondPoints, getArrowPoints } from "../element/bounds";
+import {
+  getDiamondPoints,
+  getArrowPoints,
+  getElementAbsoluteCoords,
+} from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
-import { SVG_NS } from "../utils";
+import { SVG_NS, distance } from "../utils";
 import rough from "roughjs/bin/rough";
+
+function generateElementCanvas(element: ExcalidrawElement) {
+  const canvas = document.createElement("canvas");
+  var context = canvas.getContext("2d")!;
+
+  const isLinear = /\b(arrow|line)\b/.test(element.type);
+
+  if (isLinear) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    canvas.width = (distance(x1, x2) + 40) * window.devicePixelRatio;
+    canvas.height = (distance(y1, y2) + 40) * window.devicePixelRatio;
+    element.canvasOffsetX = element.x > x1 ? distance(element.x, x1) : 0;
+    element.canvasOffsetY = element.y > y1 ? distance(element.y, y1) : 0;
+    context.translate(element.canvasOffsetX, element.canvasOffsetY);
+  } else {
+    canvas.width = (element.width + 40) * window.devicePixelRatio;
+    canvas.height = (element.height + 40) * window.devicePixelRatio;
+  }
+
+  context.translate(20, 20);
+  context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  var rc2 = rough.canvas(canvas);
+  context.globalAlpha = element.opacity / 100;
+  if (isLinear) {
+    (element.shape as Drawable[]).forEach(shape => rc2.draw(shape));
+  } else if (isTextElement(element)) {
+    const font = context.font;
+    context.font = element.font;
+    const fillStyle = context.fillStyle;
+    context.fillStyle = element.strokeColor;
+    // Canvas does not support multiline text by default
+    const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+    const lineHeight = element.height / lines.length;
+    const offset = element.height - element.baseline;
+    for (let i = 0; i < lines.length; i++) {
+      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+    }
+    context.fillStyle = fillStyle;
+    context.font = font;
+  } else {
+    rc2.draw(element.shape as Drawable);
+  }
+  context.globalAlpha = 1;
+  element.canvas = canvas;
+  context.translate(-20, -20);
+}
 
 function generateElement(
   element: ExcalidrawElement,
@@ -33,20 +84,6 @@ function generateElement(
             seed: element.seed,
           },
         );
-
-        const canvas = document.createElement("canvas");
-        canvas.width = (element.width + 20) * window.devicePixelRatio;
-        canvas.height = (element.height + 20) * window.devicePixelRatio;
-        var context = canvas.getContext("2d")!;
-        context.translate(10, 10);
-        context.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-        var rc2 = rough.canvas(canvas);
-        context.globalAlpha = element.opacity / 100;
-        rc2.draw(element.shape as Drawable);
-        context.globalAlpha = 1;
-        (element as any).canvas = canvas;
-        context.translate(-10, -10);
 
         break;
       case "diamond": {
@@ -132,7 +169,26 @@ function generateElement(
         break;
       }
     }
+
+    generateElementCanvas(element);
   }
+}
+
+function renderFromElementCanvas(
+  element: ExcalidrawElement | ExcalidrawTextElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) {
+  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+  context.translate(-20, -20);
+  // @ts-ignore
+  context.drawImage(
+    element.canvas!,
+    -element.canvasOffsetX,
+    -element.canvasOffsetY,
+  );
+  context.translate(20, 20);
+  context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
 export function renderElement(
@@ -153,43 +209,22 @@ export function renderElement(
     case "diamond":
     case "ellipse":
       generateElement(element, generator);
-      if ((element as any).canvas) {
-        context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-        context.translate(-10, -10);
-        context.drawImage((element as any).canvas, 0, 0);
-        context.translate(10, 10);
-        context.scale(window.devicePixelRatio, window.devicePixelRatio);
-      } else {
-        context.globalAlpha = element.opacity / 100;
-        rc.draw(element.shape as Drawable);
-        context.globalAlpha = 1;
-      }
+      renderFromElementCanvas(element, rc, context);
       break;
     case "line":
     case "arrow": {
       generateElement(element, generator);
-      context.globalAlpha = element.opacity / 100;
-      (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
-      context.globalAlpha = 1;
+      renderFromElementCanvas(element, rc, context);
       break;
     }
     default: {
       if (isTextElement(element)) {
-        context.globalAlpha = element.opacity / 100;
-        const font = context.font;
-        context.font = element.font;
-        const fillStyle = context.fillStyle;
-        context.fillStyle = element.strokeColor;
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const offset = element.height - element.baseline;
-        for (let i = 0; i < lines.length; i++) {
-          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+        if (element.canvas) {
+          renderFromElementCanvas(element, rc, context);
+        } else {
+          generateElementCanvas(element);
+          renderFromElementCanvas(element, rc, context);
         }
-        context.fillStyle = fillStyle;
-        context.font = font;
-        context.globalAlpha = 1;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }

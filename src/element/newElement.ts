@@ -36,6 +36,9 @@ export function newElement(
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,
     points: [] as Point[],
+    canvas: null as HTMLCanvasElement | null,
+    canvasOffsetX: 0,
+    canvasOffsetY: 0,
   };
   return element;
 }
