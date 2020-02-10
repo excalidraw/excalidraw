@@ -2,11 +2,12 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 import {
-  getArrowPoints,
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getLinePoints,
+  getLinearElementAbsoluteBounds,
 } from "./bounds";
+import { Point } from "roughjs/bin/geometry";
+import { Drawable, OpSet } from "roughjs/bin/core";
 
 function isElementDraggableFromInside(element: ExcalidrawElement): boolean {
   return element.backgroundColor !== "transparent" || element.isSelected;
@@ -59,9 +60,8 @@ export function hitTest(
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
-    } else {
-      return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
     }
+    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
@@ -86,7 +86,6 @@ export function hitTest(
   } else if (element.type === "diamond") {
     x -= element.x;
     y -= element.y;
-
     let [
       topX,
       topY,
@@ -100,8 +99,12 @@ export function hitTest(
 
     if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
-      if (topY > bottomY) [bottomY, topY] = [topY, bottomY];
-      if (rightX < leftX) [leftX, rightX] = [rightX, leftX];
+      if (topY > bottomY) {
+        [bottomY, topY] = [topY, bottomY];
+      }
+      if (rightX < leftX) {
+        [leftX, rightX] = [rightX, leftX];
+      }
 
       topY -= lineThreshold;
       bottomY += lineThreshold;
@@ -144,27 +147,22 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
         lineThreshold
     );
-  } else if (element.type === "arrow") {
-    let [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
+  } else if (element.type === "arrow" || element.type === "line") {
+    if (!element.shape) {
+      return false;
+    }
+    const shape = element.shape as Drawable[];
 
-    return (
-      //    \
-      distanceBetweenPointAndSegment(x, y, x3, y3, x2, y2) < lineThreshold ||
-      // -----
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold ||
-      //    /
-      distanceBetweenPointAndSegment(x, y, x4, y4, x2, y2) < lineThreshold
-    );
-  } else if (element.type === "line") {
-    const [x1, y1, x2, y2] = getLinePoints(element);
-    // The computation is done at the origin, we need to add a translation
-    x -= element.x;
-    y -= element.y;
+    const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
+    if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) {
+      return false;
+    }
 
-    return distanceBetweenPointAndSegment(x, y, x1, y1, x2, y2) < lineThreshold;
+    const relX = x - element.x;
+    const relY = y - element.y;
+
+    // hit thest all "subshapes" of the linear element
+    return shape.some(s => hitTestRoughShape(s.sets, relX, relY));
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
@@ -172,7 +170,85 @@ export function hitTest(
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
-  } else {
-    throw new Error("Unimplemented type " + element.type);
   }
+  throw new Error(`Unimplemented type ${element.type}`);
 }
+
+const pointInBezierEquation = (
+  p0: Point,
+  p1: Point,
+  p2: Point,
+  p3: Point,
+  [mx, my]: Point,
+) => {
+  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+  const equation = (t: number, idx: number) =>
+    Math.pow(1 - t, 3) * p3[idx] +
+    3 * t * Math.pow(1 - t, 2) * p2[idx] +
+    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+    p0[idx] * Math.pow(t, 3);
+
+  const epsilon = 20;
+  // go through t in increments of 0.01
+  let t = 0;
+  while (t <= 1.0) {
+    const tx = equation(t, 0);
+    const ty = equation(t, 1);
+
+    const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
+
+    if (diff < epsilon) {
+      return true;
+    }
+
+    t += 0.01;
+  }
+
+  return false;
+};
+
+const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
+  // read operations from first opSet
+  const ops = opSet[0].ops;
+
+  // set start position as (0,0) just in case
+  // move operation does not exist (unlikely but it is worth safekeeping it)
+  let currentP: Point = [0, 0];
+
+  return ops.some(({ op, data }, idx) => {
+    // There are only four operation types:
+    // move, bcurveTo, lineTo, and curveTo
+    if (op === "move") {
+      // change starting point
+      currentP = data as Point;
+      // move operation does not draw anything; so, it always
+      // returns false
+    } else if (op === "bcurveTo") {
+      // create points from bezier curve
+      // bezier curve stores data as a flattened array of three positions
+      // [x1, y1, x2, y2, x3, y3]
+      const p1 = [data[0], data[1]] as Point;
+      const p2 = [data[2], data[3]] as Point;
+      const p3 = [data[4], data[5]] as Point;
+
+      const p0 = currentP;
+      currentP = p3;
+
+      // check if points are on the curve
+      // cubic bezier curves require four parameters
+      // the first parameter is the last stored position (p0)
+      const retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
+
+      // set end point of bezier curve as the new starting point for
+      // upcoming operations as each operation is based on the last drawn
+      // position of the previous operation
+      return retVal;
+    } else if (op === "lineTo") {
+      // TODO: Implement this
+    } else if (op === "qcurveTo") {
+      // TODO: Implement this
+    }
+
+    return false;
+  });
+};

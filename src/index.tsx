@@ -16,7 +16,6 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
-  resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./element";
 import {
@@ -24,7 +23,6 @@ import {
   deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
-  restoreFromLocalStorage,
   saveToLocalStorage,
   getElementAtPosition,
   createScene,
@@ -33,9 +31,9 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  importFromBackend,
-  addToLoadedScenes,
-  loadedScenes,
+  loadScene,
+  calculateScrollCenter,
+  loadFromBlob,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -43,11 +41,14 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
+  isWritableElement,
   isInputLike,
   isToolIcon,
   debounce,
   capitalizeString,
   distance,
+  distance2d,
+  resetCursor,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -82,6 +83,7 @@ import {
   actionSaveScene,
   actionCopyStyles,
   actionPasteStyles,
+  actionFinalize,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -92,18 +94,14 @@ import { ToolButton } from "./components/ToolButton";
 import { LockIcon } from "./components/LockIcon";
 import { ExportDialog } from "./components/ExportDialog";
 import { LanguageList } from "./components/LanguageList";
+import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
-import { StoredScenesList } from "./components/StoredScenesList";
+import { HintViewer } from "./components/HintViewer";
+
+import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
-
-const CANVAS_WINDOW_OFFSET_LEFT = 0;
-const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-function resetCursor() {
-  document.documentElement.style.cursor = "";
-}
 
 function setCursorForShape(shape: string) {
   if (shape === "selection") {
@@ -114,6 +112,7 @@ function setCursorForShape(shape: string) {
   }
 }
 
+const DRAGGING_THRESHOLD = 10; // 10px
 const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 const ELEMENT_TRANSLATE_AMOUNT = 1;
 const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -137,26 +136,9 @@ export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
   { scrollX, scrollY }: { scrollX: number; scrollY: number },
 ) {
-  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
-  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  const x = clientX - scrollX;
+  const y = clientY - scrollY;
   return { x, y };
-}
-
-function pickAppStatePropertiesForHistory(
-  appState: AppState,
-): Partial<AppState> {
-  return {
-    exportBackground: appState.exportBackground,
-    currentItemStrokeColor: appState.currentItemStrokeColor,
-    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-    currentItemFillStyle: appState.currentItemFillStyle,
-    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-    currentItemRoughness: appState.currentItemRoughness,
-    currentItemOpacity: appState.currentItemOpacity,
-    currentItemFont: appState.currentItemFont,
-    viewBackgroundColor: appState.viewBackgroundColor,
-    name: appState.name,
-  };
 }
 
 let cursorX = 0;
@@ -165,14 +147,300 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isHoldingMouseButton: boolean = false;
 
+interface LayerUIProps {
+  actionManager: ActionManager;
+  appState: AppState;
+  canvas: HTMLCanvasElement | null;
+  setAppState: any;
+  elements: readonly ExcalidrawElement[];
+  language: string;
+  setElements: (elements: readonly ExcalidrawElement[]) => void;
+}
+
+const LayerUI = React.memo(
+  ({
+    actionManager,
+    appState,
+    setAppState,
+    canvas,
+    elements,
+    language,
+    setElements,
+  }: LayerUIProps) => {
+    function renderCanvasActions() {
+      return (
+        <Stack.Col gap={4}>
+          <Stack.Row justifyContent={"space-between"}>
+            {actionManager.renderAction("loadScene")}
+            {actionManager.renderAction("saveScene")}
+            <ExportDialog
+              elements={elements}
+              appState={appState}
+              actionManager={actionManager}
+              onExportToPng={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("png", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToSvg={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("svg", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToClipboard={(exportedElements, scale) => {
+                if (canvas) {
+                  exportCanvas("clipboard", exportedElements, canvas, {
+                    exportBackground: appState.exportBackground,
+                    name: appState.name,
+                    viewBackgroundColor: appState.viewBackgroundColor,
+                    scale,
+                  });
+                }
+              }}
+              onExportToBackend={exportedElements => {
+                if (canvas) {
+                  exportCanvas(
+                    "backend",
+                    exportedElements.map(element => ({
+                      ...element,
+                      isSelected: false,
+                    })),
+                    canvas,
+                    appState,
+                  );
+                }
+              }}
+            />
+            {actionManager.renderAction("clearCanvas")}
+          </Stack.Row>
+          {actionManager.renderAction("changeViewBackgroundColor")}
+        </Stack.Col>
+      );
+    }
+
+    function renderSelectedShapeActions(
+      elements: readonly ExcalidrawElement[],
+    ) {
+      const { elementType, editingElement } = appState;
+      const targetElements = editingElement
+        ? [editingElement]
+        : elements.filter(el => el.isSelected);
+      if (!targetElements.length && elementType === "selection") {
+        return null;
+      }
+
+      return (
+        <Island padding={4}>
+          <div className="panelColumn">
+            {actionManager.renderAction("changeStrokeColor")}
+            {(hasBackground(elementType) ||
+              targetElements.some(element => hasBackground(element.type))) && (
+              <>
+                {actionManager.renderAction("changeBackgroundColor")}
+
+                {actionManager.renderAction("changeFillStyle")}
+              </>
+            )}
+
+            {(hasStroke(elementType) ||
+              targetElements.some(element => hasStroke(element.type))) && (
+              <>
+                {actionManager.renderAction("changeStrokeWidth")}
+
+                {actionManager.renderAction("changeSloppiness")}
+              </>
+            )}
+
+            {(hasText(elementType) ||
+              targetElements.some(element => hasText(element.type))) && (
+              <>
+                {actionManager.renderAction("changeFontSize")}
+
+                {actionManager.renderAction("changeFontFamily")}
+              </>
+            )}
+
+            {actionManager.renderAction("changeOpacity")}
+
+            <fieldset>
+              <legend>{t("labels.layers")}</legend>
+              <div className="buttonList">
+                {actionManager.renderAction("sendToBack")}
+                {actionManager.renderAction("sendBackward")}
+                {actionManager.renderAction("bringToFront")}
+                {actionManager.renderAction("bringForward")}
+              </div>
+            </fieldset>
+
+            {actionManager.renderAction("deleteSelectedElements")}
+          </div>
+        </Island>
+      );
+    }
+
+    function renderShapesSwitcher() {
+      return (
+        <>
+          {SHAPES.map(({ value, icon }, index) => {
+            const label = t(`toolBar.${value}`);
+            return (
+              <ToolButton
+                key={value}
+                type="radio"
+                icon={icon}
+                checked={appState.elementType === value}
+                name="editor-current-shape"
+                title={`${capitalizeString(label)} — ${
+                  capitalizeString(value)[0]
+                }, ${index + 1}`}
+                keyBindingLabel={`${index + 1}`}
+                aria-label={capitalizeString(label)}
+                aria-keyshortcuts={`${label[0]} ${index + 1}`}
+                onChange={() => {
+                  setAppState({ elementType: value, multiElement: null });
+                  setElements(clearSelection(elements));
+                  document.documentElement.style.cursor =
+                    value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+                  setAppState({});
+                }}
+              ></ToolButton>
+            );
+          })}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <FixedSideContainer side="top">
+          <div className="App-menu App-menu_top">
+            <Stack.Col gap={4} align="end">
+              <section
+                className="App-right-menu"
+                aria-labelledby="canvas-actions-title"
+              >
+                <h2 className="visually-hidden" id="canvas-actions-title">
+                  {t("headings.canvasActions")}
+                </h2>
+                <Island padding={4}>{renderCanvasActions()}</Island>
+              </section>
+              <section
+                className="App-right-menu"
+                aria-labelledby="selected-shape-title"
+              >
+                <h2 className="visually-hidden" id="selected-shape-title">
+                  {t("headings.selectedShapeActions")}
+                </h2>
+                {renderSelectedShapeActions(elements)}
+              </section>
+            </Stack.Col>
+            <section aria-labelledby="shapes-title">
+              <Stack.Col gap={4} align="start">
+                <Stack.Row gap={1}>
+                  <Island padding={1}>
+                    <h2 className="visually-hidden" id="shapes-title">
+                      {t("headings.shapes")}
+                    </h2>
+                    <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                  </Island>
+                  <LockIcon
+                    checked={appState.elementLocked}
+                    onChange={() => {
+                      setAppState({
+                        elementLocked: !appState.elementLocked,
+                        elementType: appState.elementLocked
+                          ? "selection"
+                          : appState.elementType,
+                      });
+                    }}
+                    title={t("toolBar.lock")}
+                  />
+                </Stack.Row>
+              </Stack.Col>
+            </section>
+            <div />
+          </div>
+        </FixedSideContainer>
+        <footer role="contentinfo">
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
+          <LanguageList
+            onChange={lng => {
+              setLanguage(lng);
+              setAppState({});
+            }}
+            languages={languages}
+            currentLanguage={language}
+          />
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
+        </footer>
+      </>
+    );
+  },
+  (prev, next) => {
+    const getNecessaryObj = (appState: AppState): Partial<AppState> => {
+      const {
+        draggingElement,
+        resizingElement,
+        multiElement,
+        editingElement,
+        isResizing,
+        cursorX,
+        cursorY,
+        ...ret
+      } = appState;
+      return ret;
+    };
+    const prevAppState = getNecessaryObj(prev.appState);
+    const nextAppState = getNecessaryObj(next.appState);
+
+    const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+
+    return (
+      prev.language === next.language &&
+      prev.elements === next.elements &&
+      keys.every(k => prevAppState[k] === nextAppState[k])
+    );
+  },
+);
+
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
 
-  actionManager: ActionManager = new ActionManager();
+  actionManager: ActionManager;
   canvasOnlyActions: Array<Action>;
   constructor(props: any) {
     super(props);
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => elements,
+    );
+    this.actionManager.registerAction(actionFinalize);
     this.actionManager.registerAction(actionDeleteSelected);
     this.actionManager.registerAction(actionSendToBack);
     this.actionManager.registerAction(actionBringToFront);
@@ -203,47 +471,41 @@ export class App extends React.Component<any, AppState> {
     this.canvasOnlyActions = [actionSelectAll];
   }
 
-  private syncActionResult = (res: ActionResult) => {
-    if (res.elements !== undefined) {
+  private syncActionResult = (
+    res: ActionResult,
+    commitToHistory: boolean = true,
+  ) => {
+    if (res.elements) {
       elements = res.elements;
+      if (commitToHistory) {
+        history.resumeRecording();
+      }
       this.setState({});
     }
 
-    if (res.appState !== undefined) {
+    if (res.appState) {
+      if (commitToHistory) {
+        history.resumeRecording();
+      }
       this.setState({ ...res.appState });
     }
   };
 
   private onCut = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
+    if (isWritableElement(e.target)) {
+      return;
+    }
+    copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
+    history.resumeRecording();
     this.setState({});
     e.preventDefault();
   };
   private onCopy = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
-    e.clipboardData?.setData(
-      "text/plain",
-      JSON.stringify(
-        elements
-          .filter(element => element.isSelected)
-          .map(({ shape, ...el }) => el),
-      ),
-    );
-    e.preventDefault();
-  };
-  private onPaste = (e: ClipboardEvent) => {
-    if (isInputLike(e.target) && !isToolIcon(e.target)) return;
-    const paste = e.clipboardData?.getData("text") || "";
-    this.addElementsFromPaste(paste);
+    if (isWritableElement(e.target)) {
+      return;
+    }
+    copyToAppClipboard(elements);
     e.preventDefault();
   };
 
@@ -253,43 +515,9 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  public shouldComponentUpdate(props: any, nextState: AppState) {
-    if (!history.isRecording()) {
-      // temporary hack to fix #592
-      // eslint-disable-next-line react/no-direct-mutation-state
-      this.state = nextState;
-      this.componentDidUpdate();
-      return false;
-    }
-    return true;
-  }
-
-  private async loadScene(id: string | null) {
-    let data;
-    let selectedId;
-    if (id != null) {
-      data = await importFromBackend(id);
-      addToLoadedScenes(id);
-      selectedId = id;
-      window.history.replaceState({}, "Excalidraw", window.location.origin);
-    } else {
-      data = restoreFromLocalStorage();
-    }
-
-    if (data.elements) {
-      elements = data.elements;
-    }
-
-    if (data.appState) {
-      this.setState({ ...data.appState, selectedId });
-    } else {
-      this.setState({});
-    }
-  }
-
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.onPaste);
+    document.addEventListener("paste", this.pasteFromClipboard);
     document.addEventListener("cut", this.onCut);
 
     document.addEventListener("keydown", this.onKeyDown, false);
@@ -298,16 +526,30 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
     window.addEventListener("blur", this.onUnload, false);
+    window.addEventListener("dragover", e => e.preventDefault(), false);
+    window.addEventListener("drop", e => e.preventDefault(), false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
-    this.loadScene(id);
+    if (id) {
+      // Backwards compatibility with legacy url format
+      this.syncActionResult(await loadScene(id));
+    } else {
+      const match = window.location.hash.match(
+        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+      );
+      if (match) {
+        this.syncActionResult(await loadScene(match[1], match[2]));
+      } else {
+        this.syncActionResult(await loadScene(null));
+      }
+    }
   }
 
   public componentWillUnmount() {
     document.removeEventListener("copy", this.onCopy);
-    document.removeEventListener("paste", this.onPaste);
+    document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
@@ -333,26 +575,16 @@ export class App extends React.Component<any, AppState> {
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE && !this.state.draggingElement) {
-      elements = clearSelection(elements);
-      this.setState({ elementType: "selection" });
-      if (window.document.activeElement instanceof HTMLElement) {
-        window.document.activeElement.blur();
-      }
-      event.preventDefault();
+    if (
+      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+      // case: using arrows to move between buttons
+      (isArrowKey(event.key) && isInputLike(event.target))
+    ) {
       return;
     }
-    if (isInputLike(event.target)) return;
 
-    const actionResult = this.actionManager.handleKeyDown(
-      event,
-      elements,
-      this.state,
-    );
-
-    if (actionResult) {
-      this.syncActionResult(actionResult);
-      if (actionResult) return;
+    if (this.actionManager.handleKeyDown(event)) {
+      return;
     }
 
     const shape = findShapeByKey(event.key);
@@ -364,10 +596,15 @@ export class App extends React.Component<any, AppState> {
       elements = elements.map(el => {
         if (el.isSelected) {
           const element = { ...el };
-          if (event.key === KEYS.ARROW_LEFT) element.x -= step;
-          else if (event.key === KEYS.ARROW_RIGHT) element.x += step;
-          else if (event.key === KEYS.ARROW_UP) element.y -= step;
-          else if (event.key === KEYS.ARROW_DOWN) element.y += step;
+          if (event.key === KEYS.ARROW_LEFT) {
+            element.x -= step;
+          } else if (event.key === KEYS.ARROW_RIGHT) {
+            element.x += step;
+          } else if (event.key === KEYS.ARROW_UP) {
+            element.y -= step;
+          } else if (event.key === KEYS.ARROW_DOWN) {
+            element.y += step;
+          }
           return element;
         }
         return el;
@@ -377,32 +614,37 @@ export class App extends React.Component<any, AppState> {
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
       !event.ctrlKey &&
-      !event.shiftKey &&
       !event.altKey &&
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (!isHoldingSpace) {
-        setCursorForShape(shape);
-      }
-      elements = clearSelection(elements);
-      this.setState({ elementType: shape });
-    } else if (event[KEYS.META] && event.code === "KeyZ") {
+      this.selectShapeTool(shape);
+      // Undo action
+    } else if (event[KEYS.META] && /z/i.test(event.key)) {
       event.preventDefault();
+
+      if (
+        this.state.multiElement ||
+        this.state.resizingElement ||
+        this.state.editingElement ||
+        this.state.draggingElement
+      ) {
+        return;
+      }
 
       if (event.shiftKey) {
         // Redo action
         const data = history.redoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState(data.appState);
+          this.setState({ ...data.appState });
         }
       } else {
         // undo action
         const data = history.undoOnce();
         if (data !== null) {
           elements = data.elements;
-          this.setState(data.appState);
+          this.setState({ ...data.appState });
         }
       }
     } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
@@ -429,285 +671,93 @@ export class App extends React.Component<any, AppState> {
 
   private removeWheelEventListener: (() => void) | undefined;
 
-  private copyToClipboard = () => {
-    const text = JSON.stringify(
-      elements
-        .filter(element => element.isSelected)
-        .map(({ shape, ...el }) => el),
-    );
-    if ("clipboard" in navigator && "writeText" in navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      document.execCommand("copy");
-    }
+  private copyToAppClipboard = () => {
+    copyToAppClipboard(elements);
   };
 
-  private pasteFromClipboard = () => {
-    if ("clipboard" in navigator && "readText" in navigator.clipboard) {
-      navigator.clipboard
-        .readText()
-        .then(text => this.addElementsFromPaste(text));
-    }
-  };
-
-  private renderSelectedShapeActions(elements: readonly ExcalidrawElement[]) {
-    const { elementType, editingElement } = this.state;
-    const targetElements = editingElement
-      ? [editingElement]
-      : elements.filter(el => el.isSelected);
-    if (!targetElements.length && elementType === "selection") {
-      return null;
-    }
-
-    return (
-      <Island padding={4}>
-        <div className="panelColumn">
-          {this.actionManager.renderAction(
-            "changeStrokeColor",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {(hasBackground(elementType) ||
-            targetElements.some(element => hasBackground(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeBackgroundColor",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFillStyle",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasStroke(elementType) ||
-            targetElements.some(element => hasStroke(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeStrokeWidth",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeSloppiness",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {(hasText(elementType) ||
-            targetElements.some(element => hasText(element.type))) && (
-            <>
-              {this.actionManager.renderAction(
-                "changeFontSize",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-
-              {this.actionManager.renderAction(
-                "changeFontFamily",
-                elements,
-                this.state,
-                this.syncActionResult,
-              )}
-            </>
-          )}
-
-          {this.actionManager.renderAction(
-            "changeOpacity",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-
-          {this.actionManager.renderAction(
-            "deleteSelectedElements",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </div>
-      </Island>
-    );
-  }
-
-  private renderShapesSwitcher() {
-    return (
-      <>
-        {SHAPES.map(({ value, icon }, index) => {
-          const label = t(`toolBar.${value}`);
-          return (
-            <ToolButton
-              key={value}
-              type="radio"
-              icon={icon}
-              checked={this.state.elementType === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${
-                capitalizeString(value)[0]
-              }, ${index + 1}`}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={`${label[0]} ${index + 1}`}
-              onChange={() => {
-                this.setState({ elementType: value });
-                elements = clearSelection(elements);
-                document.documentElement.style.cursor =
-                  value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                this.setState({});
-              }}
-            ></ToolButton>
-          );
-        })}
-      </>
-    );
-  }
-
-  private renderCanvasActions() {
-    return (
-      <Stack.Col gap={4}>
-        <Stack.Row justifyContent={"space-between"}>
-          {this.actionManager.renderAction(
-            "loadScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          {this.actionManager.renderAction(
-            "saveScene",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-          <ExportDialog
-            elements={elements}
-            appState={this.state}
-            actionManager={this.actionManager}
-            syncActionResult={this.syncActionResult}
-            onExportToPng={(exportedElements, scale) => {
-              if (this.canvas)
-                exportCanvas("png", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-            }}
-            onExportToSvg={(exportedElements, scale) => {
-              if (this.canvas) {
-                exportCanvas("svg", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-              }
-            }}
-            onExportToClipboard={(exportedElements, scale) => {
-              if (this.canvas)
-                exportCanvas("clipboard", exportedElements, this.canvas, {
-                  exportBackground: this.state.exportBackground,
-                  name: this.state.name,
-                  viewBackgroundColor: this.state.viewBackgroundColor,
-                  scale,
-                });
-            }}
-            onExportToBackend={exportedElements => {
-              if (this.canvas)
-                exportCanvas(
-                  "backend",
-                  exportedElements.map(element => ({
-                    ...element,
-                    isSelected: false,
-                  })),
-                  this.canvas,
-                  this.state,
-                );
-            }}
-          />
-          {this.actionManager.renderAction(
-            "clearCanvas",
-            elements,
-            this.state,
-            this.syncActionResult,
-          )}
-        </Stack.Row>
-        {this.actionManager.renderAction(
-          "changeViewBackgroundColor",
-          elements,
+  private pasteFromClipboard = async (e: ClipboardEvent | null) => {
+    // #686
+    const target = document.activeElement;
+    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+    if (
+      // if no ClipboardEvent supplied, assume we're pasting via contextMenu
+      //  thus these checks don't make sense
+      !e ||
+      (elementUnderCursor instanceof HTMLCanvasElement &&
+        !isWritableElement(target))
+    ) {
+      const data = await getClipboardContent(e);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
           this.state,
-          this.syncActionResult,
-        )}
-      </Stack.Col>
-    );
+        );
+
+        const element = newTextElement(
+          newElement(
+            "text",
+            x,
+            y,
+            this.state.currentItemStrokeColor,
+            this.state.currentItemBackgroundColor,
+            this.state.currentItemFillStyle,
+            this.state.currentItemStrokeWidth,
+            this.state.currentItemRoughness,
+            this.state.currentItemOpacity,
+          ),
+          data.text,
+          this.state.currentItemFont,
+        );
+
+        element.isSelected = true;
+
+        elements = [...clearSelection(elements), element];
+        history.resumeRecording();
+      }
+      this.selectShapeTool("selection");
+      e?.preventDefault();
+    }
+  };
+
+  private selectShapeTool(elementType: AppState["elementType"]) {
+    if (!isHoldingSpace) {
+      setCursorForShape(elementType);
+    }
+    if (isToolIcon(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    if (elementType !== "selection") {
+      elements = clearSelection(elements);
+    }
+    this.setState({ elementType });
   }
+
+  setAppState = (obj: any) => {
+    this.setState(obj);
+  };
+
+  setElements = (elements_: readonly ExcalidrawElement[]) => {
+    elements = elements_;
+    this.setState({});
+  };
 
   public render() {
-    const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
-    const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
 
     return (
       <div className="container">
-        <FixedSideContainer side="top">
-          <div className="App-menu App-menu_top">
-            <Stack.Col gap={4} align="end">
-              <section
-                className="App-right-menu"
-                aria-labelledby="canvas-actions-title"
-              >
-                <h2 className="visually-hidden" id="canvas-actions-title">
-                  {t("headings.canvasActions")}
-                </h2>
-                <Island padding={4}>{this.renderCanvasActions()}</Island>
-              </section>
-              <section
-                className="App-right-menu"
-                aria-labelledby="selected-shape-title"
-              >
-                <h2 className="visually-hidden" id="selected-shape-title">
-                  {t("headings.selectedShapeActions")}
-                </h2>
-                {this.renderSelectedShapeActions(elements)}
-              </section>
-            </Stack.Col>
-            <section aria-labelledby="shapes-title">
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island padding={1}>
-                    <h2 className="visually-hidden" id="shapes-title">
-                      {t("headings.shapes")}
-                    </h2>
-                    <Stack.Row gap={1}>{this.renderShapesSwitcher()}</Stack.Row>
-                  </Island>
-                  <LockIcon
-                    checked={this.state.elementLocked}
-                    onChange={() => {
-                      this.setState({
-                        elementLocked: !this.state.elementLocked,
-                        elementType: this.state.elementLocked
-                          ? "selection"
-                          : this.state.elementType,
-                      });
-                    }}
-                    title={t("toolBar.lock")}
-                  />
-                </Stack.Row>
-              </Stack.Col>
-            </section>
-            <div />
-          </div>
-        </FixedSideContainer>
+        <LayerUI
+          canvas={this.canvas}
+          appState={this.state}
+          setAppState={this.setAppState}
+          actionManager={this.actionManager}
+          elements={elements}
+          setElements={this.setElements}
+          language={getLanguage()}
+        />
         <main>
           <canvas
             id="canvas"
@@ -757,13 +807,10 @@ export class App extends React.Component<any, AppState> {
                   options: [
                     navigator.clipboard && {
                       label: t("labels.paste"),
-                      action: () => this.pasteFromClipboard(),
+                      action: () => this.pasteFromClipboard(null),
                     },
-                    ...this.actionManager.getContextMenuItems(
-                      elements,
-                      this.state,
-                      this.syncActionResult,
-                      action => this.canvasOnlyActions.includes(action),
+                    ...this.actionManager.getContextMenuItems(action =>
+                      this.canvasOnlyActions.includes(action),
                     ),
                   ],
                   top: e.clientY,
@@ -782,16 +829,13 @@ export class App extends React.Component<any, AppState> {
                 options: [
                   navigator.clipboard && {
                     label: t("labels.copy"),
-                    action: this.copyToClipboard,
+                    action: this.copyToAppClipboard,
                   },
                   navigator.clipboard && {
                     label: t("labels.paste"),
-                    action: () => this.pasteFromClipboard(),
+                    action: () => this.pasteFromClipboard(null),
                   },
                   ...this.actionManager.getContextMenuItems(
-                    elements,
-                    this.state,
-                    this.syncActionResult,
                     action => !this.canvasOnlyActions.includes(action),
                   ),
                 ],
@@ -807,7 +851,9 @@ export class App extends React.Component<any, AppState> {
                 lastMouseUp(e);
               }
 
-              if (isPanning) return;
+              if (isPanning) {
+                return;
+              }
 
               // pan canvas on wheel button drag or space+drag
               if (
@@ -820,12 +866,11 @@ export class App extends React.Component<any, AppState> {
                 document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
                 let { clientX: lastX, clientY: lastY } = e;
                 const onMouseMove = (e: MouseEvent) => {
-                  let deltaX = lastX - e.clientX;
-                  let deltaY = lastY - e.clientY;
+                  const deltaX = lastX - e.clientX;
+                  const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
-                  // We don't want to save history when panning around
-                  history.skipRecording();
+
                   this.setState({
                     scrollX: this.state.scrollX - deltaX,
                     scrollY: this.state.scrollY - deltaY,
@@ -851,7 +896,9 @@ export class App extends React.Component<any, AppState> {
               }
 
               // only handle left mouse button
-              if (e.button !== MOUSE_BUTTON.MAIN) return;
+              if (e.button !== MOUSE_BUTTON.MAIN) {
+                return;
+              }
               // fixes mousemove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
@@ -867,10 +914,10 @@ export class App extends React.Component<any, AppState> {
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
                 elements,
-                e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
-                e.clientY - CANVAS_WINDOW_OFFSET_TOP,
-                canvasWidth,
-                canvasHeight,
+                e.clientX / window.devicePixelRatio,
+                e.clientY / window.devicePixelRatio,
+                canvasWidth / window.devicePixelRatio,
+                canvasHeight / window.devicePixelRatio,
                 this.state.scrollX,
                 this.state.scrollY,
               );
@@ -937,6 +984,7 @@ export class App extends React.Component<any, AppState> {
                     // state of the box
                     if (!hitElement.isSelected) {
                       hitElement.isSelected = true;
+                      elements = elements.slice();
                       elementIsAddedToSelection = true;
                     }
 
@@ -963,6 +1011,12 @@ export class App extends React.Component<any, AppState> {
               }
 
               if (isTextElement(element)) {
+                // if we're currently still editing text, clicking outside
+                //  should only finalize it, not create another (irrespective
+                //  of state.elementLocked)
+                if (this.state.editingElement?.type === "text") {
+                  return;
+                }
                 let textX = e.clientX;
                 let textY = e.clientY;
                 if (!e.altKey) {
@@ -982,7 +1036,6 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
-                    elementType: "selection",
                   });
                 };
 
@@ -1007,29 +1060,132 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    if (this.state.elementLocked) {
+                      setCursorForShape(this.state.elementType);
+                    }
+                    history.resumeRecording();
                     resetSelection();
                   },
                   onCancel: () => {
                     resetSelection();
                   },
                 });
-                this.setState({
-                  elementType: "selection",
-                  editingElement: element,
-                });
+                resetCursor();
+                if (!this.state.elementLocked) {
+                  this.setState({
+                    editingElement: element,
+                    elementType: "selection",
+                  });
+                } else {
+                  this.setState({
+                    editingElement: element,
+                  });
+                }
                 return;
+              } else if (
+                this.state.elementType === "arrow" ||
+                this.state.elementType === "line"
+              ) {
+                if (this.state.multiElement) {
+                  const { multiElement } = this.state;
+                  const { x: rx, y: ry } = multiElement;
+                  multiElement.isSelected = true;
+                  multiElement.points.push([x - rx, y - ry]);
+                  multiElement.shape = null;
+                } else {
+                  element.isSelected = false;
+                  element.points.push([0, 0]);
+                  element.shape = null;
+                  elements = [...elements, element];
+                  this.setState({
+                    draggingElement: element,
+                  });
+                }
+              } else if (element.type === "selection") {
+                this.setState({
+                  selectionElement: element,
+                  draggingElement: element,
+                });
+              } else {
+                elements = [...elements, element];
+                this.setState({ multiElement: null, draggingElement: element });
               }
-
-              elements = [...elements, element];
-              this.setState({ draggingElement: element });
 
               let lastX = x;
               let lastY = y;
 
               if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
-                lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                lastX = e.clientX;
+                lastY = e.clientY;
               }
+
+              let resizeArrowFn:
+                | ((
+                    element: ExcalidrawElement,
+                    p1: Point,
+                    deltaX: number,
+                    deltaY: number,
+                    mouseX: number,
+                    mouseY: number,
+                    perfect: boolean,
+                  ) => void)
+                | null = null;
+
+              const arrowResizeOrigin = (
+                element: ExcalidrawElement,
+                p1: Point,
+                deltaX: number,
+                deltaY: number,
+                mouseX: number,
+                mouseY: number,
+                perfect: boolean,
+              ) => {
+                if (perfect) {
+                  const absPx = p1[0] + element.x;
+                  const absPy = p1[1] + element.y;
+
+                  const { width, height } = getPerfectElementSize(
+                    element.type,
+                    mouseX - element.x - p1[0],
+                    mouseY - element.y - p1[1],
+                  );
+
+                  const dx = element.x + width + p1[0];
+                  const dy = element.y + height + p1[1];
+                  element.x = dx;
+                  element.y = dy;
+                  p1[0] = absPx - element.x;
+                  p1[1] = absPy - element.y;
+                } else {
+                  element.x += deltaX;
+                  element.y += deltaY;
+                  p1[0] -= deltaX;
+                  p1[1] -= deltaY;
+                }
+              };
+
+              const arrowResizeEnd = (
+                element: ExcalidrawElement,
+                p1: Point,
+                deltaX: number,
+                deltaY: number,
+                mouseX: number,
+                mouseY: number,
+                perfect: boolean,
+              ) => {
+                if (perfect) {
+                  const { width, height } = getPerfectElementSize(
+                    element.type,
+                    mouseX - element.x,
+                    mouseY - element.y,
+                  );
+                  p1[0] = width;
+                  p1[1] = height;
+                } else {
+                  p1[0] += deltaX;
+                  p1[1] += deltaY;
+                }
+              };
 
               const onMouseMove = (e: MouseEvent) => {
                 const target = e.target;
@@ -1038,26 +1194,38 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isOverHorizontalScrollBar) {
-                  const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+                  const x = e.clientX;
                   const dx = x - lastX;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollX: this.state.scrollX - dx });
                   lastX = x;
                   return;
                 }
 
                 if (isOverVerticalScrollBar) {
-                  const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                  const y = e.clientY;
                   const dy = y - lastY;
-                  // We don't want to save history when scrolling
-                  history.skipRecording();
                   this.setState({ scrollY: this.state.scrollY - dy });
                   lastY = y;
                   return;
                 }
 
+                // for arrows, don't start dragging until a given threshold
+                //  to ensure we don't create a 2-point arrow by mistake when
+                //  user clicks mouse in a way that it moves a tiny bit (thus
+                //  triggering mousemove)
+                if (
+                  !draggingOccurred &&
+                  (this.state.elementType === "arrow" ||
+                    this.state.elementType === "line")
+                ) {
+                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                  if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
+                    return;
+                  }
+                }
+
                 if (isResizingElements && this.state.resizingElement) {
+                  this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
@@ -1069,73 +1237,191 @@ export class App extends React.Component<any, AppState> {
                       element.type === "line" || element.type === "arrow";
                     switch (resizeHandle) {
                       case "nw":
-                        element.width -= deltaX;
-                        element.x += deltaX;
+                        if (isLinear && element.points.length === 2) {
+                          const [, p1] = element.points;
 
-                        if (e.shiftKey) {
-                          if (isLinear) {
-                            resizePerfectLineForNWHandler(element, x, y);
-                          } else {
+                          if (!resizeArrowFn) {
+                            if (p1[0] < 0 || p1[1] < 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            x,
+                            y,
+                            e.shiftKey,
+                          );
+                        } else {
+                          element.width -= deltaX;
+                          element.x += deltaX;
+
+                          if (e.shiftKey) {
                             element.y += element.height - element.width;
                             element.height = element.width;
+                          } else {
+                            element.height -= deltaY;
+                            element.y += deltaY;
                           }
-                        } else {
-                          element.height -= deltaY;
-                          element.y += deltaY;
                         }
                         break;
                       case "ne":
-                        element.width += deltaX;
-                        if (e.shiftKey) {
-                          element.y += element.height - element.width;
-                          element.height = element.width;
+                        if (isLinear && element.points.length === 2) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] >= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            x,
+                            y,
+                            e.shiftKey,
+                          );
                         } else {
-                          element.height -= deltaY;
-                          element.y += deltaY;
+                          element.width += deltaX;
+                          if (e.shiftKey) {
+                            element.y += element.height - element.width;
+                            element.height = element.width;
+                          } else {
+                            element.height -= deltaY;
+                            element.y += deltaY;
+                          }
                         }
                         break;
                       case "sw":
-                        element.width -= deltaX;
-                        element.x += deltaX;
-                        if (e.shiftKey) {
-                          element.height = element.width;
+                        if (isLinear && element.points.length === 2) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] <= 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            x,
+                            y,
+                            e.shiftKey,
+                          );
                         } else {
-                          element.height += deltaY;
+                          element.width -= deltaX;
+                          element.x += deltaX;
+                          if (e.shiftKey) {
+                            element.height = element.width;
+                          } else {
+                            element.height += deltaY;
+                          }
                         }
                         break;
                       case "se":
-                        if (e.shiftKey) {
-                          if (isLinear) {
-                            const { width, height } = getPerfectElementSize(
-                              element.type,
-                              x - element.x,
-                              y - element.y,
-                            );
-                            element.width = width;
-                            element.height = height;
-                          } else {
+                        if (isLinear && element.points.length === 2) {
+                          const [, p1] = element.points;
+                          if (!resizeArrowFn) {
+                            if (p1[0] > 0 || p1[1] > 0) {
+                              resizeArrowFn = arrowResizeEnd;
+                            } else {
+                              resizeArrowFn = arrowResizeOrigin;
+                            }
+                          }
+                          resizeArrowFn(
+                            element,
+                            p1,
+                            deltaX,
+                            deltaY,
+                            x,
+                            y,
+                            e.shiftKey,
+                          );
+                        } else {
+                          if (e.shiftKey) {
                             element.width += deltaX;
                             element.height = element.width;
+                          } else {
+                            element.width += deltaX;
+                            element.height += deltaY;
                           }
-                        } else {
-                          element.width += deltaX;
-                          element.height += deltaY;
                         }
                         break;
-                      case "n":
+                      case "n": {
                         element.height -= deltaY;
                         element.y += deltaY;
+
+                        if (element.points.length > 0) {
+                          const len = element.points.length;
+
+                          const points = [...element.points].sort(
+                            (a, b) => a[1] - b[1],
+                          );
+
+                          for (let i = 1; i < points.length; ++i) {
+                            const pnt = points[i];
+                            pnt[1] -= deltaY / (len - i);
+                          }
+                        }
                         break;
-                      case "w":
+                      }
+                      case "w": {
                         element.width -= deltaX;
                         element.x += deltaX;
+
+                        if (element.points.length > 0) {
+                          const len = element.points.length;
+                          const points = [...element.points].sort(
+                            (a, b) => a[0] - b[0],
+                          );
+
+                          for (let i = 0; i < points.length; ++i) {
+                            const pnt = points[i];
+                            pnt[0] -= deltaX / (len - i);
+                          }
+                        }
                         break;
-                      case "s":
+                      }
+                      case "s": {
                         element.height += deltaY;
+                        if (element.points.length > 0) {
+                          const len = element.points.length;
+                          const points = [...element.points].sort(
+                            (a, b) => a[1] - b[1],
+                          );
+
+                          for (let i = 1; i < points.length; ++i) {
+                            const pnt = points[i];
+                            pnt[1] += deltaY / (len - i);
+                          }
+                        }
                         break;
-                      case "e":
+                      }
+                      case "e": {
                         element.width += deltaX;
+                        if (element.points.length > 0) {
+                          const len = element.points.length;
+                          const points = [...element.points].sort(
+                            (a, b) => a[0] - b[0],
+                          );
+
+                          for (let i = 1; i < points.length; ++i) {
+                            const pnt = points[i];
+                            pnt[0] += deltaX / (len - i);
+                          }
+                        }
                         break;
+                      }
                     }
 
                     if (resizeHandle) {
@@ -1155,8 +1441,6 @@ export class App extends React.Component<any, AppState> {
 
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when resizing an element
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1176,8 +1460,6 @@ export class App extends React.Component<any, AppState> {
                     });
                     lastX = x;
                     lastY = y;
-                    // We don't want to save history when dragging an element to initially size it
-                    history.skipRecording();
                     this.setState({});
                     return;
                   }
@@ -1186,7 +1468,9 @@ export class App extends React.Component<any, AppState> {
                 // It is very important to read this.state within each move event,
                 // otherwise we would read a stale one!
                 const draggingElement = this.state.draggingElement;
-                if (!draggingElement) return;
+                if (!draggingElement) {
+                  return;
+                }
 
                 const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
@@ -1197,30 +1481,51 @@ export class App extends React.Component<any, AppState> {
                   this.state.elementType === "line" ||
                   this.state.elementType === "arrow";
 
-                if (isLinear && x < originX) width = -width;
-                if (isLinear && y < originY) height = -height;
+                if (isLinear) {
+                  draggingOccurred = true;
+                  const points = draggingElement.points;
+                  let dx = x - draggingElement.x;
+                  let dy = y - draggingElement.y;
 
-                if (e.shiftKey) {
-                  ({ width, height } = getPerfectElementSize(
-                    this.state.elementType,
-                    width,
-                    !isLinear && y < originY ? -height : height,
-                  ));
+                  if (e.shiftKey && points.length === 2) {
+                    ({ width: dx, height: dy } = getPerfectElementSize(
+                      this.state.elementType,
+                      dx,
+                      dy,
+                    ));
+                  }
 
-                  if (!isLinear && height < 0) height = -height;
-                }
+                  if (points.length === 1) {
+                    points.push([dx, dy]);
+                  } else if (points.length > 1) {
+                    const pnt = points[points.length - 1];
+                    pnt[0] = dx;
+                    pnt[1] = dy;
+                  }
+                } else {
+                  if (e.shiftKey) {
+                    ({ width, height } = getPerfectElementSize(
+                      this.state.elementType,
+                      width,
+                      y < originY ? -height : height,
+                    ));
 
-                if (!isLinear) {
+                    if (height < 0) {
+                      height = -height;
+                    }
+                  }
+
                   draggingElement.x = x < originX ? originX - width : originX;
                   draggingElement.y = y < originY ? originY - height : originY;
+
+                  draggingElement.width = width;
+                  draggingElement.height = height;
                 }
 
-                draggingElement.width = width;
-                draggingElement.height = height;
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey) {
+                  if (!e.shiftKey && elements.some(el => el.isSelected)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1231,8 +1536,6 @@ export class App extends React.Component<any, AppState> {
                     element.isSelected = true;
                   });
                 }
-                // We don't want to save history when moving an element
-                history.skipRecording();
                 this.setState({});
               };
 
@@ -1240,14 +1543,52 @@ export class App extends React.Component<any, AppState> {
                 const {
                   draggingElement,
                   resizingElement,
+                  multiElement,
                   elementType,
                   elementLocked,
                 } = this.state;
 
+                this.setState({
+                  isResizing: false,
+                  resizingElement: null,
+                  selectionElement: null,
+                });
+
+                resizeArrowFn = null;
                 lastMouseUp = null;
                 isHoldingMouseButton = false;
                 window.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
+
+                if (elementType === "arrow" || elementType === "line") {
+                  if (draggingElement!.points.length > 1) {
+                    history.resumeRecording();
+                    this.setState({});
+                  }
+                  if (!draggingOccurred && draggingElement && !multiElement) {
+                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    draggingElement.points.push([
+                      x - draggingElement.x,
+                      y - draggingElement.y,
+                    ]);
+                    draggingElement.shape = null;
+                    this.setState({ multiElement: this.state.draggingElement });
+                  } else if (draggingOccurred && !multiElement) {
+                    this.state.draggingElement!.isSelected = true;
+                    if (!elementLocked) {
+                      resetCursor();
+                      this.setState({
+                        draggingElement: null,
+                        elementType: "selection",
+                      });
+                    } else {
+                      this.setState({
+                        draggingElement: null,
+                      });
+                    }
+                  }
+                  return;
+                }
 
                 if (
                   elementType !== "selection" &&
@@ -1263,6 +1604,11 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (normalizeDimensions(draggingElement)) {
+                  this.setState({});
+                }
+
+                if (resizingElement) {
+                  history.resumeRecording();
                   this.setState({});
                 }
 
@@ -1303,15 +1649,19 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                if (elementType === "selection") {
-                  elements = elements.slice(0, -1);
-                } else if (!elementLocked) {
+                if (!elementLocked) {
                   draggingElement.isSelected = true;
+                }
+
+                if (
+                  elementType !== "selection" ||
+                  elements.some(el => el.isSelected)
+                ) {
+                  history.resumeRecording();
                 }
 
                 if (!elementLocked) {
                   resetCursor();
-
                   this.setState({
                     draggingElement: null,
                     elementType: "selection",
@@ -1327,12 +1677,10 @@ export class App extends React.Component<any, AppState> {
 
               window.addEventListener("mousemove", onMouseMove);
               window.addEventListener("mouseup", onMouseUp);
-
-              // We don't want to save history on mouseDown, only on mouseUp when it's fully configured
-              history.skipRecording();
-              this.setState({});
             }}
             onDoubleClick={e => {
+              resetCursor();
+
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
               const elementAtPosition = getElementAtPosition(elements, x, y);
@@ -1370,12 +1718,10 @@ export class App extends React.Component<any, AppState> {
                 textX =
                   this.state.scrollX +
                   elementAtPosition.x +
-                  CANVAS_WINDOW_OFFSET_LEFT +
                   elementAtPosition.width / 2;
                 textY =
                   this.state.scrollY +
                   elementAtPosition.y +
-                  CANVAS_WINDOW_OFFSET_TOP +
                   elementAtPosition.height / 2;
 
                 // x and y will change after calling newTextElement function
@@ -1399,7 +1745,6 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
-                  elementType: "selection",
                 });
               };
 
@@ -1422,6 +1767,7 @@ export class App extends React.Component<any, AppState> {
                       },
                     ];
                   }
+                  history.resumeRecording();
                   resetSelection();
                 },
                 onCancel: () => {
@@ -1430,15 +1776,32 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onMouseMove={e => {
-              if (isHoldingSpace || isPanning) return;
+              if (isHoldingSpace || isPanning) {
+                return;
+              }
               const hasDeselectedButton = Boolean(e.buttons);
+
+              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              if (this.state.multiElement) {
+                const { multiElement } = this.state;
+                const originX = multiElement.x;
+                const originY = multiElement.y;
+                const points = multiElement.points;
+                const pnt = points[points.length - 1];
+                pnt[0] = x - originX;
+                pnt[1] = y - originY;
+                multiElement.shape = null;
+                this.setState({});
+                return;
+              }
+
               if (
                 hasDeselectedButton ||
                 this.state.elementType !== "selection"
               ) {
                 return;
               }
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+
               const selectedElements = elements.filter(e => e.isSelected)
                 .length;
               if (selectedElements === 1) {
@@ -1457,89 +1820,58 @@ export class App extends React.Component<any, AppState> {
               const hitElement = getElementAtPosition(elements, x, y);
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
+            onDrop={e => {
+              const file = e.dataTransfer.files[0];
+              if (file?.type === "application/json") {
+                loadFromBlob(file)
+                  .then(({ elements, appState }) =>
+                    this.syncActionResult({ elements, appState }),
+                  )
+                  .catch(err => console.error(err));
+              }
+            }}
           >
             {t("labels.drawingCanvas")}
           </canvas>
         </main>
-        <footer role="contentinfo">
-          <LanguageList
-            onChange={lng => {
-              setLanguage(lng);
-              this.setState({});
-            }}
-            languages={languages}
-            currentLanguage={getLanguage()}
-          />
-          {this.renderIdsDropdown()}
-        </footer>
       </div>
-    );
-  }
-
-  private renderIdsDropdown() {
-    const scenes = loadedScenes();
-    if (scenes.length === 0) {
-      return;
-    }
-    return (
-      <StoredScenesList
-        scenes={scenes}
-        currentId={this.state.selectedId}
-        onChange={id => this.loadScene(id)}
-      />
     );
   }
 
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const { deltaX, deltaY } = e;
-    // We don't want to save history when panning around
-    history.skipRecording();
+
     this.setState({
       scrollX: this.state.scrollX - deltaX,
       scrollY: this.state.scrollY - deltaY,
     });
   };
 
-  private addElementsFromPaste = (paste: string) => {
-    let parsedElements;
-    try {
-      parsedElements = JSON.parse(paste);
-    } catch (e) {}
-    if (
-      Array.isArray(parsedElements) &&
-      parsedElements.length > 0 &&
-      parsedElements[0].type // need to implement a better check here...
-    ) {
-      elements = clearSelection(elements);
+  private addElementsFromPaste = (
+    clipboardElements: readonly ExcalidrawElement[],
+  ) => {
+    elements = clearSelection(elements);
 
-      const [minX, minY, maxX, maxY] = getCommonBounds(parsedElements);
+    const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
-      const elementsCenterX = distance(minX, maxX) / 2;
-      const elementsCenterY = distance(minY, maxY) / 2;
+    const elementsCenterX = distance(minX, maxX) / 2;
+    const elementsCenterY = distance(minY, maxY) / 2;
 
-      const dx =
-        cursorX -
-        this.state.scrollX -
-        CANVAS_WINDOW_OFFSET_LEFT -
-        elementsCenterX;
-      const dy =
-        cursorY -
-        this.state.scrollY -
-        CANVAS_WINDOW_OFFSET_TOP -
-        elementsCenterY;
+    const dx = cursorX - this.state.scrollX - elementsCenterX;
+    const dy = cursorY - this.state.scrollY - elementsCenterY;
 
-      elements = [
-        ...elements,
-        ...parsedElements.map(parsedElement => {
-          const duplicate = duplicateElement(parsedElement);
-          duplicate.x += dx - minX;
-          duplicate.y += dy - minY;
-          return duplicate;
-        }),
-      ];
-      this.setState({});
-    }
+    elements = [
+      ...elements,
+      ...clipboardElements.map(clipboardElements => {
+        const duplicate = duplicateElement(clipboardElements);
+        duplicate.x += dx - minX;
+        duplicate.y += dy - minY;
+        return duplicate;
+      }),
+    ];
+    history.resumeRecording();
+    this.setState({});
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
@@ -1559,12 +1891,10 @@ export class App extends React.Component<any, AppState> {
         const wysiwygX =
           this.state.scrollX +
           elementClickedInside.x +
-          CANVAS_WINDOW_OFFSET_LEFT +
           elementClickedInside.width / 2;
         const wysiwygY =
           this.state.scrollY +
           elementClickedInside.y +
-          CANVAS_WINDOW_OFFSET_TOP +
           elementClickedInside.height / 2;
         return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
       }
@@ -1581,21 +1911,25 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    renderScene(elements, this.rc!, this.canvas!, {
-      scrollX: this.state.scrollX,
-      scrollY: this.state.scrollY,
-      viewBackgroundColor: this.state.viewBackgroundColor,
-    });
+    const atLeastOneVisibleElement = renderScene(
+      elements,
+      this.state.selectionElement,
+      this.rc!,
+      this.canvas!,
+      {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    );
+    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
+    if (this.state.scrolledOutside !== scrolledOutside) {
+      this.setState({ scrolledOutside: scrolledOutside });
+    }
     this.saveDebounced();
     if (history.isRecording()) {
-      history.pushEntry(
-        history.generateCurrentEntry(
-          pickAppStatePropertiesForHistory(this.state),
-          elements,
-        ),
-      );
-    } else {
-      history.resumeRecording();
+      history.pushEntry(this.state, elements);
+      history.skipRecording();
     }
   }
 }

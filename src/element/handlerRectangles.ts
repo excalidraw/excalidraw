@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { SceneScroll } from "../scene/types";
+import { getLinearElementAbsoluteBounds } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -7,17 +8,33 @@ export function handlerRectangles(
   element: ExcalidrawElement,
   { scrollX, scrollY }: SceneScroll,
 ) {
-  const elementX1 = element.x;
-  const elementX2 = element.x + element.width;
-  const elementY1 = element.y;
-  const elementY2 = element.y + element.height;
+  let elementX2 = 0;
+  let elementY2 = 0;
+  let elementX1 = Infinity;
+  let elementY1 = Infinity;
+  let marginX = -8;
+  let marginY = -8;
+
+  const minimumSize = 40;
+  if (element.type === "arrow" || element.type === "line") {
+    [
+      elementX1,
+      elementY1,
+      elementX2,
+      elementY2,
+    ] = getLinearElementAbsoluteBounds(element);
+  } else {
+    elementX1 = element.x;
+    elementX2 = element.x + element.width;
+    elementY1 = element.y;
+    elementY2 = element.y + element.height;
+
+    marginX = element.width < 0 ? 8 : -8;
+    marginY = element.height < 0 ? 8 : -8;
+  }
 
   const margin = 4;
-  const minimumSize = 40;
   const handlers = {} as { [T in Sides]: number[] };
-
-  const marginX = element.width < 0 ? 8 : -8;
-  const marginY = element.height < 0 ? 8 : -8;
 
   if (Math.abs(elementX2 - elementX1) > minimumSize) {
     handlers["n"] = [
@@ -77,9 +94,51 @@ export function handlerRectangles(
   ]; // se
 
   if (element.type === "arrow" || element.type === "line") {
+    if (element.points.length === 2) {
+      // only check the last point because starting point is always (0,0)
+      const [, p1] = element.points;
+
+      if (p1[0] === 0 || p1[1] === 0) {
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
+      }
+
+      if (p1[0] > 0 && p1[1] < 0) {
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
+      }
+
+      if (p1[0] > 0 && p1[1] > 0) {
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
+      }
+
+      if (p1[0] < 0 && p1[1] > 0) {
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
+      }
+
+      if (p1[0] < 0 && p1[1] < 0) {
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
+      }
+    }
+
     return {
-      nw: handlers.nw,
-      se: handlers.se,
+      n: handlers.n,
+      s: handlers.s,
+      w: handlers.w,
+      e: handlers.e,
     } as typeof handlers;
   }
 

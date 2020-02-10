@@ -12,43 +12,51 @@ import { t } from "../i18n";
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
 
-  updater:
-    | ((elements: ExcalidrawElement[], appState: AppState) => void)
-    | null = null;
+  updater: UpdaterFn;
 
-  setUpdater(
-    updater: (elements: ExcalidrawElement[], appState: AppState) => void,
+  getAppState: () => AppState;
+
+  getElements: () => readonly ExcalidrawElement[];
+
+  constructor(
+    updater: UpdaterFn,
+    getAppState: () => AppState,
+    getElements: () => readonly ExcalidrawElement[],
   ) {
     this.updater = updater;
+    this.getAppState = getAppState;
+    this.getElements = getElements;
   }
 
   registerAction(action: Action) {
     this.actions[action.name] = action;
   }
 
-  handleKeyDown(
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) {
+  handleKeyDown(event: KeyboardEvent) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action => action.keyTest && action.keyTest(event, elements, appState),
+        action =>
+          action.keyTest &&
+          action.keyTest(event, this.getAppState(), this.getElements()),
       );
 
-    if (data.length === 0) return null;
+    if (data.length === 0) {
+      return false;
+    }
 
     event.preventDefault();
-    return data[0].perform(elements, appState, null);
+    const commitToHistory =
+      data[0].commitToHistory &&
+      data[0].commitToHistory(this.getAppState(), this.getElements());
+    this.updater(
+      data[0].perform(this.getElements(), this.getAppState(), null),
+      commitToHistory,
+    );
+    return true;
   }
 
-  getContextMenuItems(
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-    actionFilter: ActionFilterFn = action => action,
-  ) {
+  getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
     return Object.values(this.actions)
       .filter(actionFilter)
       .filter(action => "contextItemLabel" in action)
@@ -60,28 +68,35 @@ export class ActionManager implements ActionsManagerInterface {
       .map(action => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          updater(action.perform(elements, appState, null));
+          const commitToHistory =
+            action.commitToHistory &&
+            action.commitToHistory(this.getAppState(), this.getElements());
+          this.updater(
+            action.perform(this.getElements(), this.getAppState(), null),
+            commitToHistory,
+          );
         },
       }));
   }
 
-  renderAction(
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-  ) {
+  renderAction(name: string) {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState: any) => {
-        updater(action.perform(elements, appState, formState));
+        const commitToHistory =
+          action.commitToHistory &&
+          action.commitToHistory(this.getAppState(), this.getElements());
+        this.updater(
+          action.perform(this.getElements(), this.getAppState(), formState),
+          commitToHistory,
+        );
       };
 
       return (
         <PanelComponent
-          elements={elements}
-          appState={appState}
+          elements={this.getElements()}
+          appState={this.getAppState()}
           updateData={updateData}
         />
       );

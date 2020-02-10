@@ -26,11 +26,11 @@ export function Popover({
 
       const viewportWidth = window.innerWidth;
       if (x + width > viewportWidth) {
-        element.style.left = viewportWidth - width + "px";
+        element.style.left = `${viewportWidth - width}px`;
       }
       const viewportHeight = window.innerHeight;
       if (y + height > viewportHeight) {
-        element.style.top = viewportHeight - height + "px";
+        element.style.top = `${viewportHeight - height}px`;
       }
     }
   }, [fitInViewport]);
@@ -42,7 +42,9 @@ export function Popover({
         onClick={onCloseRequest}
         onContextMenu={e => {
           e.preventDefault();
-          if (onCloseRequest) onCloseRequest();
+          if (onCloseRequest) {
+            onCloseRequest();
+          }
         }}
       />
       {children}

@@ -28,6 +28,7 @@ export function isInputLike(
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLSelectElement
+  | HTMLBRElement
   | HTMLDivElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
@@ -35,6 +36,22 @@ export function isInputLike(
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
+  );
+}
+
+export function isWritableElement(
+  target: Element | EventTarget | null,
+): target is
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLBRElement
+  | HTMLDivElement {
+  return (
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
+    target instanceof HTMLTextAreaElement ||
+    (target instanceof HTMLInputElement &&
+      (target.type === "text" || target.type === "number"))
   );
 }
 
@@ -102,4 +119,14 @@ export function removeSelection() {
 
 export function distance(x: number, y: number) {
   return Math.abs(x - y);
+}
+
+export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+  const xd = x2 - x1;
+  const yd = y2 - y1;
+  return Math.sqrt(xd * xd + yd * yd);
+}
+
+export function resetCursor() {
+  document.documentElement.style.cursor = "";
 }

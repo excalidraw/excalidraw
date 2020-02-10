@@ -1,21 +1,32 @@
 import { ExcalidrawElement } from "../element/types";
 
-import { getDefaultAppState } from "../appState";
+import {
+  getDefaultAppState,
+  cleanAppStateForExport,
+  clearAppStateForLocalStorage,
+} from "../appState";
 
 import { AppState } from "../types";
-import { ExportType, PreviousScene } from "./types";
+import { ExportType } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
-import { getCommonBounds } from "../element";
+import {
+  getCommonBounds,
+  normalizeDimensions,
+  isInvisiblySmallElement,
+} from "../element";
 
+import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
+import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const BACKEND_POST = "https://json.excalidraw.com/api/v1/post/";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
+
+const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
+const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -23,8 +34,11 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 (window as any).handle = null;
 
 interface DataState {
+  type?: string;
+  version?: string;
+  source?: string;
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: AppState | null;
   selectedId?: number;
 }
 
@@ -36,20 +50,19 @@ export function serializeAsJSON(
     {
       type: "excalidraw",
       version: 1,
-      appState: {
-        viewBackgroundColor: appState.viewBackgroundColor,
-      },
+      source: window.location.origin,
       elements: elements.map(({ shape, isSelected, ...el }) => el),
+      appState: cleanAppStateForExport(appState),
     },
     null,
     2,
   );
 }
 
-function calculateScrollCenter(
+export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
 ): { scrollX: number; scrollY: number } {
-  let [x1, y1, x2, y2] = getCommonBounds(elements);
+  const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
@@ -76,14 +89,25 @@ export async function saveAsJSON(
     (window as any).handle,
   );
 }
-
 export async function loadFromJSON() {
+  const blob = await fileOpen({
+    description: "Excalidraw files",
+    extensions: ["json"],
+    mimeTypes: ["application/json"],
+  });
+  return loadFromBlob(blob);
+}
+
+export async function loadFromBlob(blob: any) {
   const updateAppState = (contents: string) => {
     const defaultAppState = getDefaultAppState();
     let elements = [];
     let appState = defaultAppState;
     try {
       const data = JSON.parse(contents);
+      if (data.type !== "excalidraw") {
+        throw new Error("Cannot load invalid json");
+      }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
     } catch (e) {
@@ -92,11 +116,6 @@ export async function loadFromJSON() {
     return { elements, appState };
   };
 
-  const blob = await fileOpen({
-    description: "Excalidraw files",
-    extensions: ["json"],
-    mimeTypes: ["application/json"],
-  });
   if (blob.handle) {
     (window as any).handle = blob.handle;
   }
@@ -104,23 +123,22 @@ export async function loadFromJSON() {
   if ("text" in Blob) {
     contents = await blob.text();
   } else {
-    contents = await (async () => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.readAsText(blob, "utf8");
-        reader.onloadend = () => {
-          if (reader.readyState === FileReader.DONE) {
-            resolve(reader.result as string);
-          }
-        };
-      });
-    })();
+    contents = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.readAsText(blob, "utf8");
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          resolve(reader.result as string);
+        }
+      };
+    });
   }
   const { elements, appState } = updateAppState(contents);
+  if (!elements.length) {
+    return Promise.reject("Cannot load invalid json");
+  }
   return new Promise<DataState>(resolve => {
-    resolve(
-      restore(elements, { ...appState, ...calculateScrollCenter(elements) }),
-    );
+    resolve(restore(elements, appState, { scrollToContent: true }));
   });
 }
 
@@ -128,54 +146,118 @@ export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  let response;
+  const json = serializeAsJSON(elements, appState);
+  const encoded = new TextEncoder().encode(json);
+
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true, // extractable
+    ["encrypt", "decrypt"],
+  );
+  // The iv is set to 0. We are never going to reuse the same key so we don't
+  // need to have an iv. (I hope that's correct...)
+  const iv = new Uint8Array(12);
+  // We use symmetric encryption. AES-GCM is the recommended algorithm and
+  // includes checks that the ciphertext has not been modified by an attacker.
+  const encrypted = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    key,
+    encoded,
+  );
+  // We use jwk encoding to be able to extract just the base64 encoded key.
+  // We will hardcode the rest of the attributes when importing back the key.
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+
   try {
-    response = await fetch(BACKEND_POST, {
+    const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: serializeAsJSON(elements, appState),
+      body: encrypted,
     });
     const json = await response.json();
     if (json.id) {
       const url = new URL(window.location.href);
-      url.searchParams.append("id", json.id);
+      // We need to store the key (and less importantly the id) as hash instead
+      // of queryParam in order to never send it to the server
+      url.hash = `json=${json.id},${exportedKey.k!}`;
+      const urlString = url.toString();
 
-      await navigator.clipboard.writeText(url.toString());
-      window.alert(
-        t("alerts.copiedToClipboard", {
-          url: url.toString(),
-        }),
-      );
+      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (e) {
+    console.error(e);
     window.alert(t("alerts.couldNotCreateShareableLink"));
-    return;
   }
 }
 
-export async function importFromBackend(id: string | null) {
+export async function importFromBackend(
+  id: string | null,
+  k: string | undefined,
+) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
-  const data = await fetch(`${BACKEND_GET}${id}.json`)
-    .then(response => {
-      if (!response.ok) {
-        window.alert(t("alerts.importBackendFailed"));
-      }
-      return response;
-    })
-    .then(response => response.clone().json());
-  if (data != null) {
-    try {
-      elements = data.elements || elements;
-      appState = data.appState || appState;
-    } catch (error) {
+
+  try {
+    const response = await fetch(
+      k ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+    );
+    if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      console.error(error);
+      return restore(elements, appState, { scrollToContent: true });
     }
+    let data;
+    if (k) {
+      const buffer = await response.arrayBuffer();
+      const key = await window.crypto.subtle.importKey(
+        "jwk",
+        {
+          alg: "A128GCM",
+          ext: true,
+          k: k,
+          key_ops: ["encrypt", "decrypt"],
+          kty: "oct",
+        },
+        {
+          name: "AES-GCM",
+          length: 128,
+        },
+        false, // extractable
+        ["decrypt"],
+      );
+      const iv = new Uint8Array(12);
+      const decrypted = await window.crypto.subtle.decrypt(
+        {
+          name: "AES-GCM",
+          iv: iv,
+        },
+        key,
+        buffer,
+      );
+      // We need to convert the decrypted array buffer to a string
+      const string = new window.TextDecoder("utf-8").decode(
+        new Uint8Array(decrypted) as any,
+      );
+      data = JSON.parse(string);
+    } else {
+      // Legacy format
+      data = await response.json();
+    }
+
+    elements = data.elements || elements;
+    appState = data.appState || appState;
+  } catch (error) {
+    window.alert(t("alerts.importBackendFailed"));
+    console.error(error);
+  } finally {
+    return restore(elements, appState, { scrollToContent: true });
   }
-  return restore(elements, { ...appState, ...calculateScrollCenter(elements) });
 }
 
 export async function exportCanvas(
@@ -196,8 +278,9 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length)
+  if (!elements.length) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
+  }
   // calculate smallest area to fit the contents in
 
   if (type === "svg") {
@@ -231,19 +314,10 @@ export async function exportCanvas(
       }
     });
   } else if (type === "clipboard") {
-    const errorMsg = t("alerts.couldNotCopyToClipboard");
     try {
-      tempCanvas.toBlob(async function(blob: any) {
-        try {
-          await navigator.clipboard.write([
-            new window.ClipboardItem({ "image/png": blob }),
-          ]);
-        } catch (err) {
-          window.alert(errorMsg);
-        }
-      });
+      copyCanvasToClipboardAsPng(tempCanvas);
     } catch (err) {
-      window.alert(errorMsg);
+      window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
     const appState = getDefaultAppState();
@@ -254,25 +328,70 @@ export async function exportCanvas(
   }
 
   // clean up the DOM
-  if (tempCanvas !== canvas) tempCanvas.remove();
+  if (tempCanvas !== canvas) {
+    tempCanvas.remove();
+  }
 }
 
 function restore(
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState,
+  savedState: AppState | null,
+  opts?: { scrollToContent: boolean },
 ): DataState {
+  const elements = savedElements
+    .filter(el => !isInvisiblySmallElement(el))
+    .map(element => {
+      let points: Point[] = [];
+      if (element.type === "arrow") {
+        if (Array.isArray(element.points)) {
+          // if point array is empty, add one point to the arrow
+          // this is used as fail safe to convert incoming data to a valid
+          // arrow. In the new arrow, width and height are not being usde
+          points = element.points.length > 0 ? element.points : [[0, 0]];
+        } else {
+          // convert old arrow type to a new one
+          // old arrow spec used width and height
+          // to determine the endpoints
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        }
+      } else if (element.type === "line") {
+        // old spec, pre-arrows
+        // old spec, post-arrows
+        if (!Array.isArray(element.points) || element.points.length === 0) {
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        } else {
+          points = element.points;
+        }
+      } else {
+        normalizeDimensions(element);
+      }
+
+      return {
+        ...element,
+        id: element.id || nanoid(),
+        fillStyle: element.fillStyle || "hachure",
+        strokeWidth: element.strokeWidth || 1,
+        roughness: element.roughness || 1,
+        opacity:
+          element.opacity === null || element.opacity === undefined
+            ? 100
+            : element.opacity,
+        points,
+      };
+    });
+
+  if (opts?.scrollToContent && savedState) {
+    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+  }
+
   return {
-    elements: savedElements.map(element => ({
-      ...element,
-      id: element.id || nanoid(),
-      fillStyle: element.fillStyle || "hachure",
-      strokeWidth: element.strokeWidth || 1,
-      roughness: element.roughness || 1,
-      opacity:
-        element.opacity === null || element.opacity === undefined
-          ? 100
-          : element.opacity,
-    })),
+    elements: elements,
     appState: savedState,
   };
 }
@@ -295,7 +414,7 @@ export function restoreFromLocalStorage() {
   let appState = null;
   if (savedState) {
     try {
-      appState = JSON.parse(savedState);
+      appState = JSON.parse(savedState) as AppState;
     } catch (e) {
       // Do nothing because appState is already null
     }
@@ -306,48 +425,35 @@ export function restoreFromLocalStorage() {
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
-  state: AppState,
+  appState: AppState,
 ) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
-  localStorage.setItem(LOCAL_STORAGE_KEY_STATE, JSON.stringify(state));
-}
-
-/**
- * Returns the list of ids in Local Storage
- * @returns array
- */
-export function loadedScenes(): PreviousScene[] {
-  const storedPreviousScenes = localStorage.getItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-  );
-  if (storedPreviousScenes) {
-    try {
-      return JSON.parse(storedPreviousScenes);
-    } catch (e) {
-      console.error("Could not parse previously stored ids");
-      return [];
-    }
-  }
-  return [];
-}
-
-/**
- * Append id to the list of Previous Scenes in Local Storage if not there yet
- * @param id string
- */
-export function addToLoadedScenes(id: string): void {
-  const scenes = [...loadedScenes()];
-  const newScene = scenes.every(scene => scene.id !== id);
-
-  if (newScene) {
-    scenes.push({
-      timestamp: Date.now(),
-      id,
-    });
-  }
-
   localStorage.setItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-    JSON.stringify(scenes),
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(
+      elements.map(({ shape, ...element }: ExcalidrawElement) => element),
+    ),
   );
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY_STATE,
+    JSON.stringify(clearAppStateForLocalStorage(appState)),
+  );
+}
+
+export async function loadScene(id: string | null, k?: string) {
+  let data;
+  let selectedId;
+  if (id != null) {
+    // k is the private key used to decrypt the content from the server, take
+    // extra care not to leak it
+    data = await importFromBackend(id, k);
+    selectedId = id;
+    window.history.replaceState({}, "Excalidraw", window.location.origin);
+  } else {
+    data = restoreFromLocalStorage();
+  }
+
+  return {
+    elements: data.elements,
+    appState: data.appState && { ...data.appState, selectedId },
+  };
 }

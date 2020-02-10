@@ -46,15 +46,14 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "previouslyLoadedScenes": "Scènes précédemment chargées"
+    "scrollBackToContent": "Revenir au contenu"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
-    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
-    "copiedToClipboard": "Copié dans le presse-papier: {{url}}"
+    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome."
   },
   "toolBar": {
     "selection": "Sélection",

@@ -8,28 +8,38 @@
   "dependencies": {
     "browser-nativefs": "0.2.0",
     "i18next-browser-languagedetector": "4.0.1",
-    "nanoid": "2.1.10",
+    "nanoid": "2.1.11",
     "react": "16.12.0",
     "react-dom": "16.12.0",
-    "react-scripts": "3.3.0",
+    "react-scripts": "3.3.1",
     "roughjs": "4.0.4"
   },
   "description": "",
   "devDependencies": {
-    "@types/jest": "25.1.0",
+    "@types/jest": "25.1.2",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.5",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.1",
-    "lint-staged": "10.0.3",
+    "lint-staged": "10.0.7",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
     "rewire": "4.0.1",
     "typescript": "3.7.5"
   },
   "eslintConfig": {
-    "extends": "react-app",
+    "extends": [
+      "prettier",
+      "react-app"
+    ],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
+      "curly": "warn",
       "no-console": [
         "warn",
         {
@@ -39,7 +49,17 @@
             "info"
           ]
         }
-      ]
+      ],
+      "no-else-return": "warn",
+      "no-useless-return": "warn",
+      "prefer-const": [
+        "warn",
+        {
+          "destructuring": "all"
+        }
+      ],
+      "prefer-template": "warn",
+      "prettier/prettier": "warn"
     }
   },
   "homepage": "https://excalidraw.com",
@@ -54,12 +74,15 @@
     "build": "react-scripts build",
     "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
-    "fix": "npm run prettier -- --write",
-    "prettier": "prettier \"**/*.{js,css,scss,json,md,ts,tsx,html,yml}\" --ignore-path=.eslintignore",
+    "fix": "npm run fix:other && npm run fix:code",
+    "fix:code": "npm run test:code -- --fix",
+    "fix:other": "npm run prettier -- --write",
+    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:code": "npm run prettier -- --list-different"
+    "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "test:other": "npm run prettier -- --list-different"
   },
   "version": "1.0.0",
   "license": "MIT",

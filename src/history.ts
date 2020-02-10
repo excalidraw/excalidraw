@@ -1,25 +1,31 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
+import { clearAppStatePropertiesForHistory } from "./appState";
 
 class SceneHistory {
   private recording: boolean = true;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
-  generateCurrentEntry(
-    appState: Partial<AppState>,
+  private generateEntry(
+    appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) {
     return JSON.stringify({
-      appState,
+      appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
-        isSelected: false,
+        shape: null,
+        points:
+          appState.multiElement && appState.multiElement.id === element.id
+            ? element.points.slice(0, -1)
+            : element.points,
       })),
     });
   }
 
-  pushEntry(newEntry: string) {
+  pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
+    const newEntry = this.generateEntry(appState, elements);
     if (
       this.stateHistory.length > 0 &&
       this.stateHistory[this.stateHistory.length - 1] === newEntry
@@ -67,6 +73,7 @@ class SceneHistory {
     }
 
     const currentEntry = this.stateHistory.pop();
+
     const entryToRestore = this.stateHistory[this.stateHistory.length - 1];
 
     if (currentEntry !== undefined) {

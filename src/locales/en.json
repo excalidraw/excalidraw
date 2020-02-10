@@ -39,7 +39,8 @@
     "fileTitle": "File title",
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas"
+    "drawingCanvas": "Drawing Canvas",
+    "layers": "Layers"
   },
   "buttons": {
     "clearReset": "Clear the canvas & reset background color",
@@ -52,7 +53,7 @@
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select Language",
-    "previouslyLoadedScenes": "Previously loaded scenes"
+    "scrollBackToContent": "Scroll back to content"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -60,7 +61,7 @@
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
-    "copiedToClipboard": "Copied to clipboard: {{url}}"
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Selection",
@@ -76,5 +77,10 @@
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
     "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

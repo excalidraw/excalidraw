@@ -12,7 +12,7 @@ export function FixedSideContainer({
   side,
 }: FixedSideContainerProps) {
   return (
-    <div className={"FixedSideContainer FixedSideContainer_side_" + side}>
+    <div className={`FixedSideContainer FixedSideContainer_side_${side}`}>
       {children}
     </div>
   );

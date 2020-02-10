@@ -1,12 +1,9 @@
 import { ExcalidrawElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
-import {
-  getDiamondPoints,
-  getArrowPoints,
-  getLinePoints,
-} from "../element/bounds";
+import { getDiamondPoints, getArrowPoints } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
+import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SVG_NS } from "../utils";
@@ -104,33 +101,34 @@ function generateElement(
           },
         );
         break;
+      case "line":
       case "arrow": {
-        const [x1, y1, x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
         const options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
-        element.shape = [
-          //    \
-          generator.line(x3, y3, x2, y2, options),
-          // -----
-          generator.line(x1, y1, x2, y2, options),
-          //    /
-          generator.line(x4, y4, x2, y2, options),
-        ];
-        break;
-      }
-      case "line": {
-        const [x1, y1, x2, y2] = getLinePoints(element);
-        const options = {
-          stroke: element.strokeColor,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        };
-        element.shape = generator.line(x1, y1, x2, y2, options);
+        // points array can be empty in the beginning, so it is important to add
+        // initial position to it
+        const points: Point[] = element.points.length
+          ? element.points
+          : [[0, 0]];
+
+        // curve is always the first element
+        // this simplifies finding the curve for an element
+        element.shape = [generator.curve(points, options)];
+
+        // add lines only in arrow
+        if (element.type === "arrow") {
+          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
+          element.shape.push(
+            ...[
+              generator.line(x3, y3, x2, y2, options),
+              generator.line(x4, y4, x2, y2, options),
+            ],
+          );
+        }
         break;
       }
     }
@@ -154,7 +152,6 @@ export function renderElement(
     case "rectangle":
     case "diamond":
     case "ellipse":
-    case "line": {
       generateElement(element, generator);
       if ((element as any).canvas) {
         context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
@@ -168,7 +165,7 @@ export function renderElement(
         context.globalAlpha = 1;
       }
       break;
-    }
+    case "line":
     case "arrow": {
       generateElement(element, generator);
       context.globalAlpha = element.opacity / 100;
@@ -193,9 +190,8 @@ export function renderElement(
         context.fillStyle = fillStyle;
         context.font = font;
         context.globalAlpha = 1;
-        break;
       } else {
-        throw new Error("Unimplemented type " + element.type);
+        throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }
@@ -286,7 +282,7 @@ export function renderElementToSvg(
         }
         svgRoot.appendChild(node);
       } else {
-        throw new Error("Unimplemented type " + element.type);
+        throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }

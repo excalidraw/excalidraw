@@ -16,6 +16,7 @@ import { renderElement, renderElementToSvg } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
+  selectionElement: ExcalidrawElement | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -32,7 +33,9 @@ export function renderScene(
     renderSelection?: boolean;
   } = {},
 ) {
-  if (!canvas) return;
+  if (!canvas) {
+    return false;
+  }
   const context = canvas.getContext("2d")!;
 
   const fillStyle = context.fillStyle;
@@ -57,6 +60,7 @@ export function renderScene(
     scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
   };
 
+  let atLeastOneVisibleElement = false;
   elements.forEach(element => {
     if (
       !isVisibleElement(
@@ -71,6 +75,7 @@ export function renderScene(
     ) {
       return;
     }
+    atLeastOneVisibleElement = true;
     context.translate(
       element.x + sceneState.scrollX,
       element.y + sceneState.scrollY,
@@ -81,6 +86,18 @@ export function renderScene(
       -element.y - sceneState.scrollY,
     );
   });
+
+  if (selectionElement) {
+    context.translate(
+      selectionElement.x + sceneState.scrollX,
+      selectionElement.y + sceneState.scrollY,
+    );
+    renderElement(selectionElement, rc, context);
+    context.translate(
+      -selectionElement.x - sceneState.scrollX,
+      -selectionElement.y - sceneState.scrollY,
+    );
+  }
 
   if (renderSelection) {
     const selectedElements = elements.filter(el => el.isSelected);
@@ -107,9 +124,11 @@ export function renderScene(
 
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       const handlers = handlerRectangles(selectedElements[0], sceneState);
-      Object.values(handlers).forEach(handler => {
-        context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
-      });
+      Object.values(handlers)
+        .filter(handler => handler !== undefined)
+        .forEach(handler => {
+          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+        });
     }
   }
 
@@ -126,7 +145,7 @@ export function renderScene(
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
     [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
-      if (scrollBar)
+      if (scrollBar) {
         roundRect(
           context,
           scrollBar.x,
@@ -135,10 +154,13 @@ export function renderScene(
           scrollBar.height,
           SCROLLBAR_WIDTH / 2,
         );
+      }
     });
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
   }
+
+  return atLeastOneVisibleElement;
 }
 
 function isVisibleElement(
@@ -149,11 +171,19 @@ function isVisibleElement(
   canvasHeight: number,
 ) {
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  x1 += scrollX;
-  y1 += scrollY;
-  x2 += scrollX;
-  y2 += scrollY;
-  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
+  if (element.type !== "arrow") {
+    x1 += scrollX;
+    y1 += scrollY;
+    x2 += scrollX;
+    y2 += scrollY;
+    return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
+  }
+  return (
+    x2 + scrollX >= 0 &&
+    x1 + scrollX <= canvasWidth &&
+    y2 + scrollY >= 0 &&
+    y1 + scrollY <= canvasHeight
+  );
 }
 
 // This should be only called for exporting purposes

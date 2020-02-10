@@ -3,8 +3,8 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
-  elements?: ExcalidrawElement[];
-  appState?: AppState;
+  elements?: readonly ExcalidrawElement[] | null;
+  appState?: AppState | null;
 };
 
 type ActionFn = (
@@ -13,7 +13,7 @@ type ActionFn = (
   formData: any,
 ) => ActionResult;
 
-export type UpdaterFn = (res: ActionResult) => void;
+export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export interface Action {
@@ -27,11 +27,15 @@ export interface Action {
   keyPriority?: number;
   keyTest?: (
     event: KeyboardEvent,
-    elements?: readonly ExcalidrawElement[],
-    appState?: AppState,
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  commitToHistory?: (
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {
@@ -39,21 +43,9 @@ export interface ActionsManagerInterface {
     [keyProp: string]: Action;
   };
   registerAction: (action: Action) => void;
-  handleKeyDown: (
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => ActionResult | null;
+  handleKeyDown: (event: KeyboardEvent) => boolean;
   getContextMenuItems: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
-  renderAction: (
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-  ) => React.ReactElement | null;
+  renderAction: (name: string) => React.ReactElement | null;
 }

@@ -5,6 +5,12 @@ export const languages = [
   { lng: "de", label: "Deutsch", data: require("./locales/de.json") },
   { lng: "es", label: "Español", data: require("./locales/es.json") },
   { lng: "fr", label: "Français", data: require("./locales/fr.json") },
+  {
+    lng: "nb-no",
+    label: "Norsk Bokmål",
+    data: require("./locales/nb-no.json"),
+  },
+  { lng: "pl", label: "Polski", data: require("./locales/pl.json") },
   { lng: "pt", label: "Português", data: require("./locales/pt.json") },
   { lng: "ru", label: "Русский", data: require("./locales/ru.json") },
 ];
@@ -43,12 +49,12 @@ export function t(path: string, replacement?: { [key: string]: string }) {
     findPartsForData(currentLanguage.data, parts) ||
     findPartsForData(fallbackLanguage.data, parts);
   if (translation === undefined) {
-    throw new Error("Can't find translation for " + path);
+    throw new Error(`Can't find translation for ${path}`);
   }
 
   if (replacement) {
     for (var key in replacement) {
-      translation = translation.replace("{{" + key + "}}", replacement[key]);
+      translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }
   return translation;
