@@ -1679,6 +1679,8 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mouseup", onMouseUp);
             }}
             onDoubleClick={e => {
+              resetCursor();
+
               const { x, y } = viewportCoordsToSceneCoords(e, this.state);
 
               const elementAtPosition = getElementAtPosition(elements, x, y);
