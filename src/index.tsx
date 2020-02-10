@@ -1011,6 +1011,12 @@ export class App extends React.Component<any, AppState> {
               }
 
               if (isTextElement(element)) {
+                // if we're currently still editing text, clicking outside
+                //  should only finalize it, not create another (irrespective
+                //  of state.elementLocked)
+                if (this.state.editingElement?.type === "text") {
+                  return;
+                }
                 let textX = e.clientX;
                 let textY = e.clientY;
                 if (!e.altKey) {
@@ -1054,6 +1060,9 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    if (this.state.elementLocked) {
+                      setCursorForShape(this.state.elementType);
+                    }
                     history.resumeRecording();
                     resetSelection();
                   },
@@ -1061,8 +1070,8 @@ export class App extends React.Component<any, AppState> {
                     resetSelection();
                   },
                 });
+                resetCursor();
                 if (!this.state.elementLocked) {
-                  resetCursor();
                   this.setState({
                     editingElement: element,
                     elementType: "selection",
