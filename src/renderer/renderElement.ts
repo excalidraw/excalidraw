@@ -23,8 +23,10 @@ function generateElementCanvas(element: ExcalidrawElement) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width = (distance(x1, x2) + 40) * window.devicePixelRatio;
     canvas.height = (distance(y1, y2) + 40) * window.devicePixelRatio;
-    element.canvasOffsetX = element.x > x1 ? distance(element.x, x1) : 0;
-    element.canvasOffsetY = element.y > y1 ? distance(element.y, y1) : 0;
+    element.canvasOffsetX =
+      element.x > x1 ? distance(element.x, x1) * window.devicePixelRatio : 0;
+    element.canvasOffsetY =
+      element.y > y1 ? distance(element.y, y1) * window.devicePixelRatio : 0;
     context.translate(element.canvasOffsetX, element.canvasOffsetY);
   } else {
     canvas.width = (element.width + 40) * window.devicePixelRatio;
