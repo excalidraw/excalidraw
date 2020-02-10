@@ -31,7 +31,6 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  loadedScenes,
   loadScene,
   calculateScrollCenter,
   loadFromBlob,
@@ -96,16 +95,12 @@ import { ExportDialog } from "./components/ExportDialog";
 import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
-import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
-
-const CANVAS_WINDOW_OFFSET_LEFT = 0;
-const CANVAS_WINDOW_OFFSET_TOP = 0;
 
 function resetCursor() {
   document.documentElement.style.cursor = "";
@@ -144,8 +139,8 @@ export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
   { scrollX, scrollY }: { scrollX: number; scrollY: number },
 ) {
-  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
-  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  const x = clientX - scrollX;
+  const y = clientY - scrollY;
   return { x, y };
 }
 
@@ -280,6 +275,16 @@ const LayerUI = React.memo(
 
             {actionManager.renderAction("changeOpacity")}
 
+            <fieldset>
+              <legend>{t("labels.layers")}</legend>
+              <div className="buttonList">
+                {actionManager.renderAction("sendToBack")}
+                {actionManager.renderAction("sendBackward")}
+                {actionManager.renderAction("bringToFront")}
+                {actionManager.renderAction("bringForward")}
+              </div>
+            </fieldset>
+
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
         </Island>
@@ -315,22 +320,6 @@ const LayerUI = React.memo(
             );
           })}
         </>
-      );
-    }
-
-    function renderIdsDropdown() {
-      const scenes = loadedScenes();
-      if (scenes.length === 0) {
-        return;
-      }
-      return (
-        <StoredScenesList
-          scenes={scenes}
-          currentId={appState.selectedId}
-          onChange={async (id, k) =>
-            actionManager.updater(await loadScene(id, k))
-          }
-        />
       );
     }
 
@@ -400,7 +389,6 @@ const LayerUI = React.memo(
             languages={languages}
             currentLanguage={language}
           />
-          {renderIdsDropdown()}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
@@ -777,8 +765,8 @@ export class App extends React.Component<any, AppState> {
   };
 
   public render() {
-    const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
-    const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
 
     return (
       <div className="container">
@@ -947,10 +935,10 @@ export class App extends React.Component<any, AppState> {
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
                 elements,
-                e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
-                e.clientY - CANVAS_WINDOW_OFFSET_TOP,
-                canvasWidth,
-                canvasHeight,
+                e.clientX / window.devicePixelRatio,
+                e.clientY / window.devicePixelRatio,
+                canvasWidth / window.devicePixelRatio,
+                canvasHeight / window.devicePixelRatio,
                 this.state.scrollX,
                 this.state.scrollY,
               );
@@ -1133,8 +1121,8 @@ export class App extends React.Component<any, AppState> {
               let lastY = y;
 
               if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
-                lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                lastX = e.clientX;
+                lastY = e.clientY;
               }
 
               let resizeArrowFn:
@@ -1212,7 +1200,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isOverHorizontalScrollBar) {
-                  const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+                  const x = e.clientX;
                   const dx = x - lastX;
                   this.setState({ scrollX: this.state.scrollX - dx });
                   lastX = x;
@@ -1220,7 +1208,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isOverVerticalScrollBar) {
-                  const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                  const y = e.clientY;
                   const dy = y - lastY;
                   this.setState({ scrollY: this.state.scrollY - dy });
                   lastY = y;
@@ -1727,12 +1715,10 @@ export class App extends React.Component<any, AppState> {
                 textX =
                   this.state.scrollX +
                   elementAtPosition.x +
-                  CANVAS_WINDOW_OFFSET_LEFT +
                   elementAtPosition.width / 2;
                 textY =
                   this.state.scrollY +
                   elementAtPosition.y +
-                  CANVAS_WINDOW_OFFSET_TOP +
                   elementAtPosition.height / 2;
 
                 // x and y will change after calling newTextElement function
@@ -1870,13 +1856,8 @@ export class App extends React.Component<any, AppState> {
     const elementsCenterX = distance(minX, maxX) / 2;
     const elementsCenterY = distance(minY, maxY) / 2;
 
-    const dx =
-      cursorX -
-      this.state.scrollX -
-      CANVAS_WINDOW_OFFSET_LEFT -
-      elementsCenterX;
-    const dy =
-      cursorY - this.state.scrollY - CANVAS_WINDOW_OFFSET_TOP - elementsCenterY;
+    const dx = cursorX - this.state.scrollX - elementsCenterX;
+    const dy = cursorY - this.state.scrollY - elementsCenterY;
 
     elements = [
       ...elements,
@@ -1908,12 +1889,10 @@ export class App extends React.Component<any, AppState> {
         const wysiwygX =
           this.state.scrollX +
           elementClickedInside.x +
-          CANVAS_WINDOW_OFFSET_LEFT +
           elementClickedInside.width / 2;
         const wysiwygY =
           this.state.scrollY +
           elementClickedInside.y +
-          CANVAS_WINDOW_OFFSET_TOP +
           elementClickedInside.height / 2;
         return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
       }

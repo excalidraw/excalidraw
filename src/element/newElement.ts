@@ -63,7 +63,15 @@ export function newTextElement(
 }
 
 export function duplicateElement(element: ReturnType<typeof newElement>) {
-  const copy = { ...element };
+  const copy = {
+    ...element,
+  };
+  if ("points" in copy) {
+    copy.points = Array.isArray(element.points)
+      ? JSON.parse(JSON.stringify(element.points))
+      : element.points;
+  }
+
   delete copy.shape;
   copy.id = nanoid();
   copy.seed = randomSeed();

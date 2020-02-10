@@ -51,8 +51,7 @@
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
-    "selectLanguage": "Выбрать язык",
-    "previouslyLoadedScenes": "Ранее загруженные сцены"
+    "selectLanguage": "Выбрать язык"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",

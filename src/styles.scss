@@ -87,6 +87,7 @@ button,
   border-radius: 4px;
   margin: 0.125rem 0;
   padding: 0.25rem;
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -99,7 +100,7 @@ button,
   }
 
   &:active {
-    background-color: #ced4da;
+    background-color: #adb5bd;
   }
 
   &:disabled {
@@ -112,6 +113,9 @@ button,
   background-color: #ced4da;
   &:hover {
     background-color: #ced4da;
+  }
+  &:active {
+    background-color: #adb5bd;
   }
 }
 
@@ -238,15 +242,6 @@ button,
   bottom: 0;
 }
 
-.stored-ids-select {
-  @extend .dropdown-select;
-  padding: 0 0.5em 0 1.7em;
-  bottom: 0;
-  left: 0;
-  background-position: left 0.7em top 50%, 0 0;
-  margin-left: 0.5em;
-}
-
 .visually-hidden {
   position: absolute !important;
   height: 1px;
@@ -255,6 +250,19 @@ button,
   clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
   white-space: nowrap; /* added line */
+}
+
+.zIndexButton {
+  margin: 0 5px;
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .scroll-back-to-content {
