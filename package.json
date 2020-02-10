@@ -16,7 +16,7 @@
   },
   "description": "",
   "devDependencies": {
-    "@types/jest": "25.1.1",
+    "@types/jest": "25.1.2",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.5",
