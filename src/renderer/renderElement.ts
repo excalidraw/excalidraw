@@ -181,7 +181,6 @@ function renderFromElementCanvas(
 ) {
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(-20, -20);
-  // @ts-ignore
   context.drawImage(
     element.canvas!,
     -element.canvasOffsetX,
