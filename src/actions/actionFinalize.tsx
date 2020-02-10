@@ -21,16 +21,17 @@ export const actionFinalize: Action = {
       }
       appState.multiElement.shape = null;
     }
-    if (!appState.elementLocked) {
+    if (!appState.elementLocked || !appState.multiElement) {
       resetCursor();
     }
     return {
       elements: newElements,
       appState: {
         ...appState,
-        elementType: appState.elementLocked
-          ? appState.elementType
-          : "selection",
+        elementType:
+          appState.elementLocked && appState.multiElement
+            ? appState.elementType
+            : "selection",
         draggingElement: null,
         multiElement: null,
       },
