@@ -8,7 +8,6 @@
   "dependencies": {
     "browser-nativefs": "0.2.0",
     "i18next-browser-languagedetector": "4.0.1",
-    "klona": "1.1.1",
     "nanoid": "2.1.11",
     "react": "16.12.0",
     "react-dom": "16.12.0",

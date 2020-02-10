@@ -5,7 +5,6 @@ import { Point } from "roughjs/bin/geometry";
 
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../utils";
-import klona from "klona";
 
 export function newElement(
   type: string,
@@ -64,7 +63,15 @@ export function newTextElement(
 }
 
 export function duplicateElement(element: ReturnType<typeof newElement>) {
-  const copy = klona(element);
+  const copy = {
+    ...element,
+  };
+  if ("points" in copy) {
+    copy.points = Array.isArray(element.points)
+      ? JSON.parse(JSON.stringify(element.points))
+      : element.points;
+  }
+
   delete copy.shape;
   copy.id = nanoid();
   copy.seed = randomSeed();
