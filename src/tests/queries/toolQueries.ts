@@ -1,10 +1,4 @@
-import {
-  render,
-  queries,
-  RenderResult,
-  RenderOptions,
-  buildQueries,
-} from "@testing-library/react";
+import { queries, buildQueries } from "@testing-library/react";
 
 const _getAllByToolName = (container: HTMLElement, tool: string) => {
   const toolMap: { [propKey: string]: string } = {
@@ -25,7 +19,7 @@ const getMultipleError = (c: any, tool: any) =>
 const getMissingError = (c: any, tool: any) =>
   `Unable to find an element with tool name: ${tool}`;
 
-const [
+export const [
   queryByToolName,
   getAllByToolName,
   getByToolName,
@@ -36,29 +30,3 @@ const [
   getMultipleError,
   getMissingError,
 );
-
-const customQueries = {
-  ...queries,
-  queryByToolName,
-  getAllByToolName,
-  getByToolName,
-  findAllByToolName,
-  findByToolName,
-};
-
-type TestRenderFn = (
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, "queries">,
-) => RenderResult<typeof customQueries>;
-
-const renderApp: TestRenderFn = (ui, options) =>
-  render(ui, {
-    queries: customQueries,
-    ...options,
-  });
-
-// re-export everything
-export * from "@testing-library/react";
-
-// override render method
-export { renderApp as render };

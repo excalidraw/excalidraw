@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { App } from "../index";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
-import { render, fireEvent } from "../test-utils";
+import { render, fireEvent } from "./test-utils";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
