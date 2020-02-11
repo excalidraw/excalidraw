@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("move element", () => {
+describe("resize element", () => {
   it("rectangle", () => {
     const { getByTitle, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -37,19 +37,25 @@ describe("move element", () => {
       renderScene.mockClear();
     }
 
+    // select the element first
     fireEvent.mouseDown(canvas, { clientX: 50, clientY: 20 });
+    fireEvent.mouseUp(canvas);
+
+    // select a handler rectangle (top-left)
+    fireEvent.mouseDown(canvas, { clientX: 21, clientY: 13 });
     fireEvent.mouseMove(canvas, { clientX: 20, clientY: 40 });
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(3);
-    const elements = renderScene.mock.calls[2][0];
-    expect(renderScene.mock.calls[2][1]).toBeNull();
+    expect(renderScene).toHaveBeenCalledTimes(5);
+    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene.mock.calls[4][1]).toBeNull();
     expect(elements.length).toEqual(1);
-    expect([elements[0].x, elements[0].y]).toEqual([0, 40]);
+    expect([elements[0].x, elements[0].y]).toEqual([29, 47]);
+    expect([elements[0].width, elements[0].height]).toEqual([31, 23]);
   });
 });
 
-describe("duplicate element on move when ALT is clicked", () => {
+describe("resize element with aspect ratio when SHIFT is clicked", () => {
   it("rectangle", () => {
     const { getByTitle, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -73,16 +79,20 @@ describe("duplicate element on move when ALT is clicked", () => {
       renderScene.mockClear();
     }
 
-    fireEvent.mouseDown(canvas, { clientX: 50, clientY: 20, altKey: true });
-    fireEvent.mouseMove(canvas, { clientX: 20, clientY: 40 });
+    // select the element first
+    fireEvent.mouseDown(canvas, { clientX: 50, clientY: 20 });
     fireEvent.mouseUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(3);
-    const elements = renderScene.mock.calls[2][0];
-    expect(renderScene.mock.calls[2][1]).toBeNull();
-    expect(elements.length).toEqual(2);
-    // previous element should stay intact
-    expect([elements[0].x, elements[0].y]).toEqual([30, 20]);
-    expect([elements[1].x, elements[1].y]).toEqual([0, 40]);
+    // select a handler rectangle (top-left)
+    fireEvent.mouseDown(canvas, { clientX: 21, clientY: 13 });
+    fireEvent.mouseMove(canvas, { clientX: 20, clientY: 40, shiftKey: true });
+    fireEvent.mouseUp(canvas);
+
+    expect(renderScene).toHaveBeenCalledTimes(5);
+    const elements = renderScene.mock.calls[4][0];
+    expect(renderScene.mock.calls[4][1]).toBeNull();
+    expect(elements.length).toEqual(1);
+    expect([elements[0].x, elements[0].y]).toEqual([29, 39]);
+    expect([elements[0].width, elements[0].height]).toEqual([31, 31]);
   });
 });
