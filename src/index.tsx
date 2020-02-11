@@ -1366,7 +1366,14 @@ export class App extends React.Component<any, AppState> {
                             element,
                           );
 
-                          // TODO: Set bottom most point as origin for scale
+                          element.scaleOriginY = element.points.reduce(
+                            (prev, curr) => {
+                              return Math.max(prev, curr[1]);
+                            },
+                            -Infinity,
+                          );
+                          element.scaleOriginX = 0;
+
                           if (element.scaleY < 0) {
                             element.scaleY += (y - y1) / y2;
                           } else {
@@ -1385,7 +1392,14 @@ export class App extends React.Component<any, AppState> {
                             element,
                           );
 
-                          // TODO: Set right most point as origin for scale
+                          element.scaleOriginX = element.points.reduce(
+                            (prev, curr) => {
+                              return Math.max(prev, curr[0]);
+                            },
+                            -Infinity,
+                          );
+                          element.scaleOriginY = 0;
+
                           if (element.scaleX < 0) {
                             element.scaleX += (x - x1) / x2;
                           } else {
@@ -1402,7 +1416,14 @@ export class App extends React.Component<any, AppState> {
                             element,
                           );
 
-                          // TODO: Set top most point as origin for scale
+                          element.scaleOriginY = element.points.reduce(
+                            (prev, curr) => {
+                              return Math.min(prev, curr[1]);
+                            },
+                            +Infinity,
+                          );
+                          element.scaleOriginX = 0;
+
                           if (element.scaleY < 0) {
                             element.scaleY += (y - y1) / y2;
                           } else {
@@ -1419,7 +1440,14 @@ export class App extends React.Component<any, AppState> {
                             element,
                           );
 
-                          // TODO: Set left most point as origin for scale
+                          element.scaleOriginX = element.points.reduce(
+                            (prev, curr) => {
+                              return Math.min(prev, curr[0]);
+                            },
+                            +Infinity,
+                          );
+                          element.scaleOriginY = 0;
+
                           if (element.scaleX < 0) {
                             element.scaleX += (x - x1) / x2;
                           } else {

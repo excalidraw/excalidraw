@@ -104,8 +104,8 @@ function generateElement(
         element.shape = [
           generator.curve(
             points.map(pnt => [
-              pnt[0] * element.scaleX,
-              pnt[1] * element.scaleY,
+              (pnt[0] - element.scaleOriginX) * element.scaleX,
+              (pnt[1] - element.scaleOriginY) * element.scaleY,
             ]),
             options,
           ),
