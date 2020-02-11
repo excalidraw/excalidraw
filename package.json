@@ -16,6 +16,8 @@
   },
   "description": "",
   "devDependencies": {
+    "@testing-library/jest-dom": "5.1.1",
+    "@testing-library/react": "9.4.0",
     "@types/jest": "25.1.2",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.19",
@@ -24,11 +26,17 @@
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.1",
+    "jest-canvas-mock": "2.2.0",
     "lint-staged": "10.0.7",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
     "rewire": "4.0.1",
     "typescript": "3.7.5"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|browser-nativefs)/)"
+    ]
   },
   "eslintConfig": {
     "extends": [
