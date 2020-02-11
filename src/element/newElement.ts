@@ -32,6 +32,8 @@ export function newElement(
     strokeWidth,
     roughness,
     opacity,
+    scaleX: 1.0,
+    scaleY: 1.0,
     isSelected: false,
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,

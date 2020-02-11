@@ -101,7 +101,15 @@ function generateElement(
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        element.shape = [generator.curve(points, options)];
+        element.shape = [
+          generator.curve(
+            points.map(pnt => [
+              pnt[0] * element.scaleX,
+              pnt[1] * element.scaleY,
+            ]),
+            options,
+          ),
+        ];
 
         // add lines only in arrow
         if (element.type === "arrow") {

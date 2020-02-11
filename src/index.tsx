@@ -17,6 +17,7 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   normalizeDimensions,
+  getLinearElementAbsoluteBounds,
 } from "./element";
 import {
   clearSelection,
@@ -1358,67 +1359,74 @@ export class App extends React.Component<any, AppState> {
                         }
                         break;
                       case "n": {
-                        element.height -= deltaY;
                         element.y += deltaY;
 
                         if (element.points.length > 0) {
-                          const len = element.points.length;
-
-                          const points = [...element.points].sort(
-                            (a, b) => a[1] - b[1],
+                          const [, y1, , y2] = getLinearElementAbsoluteBounds(
+                            element,
                           );
 
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[1] -= deltaY / (len - i);
+                          // TODO: Set bottom most point as origin for scale
+                          if (element.scaleY < 0) {
+                            element.scaleY += (y - y1) / y2;
+                          } else {
+                            element.scaleY += (y - y2) / y2;
                           }
+                        } else {
+                          element.height -= deltaY;
                         }
                         break;
                       }
                       case "w": {
-                        element.width -= deltaX;
                         element.x += deltaX;
 
                         if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[0] - b[0],
+                          const [x1, , x2, ,] = getLinearElementAbsoluteBounds(
+                            element,
                           );
 
-                          for (let i = 0; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[0] -= deltaX / (len - i);
+                          // TODO: Set right most point as origin for scale
+                          if (element.scaleX < 0) {
+                            element.scaleX += (x - x1) / x2;
+                          } else {
+                            element.scaleX += (x - x2) / x2;
                           }
+                        } else {
+                          element.width -= deltaX;
                         }
                         break;
                       }
                       case "s": {
-                        element.height += deltaY;
                         if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[1] - b[1],
+                          const [, y1, , y2] = getLinearElementAbsoluteBounds(
+                            element,
                           );
 
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[1] += deltaY / (len - i);
+                          // TODO: Set top most point as origin for scale
+                          if (element.scaleY < 0) {
+                            element.scaleY += (y - y1) / y2;
+                          } else {
+                            element.scaleY += (y - y2) / y2;
                           }
+                        } else {
+                          element.height += deltaY;
                         }
                         break;
                       }
                       case "e": {
-                        element.width += deltaX;
                         if (element.points.length > 0) {
-                          const len = element.points.length;
-                          const points = [...element.points].sort(
-                            (a, b) => a[0] - b[0],
+                          const [x1, , x2, ,] = getLinearElementAbsoluteBounds(
+                            element,
                           );
 
-                          for (let i = 1; i < points.length; ++i) {
-                            const pnt = points[i];
-                            pnt[0] += deltaX / (len - i);
+                          // TODO: Set left most point as origin for scale
+                          if (element.scaleX < 0) {
+                            element.scaleX += (x - x1) / x2;
+                          } else {
+                            element.scaleX += (x - x2) / x2;
                           }
+                        } else {
+                          element.width += deltaX;
                         }
                         break;
                       }
