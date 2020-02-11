@@ -16,9 +16,9 @@ beforeEach(() => {
 
 describe("remove shape in non linear elements", () => {
   it("rectangle", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Rectangle — R, 2");
+    const tool = getByToolName("rectangle");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -31,9 +31,9 @@ describe("remove shape in non linear elements", () => {
   });
 
   it("ellipse", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Ellipse — E, 4");
+    const tool = getByToolName("ellipse");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -46,9 +46,9 @@ describe("remove shape in non linear elements", () => {
   });
 
   it("diamond", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Diamond — D, 3");
+    const tool = getByToolName("diamond");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -63,9 +63,9 @@ describe("remove shape in non linear elements", () => {
 
 describe("multi point mode in linear elements", () => {
   it("arrow", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Arrow — A, 5");
+    const tool = getByToolName("arrow");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -101,9 +101,9 @@ describe("multi point mode in linear elements", () => {
   });
 
   it("line", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Line — L, 6");
+    const tool = getByToolName("line");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;

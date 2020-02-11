@@ -16,9 +16,9 @@ beforeEach(() => {
 
 describe("selection element", () => {
   it("create selection element on mouse down", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -36,9 +36,9 @@ describe("selection element", () => {
   });
 
   it("resize selection element on mouse move", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -57,9 +57,9 @@ describe("selection element", () => {
   });
 
   it("remove selection element on mouse up", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -75,11 +75,11 @@ describe("selection element", () => {
 
 describe("select single element on the scene", () => {
   it("rectangle", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
-      const tool = getByTitle("Rectangle — R, 2");
+      const tool = getByToolName("rectangle");
       fireEvent.click(tool);
       fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
@@ -87,7 +87,7 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
     // click on a line on the rectangle
     fireEvent.mouseDown(canvas, { clientX: 45, clientY: 20 });
@@ -102,11 +102,11 @@ describe("select single element on the scene", () => {
   });
 
   it("diamond", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
-      const tool = getByTitle("Diamond — D, 3");
+      const tool = getByToolName("diamond");
       fireEvent.click(tool);
       fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
@@ -114,7 +114,7 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
     // click on a line on the rectangle
     fireEvent.mouseDown(canvas, { clientX: 45, clientY: 20 });
@@ -129,11 +129,11 @@ describe("select single element on the scene", () => {
   });
 
   it("ellipse", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
-      const tool = getByTitle("Ellipse — E, 4");
+      const tool = getByToolName("ellipse");
       fireEvent.click(tool);
       fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
@@ -141,7 +141,7 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
     // click on a line on the rectangle
     fireEvent.mouseDown(canvas, { clientX: 45, clientY: 20 });
@@ -156,11 +156,11 @@ describe("select single element on the scene", () => {
   });
 
   it("arrow", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
-      const tool = getByTitle("Arrow — A, 5");
+      const tool = getByToolName("arrow");
       fireEvent.click(tool);
       fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
@@ -168,7 +168,7 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
     // click on a line on the rectangle
     fireEvent.mouseDown(canvas, { clientX: 45, clientY: 20 });
@@ -183,11 +183,11 @@ describe("select single element on the scene", () => {
   });
 
   it("arrow", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
-      const tool = getByTitle("Line — L, 6");
+      const tool = getByToolName("line");
       fireEvent.click(tool);
       fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
@@ -195,7 +195,7 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
-    const tool = getByTitle("Selection — S, 1");
+    const tool = getByToolName("selection");
     fireEvent.click(tool);
     // click on a line on the rectangle
     fireEvent.mouseDown(canvas, { clientX: 45, clientY: 20 });

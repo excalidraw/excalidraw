@@ -16,9 +16,9 @@ beforeEach(() => {
 
 describe("add element to the scene when mouse dragging long enough", () => {
   it("rectangle", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Rectangle — R, 2");
+    const tool = getByToolName("rectangle");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -45,9 +45,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
   });
 
   it("ellipse", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Ellipse — E, 4");
+    const tool = getByToolName("ellipse");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -74,9 +74,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
   });
 
   it("diamond", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Diamond — D, 3");
+    const tool = getByToolName("diamond");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -103,9 +103,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
   });
 
   it("arrow", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Arrow — A, 5");
+    const tool = getByToolName("arrow");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -133,9 +133,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
   });
 
   it("line", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Line — L, 6");
+    const tool = getByToolName("line");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -165,9 +165,9 @@ describe("add element to the scene when mouse dragging long enough", () => {
 
 describe("do not add element to the scene if size is too small", () => {
   it("rectangle", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Rectangle — R, 2");
+    const tool = getByToolName("rectangle");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -186,9 +186,9 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("ellipse", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Ellipse — E, 4");
+    const tool = getByToolName("ellipse");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -207,9 +207,9 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("diamond", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Diamond — D, 3");
+    const tool = getByToolName("diamond");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -228,9 +228,9 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("arrow", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Arrow — A, 5");
+    const tool = getByToolName("arrow");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
@@ -252,9 +252,9 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("line", () => {
-    const { getByTitle, container } = render(<App />);
+    const { getByToolName, container } = render(<App />);
     // select tool
-    const tool = getByTitle("Line — L, 6");
+    const tool = getByToolName("line");
     fireEvent.click(tool);
 
     const canvas = container.querySelector("canvas")!;
