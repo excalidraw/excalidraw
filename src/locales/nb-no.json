@@ -39,7 +39,8 @@
     "fileTitle": "Filnavn",
     "colorPicker": "Fargevelger",
     "canvasBackground": "Lerretsbakgrunn",
-    "drawingCanvas": "Lerret"
+    "drawingCanvas": "Lerret",
+    "layers": "Lag"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -59,7 +60,8 @@
     "couldNotCreateShareableLink": "Kunne ikke lage delbar lenke.",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome."
+    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
+    "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
   },
   "toolBar": {
     "selection": "Velg",
@@ -75,5 +77,10 @@
     "canvasActions": "Handlinger: lerret",
     "selectedShapeActions": "Handlinger: valgt objekt",
     "shapes": "Former"
+  },
+  "hints": {
+    "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
+    "linearElementMulti": "Trykk Escape eller Enter for å fullføre",
+    "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
   }
 }
