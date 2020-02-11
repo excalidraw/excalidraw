@@ -1902,12 +1902,7 @@ export class App extends React.Component<any, AppState> {
   }
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(
-      (elements as any)
-        .filter((x: any) => x.type !== "selection")
-        .map(({ canvas, shape, ...rest }: any) => ({ ...rest })),
-      this.state,
-    );
+    saveToLocalStorage(elements, this.state);
   }, 300);
 
   componentDidUpdate() {

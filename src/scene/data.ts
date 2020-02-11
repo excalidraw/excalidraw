@@ -434,7 +434,9 @@ export function saveToLocalStorage(
   localStorage.setItem(
     LOCAL_STORAGE_KEY,
     JSON.stringify(
-      elements.map(({ shape, ...element }: ExcalidrawElement) => element),
+      elements.map(
+        ({ shape, canvas, ...element }: ExcalidrawElement) => element,
+      ),
     ),
   );
   localStorage.setItem(
