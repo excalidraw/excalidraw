@@ -475,6 +475,9 @@ export class App extends React.Component<any, AppState> {
     res: ActionResult,
     commitToHistory: boolean = true,
   ) => {
+    if (this.unmounted) {
+      return;
+    }
     if (res.elements) {
       elements = res.elements;
       if (commitToHistory) {
@@ -515,6 +518,11 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
+  private disableEvent: EventHandlerNonNull = e => {
+    e.preventDefault();
+  };
+
+  private unmounted = false;
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.pasteFromClipboard);
@@ -526,28 +534,32 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
     window.addEventListener("blur", this.onUnload, false);
-    window.addEventListener("dragover", e => e.preventDefault(), false);
-    window.addEventListener("drop", e => e.preventDefault(), false);
+    window.addEventListener("dragover", this.disableEvent, false);
+    window.addEventListener("drop", this.disableEvent, false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
     if (id) {
       // Backwards compatibility with legacy url format
-      this.syncActionResult(await loadScene(id));
+      const scene = await loadScene(id);
+      this.syncActionResult(scene);
     } else {
       const match = window.location.hash.match(
         /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
       );
       if (match) {
-        this.syncActionResult(await loadScene(match[1], match[2]));
+        const scene = await loadScene(match[1], match[2]);
+        this.syncActionResult(scene);
       } else {
-        this.syncActionResult(await loadScene(null));
+        const scene = await loadScene(null);
+        this.syncActionResult(scene);
       }
     }
   }
 
   public componentWillUnmount() {
+    this.unmounted = true;
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
@@ -558,9 +570,12 @@ export class App extends React.Component<any, AppState> {
       this.updateCurrentCursorPosition,
       false,
     );
+    document.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
     window.removeEventListener("blur", this.onUnload, false);
+    window.removeEventListener("dragover", this.disableEvent, false);
+    window.removeEventListener("drop", this.disableEvent, false);
   }
 
   public state: AppState = getDefaultAppState();
