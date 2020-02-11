@@ -13,6 +13,8 @@ import { RoughGenerator } from "roughjs/bin/generator";
 import { SVG_NS, distance } from "../utils";
 import rough from "roughjs/bin/rough";
 
+const CANVAS_PADDING = 20;
+
 function generateElementCanvas(element: ExcalidrawElement) {
   const canvas = document.createElement("canvas");
   var context = canvas.getContext("2d")!;
@@ -21,19 +23,23 @@ function generateElementCanvas(element: ExcalidrawElement) {
 
   if (isLinear) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    canvas.width = (distance(x1, x2) + 40) * window.devicePixelRatio;
-    canvas.height = (distance(y1, y2) + 40) * window.devicePixelRatio;
+    canvas.width =
+      (distance(x1, x2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
+    canvas.height =
+      (distance(y1, y2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
     element.canvasOffsetX =
       element.x > x1 ? distance(element.x, x1) * window.devicePixelRatio : 0;
     element.canvasOffsetY =
       element.y > y1 ? distance(element.y, y1) * window.devicePixelRatio : 0;
     context.translate(element.canvasOffsetX, element.canvasOffsetY);
   } else {
-    canvas.width = (element.width + 40) * window.devicePixelRatio;
-    canvas.height = (element.height + 40) * window.devicePixelRatio;
+    canvas.width =
+      (element.width + CANVAS_PADDING * 2) * window.devicePixelRatio;
+    canvas.height =
+      (element.height + CANVAS_PADDING * 2) * window.devicePixelRatio;
   }
 
-  context.translate(20, 20);
+  context.translate(CANVAS_PADDING, CANVAS_PADDING);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
   var rc2 = rough.canvas(canvas);
@@ -59,7 +65,7 @@ function generateElementCanvas(element: ExcalidrawElement) {
   }
   context.globalAlpha = 1;
   element.canvas = canvas;
-  context.translate(-20, -20);
+  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
 }
 
 function generateElement(
@@ -182,13 +188,13 @@ function renderFromElementCanvas(
   context: CanvasRenderingContext2D,
 ) {
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(-20, -20);
+  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
   context.drawImage(
     element.canvas!,
     -element.canvasOffsetX,
     -element.canvasOffsetY,
   );
-  context.translate(20, 20);
+  context.translate(CANVAS_PADDING, CANVAS_PADDING);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
