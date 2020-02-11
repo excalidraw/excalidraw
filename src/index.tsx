@@ -475,6 +475,9 @@ export class App extends React.Component<any, AppState> {
     res: ActionResult,
     commitToHistory: boolean = true,
   ) => {
+    if (this.unmounted) {
+      return;
+    }
     if (res.elements) {
       elements = res.elements;
       if (commitToHistory) {
@@ -540,23 +543,17 @@ export class App extends React.Component<any, AppState> {
     if (id) {
       // Backwards compatibility with legacy url format
       const scene = await loadScene(id);
-      if (!this.unmounted) {
-        this.syncActionResult(scene);
-      }
+      this.syncActionResult(scene);
     } else {
       const match = window.location.hash.match(
         /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
       );
       if (match) {
         const scene = await loadScene(match[1], match[2]);
-        if (!this.unmounted) {
-          this.syncActionResult(scene);
-        }
+        this.syncActionResult(scene);
       } else {
         const scene = await loadScene(null);
-        if (!this.unmounted) {
-          this.syncActionResult(scene);
-        }
+        this.syncActionResult(scene);
       }
     }
   }
