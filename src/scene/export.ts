@@ -86,8 +86,8 @@ export function exportToSvg(
         src: url("https://excalidraw.com/FG_Virgil.ttf");
       }
       @font-face {
-        font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.ttf");
+        font-family: "Victor Mono";
+        src: url("https://excalidraw.com/VictorMono-Medium.woff2");
       }
     </style>
   </defs>

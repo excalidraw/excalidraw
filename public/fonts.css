@@ -5,9 +5,9 @@
   font-display: swap;
 }
 
-/* https://github.com/microsoft/cascadia-code */
+/* https://github.com/rubjo/victor-mono */
 @font-face {
-  font-family: "Cascadia";
-  src: url("Cascadia.ttf");
+  font-family: "Victor Mono";
+  src: url("VictorMono-Medium.woff2");
   font-display: swap;
 }

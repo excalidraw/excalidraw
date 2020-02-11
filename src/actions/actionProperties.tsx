@@ -336,7 +336,7 @@ export const actionChangeFontFamily: Action = {
         options={[
           { value: "Virgil", text: t("labels.handDrawn") },
           { value: "Helvetica", text: t("labels.normal") },
-          { value: "Cascadia", text: t("labels.code") },
+          { value: "Victor Mono", text: t("labels.code") },
         ]}
         value={getFormValue(
           appState.editingElement,

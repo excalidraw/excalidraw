@@ -57,7 +57,7 @@ const elements = [
 ];
 
 registerFont("./public/FG_Virgil.ttf", { family: "Virgil" });
-registerFont("./public/Cascadia.ttf", { family: "Cascadia" });
+registerFont("./public/VictorMono-Medium.woff2", { family: "Victor Mono" });
 const canvas = exportToCanvas(
   elements as any,
   {
