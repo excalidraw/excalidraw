@@ -215,26 +215,15 @@ export function renderElement(
     case "rectangle":
     case "diamond":
     case "ellipse":
-      generateElement(element, generator);
-      renderFromElementCanvas(element, rc, context);
-      break;
     case "line":
-    case "arrow": {
+    case "arrow":
+    case "text": {
       generateElement(element, generator);
       renderFromElementCanvas(element, rc, context);
       break;
     }
     default: {
-      if (isTextElement(element)) {
-        if (element.canvas) {
-          renderFromElementCanvas(element, rc, context);
-        } else {
-          generateElementCanvas(element);
-          renderFromElementCanvas(element, rc, context);
-        }
-      } else {
-        throw new Error(`Unimplemented type ${element.type}`);
-      }
+      throw new Error(`Unimplemented type ${element.type}`);
     }
   }
 }
