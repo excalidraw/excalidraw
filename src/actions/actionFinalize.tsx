@@ -19,7 +19,7 @@ export const actionFinalize: Action = {
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
       }
-      appState.multiElement.shape = null;
+      appState.multiElement.canvas = null;
     }
     if (!appState.elementLocked || !appState.multiElement) {
       resetCursor();

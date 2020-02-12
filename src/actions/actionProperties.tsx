@@ -41,7 +41,7 @@ export const actionChangeStrokeColor: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         strokeColor: value,
       })),
       appState: { ...appState, currentItemStrokeColor: value },
@@ -72,7 +72,7 @@ export const actionChangeBackgroundColor: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         backgroundColor: value,
       })),
       appState: { ...appState, currentItemBackgroundColor: value },
@@ -103,7 +103,7 @@ export const actionChangeFillStyle: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         fillStyle: value,
       })),
       appState: { ...appState, currentItemFillStyle: value },
@@ -140,7 +140,7 @@ export const actionChangeStrokeWidth: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         strokeWidth: value,
       })),
       appState: { ...appState, currentItemStrokeWidth: value },
@@ -175,7 +175,7 @@ export const actionChangeSloppiness: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         roughness: value,
       })),
       appState: { ...appState, currentItemRoughness: value },
@@ -210,7 +210,7 @@ export const actionChangeOpacity: Action = {
     return {
       elements: changeProperty(elements, el => ({
         ...el,
-        shape: null,
+        canvas: null,
         opacity: value,
       })),
       appState: { ...appState, currentItemOpacity: value },
@@ -261,7 +261,7 @@ export const actionChangeFontSize: Action = {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = {
             ...el,
-            shape: null,
+            canvas: null,
             font: `${value}px ${el.font.split("px ")[1]}`,
           };
           redrawTextBoundingBox(element);
@@ -310,7 +310,7 @@ export const actionChangeFontFamily: Action = {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = {
             ...el,
-            shape: null,
+            canvas: null,
             font: `${el.font.split("px ")[0]}px ${value}`,
           };
           redrawTextBoundingBox(element);

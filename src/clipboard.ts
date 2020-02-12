@@ -21,7 +21,7 @@ export async function copyToAppClipboard(
   CLIPBOARD = JSON.stringify(
     elements
       .filter(element => element.isSelected)
-      .map(({ shape, ...el }) => el),
+      .map(({ shape, canvas, ...el }) => el),
   );
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
