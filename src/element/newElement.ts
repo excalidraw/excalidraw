@@ -71,15 +71,12 @@ function _duplicateElement(val: any, depth: number = 0) {
     return val;
   }
 
-  let k, tmp;
-  const str = Object.prototype.toString.call(val);
-
-  if (str === "[object Object]") {
-    tmp =
+  if (Object.prototype.toString.call(val) === "[object Object]") {
+    const tmp =
       typeof val.constructor === "function"
         ? Object.create(Object.getPrototypeOf(val))
         : {};
-    for (k in val) {
+    for (const k in val) {
       if (val.hasOwnProperty(k)) {
         // don't copy top-level shape property, which we want to regenerate
         if (depth === 0 && k === "shape") {
@@ -91,12 +88,13 @@ function _duplicateElement(val: any, depth: number = 0) {
     return tmp;
   }
 
-  if (str === "[object Array]") {
-    k = val.length;
-    for (tmp = new Array(k); k--; ) {
-      tmp[k] = _duplicateElement(val[k], depth + 1);
+  if (Array.isArray(val)) {
+    let k = val.length;
+    const arr = new Array(k);
+    while (k--) {
+      arr[k] = _duplicateElement(val[k], depth + 1);
     }
-    return tmp;
+    return arr;
   }
 
   return val;

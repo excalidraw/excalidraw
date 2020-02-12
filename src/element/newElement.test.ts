@@ -48,7 +48,14 @@ it("clones arrow element", () => {
   expect(copy).not.toHaveProperty("shape");
   expect(copy.id).not.toBe(element.id);
   expect(typeof copy.id).toBe("string");
+  expect(copy.seed).not.toBe(element.seed);
   expect(typeof copy.seed).toBe("number");
+  expect(copy).toEqual({
+    ...element,
+    id: copy.id,
+    seed: copy.seed,
+    shape: undefined,
+  });
 });
 
 it("clones text element", () => {
