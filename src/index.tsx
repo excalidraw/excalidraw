@@ -1091,11 +1091,11 @@ export class App extends React.Component<any, AppState> {
                   const { x: rx, y: ry } = multiElement;
                   multiElement.isSelected = true;
                   multiElement.points.push([x - rx, y - ry]);
-                  multiElement.canvas = null;
+                  multiElement.shape = null;
                 } else {
                   element.isSelected = false;
                   element.points.push([0, 0]);
-                  element.canvas = null;
+                  element.shape = null;
                   elements = [...elements, element];
                   this.setState({
                     draggingElement: element,
@@ -1437,7 +1437,7 @@ export class App extends React.Component<any, AppState> {
                     );
                     el.x = element.x;
                     el.y = element.y;
-                    el.canvas = null;
+                    el.shape = null;
 
                     lastX = x;
                     lastY = y;
@@ -1522,7 +1522,7 @@ export class App extends React.Component<any, AppState> {
                   draggingElement.height = height;
                 }
 
-                draggingElement.canvas = null;
+                draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
                   if (!e.shiftKey && elements.some(el => el.isSelected)) {
@@ -1571,7 +1571,7 @@ export class App extends React.Component<any, AppState> {
                       x - draggingElement.x,
                       y - draggingElement.y,
                     ]);
-                    draggingElement.canvas = null;
+                    draggingElement.shape = null;
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
@@ -1790,7 +1790,7 @@ export class App extends React.Component<any, AppState> {
                 const pnt = points[points.length - 1];
                 pnt[0] = x - originX;
                 pnt[1] = y - originY;
-                multiElement.canvas = null;
+                multiElement.shape = null;
                 this.setState({});
                 return;
               }

@@ -72,7 +72,7 @@ function generateElement(
   element: ExcalidrawElement,
   generator: RoughGenerator,
 ) {
-  if (!element.canvas) {
+  if (!element.shape || !element.canvas) {
     switch (element.type) {
       case "rectangle":
         element.shape = generator.rectangle(

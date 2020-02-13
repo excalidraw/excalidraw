@@ -86,7 +86,7 @@ export function normalizeDimensions(
     element.y -= element.height;
   }
 
-  element.canvas = null;
+  element.shape = null;
 
   return true;
 }

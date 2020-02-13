@@ -51,7 +51,7 @@ export function newTextElement(
   const metrics = measureText(text, font);
   const textElement: ExcalidrawTextElement = {
     ...element,
-    canvas: null,
+    shape: null,
     type: "text",
     text: text,
     font: font,
