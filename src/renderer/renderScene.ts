@@ -50,12 +50,27 @@ export function renderScene(
       sceneState.viewBackgroundColor.length === 5 ||
       sceneState.viewBackgroundColor.length === 9;
     if (hasTransparence) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(
+        0,
+        0,
+        canvas.width / window.devicePixelRatio,
+        canvas.height / window.devicePixelRatio,
+      );
     }
     context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(
+      0,
+      0,
+      canvas.width / window.devicePixelRatio,
+      canvas.height / window.devicePixelRatio,
+    );
   } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(
+      0,
+      0,
+      canvas.width / window.devicePixelRatio,
+      canvas.height / window.devicePixelRatio,
+    );
   }
   context.fillStyle = fillStyle;
 
