@@ -50,6 +50,7 @@ export function exportToCanvas(
       offsetY: -minY + exportPadding,
       renderScrollbars: false,
       renderSelection: false,
+      renderOptimizations: false,
     },
   );
   return tempCanvas;

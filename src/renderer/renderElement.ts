@@ -10,6 +10,7 @@ import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
+import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
 import rough from "roughjs/bin/rough";
 
@@ -42,30 +43,51 @@ function generateElementCanvas(element: ExcalidrawElement) {
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-  var rc2 = rough.canvas(canvas);
-  context.globalAlpha = element.opacity / 100;
-  if (isLinear) {
-    (element.shape as Drawable[]).forEach(shape => rc2.draw(shape));
-  } else if (isTextElement(element)) {
-    const font = context.font;
-    context.font = element.font;
-    const fillStyle = context.fillStyle;
-    context.fillStyle = element.strokeColor;
-    // Canvas does not support multiline text by default
-    const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-    const lineHeight = element.height / lines.length;
-    const offset = element.height - element.baseline;
-    for (let i = 0; i < lines.length; i++) {
-      context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
-    }
-    context.fillStyle = fillStyle;
-    context.font = font;
-  } else {
-    rc2.draw(element.shape as Drawable);
-  }
-  context.globalAlpha = 1;
+  const rc = rough.canvas(canvas);
+  drawElementOnCanvas(element, rc, context);
   element.canvas = canvas;
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+}
+
+function drawElementOnCanvas(
+  element: ExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) {
+  context.globalAlpha = element.opacity / 100;
+  switch (element.type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse": {
+      rc.draw(element.shape as Drawable);
+      break;
+    }
+    case "arrow":
+    case "line": {
+      (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
+      break;
+    }
+    default: {
+      if (isTextElement(element)) {
+        const font = context.font;
+        context.font = element.font;
+        const fillStyle = context.fillStyle;
+        context.fillStyle = element.strokeColor;
+        // Canvas does not support multiline text by default
+        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lineHeight = element.height / lines.length;
+        const offset = element.height - element.baseline;
+        for (let i = 0; i < lines.length; i++) {
+          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+        }
+        context.fillStyle = fillStyle;
+        context.font = font;
+      } else {
+        throw new Error(`Unimplemented type ${element.type}`);
+      }
+    }
+  }
+  context.globalAlpha = 1;
 }
 
 function generateElement(
@@ -176,23 +198,35 @@ function generateElement(
         }
         break;
       }
+      case "text": {
+        // just to ensure we don't regenerate element.canvas on rerenders
+        element.shape = [];
+        break;
+      }
     }
 
     generateElementCanvas(element);
   }
 }
 
-function renderFromElementCanvas(
+function drawElementFromCanvas(
   element: ExcalidrawElement | ExcalidrawTextElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  sceneState: SceneState,
 ) {
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
   context.drawImage(
     element.canvas!,
-    -element.canvasOffsetX,
-    -element.canvasOffsetY,
+    Math.floor(
+      (-element.canvasOffsetX + element.x + sceneState.scrollX) *
+        window.devicePixelRatio,
+    ),
+    Math.floor(
+      (-element.canvasOffsetY + element.y + sceneState.scrollY) *
+        window.devicePixelRatio,
+    ),
   );
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -202,6 +236,8 @@ export function renderElement(
   element: ExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  renderOptimizations: boolean,
+  sceneState: SceneState,
 ) {
   const generator = rc.generator;
   switch (element.type) {
@@ -219,7 +255,16 @@ export function renderElement(
     case "arrow":
     case "text": {
       generateElement(element, generator);
-      renderFromElementCanvas(element, rc, context);
+
+      if (renderOptimizations) {
+        drawElementFromCanvas(element, rc, context, sceneState);
+      } else {
+        const offsetX = Math.floor(element.x + sceneState.scrollX);
+        const offsetY = Math.floor(element.y + sceneState.scrollY);
+        context.translate(offsetX, offsetY);
+        drawElementOnCanvas(element, rc, context);
+        context.translate(-offsetX, -offsetY);
+      }
       break;
     }
     default: {

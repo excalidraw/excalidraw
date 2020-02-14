@@ -1916,6 +1916,9 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
       },
+      {
+        renderOptimizations: true,
+      },
     );
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {

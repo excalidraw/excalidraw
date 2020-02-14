@@ -26,11 +26,16 @@ export function renderScene(
     offsetY,
     renderScrollbars = true,
     renderSelection = true,
+    // Whether to employ render optimizations to improve performance.
+    // Should not be turned on for export operations and similar, because it
+    //  doesn't guarantee pixel-perfect output.
+    renderOptimizations = false,
   }: {
     offsetX?: number;
     offsetY?: number;
     renderScrollbars?: boolean;
     renderSelection?: boolean;
+    renderOptimizations?: boolean;
   } = {},
 ) {
   if (!canvas) {
@@ -56,8 +61,12 @@ export function renderScene(
 
   sceneState = {
     ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
+    scrollX: Math.floor(
+      typeof offsetX === "number" ? offsetX : sceneState.scrollX,
+    ),
+    scrollY: Math.floor(
+      typeof offsetY === "number" ? offsetY : sceneState.scrollY,
+    ),
   };
 
   let atLeastOneVisibleElement = false;
@@ -76,15 +85,7 @@ export function renderScene(
       return;
     }
     atLeastOneVisibleElement = true;
-    context.translate(
-      element.x + sceneState.scrollX,
-      element.y + sceneState.scrollY,
-    );
-    renderElement(element, rc, context);
-    context.translate(
-      -element.x - sceneState.scrollX,
-      -element.y - sceneState.scrollY,
-    );
+    renderElement(element, rc, context, renderOptimizations, sceneState);
   });
 
   if (selectionElement) {
@@ -92,7 +93,13 @@ export function renderScene(
       selectionElement.x + sceneState.scrollX,
       selectionElement.y + sceneState.scrollY,
     );
-    renderElement(selectionElement, rc, context);
+    renderElement(
+      selectionElement,
+      rc,
+      context,
+      renderOptimizations,
+      sceneState,
+    );
     context.translate(
       -selectionElement.x - sceneState.scrollX,
       -selectionElement.y - sceneState.scrollY,
