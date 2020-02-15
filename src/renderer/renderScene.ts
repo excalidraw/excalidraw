@@ -68,7 +68,7 @@ export function renderScene(
     );
   }
 
-  // Handle scroll
+  // Handle zoom translation
   const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
   function translateContextToZoom() {
     context.setTransform(
@@ -102,7 +102,12 @@ export function renderScene(
 
   // Paint visible elements
   const visibleElements = elements.filter(element =>
-    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight),
+    isVisibleElement(
+      element,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
+      sceneState,
+    ),
   );
 
   context.save();
@@ -182,11 +187,7 @@ export function renderScene(
       elements,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
-      {
-        scrollX: sceneState.scrollX,
-        scrollY: sceneState.scrollY,
-        zoom: sceneState.zoom,
-      },
+      sceneState,
     );
 
     context.save();
@@ -212,12 +213,33 @@ export function renderScene(
 
 function isVisibleElement(
   element: ExcalidrawElement,
-  canvasWidth: number,
-  canvasHeight: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
 ) {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-  return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
+  // Apply zoom
+  const viewportWidthWithZoom = viewportWidth / zoom;
+  const viewportHeightWithZoom = viewportHeight / zoom;
+
+  const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
+  const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
+
+  return (
+    x2 + scrollX - viewportWidthDiff / 2 >= 0 &&
+    x1 + scrollX - viewportWidthDiff / 2 <= viewportWidthWithZoom &&
+    y2 + scrollY - viewportHeightDiff / 2 >= 0 &&
+    y1 + scrollY - viewportHeightDiff / 2 <= viewportHeightWithZoom
+  );
 }
 
 // This should be only called for exporting purposes

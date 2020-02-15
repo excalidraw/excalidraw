@@ -999,11 +999,7 @@ export class App extends React.Component<any, AppState> {
                 e.clientY / window.devicePixelRatio,
                 canvasWidth / window.devicePixelRatio,
                 canvasHeight / window.devicePixelRatio,
-                {
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  zoom: this.state.zoom,
-                },
+                this.state,
               );
 
               const { x, y } = viewportCoordsToSceneCoords(
@@ -1290,7 +1286,9 @@ export class App extends React.Component<any, AppState> {
                 if (isOverHorizontalScrollBar) {
                   const x = e.clientX;
                   const dx = x - lastX;
-                  this.setState({ scrollX: this.state.scrollX - dx });
+                  this.setState({
+                    scrollX: this.state.scrollX - dx / this.state.zoom,
+                  });
                   lastX = x;
                   return;
                 }
@@ -1298,7 +1296,9 @@ export class App extends React.Component<any, AppState> {
                 if (isOverVerticalScrollBar) {
                   const y = e.clientY;
                   const dy = y - lastY;
-                  this.setState({ scrollY: this.state.scrollY - dy });
+                  this.setState({
+                    scrollY: this.state.scrollY - dy / this.state.zoom,
+                  });
                   lastY = y;
                   return;
                 }

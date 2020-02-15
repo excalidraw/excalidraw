@@ -27,11 +27,18 @@ export function getScrollBars(
     elementsMaxY,
   ] = getCommonBounds(elements);
 
+  // Apply zoom
+  const viewportWidthWithZoom = viewportWidth / zoom;
+  const viewportHeightWithZoom = viewportHeight / zoom;
+
+  const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
+  const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
+
   // The viewport is the rectangle currently visible for the user
-  const viewportMinX = -scrollX;
-  const viewportMinY = -scrollY;
-  const viewportMaxX = -scrollX + viewportWidth;
-  const viewportMaxY = -scrollY + viewportHeight;
+  const viewportMinX = -scrollX + viewportWidthDiff / 2;
+  const viewportMinY = -scrollY + viewportHeightDiff / 2;
+  const viewportMaxX = viewportMinX + viewportWidthWithZoom;
+  const viewportMaxY = viewportMinY + viewportHeightWithZoom;
 
   // The scene is the bounding box of both the elements and viewport
   const sceneMinX = Math.min(elementsMinX, viewportMinX);
