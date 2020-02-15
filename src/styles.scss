@@ -142,6 +142,28 @@ button,
   justify-self: flex-end;
 }
 
+.App-menu_bottom {
+  position: fixed;
+  bottom: 0;
+
+  grid-template-columns: 1fr auto 1fr;
+  align-items: flex-start;
+  cursor: default;
+  pointer-events: none !important;
+}
+
+.App-menu_bottom > * {
+  pointer-events: all;
+}
+
+.App-menu_bottom > *:first-child {
+  justify-self: flex-start;
+}
+
+.App-menu_bottom > *:last-child {
+  justify-self: flex-end;
+}
+
 .App-menu_left {
   grid-template-rows: 1fr auto 1fr;
   height: 100%;

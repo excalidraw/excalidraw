@@ -28,6 +28,7 @@ export function getDefaultAppState(): AppState {
     name: DEFAULT_PROJECT_NAME,
     isResizing: false,
     selectionElement: null,
+    zoom: 1,
   };
 }
 
