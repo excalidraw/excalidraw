@@ -27,8 +27,4 @@ export {
   hasText,
 } from "./comparisons";
 export { createScene } from "./createScene";
-export {
-  getXCoordinateWithSceneState,
-  getYCoordinateWithSceneState,
-  getZoomTranslation,
-} from "./transforms";
+export { getZoomOrigin, getZoomTranslation } from "./zoom";

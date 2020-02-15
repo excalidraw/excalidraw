@@ -1,47 +1,24 @@
 import { ExcalidrawElement } from "./types";
-import { SceneState } from "../scene/types";
-
-import {
-  getXCoordinateWithSceneState,
-  getYCoordinateWithSceneState,
-} from "../scene/transforms";
 
 import { getElementAbsoluteCoords } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
-export function handlerRectangles(
-  element: ExcalidrawElement,
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: SceneState["scrollX"];
-    scrollY: SceneState["scrollY"];
-    zoom: SceneState["zoom"];
-  },
-) {
-  const handlerWidth = 8;
-  const handlerHeight = 8;
+export function handlerRectangles(element: ExcalidrawElement, zoom: number) {
+  const handlerWidth = 8 / zoom;
+  const handlerHeight = 8 / zoom;
 
-  const handlerMarginX = 8;
-  const handlerMarginY = 8;
+  const handlerMarginX = 8 / zoom;
+  const handlerMarginY = 8 / zoom;
 
-  let [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
+  const [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
     element,
   );
-
-  // Apply scene state to positions
-  elementX1 = getXCoordinateWithSceneState(elementX1, { scrollX, zoom });
-  elementY1 = getYCoordinateWithSceneState(elementY1, { scrollY, zoom });
-  elementX2 = getXCoordinateWithSceneState(elementX2, { scrollX, zoom });
-  elementY2 = getYCoordinateWithSceneState(elementY2, { scrollY, zoom });
 
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLineMargin = 4;
+  const dashedLineMargin = 4 / zoom;
 
   const handlers = {
     nw: [
@@ -71,7 +48,7 @@ export function handlerRectangles(
   } as { [T in Sides]: number[] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandlers = 40;
+  const minimumSizeForEightHandlers = 40 / zoom;
   if (Math.abs(elementWidth) > minimumSizeForEightHandlers) {
     handlers["n"] = [
       elementX1 + elementWidth / 2,

@@ -1,6 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
-import { SceneState } from "./types";
 
 const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
@@ -15,9 +14,9 @@ export function getScrollBars(
     scrollY,
     zoom,
   }: {
-    scrollX: SceneState["scrollX"];
-    scrollY: SceneState["scrollY"];
-    zoom: SceneState["zoom"];
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
   },
 ) {
   // This is the bounding box of all the elements
@@ -87,9 +86,9 @@ export function isOverScrollBars(
     scrollY,
     zoom,
   }: {
-    scrollX: SceneState["scrollX"];
-    scrollY: SceneState["scrollY"];
-    zoom: SceneState["zoom"];
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
   },
 ) {
   const scrollBars = getScrollBars(elements, viewportWidth, viewportHeight, {

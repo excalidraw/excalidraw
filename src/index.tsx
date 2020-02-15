@@ -34,7 +34,7 @@ import {
   loadScene,
   calculateScrollCenter,
   loadFromBlob,
-  getZoomTranslation,
+  getZoomOrigin,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -134,10 +134,20 @@ let lastMouseUp: ((e: any) => void) | null = null;
 
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
-  { scrollX, scrollY }: { scrollX: number; scrollY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
 ) {
-  const x = clientX - scrollX;
-  const y = clientY - scrollY;
+  const zoomOrigin = getZoomOrigin(canvas);
+  const x = zoomOrigin.x + (clientX - scrollX - zoomOrigin.x) / zoom;
+  const y = zoomOrigin.y + (clientY - scrollY - zoomOrigin.y) / zoom;
   return { x, y };
 }
 
@@ -732,6 +742,7 @@ export class App extends React.Component<any, AppState> {
         const { x, y } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
+          this.canvas,
         );
 
         const element = newTextElement(
@@ -831,9 +842,18 @@ export class App extends React.Component<any, AppState> {
             onContextMenu={e => {
               e.preventDefault();
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
 
-              const element = getElementAtPosition(elements, x, y);
+              const element = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
               if (!element) {
                 ContextMenu.push({
                   options: [
@@ -957,7 +977,11 @@ export class App extends React.Component<any, AppState> {
                 },
               );
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
 
               const originX = x;
               const originY = y;
@@ -992,7 +1016,7 @@ export class App extends React.Component<any, AppState> {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
-                  this.state,
+                  this.state.zoom,
                 );
                 this.setState({
                   resizingElement: resizeElement ? resizeElement.element : null,
@@ -1005,7 +1029,12 @@ export class App extends React.Component<any, AppState> {
                   );
                   isResizingElements = true;
                 } else {
-                  hitElement = getElementAtPosition(elements, x, y);
+                  hitElement = getElementAtPosition(
+                    elements,
+                    x,
+                    y,
+                    this.state.zoom,
+                  );
                   // clear selection if shift is not clicked
                   if (!hitElement?.isSelected && !e.shiftKey) {
                     elements = clearSelection(elements);
@@ -1253,7 +1282,11 @@ export class App extends React.Component<any, AppState> {
                   (this.state.elementType === "arrow" ||
                     this.state.elementType === "line")
                 ) {
-                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                  const { x, y } = viewportCoordsToSceneCoords(
+                    e,
+                    this.state,
+                    this.canvas,
+                  );
                   if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
                   }
@@ -1264,7 +1297,11 @@ export class App extends React.Component<any, AppState> {
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
                     const deltaX = x - lastX;
                     const deltaY = y - lastY;
                     const element = selectedElements[0];
@@ -1487,7 +1524,11 @@ export class App extends React.Component<any, AppState> {
                   draggingOccurred = true;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
 
                     selectedElements.forEach(element => {
                       element.x += x - lastX;
@@ -1507,7 +1548,11 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                const { x, y } = viewportCoordsToSceneCoords(
+                  e,
+                  this.state,
+                  this.canvas,
+                );
 
                 let width = distance(originX, x);
                 let height = distance(originY, y);
@@ -1601,7 +1646,11 @@ export class App extends React.Component<any, AppState> {
                     this.setState({});
                   }
                   if (!draggingOccurred && draggingElement && !multiElement) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
                     draggingElement.points.push([
                       x - draggingElement.x,
                       y - draggingElement.y,
@@ -1716,9 +1765,18 @@ export class App extends React.Component<any, AppState> {
             onDoubleClick={e => {
               resetCursor();
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
 
-              const elementAtPosition = getElementAtPosition(elements, x, y);
+              const elementAtPosition = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
 
               const element =
                 elementAtPosition && isTextElement(elementAtPosition)
@@ -1816,7 +1874,11 @@ export class App extends React.Component<any, AppState> {
               }
               const hasDeselectedButton = Boolean(e.buttons);
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
               if (this.state.multiElement) {
                 const { multiElement } = this.state;
                 const originX = multiElement.x;
@@ -1843,7 +1905,7 @@ export class App extends React.Component<any, AppState> {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
-                  this.state,
+                  this.state.zoom,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
@@ -1852,7 +1914,12 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
               }
-              const hitElement = getElementAtPosition(elements, x, y);
+              const hitElement = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
             onDrop={e => {
@@ -1943,34 +2010,15 @@ export class App extends React.Component<any, AppState> {
     );
   }, 300);
 
-  componentDidUpdate(prevProps: any, prevState: AppState) {
-    let localScrollX = this.state.scrollX;
-    let localScrollY = this.state.scrollY;
-
-    if (this.canvas !== null && prevState.zoom !== this.state.zoom) {
-      const { x, y } = getZoomTranslation(
-        this.canvas,
-        prevState.zoom,
-        this.state.zoom,
-      );
-
-      localScrollX = localScrollX + x;
-      localScrollY = localScrollY + y;
-
-      this.setState({
-        scrollX: localScrollX,
-        scrollY: localScrollY,
-      });
-    }
-
+  componentDidUpdate() {
     const atLeastOneVisibleElement = renderScene(
       elements,
       this.state.selectionElement,
       this.rc!,
       this.canvas!,
       {
-        scrollX: localScrollX,
-        scrollY: localScrollY,
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
       },

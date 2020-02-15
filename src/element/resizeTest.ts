@@ -1,11 +1,4 @@
-import { SceneState } from "../scene/types";
-import { AppState } from "../types";
 import { ExcalidrawElement } from "./types";
-
-import {
-  getXCoordinateWithSceneState,
-  getYCoordinateWithSceneState,
-} from "../scene";
 
 import { handlerRectangles } from "./handlerRectangles";
 
@@ -15,30 +8,13 @@ export function resizeTest(
   element: ExcalidrawElement,
   x: number,
   y: number,
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: SceneState["scrollX"];
-    scrollY: SceneState["scrollY"];
-    zoom: SceneState["zoom"];
-  },
+  zoom: number,
 ): HandlerRectanglesRet | false {
   if (!element.isSelected || element.type === "text") {
     return false;
   }
 
-  const handlers = handlerRectangles(element, { scrollX, scrollY, zoom });
-
-  const xWithSceneState = getXCoordinateWithSceneState(x, {
-    scrollX,
-    zoom,
-  });
-  const yWithSceneState = getYCoordinateWithSceneState(y, {
-    scrollY,
-    zoom,
-  });
+  const handlers = handlerRectangles(element, zoom);
 
   const filter = Object.keys(handlers).filter(key => {
     const handler = handlers[key as HandlerRectanglesRet]!;
@@ -47,10 +23,10 @@ export function resizeTest(
     }
 
     return (
-      xWithSceneState >= handler[0] &&
-      xWithSceneState <= handler[0] + handler[2] &&
-      yWithSceneState >= handler[1] &&
-      yWithSceneState <= handler[1] + handler[3]
+      x >= handler[0] &&
+      x <= handler[0] + handler[2] &&
+      y >= handler[1] &&
+      y <= handler[1] + handler[3]
     );
   });
 
@@ -64,17 +40,13 @@ export function resizeTest(
 export function getElementWithResizeHandler(
   elements: readonly ExcalidrawElement[],
   { x, y }: { x: number; y: number },
-  { scrollX, scrollY, zoom }: AppState,
+  zoom: number,
 ) {
   return elements.reduce((result, element) => {
     if (result) {
       return result;
     }
-    const resizeHandle = resizeTest(element, x, y, {
-      scrollX,
-      scrollY,
-      zoom,
-    });
+    const resizeHandle = resizeTest(element, x, y, zoom);
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
 }
