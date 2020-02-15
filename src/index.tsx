@@ -566,6 +566,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
+    elements = elements.map(el => ({ ...el, shape: null }));
     this.setState({});
   };
 

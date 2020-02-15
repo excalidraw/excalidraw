@@ -28,10 +28,15 @@ function generateElementCanvas(element: ExcalidrawElement) {
       (distance(x1, x2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
     canvas.height =
       (distance(y1, y2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
+
     element.canvasOffsetX =
-      element.x > x1 ? distance(element.x, x1) * window.devicePixelRatio : 0;
+      element.x > x1
+        ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
+        : 0;
     element.canvasOffsetY =
-      element.y > y1 ? distance(element.y, y1) * window.devicePixelRatio : 0;
+      element.y > y1
+        ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
+        : 0;
     context.translate(element.canvasOffsetX, element.canvasOffsetY);
   } else {
     canvas.width =
@@ -220,12 +225,12 @@ function drawElementFromCanvas(
   context.drawImage(
     element.canvas!,
     Math.floor(
-      (-element.canvasOffsetX + element.x + sceneState.scrollX) *
-        window.devicePixelRatio,
+      -element.canvasOffsetX +
+        (Math.floor(element.x) + sceneState.scrollX) * window.devicePixelRatio,
     ),
     Math.floor(
-      (-element.canvasOffsetY + element.y + sceneState.scrollY) *
-        window.devicePixelRatio,
+      -element.canvasOffsetY +
+        (Math.floor(element.y) + sceneState.scrollY) * window.devicePixelRatio,
     ),
   );
   context.translate(CANVAS_PADDING, CANVAS_PADDING);

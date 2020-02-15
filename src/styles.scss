@@ -6,6 +6,15 @@ body {
   color: var(--text-color-primary);
 }
 
+canvas {
+  // following props improve blurriness at certain devicePixelRatios.
+  // AFAIK it doesn't affect export (in fact, export seems sharp either way).
+
+  image-rendering: pixelated; // chromium
+  // NOTE: must be declared *after* the above
+  image-rendering: -moz-crisp-edges; // FF
+}
+
 .container {
   display: flex;
   position: fixed;
