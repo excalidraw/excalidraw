@@ -70,7 +70,7 @@ export function renderScene(
 
   // Handle scroll
   const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
-  function translateContextToScroll() {
+  function translateContextToZoom() {
     context.setTransform(
       getContextTransformScaleX(context.getTransform()),
       0,
@@ -107,7 +107,7 @@ export function renderScene(
 
   context.save();
   scaleContextToZoom();
-  translateContextToScroll();
+  translateContextToZoom();
   context.translate(sceneState.scrollX, sceneState.scrollY);
   visibleElements.forEach(element => {
     context.save();
@@ -121,7 +121,7 @@ export function renderScene(
   if (selectionElement) {
     context.save();
     scaleContextToZoom();
-    translateContextToScroll();
+    translateContextToZoom();
     context.translate(sceneState.scrollX, sceneState.scrollY);
     context.translate(selectionElement.x, selectionElement.y);
     renderElement(selectionElement, rc, context);
@@ -135,7 +135,7 @@ export function renderScene(
 
     context.save();
     scaleContextToZoom();
-    translateContextToScroll();
+    translateContextToZoom();
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
       const [
@@ -164,7 +164,7 @@ export function renderScene(
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       context.save();
       scaleContextToZoom();
-      translateContextToScroll();
+      translateContextToZoom();
       context.translate(sceneState.scrollX, sceneState.scrollY);
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
