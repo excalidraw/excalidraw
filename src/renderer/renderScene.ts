@@ -46,12 +46,10 @@ export function renderScene(
   // Use offsets insteads of scrolls if available
   sceneState = {
     ...sceneState,
-    scrollX: Math.floor(
-      typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    ),
-    scrollY: Math.floor(
-      typeof offsetY === "number" ? offsetY : sceneState.scrollY,
-    ),
+    scrollX:
+      typeof offsetX === "number" ? Math.floor(offsetX) : sceneState.scrollX,
+    scrollY:
+      typeof offsetY === "number" ? Math.floor(offsetY) : sceneState.scrollY,
   };
 
   const context = canvas.getContext("2d")!;

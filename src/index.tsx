@@ -2053,6 +2053,14 @@ export class App extends React.Component<any, AppState> {
     saveToLocalStorage(elements, this.state);
   }, 300);
 
+  static getDerivedStateFromProps(props: any, state: AppState) {
+    if (!Number.isInteger(state.scrollX) || !Number.isInteger(state.scrollY)) {
+      state.scrollX = Math.floor(state.scrollX);
+      state.scrollY = Math.floor(state.scrollY);
+      return state;
+    }
+  }
+
   componentDidUpdate() {
     const atLeastOneVisibleElement = renderScene(
       elements,
