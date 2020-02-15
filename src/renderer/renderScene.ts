@@ -76,11 +76,9 @@ export function renderScene(
       0,
       0,
       getContextTransformScaleY(context.getTransform()),
-      getContextTransformTranslateX(initialContextTransform) +
-        sceneState.scrollX -
+      getContextTransformTranslateX(initialContextTransform) -
         zoomTranslation.x,
-      getContextTransformTranslateY(initialContextTransform) +
-        sceneState.scrollY -
+      getContextTransformTranslateY(initialContextTransform) -
         zoomTranslation.y,
     );
   }
@@ -110,6 +108,7 @@ export function renderScene(
   context.save();
   scaleContextToZoom();
   translateContextToScroll();
+  context.translate(sceneState.scrollX, sceneState.scrollY);
   visibleElements.forEach(element => {
     context.save();
     context.translate(element.x, element.y);
@@ -123,6 +122,7 @@ export function renderScene(
     context.save();
     scaleContextToZoom();
     translateContextToScroll();
+    context.translate(sceneState.scrollX, sceneState.scrollY);
     context.translate(selectionElement.x, selectionElement.y);
     renderElement(selectionElement, rc, context);
     context.restore();
@@ -136,6 +136,7 @@ export function renderScene(
     context.save();
     scaleContextToZoom();
     translateContextToScroll();
+    context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
       const [
         elementX1,
@@ -164,6 +165,7 @@ export function renderScene(
       context.save();
       scaleContextToZoom();
       translateContextToScroll();
+      context.translate(sceneState.scrollX, sceneState.scrollY);
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
         .filter(handler => handler !== undefined)

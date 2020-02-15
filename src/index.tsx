@@ -146,8 +146,12 @@ export function viewportCoordsToSceneCoords(
   canvas: HTMLCanvasElement | null,
 ) {
   const zoomOrigin = getZoomOrigin(canvas);
-  const x = zoomOrigin.x + (clientX - scrollX - zoomOrigin.x) / zoom;
-  const y = zoomOrigin.y + (clientY - scrollY - zoomOrigin.y) / zoom;
+  const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
+  const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
+
+  const x = clientXWithZoom - scrollX;
+  const y = clientYWithZoom - scrollY;
+
   return { x, y };
 }
 
