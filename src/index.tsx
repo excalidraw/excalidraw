@@ -2055,10 +2055,12 @@ export class App extends React.Component<any, AppState> {
 
   static getDerivedStateFromProps(props: any, state: AppState) {
     if (!Number.isInteger(state.scrollX) || !Number.isInteger(state.scrollY)) {
-      state.scrollX = Math.floor(state.scrollX);
-      state.scrollY = Math.floor(state.scrollY);
-      return state;
+      return {
+        scrollX: Math.floor(state.scrollX),
+        scrollY: Math.floor(state.scrollY),
+      };
     }
+    return null;
   }
 
   componentDidUpdate() {
