@@ -928,8 +928,8 @@ export class App extends React.Component<any, AppState> {
                   lastY = e.clientY;
 
                   this.setState({
-                    scrollX: this.state.scrollX - deltaX,
-                    scrollY: this.state.scrollY - deltaY,
+                    scrollX: this.state.scrollX - deltaX / this.state.zoom,
+                    scrollY: this.state.scrollY - deltaY / this.state.zoom,
                   });
                 };
                 const teardown = (lastMouseUp = () => {
