@@ -1964,8 +1964,14 @@ export class App extends React.Component<any, AppState> {
     const elementsCenterX = distance(minX, maxX) / 2;
     const elementsCenterY = distance(minY, maxY) / 2;
 
-    const dx = cursorX - this.state.scrollX - elementsCenterX;
-    const dy = cursorY - this.state.scrollY - elementsCenterY;
+    const { x, y } = viewportCoordsToSceneCoords(
+      { clientX: cursorX, clientY: cursorY },
+      this.state,
+      this.canvas,
+    );
+
+    const dx = x - elementsCenterX;
+    const dy = y - elementsCenterY;
 
     elements = [
       ...elements,
