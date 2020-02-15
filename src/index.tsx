@@ -155,6 +155,31 @@ export function viewportCoordsToSceneCoords(
   return { x, y };
 }
 
+export function sceneCoordsToViewportCoords(
+  { sceneX, sceneY }: { sceneX: number; sceneY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
+) {
+  const zoomOrigin = getZoomOrigin(canvas);
+  const sceneXWithZoomAndScroll =
+    zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
+  const sceneYWithZoomAndScroll =
+    zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
+
+  const x = sceneXWithZoomAndScroll;
+  const y = sceneYWithZoomAndScroll;
+
+  return { x, y };
+}
+
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -1114,6 +1139,7 @@ export class App extends React.Component<any, AppState> {
                   strokeColor: this.state.currentItemStrokeColor,
                   opacity: this.state.currentItemOpacity,
                   font: this.state.currentItemFont,
+                  zoom: this.state.zoom,
                   onSubmit: text => {
                     if (text) {
                       elements = [
@@ -1812,18 +1838,26 @@ export class App extends React.Component<any, AppState> {
                 );
                 this.setState({});
 
-                textX =
-                  this.state.scrollX +
-                  elementAtPosition.x +
-                  elementAtPosition.width / 2;
-                textY =
-                  this.state.scrollY +
-                  elementAtPosition.y +
-                  elementAtPosition.height / 2;
+                const centerElementX =
+                  elementAtPosition.x + elementAtPosition.width / 2;
+                const centerElementY =
+                  elementAtPosition.y + elementAtPosition.height / 2;
+
+                const {
+                  x: centerElementXInViewport,
+                  y: centerElementYInViewport,
+                } = sceneCoordsToViewportCoords(
+                  { sceneX: centerElementX, sceneY: centerElementY },
+                  this.state,
+                  this.canvas,
+                );
+
+                textX = centerElementXInViewport;
+                textY = centerElementYInViewport;
 
                 // x and y will change after calling newTextElement function
-                element.x = elementAtPosition.x + elementAtPosition.width / 2;
-                element.y = elementAtPosition.y + elementAtPosition.height / 2;
+                element.x = centerElementX;
+                element.y = centerElementY;
               } else if (!e.altKey) {
                 const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                   x,
@@ -1852,6 +1886,7 @@ export class App extends React.Component<any, AppState> {
                 strokeColor: element.strokeColor,
                 font: element.font,
                 opacity: this.state.currentItemOpacity,
+                zoom: this.state.zoom,
                 onSubmit: text => {
                   if (text) {
                     elements = [
