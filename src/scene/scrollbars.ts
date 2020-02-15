@@ -9,8 +9,15 @@ export function getScrollBars(
   elements: readonly ExcalidrawElement[],
   viewportWidth: number,
   viewportHeight: number,
-  scrollX: number,
-  scrollY: number,
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
 ) {
   // This is the bounding box of all the elements
   const [
@@ -20,11 +27,18 @@ export function getScrollBars(
     elementsMaxY,
   ] = getCommonBounds(elements);
 
+  // Apply zoom
+  const viewportWidthWithZoom = viewportWidth / zoom;
+  const viewportHeightWithZoom = viewportHeight / zoom;
+
+  const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
+  const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
+
   // The viewport is the rectangle currently visible for the user
-  const viewportMinX = -scrollX;
-  const viewportMinY = -scrollY;
-  const viewportMaxX = -scrollX + viewportWidth;
-  const viewportMaxY = -scrollY + viewportHeight;
+  const viewportMinX = -scrollX + viewportWidthDiff / 2;
+  const viewportMinY = -scrollY + viewportHeightDiff / 2;
+  const viewportMaxX = viewportMinX + viewportWidthWithZoom;
+  const viewportMaxY = viewportMinY + viewportHeightWithZoom;
 
   // The scene is the bounding box of both the elements and viewport
   const sceneMinX = Math.min(elementsMinX, viewportMinX);
@@ -74,16 +88,21 @@ export function isOverScrollBars(
   y: number,
   viewportWidth: number,
   viewportHeight: number,
-  scrollX: number,
-  scrollY: number,
-) {
-  const scrollBars = getScrollBars(
-    elements,
-    viewportWidth,
-    viewportHeight,
+  {
     scrollX,
     scrollY,
-  );
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
+) {
+  const scrollBars = getScrollBars(elements, viewportWidth, viewportHeight, {
+    scrollX,
+    scrollY,
+    zoom,
+  });
 
   const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
     scrollBars.horizontal,

@@ -8,6 +8,7 @@ type TextWysiwygParams = {
   strokeColor: string;
   font: string;
   opacity: number;
+  zoom: number;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -25,6 +26,7 @@ export function textWysiwyg({
   strokeColor,
   font,
   opacity,
+  zoom,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -43,7 +45,7 @@ export function textWysiwyg({
     opacity: opacity / 100,
     top: `${y}px`,
     left: `${x}px`,
-    transform: "translate(-50%, -50%)",
+    transform: `translate(-50%, -50%) scale(${zoom})`,
     textAlign: "left",
     display: "inline-block",
     font: font,
