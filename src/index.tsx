@@ -1093,13 +1093,11 @@ export class App extends React.Component<any, AppState> {
                           ...element,
                           isSelected: false,
                         })),
-                        ...elements
-                          .filter(element => element.isSelected)
-                          .map(element => {
-                            const newElement = duplicateElement(element);
-                            newElement.isSelected = true;
-                            return newElement;
-                          }),
+                        ...getSelectedElements(elements).map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        }),
                       ];
                     }
                   }

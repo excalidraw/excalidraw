@@ -71,9 +71,7 @@ export function getCommonAttributeOfSelectedElements<T>(
 ): T | null {
   const attributes = Array.from(
     new Set(
-      elements
-        .filter(element => element.isSelected)
-        .map(element => getAttribute(element)),
+      getSelectedElements(elements).map(element => getAttribute(element)),
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;
