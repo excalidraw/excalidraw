@@ -31,6 +31,7 @@ describe("Panning", () => {
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
     );
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangle", {
       clip: region,
@@ -42,6 +43,7 @@ describe("Panning", () => {
       { x: region.x, y: region.y },
       { x: region.x + 20, y: region.y + 15 },
     );
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangle", {
       clip: region,
       ...artistDrawingConfig,
@@ -53,6 +55,7 @@ describe("Panning", () => {
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
     );
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangleWheel", {
       clip: region,
@@ -64,6 +67,7 @@ describe("Panning", () => {
       { x: region.x + 17, y: region.y + 18 },
       1,
     );
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangleWheel", {
       clip: region,
       ...artistDrawingConfig,

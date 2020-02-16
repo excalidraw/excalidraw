@@ -23,13 +23,16 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
     );
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("rectangleArtist", {
       clip: region,
       ...artistDrawingConfig,
     });
+    cy.get("#canvas").click(region.x + 10, region.y + 10); // select
     // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("rectangleArchitect", {
       clip: region,
     });
@@ -52,6 +55,7 @@ describe("Drawing", () => {
       width: 200,
       height: 100,
     };
+    cy.get("#canvas").click(region.x - 100, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("textTool", {
       clip: screenshotRegion,
     });
@@ -69,6 +73,7 @@ describe("Drawing", () => {
       width: 200,
       height: 100,
     };
+    cy.get("#canvas").click(region.x - 100, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("textDblClick", {
       clip: screenshotRegion,
     });
@@ -81,6 +86,7 @@ describe("Drawing", () => {
       { x: region.x + 50, y: region.y + 50 },
     );
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("diamondArchitect", {
       clip: region,
     });
@@ -93,6 +99,7 @@ describe("Drawing", () => {
       { x: region.x + 50, y: region.y + 50 },
     );
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 100); // deselect
     cy.get("#canvas").matchImageSnapshot("arrowSEArchitect", {
       clip: region,
     });
@@ -105,6 +112,7 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 10 },
     );
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 100); // deselect
     cy.get("#canvas").matchImageSnapshot("arrowNWArchitect", {
       clip: region,
     });
@@ -117,6 +125,7 @@ describe("Drawing", () => {
       { x: region.x + 50, y: region.y + 10 },
     );
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 100); // deselect
     cy.get("#canvas").matchImageSnapshot("arrowNEArchitect", {
       clip: region,
     });
@@ -129,6 +138,7 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 50 },
     );
     cy.contains("Architect").click();
+    cy.get("#canvas").click(region.x - 50, region.y - 100); // deselect
     cy.get("#canvas").matchImageSnapshot("arrowSWArchitect", {
       clip: region,
     });
