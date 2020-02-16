@@ -1558,7 +1558,7 @@ export class App extends React.Component<any, AppState> {
                   // if elements should be deselected on mouseup
                   draggingOccurred = true;
                   const selectedElements = getSelectedElements(elements);
-                  if (selectedElements.length) {
+                  if (selectedElements.length > 0) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       e,
                       this.state,
