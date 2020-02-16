@@ -1050,7 +1050,10 @@ export class App extends React.Component<any, AppState> {
                   resizingElement: resizeElement ? resizeElement.element : null,
                 });
 
-                if (resizeElement) {
+                const selectedElements = elements.filter(
+                  element => element.isSelected,
+                ).length;
+                if (selectedElements === 1 && resizeElement) {
                   resizeHandle = resizeElement.resizeHandle;
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     resizeElement,
