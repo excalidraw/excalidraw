@@ -37,6 +37,7 @@ import {
   getZoomOrigin,
   getNormalizedZoom,
   getSelectedElements,
+  isSomeElementSelected,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -1643,7 +1644,7 @@ export class App extends React.Component<any, AppState> {
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey && elements.some(el => el.isSelected)) {
+                  if (!e.shiftKey && isSomeElementSelected(elements)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1777,7 +1778,7 @@ export class App extends React.Component<any, AppState> {
 
                 if (
                   elementType !== "selection" ||
-                  elements.some(el => el.isSelected)
+                  isSomeElementSelected(elements)
                 ) {
                   history.resumeRecording();
                 }

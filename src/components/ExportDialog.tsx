@@ -16,7 +16,7 @@ import { t } from "../i18n";
 import { KEYS } from "../keys";
 
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -47,7 +47,7 @@ function ExportModal({
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
 }) {
-  const someElementIsSelected = elements.some(element => element.isSelected);
+  const someElementIsSelected = isSomeElementSelected(elements);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);

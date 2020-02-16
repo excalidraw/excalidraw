@@ -3,7 +3,7 @@ export {
   clearSelection,
   getSelectedIndices,
   deleteSelectedElements,
-  someElementIsSelected,
+  isSomeElementSelected,
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
