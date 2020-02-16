@@ -120,8 +120,6 @@ export function renderScene(
     context.save();
     scaleContextToZoom();
     translateContextToZoom();
-    context.translate(sceneState.scrollX, sceneState.scrollY);
-    context.translate(selectionElement.x, selectionElement.y);
     renderElement(
       selectionElement,
       rc,

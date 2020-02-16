@@ -247,6 +247,10 @@ export function renderElement(
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
+      context.translate(
+        element.x + sceneState.scrollX,
+        element.y + sceneState.scrollY,
+      );
       const fillStyle = context.fillStyle;
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
       context.fillRect(0, 0, element.width, element.height);
