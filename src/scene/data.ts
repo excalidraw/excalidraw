@@ -59,17 +59,21 @@ export function serializeAsJSON(
   );
 }
 
+export function normalizeScroll(pos: number) {
+  return Math.floor(pos) as AppState["scrollX"];
+}
+
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
-): { scrollX: number; scrollY: number } {
+): { scrollX: AppState["scrollX"]; scrollY: AppState["scrollY"] } {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
   return {
-    scrollX: window.innerWidth / 2 - centerX,
-    scrollY: window.innerHeight / 2 - centerY,
+    scrollX: normalizeScroll(window.innerWidth / 2 - centerX),
+    scrollY: normalizeScroll(window.innerHeight / 2 - centerY),
   };
 }
 

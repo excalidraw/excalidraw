@@ -1,6 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
+import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
@@ -14,6 +15,7 @@ import {
 import { getZoomTranslation } from "../scene/zoom";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
+import { normalizeScroll } from "../scene/data";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
@@ -46,10 +48,12 @@ export function renderScene(
   // Use offsets insteads of scrolls if available
   sceneState = {
     ...sceneState,
-    scrollX:
-      typeof offsetX === "number" ? Math.floor(offsetX) : sceneState.scrollX,
-    scrollY:
-      typeof offsetY === "number" ? Math.floor(offsetY) : sceneState.scrollY,
+    scrollX: normalizeScroll(
+      typeof offsetX === "number" ? offsetX : sceneState.scrollX,
+    ),
+    scrollY: normalizeScroll(
+      typeof offsetY === "number" ? offsetY : sceneState.scrollY,
+    ),
   };
 
   const context = canvas.getContext("2d")!;
@@ -233,8 +237,8 @@ function isVisibleElement(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
     zoom: number;
   },
 ) {

@@ -102,6 +102,7 @@ import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { HintViewer } from "./components/HintViewer";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
+import { normalizeScroll } from "./scene/data";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -139,8 +140,8 @@ export function viewportCoordsToSceneCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,
@@ -162,8 +163,8 @@ export function sceneCoordsToViewportCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,
@@ -954,8 +955,12 @@ export class App extends React.Component<any, AppState> {
                   lastY = e.clientY;
 
                   this.setState({
-                    scrollX: this.state.scrollX - deltaX / this.state.zoom,
-                    scrollY: this.state.scrollY - deltaY / this.state.zoom,
+                    scrollX: normalizeScroll(
+                      this.state.scrollX - deltaX / this.state.zoom,
+                    ),
+                    scrollY: normalizeScroll(
+                      this.state.scrollY - deltaY / this.state.zoom,
+                    ),
                   });
                 };
                 const teardown = (lastMouseUp = () => {
@@ -1288,7 +1293,9 @@ export class App extends React.Component<any, AppState> {
                   const x = e.clientX;
                   const dx = x - lastX;
                   this.setState({
-                    scrollX: this.state.scrollX - dx / this.state.zoom,
+                    scrollX: normalizeScroll(
+                      this.state.scrollX - dx / this.state.zoom,
+                    ),
                   });
                   lastX = x;
                   return;
@@ -1298,7 +1305,9 @@ export class App extends React.Component<any, AppState> {
                   const y = e.clientY;
                   const dy = y - lastY;
                   this.setState({
-                    scrollY: this.state.scrollY - dy / this.state.zoom,
+                    scrollY: normalizeScroll(
+                      this.state.scrollY - dy / this.state.zoom,
+                    ),
                   });
                   lastY = y;
                   return;
@@ -1985,8 +1994,8 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
 
     this.setState({
-      scrollX: this.state.scrollX - deltaX / this.state.zoom,
-      scrollY: this.state.scrollY - deltaY / this.state.zoom,
+      scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
+      scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
     });
   };
 
@@ -2052,16 +2061,6 @@ export class App extends React.Component<any, AppState> {
   private saveDebounced = debounce(() => {
     saveToLocalStorage(elements, this.state);
   }, 300);
-
-  static getDerivedStateFromProps(props: any, state: AppState) {
-    if (!Number.isInteger(state.scrollX) || !Number.isInteger(state.scrollY)) {
-      return {
-        scrollX: Math.floor(state.scrollX),
-        scrollY: Math.floor(state.scrollY),
-      };
-    }
-    return null;
-  }
 
   componentDidUpdate() {
     const atLeastOneVisibleElement = renderScene(
