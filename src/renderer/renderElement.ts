@@ -25,9 +25,9 @@ function generateElementCanvas(element: ExcalidrawElement) {
   if (isLinear) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
-      (distance(x1, x2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
+      distance(x1, x2) * window.devicePixelRatio + CANVAS_PADDING * 2;
     canvas.height =
-      (distance(y1, y2) + CANVAS_PADDING * 2) * window.devicePixelRatio;
+      distance(y1, y2) * window.devicePixelRatio + CANVAS_PADDING * 2;
 
     element.canvasOffsetX =
       element.x > x1
@@ -39,10 +39,9 @@ function generateElementCanvas(element: ExcalidrawElement) {
         : 0;
     context.translate(element.canvasOffsetX, element.canvasOffsetY);
   } else {
-    canvas.width =
-      (element.width + CANVAS_PADDING * 2) * window.devicePixelRatio;
+    canvas.width = element.width * window.devicePixelRatio + CANVAS_PADDING * 2;
     canvas.height =
-      (element.height + CANVAS_PADDING * 2) * window.devicePixelRatio;
+      element.height * window.devicePixelRatio + CANVAS_PADDING * 2;
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
