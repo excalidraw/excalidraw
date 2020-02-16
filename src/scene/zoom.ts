@@ -28,3 +28,9 @@ export function getZoomTranslation(canvas: HTMLCanvasElement, zoom: number) {
     y: parseFloat(diffMiddleOfTheCanvas.y.toFixed(8)),
   };
 }
+
+export function getNormalizedZoom(zoom: number): number {
+  const normalizedZoom = parseFloat(zoom.toFixed(2));
+  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
+  return clampedZoom;
+}
