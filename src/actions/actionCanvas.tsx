@@ -62,6 +62,9 @@ const KEY_CODES = {
   MINUS: 189,
   EQUALS: 187,
   ZERO: 48,
+  NUM_SUBTRACT: 109,
+  NUM_ADD: 107,
+  NUM_ZERO: 96,
 };
 
 export const actionZoomIn: Action = {
@@ -86,7 +89,9 @@ export const actionZoomIn: Action = {
     />
   ),
   keyTest: event =>
-    event.keyCode === KEY_CODES.EQUALS && (event[KEYS.META] || event.shiftKey),
+    (event.keyCode === KEY_CODES.EQUALS ||
+      event.keyCode === KEY_CODES.NUM_ADD) &&
+    (event[KEYS.META] || event.shiftKey),
 };
 
 export const actionZoomOut: Action = {
@@ -111,7 +116,9 @@ export const actionZoomOut: Action = {
     />
   ),
   keyTest: event =>
-    event.keyCode === KEY_CODES.MINUS && (event[KEYS.META] || event.shiftKey),
+    (event.keyCode === KEY_CODES.MINUS ||
+      event.keyCode === KEY_CODES.NUM_SUBTRACT) &&
+    (event[KEYS.META] || event.shiftKey),
 };
 
 export const actionResetZoom: Action = {
@@ -125,5 +132,7 @@ export const actionResetZoom: Action = {
     };
   },
   keyTest: event =>
-    event.keyCode === KEY_CODES.ZERO && (event[KEYS.META] || event.shiftKey),
+    (event.keyCode === KEY_CODES.ZERO ||
+      event.keyCode === KEY_CODES.NUM_ZERO) &&
+    (event[KEYS.META] || event.shiftKey),
 };
