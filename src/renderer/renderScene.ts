@@ -51,8 +51,11 @@ export function renderScene(
   const normalizedCanvasHeight =
     canvas.height / getContextTransformScaleY(initialContextTransform);
 
-  // Handle zoom scaling
-  function scaleContextToZoom() {
+  const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
+  function applyZoom(context: CanvasRenderingContext2D): void {
+    context.save();
+
+    // Handle zoom scaling
     context.setTransform(
       getContextTransformScaleX(initialContextTransform) * sceneState.zoom,
       0,
@@ -61,11 +64,7 @@ export function renderScene(
       getContextTransformTranslateX(context.getTransform()),
       getContextTransformTranslateY(context.getTransform()),
     );
-  }
-
-  // Handle zoom translation
-  const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
-  function translateContextToZoom() {
+    // Handle zoom translation
     context.setTransform(
       getContextTransformScaleX(context.getTransform()),
       0,
@@ -76,6 +75,9 @@ export function renderScene(
       getContextTransformTranslateY(initialContextTransform) -
         zoomTranslation.y,
     );
+  }
+  function resetZoom(context: CanvasRenderingContext2D): void {
+    context.restore();
   }
 
   // Paint background
@@ -105,21 +107,15 @@ export function renderScene(
     ),
   );
 
-  context.save();
-  scaleContextToZoom();
-  translateContextToZoom();
+  applyZoom(context);
   visibleElements.forEach(element => {
-    context.save();
     renderElement(element, rc, context, renderOptimizations, sceneState);
-    context.restore();
   });
-  context.restore();
+  resetZoom(context);
 
   // Pain selection element
   if (selectionElement) {
-    context.save();
-    scaleContextToZoom();
-    translateContextToZoom();
+    applyZoom(context);
     renderElement(
       selectionElement,
       rc,
@@ -127,7 +123,7 @@ export function renderScene(
       renderOptimizations,
       sceneState,
     );
-    context.restore();
+    resetZoom(context);
   }
 
   // Pain selected elements
@@ -135,9 +131,7 @@ export function renderScene(
     const selectedElements = elements.filter(element => element.isSelected);
     const dashledLinePadding = 4 / sceneState.zoom;
 
-    context.save();
-    scaleContextToZoom();
-    translateContextToZoom();
+    applyZoom(context);
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
       const [
@@ -160,13 +154,11 @@ export function renderScene(
       );
       context.setLineDash(initialLineDash);
     });
-    context.restore();
+    resetZoom(context);
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      context.save();
-      scaleContextToZoom();
-      translateContextToZoom();
+      applyZoom(context);
       context.translate(sceneState.scrollX, sceneState.scrollY);
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
@@ -174,7 +166,7 @@ export function renderScene(
         .forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
-      context.restore();
+      resetZoom(context);
     }
 
     return visibleElements.length > 0;
