@@ -6,6 +6,7 @@ export {
   someElementIsSelected,
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
+  getSelectedElements,
 } from "./selection";
 export {
   exportCanvas,

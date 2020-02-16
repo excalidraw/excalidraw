@@ -16,6 +16,7 @@ import { t } from "../i18n";
 import { KEYS } from "../keys";
 
 import { probablySupportsClipboardBlob } from "../clipboard";
+import { getSelectedElements } from "../scene";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -56,7 +57,7 @@ function ExportModal({
   const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
-    ? elements.filter(element => element.isSelected)
+    ? getSelectedElements(elements)
     : elements;
 
   useEffect(() => {

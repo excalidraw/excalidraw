@@ -36,6 +36,7 @@ import {
   loadFromBlob,
   getZoomOrigin,
   getNormalizedZoom,
+  getSelectedElements,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -275,7 +276,7 @@ const LayerUI = React.memo(
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
         ? [editingElement]
-        : elements.filter(el => el.isSelected);
+        : getSelectedElements(elements);
       if (!targetElements.length && elementType === "selection") {
         return null;
       }
@@ -1050,9 +1051,7 @@ export class App extends React.Component<any, AppState> {
                   resizingElement: resizeElement ? resizeElement.element : null,
                 });
 
-                const selectedElements = elements.filter(
-                  element => element.isSelected,
-                ).length;
+                const selectedElements = getSelectedElements(elements).length;
                 if (selectedElements === 1 && resizeElement) {
                   resizeHandle = resizeElement.resizeHandle;
                   document.documentElement.style.cursor = getCursorForResizingElement(
@@ -1331,7 +1330,7 @@ export class App extends React.Component<any, AppState> {
                 if (isResizingElements && this.state.resizingElement) {
                   this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
-                  const selectedElements = elements.filter(el => el.isSelected);
+                  const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length === 1) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       e,
@@ -1558,7 +1557,7 @@ export class App extends React.Component<any, AppState> {
                   // Marking that click was used for dragging to check
                   // if elements should be deselected on mouseup
                   draggingOccurred = true;
-                  const selectedElements = elements.filter(el => el.isSelected);
+                  const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       e,
@@ -1944,8 +1943,7 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              const selectedElements = elements.filter(e => e.isSelected)
-                .length;
+              const selectedElements = getSelectedElements(elements).length;
               if (selectedElements === 1) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,

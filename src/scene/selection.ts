@@ -75,3 +75,9 @@ export function getCommonAttributeOfSelectedElements<T>(
   );
   return attributes.length === 1 ? attributes[0] : null;
 }
+
+export function getSelectedElements(
+  elements: readonly ExcalidrawElement[],
+): readonly ExcalidrawElement[] {
+  return elements.filter(element => element.isSelected);
+}

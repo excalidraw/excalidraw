@@ -12,6 +12,7 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 import { getZoomTranslation } from "../scene/zoom";
+import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 
@@ -135,7 +136,7 @@ export function renderScene(
 
   // Pain selected elements
   if (renderSelection) {
-    const selectedElements = elements.filter(element => element.isSelected);
+    const selectedElements = getSelectedElements(elements);
     const dashledLinePadding = 4 / sceneState.zoom;
 
     context.save();
