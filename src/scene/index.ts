@@ -3,9 +3,10 @@ export {
   clearSelection,
   getSelectedIndices,
   deleteSelectedElements,
-  someElementIsSelected,
+  isSomeElementSelected,
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
+  getSelectedElements,
 } from "./selection";
 export {
   exportCanvas,

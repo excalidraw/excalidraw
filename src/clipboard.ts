@@ -1,4 +1,5 @@
 import { ExcalidrawElement } from "./element/types";
+import { getSelectedElements } from "./scene";
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -19,9 +20,7 @@ export async function copyToAppClipboard(
   elements: readonly ExcalidrawElement[],
 ) {
   CLIPBOARD = JSON.stringify(
-    elements
-      .filter(element => element.isSelected)
-      .map(({ shape, ...el }) => el),
+    getSelectedElements(elements).map(({ shape, ...el }) => el),
   );
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
