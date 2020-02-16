@@ -1,17 +1,17 @@
 import { ExcalidrawTextElement } from "../element/types";
-import { AppState } from "../types";
+import { FlooredNumber } from "../types";
 
 export type SceneState = {
-  scrollX: AppState["scrollX"];
-  scrollY: AppState["scrollY"];
+  scrollX: FlooredNumber;
+  scrollY: FlooredNumber;
   // null indicates transparent bg
   viewBackgroundColor: string | null;
   zoom: number;
 };
 
 export type SceneScroll = {
-  scrollX: AppState["scrollX"];
-  scrollY: AppState["scrollY"];
+  scrollX: FlooredNumber;
+  scrollY: FlooredNumber;
 };
 
 export interface Scene {

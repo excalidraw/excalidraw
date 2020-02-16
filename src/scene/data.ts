@@ -6,7 +6,7 @@ import {
   clearAppStateForLocalStorage,
 } from "../appState";
 
-import { AppState } from "../types";
+import { AppState, FlooredNumber } from "../types";
 import { ExportType } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
@@ -60,12 +60,12 @@ export function serializeAsJSON(
 }
 
 export function normalizeScroll(pos: number) {
-  return Math.floor(pos) as AppState["scrollX"];
+  return Math.floor(pos) as FlooredNumber;
 }
 
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
-): { scrollX: AppState["scrollX"]; scrollY: AppState["scrollY"] } {
+): { scrollX: FlooredNumber; scrollY: FlooredNumber } {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;

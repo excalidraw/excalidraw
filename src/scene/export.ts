@@ -48,8 +48,8 @@ export function exportToCanvas(
       zoom: 1,
     },
     {
-      offsetX: -minX + exportPadding,
-      offsetY: -minY + exportPadding,
+      offsetX: normalizeScroll(-minX + exportPadding),
+      offsetY: normalizeScroll(-minY + exportPadding),
       renderScrollbars: false,
       renderSelection: false,
       renderOptimizations: false,

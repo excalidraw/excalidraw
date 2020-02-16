@@ -38,7 +38,7 @@ import {
 } from "./scene";
 
 import { renderScene } from "./renderer";
-import { AppState } from "./types";
+import { AppState, FlooredNumber } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
@@ -140,8 +140,8 @@ export function viewportCoordsToSceneCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: AppState["scrollX"];
-    scrollY: AppState["scrollY"];
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,
@@ -163,8 +163,8 @@ export function sceneCoordsToViewportCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: AppState["scrollX"];
-    scrollY: AppState["scrollY"];
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,

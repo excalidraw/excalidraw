@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "./element/types";
 import { SHAPES } from "./shapes";
 
-type FlooredNumber = number & { _brand: "FlooredNumber" };
+export type FlooredNumber = number & { _brand: "FlooredNumber" };
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
