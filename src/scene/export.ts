@@ -43,13 +43,11 @@ export function exportToCanvas(
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: normalizeScroll(0),
-      scrollY: normalizeScroll(0),
+      scrollX: normalizeScroll(-minX + exportPadding),
+      scrollY: normalizeScroll(-minY + exportPadding),
       zoom: 1,
     },
     {
-      offsetX: normalizeScroll(-minX + exportPadding),
-      offsetY: normalizeScroll(-minY + exportPadding),
       renderScrollbars: false,
       renderSelection: false,
       renderOptimizations: false,

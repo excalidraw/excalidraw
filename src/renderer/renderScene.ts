@@ -24,8 +24,6 @@ export function renderScene(
   sceneState: SceneState,
   // extra options, currently passed by export helper
   {
-    offsetX,
-    offsetY,
     renderScrollbars = true,
     renderSelection = true,
     // Whether to employ render optimizations to improve performance.
@@ -33,8 +31,6 @@ export function renderScene(
     //  doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
   }: {
-    offsetX?: FlooredNumber;
-    offsetY?: FlooredNumber;
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
@@ -43,13 +39,6 @@ export function renderScene(
   if (!canvas) {
     return false;
   }
-
-  // Use offsets insteads of scrolls if available
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
-  };
 
   const context = canvas.getContext("2d")!;
 
