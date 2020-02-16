@@ -1047,12 +1047,15 @@ export class App extends React.Component<any, AppState> {
                   { x, y },
                   this.state.zoom,
                 );
-                this.setState({
-                  resizingElement: resizeElement ? resizeElement.element : null,
-                });
 
                 const selectedElements = getSelectedElements(elements);
                 if (selectedElements.length === 1 && resizeElement) {
+                  this.setState({
+                    resizingElement: resizeElement
+                      ? resizeElement.element
+                      : null,
+                  });
+
                   resizeHandle = resizeElement.resizeHandle;
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     resizeElement,
