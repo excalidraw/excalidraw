@@ -35,6 +35,7 @@ import {
   calculateScrollCenter,
   loadFromBlob,
   getZoomOrigin,
+  getNormalizedZoom,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -1983,10 +1984,17 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
     const { deltaX, deltaY } = e;
 
-    this.setState({
-      scrollX: this.state.scrollX - deltaX / this.state.zoom,
-      scrollY: this.state.scrollY - deltaY / this.state.zoom,
-    });
+    if (e[KEYS.META]) {
+      this.setState(({ zoom }) => ({
+        zoom: getNormalizedZoom(zoom - deltaY / 100),
+      }));
+      return;
+    }
+
+    this.setState(({ zoom, scrollX, scrollY }) => ({
+      scrollX: scrollX - deltaX / zoom,
+      scrollY: scrollY - deltaY / zoom,
+    }));
   };
 
   private addElementsFromPaste = (
