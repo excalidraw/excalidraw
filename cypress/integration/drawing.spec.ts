@@ -73,4 +73,89 @@ describe("Drawing", () => {
       clip: screenshotRegion,
     });
   });
+  it("should draw a diamond", () => {
+    // just capture an empty square on the center of the viewport
+    cy.get('input[aria-label="Diamond"]').click();
+    cy.get("#canvas").drag(
+      { x: region.x + 10, y: region.y + 10 },
+      { x: region.x + 50, y: region.y + 50 },
+    );
+    cy.get("#canvas").matchImageSnapshot("diamondArtist", {
+      clip: region,
+      ...artistDrawingConfig,
+    });
+    // for catching any mistake we also compare architect sloppiness
+    cy.contains("Architect").click();
+    cy.get("#canvas").matchImageSnapshot("diamondArchitect", {
+      clip: region,
+    });
+  });
+  it("should draw a arrow pointing south-east", () => {
+    // just capture an empty square on the center of the viewport
+    cy.get('input[aria-label="Arrow"]').click();
+    cy.get("#canvas").drag(
+      { x: region.x + 10, y: region.y + 10 },
+      { x: region.x + 50, y: region.y + 50 },
+    );
+    cy.get("#canvas").matchImageSnapshot("arrowSEArtist", {
+      clip: region,
+      ...artistDrawingConfig,
+    });
+    // for catching any mistake we also compare architect sloppiness
+    cy.contains("Architect").click();
+    cy.get("#canvas").matchImageSnapshot("arrowSEArchitect", {
+      clip: region,
+    });
+  });
+  it("should draw a arrow pointing north-west", () => {
+    // just capture an empty square on the center of the viewport
+    cy.get('input[aria-label="Arrow"]').click();
+    cy.get("#canvas").drag(
+      { x: region.x + 50, y: region.y + 50 },
+      { x: region.x + 10, y: region.y + 10 },
+    );
+    cy.get("#canvas").matchImageSnapshot("arrowNWArtist", {
+      clip: region,
+      ...artistDrawingConfig,
+    });
+    // for catching any mistake we also compare architect sloppiness
+    cy.contains("Architect").click();
+    cy.get("#canvas").matchImageSnapshot("arrowNWArchitect", {
+      clip: region,
+    });
+  });
+  it("should draw a arrow pointing north-east", () => {
+    // just capture an empty square on the center of the viewport
+    cy.get('input[aria-label="Arrow"]').click();
+    cy.get("#canvas").drag(
+      { x: region.x + 10, y: region.y + 50 },
+      { x: region.x + 50, y: region.y + 10 },
+    );
+    cy.get("#canvas").matchImageSnapshot("arrowNEArtist", {
+      clip: region,
+      ...artistDrawingConfig,
+    });
+    // for catching any mistake we also compare architect sloppiness
+    cy.contains("Architect").click();
+    cy.get("#canvas").matchImageSnapshot("arrowNEArchitect", {
+      clip: region,
+    });
+  });
+  it("should draw a arrow pointing south-west", () => {
+    // just capture an empty square on the center of the viewport
+    cy.get('input[aria-label="Arrow"]').click();
+    cy.get("#canvas").drag(
+      { x: region.x + 50, y: region.y + 10 },
+      { x: region.x + 10, y: region.y + 50 },
+    );
+    cy.get("#canvas").matchImageSnapshot("arrowSWArtist", {
+      clip: region,
+      ...artistDrawingConfig,
+    });
+    // for catching any mistake we also compare architect sloppiness
+    cy.contains("Architect").click();
+    cy.get("#canvas").matchImageSnapshot("arrowSWArchitect", {
+      clip: region,
+    });
+  });
 });
