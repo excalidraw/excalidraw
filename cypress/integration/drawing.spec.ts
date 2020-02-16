@@ -1,4 +1,7 @@
-import { baseDrawingRegion as region } from "../support/utils";
+import {
+  baseDrawingRegion as region,
+  artistDrawingConfig,
+} from "../support/utils";
 
 describe("Drawing", () => {
   it("should change canvas background color", () => {
@@ -23,8 +26,7 @@ describe("Drawing", () => {
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("rectangleArtist", {
       clip: region,
-      failureThreshold: 0.04,
-      failureThresholdType: "percent",
+      ...artistDrawingConfig,
     });
     // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();

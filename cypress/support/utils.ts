@@ -7,3 +7,8 @@ export const baseDrawingRegion = {
   width: 100,
   height: 100,
 };
+
+export const artistDrawingConfig = {
+  failureThreshold: 0.04,
+  failureThresholdType: "percent",
+} as const;
