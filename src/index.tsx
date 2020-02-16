@@ -1051,8 +1051,8 @@ export class App extends React.Component<any, AppState> {
                   resizingElement: resizeElement ? resizeElement.element : null,
                 });
 
-                const selectedElements = getSelectedElements(elements).length;
-                if (selectedElements === 1 && resizeElement) {
+                const selectedElements = getSelectedElements(elements);
+                if (selectedElements.length === 1 && resizeElement) {
                   resizeHandle = resizeElement.resizeHandle;
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     resizeElement,
@@ -1943,8 +1943,8 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              const selectedElements = getSelectedElements(elements).length;
-              if (selectedElements === 1) {
+              const selectedElements = getSelectedElements(elements);
+              if (selectedElements.length === 1) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
