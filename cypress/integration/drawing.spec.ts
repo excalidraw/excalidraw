@@ -80,11 +80,6 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
     );
-    cy.get("#canvas").matchImageSnapshot("diamondArtist", {
-      clip: region,
-      ...artistDrawingConfig,
-    });
-    // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
     cy.get("#canvas").matchImageSnapshot("diamondArchitect", {
       clip: region,
@@ -97,11 +92,6 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
     );
-    cy.get("#canvas").matchImageSnapshot("arrowSEArtist", {
-      clip: region,
-      ...artistDrawingConfig,
-    });
-    // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
     cy.get("#canvas").matchImageSnapshot("arrowSEArchitect", {
       clip: region,
@@ -114,11 +104,6 @@ describe("Drawing", () => {
       { x: region.x + 50, y: region.y + 50 },
       { x: region.x + 10, y: region.y + 10 },
     );
-    cy.get("#canvas").matchImageSnapshot("arrowNWArtist", {
-      clip: region,
-      ...artistDrawingConfig,
-    });
-    // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
     cy.get("#canvas").matchImageSnapshot("arrowNWArchitect", {
       clip: region,
@@ -131,11 +116,6 @@ describe("Drawing", () => {
       { x: region.x + 10, y: region.y + 50 },
       { x: region.x + 50, y: region.y + 10 },
     );
-    cy.get("#canvas").matchImageSnapshot("arrowNEArtist", {
-      clip: region,
-      ...artistDrawingConfig,
-    });
-    // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
     cy.get("#canvas").matchImageSnapshot("arrowNEArchitect", {
       clip: region,
@@ -148,11 +128,6 @@ describe("Drawing", () => {
       { x: region.x + 50, y: region.y + 10 },
       { x: region.x + 10, y: region.y + 50 },
     );
-    cy.get("#canvas").matchImageSnapshot("arrowSWArtist", {
-      clip: region,
-      ...artistDrawingConfig,
-    });
-    // for catching any mistake we also compare architect sloppiness
     cy.contains("Architect").click();
     cy.get("#canvas").matchImageSnapshot("arrowSWArchitect", {
       clip: region,
