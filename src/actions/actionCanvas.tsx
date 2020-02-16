@@ -59,12 +59,12 @@ export const actionClearCanvas: Action = {
 const ZOOM_STEP = 0.1;
 
 const KEY_CODES = {
-  MINUS: 189,
-  EQUALS: 187,
-  ZERO: 48,
-  NUM_SUBTRACT: 109,
-  NUM_ADD: 107,
-  NUM_ZERO: 96,
+  MINUS: "Minus",
+  EQUAL: "Equal",
+  ZERO: "Digit0",
+  NUM_SUBTRACT: "NumpadSubtract",
+  NUM_ADD: "NumpadAdd",
+  NUM_ZERO: "Numpad0",
 };
 
 export const actionZoomIn: Action = {
@@ -89,8 +89,7 @@ export const actionZoomIn: Action = {
     />
   ),
   keyTest: event =>
-    (event.keyCode === KEY_CODES.EQUALS ||
-      event.keyCode === KEY_CODES.NUM_ADD) &&
+    (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
     (event[KEYS.META] || event.shiftKey),
 };
 
@@ -116,8 +115,7 @@ export const actionZoomOut: Action = {
     />
   ),
   keyTest: event =>
-    (event.keyCode === KEY_CODES.MINUS ||
-      event.keyCode === KEY_CODES.NUM_SUBTRACT) &&
+    (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
     (event[KEYS.META] || event.shiftKey),
 };
 
@@ -132,7 +130,6 @@ export const actionResetZoom: Action = {
     };
   },
   keyTest: event =>
-    (event.keyCode === KEY_CODES.ZERO ||
-      event.keyCode === KEY_CODES.NUM_ZERO) &&
+    (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.META] || event.shiftKey),
 };
