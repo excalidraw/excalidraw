@@ -7,18 +7,21 @@ import {
 } from "../appState";
 
 import { AppState } from "../types";
-import { ExportType, PreviousScene } from "./types";
+import { ExportType } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
 import { fileOpen, fileSave } from "browser-nativefs";
-import { getCommonBounds, normalizeDimensions } from "../element";
+import {
+  getCommonBounds,
+  normalizeDimensions,
+  isInvisiblySmallElement,
+} from "../element";
 
 import { Point } from "roughjs/bin/geometry";
 import { t } from "../i18n";
 import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_SCENE_PREVIOUS_KEY = "excalidraw-previos-scenes";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
@@ -177,10 +180,6 @@ export async function exportToBackend(
       body: encrypted,
     });
     const json = await response.json();
-    // TODO: comment following
-    // const json = {id: '1234'}
-    // console.log("new Uint8Array([" + new Uint8Array(encrypted).join(",") + "])");
-
     if (json.id) {
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
@@ -188,7 +187,7 @@ export async function exportToBackend(
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
 
-      window.prompt(t("alerts.uploadedSecurly"), urlString);
+      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
@@ -339,51 +338,53 @@ function restore(
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
 ): DataState {
-  const elements = savedElements.map(element => {
-    let points: Point[] = [];
-    if (element.type === "arrow") {
-      if (Array.isArray(element.points)) {
-        // if point array is empty, add one point to the arrow
-        // this is used as fail safe to convert incoming data to a valid
-        // arrow. In the new arrow, width and height are not being usde
-        points = element.points.length > 0 ? element.points : [[0, 0]];
+  const elements = savedElements
+    .filter(el => !isInvisiblySmallElement(el))
+    .map(element => {
+      let points: Point[] = [];
+      if (element.type === "arrow") {
+        if (Array.isArray(element.points)) {
+          // if point array is empty, add one point to the arrow
+          // this is used as fail safe to convert incoming data to a valid
+          // arrow. In the new arrow, width and height are not being usde
+          points = element.points.length > 0 ? element.points : [[0, 0]];
+        } else {
+          // convert old arrow type to a new one
+          // old arrow spec used width and height
+          // to determine the endpoints
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        }
+      } else if (element.type === "line") {
+        // old spec, pre-arrows
+        // old spec, post-arrows
+        if (!Array.isArray(element.points) || element.points.length === 0) {
+          points = [
+            [0, 0],
+            [element.width, element.height],
+          ];
+        } else {
+          points = element.points;
+        }
       } else {
-        // convert old arrow type to a new one
-        // old arrow spec used width and height
-        // to determine the endpoints
-        points = [
-          [0, 0],
-          [element.width, element.height],
-        ];
+        normalizeDimensions(element);
       }
-    } else if (element.type === "line") {
-      // old spec, pre-arrows
-      // old spec, post-arrows
-      if (!Array.isArray(element.points) || element.points.length === 0) {
-        points = [
-          [0, 0],
-          [element.width, element.height],
-        ];
-      } else {
-        points = element.points;
-      }
-    } else {
-      normalizeDimensions(element);
-    }
 
-    return {
-      ...element,
-      id: element.id || nanoid(),
-      fillStyle: element.fillStyle || "hachure",
-      strokeWidth: element.strokeWidth || 1,
-      roughness: element.roughness || 1,
-      opacity:
-        element.opacity === null || element.opacity === undefined
-          ? 100
-          : element.opacity,
-      points,
-    };
-  });
+      return {
+        ...element,
+        id: element.id || nanoid(),
+        fillStyle: element.fillStyle || "hachure",
+        strokeWidth: element.strokeWidth || 1,
+        roughness: element.roughness || 1,
+        opacity:
+          element.opacity === null || element.opacity === undefined
+            ? 100
+            : element.opacity,
+        points,
+      };
+    });
 
   if (opts?.scrollToContent && savedState) {
     savedState = { ...savedState, ...calculateScrollCenter(elements) };
@@ -438,47 +439,6 @@ export function saveToLocalStorage(
   );
 }
 
-/**
- * Returns the list of ids in Local Storage
- * @returns array
- */
-export function loadedScenes(): PreviousScene[] {
-  const storedPreviousScenes = localStorage.getItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-  );
-  if (storedPreviousScenes) {
-    try {
-      return JSON.parse(storedPreviousScenes);
-    } catch (e) {
-      console.error("Could not parse previously stored ids");
-      return [];
-    }
-  }
-  return [];
-}
-
-/**
- * Append id to the list of Previous Scenes in Local Storage if not there yet
- * @param id string
- */
-export function addToLoadedScenes(id: string, k: string | undefined): void {
-  const scenes = [...loadedScenes()];
-  const newScene = scenes.every(scene => scene.id !== id);
-
-  if (newScene) {
-    scenes.push({
-      timestamp: Date.now(),
-      id,
-      k,
-    });
-  }
-
-  localStorage.setItem(
-    LOCAL_STORAGE_SCENE_PREVIOUS_KEY,
-    JSON.stringify(scenes),
-  );
-}
-
 export async function loadScene(id: string | null, k?: string) {
   let data;
   let selectedId;
@@ -486,7 +446,6 @@ export async function loadScene(id: string | null, k?: string) {
     // k is the private key used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, k);
-    addToLoadedScenes(id, k);
     selectedId = id;
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {

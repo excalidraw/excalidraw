@@ -16,8 +16,6 @@ export {
   saveToLocalStorage,
   exportToBackend,
   importFromBackend,
-  addToLoadedScenes,
-  loadedScenes,
   loadScene,
   calculateScrollCenter,
 } from "./data";
@@ -29,3 +27,4 @@ export {
   hasText,
 } from "./comparisons";
 export { createScene } from "./createScene";
+export { getZoomOrigin, getZoomTranslation } from "./zoom";

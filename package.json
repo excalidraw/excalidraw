@@ -6,7 +6,7 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "browser-nativefs": "0.2.0",
+    "browser-nativefs": "0.2.2",
     "i18next-browser-languagedetector": "4.0.1",
     "nanoid": "2.1.11",
     "react": "16.12.0",
@@ -18,7 +18,9 @@
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^4.1.1",
     "@types/cypress-image-snapshot": "^3.1.2",
-    "@types/jest": "25.1.1",
+    "@testing-library/jest-dom": "5.1.1",
+    "@testing-library/react": "9.4.0",
+    "@types/jest": "25.1.2",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.5",
@@ -27,13 +29,19 @@
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-prettier": "3.1.2",
-    "husky": "4.2.1",
+    "husky": "4.2.2",
+    "jest-canvas-mock": "2.2.0",
     "lint-staged": "10.0.7",
     "node-sass": "4.13.1",
     "prettier": "1.19.1",
     "rewire": "4.0.1",
     "ts-loader": "^6.2.1",
     "typescript": "3.7.5"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|browser-nativefs)/)"
+    ]
   },
   "eslintConfig": {
     "extends": [

@@ -31,10 +31,10 @@ import {
   hasStroke,
   hasText,
   exportCanvas,
-  loadedScenes,
   loadScene,
   calculateScrollCenter,
   loadFromBlob,
+  getZoomOrigin,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -49,6 +49,7 @@ import {
   capitalizeString,
   distance,
   distance2d,
+  resetCursor,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -77,6 +78,8 @@ import {
   actionChangeFontFamily,
   actionChangeViewBackgroundColor,
   actionClearCanvas,
+  actionZoomIn,
+  actionZoomOut,
   actionChangeProjectName,
   actionChangeExportBackground,
   actionLoadScene,
@@ -96,20 +99,12 @@ import { ExportDialog } from "./components/ExportDialog";
 import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
-import { StoredScenesList } from "./components/StoredScenesList";
 import { HintViewer } from "./components/HintViewer";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 
 let { elements } = createScene();
 const { history } = createHistory();
-
-const CANVAS_WINDOW_OFFSET_LEFT = 0;
-const CANVAS_WINDOW_OFFSET_TOP = 0;
-
-function resetCursor() {
-  document.documentElement.style.cursor = "";
-}
 
 function setCursorForShape(shape: string) {
   if (shape === "selection") {
@@ -135,17 +130,53 @@ const MOUSE_BUTTON = {
   SECONDARY: 2,
 };
 
-let lastCanvasWidth = -1;
-let lastCanvasHeight = -1;
-
 let lastMouseUp: ((e: any) => void) | null = null;
 
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
-  { scrollX, scrollY }: { scrollX: number; scrollY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
 ) {
-  const x = clientX - CANVAS_WINDOW_OFFSET_LEFT - scrollX;
-  const y = clientY - CANVAS_WINDOW_OFFSET_TOP - scrollY;
+  const zoomOrigin = getZoomOrigin(canvas);
+  const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
+  const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
+
+  const x = clientXWithZoom - scrollX;
+  const y = clientYWithZoom - scrollY;
+
+  return { x, y };
+}
+
+export function sceneCoordsToViewportCoords(
+  { sceneX, sceneY }: { sceneX: number; sceneY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
+) {
+  const zoomOrigin = getZoomOrigin(canvas);
+  const sceneXWithZoomAndScroll =
+    zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
+  const sceneYWithZoomAndScroll =
+    zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
+
+  const x = sceneXWithZoomAndScroll;
+  const y = sceneYWithZoomAndScroll;
+
   return { x, y };
 }
 
@@ -280,6 +311,16 @@ const LayerUI = React.memo(
 
             {actionManager.renderAction("changeOpacity")}
 
+            <fieldset>
+              <legend>{t("labels.layers")}</legend>
+              <div className="buttonList">
+                {actionManager.renderAction("sendToBack")}
+                {actionManager.renderAction("sendBackward")}
+                {actionManager.renderAction("bringToFront")}
+                {actionManager.renderAction("bringForward")}
+              </div>
+            </fieldset>
+
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
         </Island>
@@ -318,19 +359,17 @@ const LayerUI = React.memo(
       );
     }
 
-    function renderIdsDropdown() {
-      const scenes = loadedScenes();
-      if (scenes.length === 0) {
-        return;
-      }
+    function renderZoomActions() {
       return (
-        <StoredScenesList
-          scenes={scenes}
-          currentId={appState.selectedId}
-          onChange={async (id, k) =>
-            actionManager.updater(await loadScene(id, k))
-          }
-        />
+        <Stack.Col gap={1}>
+          <Stack.Row gap={1} align="center">
+            {actionManager.renderAction("zoomIn")}
+            {actionManager.renderAction("zoomOut")}
+            <div style={{ marginLeft: 4 }}>
+              {(appState.zoom * 100).toFixed(0)}%
+            </div>
+          </Stack.Row>
+        </Stack.Col>
       );
     }
 
@@ -384,6 +423,16 @@ const LayerUI = React.memo(
             </section>
             <div />
           </div>
+          <div className="App-menu App-menu_bottom">
+            <Stack.Col gap={2}>
+              <section aria-labelledby="canvas-zoom-actions-title">
+                <h2 className="visually-hidden" id="canvas-zoom-actions-title">
+                  {t("headings.canvasActions")}
+                </h2>
+                <Island padding={1}>{renderZoomActions()}</Island>
+              </section>
+            </Stack.Col>
+          </div>
         </FixedSideContainer>
         <footer role="contentinfo">
           <HintViewer
@@ -400,7 +449,6 @@ const LayerUI = React.memo(
             languages={languages}
             currentLanguage={language}
           />
-          {renderIdsDropdown()}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
@@ -474,6 +522,8 @@ export class App extends React.Component<any, AppState> {
 
     this.actionManager.registerAction(actionChangeViewBackgroundColor);
     this.actionManager.registerAction(actionClearCanvas);
+    this.actionManager.registerAction(actionZoomIn);
+    this.actionManager.registerAction(actionZoomOut);
 
     this.actionManager.registerAction(actionChangeProjectName);
     this.actionManager.registerAction(actionChangeExportBackground);
@@ -490,6 +540,9 @@ export class App extends React.Component<any, AppState> {
     res: ActionResult,
     commitToHistory: boolean = true,
   ) => {
+    if (this.unmounted) {
+      return;
+    }
     if (res.elements) {
       elements = res.elements;
       if (commitToHistory) {
@@ -530,6 +583,11 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
+  private disableEvent: EventHandlerNonNull = e => {
+    e.preventDefault();
+  };
+
+  private unmounted = false;
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.pasteFromClipboard);
@@ -541,28 +599,32 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
     window.addEventListener("blur", this.onUnload, false);
-    window.addEventListener("dragover", e => e.preventDefault(), false);
-    window.addEventListener("drop", e => e.preventDefault(), false);
+    window.addEventListener("dragover", this.disableEvent, false);
+    window.addEventListener("drop", this.disableEvent, false);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
     if (id) {
       // Backwards compatibility with legacy url format
-      this.syncActionResult(await loadScene(id));
+      const scene = await loadScene(id);
+      this.syncActionResult(scene);
     } else {
       const match = window.location.hash.match(
         /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
       );
       if (match) {
-        this.syncActionResult(await loadScene(match[1], match[2]));
+        const scene = await loadScene(match[1], match[2]);
+        this.syncActionResult(scene);
       } else {
-        this.syncActionResult(await loadScene(null));
+        const scene = await loadScene(null);
+        this.syncActionResult(scene);
       }
     }
   }
 
   public componentWillUnmount() {
+    this.unmounted = true;
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
@@ -573,9 +635,12 @@ export class App extends React.Component<any, AppState> {
       this.updateCurrentCursorPosition,
       false,
     );
+    document.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
     window.removeEventListener("blur", this.onUnload, false);
+    window.removeEventListener("dragover", this.disableEvent, false);
+    window.removeEventListener("drop", this.disableEvent, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -684,8 +749,6 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private removeWheelEventListener: (() => void) | undefined;
-
   private copyToAppClipboard = () => {
     copyToAppClipboard(elements);
   };
@@ -708,6 +771,7 @@ export class App extends React.Component<any, AppState> {
         const { x, y } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
+          this.canvas,
         );
 
         const element = newTextElement(
@@ -759,8 +823,13 @@ export class App extends React.Component<any, AppState> {
   };
 
   public render() {
-    const canvasWidth = window.innerWidth - CANVAS_WINDOW_OFFSET_LEFT;
-    const canvasHeight = window.innerHeight - CANVAS_WINDOW_OFFSET_TOP;
+    const canvasDOMWidth = window.innerWidth;
+    const canvasDOMHeight = window.innerHeight;
+
+    const canvasScale = window.devicePixelRatio;
+
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
       <div className="container">
@@ -777,46 +846,43 @@ export class App extends React.Component<any, AppState> {
           <canvas
             id="canvas"
             style={{
-              width: canvasWidth,
-              height: canvasHeight,
+              width: canvasDOMWidth,
+              height: canvasDOMHeight,
             }}
-            width={canvasWidth * window.devicePixelRatio}
-            height={canvasHeight * window.devicePixelRatio}
+            width={canvasWidth}
+            height={canvasHeight}
             ref={canvas => {
-              if (this.canvas === null) {
+              // canvas is null when unmounting
+              if (canvas !== null) {
                 this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas!);
-              }
-              if (this.removeWheelEventListener) {
-                this.removeWheelEventListener();
-                this.removeWheelEventListener = undefined;
-              }
-              if (canvas) {
-                canvas.addEventListener("wheel", this.handleWheel, {
+                this.rc = rough.canvas(this.canvas);
+
+                this.canvas.addEventListener("wheel", this.handleWheel, {
                   passive: false,
                 });
-                this.removeWheelEventListener = () =>
-                  canvas.removeEventListener("wheel", this.handleWheel);
-                // Whenever React sets the width/height of the canvas element,
-                // the context loses the scale transform. We need to re-apply it
-                if (
-                  canvasWidth !== lastCanvasWidth ||
-                  canvasHeight !== lastCanvasHeight
-                ) {
-                  lastCanvasWidth = canvasWidth;
-                  lastCanvasHeight = canvasHeight;
-                  canvas
-                    .getContext("2d")!
-                    .scale(window.devicePixelRatio, window.devicePixelRatio);
-                }
+
+                this.canvas
+                  .getContext("2d")
+                  ?.setTransform(canvasScale, 0, 0, canvasScale, 0, 0);
+              } else {
+                this.canvas?.removeEventListener("wheel", this.handleWheel);
               }
             }}
             onContextMenu={e => {
               e.preventDefault();
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
 
-              const element = getElementAtPosition(elements, x, y);
+              const element = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
               if (!element) {
                 ContextMenu.push({
                   options: [
@@ -887,8 +953,8 @@ export class App extends React.Component<any, AppState> {
                   lastY = e.clientY;
 
                   this.setState({
-                    scrollX: this.state.scrollX - deltaX,
-                    scrollY: this.state.scrollY - deltaY,
+                    scrollX: this.state.scrollX - deltaX / this.state.zoom,
+                    scrollY: this.state.scrollY - deltaY / this.state.zoom,
                   });
                 };
                 const teardown = (lastMouseUp = () => {
@@ -929,15 +995,18 @@ export class App extends React.Component<any, AppState> {
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
                 elements,
-                e.clientX - CANVAS_WINDOW_OFFSET_LEFT,
-                e.clientY - CANVAS_WINDOW_OFFSET_TOP,
-                canvasWidth,
-                canvasHeight,
-                this.state.scrollX,
-                this.state.scrollY,
+                e.clientX / window.devicePixelRatio,
+                e.clientY / window.devicePixelRatio,
+                canvasWidth / window.devicePixelRatio,
+                canvasHeight / window.devicePixelRatio,
+                this.state,
               );
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
 
               const originX = x;
               const originY = y;
@@ -972,7 +1041,7 @@ export class App extends React.Component<any, AppState> {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
-                  this.state,
+                  this.state.zoom,
                 );
                 this.setState({
                   resizingElement: resizeElement ? resizeElement.element : null,
@@ -985,7 +1054,12 @@ export class App extends React.Component<any, AppState> {
                   );
                   isResizingElements = true;
                 } else {
-                  hitElement = getElementAtPosition(elements, x, y);
+                  hitElement = getElementAtPosition(
+                    elements,
+                    x,
+                    y,
+                    this.state.zoom,
+                  );
                   // clear selection if shift is not clicked
                   if (!hitElement?.isSelected && !e.shiftKey) {
                     elements = clearSelection(elements);
@@ -1026,6 +1100,12 @@ export class App extends React.Component<any, AppState> {
               }
 
               if (isTextElement(element)) {
+                // if we're currently still editing text, clicking outside
+                //  should only finalize it, not create another (irrespective
+                //  of state.elementLocked)
+                if (this.state.editingElement?.type === "text") {
+                  return;
+                }
                 let textX = e.clientX;
                 let textY = e.clientY;
                 if (!e.altKey) {
@@ -1045,7 +1125,6 @@ export class App extends React.Component<any, AppState> {
                   this.setState({
                     draggingElement: null,
                     editingElement: null,
-                    elementType: "selection",
                   });
                 };
 
@@ -1056,6 +1135,7 @@ export class App extends React.Component<any, AppState> {
                   strokeColor: this.state.currentItemStrokeColor,
                   opacity: this.state.currentItemOpacity,
                   font: this.state.currentItemFont,
+                  zoom: this.state.zoom,
                   onSubmit: text => {
                     if (text) {
                       elements = [
@@ -1070,6 +1150,9 @@ export class App extends React.Component<any, AppState> {
                         },
                       ];
                     }
+                    if (this.state.elementLocked) {
+                      setCursorForShape(this.state.elementType);
+                    }
                     history.resumeRecording();
                     resetSelection();
                   },
@@ -1077,10 +1160,17 @@ export class App extends React.Component<any, AppState> {
                     resetSelection();
                   },
                 });
-                this.setState({
-                  elementType: "selection",
-                  editingElement: element,
-                });
+                resetCursor();
+                if (!this.state.elementLocked) {
+                  this.setState({
+                    editingElement: element,
+                    elementType: "selection",
+                  });
+                } else {
+                  this.setState({
+                    editingElement: element,
+                  });
+                }
                 return;
               } else if (
                 this.state.elementType === "arrow" ||
@@ -1115,8 +1205,8 @@ export class App extends React.Component<any, AppState> {
               let lastY = y;
 
               if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
-                lastY = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                lastX = e.clientX;
+                lastY = e.clientY;
               }
 
               let resizeArrowFn:
@@ -1194,17 +1284,21 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isOverHorizontalScrollBar) {
-                  const x = e.clientX - CANVAS_WINDOW_OFFSET_LEFT;
+                  const x = e.clientX;
                   const dx = x - lastX;
-                  this.setState({ scrollX: this.state.scrollX - dx });
+                  this.setState({
+                    scrollX: this.state.scrollX - dx / this.state.zoom,
+                  });
                   lastX = x;
                   return;
                 }
 
                 if (isOverVerticalScrollBar) {
-                  const y = e.clientY - CANVAS_WINDOW_OFFSET_TOP;
+                  const y = e.clientY;
                   const dy = y - lastY;
-                  this.setState({ scrollY: this.state.scrollY - dy });
+                  this.setState({
+                    scrollY: this.state.scrollY - dy / this.state.zoom,
+                  });
                   lastY = y;
                   return;
                 }
@@ -1218,7 +1312,11 @@ export class App extends React.Component<any, AppState> {
                   (this.state.elementType === "arrow" ||
                     this.state.elementType === "line")
                 ) {
-                  const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                  const { x, y } = viewportCoordsToSceneCoords(
+                    e,
+                    this.state,
+                    this.canvas,
+                  );
                   if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
                     return;
                   }
@@ -1229,7 +1327,11 @@ export class App extends React.Component<any, AppState> {
                   const el = this.state.resizingElement;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length === 1) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
                     const deltaX = x - lastX;
                     const deltaY = y - lastY;
                     const element = selectedElements[0];
@@ -1452,7 +1554,11 @@ export class App extends React.Component<any, AppState> {
                   draggingOccurred = true;
                   const selectedElements = elements.filter(el => el.isSelected);
                   if (selectedElements.length) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
 
                     selectedElements.forEach(element => {
                       element.x += x - lastX;
@@ -1472,7 +1578,11 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
 
-                const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                const { x, y } = viewportCoordsToSceneCoords(
+                  e,
+                  this.state,
+                  this.canvas,
+                );
 
                 let width = distance(originX, x);
                 let height = distance(originY, y);
@@ -1566,7 +1676,11 @@ export class App extends React.Component<any, AppState> {
                     this.setState({});
                   }
                   if (!draggingOccurred && draggingElement && !multiElement) {
-                    const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+                    const { x, y } = viewportCoordsToSceneCoords(
+                      e,
+                      this.state,
+                      this.canvas,
+                    );
                     draggingElement.points.push([
                       x - draggingElement.x,
                       y - draggingElement.y,
@@ -1575,10 +1689,17 @@ export class App extends React.Component<any, AppState> {
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     this.state.draggingElement!.isSelected = true;
-                    this.setState({
-                      draggingElement: null,
-                      elementType: "selection",
-                    });
+                    if (!elementLocked) {
+                      resetCursor();
+                      this.setState({
+                        draggingElement: null,
+                        elementType: "selection",
+                      });
+                    } else {
+                      this.setState({
+                        draggingElement: null,
+                      });
+                    }
                   }
                   return;
                 }
@@ -1672,9 +1793,20 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("mouseup", onMouseUp);
             }}
             onDoubleClick={e => {
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              resetCursor();
 
-              const elementAtPosition = getElementAtPosition(elements, x, y);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
+
+              const elementAtPosition = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
 
               const element =
                 elementAtPosition && isTextElement(elementAtPosition)
@@ -1706,20 +1838,26 @@ export class App extends React.Component<any, AppState> {
                 );
                 this.setState({});
 
-                textX =
-                  this.state.scrollX +
-                  elementAtPosition.x +
-                  CANVAS_WINDOW_OFFSET_LEFT +
-                  elementAtPosition.width / 2;
-                textY =
-                  this.state.scrollY +
-                  elementAtPosition.y +
-                  CANVAS_WINDOW_OFFSET_TOP +
-                  elementAtPosition.height / 2;
+                const centerElementX =
+                  elementAtPosition.x + elementAtPosition.width / 2;
+                const centerElementY =
+                  elementAtPosition.y + elementAtPosition.height / 2;
+
+                const {
+                  x: centerElementXInViewport,
+                  y: centerElementYInViewport,
+                } = sceneCoordsToViewportCoords(
+                  { sceneX: centerElementX, sceneY: centerElementY },
+                  this.state,
+                  this.canvas,
+                );
+
+                textX = centerElementXInViewport;
+                textY = centerElementYInViewport;
 
                 // x and y will change after calling newTextElement function
-                element.x = elementAtPosition.x + elementAtPosition.width / 2;
-                element.y = elementAtPosition.y + elementAtPosition.height / 2;
+                element.x = centerElementX;
+                element.y = centerElementY;
               } else if (!e.altKey) {
                 const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                   x,
@@ -1738,7 +1876,6 @@ export class App extends React.Component<any, AppState> {
                 this.setState({
                   draggingElement: null,
                   editingElement: null,
-                  elementType: "selection",
                 });
               };
 
@@ -1749,6 +1886,7 @@ export class App extends React.Component<any, AppState> {
                 strokeColor: element.strokeColor,
                 font: element.font,
                 opacity: this.state.currentItemOpacity,
+                zoom: this.state.zoom,
                 onSubmit: text => {
                   if (text) {
                     elements = [
@@ -1775,7 +1913,11 @@ export class App extends React.Component<any, AppState> {
               }
               const hasDeselectedButton = Boolean(e.buttons);
 
-              const { x, y } = viewportCoordsToSceneCoords(e, this.state);
+              const { x, y } = viewportCoordsToSceneCoords(
+                e,
+                this.state,
+                this.canvas,
+              );
               if (this.state.multiElement) {
                 const { multiElement } = this.state;
                 const originX = multiElement.x;
@@ -1802,7 +1944,7 @@ export class App extends React.Component<any, AppState> {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
-                  this.state,
+                  this.state.zoom,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
@@ -1811,7 +1953,12 @@ export class App extends React.Component<any, AppState> {
                   return;
                 }
               }
-              const hitElement = getElementAtPosition(elements, x, y);
+              const hitElement = getElementAtPosition(
+                elements,
+                x,
+                y,
+                this.state.zoom,
+              );
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
             onDrop={e => {
@@ -1837,8 +1984,8 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
 
     this.setState({
-      scrollX: this.state.scrollX - deltaX,
-      scrollY: this.state.scrollY - deltaY,
+      scrollX: this.state.scrollX - deltaX / this.state.zoom,
+      scrollY: this.state.scrollY - deltaY / this.state.zoom,
     });
   };
 
@@ -1852,13 +1999,14 @@ export class App extends React.Component<any, AppState> {
     const elementsCenterX = distance(minX, maxX) / 2;
     const elementsCenterY = distance(minY, maxY) / 2;
 
-    const dx =
-      cursorX -
-      this.state.scrollX -
-      CANVAS_WINDOW_OFFSET_LEFT -
-      elementsCenterX;
-    const dy =
-      cursorY - this.state.scrollY - CANVAS_WINDOW_OFFSET_TOP - elementsCenterY;
+    const { x, y } = viewportCoordsToSceneCoords(
+      { clientX: cursorX, clientY: cursorY },
+      this.state,
+      this.canvas,
+    );
+
+    const dx = x - elementsCenterX;
+    const dy = y - elementsCenterY;
 
     elements = [
       ...elements,
@@ -1890,12 +2038,10 @@ export class App extends React.Component<any, AppState> {
         const wysiwygX =
           this.state.scrollX +
           elementClickedInside.x +
-          CANVAS_WINDOW_OFFSET_LEFT +
           elementClickedInside.width / 2;
         const wysiwygY =
           this.state.scrollY +
           elementClickedInside.y +
-          CANVAS_WINDOW_OFFSET_TOP +
           elementClickedInside.height / 2;
         return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
       }
@@ -1919,6 +2065,7 @@ export class App extends React.Component<any, AppState> {
         scrollX: this.state.scrollX,
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
+        zoom: this.state.zoom,
       },
     );
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;

@@ -2,6 +2,7 @@ import { Action } from "./types";
 import { KEYS } from "../keys";
 import { clearSelection } from "../scene";
 import { isInvisiblySmallElement } from "../element";
+import { resetCursor } from "../utils";
 
 export const actionFinalize: Action = {
   name: "finalize",
@@ -20,11 +21,17 @@ export const actionFinalize: Action = {
       }
       appState.multiElement.shape = null;
     }
+    if (!appState.elementLocked || !appState.multiElement) {
+      resetCursor();
+    }
     return {
       elements: newElements,
       appState: {
         ...appState,
-        elementType: "selection",
+        elementType:
+          appState.elementLocked && appState.multiElement
+            ? appState.elementType
+            : "selection",
         draggingElement: null,
         multiElement: null,
       },

@@ -1,6 +1,7 @@
 import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
+
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
@@ -17,10 +18,11 @@ export function hitTest(
   element: ExcalidrawElement,
   x: number,
   y: number,
+  zoom: number,
 ): boolean {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
-  const lineThreshold = 10;
+  const lineThreshold = 10 / zoom;
 
   if (element.type === "ellipse") {
     // https://stackoverflow.com/a/46007540/232122
