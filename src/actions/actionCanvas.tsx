@@ -6,6 +6,7 @@ import { trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
+import { KEYS } from "../keys";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
@@ -57,6 +58,15 @@ export const actionClearCanvas: Action = {
 
 const ZOOM_STEP = 0.1;
 
+const KEY_CODES = {
+  MINUS: "Minus",
+  EQUAL: "Equal",
+  ZERO: "Digit0",
+  NUM_SUBTRACT: "NumpadSubtract",
+  NUM_ADD: "NumpadAdd",
+  NUM_ZERO: "Numpad0",
+};
+
 export const actionZoomIn: Action = {
   name: "zoomIn",
   perform: (elements, appState) => {
@@ -78,6 +88,9 @@ export const actionZoomIn: Action = {
       }}
     />
   ),
+  keyTest: event =>
+    (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
+    (event[KEYS.META] || event.shiftKey),
 };
 
 export const actionZoomOut: Action = {
@@ -101,4 +114,22 @@ export const actionZoomOut: Action = {
       }}
     />
   ),
+  keyTest: event =>
+    (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
+    (event[KEYS.META] || event.shiftKey),
+};
+
+export const actionResetZoom: Action = {
+  name: "resetZoom",
+  perform: (elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        zoom: 1,
+      },
+    };
+  },
+  keyTest: event =>
+    (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
+    (event[KEYS.META] || event.shiftKey),
 };
