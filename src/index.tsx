@@ -1985,8 +1985,15 @@ export class App extends React.Component<any, AppState> {
     const { deltaX, deltaY } = e;
 
     if (e[KEYS.META]) {
+      const sign = Math.sign(deltaY);
+      const MAX_STEP = 10;
+      let delta = Math.abs(deltaY);
+      if (delta > MAX_STEP) {
+        delta = MAX_STEP;
+      }
+      delta *= sign;
       this.setState(({ zoom }) => ({
-        zoom: getNormalizedZoom(zoom - deltaY / 100),
+        zoom: getNormalizedZoom(zoom - delta / 100),
       }));
       return;
     }
