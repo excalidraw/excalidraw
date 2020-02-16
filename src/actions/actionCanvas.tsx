@@ -5,6 +5,7 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
+import { getNormalizedZoom } from "../scene";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
@@ -55,12 +56,6 @@ export const actionClearCanvas: Action = {
 };
 
 const ZOOM_STEP = 0.1;
-
-function getNormalizedZoom(zoom: number): number {
-  const normalizedZoom = parseFloat(zoom.toFixed(2));
-  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
-  return clampedZoom;
-}
 
 export const actionZoomIn: Action = {
   name: "zoomIn",
