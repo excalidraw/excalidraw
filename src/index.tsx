@@ -81,6 +81,7 @@ import {
   actionClearCanvas,
   actionZoomIn,
   actionZoomOut,
+  actionResetZoom,
   actionChangeProjectName,
   actionChangeExportBackground,
   actionLoadScene,
@@ -525,6 +526,7 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(actionClearCanvas);
     this.actionManager.registerAction(actionZoomIn);
     this.actionManager.registerAction(actionZoomOut);
+    this.actionManager.registerAction(actionResetZoom);
 
     this.actionManager.registerAction(actionChangeProjectName);
     this.actionManager.registerAction(actionChangeExportBackground);
