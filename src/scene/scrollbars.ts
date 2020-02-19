@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
+import { FlooredNumber } from "../types";
 
 const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
@@ -14,8 +15,8 @@ export function getScrollBars(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
 ) {
@@ -93,8 +94,8 @@ export function isOverScrollBars(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
 ) {
