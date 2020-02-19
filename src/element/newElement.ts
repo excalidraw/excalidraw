@@ -37,6 +37,7 @@ export function newElement(
     shape: null as Drawable | Drawable[] | null,
     points: [] as Point[],
     canvas: null as HTMLCanvasElement | null,
+    canvasZoom: 1, // The zoom level used to render the cached canvas
     canvasOffsetX: 0,
     canvasOffsetY: 0,
   };

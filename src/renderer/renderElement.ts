@@ -16,7 +16,7 @@ import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
 
-function generateElementCanvas(element: ExcalidrawElement) {
+function generateElementCanvas(element: ExcalidrawElement, zoom: number) {
   const canvas = document.createElement("canvas");
   var context = canvas.getContext("2d")!;
 
@@ -25,9 +25,9 @@ function generateElementCanvas(element: ExcalidrawElement) {
   if (isLinear) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
-      distance(x1, x2) * window.devicePixelRatio + CANVAS_PADDING * 2;
+      distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      distance(y1, y2) * window.devicePixelRatio + CANVAS_PADDING * 2;
+      distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
 
     element.canvasOffsetX =
       element.x > x1
@@ -37,19 +37,24 @@ function generateElementCanvas(element: ExcalidrawElement) {
       element.y > y1
         ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
         : 0;
-    context.translate(element.canvasOffsetX, element.canvasOffsetY);
+    context.translate(
+      element.canvasOffsetX * zoom,
+      element.canvasOffsetY * zoom,
+    );
   } else {
-    canvas.width = element.width * window.devicePixelRatio + CANVAS_PADDING * 2;
+    canvas.width =
+      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      element.height * window.devicePixelRatio + CANVAS_PADDING * 2;
+      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
-  context.scale(window.devicePixelRatio, window.devicePixelRatio);
+  context.scale(window.devicePixelRatio * zoom, window.devicePixelRatio * zoom);
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
   element.canvas = canvas;
+  element.canvasZoom = zoom;
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
 }
 
@@ -97,8 +102,10 @@ function drawElementOnCanvas(
 function generateElement(
   element: ExcalidrawElement,
   generator: RoughGenerator,
+  sceneState?: SceneState,
 ) {
-  if (!element.shape || !element.canvas) {
+  if (!element.shape) {
+    element.canvas = null;
     switch (element.type) {
       case "rectangle":
         element.shape = generator.rectangle(
@@ -208,8 +215,10 @@ function generateElement(
         break;
       }
     }
-
-    generateElementCanvas(element);
+  }
+  const zoom = sceneState ? sceneState.zoom : 1;
+  if (!element.canvas || element.canvasZoom !== zoom) {
+    generateElementCanvas(element, zoom);
   }
 }
 
@@ -220,7 +229,10 @@ function drawElementFromCanvas(
   sceneState: SceneState,
 ) {
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+  context.translate(
+    -CANVAS_PADDING / sceneState.zoom,
+    -CANVAS_PADDING / sceneState.zoom,
+  );
   context.drawImage(
     element.canvas!,
     Math.floor(
@@ -231,8 +243,13 @@ function drawElementFromCanvas(
       -element.canvasOffsetY +
         (Math.floor(element.y) + sceneState.scrollY) * window.devicePixelRatio,
     ),
+    element.canvas!.width / sceneState.zoom,
+    element.canvas!.height / sceneState.zoom,
   );
-  context.translate(CANVAS_PADDING, CANVAS_PADDING);
+  context.translate(
+    CANVAS_PADDING / sceneState.zoom,
+    CANVAS_PADDING / sceneState.zoom,
+  );
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
@@ -262,7 +279,7 @@ export function renderElement(
     case "line":
     case "arrow":
     case "text": {
-      generateElement(element, generator);
+      generateElement(element, generator, sceneState);
 
       if (renderOptimizations) {
         drawElementFromCanvas(element, rc, context, sceneState);
