@@ -17,6 +17,54 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 
+let canvasBelow: HTMLCanvasElement | null = null;
+let canvasAbove: HTMLCanvasElement | null = null;
+
+const prevRender: {
+  selectedIds: string;
+  sceneState: SceneState | null;
+  selectionStart: number | null;
+  selectionEnd: number | null;
+} = {
+  selectedIds: "",
+  sceneState: null,
+  selectionStart: null,
+  selectionEnd: null,
+};
+
+function duplicateCanvas(canvas: HTMLCanvasElement) {
+  const context = canvas.getContext("2d")!;
+
+  const _canvas = document.createElement("canvas");
+  const _context = _canvas.getContext("2d")!;
+  _canvas.width = canvas.width;
+  _canvas.height = canvas.height;
+  _context.setTransform(context.getTransform());
+
+  return _canvas;
+}
+
+function findSelectionEnd(elements: readonly ExcalidrawElement[]): number {
+  let i = elements.length;
+  while (--i > -1) {
+    if (elements[i].isSelected) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function findSelectionStart(elements: readonly ExcalidrawElement[]): number {
+  const len = elements.length;
+  let i = -1;
+  while (++i < len) {
+    if (elements[i].isSelected) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 export function renderScene(
   elements: readonly ExcalidrawElement[],
   selectionElement: ExcalidrawElement | null,
@@ -108,11 +156,88 @@ export function renderScene(
     ),
   );
 
-  applyZoom(context);
-  visibleElements.forEach(element => {
-    renderElement(element, rc, context, renderOptimizations, sceneState);
-  });
-  resetZoom(context);
+  const selectionStart = findSelectionStart(visibleElements);
+  const selectionEnd = findSelectionEnd(visibleElements);
+
+  const middleElements = visibleElements.slice(
+    selectionStart,
+    selectionEnd + 1,
+  );
+  // console.log(selectionStart, selectionEnd, middleElements);
+
+  const selectedIds = middleElements.map(e => e.id).join();
+
+  if (selectedIds) {
+    if (
+      !prevRender.sceneState ||
+      !sceneState ||
+      sceneState.zoom !== prevRender.sceneState.zoom ||
+      sceneState.scrollX !== prevRender.sceneState.scrollX ||
+      sceneState.scrollY !== prevRender.sceneState.scrollY ||
+      selectedIds !== prevRender.selectedIds ||
+      !canvasBelow ||
+      !canvasAbove ||
+      selectionStart !== prevRender.selectionStart ||
+      selectionEnd !== prevRender.selectionEnd
+    ) {
+      if (!canvasBelow) {
+        canvasBelow = duplicateCanvas(canvas);
+      }
+      if (!canvasAbove) {
+        canvasAbove = duplicateCanvas(canvas);
+      }
+      const elementBelow = visibleElements.slice(0, selectionStart);
+      const elementAbove = visibleElements.slice(selectionEnd + 1);
+      const contextBelow = canvasBelow!.getContext("2d")!;
+      const contextAbove = canvasAbove!.getContext("2d")!;
+
+      contextBelow.clearRect(0, 0, canvasBelow!.width, canvasBelow!.height);
+      contextAbove.clearRect(0, 0, canvasAbove!.width, canvasAbove!.height);
+
+      applyZoom(contextBelow);
+      elementBelow.forEach(element => {
+        renderElement(
+          element,
+          rc,
+          contextBelow,
+          renderOptimizations,
+          sceneState,
+        );
+      });
+      resetZoom(contextBelow);
+      applyZoom(contextAbove);
+      elementAbove.forEach(element => {
+        renderElement(
+          element,
+          rc,
+          contextAbove,
+          renderOptimizations,
+          sceneState,
+        );
+      });
+      resetZoom(contextAbove);
+    }
+    prevRender.selectedIds = selectedIds;
+    prevRender.sceneState = sceneState;
+    prevRender.selectionStart = selectionStart;
+    prevRender.selectionEnd = selectionEnd;
+
+    context.drawImage(canvasBelow!, 0, 0);
+    applyZoom(context);
+    middleElements.forEach(element => {
+      renderElement(element, rc, context, renderOptimizations, sceneState);
+    });
+    resetZoom(context);
+    context.drawImage(canvasAbove!, 0, 0);
+  } else {
+    canvasBelow = null;
+    canvasAbove = null;
+    applyZoom(context);
+    visibleElements.forEach(element => {
+      renderElement(element, rc, context, renderOptimizations, sceneState);
+    });
+    resetZoom(context);
+  }
 
   // Pain selection element
   if (selectionElement) {
@@ -129,7 +254,7 @@ export function renderScene(
 
   // Pain selected elements
   if (renderSelection) {
-    const selectedElements = getSelectedElements(elements);
+    const selectedElements = getSelectedElements(visibleElements);
     const dashledLinePadding = 4 / sceneState.zoom;
 
     applyZoom(context);
