@@ -250,19 +250,6 @@ const LayerUI = React.memo(
                   });
                 }
               }}
-              onExportToBackend={exportedElements => {
-                if (canvas) {
-                  exportCanvas(
-                    "backend",
-                    exportedElements.map(element => ({
-                      ...element,
-                      isSelected: false,
-                    })),
-                    canvas,
-                    appState,
-                  );
-                }
-              }}
             />
             {actionManager.renderAction("clearCanvas")}
           </Stack.Row>
@@ -607,25 +594,8 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
-
-    if (id) {
-      // Backwards compatibility with legacy url format
-      const scene = await loadScene(id);
-      this.syncActionResult(scene);
-    } else {
-      const match = window.location.hash.match(
-        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-      );
-      if (match) {
-        const scene = await loadScene(match[1], match[2]);
-        this.syncActionResult(scene);
-      } else {
-        const scene = await loadScene(null);
-        this.syncActionResult(scene);
-      }
-    }
+    const scene = await loadScene();
+    this.syncActionResult(scene);
   }
 
   public componentWillUnmount() {

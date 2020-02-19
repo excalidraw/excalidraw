@@ -23,10 +23,6 @@ import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
-
-const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
-const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
@@ -142,124 +138,6 @@ export async function loadFromBlob(blob: any) {
   });
 }
 
-export async function exportToBackend(
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) {
-  const json = serializeAsJSON(elements, appState);
-  const encoded = new TextEncoder().encode(json);
-
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
-  // The iv is set to 0. We are never going to reuse the same key so we don't
-  // need to have an iv. (I hope that's correct...)
-  const iv = new Uint8Array(12);
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
-  // includes checks that the ciphertext has not been modified by an attacker.
-  const encrypted = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv: iv,
-    },
-    key,
-    encoded,
-  );
-  // We use jwk encoding to be able to extract just the base64 encoded key.
-  // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
-
-  try {
-    const response = await fetch(BACKEND_V2_POST, {
-      method: "POST",
-      body: encrypted,
-    });
-    const json = await response.json();
-    if (json.id) {
-      const url = new URL(window.location.href);
-      // We need to store the key (and less importantly the id) as hash instead
-      // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
-      const urlString = url.toString();
-
-      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
-    } else {
-      window.alert(t("alerts.couldNotCreateShareableLink"));
-    }
-  } catch (e) {
-    console.error(e);
-    window.alert(t("alerts.couldNotCreateShareableLink"));
-  }
-}
-
-export async function importFromBackend(
-  id: string | null,
-  k: string | undefined,
-) {
-  let elements: readonly ExcalidrawElement[] = [];
-  let appState: AppState = getDefaultAppState();
-
-  try {
-    const response = await fetch(
-      k ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-    );
-    if (!response.ok) {
-      window.alert(t("alerts.importBackendFailed"));
-      return restore(elements, appState, { scrollToContent: true });
-    }
-    let data;
-    if (k) {
-      const buffer = await response.arrayBuffer();
-      const key = await window.crypto.subtle.importKey(
-        "jwk",
-        {
-          alg: "A128GCM",
-          ext: true,
-          k: k,
-          key_ops: ["encrypt", "decrypt"],
-          kty: "oct",
-        },
-        {
-          name: "AES-GCM",
-          length: 128,
-        },
-        false, // extractable
-        ["decrypt"],
-      );
-      const iv = new Uint8Array(12);
-      const decrypted = await window.crypto.subtle.decrypt(
-        {
-          name: "AES-GCM",
-          iv: iv,
-        },
-        key,
-        buffer,
-      );
-      // We need to convert the decrypted array buffer to a string
-      const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted) as any,
-      );
-      data = JSON.parse(string);
-    } else {
-      // Legacy format
-      data = await response.json();
-    }
-
-    elements = data.elements || elements;
-    appState = data.appState || appState;
-  } catch (error) {
-    window.alert(t("alerts.importBackendFailed"));
-    console.error(error);
-  } finally {
-    return restore(elements, appState, { scrollToContent: true });
-  }
-}
-
 export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
@@ -319,12 +197,6 @@ export async function exportCanvas(
     } catch (err) {
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
-  } else if (type === "backend") {
-    const appState = getDefaultAppState();
-    if (exportBackground) {
-      appState.viewBackgroundColor = viewBackgroundColor;
-    }
-    exportToBackend(elements, appState);
   }
 
   // clean up the DOM
@@ -439,21 +311,11 @@ export function saveToLocalStorage(
   );
 }
 
-export async function loadScene(id: string | null, k?: string) {
-  let data;
-  let selectedId;
-  if (id != null) {
-    // k is the private key used to decrypt the content from the server, take
-    // extra care not to leak it
-    data = await importFromBackend(id, k);
-    selectedId = id;
-    window.history.replaceState({}, "Excalidraw", window.location.origin);
-  } else {
-    data = restoreFromLocalStorage();
-  }
+export async function loadScene() {
+  const data = restoreFromLocalStorage();
 
   return {
     elements: data.elements,
-    appState: data.appState && { ...data.appState, selectedId },
+    appState: data.appState && { ...data.appState, undefined },
   };
 }
