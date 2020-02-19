@@ -84,7 +84,7 @@ function _duplicateElement(val: any, depth: number = 0) {
     for (const k in val) {
       if (val.hasOwnProperty(k)) {
         // don't copy top-level shape property, which we want to regenerate
-        if (depth === 0 && k === "shape") {
+        if (depth === 0 && (k === "shape" || k === "canvas")) {
           continue;
         }
         tmp[k] = _duplicateElement(val[k], depth + 1);
