@@ -35,6 +35,9 @@ import {
   calculateScrollCenter,
   loadFromBlob,
   getZoomOrigin,
+  getNormalizedZoom,
+  getSelectedElements,
+  isSomeElementSelected,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -80,6 +83,7 @@ import {
   actionClearCanvas,
   actionZoomIn,
   actionZoomOut,
+  actionResetZoom,
   actionChangeProjectName,
   actionChangeExportBackground,
   actionLoadScene,
@@ -274,7 +278,7 @@ const LayerUI = React.memo(
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
         ? [editingElement]
-        : elements.filter(el => el.isSelected);
+        : getSelectedElements(elements);
       if (!targetElements.length && elementType === "selection") {
         return null;
       }
@@ -525,6 +529,7 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(actionClearCanvas);
     this.actionManager.registerAction(actionZoomIn);
     this.actionManager.registerAction(actionZoomOut);
+    this.actionManager.registerAction(actionResetZoom);
 
     this.actionManager.registerAction(actionChangeProjectName);
     this.actionManager.registerAction(actionChangeExportBackground);
@@ -1049,11 +1054,15 @@ export class App extends React.Component<any, AppState> {
                   { x, y },
                   this.state.zoom,
                 );
-                this.setState({
-                  resizingElement: resizeElement ? resizeElement.element : null,
-                });
 
-                if (resizeElement) {
+                const selectedElements = getSelectedElements(elements);
+                if (selectedElements.length === 1 && resizeElement) {
+                  this.setState({
+                    resizingElement: resizeElement
+                      ? resizeElement.element
+                      : null,
+                  });
+
                   resizeHandle = resizeElement.resizeHandle;
                   document.documentElement.style.cursor = getCursorForResizingElement(
                     resizeElement,
@@ -1090,13 +1099,11 @@ export class App extends React.Component<any, AppState> {
                           ...element,
                           isSelected: false,
                         })),
-                        ...elements
-                          .filter(element => element.isSelected)
-                          .map(element => {
-                            const newElement = duplicateElement(element);
-                            newElement.isSelected = true;
-                            return newElement;
-                          }),
+                        ...getSelectedElements(elements).map(element => {
+                          const newElement = duplicateElement(element);
+                          newElement.isSelected = true;
+                          return newElement;
+                        }),
                       ];
                     }
                   }
@@ -1335,7 +1342,7 @@ export class App extends React.Component<any, AppState> {
                 if (isResizingElements && this.state.resizingElement) {
                   this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
-                  const selectedElements = elements.filter(el => el.isSelected);
+                  const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length === 1) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       e,
@@ -1562,8 +1569,8 @@ export class App extends React.Component<any, AppState> {
                   // Marking that click was used for dragging to check
                   // if elements should be deselected on mouseup
                   draggingOccurred = true;
-                  const selectedElements = elements.filter(el => el.isSelected);
-                  if (selectedElements.length) {
+                  const selectedElements = getSelectedElements(elements);
+                  if (selectedElements.length > 0) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       e,
                       this.state,
@@ -1645,7 +1652,7 @@ export class App extends React.Component<any, AppState> {
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey && elements.some(el => el.isSelected)) {
+                  if (!e.shiftKey && isSomeElementSelected(elements)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1779,7 +1786,7 @@ export class App extends React.Component<any, AppState> {
 
                 if (
                   elementType !== "selection" ||
-                  elements.some(el => el.isSelected)
+                  isSomeElementSelected(elements)
                 ) {
                   history.resumeRecording();
                 }
@@ -1948,9 +1955,8 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              const selectedElements = elements.filter(e => e.isSelected)
-                .length;
-              if (selectedElements === 1) {
+              const selectedElements = getSelectedElements(elements);
+              if (selectedElements.length === 1) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
@@ -1993,10 +1999,24 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
     const { deltaX, deltaY } = e;
 
-    this.setState({
-      scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
-      scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
-    });
+    if (e[KEYS.META]) {
+      const sign = Math.sign(deltaY);
+      const MAX_STEP = 10;
+      let delta = Math.abs(deltaY);
+      if (delta > MAX_STEP) {
+        delta = MAX_STEP;
+      }
+      delta *= sign;
+      this.setState(({ zoom }) => ({
+        zoom: getNormalizedZoom(zoom - delta / 100),
+      }));
+      return;
+    }
+
+    this.setState(({ zoom, scrollX, scrollY }) => ({
+      scrollX: normalizeScroll(scrollX - deltaX / zoom),
+      scrollY: normalizeScroll(scrollY - deltaY / zoom),
+    }));
   };
 
   private addElementsFromPaste = (

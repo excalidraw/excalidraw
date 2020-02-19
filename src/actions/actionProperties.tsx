@@ -1,7 +1,10 @@
 import React from "react";
 import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { getCommonAttributeOfSelectedElements } from "../scene";
+import {
+  getCommonAttributeOfSelectedElements,
+  isSomeElementSelected,
+} from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
@@ -28,7 +31,7 @@ const getFormValue = function<T>(
 ): T | null {
   return (
     (editingElement && getAttribute(editingElement)) ??
-    (elements.some(element => element.isSelected)
+    (isSomeElementSelected(elements)
       ? getCommonAttributeOfSelectedElements(elements, getAttribute)
       : defaultValue) ??
     null

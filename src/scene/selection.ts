@@ -55,8 +55,11 @@ export function getSelectedIndices(elements: readonly ExcalidrawElement[]) {
   return selectedIndices;
 }
 
-export const someElementIsSelected = (elements: readonly ExcalidrawElement[]) =>
-  elements.some(element => element.isSelected);
+export function isSomeElementSelected(
+  elements: readonly ExcalidrawElement[],
+): boolean {
+  return elements.some(element => element.isSelected);
+}
 
 /**
  * Returns common attribute (picked by `getAttribute` callback) of selected
@@ -68,10 +71,14 @@ export function getCommonAttributeOfSelectedElements<T>(
 ): T | null {
   const attributes = Array.from(
     new Set(
-      elements
-        .filter(element => element.isSelected)
-        .map(element => getAttribute(element)),
+      getSelectedElements(elements).map(element => getAttribute(element)),
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;
+}
+
+export function getSelectedElements(
+  elements: readonly ExcalidrawElement[],
+): readonly ExcalidrawElement[] {
+  return elements.filter(element => element.isSelected);
 }

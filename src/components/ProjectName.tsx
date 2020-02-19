@@ -25,6 +25,9 @@ export class ProjectName extends Component<Props> {
   private handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      if (e.nativeEvent.isComposing || e.keyCode === 229) {
+        return;
+      }
       e.currentTarget.blur();
     }
   };
