@@ -16,7 +16,6 @@ export {
   restoreFromLocalStorage,
   saveToLocalStorage,
   exportToBackend,
-  importFromBackend,
   loadScene,
   calculateScrollCenter,
 } from "./data";

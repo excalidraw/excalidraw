@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportFile } from "./icons";
 import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -34,7 +34,6 @@ function ExportModal({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
   onCloseRequest,
 }: {
   appState: AppState;
@@ -44,7 +43,6 @@ function ExportModal({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
   onCloseRequest: () => void;
 }) {
   const someElementIsSelected = isSomeElementSelected(elements);
@@ -149,13 +147,6 @@ function ExportModal({
                   onClick={() => onExportToClipboard(exportedElements, scale)}
                 />
               )}
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
             </Stack.Row>
           </Stack.Col>
 
@@ -207,7 +198,6 @@ export function ExportDialog({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -216,7 +206,6 @@ export function ExportDialog({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
 }) {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
@@ -250,7 +239,6 @@ export function ExportDialog({
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
-            onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
           />
         </Modal>
