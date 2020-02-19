@@ -1,6 +1,8 @@
 import { ExcalidrawElement } from "./element/types";
 import { SHAPES } from "./shapes";
 
+export type FlooredNumber = number & { _brand: "FlooredNumber" };
+
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
@@ -20,8 +22,8 @@ export type AppState = {
   currentItemOpacity: number;
   currentItemFont: string;
   viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
+  scrollX: FlooredNumber;
+  scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
   scrolledOutside: boolean;

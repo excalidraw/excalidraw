@@ -1,4 +1,4 @@
-import { AppState } from "./types";
+import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
@@ -20,8 +20,8 @@ export function getDefaultAppState(): AppState {
     currentItemOpacity: 100,
     currentItemFont: "20px Virgil",
     viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
+    scrollX: 0 as FlooredNumber,
+    scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
     scrolledOutside: false,

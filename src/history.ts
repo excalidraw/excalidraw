@@ -16,6 +16,7 @@ class SceneHistory {
       elements: elements.map(({ shape, ...element }) => ({
         ...element,
         shape: null,
+        canvas: null,
         points:
           appState.multiElement && appState.multiElement.id === element.id
             ? element.points.slice(0, -1)

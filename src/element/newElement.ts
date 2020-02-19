@@ -36,6 +36,10 @@ export function newElement(
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,
     points: [] as Point[],
+    canvas: null as HTMLCanvasElement | null,
+    canvasZoom: 1, // The zoom level used to render the cached canvas
+    canvasOffsetX: 0,
+    canvasOffsetY: 0,
   };
   return element;
 }
@@ -48,6 +52,7 @@ export function newTextElement(
   const metrics = measureText(text, font);
   const textElement: ExcalidrawTextElement = {
     ...element,
+    shape: null,
     type: "text",
     text: text,
     font: font,
