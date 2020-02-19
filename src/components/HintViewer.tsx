@@ -1,6 +1,7 @@
 import React from "react";
 import { t } from "../i18n";
 import { ExcalidrawElement } from "../element/types";
+import { getSelectedElements } from "../scene";
 
 import "./HintViewer.css";
 
@@ -20,7 +21,7 @@ const getHints = ({ elementType, multiMode, isResizing, elements }: Hint) => {
   }
 
   if (isResizing) {
-    const selectedElements = elements.filter(el => el.isSelected);
+    const selectedElements = getSelectedElements(elements);
     if (
       selectedElements.length === 1 &&
       (selectedElements[0].type === "arrow" ||

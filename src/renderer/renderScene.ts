@@ -1,6 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
+import { FlooredNumber } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
@@ -11,6 +12,8 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
+import { getZoomTranslation } from "../scene/zoom";
+import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 
@@ -22,126 +25,164 @@ export function renderScene(
   sceneState: SceneState,
   // extra options, currently passed by export helper
   {
-    offsetX,
-    offsetY,
     renderScrollbars = true,
     renderSelection = true,
+    // Whether to employ render optimizations to improve performance.
+    // Should not be turned on for export operations and similar, because it
+    //  doesn't guarantee pixel-perfect output.
+    renderOptimizations = false,
   }: {
-    offsetX?: number;
-    offsetY?: number;
     renderScrollbars?: boolean;
     renderSelection?: boolean;
+    renderOptimizations?: boolean;
   } = {},
-) {
+): boolean {
   if (!canvas) {
     return false;
   }
+
   const context = canvas.getContext("2d")!;
 
-  const fillStyle = context.fillStyle;
+  // Get initial scale transform as reference for later usage
+  const initialContextTransform = context.getTransform();
+
+  // When doing calculations based on canvas width we should used normalized one
+  const normalizedCanvasWidth =
+    canvas.width / getContextTransformScaleX(initialContextTransform);
+  const normalizedCanvasHeight =
+    canvas.height / getContextTransformScaleY(initialContextTransform);
+
+  const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
+  function applyZoom(context: CanvasRenderingContext2D): void {
+    context.save();
+
+    // Handle zoom scaling
+    context.setTransform(
+      getContextTransformScaleX(initialContextTransform) * sceneState.zoom,
+      0,
+      0,
+      getContextTransformScaleY(initialContextTransform) * sceneState.zoom,
+      getContextTransformTranslateX(context.getTransform()),
+      getContextTransformTranslateY(context.getTransform()),
+    );
+    // Handle zoom translation
+    context.setTransform(
+      getContextTransformScaleX(context.getTransform()),
+      0,
+      0,
+      getContextTransformScaleY(context.getTransform()),
+      getContextTransformTranslateX(initialContextTransform) -
+        zoomTranslation.x,
+      getContextTransformTranslateY(initialContextTransform) -
+        zoomTranslation.y,
+    );
+  }
+  function resetZoom(context: CanvasRenderingContext2D): void {
+    context.restore();
+  }
+
+  // Paint background
+  context.save();
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
       sceneState.viewBackgroundColor === "transparent" ||
       sceneState.viewBackgroundColor.length === 5 ||
       sceneState.viewBackgroundColor.length === 9;
     if (hasTransparence) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
     context.fillStyle = sceneState.viewBackgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   }
-  context.fillStyle = fillStyle;
+  context.restore();
 
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
-  };
+  // Paint visible elements
+  const visibleElements = elements.filter(element =>
+    isVisibleElement(
+      element,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
+      sceneState,
+    ),
+  );
 
-  let atLeastOneVisibleElement = false;
-  elements.forEach(element => {
-    if (
-      !isVisibleElement(
-        element,
-        sceneState.scrollX,
-        sceneState.scrollY,
-        // If canvas is scaled for high pixelDeviceRatio width and height
-        // setted in the `style` attribute
-        parseInt(canvas.style.width) || canvas.width,
-        parseInt(canvas.style.height) || canvas.height,
-      )
-    ) {
-      return;
-    }
-    atLeastOneVisibleElement = true;
-    context.translate(
-      element.x + sceneState.scrollX,
-      element.y + sceneState.scrollY,
-    );
-    renderElement(element, rc, context);
-    context.translate(
-      -element.x - sceneState.scrollX,
-      -element.y - sceneState.scrollY,
-    );
+  applyZoom(context);
+  visibleElements.forEach(element => {
+    renderElement(element, rc, context, renderOptimizations, sceneState);
   });
+  resetZoom(context);
 
+  // Pain selection element
   if (selectionElement) {
-    context.translate(
-      selectionElement.x + sceneState.scrollX,
-      selectionElement.y + sceneState.scrollY,
+    applyZoom(context);
+    renderElement(
+      selectionElement,
+      rc,
+      context,
+      renderOptimizations,
+      sceneState,
     );
-    renderElement(selectionElement, rc, context);
-    context.translate(
-      -selectionElement.x - sceneState.scrollX,
-      -selectionElement.y - sceneState.scrollY,
-    );
+    resetZoom(context);
   }
 
+  // Pain selected elements
   if (renderSelection) {
-    const selectedElements = elements.filter(el => el.isSelected);
+    const selectedElements = getSelectedElements(elements);
+    const dashledLinePadding = 4 / sceneState.zoom;
 
+    applyZoom(context);
+    context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
-      const margin = 4;
-
       const [
         elementX1,
         elementY1,
         elementX2,
         elementY2,
       ] = getElementAbsoluteCoords(element);
-      const lineDash = context.getLineDash();
-      context.setLineDash([8, 4]);
-      context.strokeRect(
-        elementX1 - margin + sceneState.scrollX,
-        elementY1 - margin + sceneState.scrollY,
-        elementX2 - elementX1 + margin * 2,
-        elementY2 - elementY1 + margin * 2,
-      );
-      context.setLineDash(lineDash);
-    });
 
+      const elementWidth = elementX2 - elementX1;
+      const elementHeight = elementY2 - elementY1;
+
+      const initialLineDash = context.getLineDash();
+      context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
+      context.strokeRect(
+        elementX1 - dashledLinePadding,
+        elementY1 - dashledLinePadding,
+        elementWidth + dashledLinePadding * 2,
+        elementHeight + dashledLinePadding * 2,
+      );
+      context.setLineDash(initialLineDash);
+    });
+    resetZoom(context);
+
+    // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      const handlers = handlerRectangles(selectedElements[0], sceneState);
+      applyZoom(context);
+      context.translate(sceneState.scrollX, sceneState.scrollY);
+      const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
+      resetZoom(context);
     }
+
+    return visibleElements.length > 0;
   }
 
+  // Paint scrollbars
   if (renderScrollbars) {
     const scrollBars = getScrollBars(
       elements,
-      context.canvas.width / window.devicePixelRatio,
-      context.canvas.height / window.devicePixelRatio,
-      sceneState.scrollX,
-      sceneState.scrollY,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
+      sceneState,
     );
 
-    const strokeStyle = context.strokeStyle;
+    context.save();
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
     [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
@@ -156,33 +197,40 @@ export function renderScene(
         );
       }
     });
-    context.strokeStyle = strokeStyle;
-    context.fillStyle = fillStyle;
+    context.restore();
   }
 
-  return atLeastOneVisibleElement;
+  return visibleElements.length > 0;
 }
 
 function isVisibleElement(
   element: ExcalidrawElement,
-  scrollX: number,
-  scrollY: number,
-  canvasWidth: number,
-  canvasHeight: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
+    zoom: number;
+  },
 ) {
-  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  if (element.type !== "arrow") {
-    x1 += scrollX;
-    y1 += scrollY;
-    x2 += scrollX;
-    y2 += scrollY;
-    return x2 >= 0 && x1 <= canvasWidth && y2 >= 0 && y1 <= canvasHeight;
-  }
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // Apply zoom
+  const viewportWidthWithZoom = viewportWidth / zoom;
+  const viewportHeightWithZoom = viewportHeight / zoom;
+
+  const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
+  const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
+
   return (
-    x2 + scrollX >= 0 &&
-    x1 + scrollX <= canvasWidth &&
-    y2 + scrollY >= 0 &&
-    y1 + scrollY <= canvasHeight
+    x2 + scrollX - viewportWidthDiff / 2 >= 0 &&
+    x1 + scrollX - viewportWidthDiff / 2 <= viewportWidthWithZoom &&
+    y2 + scrollY - viewportHeightDiff / 2 >= 0 &&
+    y1 + scrollY - viewportHeightDiff / 2 <= viewportHeightWithZoom
   );
 }
 
@@ -212,4 +260,17 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
+}
+
+function getContextTransformScaleX(transform: DOMMatrix): number {
+  return transform.a;
+}
+function getContextTransformScaleY(transform: DOMMatrix): number {
+  return transform.d;
+}
+function getContextTransformTranslateX(transform: DOMMatrix): number {
+  return transform.e;
+}
+function getContextTransformTranslateY(transform: DOMMatrix): number {
+  return transform.f;
 }

@@ -1,97 +1,82 @@
 import { ExcalidrawElement } from "./types";
-import { SceneScroll } from "../scene/types";
-import { getLinearElementAbsoluteBounds } from "./bounds";
+
+import { getElementAbsoluteCoords } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
-export function handlerRectangles(
-  element: ExcalidrawElement,
-  { scrollX, scrollY }: SceneScroll,
-) {
-  let elementX2 = 0;
-  let elementY2 = 0;
-  let elementX1 = Infinity;
-  let elementY1 = Infinity;
-  let marginX = -8;
-  let marginY = -8;
+export function handlerRectangles(element: ExcalidrawElement, zoom: number) {
+  const handlerWidth = 8 / zoom;
+  const handlerHeight = 8 / zoom;
 
-  const minimumSize = 40;
-  if (element.type === "arrow" || element.type === "line") {
-    [
-      elementX1,
-      elementY1,
-      elementX2,
-      elementY2,
-    ] = getLinearElementAbsoluteBounds(element);
-  } else {
-    elementX1 = element.x;
-    elementX2 = element.x + element.width;
-    elementY1 = element.y;
-    elementY2 = element.y + element.height;
+  const handlerMarginX = 8 / zoom;
+  const handlerMarginY = 8 / zoom;
 
-    marginX = element.width < 0 ? 8 : -8;
-    marginY = element.height < 0 ? 8 : -8;
-  }
+  const [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
+    element,
+  );
 
-  const margin = 4;
-  const handlers = {} as { [T in Sides]: number[] };
+  const elementWidth = elementX2 - elementX1;
+  const elementHeight = elementY2 - elementY1;
 
-  if (Math.abs(elementX2 - elementX1) > minimumSize) {
+  const dashedLineMargin = 4 / zoom;
+
+  const handlers = {
+    nw: [
+      elementX1 - dashedLineMargin - handlerMarginX,
+      elementY1 - dashedLineMargin - handlerMarginY,
+      handlerWidth,
+      handlerHeight,
+    ],
+    ne: [
+      elementX2 + dashedLineMargin,
+      elementY1 - dashedLineMargin - handlerMarginY,
+      handlerWidth,
+      handlerHeight,
+    ],
+    sw: [
+      elementX1 - dashedLineMargin - handlerMarginX,
+      elementY2 + dashedLineMargin,
+      handlerWidth,
+      handlerHeight,
+    ],
+    se: [
+      elementX2 + dashedLineMargin,
+      elementY2 + dashedLineMargin,
+      handlerWidth,
+      handlerHeight,
+    ],
+  } as { [T in Sides]: number[] };
+
+  // We only want to show height handlers (all cardinal directions)  above a certain size
+  const minimumSizeForEightHandlers = 40 / zoom;
+  if (Math.abs(elementWidth) > minimumSizeForEightHandlers) {
     handlers["n"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
-      elementY1 - margin + scrollY + marginY,
-      8,
-      8,
+      elementX1 + elementWidth / 2,
+      elementY1 - dashedLineMargin - handlerMarginY,
+      handlerWidth,
+      handlerHeight,
     ];
-
     handlers["s"] = [
-      elementX1 + (elementX2 - elementX1) / 2 + scrollX - 4,
-      elementY2 - margin + scrollY - marginY,
-      8,
-      8,
+      elementX1 + elementWidth / 2,
+      elementY2 + dashedLineMargin,
+      handlerWidth,
+      handlerHeight,
     ];
   }
-
-  if (Math.abs(elementY2 - elementY1) > minimumSize) {
+  if (Math.abs(elementHeight) > minimumSizeForEightHandlers) {
     handlers["w"] = [
-      elementX1 - margin + scrollX + marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
-      8,
-      8,
+      elementX1 - dashedLineMargin - handlerMarginX,
+      elementY1 + elementHeight / 2,
+      handlerWidth,
+      handlerHeight,
     ];
-
     handlers["e"] = [
-      elementX2 - margin + scrollX - marginX,
-      elementY1 + (elementY2 - elementY1) / 2 + scrollY - 4,
-      8,
-      8,
+      elementX2 + dashedLineMargin,
+      elementY1 + elementHeight / 2,
+      handlerWidth,
+      handlerHeight,
     ];
   }
-
-  handlers["nw"] = [
-    elementX1 - margin + scrollX + marginX,
-    elementY1 - margin + scrollY + marginY,
-    8,
-    8,
-  ]; // nw
-  handlers["ne"] = [
-    elementX2 - margin + scrollX - marginX,
-    elementY1 - margin + scrollY + marginY,
-    8,
-    8,
-  ]; // ne
-  handlers["sw"] = [
-    elementX1 - margin + scrollX + marginX,
-    elementY2 - margin + scrollY - marginY,
-    8,
-    8,
-  ]; // sw
-  handlers["se"] = [
-    elementX2 - margin + scrollX - marginX,
-    elementY2 - margin + scrollY - marginY,
-    8,
-    8,
-  ]; // se
 
   if (element.type === "arrow" || element.type === "line") {
     if (element.points.length === 2) {

@@ -21,6 +21,9 @@ export {
 export {
   actionChangeViewBackgroundColor,
   actionClearCanvas,
+  actionZoomIn,
+  actionZoomOut,
+  actionResetZoom,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";

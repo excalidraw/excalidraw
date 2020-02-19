@@ -3,9 +3,10 @@ export {
   clearSelection,
   getSelectedIndices,
   deleteSelectedElements,
-  someElementIsSelected,
+  isSomeElementSelected,
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
+  getSelectedElements,
 } from "./selection";
 export {
   exportCanvas,
@@ -27,3 +28,4 @@ export {
   hasText,
 } from "./comparisons";
 export { createScene } from "./createScene";
+export { getZoomOrigin, getZoomTranslation, getNormalizedZoom } from "./zoom";

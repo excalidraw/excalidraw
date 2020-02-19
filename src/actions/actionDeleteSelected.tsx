@@ -1,5 +1,5 @@
 import { Action } from "./types";
-import { deleteSelectedElements } from "../scene";
+import { deleteSelectedElements, isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 
 export const actionDeleteSelected: Action = {
@@ -12,6 +12,6 @@ export const actionDeleteSelected: Action = {
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
-  commitToHistory: (_, elements) => elements.some(el => el.isSelected),
+  commitToHistory: (_, elements) => isSomeElementSelected(elements),
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
 };

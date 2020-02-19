@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
-import { hitTest } from "../element/collision";
-import { getElementAbsoluteCoords } from "../element";
+
+import { getElementAbsoluteCoords, hitTest } from "../element";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" || type === "ellipse" || type === "diamond";
@@ -18,11 +18,12 @@ export function getElementAtPosition(
   elements: readonly ExcalidrawElement[],
   x: number,
   y: number,
+  zoom: number,
 ) {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
-    if (hitTest(elements[i], x, y)) {
+    if (hitTest(elements[i], x, y, zoom)) {
       hitElement = elements[i];
       break;
     }

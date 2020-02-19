@@ -6,6 +6,15 @@ body {
   color: var(--text-color-primary);
 }
 
+canvas {
+  // following props improve blurriness at certain devicePixelRatios.
+  // AFAIK it doesn't affect export (in fact, export seems sharp either way).
+
+  image-rendering: pixelated; // chromium
+  // NOTE: must be declared *after* the above
+  image-rendering: -moz-crisp-edges; // FF
+}
+
 .container {
   display: flex;
   position: fixed;
@@ -139,6 +148,28 @@ button,
 }
 
 .App-menu_top > *:last-child {
+  justify-self: flex-end;
+}
+
+.App-menu_bottom {
+  position: fixed;
+  bottom: 0;
+
+  grid-template-columns: 1fr auto 1fr;
+  align-items: flex-start;
+  cursor: default;
+  pointer-events: none !important;
+}
+
+.App-menu_bottom > * {
+  pointer-events: all;
+}
+
+.App-menu_bottom > *:first-child {
+  justify-self: flex-start;
+}
+
+.App-menu_bottom > *:last-child {
   justify-self: flex-end;
 }
 
