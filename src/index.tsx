@@ -381,6 +381,12 @@ const LayerUI = React.memo(
     return (
       <>
         <FixedSideContainer side="top">
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
               <section
@@ -410,12 +416,6 @@ const LayerUI = React.memo(
                       {t("headings.shapes")}
                     </h2>
                     <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
-                    <HintViewer
-                      elementType={appState.elementType}
-                      multiMode={appState.multiElement !== null}
-                      isResizing={appState.isResizing}
-                      elements={elements}
-                    />
                   </Island>
                   <LockIcon
                     checked={appState.elementLocked}

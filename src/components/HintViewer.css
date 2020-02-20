@@ -2,5 +2,8 @@
   color: #adb5bd; /* OC: GRAY 5*/
   font-size: 0.8rem;
   position: absolute;
-  top: 48px;
+  top: 54px;
+  left: 50%;
+  /* the 16px is a hardcoded 1/2 of lock icon */
+  transform: translateX(calc(-50% - 16px));
 }
