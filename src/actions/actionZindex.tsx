@@ -9,6 +9,7 @@ import {
 import { getSelectedIndices } from "../scene";
 import { KEYS } from "../keys";
 import { t } from "../i18n";
+import { getShortcutKey } from "../utils";
 
 const ACTIVE_ELEM_COLOR = "#ffa94d"; // OC ORANGE 4
 
@@ -86,14 +87,13 @@ export const actionSendBackward: Action = {
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "B",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "[",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={e => updateData(null)}
-      title={t("labels.sendBackward")}
+      title={`${t("labels.sendBackward")} ${getShortcutKey("CtrlOrCmd+[")}`}
     >
       {ICONS.sendBackward}
     </button>
@@ -111,14 +111,13 @@ export const actionBringForward: Action = {
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "F",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "]",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={e => updateData(null)}
-      title={t("labels.bringForward")}
+      title={`${t("labels.bringForward")} ${getShortcutKey("CtrlOrCmd+]")}`}
     >
       {ICONS.bringForward}
     </button>
@@ -136,13 +135,13 @@ export const actionSendToBack: Action = {
   contextItemLabel: "labels.sendToBack",
   commitToHistory: () => true,
   keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "B",
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "[",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={e => updateData(null)}
-      title={t("labels.sendToBack")}
+      title={`${t("labels.sendToBack")} ${getShortcutKey("Alt+CtrlOrCmd+[")}`}
     >
       {ICONS.sendToBack}
     </button>
@@ -160,13 +159,13 @@ export const actionBringToFront: Action = {
   commitToHistory: () => true,
   contextItemLabel: "labels.bringToFront",
   keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "F",
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "]",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={e => updateData(null)}
-      title={t("labels.bringToFront")}
+      title={`${t("labels.bringToFront")} ${getShortcutKey("Alt+CtrlOrCmd+]")}`}
     >
       {ICONS.bringToFront}
     </button>
