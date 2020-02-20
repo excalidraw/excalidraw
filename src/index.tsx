@@ -291,51 +291,49 @@ const LayerUI = React.memo(
       }
 
       return (
-        <Island padding={4}>
-          <div className="panelColumn">
-            {actionManager.renderAction("changeStrokeColor")}
-            {(hasBackground(elementType) ||
-              targetElements.some(element => hasBackground(element.type))) && (
-              <>
-                {actionManager.renderAction("changeBackgroundColor")}
+        <div className="panelColumn">
+          {actionManager.renderAction("changeStrokeColor")}
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
+            <>
+              {actionManager.renderAction("changeBackgroundColor")}
 
-                {actionManager.renderAction("changeFillStyle")}
-              </>
-            )}
+              {actionManager.renderAction("changeFillStyle")}
+            </>
+          )}
 
-            {(hasStroke(elementType) ||
-              targetElements.some(element => hasStroke(element.type))) && (
-              <>
-                {actionManager.renderAction("changeStrokeWidth")}
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
+            <>
+              {actionManager.renderAction("changeStrokeWidth")}
 
-                {actionManager.renderAction("changeSloppiness")}
-              </>
-            )}
+              {actionManager.renderAction("changeSloppiness")}
+            </>
+          )}
 
-            {(hasText(elementType) ||
-              targetElements.some(element => hasText(element.type))) && (
-              <>
-                {actionManager.renderAction("changeFontSize")}
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
+            <>
+              {actionManager.renderAction("changeFontSize")}
 
-                {actionManager.renderAction("changeFontFamily")}
-              </>
-            )}
+              {actionManager.renderAction("changeFontFamily")}
+            </>
+          )}
 
-            {actionManager.renderAction("changeOpacity")}
+          {actionManager.renderAction("changeOpacity")}
 
-            <fieldset>
-              <legend>{t("labels.layers")}</legend>
-              <div className="buttonList">
-                {actionManager.renderAction("sendToBack")}
-                {actionManager.renderAction("sendBackward")}
-                {actionManager.renderAction("bringToFront")}
-                {actionManager.renderAction("bringForward")}
-              </div>
-            </fieldset>
+          <fieldset>
+            <legend>{t("labels.layers")}</legend>
+            <div className="buttonList">
+              {actionManager.renderAction("sendToBack")}
+              {actionManager.renderAction("sendBackward")}
+              {actionManager.renderAction("bringToFront")}
+              {actionManager.renderAction("bringForward")}
+            </div>
+          </fieldset>
 
-            {actionManager.renderAction("deleteSelectedElements")}
-          </div>
-        </Island>
+          {actionManager.renderAction("deleteSelectedElements")}
+        </div>
       );
     }
 
@@ -410,7 +408,7 @@ const LayerUI = React.memo(
             <h2 className="visually-hidden" id="canvas-actions-title">
               {t("headings.canvasActions")}
             </h2>
-            <Island padding={4}>
+            <div className="App-mobile-menu-scroller">
               <Stack.Col gap={4}>
                 {actionManager.renderAction("loadScene")}
                 {actionManager.renderAction("saveScene")}
@@ -418,7 +416,7 @@ const LayerUI = React.memo(
                 {actionManager.renderAction("clearCanvas")}
                 {actionManager.renderAction("changeViewBackgroundColor")}
               </Stack.Col>
-            </Island>
+            </div>
           </section>
         ) : appState.openedMenu === "shape" ? (
           <section
@@ -428,7 +426,9 @@ const LayerUI = React.memo(
             <h2 className="visually-hidden" id="selected-shape-title">
               {t("headings.selectedShapeActions")}
             </h2>
-            {renderSelectedShapeActions(elements)}
+            <div className="App-mobile-menu-scroller">
+              {renderSelectedShapeActions(elements)}
+            </div>
           </section>
         ) : null}
         <FixedSideContainer side="top">
@@ -532,7 +532,9 @@ const LayerUI = React.memo(
                 <h2 className="visually-hidden" id="selected-shape-title">
                   {t("headings.selectedShapeActions")}
                 </h2>
-                {renderSelectedShapeActions(elements)}
+                <Island padding={4}>
+                  {renderSelectedShapeActions(elements)}
+                </Island>
               </section>
             </Stack.Col>
             <section aria-labelledby="shapes-title">

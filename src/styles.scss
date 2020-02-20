@@ -171,9 +171,13 @@ button,
   max-height: calc(100% - var(--bottom));
   overflow-y: scroll;
 }
-.App-mobile-menu .Island {
+.App-mobile-menu .App-mobile-menu-scroller {
   background: #fcfcfc;
   box-shadow: none;
+  --padding: calc(4 * var(--space-factor));
+  padding: var(--padding);
+  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
+  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
 }
 
 .App-menu {
