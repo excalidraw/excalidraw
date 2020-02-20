@@ -5,6 +5,7 @@ body {
   --ui-font: Arial, Helvetica, sans-serif;
   font-family: var(--ui-font);
   color: var(--text-color-primary);
+  -webkit-text-size-adjust: 100%;
 }
 
 canvas {
@@ -158,13 +159,13 @@ button,
   border-top: 1px solid #ccc;
 }
 .App-mobile-menu {
+  --bottom: calc(3rem - 1px + max(var(--spacing), env(safe-area-inset-bottom)));
   display: grid;
   position: fixed;
   width: 100%;
-  bottom: calc(3.5rem - 1px);
-  bottom: calc(3rem - 1px + max(var(--spacing), env(safe-area-inset-bottom)));
-  z-index: 1;
-  max-height: calc(100% - 7rem);
+  bottom: var(--bottom);
+  z-index: 4;
+  max-height: calc(100% - var(--bottom));
   overflow-y: scroll;
 }
 .App-mobile-menu .Island {
