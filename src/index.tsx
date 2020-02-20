@@ -443,10 +443,10 @@ const LayerUI = React.memo(
         </FixedSideContainer>
         <footer role="contentinfo">
           <HintViewer
-            elementType={appState.elementType}
-            multiMode={appState.multiElement !== null}
-            isResizing={appState.isResizing}
             elements={elements}
+            elementType={appState.elementType}
+            isResizing={appState.isResizing}
+            multiMode={appState.multiElement !== null}
           />
           <LanguageList
             onChange={lng => {
