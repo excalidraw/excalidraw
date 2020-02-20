@@ -410,6 +410,12 @@ const LayerUI = React.memo(
                       {t("headings.shapes")}
                     </h2>
                     <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                    <HintViewer
+                      elementType={appState.elementType}
+                      multiMode={appState.multiElement !== null}
+                      isResizing={appState.isResizing}
+                      elements={elements}
+                    />
                   </Island>
                   <LockIcon
                     checked={appState.elementLocked}
@@ -440,12 +446,6 @@ const LayerUI = React.memo(
           </div>
         </FixedSideContainer>
         <footer role="contentinfo">
-          <HintViewer
-            elementType={appState.elementType}
-            multiMode={appState.multiElement !== null}
-            isResizing={appState.isResizing}
-            elements={elements}
-          />
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
