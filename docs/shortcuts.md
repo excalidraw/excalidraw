@@ -22,17 +22,17 @@
 
 ### Editor
 
-| Function       |   Mac    |   Other    |
-| -------------- | :------: | :--------: |
-| Copy           |   `⌘C`   | `Ctrl + C` |
-| Paste          |   `⌘V`   | `Ctrl + V` |
+| Function       |   Mac    |      Other       |
+| -------------- | :------: | :--------------: |
+| Copy           |   `⌘C`   |    `Ctrl + C`    |
+| Paste          |   `⌘V`   |    `Ctrl + V`    |
 | Copy styles    |
 | Paste styles   |
-| Delete         | `delete` |   `del`    |
-| Send to back   |
-| Bring to front |
-| Send backwards |
-| Bring forward  |
+| Delete         | `delete` |      `del`       |
+| Send to back   |  `⌥⌘[`   | `Alt + Ctrl + [` |
+| Bring to front |  `⌥⌘]`   | `Alt + Ctrl + ]` |
+| Send backwards |   `⌘[`   |    `Ctrl + [`    |
+| Bring forward  |   `⌘]`   |    `Ctrl + ]`    |
 
 ### View
 
