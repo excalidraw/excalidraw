@@ -9,6 +9,9 @@ body {
 }
 
 canvas {
+  touch-action: none;
+  user-select: none;
+
   // following props improve blurriness at certain devicePixelRatios.
   // AFAIK it doesn't affect export (in fact, export seems sharp either way).
 
