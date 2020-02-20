@@ -1,6 +1,6 @@
 .HintViewer {
   color: #adb5bd; /* OC: GRAY 5*/
   font-size: 0.8rem;
-  margin-top: 4px;
-  text-align: center;
+  position: absolute;
+  top: 48px;
 }
