@@ -31,4 +31,5 @@ export type AppState = {
   selectedId?: string;
   isResizing: boolean;
   zoom: number;
+  openedMenu: "canvas" | "shape" | null;
 };

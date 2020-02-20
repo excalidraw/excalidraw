@@ -1,13 +1,13 @@
 .ToolIcon {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   font-family: Cascadia;
   cursor: pointer;
+  background-color: #e9ecef;
 }
 
 .ToolIcon__icon {
-  background-color: #e9ecef;
-
   width: 2.5rem;
   height: 2.5rem;
 
@@ -23,6 +23,10 @@
   }
 }
 
+.ToolIcon__label {
+  font-family: var(--ui-font);
+}
+
 .ToolIcon_size_s .ToolIcon__icon {
   width: 1.4rem;
   height: 1.4rem;
@@ -35,13 +39,13 @@
   margin: 0;
   font-size: inherit;
 
-  &:hover .ToolIcon__icon {
+  &:hover {
     background-color: #e9ecef;
   }
-  &:active .ToolIcon__icon {
+  &:active {
     background-color: #ced4da;
   }
-  &:focus .ToolIcon__icon {
+  &:focus {
     box-shadow: 0 0 0 2px #a5d8ff;
   }
 }
@@ -70,19 +74,19 @@
   align-items: center;
   justify-content: center;
   margin-left: 0.1rem;
+  background-color: transparent;
 
   .ToolIcon__icon {
-    background-color: transparent;
     width: 2rem;
     height: 2em;
   }
-  &:hover .ToolIcon__icon {
+  &:hover {
     background-color: transparent;
   }
-  &:active .ToolIcon__icon {
+  &:active {
     background-color: transparent;
   }
-  &:focus .ToolIcon__icon {
+  &:focus {
     box-shadow: none;
   }
 }
@@ -93,6 +97,6 @@
   right: 3px;
   font-size: 0.5em;
   color: #adb5bd; // OC GRAY 5
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--ui-font);
   user-select: none;
 }
