@@ -2,11 +2,16 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  --ui-font: Arial, Helvetica, sans-serif;
+  font-family: var(--ui-font);
   color: var(--text-color-primary);
+  -webkit-text-size-adjust: 100%;
 }
 
 canvas {
+  touch-action: none;
+  user-select: none;
+
   // following props improve blurriness at certain devicePixelRatios.
   // AFAIK it doesn't affect export (in fact, export seems sharp either way).
 
@@ -22,6 +27,11 @@ canvas {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.panelRow {
+  display: flex;
+  justify-content: space-between;
 }
 
 .panelColumn {
@@ -91,6 +101,7 @@ input:focus {
 
 button,
 .buttonList label {
+  user-select: none;
   background-color: #e9ecef;
   border: 0;
   border-radius: 4px;
@@ -126,6 +137,47 @@ button,
   &:active {
     background-color: #adb5bd;
   }
+}
+
+.App-toolbar {
+  padding: var(--spacing);
+  padding-bottom: #{"max(var(--spacing), env(safe-area-inset-bottom))"};
+  padding-left: #{"max(var(--spacing), env(safe-area-inset-left))"};
+  padding-right: #{"max(var(--spacing), env(safe-area-inset-right))"};
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  position: absolute;
+  bottom: 0;
+}
+.App-toolbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.App-toolbar,
+.App-mobile-menu {
+  --spacing: 0.5rem;
+  background: #fcfcfc;
+  border-top: 1px solid #ccc;
+}
+.App-mobile-menu {
+  --bottom: calc(3rem - 1px + max(var(--spacing), env(safe-area-inset-bottom)));
+  display: grid;
+  position: fixed;
+  width: 100%;
+  bottom: var(--bottom);
+  z-index: 4;
+  max-height: calc(100% - var(--bottom));
+  overflow-y: scroll;
+}
+.App-mobile-menu .App-mobile-menu-scroller {
+  background: #fcfcfc;
+  box-shadow: none;
+  --padding: calc(4 * var(--space-factor));
+  padding: var(--padding);
+  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
+  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
 }
 
 .App-menu {
@@ -302,4 +354,14 @@ button,
   bottom: 20px;
   transform: translateX(-50%);
   padding: 10px 20px;
+}
+
+@media (max-width: 600px), (max-height: 500px) {
+  aside {
+    display: none;
+  }
+  .scroll-back-to-content {
+    bottom: 70px;
+    bottom: calc(70px + env(safe-area-inset-bottom));
+  }
 }
