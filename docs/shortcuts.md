@@ -1,3 +1,12 @@
+### General
+
+| Function     | Mac | Other |
+| ------------ | :-: | :---: |
+| Load         |
+| Save         |
+| Export       |
+| Clear canvas |
+
 ### Shapes
 
 | Function  | Mac  | Other |
