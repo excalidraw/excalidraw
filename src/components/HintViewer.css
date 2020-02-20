@@ -6,4 +6,5 @@
   left: 50%;
   /* the 16px is a hardcoded 1/2 of lock icon */
   transform: translateX(calc(-50% - 16px));
+  pointer-events: none;
 }
