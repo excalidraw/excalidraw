@@ -53,6 +53,7 @@ import {
   distance,
   distance2d,
   resetCursor,
+  getShortcutKey,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
@@ -337,6 +338,9 @@ const LayerUI = React.memo(
         <>
           {SHAPES.map(({ value, icon }, index) => {
             const label = t(`toolBar.${value}`);
+            const shortcut = getShortcutKey(
+              `${capitalizeString(value)[0]}, ${index + 1}`,
+            );
             return (
               <ToolButton
                 key={value}
@@ -344,9 +348,7 @@ const LayerUI = React.memo(
                 icon={icon}
                 checked={appState.elementType === value}
                 name="editor-current-shape"
-                title={`${capitalizeString(label)} — ${
-                  capitalizeString(value)[0]
-                }, ${index + 1}`}
+                title={`${capitalizeString(label)} ${shortcut}`}
                 keyBindingLabel={`${index + 1}`}
                 aria-label={capitalizeString(label)}
                 aria-keyshortcuts={`${label[0]} ${index + 1}`}
@@ -707,7 +709,7 @@ export class App extends React.Component<any, AppState> {
     ) {
       this.selectShapeTool(shape);
       // Undo action
-    } else if (event[KEYS.META] && /z/i.test(event.key)) {
+    } else if (event[KEYS.CTRL_OR_CMD] && /z/i.test(event.key)) {
       event.preventDefault();
 
       if (
@@ -1999,7 +2001,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
     const { deltaX, deltaY } = e;
 
-    if (e[KEYS.META]) {
+    if (e[KEYS.CTRL_OR_CMD]) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);

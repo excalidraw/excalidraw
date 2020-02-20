@@ -86,7 +86,8 @@ export const actionSendBackward: Action = {
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event => event[KEYS.META] && event.altKey && event.key === "B",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "B",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -110,7 +111,8 @@ export const actionBringForward: Action = {
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event => event[KEYS.META] && event.altKey && event.key === "F",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "F",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -133,7 +135,8 @@ export const actionSendToBack: Action = {
   },
   contextItemLabel: "labels.sendToBack",
   commitToHistory: () => true,
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "B",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "B",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -156,7 +159,8 @@ export const actionBringToFront: Action = {
   },
   commitToHistory: () => true,
   contextItemLabel: "labels.bringToFront",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "F",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "F",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"

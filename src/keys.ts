@@ -7,7 +7,7 @@ export const KEYS = {
   ESCAPE: "Escape",
   DELETE: "Delete",
   BACKSPACE: "Backspace",
-  get META() {
+  get CTRL_OR_CMD() {
     return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
       ? "metaKey"
       : "ctrlKey";

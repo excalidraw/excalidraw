@@ -7,6 +7,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { KEYS } from "../keys";
+import { getShortcutKey } from "../utils";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
@@ -81,7 +82,7 @@ export const actionZoomIn: Action = {
     <ToolButton
       type="button"
       icon={zoomIn}
-      title={t("buttons.zoomIn")}
+      title={`${t("buttons.zoomIn")} ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
@@ -90,7 +91,7 @@ export const actionZoomIn: Action = {
   ),
   keyTest: event =>
     (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
-    (event[KEYS.META] || event.shiftKey),
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 };
 
 export const actionZoomOut: Action = {
@@ -107,7 +108,7 @@ export const actionZoomOut: Action = {
     <ToolButton
       type="button"
       icon={zoomOut}
-      title={t("buttons.zoomOut")}
+      title={`${t("buttons.zoomOut")} ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);
@@ -116,7 +117,7 @@ export const actionZoomOut: Action = {
   ),
   keyTest: event =>
     (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
-    (event[KEYS.META] || event.shiftKey),
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 };
 
 export const actionResetZoom: Action = {
@@ -131,5 +132,5 @@ export const actionResetZoom: Action = {
   },
   keyTest: event =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
-    (event[KEYS.META] || event.shiftKey),
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 };
