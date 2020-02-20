@@ -104,7 +104,7 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { HintViewer } from "./components/HintViewer";
-import useIsMobile from "./is-mobile";
+import useIsMobile, { IsMobileProvider } from "./is-mobile";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
@@ -2326,7 +2326,9 @@ class TopErrorBoundary extends React.Component {
 
 ReactDOM.render(
   <TopErrorBoundary>
-    <App />
+    <IsMobileProvider>
+      <App />
+    </IsMobileProvider>
   </TopErrorBoundary>,
   rootElement,
 );
