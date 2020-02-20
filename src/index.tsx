@@ -420,6 +420,16 @@ const LayerUI = React.memo(
               </Stack.Col>
             </Island>
           </section>
+        ) : appState.openedMenu === "shape" ? (
+          <section
+            className="App-mobile-menu"
+            aria-labelledby="selected-shape-title"
+          >
+            <h2 className="visually-hidden" id="selected-shape-title">
+              {t("headings.selectedShapeActions")}
+            </h2>
+            {renderSelectedShapeActions(elements)}
+          </section>
         ) : null}
         <FixedSideContainer side="top">
           <section aria-labelledby="shapes-title">
@@ -450,18 +460,28 @@ const LayerUI = React.memo(
               }
             />
             {lockButton}
-            <ToolButton
-              type="button"
-              icon={
-                <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>✎</span>
-              }
-              aria-label={t("buttons.menu")}
-              onClick={() =>
-                setAppState(({ openedMenu }: any) => ({
-                  openedMenu: openedMenu === "shape" ? null : "shape",
-                }))
-              }
-            />
+            <div
+              style={{
+                visibility: isSomeElementSelected(elements)
+                  ? "visible"
+                  : "hidden",
+              }}
+            >
+              <ToolButton
+                type="button"
+                icon={
+                  <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>
+                    ✎
+                  </span>
+                }
+                aria-label={t("buttons.menu")}
+                onClick={() =>
+                  setAppState(({ openedMenu }: any) => ({
+                    openedMenu: openedMenu === "shape" ? null : "shape",
+                  }))
+                }
+              />
+            </div>
             <HintViewer
               elementType={appState.elementType}
               multiMode={appState.multiElement !== null}

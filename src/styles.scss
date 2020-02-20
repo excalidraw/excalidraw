@@ -25,6 +25,11 @@ canvas {
   right: 0;
 }
 
+.panelRow {
+  display: flex;
+  justify-content: space-between;
+}
+
 .panelColumn {
   display: flex;
   flex-direction: column;
@@ -131,7 +136,6 @@ button,
 }
 
 .App-toolbar {
-  --spacing: 0.5rem;
   padding: var(--spacing);
   padding-bottom: #{"max(var(--spacing), env(safe-area-inset-bottom))"};
   padding-left: #{"max(var(--spacing), env(safe-area-inset-left))"};
@@ -141,7 +145,6 @@ button,
   overflow: auto;
   position: absolute;
   bottom: 0;
-  height: 3.5rem;
 }
 .App-toolbar-content {
   display: flex;
@@ -150,6 +153,7 @@ button,
 }
 .App-toolbar,
 .App-mobile-menu {
+  --spacing: 0.5rem;
   background: #fcfcfc;
   border-top: 1px solid #ccc;
 }
@@ -158,8 +162,10 @@ button,
   position: fixed;
   width: 100%;
   bottom: calc(3.5rem - 1px);
-  bottom: calc(3.5rem - 1px + env(safe-area-inset-bottom));
+  bottom: calc(3rem - 1px + max(var(--spacing), env(safe-area-inset-bottom)));
   z-index: 1;
+  max-height: calc(100% - 7rem);
+  overflow-y: scroll;
 }
 .App-mobile-menu .Island {
   background: #fcfcfc;
