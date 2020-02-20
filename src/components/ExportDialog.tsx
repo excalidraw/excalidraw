@@ -17,6 +17,7 @@ import { KEYS } from "../keys";
 
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
+import useIsMobile from "../is-mobile";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -233,6 +234,7 @@ export function ExportDialog({
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
+        showAriaLabel={useIsMobile()}
         title={t("buttons.export")}
         ref={triggerButton}
       />

@@ -43,7 +43,7 @@
     "layers": "Layers"
   },
   "buttons": {
-    "clearReset": "Clear the canvas & reset background color",
+    "clearReset": "Reset the canvas",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
@@ -55,7 +55,8 @@
     "selectLanguage": "Select Language",
     "scrollBackToContent": "Scroll back to content",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "menu": "Menu"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

@@ -104,6 +104,7 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { HintViewer } from "./components/HintViewer";
+import useIsMobile from "./is-mobile";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
@@ -134,6 +135,18 @@ const MOUSE_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
 };
+
+// Block pinch-zooming on iOS outside of the content area
+document.addEventListener(
+  "touchmove",
+  function(event) {
+    // @ts-ignore
+    if (event.scale !== 1) {
+      event.preventDefault();
+    }
+  },
+  { passive: false },
+);
 
 let lastMouseUp: ((e: any) => void) | null = null;
 
@@ -211,64 +224,58 @@ const LayerUI = React.memo(
     language,
     setElements,
   }: LayerUIProps) => {
-    function renderCanvasActions() {
+    const isMobile = useIsMobile();
+
+    function renderExportDialog() {
       return (
-        <Stack.Col gap={4}>
-          <Stack.Row justifyContent={"space-between"}>
-            {actionManager.renderAction("loadScene")}
-            {actionManager.renderAction("saveScene")}
-            <ExportDialog
-              elements={elements}
-              appState={appState}
-              actionManager={actionManager}
-              onExportToPng={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("png", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToSvg={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("svg", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToClipboard={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("clipboard", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToBackend={exportedElements => {
-                if (canvas) {
-                  exportCanvas(
-                    "backend",
-                    exportedElements.map(element => ({
-                      ...element,
-                      isSelected: false,
-                    })),
-                    canvas,
-                    appState,
-                  );
-                }
-              }}
-            />
-            {actionManager.renderAction("clearCanvas")}
-          </Stack.Row>
-          {actionManager.renderAction("changeViewBackgroundColor")}
-        </Stack.Col>
+        <ExportDialog
+          elements={elements}
+          appState={appState}
+          actionManager={actionManager}
+          onExportToPng={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("png", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToSvg={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("svg", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToClipboard={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("clipboard", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToBackend={exportedElements => {
+            if (canvas) {
+              exportCanvas(
+                "backend",
+                exportedElements.map(element => ({
+                  ...element,
+                  isSelected: false,
+                })),
+                canvas,
+                appState,
+              );
+            }
+          }}
+        />
       );
     }
 
@@ -378,7 +385,103 @@ const LayerUI = React.memo(
       );
     }
 
-    return (
+    const lockButton = (
+      <LockIcon
+        checked={appState.elementLocked}
+        onChange={() => {
+          setAppState({
+            elementLocked: !appState.elementLocked,
+            elementType: appState.elementLocked
+              ? "selection"
+              : appState.elementType,
+          });
+        }}
+        title={t("toolBar.lock")}
+      />
+    );
+
+    return isMobile ? (
+      <>
+        {appState.openedMenu === "canvas" ? (
+          <section
+            className="App-mobile-menu"
+            aria-labelledby="canvas-actions-title"
+          >
+            <h2 className="visually-hidden" id="canvas-actions-title">
+              {t("headings.canvasActions")}
+            </h2>
+            <Island padding={4}>
+              <Stack.Col gap={4}>
+                {actionManager.renderAction("loadScene")}
+                {actionManager.renderAction("saveScene")}
+                {renderExportDialog()}
+                {actionManager.renderAction("clearCanvas")}
+                {actionManager.renderAction("changeViewBackgroundColor")}
+              </Stack.Col>
+            </Island>
+          </section>
+        ) : null}
+        <FixedSideContainer side="top">
+          <section aria-labelledby="shapes-title">
+            <Stack.Col gap={4} align="center">
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden" id="shapes-title">
+                    {t("headings.shapes")}
+                  </h2>
+                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                </Island>
+              </Stack.Row>
+            </Stack.Col>
+          </section>
+        </FixedSideContainer>
+        <footer className="App-toolbar">
+          <div className="App-toolbar-content">
+            <ToolButton
+              type="button"
+              icon={
+                <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>☰</span>
+              }
+              aria-label={t("buttons.menu")}
+              onClick={() =>
+                setAppState(({ openedMenu }: any) => ({
+                  openedMenu: openedMenu === "canvas" ? null : "canvas",
+                }))
+              }
+            />
+            {lockButton}
+            <ToolButton
+              type="button"
+              icon={
+                <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>✎</span>
+              }
+              aria-label={t("buttons.menu")}
+              onClick={() =>
+                setAppState(({ openedMenu }: any) => ({
+                  openedMenu: openedMenu === "shape" ? null : "shape",
+                }))
+              }
+            />
+            <HintViewer
+              elementType={appState.elementType}
+              multiMode={appState.multiElement !== null}
+              isResizing={appState.isResizing}
+              elements={elements}
+            />
+            {appState.scrolledOutside && (
+              <button
+                className="scroll-back-to-content"
+                onClick={() => {
+                  setAppState({ ...calculateScrollCenter(elements) });
+                }}
+              >
+                {t("buttons.scrollBackToContent")}
+              </button>
+            )}
+          </div>
+        </footer>
+      </>
+    ) : (
       <>
         <FixedSideContainer side="top">
           <div className="App-menu App-menu_top">
@@ -390,7 +493,17 @@ const LayerUI = React.memo(
                 <h2 className="visually-hidden" id="canvas-actions-title">
                   {t("headings.canvasActions")}
                 </h2>
-                <Island padding={4}>{renderCanvasActions()}</Island>
+                <Island padding={4}>
+                  <Stack.Col gap={4}>
+                    <Stack.Row justifyContent={"space-between"}>
+                      {actionManager.renderAction("loadScene")}
+                      {actionManager.renderAction("saveScene")}
+                      {renderExportDialog()}
+                      {actionManager.renderAction("clearCanvas")}
+                    </Stack.Row>
+                    {actionManager.renderAction("changeViewBackgroundColor")}
+                  </Stack.Col>
+                </Island>
               </section>
               <section
                 className="App-right-menu"
@@ -411,18 +524,7 @@ const LayerUI = React.memo(
                     </h2>
                     <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
                   </Island>
-                  <LockIcon
-                    checked={appState.elementLocked}
-                    onChange={() => {
-                      setAppState({
-                        elementLocked: !appState.elementLocked,
-                        elementType: appState.elementLocked
-                          ? "selection"
-                          : appState.elementType,
-                      });
-                    }}
-                    title={t("toolBar.lock")}
-                  />
+                  {lockButton}
                 </Stack.Row>
               </Stack.Col>
             </section>

@@ -98,7 +98,9 @@
   box-sizing: content-box;
   border-radius: 0px 4px 4px 0px;
   float: left;
+  padding: 1px;
   padding-left: 0.5em;
+  appearance: none;
 }
 
 .color-picker-label-swatch {
