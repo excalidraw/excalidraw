@@ -10,6 +10,7 @@ body {
 }
 [contenteditable] {
   user-select: auto;
+  cursor: text;
 }
 
 canvas {
