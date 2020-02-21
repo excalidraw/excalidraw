@@ -288,7 +288,8 @@ const LayerUI = React.memo(
     }
 
     const showSelectedShapeActions =
-      (appState.editingElement || getSelectedElements(elements).length) &&
+      appState.editingElement ||
+      getSelectedElements(elements).length ||
       appState.elementType === "selection";
 
     function renderSelectedShapeActions() {
