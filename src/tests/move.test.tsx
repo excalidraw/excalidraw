@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 describe("move element", () => {
-  it("rectangle", () => {
+  it.skip("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 
@@ -50,7 +50,7 @@ describe("move element", () => {
 });
 
 describe("duplicate element on move when ALT is clicked", () => {
-  it("rectangle", () => {
+  it.skip("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 

@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 describe("resize element", () => {
-  it("rectangle", () => {
+  it.skip("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 
@@ -56,7 +56,7 @@ describe("resize element", () => {
 });
 
 describe("resize element with aspect ratio when SHIFT is clicked", () => {
-  it("rectangle", () => {
+  it.skip("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 
