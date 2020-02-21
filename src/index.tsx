@@ -480,7 +480,7 @@ const LayerUI = React.memo(
                   visible={isSomeElementSelected(elements)}
                   type="button"
                   icon={edit}
-                  aria-label={t("buttons.menu")}
+                  aria-label={t("buttons.edit")}
                   onClick={() =>
                     setAppState(({ openedMenu }: any) => ({
                       openedMenu: openedMenu === "shape" ? null : "shape",
