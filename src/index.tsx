@@ -109,6 +109,7 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
+import { menu, palette } from "./components/icons";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -286,9 +287,11 @@ const LayerUI = React.memo(
       );
     }
 
-    const showSelectedShapeActions =
-      (appState.editingElement || getSelectedElements(elements).length) &&
-      appState.elementType === "selection";
+    const showSelectedShapeActions = Boolean(
+      appState.editingElement ||
+        getSelectedElements(elements).length ||
+        appState.elementType !== "selection",
+    );
 
     function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
@@ -386,21 +389,6 @@ const LayerUI = React.memo(
       );
     }
 
-    const lockButton = (
-      <LockIcon
-        checked={appState.elementLocked}
-        onChange={() => {
-          setAppState({
-            elementLocked: !appState.elementLocked,
-            elementType: appState.elementLocked
-              ? "selection"
-              : appState.elementType,
-          });
-        }}
-        title={t("toolBar.lock")}
-      />
-    );
-
     return isMobile ? (
       <>
         {appState.openedMenu === "canvas" ? (
@@ -411,13 +399,24 @@ const LayerUI = React.memo(
             <h2 className="visually-hidden" id="canvas-actions-title">
               {t("headings.canvasActions")}
             </h2>
-            <div className="App-mobile-menu-scroller">
+            <div className="App-mobile-menu-scroller panelColumn">
               <Stack.Col gap={4}>
                 {actionManager.renderAction("loadScene")}
                 {actionManager.renderAction("saveScene")}
                 {renderExportDialog()}
                 {actionManager.renderAction("clearCanvas")}
                 {actionManager.renderAction("changeViewBackgroundColor")}
+                <fieldset>
+                  <legend>{t("labels.language")}</legend>
+                  <LanguageList
+                    onChange={lng => {
+                      setLanguage(lng);
+                      setAppState({});
+                    }}
+                    languages={languages}
+                    currentLanguage={language}
+                  />
+                </fieldset>
               </Stack.Col>
             </div>
           </section>
@@ -456,61 +455,57 @@ const LayerUI = React.memo(
         </FixedSideContainer>
         <footer className="App-toolbar">
           <div className="App-toolbar-content">
-            <ToolButton
-              type="button"
-              icon={
-                <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>☰</span>
-              }
-              aria-label={t("buttons.menu")}
-              onClick={() =>
-                setAppState(({ openedMenu }: any) => ({
-                  openedMenu: openedMenu === "canvas" ? null : "canvas",
-                }))
-              }
-            />
-            <div
-              style={{
-                visibility: isSomeElementSelected(elements)
-                  ? "visible"
-                  : "hidden",
-              }}
-            >
-              {" "}
-              {actionManager.renderAction("deleteSelectedElements")}
-            </div>
-            {lockButton}
-            {actionManager.renderAction("finalize")}
-            <div
-              style={{
-                visibility: isSomeElementSelected(elements)
-                  ? "visible"
-                  : "hidden",
-              }}
-            >
-              <ToolButton
-                type="button"
-                icon={
-                  <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>
-                    ✎
-                  </span>
-                }
-                aria-label={t("buttons.menu")}
-                onClick={() =>
-                  setAppState(({ openedMenu }: any) => ({
-                    openedMenu: openedMenu === "shape" ? null : "shape",
-                  }))
-                }
-              />
-            </div>
-            {appState.scrolledOutside && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({ ...calculateScrollCenter(elements) });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
+            {appState.multiElement ? (
+              <>
+                {actionManager.renderAction("deleteSelectedElements")}
+                <ToolButton
+                  visible={showSelectedShapeActions}
+                  type="button"
+                  icon={palette}
+                  aria-label={t("buttons.edit")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
+                {actionManager.renderAction("finalize")}
+              </>
+            ) : (
+              <>
+                <ToolButton
+                  type="button"
+                  icon={menu}
+                  aria-label={t("buttons.menu")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "canvas" ? null : "canvas",
+                    }))
+                  }
+                />
+                <ToolButton
+                  visible={showSelectedShapeActions}
+                  type="button"
+                  icon={palette}
+                  aria-label={t("buttons.edit")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
+                {actionManager.renderAction("deleteSelectedElements")}
+                {appState.scrolledOutside && (
+                  <button
+                    className="scroll-back-to-content"
+                    onClick={() => {
+                      setAppState({ ...calculateScrollCenter(elements) });
+                    }}
+                  >
+                    {t("buttons.scrollBackToContent")}
+                  </button>
+                )}
+              </>
             )}
           </div>
         </footer>
@@ -545,7 +540,7 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              {showSelectedShapeActions ? (
+              {showSelectedShapeActions && (
                 <section
                   className="App-right-menu"
                   aria-labelledby="selected-shape-title"
@@ -555,7 +550,7 @@ const LayerUI = React.memo(
                   </h2>
                   <Island padding={4}>{renderSelectedShapeActions()}</Island>
                 </section>
-              ) : null}
+              )}
             </Stack.Col>
             <section aria-labelledby="shapes-title">
               <Stack.Col gap={4} align="start">
@@ -566,7 +561,19 @@ const LayerUI = React.memo(
                     </h2>
                     <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
                   </Island>
-                  {lockButton}
+                  <LockIcon
+                    checked={appState.elementLocked}
+                    onChange={() => {
+                      setAppState({
+                        elementLocked: !appState.elementLocked,
+                        elementType: appState.elementLocked
+                          ? "selection"
+                          : appState.elementType,
+                      });
+                    }}
+                    title={t("toolBar.lock")}
+                    isButton={isMobile}
+                  />
                 </Stack.Row>
               </Stack.Col>
             </section>
@@ -591,6 +598,7 @@ const LayerUI = React.memo(
             }}
             languages={languages}
             currentLanguage={language}
+            floating
           />
           {appState.scrolledOutside && (
             <button
@@ -1085,6 +1093,8 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
+              this.setState({ lastPointerDownWith: e.pointerType });
+
               // pan canvas on wheel button drag or space+drag
               if (
                 gesture.pointers.length === 0 &&
@@ -1213,6 +1223,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
 
                 const selectedElements = getSelectedElements(elements);
@@ -1278,6 +1289,9 @@ export class App extends React.Component<any, AppState> {
                 //  of state.elementLocked)
                 if (this.state.editingElement?.type === "text") {
                   return;
+                }
+                if (elementIsAddedToSelection) {
+                  element = hitElement!;
                 }
                 let textX = e.clientX;
                 let textY = e.clientY;
@@ -2152,6 +2166,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
