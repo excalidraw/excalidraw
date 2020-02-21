@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("selection element", () => {
+describe.skip("selection element", () => {
   it("create selection element on pointer down", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -73,7 +73,7 @@ describe("selection element", () => {
   });
 });
 
-describe("select single element on the scene", () => {
+describe.skip("select single element on the scene", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;

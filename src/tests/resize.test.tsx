@@ -13,8 +13,8 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("resize element", () => {
-  it.skip("rectangle", () => {
+describe.skip("resize element", () => {
+  it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 
@@ -55,8 +55,8 @@ describe("resize element", () => {
   });
 });
 
-describe("resize element with aspect ratio when SHIFT is clicked", () => {
-  it.skip("rectangle", () => {
+describe.skip("resize element with aspect ratio when SHIFT is clicked", () => {
+  it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 

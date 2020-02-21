@@ -13,8 +13,8 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("move element", () => {
-  it.skip("rectangle", () => {
+describe.skip("move element", () => {
+  it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 
@@ -49,8 +49,8 @@ describe("move element", () => {
   });
 });
 
-describe("duplicate element on move when ALT is clicked", () => {
-  it.skip("rectangle", () => {
+describe.skip("duplicate element on move when ALT is clicked", () => {
+  it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
 

@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("add element to the scene when pointer dragging long enough", () => {
+describe.skip("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -163,7 +163,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
   });
 });
 
-describe("do not add element to the scene if size is too small", () => {
+describe.skip("do not add element to the scene if size is too small", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool

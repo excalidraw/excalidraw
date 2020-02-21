@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("remove shape in non linear elements", () => {
+describe.skip("remove shape in non linear elements", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -61,7 +61,7 @@ describe("remove shape in non linear elements", () => {
   });
 });
 
-describe("multi point mode in linear elements", () => {
+describe.skip("multi point mode in linear elements", () => {
   it("arrow", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
