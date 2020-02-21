@@ -5,7 +5,7 @@ import { isInvisiblySmallElement } from "../element";
 import { resetCursor } from "../utils";
 import React from "react";
 import { ToolButton } from "../components/ToolButton";
-import { save } from "../components/icons";
+import { done } from "../components/icons";
 import { t } from "../i18n";
 
 export const actionFinalize: Action = {
@@ -55,7 +55,7 @@ export const actionFinalize: Action = {
     >
       <ToolButton
         type="button"
-        icon={save}
+        icon={done}
         title={t("buttons.done")}
         aria-label={t("buttons.done")}
         onClick={() => updateData(null)}

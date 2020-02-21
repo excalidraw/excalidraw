@@ -109,6 +109,7 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
+import { menu, edit } from "./components/icons";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -457,61 +458,62 @@ const LayerUI = React.memo(
         </FixedSideContainer>
         <footer className="App-toolbar">
           <div className="App-toolbar-content">
-            <ToolButton
-              type="button"
-              icon={
-                <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>☰</span>
-              }
-              aria-label={t("buttons.menu")}
-              onClick={() =>
-                setAppState(({ openedMenu }: any) => ({
-                  openedMenu: openedMenu === "canvas" ? null : "canvas",
-                }))
-              }
-            />
-            <div
-              style={{
-                visibility: isSomeElementSelected(elements)
-                  ? "visible"
-                  : "hidden",
-              }}
-            >
-              {" "}
-              {actionManager.renderAction("deleteSelectedElements")}
-            </div>
-            {lockButton}
-            {actionManager.renderAction("finalize")}
-            <div
-              style={{
-                visibility: isSomeElementSelected(elements)
-                  ? "visible"
-                  : "hidden",
-              }}
-            >
-              <ToolButton
-                type="button"
-                icon={
-                  <span style={{ fontSize: "2em", marginTop: "-0.15em" }}>
-                    ✎
-                  </span>
-                }
-                aria-label={t("buttons.menu")}
-                onClick={() =>
-                  setAppState(({ openedMenu }: any) => ({
-                    openedMenu: openedMenu === "shape" ? null : "shape",
-                  }))
-                }
-              />
-            </div>
-            {appState.scrolledOutside && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({ ...calculateScrollCenter(elements) });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
+            {appState.multiElement ? (
+              <>
+                {actionManager.renderAction("deleteSelectedElements")}
+                {actionManager.renderAction("finalize")}
+              </>
+            ) : (
+              <>
+                <ToolButton
+                  type="button"
+                  icon={menu}
+                  aria-label={t("buttons.menu")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "canvas" ? null : "canvas",
+                    }))
+                  }
+                />
+                <div
+                  style={{
+                    visibility: isSomeElementSelected(elements)
+                      ? "visible"
+                      : "hidden",
+                  }}
+                >
+                  {actionManager.renderAction("deleteSelectedElements")}
+                </div>
+                {lockButton}
+                <div
+                  style={{
+                    visibility: isSomeElementSelected(elements)
+                      ? "visible"
+                      : "hidden",
+                  }}
+                >
+                  <ToolButton
+                    type="button"
+                    icon={edit}
+                    aria-label={t("buttons.menu")}
+                    onClick={() =>
+                      setAppState(({ openedMenu }: any) => ({
+                        openedMenu: openedMenu === "shape" ? null : "shape",
+                      }))
+                    }
+                  />
+                </div>
+                {appState.scrolledOutside && (
+                  <button
+                    className="scroll-back-to-content"
+                    onClick={() => {
+                      setAppState({ ...calculateScrollCenter(elements) });
+                    }}
+                  >
+                    {t("buttons.scrollBackToContent")}
+                  </button>
+                )}
+              </>
             )}
           </div>
         </footer>
