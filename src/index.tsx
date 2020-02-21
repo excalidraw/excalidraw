@@ -287,10 +287,11 @@ const LayerUI = React.memo(
       );
     }
 
-    const showSelectedShapeActions =
+    const showSelectedShapeActions = Boolean(
       appState.editingElement ||
-      getSelectedElements(elements).length ||
-      appState.elementType !== "selection";
+        getSelectedElements(elements).length ||
+        appState.elementType !== "selection",
+    );
 
     function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
@@ -472,7 +473,7 @@ const LayerUI = React.memo(
                   }
                 />
                 <ToolButton
-                  visible={isSomeElementSelected(elements)}
+                  visible={showSelectedShapeActions}
                   type="button"
                   icon={palette}
                   aria-label={t("buttons.edit")}
@@ -522,7 +523,7 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              {showSelectedShapeActions ? (
+              {showSelectedShapeActions && (
                 <section
                   className="App-right-menu"
                   aria-labelledby="selected-shape-title"
@@ -532,7 +533,7 @@ const LayerUI = React.memo(
                   </h2>
                   <Island padding={4}>{renderSelectedShapeActions()}</Island>
                 </section>
-              ) : null}
+              )}
             </Stack.Col>
             <section aria-labelledby="shapes-title">
               <Stack.Col gap={4} align="start">
