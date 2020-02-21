@@ -40,7 +40,8 @@
     "colorPicker": "Paleta kolorów",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
-    "layers": "Warstwy"
+    "layers": "Warstwy",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -55,14 +56,18 @@
     "selectLanguage": "Wybierz język",
     "scrollBackToContent": "Wróć do obszaru roboczego",
     "zoomIn": "Powiększ",
-    "zoomOut": "Pomniejsz"
+    "zoomOut": "Pomniejsz",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
-    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome."
+    "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Zaznaczenie",

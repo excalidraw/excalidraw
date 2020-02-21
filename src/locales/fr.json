@@ -35,7 +35,13 @@
     "extraBold": "Très épais",
     "architect": "Architecte",
     "artist": "Artiste",
-    "cartoonist": "Cartooniste"
+    "cartoonist": "Cartooniste",
+    "fileTitle": "File title",
+    "colorPicker": "Color picker",
+    "canvasBackground": "Canvas background",
+    "drawingCanvas": "Drawing Canvas",
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -46,14 +52,22 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "scrollBackToContent": "Revenir au contenu"
+    "close": "Close",
+    "selectLanguage": "Select Language",
+    "scrollBackToContent": "Revenir au contenu",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
-    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome."
+    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -62,6 +76,17 @@
     "ellipse": "Ellipse",
     "arrow": "Flèche",
     "line": "Ligne",
-    "text": "Texte"
+    "text": "Texte",
+    "lock": "Keep selected tool active after drawing"
+  },
+  "headings": {
+    "canvasActions": "Canvas actions",
+    "selectedShapeActions": "Selected shape actions",
+    "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

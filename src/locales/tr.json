@@ -40,7 +40,8 @@
     "colorPicker": "Renk seçici",
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
-    "layers": "Katmanlar"
+    "layers": "Katmanlar",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -57,7 +58,8 @@
     "zoomIn": "Yakınlaştır",
     "zoomOut": "Uzaklaştır",
     "menu": "Menü",
-    "done": "Tamam"
+    "done": "Tamam",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
