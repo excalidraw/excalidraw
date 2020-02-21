@@ -7,11 +7,11 @@ export function IsMobileProvider({ children }: { children: React.ReactNode }) {
   if (!query.current) {
     query.current = window.matchMedia
       ? window.matchMedia("(max-width: 600px), (max-height: 500px)")
-      : ({
+      : (({
           matches: false,
           addListener: () => {},
           removeListener: () => {},
-        } as any);
+        } as any) as MediaQueryList);
   }
   const [isMobile, setMobile] = useState(query.current.matches);
 
