@@ -59,7 +59,9 @@
     "zoomOut": "Zoom out",
     "menu": "Menu",
     "done": "Done",
-    "edit": "Edit"
+    "edit": "Edit",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

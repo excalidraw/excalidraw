@@ -83,7 +83,7 @@ export class ActionManager implements ActionsManagerInterface {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
-      const updateData = (formState: any) => {
+      const updateData = (formState?: any) => {
         const commitToHistory =
           action.commitToHistory &&
           action.commitToHistory(this.getAppState(), this.getElements());

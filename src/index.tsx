@@ -17,6 +17,7 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   normalizeDimensions,
+  showSelectedShapeActions,
 } from "./element";
 import {
   clearSelection,
@@ -91,6 +92,8 @@ import {
   actionCopyStyles,
   actionPasteStyles,
   actionFinalize,
+  actionToggleCanvasMenu,
+  actionToggleEditMenu,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -109,7 +112,7 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
-import { menu, palette } from "./components/icons";
+import { createUndoAction, createRedoAction } from "./actions/actionHistory";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -287,12 +290,6 @@ const LayerUI = React.memo(
       );
     }
 
-    const showSelectedShapeActions = Boolean(
-      appState.editingElement ||
-        getSelectedElements(elements).length ||
-        appState.elementType !== "selection",
-    );
-
     function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
@@ -420,7 +417,8 @@ const LayerUI = React.memo(
               </Stack.Col>
             </div>
           </section>
-        ) : appState.openedMenu === "shape" && showSelectedShapeActions ? (
+        ) : appState.openedMenu === "shape" &&
+          showSelectedShapeActions(appState, elements) ? (
           <section
             className="App-mobile-menu"
             aria-labelledby="selected-shape-title"
@@ -455,59 +453,23 @@ const LayerUI = React.memo(
         </FixedSideContainer>
         <footer className="App-toolbar">
           <div className="App-toolbar-content">
-            {appState.multiElement ? (
-              <>
-                {actionManager.renderAction("deleteSelectedElements")}
-                <ToolButton
-                  visible={showSelectedShapeActions}
-                  type="button"
-                  icon={palette}
-                  aria-label={t("buttons.edit")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "shape" ? null : "shape",
-                    }))
-                  }
-                />
-                {actionManager.renderAction("finalize")}
-              </>
-            ) : (
-              <>
-                <ToolButton
-                  type="button"
-                  icon={menu}
-                  aria-label={t("buttons.menu")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "canvas" ? null : "canvas",
-                    }))
-                  }
-                />
-                <ToolButton
-                  visible={showSelectedShapeActions}
-                  type="button"
-                  icon={palette}
-                  aria-label={t("buttons.edit")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "shape" ? null : "shape",
-                    }))
-                  }
-                />
-                {actionManager.renderAction("deleteSelectedElements")}
-                {appState.scrolledOutside && (
-                  <button
-                    className="scroll-back-to-content"
-                    onClick={() => {
-                      setAppState({ ...calculateScrollCenter(elements) });
-                    }}
-                  >
-                    {t("buttons.scrollBackToContent")}
-                  </button>
-                )}
-              </>
-            )}
+            {actionManager.renderAction("toggleCanvasMenu")}
+            {actionManager.renderAction("toggleEditMenu")}
+            {actionManager.renderAction("undo")}
+            {actionManager.renderAction("redo")}
+            {actionManager.renderAction("finalize")}
+            {actionManager.renderAction("deleteSelectedElements")}
           </div>
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
         </footer>
       </>
     ) : (
@@ -685,6 +647,12 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
 
+    this.actionManager.registerAction(actionToggleCanvasMenu);
+    this.actionManager.registerAction(actionToggleEditMenu);
+
+    this.actionManager.registerAction(createUndoAction(history));
+    this.actionManager.registerAction(createRedoAction(history));
+
     this.canvasOnlyActions = [actionSelectAll];
   }
 
@@ -852,34 +820,6 @@ export class App extends React.Component<any, AppState> {
       this.state.draggingElement === null
     ) {
       this.selectShapeTool(shape);
-      // Undo action
-    } else if (event[KEYS.META] && /z/i.test(event.key)) {
-      event.preventDefault();
-
-      if (
-        this.state.multiElement ||
-        this.state.resizingElement ||
-        this.state.editingElement ||
-        this.state.draggingElement
-      ) {
-        return;
-      }
-
-      if (event.shiftKey) {
-        // Redo action
-        const data = history.redoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState({ ...data.appState });
-        }
-      } else {
-        // undo action
-        const data = history.undoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState({ ...data.appState });
-        }
-      }
     } else if (event.key === KEYS.SPACE && gesture.pointers.length === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
