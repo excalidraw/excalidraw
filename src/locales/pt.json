@@ -35,7 +35,13 @@
     "extraBold": "Muito espesso",
     "architect": "Arquitecto",
     "artist": "Artista",
-    "cartoonist": "Caricaturista"
+    "cartoonist": "Caricaturista",
+    "fileTitle": "File title",
+    "colorPicker": "Color picker",
+    "canvasBackground": "Canvas background",
+    "drawingCanvas": "Drawing Canvas",
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -46,14 +52,22 @@
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
-    "scrollBackToContent": "Voltar ao conteúdo"
+    "close": "Close",
+    "selectLanguage": "Select Language",
+    "scrollBackToContent": "Voltar ao conteúdo",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
-    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome."
+    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -62,6 +76,17 @@
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Linha",
-    "text": "Texto"
+    "text": "Texto",
+    "lock": "Keep selected tool active after drawing"
+  },
+  "headings": {
+    "canvasActions": "Canvas actions",
+    "selectedShapeActions": "Selected shape actions",
+    "shapes": "Shapes"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }
