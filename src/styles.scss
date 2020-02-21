@@ -353,7 +353,7 @@ button,
 .scroll-back-to-content {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
 }
@@ -363,7 +363,7 @@ button,
     display: none;
   }
   .scroll-back-to-content {
-    bottom: 70px;
-    bottom: calc(70px + env(safe-area-inset-bottom));
+    bottom: 80px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
