@@ -33,3 +33,16 @@ export type AppState = {
   zoom: number;
   openedMenu: "canvas" | "shape" | null;
 };
+
+export type Pointer = Readonly<{
+  id: number;
+  x: number;
+  y: number;
+}>;
+
+export type Gesture = {
+  pointers: Array<Pointer>;
+  lastCenter: { x: number; y: number } | null;
+  initialDistance: number | null;
+  initialScale: number | null;
+};

@@ -356,7 +356,7 @@ button,
   padding: 10px 20px;
 }
 
-@media (max-width: 600px), (max-height: 500px) {
+@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
   aside {
     display: none;
   }

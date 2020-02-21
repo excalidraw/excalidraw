@@ -56,7 +56,8 @@
     "scrollBackToContent": "Scroll back to content",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
-    "menu": "Menu"
+    "menu": "Menu",
+    "done": "Done"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
