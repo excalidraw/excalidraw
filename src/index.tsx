@@ -286,17 +286,15 @@ const LayerUI = React.memo(
       );
     }
 
-    function renderSelectedShapeActions(
-      elements: readonly ExcalidrawElement[],
-    ) {
+    const showSelectedShapeActions =
+      (appState.editingElement || getSelectedElements(elements).length) &&
+      appState.elementType === "selection";
+
+    function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
         ? [editingElement]
         : getSelectedElements(elements);
-      if (!targetElements.length && elementType === "selection") {
-        return null;
-      }
-
       return (
         <div className="panelColumn">
           {actionManager.renderAction("changeStrokeColor")}
@@ -423,7 +421,7 @@ const LayerUI = React.memo(
               </Stack.Col>
             </div>
           </section>
-        ) : appState.openedMenu === "shape" ? (
+        ) : appState.openedMenu === "shape" && showSelectedShapeActions ? (
           <section
             className="App-mobile-menu"
             aria-labelledby="selected-shape-title"
@@ -432,7 +430,7 @@ const LayerUI = React.memo(
               {t("headings.selectedShapeActions")}
             </h2>
             <div className="App-mobile-menu-scroller">
-              {renderSelectedShapeActions(elements)}
+              {renderSelectedShapeActions()}
             </div>
           </section>
         ) : null}
@@ -541,17 +539,17 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              <section
-                className="App-right-menu"
-                aria-labelledby="selected-shape-title"
-              >
-                <h2 className="visually-hidden" id="selected-shape-title">
-                  {t("headings.selectedShapeActions")}
-                </h2>
-                <Island padding={4}>
-                  {renderSelectedShapeActions(elements)}
-                </Island>
-              </section>
+              {showSelectedShapeActions && (
+                <section
+                  className="App-right-menu"
+                  aria-labelledby="selected-shape-title"
+                >
+                  <h2 className="visually-hidden" id="selected-shape-title">
+                    {t("headings.selectedShapeActions")}
+                  </h2>
+                  <Island padding={4}>{renderSelectedShapeActions()}</Island>
+                </section>
+              )}
             </Stack.Col>
             <section aria-labelledby="shapes-title">
               <Stack.Col gap={4} align="start">
