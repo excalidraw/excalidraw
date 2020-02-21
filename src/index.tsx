@@ -475,34 +475,19 @@ const LayerUI = React.memo(
                     }))
                   }
                 />
-                <div
-                  style={{
-                    visibility: isSomeElementSelected(elements)
-                      ? "visible"
-                      : "hidden",
-                  }}
-                >
-                  {actionManager.renderAction("deleteSelectedElements")}
-                </div>
+                <ToolButton
+                  visible={isSomeElementSelected(elements)}
+                  type="button"
+                  icon={edit}
+                  aria-label={t("buttons.menu")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
+                {actionManager.renderAction("deleteSelectedElements")}
                 {lockButton}
-                <div
-                  style={{
-                    visibility: isSomeElementSelected(elements)
-                      ? "visible"
-                      : "hidden",
-                  }}
-                >
-                  <ToolButton
-                    type="button"
-                    icon={edit}
-                    aria-label={t("buttons.menu")}
-                    onClick={() =>
-                      setAppState(({ openedMenu }: any) => ({
-                        openedMenu: openedMenu === "shape" ? null : "shape",
-                      }))
-                    }
-                  />
-                </div>
                 {appState.scrolledOutside && (
                   <button
                     className="scroll-back-to-content"
