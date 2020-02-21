@@ -27,6 +27,7 @@ export const actionFinalize: Action = {
         newElements = newElements.slice(0, -1);
       }
       appState.multiElement.shape = null;
+      appState.multiElement.isSelected = true;
     }
     if (!appState.elementLocked || !appState.multiElement) {
       resetCursor();
