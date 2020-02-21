@@ -6,6 +6,11 @@ body {
   font-family: var(--ui-font);
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;
+  user-select: none;
+}
+[contenteditable] {
+  user-select: auto;
+  cursor: text;
 }
 
 canvas {
@@ -139,11 +144,19 @@ button,
   }
 }
 
+.App-toolbar,
+.App-mobile-menu {
+  --spacing: 0.5rem;
+  --padding: calc(4 * var(--space-factor));
+  padding: var(--padding);
+  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
+  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
+  background: #fcfcfc;
+  border-top: 1px solid #ccc;
+  box-sizing: border-box;
+}
 .App-toolbar {
-  padding: var(--spacing);
-  padding-bottom: #{"max(var(--spacing), env(safe-area-inset-bottom))"};
-  padding-left: #{"max(var(--spacing), env(safe-area-inset-left))"};
-  padding-right: #{"max(var(--spacing), env(safe-area-inset-right))"};
+  padding-bottom: #{"max(var(--padding), env(safe-area-inset-bottom))"};
   width: 100%;
   box-sizing: border-box;
   overflow: auto;
@@ -155,14 +168,8 @@ button,
   align-items: center;
   justify-content: space-between;
 }
-.App-toolbar,
 .App-mobile-menu {
-  --spacing: 0.5rem;
-  background: #fcfcfc;
-  border-top: 1px solid #ccc;
-}
-.App-mobile-menu {
-  --bottom: calc(3rem - 1px + max(var(--spacing), env(safe-area-inset-bottom)));
+  --bottom: calc(3rem - 1px + max(var(--padding), env(safe-area-inset-bottom)));
   display: grid;
   position: fixed;
   width: 100%;
@@ -174,10 +181,6 @@ button,
 .App-mobile-menu .App-mobile-menu-scroller {
   background: #fcfcfc;
   box-shadow: none;
-  --padding: calc(4 * var(--space-factor));
-  padding: var(--padding);
-  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
-  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
 }
 
 .App-menu {
@@ -288,12 +291,7 @@ button,
 }
 
 .dropdown-select {
-  position: absolute;
-  margin-bottom: 0.5em;
-  margin-right: 0.5em;
   height: 1.5rem;
-  right: 0;
-  bottom: 0;
   padding: 0 1.5rem 0 0.5rem;
   background-color: #e9ecef;
   border-radius: var(--space-factor);
@@ -317,10 +315,14 @@ button,
   &:active {
     background-color: #ced4da;
   }
+  &.dropdown-select--floating {
+    position: absolute;
+    margin-bottom: 0.5em;
+    margin-right: 0.5em;
+  }
 }
 
-.language-select {
-  @extend .dropdown-select;
+.dropdown-select__language.dropdown-select--floating {
   right: 0;
   bottom: 0;
 }
@@ -351,7 +353,7 @@ button,
 .scroll-back-to-content {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
 }
@@ -361,7 +363,7 @@ button,
     display: none;
   }
   .scroll-back-to-content {
-    bottom: 70px;
-    bottom: calc(70px + env(safe-area-inset-bottom));
+    bottom: 80px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }

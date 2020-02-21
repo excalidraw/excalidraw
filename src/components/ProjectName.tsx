@@ -36,7 +36,7 @@ export class ProjectName extends Component<Props> {
     return (
       <span
         suppressContentEditableWarning
-        contentEditable="true"
+        contentEditable={"plaintext-only" as any}
         data-type="wysiwyg"
         className="ProjectName"
         role="textbox"

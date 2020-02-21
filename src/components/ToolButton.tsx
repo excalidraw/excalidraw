@@ -15,6 +15,7 @@ type ToolButtonBaseProps = {
   size?: ToolIconSize;
   keyBindingLabel?: string;
   showAriaLabel?: boolean;
+  visible?: boolean;
 };
 
 type ToolButtonProps =
@@ -45,6 +46,10 @@ export const ToolButton = React.forwardRef(function(
         type="button"
         onClick={props.onClick}
         ref={innerRef}
+        style={{
+          visibility:
+            props.visible || props.visible == null ? "visible" : "hidden",
+        }}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
           {props.icon || props.label}

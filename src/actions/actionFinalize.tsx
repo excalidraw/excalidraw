@@ -5,7 +5,7 @@ import { isInvisiblySmallElement } from "../element";
 import { resetCursor } from "../utils";
 import React from "react";
 import { ToolButton } from "../components/ToolButton";
-import { save } from "../components/icons";
+import { done } from "../components/icons";
 import { t } from "../i18n";
 
 export const actionFinalize: Action = {
@@ -16,10 +16,13 @@ export const actionFinalize: Action = {
       window.document.activeElement.blur();
     }
     if (appState.multiElement) {
-      appState.multiElement.points = appState.multiElement.points.slice(
-        0,
-        appState.multiElement.points.length - 1,
-      );
+      // pen and mouse have hover
+      if (appState.lastPointerDownWith !== "touch") {
+        appState.multiElement.points = appState.multiElement.points.slice(
+          0,
+          appState.multiElement.points.length - 1,
+        );
+      }
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
       }
@@ -50,12 +53,12 @@ export const actionFinalize: Action = {
   PanelComponent: ({ appState, updateData }) => (
     <div
       style={{
-        visibility: appState.multiElement !== null ? "visible" : "hidden",
+        visibility: appState.multiElement != null ? "visible" : "hidden",
       }}
     >
       <ToolButton
         type="button"
-        icon={save}
+        icon={done}
         title={t("buttons.done")}
         aria-label={t("buttons.done")}
         onClick={() => updateData(null)}

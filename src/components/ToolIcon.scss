@@ -5,6 +5,7 @@
   font-family: Cascadia;
   cursor: pointer;
   background-color: #e9ecef;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ToolIcon__icon {
@@ -69,17 +70,8 @@
   }
 }
 
-.ToolIcon.ToolIcon__lock {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 0.1rem;
+.ToolIcon_type_floating {
   background-color: transparent;
-
-  .ToolIcon__icon {
-    width: 2rem;
-    height: 2em;
-  }
   &:hover {
     background-color: transparent;
   }
@@ -88,6 +80,22 @@
   }
   &:focus {
     box-shadow: none;
+  }
+  .ToolIcon__icon {
+    width: 2rem;
+    height: 2em;
+  }
+}
+
+.ToolIcon.ToolIcon__lock {
+  &.ToolIcon_type_button {
+    border-radius: 4px;
+    svg {
+      position: static;
+    }
+  }
+  &.ToolIcon_type_floating {
+    margin-left: 0.1rem;
   }
 }
 

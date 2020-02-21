@@ -18,13 +18,14 @@ export const actionDeleteSelected: Action = {
   contextMenuOrder: 3,
   commitToHistory: (_, elements) => isSomeElementSelected(elements),
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ elements, updateData }) => (
     <ToolButton
       type="button"
       icon={trash}
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
+      visible={isSomeElementSelected(elements)}
     />
   ),
 };
