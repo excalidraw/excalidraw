@@ -6,6 +6,10 @@ body {
   font-family: var(--ui-font);
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;
+  user-select: none;
+}
+[contenteditable] {
+  user-select: auto;
 }
 
 canvas {
