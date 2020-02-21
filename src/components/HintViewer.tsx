@@ -37,16 +37,16 @@ const getHints = ({ elementType, multiMode, isResizing, elements }: Hint) => {
 };
 
 export const HintViewer = ({
-  elements,
   elementType,
-  isResizing,
   multiMode,
+  isResizing,
+  elements,
 }: Hint) => {
   const hint = getHints({
-    elements,
     elementType,
-    isResizing,
     multiMode,
+    isResizing,
+    elements,
   });
   if (!hint) {
     return null;
