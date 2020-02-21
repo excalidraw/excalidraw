@@ -39,7 +39,9 @@
     "fileTitle": "Título del archivo",
     "colorPicker": "Selector de color",
     "canvasBackground": "Fondo del lienzo",
-    "drawingCanvas": "Lienzo de dibujo"
+    "drawingCanvas": "Lienzo de dibujo",
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -50,16 +52,22 @@
     "save": "Guardar",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
-    "showExportDialog": "Mostrar diálogo para exportar",
     "close": "Cerrar",
-    "selectLanguage": "Seleccionar idioma"
+    "selectLanguage": "Seleccionar idioma",
+    "scrollBackToContent": "Scroll back to content",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
-    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador."
+    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Selección",
@@ -75,5 +83,10 @@
     "canvasActions": "Acciones del lienzo",
     "selectedShapeActions": "Acciones de la forma seleccionada",
     "shapes": "Formas"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }
