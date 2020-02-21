@@ -382,10 +382,10 @@ const LayerUI = React.memo(
       <>
         <FixedSideContainer side="top">
           <HintViewer
-            elements={elements}
             elementType={appState.elementType}
-            isResizing={appState.isResizing}
             multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
           />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
