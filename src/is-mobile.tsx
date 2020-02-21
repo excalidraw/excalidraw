@@ -5,9 +5,13 @@ const context = React.createContext(false);
 export function IsMobileProvider({ children }: { children: React.ReactNode }) {
   const query = useRef<MediaQueryList>();
   if (!query.current) {
-    query.current = window.matchMedia(
-      "(max-width: 600px), (max-height: 500px)",
-    ) || { matches: false, addListener: () => {}, removeListener: () => {} };
+    query.current = window.matchMedia
+      ? window.matchMedia("(max-width: 600px), (max-height: 500px)")
+      : ({
+          matches: false,
+          addListener: () => {},
+          removeListener: () => {},
+        } as any);
   }
   const [isMobile, setMobile] = useState(query.current.matches);
 
