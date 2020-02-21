@@ -4,3 +4,11 @@
   bottom: 0.5em;
   font-size: 0.8rem;
 }
+
+@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
+  .HintViewer {
+    position: static;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+}
