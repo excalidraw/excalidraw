@@ -1288,6 +1288,9 @@ export class App extends React.Component<any, AppState> {
                 if (this.state.editingElement?.type === "text") {
                   return;
                 }
+                if (elementIsAddedToSelection) {
+                  element = hitElement!;
+                }
                 let textX = e.clientX;
                 let textY = e.clientY;
                 if (!e.altKey) {
