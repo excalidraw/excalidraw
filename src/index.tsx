@@ -388,22 +388,6 @@ const LayerUI = React.memo(
       );
     }
 
-    const lockButton = (
-      <LockIcon
-        checked={appState.elementLocked}
-        onChange={() => {
-          setAppState({
-            elementLocked: !appState.elementLocked,
-            elementType: appState.elementLocked
-              ? "selection"
-              : appState.elementType,
-          });
-        }}
-        title={t("toolBar.lock")}
-        isButton={isMobile}
-      />
-    );
-
     return isMobile ? (
       <>
         {appState.openedMenu === "canvas" ? (
@@ -488,7 +472,6 @@ const LayerUI = React.memo(
                   }
                 />
                 {actionManager.renderAction("deleteSelectedElements")}
-                {lockButton}
                 {appState.scrolledOutside && (
                   <button
                     className="scroll-back-to-content"
@@ -549,7 +532,19 @@ const LayerUI = React.memo(
                     </h2>
                     <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
                   </Island>
-                  {lockButton}
+                  <LockIcon
+                    checked={appState.elementLocked}
+                    onChange={() => {
+                      setAppState({
+                        elementLocked: !appState.elementLocked,
+                        elementType: appState.elementLocked
+                          ? "selection"
+                          : appState.elementType,
+                      });
+                    }}
+                    title={t("toolBar.lock")}
+                    isButton={isMobile}
+                  />
                 </Stack.Row>
               </Stack.Col>
             </section>
