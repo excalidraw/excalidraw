@@ -338,8 +338,6 @@ const LayerUI = React.memo(
               {actionManager.renderAction("bringForward")}
             </div>
           </fieldset>
-
-          {actionManager.renderAction("deleteSelectedElements")}
         </div>
       );
     }
@@ -451,6 +449,12 @@ const LayerUI = React.memo(
               </Stack.Row>
             </Stack.Col>
           </section>
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
         </FixedSideContainer>
         <footer className="App-toolbar">
           <div className="App-toolbar-content">
@@ -466,7 +470,18 @@ const LayerUI = React.memo(
                 }))
               }
             />
+            <div
+              style={{
+                visibility: isSomeElementSelected(elements)
+                  ? "visible"
+                  : "hidden",
+              }}
+            >
+              {" "}
+              {actionManager.renderAction("deleteSelectedElements")}
+            </div>
             {lockButton}
+            {actionManager.renderAction("finalize")}
             <div
               style={{
                 visibility: isSomeElementSelected(elements)
@@ -489,12 +504,6 @@ const LayerUI = React.memo(
                 }
               />
             </div>
-            <HintViewer
-              elementType={appState.elementType}
-              multiMode={appState.multiElement !== null}
-              isResizing={appState.isResizing}
-              elements={elements}
-            />
             {appState.scrolledOutside && (
               <button
                 className="scroll-back-to-content"
