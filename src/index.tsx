@@ -1093,6 +1093,8 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
+              this.setState({ lastPointerDownWith: e.pointerType });
+
               // pan canvas on wheel button drag or space+drag
               if (
                 gesture.pointers.length === 0 &&
