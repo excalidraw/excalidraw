@@ -22,22 +22,22 @@
 
 ### Editor
 
-| Function       |  Mac   |       Other        |
-| -------------- | :----: | :----------------: |
-| Copy           |   ⌘C   |     `Ctrl + C`     |
-| Paste          |   ⌘V   |     `Ctrl + V`     |
-| Copy styles    |  ⌘⇧V   | `Shift + Ctrl + V` |
-| Paste styles   |  ⌘⇧C   | `Shift + Ctrl + C` |
-| Delete         |   ⌫    |       `del`        |
-| Send to back   |  ⌥⌘\[  |  `Alt + Ctrl + [`  |
-| Bring to front |  ⌥⌘\]  |  `Alt + Ctrl + ]`  |
-| Send backwards |  ⌘\[   |     `Ctrl + [`     |
-| Bring forward  |  ⌘\]   |     `Ctrl + ]`     |
+| Function       | Mac  |       Other        |
+| -------------- | :--: | :----------------: |
+| Copy           |  ⌘C  |     `Ctrl + C`     |
+| Paste          |  ⌘V  |     `Ctrl + V`     |
+| Copy styles    | ⌘⇧V  | `Shift + Ctrl + V` |
+| Paste styles   | ⌘⇧C  | `Shift + Ctrl + C` |
+| Delete         |  ⌫   |       `del`        |
+| Send to back   | ⌥⌘\[ |  `Alt + Ctrl + [`  |
+| Bring to front | ⌥⌘\] |  `Alt + Ctrl + ]`  |
+| Send backwards | ⌘\[  |     `Ctrl + [`     |
+| Bring forward  | ⌘\]  |     `Ctrl + ]`     |
 
 ### View
 
-| Function   | Mac  |   Other    |
-| ---------- | :--: | :--------: |
-| Zoom in    | ⌘+ | `Ctrl + +` |
-| Zoom out   | ⌘- | `Ctrl + -` |
-| Zoom reset | ⌘0 | `Ctrl + 0` |
+| Function   | Mac |   Other    |
+| ---------- | :-: | :--------: |
+| Zoom in    | ⌘+  | `Ctrl + +` |
+| Zoom out   | ⌘-  | `Ctrl + -` |
+| Zoom reset | ⌘0  | `Ctrl + 0` |
