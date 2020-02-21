@@ -87,7 +87,8 @@ export const actionSendBackward: Action = {
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "[",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && !event.altKey && event.key === "[",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -111,7 +112,8 @@ export const actionBringForward: Action = {
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "]",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && !event.altKey && event.key === "]",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
