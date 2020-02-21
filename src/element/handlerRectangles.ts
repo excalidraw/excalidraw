@@ -31,7 +31,7 @@ export function handlerRectangles(
 
   const dashedLineMargin = 4 / zoom;
 
-  const centeringOffset = (size - 8) / 1.25;
+  const centeringOffset = (size - 8) / (2 * zoom);
 
   const handlers = {
     nw: [
@@ -61,16 +61,16 @@ export function handlerRectangles(
   } as { [T in Sides]: number[] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandlers = 40 / zoom;
+  const minimumSizeForEightHandlers = (5 * size) / zoom;
   if (Math.abs(elementWidth) > minimumSizeForEightHandlers) {
     handlers["n"] = [
-      elementX1 + elementWidth / 2 - size / 2,
+      elementX1 + elementWidth / 2 - handlerWidth / 2,
       elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
       handlerWidth,
       handlerHeight,
     ];
     handlers["s"] = [
-      elementX1 + elementWidth / 2 - size / 2,
+      elementX1 + elementWidth / 2 - handlerWidth / 2,
       elementY2 + dashedLineMargin - centeringOffset,
       handlerWidth,
       handlerHeight,
@@ -79,13 +79,13 @@ export function handlerRectangles(
   if (Math.abs(elementHeight) > minimumSizeForEightHandlers) {
     handlers["w"] = [
       elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY1 + elementHeight / 2 - size / 2,
+      elementY1 + elementHeight / 2 - handlerHeight / 2,
       handlerWidth,
       handlerHeight,
     ];
     handlers["e"] = [
       elementX2 + dashedLineMargin - centeringOffset,
-      elementY1 + elementHeight / 2 - size / 2,
+      elementY1 + elementHeight / 2 - handlerHeight / 2,
       handlerWidth,
       handlerHeight,
     ];
