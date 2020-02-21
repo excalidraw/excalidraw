@@ -109,7 +109,7 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
-import { menu, edit } from "./components/icons";
+import { menu, palette } from "./components/icons";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -290,7 +290,7 @@ const LayerUI = React.memo(
     const showSelectedShapeActions =
       appState.editingElement ||
       getSelectedElements(elements).length ||
-      appState.elementType === "selection";
+      appState.elementType !== "selection";
 
     function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
@@ -479,7 +479,7 @@ const LayerUI = React.memo(
                 <ToolButton
                   visible={isSomeElementSelected(elements)}
                   type="button"
-                  icon={edit}
+                  icon={palette}
                   aria-label={t("buttons.edit")}
                   onClick={() =>
                     setAppState(({ openedMenu }: any) => ({
