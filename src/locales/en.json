@@ -40,7 +40,8 @@
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers"
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

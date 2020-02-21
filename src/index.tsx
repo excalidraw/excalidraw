@@ -398,13 +398,24 @@ const LayerUI = React.memo(
             <h2 className="visually-hidden" id="canvas-actions-title">
               {t("headings.canvasActions")}
             </h2>
-            <div className="App-mobile-menu-scroller">
+            <div className="App-mobile-menu-scroller panelColumn">
               <Stack.Col gap={4}>
                 {actionManager.renderAction("loadScene")}
                 {actionManager.renderAction("saveScene")}
                 {renderExportDialog()}
                 {actionManager.renderAction("clearCanvas")}
                 {actionManager.renderAction("changeViewBackgroundColor")}
+                <fieldset>
+                  <legend>{t("labels.language")}</legend>
+                  <LanguageList
+                    onChange={lng => {
+                      setLanguage(lng);
+                      setAppState({});
+                    }}
+                    languages={languages}
+                    currentLanguage={language}
+                  />
+                </fieldset>
               </Stack.Col>
             </div>
           </section>
@@ -575,6 +586,7 @@ const LayerUI = React.memo(
             }}
             languages={languages}
             currentLanguage={language}
+            floating
           />
           {appState.scrolledOutside && (
             <button
