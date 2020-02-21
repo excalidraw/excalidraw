@@ -458,6 +458,17 @@ const LayerUI = React.memo(
             {appState.multiElement ? (
               <>
                 {actionManager.renderAction("deleteSelectedElements")}
+                <ToolButton
+                  visible={showSelectedShapeActions}
+                  type="button"
+                  icon={palette}
+                  aria-label={t("buttons.edit")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
                 {actionManager.renderAction("finalize")}
               </>
             ) : (
