@@ -1213,6 +1213,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
 
                 const selectedElements = getSelectedElements(elements);
@@ -2152,6 +2153,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
