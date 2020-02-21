@@ -398,6 +398,7 @@ const LayerUI = React.memo(
           });
         }}
         title={t("toolBar.lock")}
+        isButton={isMobile}
       />
     );
 
