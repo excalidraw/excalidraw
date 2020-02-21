@@ -539,7 +539,7 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              {showSelectedShapeActions && (
+              {showSelectedShapeActions ? (
                 <section
                   className="App-right-menu"
                   aria-labelledby="selected-shape-title"
@@ -549,7 +549,7 @@ const LayerUI = React.memo(
                   </h2>
                   <Island padding={4}>{renderSelectedShapeActions()}</Island>
                 </section>
-              )}
+              ) : null}
             </Stack.Col>
             <section aria-labelledby="shapes-title">
               <Stack.Col gap={4} align="start">
