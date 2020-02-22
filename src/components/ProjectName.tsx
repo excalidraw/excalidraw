@@ -31,7 +31,10 @@ export class ProjectName extends Component<Props> {
       e.currentTarget.blur();
     }
   };
-  private makeEditable = (editable: HTMLSpanElement) => {
+  private makeEditable = (editable: HTMLSpanElement | null) => {
+    if (!editable) {
+      return;
+    }
     try {
       editable.contentEditable = "plaintext-only";
     } catch {
