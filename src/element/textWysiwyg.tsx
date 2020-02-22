@@ -34,7 +34,11 @@ export function textWysiwyg({
   // But this solution has an issue — it allows to paste
   // multiline text, which is not currently supported
   const editable = document.createElement("div");
-  editable.contentEditable = "plaintext-only";
+  try {
+    editable.contentEditable = "plaintext-only";
+  } catch {
+    editable.contentEditable = "true";
+  }
   editable.tabIndex = 0;
   editable.innerText = initText;
   editable.dataset.type = "wysiwyg";
