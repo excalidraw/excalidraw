@@ -2185,7 +2185,7 @@ export class App extends React.Component<any, AppState> {
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
             onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
+            onPointerLeave={this.removePointer}
             onDrop={e => {
               const file = e.dataTransfer.files[0];
               if (file?.type === "application/json") {
