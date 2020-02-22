@@ -2426,11 +2426,11 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
               </button>
               <br />
               <div className="smaller">
-                <span role="img" aria-labelledby="warning">
+                <span role="img" aria-label="warning">
                   ⚠️
                 </span>{" "}
                 This will result in loss of work{" "}
-                <span role="img" aria-labelledby="warning">
+                <span role="img" aria-hidden="true">
                   ⚠️
                 </span>
               </div>
