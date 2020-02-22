@@ -41,7 +41,7 @@ import {
 } from "./scene";
 
 import { renderScene } from "./renderer";
-import { AppState } from "./types";
+import { AppState, FlooredNumber, Gesture } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
@@ -104,8 +104,12 @@ import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
 import { HintViewer } from "./components/HintViewer";
+import useIsMobile, { IsMobileProvider } from "./is-mobile";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
+import { normalizeScroll } from "./scene/data";
+import { getCenter, getDistance } from "./gesture";
+import { menu, palette } from "./components/icons";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -128,13 +132,32 @@ const CURSOR_TYPE = {
   CROSSHAIR: "crosshair",
   GRABBING: "grabbing",
 };
-const MOUSE_BUTTON = {
+const POINTER_BUTTON = {
   MAIN: 0,
   WHEEL: 1,
   SECONDARY: 2,
+  TOUCH: -1,
 };
 
-let lastMouseUp: ((e: any) => void) | null = null;
+// Block pinch-zooming on iOS outside of the content area
+document.addEventListener(
+  "touchmove",
+  function(event) {
+    // @ts-ignore
+    if (event.scale !== 1) {
+      event.preventDefault();
+    }
+  },
+  { passive: false },
+);
+
+let lastPointerUp: ((e: any) => void) | null = null;
+const gesture: Gesture = {
+  pointers: [],
+  lastCenter: null,
+  initialDistance: null,
+  initialScale: null,
+};
 
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
@@ -143,8 +166,8 @@ export function viewportCoordsToSceneCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,
@@ -166,8 +189,8 @@ export function sceneCoordsToViewportCoords(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
   canvas: HTMLCanvasElement | null,
@@ -188,7 +211,6 @@ let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
-let isHoldingMouseButton: boolean = false;
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -210,124 +232,114 @@ const LayerUI = React.memo(
     language,
     setElements,
   }: LayerUIProps) => {
-    function renderCanvasActions() {
+    const isMobile = useIsMobile();
+
+    function renderExportDialog() {
       return (
-        <Stack.Col gap={4}>
-          <Stack.Row justifyContent={"space-between"}>
-            {actionManager.renderAction("loadScene")}
-            {actionManager.renderAction("saveScene")}
-            <ExportDialog
-              elements={elements}
-              appState={appState}
-              actionManager={actionManager}
-              onExportToPng={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("png", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToSvg={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("svg", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToClipboard={(exportedElements, scale) => {
-                if (canvas) {
-                  exportCanvas("clipboard", exportedElements, canvas, {
-                    exportBackground: appState.exportBackground,
-                    name: appState.name,
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    scale,
-                  });
-                }
-              }}
-              onExportToBackend={exportedElements => {
-                if (canvas) {
-                  exportCanvas(
-                    "backend",
-                    exportedElements.map(element => ({
-                      ...element,
-                      isSelected: false,
-                    })),
-                    canvas,
-                    appState,
-                  );
-                }
-              }}
-            />
-            {actionManager.renderAction("clearCanvas")}
-          </Stack.Row>
-          {actionManager.renderAction("changeViewBackgroundColor")}
-        </Stack.Col>
+        <ExportDialog
+          elements={elements}
+          appState={appState}
+          actionManager={actionManager}
+          onExportToPng={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("png", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToSvg={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("svg", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToClipboard={(exportedElements, scale) => {
+            if (canvas) {
+              exportCanvas("clipboard", exportedElements, canvas, {
+                exportBackground: appState.exportBackground,
+                name: appState.name,
+                viewBackgroundColor: appState.viewBackgroundColor,
+                scale,
+              });
+            }
+          }}
+          onExportToBackend={exportedElements => {
+            if (canvas) {
+              exportCanvas(
+                "backend",
+                exportedElements.map(element => ({
+                  ...element,
+                  isSelected: false,
+                })),
+                canvas,
+                appState,
+              );
+            }
+          }}
+        />
       );
     }
 
-    function renderSelectedShapeActions(
-      elements: readonly ExcalidrawElement[],
-    ) {
+    const showSelectedShapeActions = Boolean(
+      appState.editingElement ||
+        getSelectedElements(elements).length ||
+        appState.elementType !== "selection",
+    );
+
+    function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
         ? [editingElement]
         : getSelectedElements(elements);
-      if (!targetElements.length && elementType === "selection") {
-        return null;
-      }
-
       return (
-        <Island padding={4}>
-          <div className="panelColumn">
-            {actionManager.renderAction("changeStrokeColor")}
-            {(hasBackground(elementType) ||
-              targetElements.some(element => hasBackground(element.type))) && (
-              <>
-                {actionManager.renderAction("changeBackgroundColor")}
+        <div className="panelColumn">
+          {actionManager.renderAction("changeStrokeColor")}
+          {(hasBackground(elementType) ||
+            targetElements.some(element => hasBackground(element.type))) && (
+            <>
+              {actionManager.renderAction("changeBackgroundColor")}
 
-                {actionManager.renderAction("changeFillStyle")}
-              </>
-            )}
+              {actionManager.renderAction("changeFillStyle")}
+            </>
+          )}
 
-            {(hasStroke(elementType) ||
-              targetElements.some(element => hasStroke(element.type))) && (
-              <>
-                {actionManager.renderAction("changeStrokeWidth")}
+          {(hasStroke(elementType) ||
+            targetElements.some(element => hasStroke(element.type))) && (
+            <>
+              {actionManager.renderAction("changeStrokeWidth")}
 
-                {actionManager.renderAction("changeSloppiness")}
-              </>
-            )}
+              {actionManager.renderAction("changeSloppiness")}
+            </>
+          )}
 
-            {(hasText(elementType) ||
-              targetElements.some(element => hasText(element.type))) && (
-              <>
-                {actionManager.renderAction("changeFontSize")}
+          {(hasText(elementType) ||
+            targetElements.some(element => hasText(element.type))) && (
+            <>
+              {actionManager.renderAction("changeFontSize")}
 
-                {actionManager.renderAction("changeFontFamily")}
-              </>
-            )}
+              {actionManager.renderAction("changeFontFamily")}
+            </>
+          )}
 
-            {actionManager.renderAction("changeOpacity")}
+          {actionManager.renderAction("changeOpacity")}
 
-            <fieldset>
-              <legend>{t("labels.layers")}</legend>
-              <div className="buttonList">
-                {actionManager.renderAction("sendToBack")}
-                {actionManager.renderAction("sendBackward")}
-                {actionManager.renderAction("bringToFront")}
-                {actionManager.renderAction("bringForward")}
-              </div>
-            </fieldset>
-
-            {actionManager.renderAction("deleteSelectedElements")}
-          </div>
-        </Island>
+          <fieldset>
+            <legend>{t("labels.layers")}</legend>
+            <div className="buttonList">
+              {actionManager.renderAction("sendToBack")}
+              {actionManager.renderAction("sendBackward")}
+              {actionManager.renderAction("bringToFront")}
+              {actionManager.renderAction("bringForward")}
+            </div>
+          </fieldset>
+        </div>
       );
     }
 
@@ -378,9 +390,136 @@ const LayerUI = React.memo(
       );
     }
 
-    return (
+    return isMobile ? (
+      <>
+        {appState.openedMenu === "canvas" ? (
+          <section
+            className="App-mobile-menu"
+            aria-labelledby="canvas-actions-title"
+          >
+            <h2 className="visually-hidden" id="canvas-actions-title">
+              {t("headings.canvasActions")}
+            </h2>
+            <div className="App-mobile-menu-scroller panelColumn">
+              <Stack.Col gap={4}>
+                {actionManager.renderAction("loadScene")}
+                {actionManager.renderAction("saveScene")}
+                {renderExportDialog()}
+                {actionManager.renderAction("clearCanvas")}
+                {actionManager.renderAction("changeViewBackgroundColor")}
+                <fieldset>
+                  <legend>{t("labels.language")}</legend>
+                  <LanguageList
+                    onChange={lng => {
+                      setLanguage(lng);
+                      setAppState({});
+                    }}
+                    languages={languages}
+                    currentLanguage={language}
+                  />
+                </fieldset>
+              </Stack.Col>
+            </div>
+          </section>
+        ) : appState.openedMenu === "shape" && showSelectedShapeActions ? (
+          <section
+            className="App-mobile-menu"
+            aria-labelledby="selected-shape-title"
+          >
+            <h2 className="visually-hidden" id="selected-shape-title">
+              {t("headings.selectedShapeActions")}
+            </h2>
+            <div className="App-mobile-menu-scroller">
+              {renderSelectedShapeActions()}
+            </div>
+          </section>
+        ) : null}
+        <FixedSideContainer side="top">
+          <section aria-labelledby="shapes-title">
+            <Stack.Col gap={4} align="center">
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  <h2 className="visually-hidden" id="shapes-title">
+                    {t("headings.shapes")}
+                  </h2>
+                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                </Island>
+              </Stack.Row>
+            </Stack.Col>
+          </section>
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
+        </FixedSideContainer>
+        <footer className="App-toolbar">
+          <div className="App-toolbar-content">
+            {appState.multiElement ? (
+              <>
+                {actionManager.renderAction("deleteSelectedElements")}
+                <ToolButton
+                  visible={showSelectedShapeActions}
+                  type="button"
+                  icon={palette}
+                  aria-label={t("buttons.edit")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
+                {actionManager.renderAction("finalize")}
+              </>
+            ) : (
+              <>
+                <ToolButton
+                  type="button"
+                  icon={menu}
+                  aria-label={t("buttons.menu")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "canvas" ? null : "canvas",
+                    }))
+                  }
+                />
+                <ToolButton
+                  visible={showSelectedShapeActions}
+                  type="button"
+                  icon={palette}
+                  aria-label={t("buttons.edit")}
+                  onClick={() =>
+                    setAppState(({ openedMenu }: any) => ({
+                      openedMenu: openedMenu === "shape" ? null : "shape",
+                    }))
+                  }
+                />
+                {actionManager.renderAction("deleteSelectedElements")}
+                {appState.scrolledOutside && (
+                  <button
+                    className="scroll-back-to-content"
+                    onClick={() => {
+                      setAppState({ ...calculateScrollCenter(elements) });
+                    }}
+                  >
+                    {t("buttons.scrollBackToContent")}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </footer>
+      </>
+    ) : (
       <>
         <FixedSideContainer side="top">
+          <HintViewer
+            elementType={appState.elementType}
+            multiMode={appState.multiElement !== null}
+            isResizing={appState.isResizing}
+            elements={elements}
+          />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
               <section
@@ -390,17 +529,29 @@ const LayerUI = React.memo(
                 <h2 className="visually-hidden" id="canvas-actions-title">
                   {t("headings.canvasActions")}
                 </h2>
-                <Island padding={4}>{renderCanvasActions()}</Island>
+                <Island padding={4}>
+                  <Stack.Col gap={4}>
+                    <Stack.Row justifyContent={"space-between"}>
+                      {actionManager.renderAction("loadScene")}
+                      {actionManager.renderAction("saveScene")}
+                      {renderExportDialog()}
+                      {actionManager.renderAction("clearCanvas")}
+                    </Stack.Row>
+                    {actionManager.renderAction("changeViewBackgroundColor")}
+                  </Stack.Col>
+                </Island>
               </section>
-              <section
-                className="App-right-menu"
-                aria-labelledby="selected-shape-title"
-              >
-                <h2 className="visually-hidden" id="selected-shape-title">
-                  {t("headings.selectedShapeActions")}
-                </h2>
-                {renderSelectedShapeActions(elements)}
-              </section>
+              {showSelectedShapeActions && (
+                <section
+                  className="App-right-menu"
+                  aria-labelledby="selected-shape-title"
+                >
+                  <h2 className="visually-hidden" id="selected-shape-title">
+                    {t("headings.selectedShapeActions")}
+                  </h2>
+                  <Island padding={4}>{renderSelectedShapeActions()}</Island>
+                </section>
+              )}
             </Stack.Col>
             <section aria-labelledby="shapes-title">
               <Stack.Col gap={4} align="start">
@@ -422,6 +573,7 @@ const LayerUI = React.memo(
                       });
                     }}
                     title={t("toolBar.lock")}
+                    isButton={isMobile}
                   />
                 </Stack.Row>
               </Stack.Col>
@@ -440,12 +592,6 @@ const LayerUI = React.memo(
           </div>
         </FixedSideContainer>
         <footer role="contentinfo">
-          <HintViewer
-            elementType={appState.elementType}
-            multiMode={appState.multiElement !== null}
-            isResizing={appState.isResizing}
-            elements={elements}
-          />
           <LanguageList
             onChange={lng => {
               setLanguage(lng);
@@ -453,6 +599,7 @@ const LayerUI = React.memo(
             }}
             languages={languages}
             currentLanguage={language}
+            floating
           />
           {appState.scrolledOutside && (
             <button
@@ -652,6 +799,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
+    elements = elements.map(el => ({ ...el, shape: null }));
     this.setState({});
   };
 
@@ -733,7 +881,7 @@ export class App extends React.Component<any, AppState> {
           this.setState({ ...data.appState });
         }
       }
-    } else if (event.key === KEYS.SPACE && !isHoldingMouseButton) {
+    } else if (event.key === KEYS.SPACE && gesture.pointers.length === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
@@ -826,6 +974,10 @@ export class App extends React.Component<any, AppState> {
   setElements = (elements_: readonly ExcalidrawElement[]) => {
     elements = elements_;
     this.setState({});
+  };
+
+  removePointer = (e: React.PointerEvent<HTMLElement>) => {
+    gesture.pointers = gesture.pointers.filter(p => p.id !== e.pointerId);
   };
 
   public render() {
@@ -930,69 +1082,93 @@ export class App extends React.Component<any, AppState> {
                 left: e.clientX,
               });
             }}
-            onMouseDown={e => {
-              if (lastMouseUp !== null) {
-                // Unfortunately, sometimes we don't get a mouseup after a mousedown,
+            onPointerDown={e => {
+              if (lastPointerUp !== null) {
+                // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
                 // this can happen when a contextual menu or alert is triggered. In order to avoid
-                // being in a weird state, we clean up on the next mousedown
-                lastMouseUp(e);
+                // being in a weird state, we clean up on the next pointerdown
+                lastPointerUp(e);
               }
 
               if (isPanning) {
                 return;
               }
 
+              this.setState({ lastPointerDownWith: e.pointerType });
+
               // pan canvas on wheel button drag or space+drag
               if (
-                !isHoldingMouseButton &&
-                (e.button === MOUSE_BUTTON.WHEEL ||
-                  (e.button === MOUSE_BUTTON.MAIN && isHoldingSpace))
+                gesture.pointers.length === 0 &&
+                (e.button === POINTER_BUTTON.WHEEL ||
+                  (e.button === POINTER_BUTTON.MAIN && isHoldingSpace))
               ) {
-                isHoldingMouseButton = true;
                 isPanning = true;
                 document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
                 let { clientX: lastX, clientY: lastY } = e;
-                const onMouseMove = (e: MouseEvent) => {
+                const onPointerMove = (e: PointerEvent) => {
                   const deltaX = lastX - e.clientX;
                   const deltaY = lastY - e.clientY;
                   lastX = e.clientX;
                   lastY = e.clientY;
 
                   this.setState({
-                    scrollX: this.state.scrollX - deltaX / this.state.zoom,
-                    scrollY: this.state.scrollY - deltaY / this.state.zoom,
+                    scrollX: normalizeScroll(
+                      this.state.scrollX - deltaX / this.state.zoom,
+                    ),
+                    scrollY: normalizeScroll(
+                      this.state.scrollY - deltaY / this.state.zoom,
+                    ),
                   });
                 };
-                const teardown = (lastMouseUp = () => {
-                  lastMouseUp = null;
+                const teardown = (lastPointerUp = () => {
+                  lastPointerUp = null;
                   isPanning = false;
-                  isHoldingMouseButton = false;
                   if (!isHoldingSpace) {
                     setCursorForShape(this.state.elementType);
                   }
-                  window.removeEventListener("mousemove", onMouseMove);
-                  window.removeEventListener("mouseup", teardown);
+                  window.removeEventListener("pointermove", onPointerMove);
+                  window.removeEventListener("pointerup", teardown);
                   window.removeEventListener("blur", teardown);
                 });
                 window.addEventListener("blur", teardown);
-                window.addEventListener("mousemove", onMouseMove, {
+                window.addEventListener("pointermove", onPointerMove, {
                   passive: true,
                 });
-                window.addEventListener("mouseup", teardown);
+                window.addEventListener("pointerup", teardown);
                 return;
               }
 
-              // only handle left mouse button
-              if (e.button !== MOUSE_BUTTON.MAIN) {
+              // only handle left mouse button or touch
+              if (
+                e.button !== POINTER_BUTTON.MAIN &&
+                e.button !== POINTER_BUTTON.TOUCH
+              ) {
                 return;
               }
-              // fixes mousemove causing selection of UI texts #32
+
+              gesture.pointers.push({
+                id: e.pointerId,
+                x: e.clientX,
+                y: e.clientY,
+              });
+              if (gesture.pointers.length === 2) {
+                gesture.lastCenter = getCenter(gesture.pointers);
+                gesture.initialScale = this.state.zoom;
+                gesture.initialDistance = getDistance(gesture.pointers);
+              }
+
+              // fixes pointermove causing selection of UI texts #32
               e.preventDefault();
               // Preventing the event above disables default behavior
               //  of defocusing potentially focused element, which is what we
               //  want when clicking inside the canvas.
               if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur();
+              }
+
+              // don't select while panning
+              if (gesture.pointers.length > 1) {
+                return;
               }
 
               // Handle scrollbars dragging
@@ -1048,6 +1224,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
 
                 const selectedElements = getSelectedElements(elements);
@@ -1087,7 +1264,7 @@ export class App extends React.Component<any, AppState> {
                       elementIsAddedToSelection = true;
                     }
 
-                    // We duplicate the selected element if alt is pressed on Mouse down
+                    // We duplicate the selected element if alt is pressed on pointer down
                     if (e.altKey) {
                       elements = [
                         ...elements.map(element => ({
@@ -1113,6 +1290,9 @@ export class App extends React.Component<any, AppState> {
                 //  of state.elementLocked)
                 if (this.state.editingElement?.type === "text") {
                   return;
+                }
+                if (elementIsAddedToSelection) {
+                  element = hitElement!;
                 }
                 let textX = e.clientX;
                 let textY = e.clientY;
@@ -1187,7 +1367,8 @@ export class App extends React.Component<any, AppState> {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
-                  multiElement.isSelected = true;
+                  //force LayerUI rerender
+                  elements = elements.slice();
                   multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
                 } else {
@@ -1223,8 +1404,8 @@ export class App extends React.Component<any, AppState> {
                     p1: Point,
                     deltaX: number,
                     deltaY: number,
-                    mouseX: number,
-                    mouseY: number,
+                    pointerX: number,
+                    pointerY: number,
                     perfect: boolean,
                   ) => void)
                 | null = null;
@@ -1234,8 +1415,8 @@ export class App extends React.Component<any, AppState> {
                 p1: Point,
                 deltaX: number,
                 deltaY: number,
-                mouseX: number,
-                mouseY: number,
+                pointerX: number,
+                pointerY: number,
                 perfect: boolean,
               ) => {
                 if (perfect) {
@@ -1244,8 +1425,8 @@ export class App extends React.Component<any, AppState> {
 
                   const { width, height } = getPerfectElementSize(
                     element.type,
-                    mouseX - element.x - p1[0],
-                    mouseY - element.y - p1[1],
+                    pointerX - element.x - p1[0],
+                    pointerY - element.y - p1[1],
                   );
 
                   const dx = element.x + width + p1[0];
@@ -1267,15 +1448,15 @@ export class App extends React.Component<any, AppState> {
                 p1: Point,
                 deltaX: number,
                 deltaY: number,
-                mouseX: number,
-                mouseY: number,
+                pointerX: number,
+                pointerY: number,
                 perfect: boolean,
               ) => {
                 if (perfect) {
                   const { width, height } = getPerfectElementSize(
                     element.type,
-                    mouseX - element.x,
-                    mouseY - element.y,
+                    pointerX - element.x,
+                    pointerY - element.y,
                   );
                   p1[0] = width;
                   p1[1] = height;
@@ -1285,7 +1466,7 @@ export class App extends React.Component<any, AppState> {
                 }
               };
 
-              const onMouseMove = (e: MouseEvent) => {
+              const onPointerMove = (e: PointerEvent) => {
                 const target = e.target;
                 if (!(target instanceof HTMLElement)) {
                   return;
@@ -1295,7 +1476,9 @@ export class App extends React.Component<any, AppState> {
                   const x = e.clientX;
                   const dx = x - lastX;
                   this.setState({
-                    scrollX: this.state.scrollX - dx / this.state.zoom,
+                    scrollX: normalizeScroll(
+                      this.state.scrollX - dx / this.state.zoom,
+                    ),
                   });
                   lastX = x;
                   return;
@@ -1305,7 +1488,9 @@ export class App extends React.Component<any, AppState> {
                   const y = e.clientY;
                   const dy = y - lastY;
                   this.setState({
-                    scrollY: this.state.scrollY - dy / this.state.zoom,
+                    scrollY: normalizeScroll(
+                      this.state.scrollY - dy / this.state.zoom,
+                    ),
                   });
                   lastY = y;
                   return;
@@ -1314,7 +1499,7 @@ export class App extends React.Component<any, AppState> {
                 // for arrows, don't start dragging until a given threshold
                 //  to ensure we don't create a 2-point arrow by mistake when
                 //  user clicks mouse in a way that it moves a tiny bit (thus
-                //  triggering mousemove)
+                //  triggering pointermove)
                 if (
                   !draggingOccurred &&
                   (this.state.elementType === "arrow" ||
@@ -1558,7 +1743,7 @@ export class App extends React.Component<any, AppState> {
 
                 if (hitElement?.isSelected) {
                   // Marking that click was used for dragging to check
-                  // if elements should be deselected on mouseup
+                  // if elements should be deselected on pointerup
                   draggingOccurred = true;
                   const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length > 0) {
@@ -1657,7 +1842,7 @@ export class App extends React.Component<any, AppState> {
                 this.setState({});
               };
 
-              const onMouseUp = (e: MouseEvent) => {
+              const onPointerUp = (e: PointerEvent) => {
                 const {
                   draggingElement,
                   resizingElement,
@@ -1673,10 +1858,9 @@ export class App extends React.Component<any, AppState> {
                 });
 
                 resizeArrowFn = null;
-                lastMouseUp = null;
-                isHoldingMouseButton = false;
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("mouseup", onMouseUp);
+                lastPointerUp = null;
+                window.removeEventListener("pointermove", onPointerMove);
+                window.removeEventListener("pointerup", onPointerUp);
 
                 if (elementType === "arrow" || elementType === "line") {
                   if (draggingElement!.points.length > 1) {
@@ -1717,7 +1901,7 @@ export class App extends React.Component<any, AppState> {
                   draggingElement &&
                   isInvisiblySmallElement(draggingElement)
                 ) {
-                  // remove invisible element which was added in onMouseDown
+                  // remove invisible element which was added in onPointerDown
                   elements = elements.slice(0, -1);
                   this.setState({
                     draggingElement: null,
@@ -1749,7 +1933,7 @@ export class App extends React.Component<any, AppState> {
                 // from hitted element
                 //
                 // If click occurred and elements were dragged or some element
-                // was added to selection (on mousedown phase) we need to keep
+                // was added to selection (on pointerdown phase) we need to keep
                 // selection unchanged
                 if (
                   hitElement &&
@@ -1795,10 +1979,10 @@ export class App extends React.Component<any, AppState> {
                 }
               };
 
-              lastMouseUp = onMouseUp;
+              lastPointerUp = onPointerUp;
 
-              window.addEventListener("mousemove", onMouseMove);
-              window.addEventListener("mouseup", onMouseUp);
+              window.addEventListener("pointermove", onPointerMove);
+              window.addEventListener("pointerup", onPointerUp);
             }}
             onDoubleClick={e => {
               resetCursor();
@@ -1915,7 +2099,39 @@ export class App extends React.Component<any, AppState> {
                 },
               });
             }}
-            onMouseMove={e => {
+            onPointerMove={e => {
+              gesture.pointers = gesture.pointers.map(p =>
+                p.id === e.pointerId
+                  ? {
+                      id: e.pointerId,
+                      x: e.clientX,
+                      y: e.clientY,
+                    }
+                  : p,
+              );
+
+              if (gesture.pointers.length === 2) {
+                const center = getCenter(gesture.pointers);
+                const deltaX = center.x - gesture.lastCenter!.x;
+                const deltaY = center.y - gesture.lastCenter!.y;
+                gesture.lastCenter = center;
+
+                const distance = getDistance(gesture.pointers);
+                const scaleFactor = distance / gesture.initialDistance!;
+
+                this.setState({
+                  scrollX: normalizeScroll(
+                    this.state.scrollX + deltaX / this.state.zoom,
+                  ),
+                  scrollY: normalizeScroll(
+                    this.state.scrollY + deltaY / this.state.zoom,
+                  ),
+                  zoom: getNormalizedZoom(gesture.initialScale! * scaleFactor),
+                });
+              } else {
+                gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
+              }
+
               if (isHoldingSpace || isPanning) {
                 return;
               }
@@ -1952,6 +2168,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
+                  e.pointerType,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
@@ -1968,6 +2185,8 @@ export class App extends React.Component<any, AppState> {
               );
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
+            onPointerUp={this.removePointer}
+            onPointerLeave={this.removePointer}
             onDrop={e => {
               const file = e.dataTransfer.files[0];
               if (file?.type === "application/json") {
@@ -2005,8 +2224,8 @@ export class App extends React.Component<any, AppState> {
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: scrollX - deltaX / zoom,
-      scrollY: scrollY - deltaY / zoom,
+      scrollX: normalizeScroll(scrollX - deltaX / zoom),
+      scrollY: normalizeScroll(scrollY - deltaY / zoom),
     }));
   };
 
@@ -2070,10 +2289,7 @@ export class App extends React.Component<any, AppState> {
   }
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(
-      elements.filter(x => x.type !== "selection"),
-      this.state,
-    );
+    saveToLocalStorage(elements, this.state);
   }, 300);
 
   componentDidUpdate() {
@@ -2087,6 +2303,9 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
+      },
+      {
+        renderOptimizations: true,
       },
     );
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
@@ -2195,7 +2414,9 @@ class TopErrorBoundary extends React.Component {
 
 ReactDOM.render(
   <TopErrorBoundary>
-    <App />
+    <IsMobileProvider>
+      <App />
+    </IsMobileProvider>
   </TopErrorBoundary>,
   rootElement,
 );

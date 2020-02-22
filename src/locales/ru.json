@@ -39,7 +39,9 @@
     "fileTitle": "Название файла",
     "colorPicker": "Выбор цвета",
     "canvasBackground": "Фон холста",
-    "drawingCanvas": "Рисование холста"
+    "drawingCanvas": "Рисование холста",
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",
@@ -51,14 +53,21 @@
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
-    "selectLanguage": "Выбрать язык"
+    "selectLanguage": "Выбрать язык",
+    "scrollBackToContent": "Scroll back to content",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
     "couldNotCreateShareableLink": "Не удалось создать общедоступную ссылку.",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
-    "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome."
+    "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -74,5 +83,10 @@
     "canvasActions": "Операции холста",
     "selectedShapeActions": "Операции выбранной фигуры",
     "shapes": "Фигуры"
+  },
+  "hints": {
+    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElementMulti": "Press Escape or Enter to finish",
+    "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }

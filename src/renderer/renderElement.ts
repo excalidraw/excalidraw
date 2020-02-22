@@ -1,18 +1,111 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { isTextElement } from "../element/typeChecks";
-import { getDiamondPoints, getArrowPoints } from "../element/bounds";
+import {
+  getDiamondPoints,
+  getArrowPoints,
+  getElementAbsoluteCoords,
+} from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
-import { SVG_NS } from "../utils";
+import { SceneState } from "../scene/types";
+import { SVG_NS, distance } from "../utils";
+import rough from "roughjs/bin/rough";
+
+const CANVAS_PADDING = 20;
+
+function generateElementCanvas(element: ExcalidrawElement, zoom: number) {
+  const canvas = document.createElement("canvas");
+  var context = canvas.getContext("2d")!;
+
+  const isLinear = /\b(arrow|line)\b/.test(element.type);
+
+  if (isLinear) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    canvas.width =
+      distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    canvas.height =
+      distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+
+    element.canvasOffsetX =
+      element.x > x1
+        ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
+        : 0;
+    element.canvasOffsetY =
+      element.y > y1
+        ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
+        : 0;
+    context.translate(
+      element.canvasOffsetX * zoom,
+      element.canvasOffsetY * zoom,
+    );
+  } else {
+    canvas.width =
+      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    canvas.height =
+      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+  }
+
+  context.translate(CANVAS_PADDING, CANVAS_PADDING);
+  context.scale(window.devicePixelRatio * zoom, window.devicePixelRatio * zoom);
+
+  const rc = rough.canvas(canvas);
+  drawElementOnCanvas(element, rc, context);
+  element.canvas = canvas;
+  element.canvasZoom = zoom;
+  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+}
+
+function drawElementOnCanvas(
+  element: ExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) {
+  context.globalAlpha = element.opacity / 100;
+  switch (element.type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse": {
+      rc.draw(element.shape as Drawable);
+      break;
+    }
+    case "arrow":
+    case "line": {
+      (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
+      break;
+    }
+    default: {
+      if (isTextElement(element)) {
+        const font = context.font;
+        context.font = element.font;
+        const fillStyle = context.fillStyle;
+        context.fillStyle = element.strokeColor;
+        // Canvas does not support multiline text by default
+        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lineHeight = element.height / lines.length;
+        const offset = element.height - element.baseline;
+        for (let i = 0; i < lines.length; i++) {
+          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+        }
+        context.fillStyle = fillStyle;
+        context.font = font;
+      } else {
+        throw new Error(`Unimplemented type ${element.type}`);
+      }
+    }
+  }
+  context.globalAlpha = 1;
+}
 
 function generateElement(
   element: ExcalidrawElement,
   generator: RoughGenerator,
+  sceneState?: SceneState,
 ) {
   if (!element.shape) {
+    element.canvas = null;
     switch (element.type) {
       case "rectangle":
         element.shape = generator.rectangle(
@@ -32,6 +125,7 @@ function generateElement(
             seed: element.seed,
           },
         );
+
         break;
       case "diamond": {
         const [
@@ -115,18 +209,64 @@ function generateElement(
         }
         break;
       }
+      case "text": {
+        // just to ensure we don't regenerate element.canvas on rerenders
+        element.shape = [];
+        break;
+      }
     }
   }
+  const zoom = sceneState ? sceneState.zoom : 1;
+  if (!element.canvas || element.canvasZoom !== zoom) {
+    generateElementCanvas(element, zoom);
+  }
+}
+
+function drawElementFromCanvas(
+  element: ExcalidrawElement | ExcalidrawTextElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+) {
+  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+  context.translate(
+    -CANVAS_PADDING / sceneState.zoom,
+    -CANVAS_PADDING / sceneState.zoom,
+  );
+  context.drawImage(
+    element.canvas!,
+    Math.floor(
+      -element.canvasOffsetX +
+        (Math.floor(element.x) + sceneState.scrollX) * window.devicePixelRatio,
+    ),
+    Math.floor(
+      -element.canvasOffsetY +
+        (Math.floor(element.y) + sceneState.scrollY) * window.devicePixelRatio,
+    ),
+    element.canvas!.width / sceneState.zoom,
+    element.canvas!.height / sceneState.zoom,
+  );
+  context.translate(
+    CANVAS_PADDING / sceneState.zoom,
+    CANVAS_PADDING / sceneState.zoom,
+  );
+  context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
 export function renderElement(
   element: ExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  renderOptimizations: boolean,
+  sceneState: SceneState,
 ) {
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
+      context.translate(
+        element.x + sceneState.scrollX,
+        element.y + sceneState.scrollY,
+      );
       const fillStyle = context.fillStyle;
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
       context.fillRect(0, 0, element.width, element.height);
@@ -136,39 +276,24 @@ export function renderElement(
     case "rectangle":
     case "diamond":
     case "ellipse":
-      generateElement(element, generator);
-      context.globalAlpha = element.opacity / 100;
-      rc.draw(element.shape as Drawable);
-      context.globalAlpha = 1;
-      break;
     case "line":
-    case "arrow": {
-      generateElement(element, generator);
-      context.globalAlpha = element.opacity / 100;
-      (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
-      context.globalAlpha = 1;
+    case "arrow":
+    case "text": {
+      generateElement(element, generator, sceneState);
+
+      if (renderOptimizations) {
+        drawElementFromCanvas(element, rc, context, sceneState);
+      } else {
+        const offsetX = Math.floor(element.x + sceneState.scrollX);
+        const offsetY = Math.floor(element.y + sceneState.scrollY);
+        context.translate(offsetX, offsetY);
+        drawElementOnCanvas(element, rc, context);
+        context.translate(-offsetX, -offsetY);
+      }
       break;
     }
     default: {
-      if (isTextElement(element)) {
-        context.globalAlpha = element.opacity / 100;
-        const font = context.font;
-        context.font = element.font;
-        const fillStyle = context.fillStyle;
-        context.fillStyle = element.strokeColor;
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const offset = element.height - element.baseline;
-        for (let i = 0; i < lines.length; i++) {
-          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
-        }
-        context.fillStyle = fillStyle;
-        context.font = font;
-        context.globalAlpha = 1;
-      } else {
-        throw new Error(`Unimplemented type ${element.type}`);
-      }
+      throw new Error(`Unimplemented type ${element.type}`);
     }
   }
 }

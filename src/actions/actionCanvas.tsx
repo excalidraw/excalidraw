@@ -7,6 +7,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { KEYS } from "../keys";
+import useIsMobile from "../is-mobile";
 
 export const actionChangeViewBackgroundColor: Action = {
   name: "changeViewBackgroundColor",
@@ -43,6 +44,7 @@ export const actionClearCanvas: Action = {
       icon={trash}
       title={t("buttons.clearReset")}
       aria-label={t("buttons.clearReset")}
+      showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
           // TODO: Defined globally, since file handles aren't yet serializable.

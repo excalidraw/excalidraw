@@ -3,6 +3,10 @@ import { KEYS } from "../keys";
 import { clearSelection } from "../scene";
 import { isInvisiblySmallElement } from "../element";
 import { resetCursor } from "../utils";
+import React from "react";
+import { ToolButton } from "../components/ToolButton";
+import { done } from "../components/icons";
+import { t } from "../i18n";
 
 export const actionFinalize: Action = {
   name: "finalize",
@@ -12,14 +16,20 @@ export const actionFinalize: Action = {
       window.document.activeElement.blur();
     }
     if (appState.multiElement) {
-      appState.multiElement.points = appState.multiElement.points.slice(
-        0,
-        appState.multiElement.points.length - 1,
-      );
+      // pen and mouse have hover
+      if (appState.lastPointerDownWith !== "touch") {
+        appState.multiElement.points = appState.multiElement.points.slice(
+          0,
+          appState.multiElement.points.length - 1,
+        );
+      }
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
       }
       appState.multiElement.shape = null;
+      if (!appState.elementLocked) {
+        appState.multiElement.isSelected = true;
+      }
     }
     if (!appState.elementLocked || !appState.multiElement) {
       resetCursor();
@@ -43,4 +53,19 @@ export const actionFinalize: Action = {
       appState.multiElement === null) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
+  PanelComponent: ({ appState, updateData }) => (
+    <div
+      style={{
+        visibility: appState.multiElement != null ? "visible" : "hidden",
+      }}
+    >
+      <ToolButton
+        type="button"
+        icon={done}
+        title={t("buttons.done")}
+        aria-label={t("buttons.done")}
+        onClick={() => updateData(null)}
+      />
+    </div>
+  ),
 };

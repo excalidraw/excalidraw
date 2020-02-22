@@ -3,6 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
+import { normalizeScroll } from "./data";
 
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
@@ -42,15 +43,14 @@ export function exportToCanvas(
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0,
+      scrollX: normalizeScroll(-minX + exportPadding),
+      scrollY: normalizeScroll(-minY + exportPadding),
       zoom: 1,
     },
     {
-      offsetX: -minX + exportPadding,
-      offsetY: -minY + exportPadding,
       renderScrollbars: false,
       renderSelection: false,
+      renderOptimizations: false,
     },
   );
   return tempCanvas;

@@ -40,7 +40,8 @@
     "colorPicker": "Fargevelger",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
-    "layers": "Lag"
+    "layers": "Lag",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -53,7 +54,12 @@
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
     "selectLanguage": "Velg språk",
-    "scrollBackToContent": "Skroll tilbake til innhold"
+    "scrollBackToContent": "Skroll tilbake til innhold",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",

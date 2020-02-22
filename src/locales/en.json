@@ -40,10 +40,11 @@
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers"
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
-    "clearReset": "Clear the canvas & reset background color",
+    "clearReset": "Reset the canvas",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
@@ -57,6 +58,9 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom"
+    "menu": "Menu",
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

@@ -2,8 +2,27 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  --ui-font: Arial, Helvetica, sans-serif;
+  font-family: var(--ui-font);
   color: var(--text-color-primary);
+  -webkit-text-size-adjust: 100%;
+  user-select: none;
+}
+[contenteditable] {
+  user-select: auto;
+  cursor: text;
+}
+
+canvas {
+  touch-action: none;
+  user-select: none;
+
+  // following props improve blurriness at certain devicePixelRatios.
+  // AFAIK it doesn't affect export (in fact, export seems sharp either way).
+
+  image-rendering: pixelated; // chromium
+  // NOTE: must be declared *after* the above
+  image-rendering: -moz-crisp-edges; // FF
 }
 
 .container {
@@ -13,6 +32,11 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.panelRow {
+  display: flex;
+  justify-content: space-between;
 }
 
 .panelColumn {
@@ -82,6 +106,7 @@ input:focus {
 
 button,
 .buttonList label {
+  user-select: none;
   background-color: #e9ecef;
   border: 0;
   border-radius: 4px;
@@ -117,6 +142,45 @@ button,
   &:active {
     background-color: #adb5bd;
   }
+}
+
+.App-toolbar,
+.App-mobile-menu {
+  --spacing: 0.5rem;
+  --padding: calc(4 * var(--space-factor));
+  padding: var(--padding);
+  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
+  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
+  background: #fcfcfc;
+  border-top: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.App-toolbar {
+  padding-bottom: #{"max(var(--padding), env(safe-area-inset-bottom))"};
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  position: absolute;
+  bottom: 0;
+}
+.App-toolbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.App-mobile-menu {
+  --bottom: calc(3rem - 1px + max(var(--padding), env(safe-area-inset-bottom)));
+  display: grid;
+  position: fixed;
+  width: 100%;
+  bottom: var(--bottom);
+  z-index: 4;
+  max-height: calc(100% - var(--bottom));
+  overflow-y: scroll;
+}
+.App-mobile-menu .App-mobile-menu-scroller {
+  background: #fcfcfc;
+  box-shadow: none;
 }
 
 .App-menu {
@@ -227,12 +291,7 @@ button,
 }
 
 .dropdown-select {
-  position: absolute;
-  margin-bottom: 0.5em;
-  margin-right: 0.5em;
   height: 1.5rem;
-  right: 0;
-  bottom: 0;
   padding: 0 1.5rem 0 0.5rem;
   background-color: #e9ecef;
   border-radius: var(--space-factor);
@@ -256,10 +315,14 @@ button,
   &:active {
     background-color: #ced4da;
   }
+  &.dropdown-select--floating {
+    position: absolute;
+    margin-bottom: 0.5em;
+    margin-right: 0.5em;
+  }
 }
 
-.language-select {
-  @extend .dropdown-select;
+.dropdown-select__language.dropdown-select--floating {
   right: 0;
   bottom: 0;
 }
@@ -290,7 +353,17 @@ button,
 .scroll-back-to-content {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
+}
+
+@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
+  aside {
+    display: none;
+  }
+  .scroll-back-to-content {
+    bottom: 80px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
 }
