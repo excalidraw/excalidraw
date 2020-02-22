@@ -2322,7 +2322,7 @@ export class App extends React.Component<any, AppState> {
 const rootElement = document.getElementById("root");
 
 interface TopErrorBoundaryState {
-  unresolvedError: Error | null;
+  unresolvedError: Error[] | null;
   hasError: boolean;
   stack: string;
   localStorage: string;
@@ -2336,7 +2336,7 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
     localStorage: "",
   };
 
-  static getDerivedStateFromError(error: Error) {
+  componentDidCatch(error: Error) {
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
@@ -2345,25 +2345,32 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
         _localStorage[key] = value;
       }
     }
-    return {
+    this.setState(state => ({
       hasError: true,
-      unresolvedError: error,
+      unresolvedError: state.unresolvedError
+        ? state.unresolvedError.concat(error)
+        : [error],
       localStorage: JSON.stringify(_localStorage),
-    };
+    }));
   }
 
   async componentDidUpdate() {
     if (this.state.unresolvedError !== null) {
       const StackTrace = await import("stacktrace-js");
-      let stack = `${this.state.unresolvedError.message}:\n\n`;
-      try {
-        stack += (await StackTrace.fromError(this.state.unresolvedError)).join(
-          "\n",
-        );
-      } catch (err) {
-        console.error(err);
-        stack += this.state.unresolvedError.stack || "";
+      let stack = "";
+      for (const error of this.state.unresolvedError) {
+        if (stack) {
+          stack += `\n\n================\n\n`;
+        }
+        stack += `${error.message}:\n\n`;
+        try {
+          stack += (await StackTrace.fromError(error)).join("\n");
+        } catch (err) {
+          console.error(err);
+          stack += error.stack || "";
+        }
       }
+
       this.setState(state => ({
         unresolvedError: null,
         stack: `${
