@@ -55,6 +55,7 @@
 .ToolIcon_type_checkbox {
   position: absolute;
   opacity: 0;
+  pointer-events: none;
 
   &:hover + .ToolIcon__icon {
     background-color: #e9ecef;
