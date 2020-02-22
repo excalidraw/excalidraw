@@ -2321,13 +2321,15 @@ export class App extends React.Component<any, AppState> {
 
 const rootElement = document.getElementById("root");
 
-class TopErrorBoundary extends React.Component {
-  state: {
-    unresolvedError: Error | null;
-    hasError: boolean;
-    stack: string;
-    localStorage: string;
-  } = {
+interface TopErrorBoundaryState {
+  unresolvedError: Error | null;
+  hasError: boolean;
+  stack: string;
+  localStorage: string;
+}
+
+class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
+  state: TopErrorBoundaryState = {
     unresolvedError: null,
     hasError: false,
     stack: "",
@@ -2353,19 +2355,21 @@ class TopErrorBoundary extends React.Component {
   async componentDidUpdate() {
     if (this.state.unresolvedError !== null) {
       const StackTrace = await import("stacktrace-js");
-      let stack = "";
+      let stack = `${this.state.unresolvedError.message}:\n\n`;
       try {
-        stack = (await StackTrace.fromError(this.state.unresolvedError)).join(
+        stack += (await StackTrace.fromError(this.state.unresolvedError)).join(
           "\n",
         );
       } catch (err) {
         console.error(err);
-        stack = this.state.unresolvedError.stack || "";
+        stack += this.state.unresolvedError.stack || "";
       }
-      this.setState({
+      this.setState(state => ({
         unresolvedError: null,
-        stack,
-      });
+        stack: `${
+          state.stack ? `${state.stack}\n\n================\n\n${stack}` : stack
+        }`,
+      }));
     }
   }
 
@@ -2430,6 +2434,7 @@ class TopErrorBoundary extends React.Component {
                   <textarea
                     rows={10}
                     onPointerDown={this.selectTextArea}
+                    readOnly={true}
                     value={
                       this.state.unresolvedError
                         ? "Loading data. please wait..."
@@ -2440,6 +2445,7 @@ class TopErrorBoundary extends React.Component {
                   <textarea
                     rows={5}
                     onPointerDown={this.selectTextArea}
+                    readOnly={true}
                     value={this.state.localStorage}
                   />
                 </div>
