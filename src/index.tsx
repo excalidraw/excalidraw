@@ -2356,7 +2356,6 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
 
   async componentDidUpdate() {
     if (this.state.unresolvedError !== null) {
-      const StackTrace = await import("stacktrace-js");
       let stack = "";
       for (const error of this.state.unresolvedError) {
         if (stack) {
@@ -2364,6 +2363,7 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
         }
         stack += `${error.message}:\n\n`;
         try {
+          const StackTrace = await import("stacktrace-js");
           stack += (await StackTrace.fromError(error)).join("\n");
         } catch (err) {
           console.error(err);
