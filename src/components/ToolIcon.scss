@@ -1,10 +1,17 @@
+:root {
+  --button-gray-1: #e9ecef;
+  --button-gray-2: #ced4da;
+  --button-gray-3: #adb5bd;
+  --button-blue: #a5d8ff;
+}
+
 .ToolIcon {
   display: inline-flex;
   align-items: center;
   position: relative;
   font-family: Cascadia;
   cursor: pointer;
-  background-color: #e9ecef;
+  background-color: var(--button-gray-1);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -41,13 +48,13 @@
   font-size: inherit;
 
   &:hover {
-    background-color: #e9ecef;
+    background-color: var(--button-gray-1);
   }
   &:active {
-    background-color: #ced4da;
+    background-color: var(--button-gray-2);
   }
   &:focus {
-    box-shadow: 0 0 0 2px #a5d8ff;
+    box-shadow: 0 0 0 2px var(--button-blue);
   }
 }
 
@@ -56,17 +63,14 @@
   position: absolute;
   opacity: 0;
 
-  &:hover + .ToolIcon__icon {
-    background-color: #e9ecef;
-  }
   &:checked + .ToolIcon__icon {
-    background-color: #ced4da;
+    background-color: var(--button-gray-2);
   }
   &:focus + .ToolIcon__icon {
-    box-shadow: 0 0 0 2px #a5d8ff;
+    box-shadow: 0 0 0 2px var(--button-blue);
   }
   &:active + .ToolIcon__icon {
-    background-color: #adb5bd;
+    background-color: var(--button-gray-3);
   }
 }
 
@@ -104,7 +108,7 @@
   bottom: 2px;
   right: 3px;
   font-size: 0.5em;
-  color: #adb5bd; // OC GRAY 5
+  color: var(--button-gray-3); // OC GRAY 5
   font-family: var(--ui-font);
   user-select: none;
 }
