@@ -2338,6 +2338,7 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
   };
 
   componentDidCatch(error: Error) {
+    resetCursor();
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
@@ -2407,34 +2408,39 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
       return (
         <div className="ErrorSplash">
           <div className="ErrorSplash-messageContainer">
-            <div className="ErrorSplash-paragraph bigger">
-              Encountered an error. Please{" "}
+            <div className="ErrorSplash-paragraph bigger align-center">
+              Encountered an error. Try{" "}
               <button onClick={() => window.location.reload()}>
-                reload the page
+                reloading the page.
               </button>
-              .
             </div>
-            <div className="ErrorSplash-paragraph">
-              If reloading doesn't work. Try{" "}
+            <div className="ErrorSplash-paragraph align-center">
+              If reloading doesn't work, try{" "}
               <button
                 onClick={() => {
                   localStorage.clear();
                   window.location.reload();
                 }}
               >
-                clearing the canvas
+                clearing the canvas.
               </button>
-              .<br />
+              <br />
               <div className="smaller">
-                (This will unfortunately result in loss of work.)
+                <span role="img" aria-labelledby="warning">
+                  ⚠️
+                </span>{" "}
+                This will result in loss of work{" "}
+                <span role="img" aria-labelledby="warning">
+                  ⚠️
+                </span>
               </div>
             </div>
             <div>
               <div className="ErrorSplash-paragraph">
                 Before doing so, we'd appreciate if you opened an issue on our{" "}
-                <button onClick={this.createGithubIssue}>bug tracker</button>.
-                Please include the following error stack trace & localStorage
-                content (provided it's not private):
+                <button onClick={this.createGithubIssue}>bug tracker.</button>{" "}
+                Please include the following error stack trace (and if it's not
+                private, also the scene content):
               </div>
               <div className="ErrorSplash-paragraph">
                 <div className="ErrorSplash-details">
@@ -2449,7 +2455,7 @@ class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
                         : this.state.stack
                     }
                   />
-                  <label>LocalStorage content:</label>
+                  <label>Scene content:</label>
                   <textarea
                     rows={5}
                     onPointerDown={this.selectTextArea}
