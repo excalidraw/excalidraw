@@ -2322,19 +2322,58 @@ export class App extends React.Component<any, AppState> {
 const rootElement = document.getElementById("root");
 
 class TopErrorBoundary extends React.Component {
-  state = { hasError: false, stack: "", localStorage: "" };
+  state: {
+    unresolvedError: Error | null;
+    hasError: boolean;
+    stack: string;
+    localStorage: string;
+  } = {
+    unresolvedError: null,
+    hasError: false,
+    stack: "",
+    localStorage: "",
+  };
 
-  static getDerivedStateFromError(error: any) {
-    console.error(error);
+  static getDerivedStateFromError(error: Error) {
+    const _localStorage: any = {};
+    for (const [key, value] of Object.entries({ ...localStorage })) {
+      try {
+        _localStorage[key] = JSON.parse(value);
+      } catch (err) {
+        _localStorage[key] = value;
+      }
+    }
     return {
       hasError: true,
-      localStorage: JSON.stringify({ ...localStorage }),
-      stack: error.stack,
+      unresolvedError: error,
+      localStorage: JSON.stringify(_localStorage),
     };
   }
 
+  async componentDidUpdate() {
+    if (this.state.unresolvedError !== null) {
+      const StackTrace = await import("stacktrace-js");
+      let stack = "";
+      try {
+        stack = (await StackTrace.fromError(this.state.unresolvedError)).join(
+          "\n",
+        );
+      } catch (err) {
+        console.error(err);
+        stack = this.state.unresolvedError.stack || "";
+      }
+      this.setState({
+        unresolvedError: null,
+        stack,
+      });
+    }
+  }
+
   private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
-    (event.target as HTMLTextAreaElement).select();
+    if (event.target !== document.activeElement) {
+      event.preventDefault();
+      (event.target as HTMLTextAreaElement).select();
+    }
   }
 
   private async createGithubIssue() {
@@ -2390,14 +2429,18 @@ class TopErrorBoundary extends React.Component {
                   <label>Error stack trace:</label>
                   <textarea
                     rows={10}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.stack}
+                    onPointerDown={this.selectTextArea}
+                    value={
+                      this.state.unresolvedError
+                        ? "Loading data. please wait..."
+                        : this.state.stack
+                    }
                   />
                   <label>LocalStorage content:</label>
                   <textarea
                     rows={5}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.localStorage}
+                    onPointerDown={this.selectTextArea}
+                    value={this.state.localStorage}
                   />
                 </div>
               </div>
