@@ -1366,7 +1366,8 @@ export class App extends React.Component<any, AppState> {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
-                  multiElement.isSelected = true;
+                  //force LayerUI rerender
+                  elements = elements.slice();
                   multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
                 } else {
