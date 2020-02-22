@@ -398,6 +398,10 @@ function restore(
     savedState = { ...savedState, ...calculateScrollCenter(elements) };
   }
 
+  if (savedState) {
+    savedState.zoom = savedState.zoom || getDefaultAppState().zoom;
+  }
+
   return {
     elements: elements,
     appState: savedState,
