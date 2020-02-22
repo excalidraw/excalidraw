@@ -31,12 +31,19 @@ export class ProjectName extends Component<Props> {
       e.currentTarget.blur();
     }
   };
+  private makeEditable = (editable: HTMLSpanElement) => {
+    try {
+      editable.contentEditable = "plaintext-only";
+    } catch {
+      editable.contentEditable = "true";
+    }
+  };
 
   public render() {
     return (
       <span
         suppressContentEditableWarning
-        contentEditable={"plaintext-only" as any}
+        ref={this.makeEditable}
         data-type="wysiwyg"
         className="ProjectName"
         role="textbox"
