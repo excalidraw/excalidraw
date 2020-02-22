@@ -379,8 +379,9 @@ const LayerUI = React.memo(
       return (
         <Stack.Col gap={1}>
           <Stack.Row gap={1} align="center">
-            {actionManager.renderAction("zoomIn")}
-            {actionManager.renderAction("zoomOut")}
+            {actionManager.renderAction(actionZoomIn.name)}
+            {actionManager.renderAction(actionZoomOut.name)}
+            {actionManager.renderAction(actionResetZoom.name)}
             <div style={{ marginLeft: 4 }}>
               {(appState.zoom * 100).toFixed(0)}%
             </div>
