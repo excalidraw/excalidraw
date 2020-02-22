@@ -12,7 +12,8 @@
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-scripts": "3.4.0",
-    "roughjs": "4.0.4"
+    "roughjs": "4.0.4",
+    "stacktrace-js": "2.0.2"
   },
   "description": "",
   "devDependencies": {

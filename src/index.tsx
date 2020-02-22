@@ -2322,20 +2322,70 @@ export class App extends React.Component<any, AppState> {
 
 const rootElement = document.getElementById("root");
 
-class TopErrorBoundary extends React.Component {
-  state = { hasError: false, stack: "", localStorage: "" };
+interface TopErrorBoundaryState {
+  unresolvedError: Error[] | null;
+  hasError: boolean;
+  stack: string;
+  localStorage: string;
+}
 
-  static getDerivedStateFromError(error: any) {
-    console.error(error);
-    return {
+class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
+  state: TopErrorBoundaryState = {
+    unresolvedError: null,
+    hasError: false,
+    stack: "",
+    localStorage: "",
+  };
+
+  componentDidCatch(error: Error) {
+    const _localStorage: any = {};
+    for (const [key, value] of Object.entries({ ...localStorage })) {
+      try {
+        _localStorage[key] = JSON.parse(value);
+      } catch (err) {
+        _localStorage[key] = value;
+      }
+    }
+    this.setState(state => ({
       hasError: true,
-      localStorage: JSON.stringify({ ...localStorage }),
-      stack: error.stack,
-    };
+      unresolvedError: state.unresolvedError
+        ? state.unresolvedError.concat(error)
+        : [error],
+      localStorage: JSON.stringify(_localStorage),
+    }));
+  }
+
+  async componentDidUpdate() {
+    if (this.state.unresolvedError !== null) {
+      let stack = "";
+      for (const error of this.state.unresolvedError) {
+        if (stack) {
+          stack += `\n\n================\n\n`;
+        }
+        stack += `${error.message}:\n\n`;
+        try {
+          const StackTrace = await import("stacktrace-js");
+          stack += (await StackTrace.fromError(error)).join("\n");
+        } catch (err) {
+          console.error(err);
+          stack += error.stack || "";
+        }
+      }
+
+      this.setState(state => ({
+        unresolvedError: null,
+        stack: `${
+          state.stack ? `${state.stack}\n\n================\n\n${stack}` : stack
+        }`,
+      }));
+    }
   }
 
   private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
-    (event.target as HTMLTextAreaElement).select();
+    if (event.target !== document.activeElement) {
+      event.preventDefault();
+      (event.target as HTMLTextAreaElement).select();
+    }
   }
 
   private async createGithubIssue() {
@@ -2391,14 +2441,20 @@ class TopErrorBoundary extends React.Component {
                   <label>Error stack trace:</label>
                   <textarea
                     rows={10}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.stack}
+                    onPointerDown={this.selectTextArea}
+                    readOnly={true}
+                    value={
+                      this.state.unresolvedError
+                        ? "Loading data. please wait..."
+                        : this.state.stack
+                    }
                   />
                   <label>LocalStorage content:</label>
                   <textarea
                     rows={5}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.localStorage}
+                    onPointerDown={this.selectTextArea}
+                    readOnly={true}
+                    value={this.state.localStorage}
                   />
                 </div>
               </div>
