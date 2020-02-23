@@ -52,5 +52,9 @@ export const HintViewer = ({
     return null;
   }
 
-  return <div className="HintViewer">{hint}</div>;
+  return (
+    <div className="HintViewer">
+      <span>{hint}</span>
+    </div>
+  );
 };
