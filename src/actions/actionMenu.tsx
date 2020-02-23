@@ -13,12 +13,13 @@ export const actionToggleCanvasMenu: Action = {
       openedMenu: appState.openedMenu === "canvas" ? null : "canvas",
     },
   }),
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ appState, updateData }) => (
     <ToolButton
       type="button"
       icon={menu}
       aria-label={t("buttons.menu")}
       onClick={updateData}
+      selected={appState.openedMenu === "canvas"}
     />
   ),
 };
@@ -38,6 +39,7 @@ export const actionToggleEditMenu: Action = {
       icon={palette}
       aria-label={t("buttons.edit")}
       onClick={updateData}
+      selected={appState.openedMenu === "shape"}
     />
   ),
 };

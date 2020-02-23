@@ -56,6 +56,12 @@
   &:focus {
     box-shadow: 0 0 0 2px var(--button-blue);
   }
+  &.ToolIcon--selected {
+    background-color: var(--button-gray-2);
+    &:active {
+      background-color: var(--button-gray-3);
+    }
+  }
 }
 
 .ToolIcon_type_radio,
