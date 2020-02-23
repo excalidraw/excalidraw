@@ -2188,7 +2188,7 @@ export class App extends React.Component<any, AppState> {
     e.preventDefault();
     const { deltaX, deltaY } = e;
 
-    if (e[KEYS.META]) {
+    if (e.metaKey || e.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);
