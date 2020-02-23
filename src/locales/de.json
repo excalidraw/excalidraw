@@ -36,31 +36,31 @@
     "architect": "Architekt",
     "artist": "Künstler",
     "cartoonist": "Karikaturist",
-    "fileTitle": "File title",
-    "colorPicker": "Color picker",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
-    "language": "Language"
+    "fileTitle": "Dateiname",
+    "colorPicker": "Farbauswähler",
+    "canvasBackground": "Zeichenflächenhintergrund",
+    "drawingCanvas": "Zeichenfläche",
+    "layers": "Ebenen",
+    "language": "Sprache"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
-    "export": "Export",
+    "export": "Exportieren",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In die Zwischenablage kopieren",
     "save": "Speichern",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
-    "close": "Close",
-    "selectLanguage": "Select Language",
+    "close": "Schließen",
+    "selectLanguage": "Sprache auswählen",
     "scrollBackToContent": "Scroll back to content",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
-    "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "resetZoom": "Zoom zurücksetzen",
+    "menu": "Menü",
+    "done": "Fertig",
+    "edit": "Bearbeiten"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -78,7 +78,7 @@
     "arrow": "Pfeil",
     "line": "Linie",
     "text": "Text",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
   },
   "headings": {
     "canvasActions": "Canvas actions",
