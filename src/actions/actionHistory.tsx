@@ -24,20 +24,19 @@ const writeData = (
 const testUndo = (shift: boolean) => (
   event: KeyboardEvent,
   appState: AppState,
-) =>
-  event[KEYS.META] &&
-  /z/i.test(event.key) &&
-  [
-    appState.multiElement,
-    appState.resizingElement,
-    appState.editingElement,
-    appState.draggingElement,
-  ].every(x => x === null) &&
-  event.shiftKey === shift;
+) => event[KEYS.META] && /z/i.test(event.key) && event.shiftKey === shift;
 
 export const createUndoAction: (h: SceneHistory) => Action = history => ({
   name: "undo",
-  perform: (_, appState) => writeData(appState, history.undoOnce()),
+  perform: (_, appState) =>
+    [
+      appState.multiElement,
+      appState.resizingElement,
+      appState.editingElement,
+      appState.draggingElement,
+    ].every(x => x === null)
+      ? writeData(appState, history.undoOnce())
+      : {},
   keyTest: testUndo(false),
   PanelComponent: ({ updateData }) => (
     <ToolButton
@@ -52,7 +51,15 @@ export const createUndoAction: (h: SceneHistory) => Action = history => ({
 
 export const createRedoAction: (h: SceneHistory) => Action = history => ({
   name: "redo",
-  perform: (_, appState) => writeData(appState, history.redoOnce()),
+  perform: (_, appState) =>
+    [
+      appState.multiElement,
+      appState.resizingElement,
+      appState.editingElement,
+      appState.draggingElement,
+    ].every(x => x === null)
+      ? writeData(appState, history.redoOnce())
+      : {},
   keyTest: testUndo(true),
   PanelComponent: ({ updateData }) => (
     <ToolButton
