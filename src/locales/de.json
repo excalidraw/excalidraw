@@ -88,6 +88,6 @@
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "linearElementMulti": "Drücke zum Beenden Escape- oder Eingabetaste",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten"
   }
 }
