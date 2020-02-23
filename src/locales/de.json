@@ -54,7 +54,7 @@
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",
     "selectLanguage": "Sprache auswählen",
-    "scrollBackToContent": "Scroll back to content",
+    "scrollBackToContent": "Zurück zum Inhalt",
     "zoomIn": "Vergrößern",
     "zoomOut": "Verkleinern",
     "resetZoom": "Zoom zurücksetzen",
@@ -68,7 +68,7 @@
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert, sodass weder Excalidraw-Server noch Dritte den Inhalt einsehen können."
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -81,13 +81,13 @@
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "Aktionen für Zeichenfläche",
+    "selectedShapeActions": "Aktionen für Auswahl",
+    "shapes": "Formen"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
+    "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
+    "linearElementMulti": "Drücke zum Beenden Escape- oder Eingabetaste",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }
