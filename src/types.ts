@@ -47,3 +47,8 @@ export type Gesture = {
   initialDistance: number | null;
   initialScale: number | null;
 };
+
+export declare class GestureEvent extends UIEvent {
+  readonly rotation: number;
+  readonly scale: number;
+}

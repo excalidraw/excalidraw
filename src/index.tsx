@@ -42,7 +42,7 @@ import {
 } from "./scene";
 
 import { renderScene } from "./renderer";
-import { AppState, FlooredNumber, Gesture } from "./types";
+import { AppState, FlooredNumber, Gesture, GestureEvent } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
@@ -722,6 +722,19 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
 
+    // Safari-only desktop pinch zoom
+    document.addEventListener(
+      "gesturestart",
+      this.onGestureStart as any,
+      false,
+    );
+    document.addEventListener(
+      "gesturechange",
+      this.onGestureChange as any,
+      false,
+    );
+    document.addEventListener("gestureend", this.onGestureEnd as any, false);
+
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
@@ -761,6 +774,18 @@ export class App extends React.Component<any, AppState> {
     window.removeEventListener("blur", this.onUnload, false);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
+
+    document.removeEventListener(
+      "gesturestart",
+      this.onGestureStart as any,
+      false,
+    );
+    document.removeEventListener(
+      "gesturechange",
+      this.onGestureChange as any,
+      false,
+    );
+    document.removeEventListener("gestureend", this.onGestureEnd as any, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -905,6 +930,22 @@ export class App extends React.Component<any, AppState> {
     }
     this.setState({ elementType });
   }
+
+  private onGestureStart = (event: GestureEvent) => {
+    event.preventDefault();
+    gesture.initialScale = this.state.zoom;
+  };
+  private onGestureChange = (event: GestureEvent) => {
+    event.preventDefault();
+
+    this.setState({
+      zoom: getNormalizedZoom(gesture.initialScale! * event.scale),
+    });
+  };
+  private onGestureEnd = (event: GestureEvent) => {
+    event.preventDefault();
+    gesture.initialScale = null;
+  };
 
   setAppState = (obj: any) => {
     this.setState(obj);
