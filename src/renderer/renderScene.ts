@@ -169,8 +169,6 @@ export function renderScene(
         });
       resetZoom(context);
     }
-
-    return visibleElements.length > 0;
   }
 
   // Paint scrollbars
