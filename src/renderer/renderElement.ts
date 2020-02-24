@@ -314,7 +314,21 @@ export function renderElementToSvg(
     }
     case "rectangle":
     case "diamond":
-    case "ellipse":
+    case "ellipse": {
+      generateElement(element, generator);
+      const node = rsvg.draw(element.shape as Drawable);
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${offsetY || 0})`,
+      );
+      svgRoot.appendChild(node);
+      break;
+    }
     case "line":
     case "arrow": {
       generateElement(element, generator);
