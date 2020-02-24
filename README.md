@@ -3,7 +3,7 @@
     <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
   <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.</h3>
-  <h4>This version has no connection to the exxalidraw server and should be completely standalone.<h4>
+  <h4>This version has no connection to the excalidraw server and should be completely standalone.<h4>
 </div>
 
 ## Run the code
