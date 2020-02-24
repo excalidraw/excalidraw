@@ -36,12 +36,12 @@
     "architect": "Arquitecto",
     "artist": "Artista",
     "cartoonist": "Caricaturista",
-    "fileTitle": "File title",
-    "colorPicker": "Color picker",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
-    "language": "Language"
+    "fileTitle": "Título do arquivo",
+    "colorPicker": "Seletor de cores",
+    "canvasBackground": "Fundo da tela",
+    "drawingCanvas": "Tela de desenho",
+    "layers": "Camadas",
+    "language": "Idioma"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -52,15 +52,15 @@
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
-    "close": "Close",
-    "selectLanguage": "Select Language",
+    "close": "Fechar",
+    "selectLanguage": "Selecionar Idioma",
     "scrollBackToContent": "Voltar ao conteúdo",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
+    "zoomIn": "Aumentar zoom",
+    "zoomOut": "Afastar zoom",
+    "resetZoom": "Redefinir zoom",
     "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "done": "Concluído",
+    "edit": "Editar"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
@@ -68,7 +68,7 @@
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -78,16 +78,16 @@
     "arrow": "Flecha",
     "line": "Linha",
     "text": "Texto",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Manter a ferramenta selecionada ativa após desenhar"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "Ações da tela",
+    "selectedShapeActions": "Ações das formas selecionadas",
+    "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "linearElementMulti": "Pressione Escape ou Enter para concluir",
+    "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   }
 }
