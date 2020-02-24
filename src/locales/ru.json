@@ -86,8 +86,8 @@
     "shapes": "Фигуры"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
+    "linearElementMulti": "Нажмите Escape или Enter, чтобы закончить",
+    "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
   }
 }
