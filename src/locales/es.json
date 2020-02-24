@@ -41,7 +41,7 @@
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
-    "language": "Language"
+    "language": "Lenguaje"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -54,12 +54,12 @@
     "getShareableLink": "Obtener enlace para compartir",
     "close": "Cerrar",
     "selectLanguage": "Seleccionar idioma",
-    "scrollBackToContent": "Scroll back to content",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
+    "scrollBackToContent": "Volver al contenido",
+    "zoomIn": "Acercarse",
+    "zoomOut": "Alejarse",
+    "resetZoom": "Restablecer zoom",
     "menu": "Menú",
-    "done": "Done",
+    "done": "Terminado",
     "edit": "Editar"
   },
   "alerts": {
@@ -68,7 +68,7 @@
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -86,8 +86,8 @@
     "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
+    "linearElementMulti": "Presione Escape o Enter para finalizar",
+    "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
   }
 }
