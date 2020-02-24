@@ -36,10 +36,10 @@
     "architect": "Architecte",
     "artist": "Artiste",
     "cartoonist": "Cartooniste",
-    "fileTitle": "Nom du fichier",
+    "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
+    "canvasBackground": "Fond du canvas",
+    "drawingCanvas": "Toile de dessin",
     "layers": "Calques",
     "language": "Langue"
   },
@@ -55,12 +55,12 @@
     "close": "Fermer",
     "selectLanguage": "Sélectionner une langue",
     "scrollBackToContent": "Revenir au contenu",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
     "resetZoom": "Réinitialiser le zoom",
     "menu": "Menu",
     "done": "Terminé",
-    "edit": "Éditer"
+    "edit": "Modifier"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -68,7 +68,7 @@
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -86,8 +86,8 @@
     "shapes": "Formes"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   }
 }
