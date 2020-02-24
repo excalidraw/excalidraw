@@ -41,7 +41,7 @@
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
-    "language": "Language"
+    "language": "Dil"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -60,7 +60,7 @@
     "resetZoom": "Reset zoom",
     "menu": "Menü",
     "done": "Tamam",
-    "edit": "Edit"
+    "edit": "Düzenle"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
