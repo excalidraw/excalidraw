@@ -43,7 +43,7 @@ export const actionPasteStyles: Action = {
             roughness: pastedElement?.roughness,
           };
           if (isTextElement(newElement)) {
-            newElement.font = pastedElement?.font;
+            newElement.font = pastedElement?.font || "20px Virgil";
             redrawTextBoundingBox(newElement);
           }
           return newElement;
