@@ -10,6 +10,7 @@ import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
+import { DEFAULT_FONT } from "../appState";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -297,7 +298,7 @@ export const actionChangeFontSize: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && +element.font.split("px ")[0],
-          +(appState.currentItemFont || "20px Virgil").split("px ")[0],
+          +(appState.currentItemFont || DEFAULT_FONT).split("px ")[0],
         )}
         onChange={value => updateData(value)}
       />
@@ -345,7 +346,7 @@ export const actionChangeFontFamily: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && element.font.split("px ")[1],
-          (appState.currentItemFont || "20px Virgil").split("px ")[1],
+          (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
         )}
         onChange={value => updateData(value)}
       />
