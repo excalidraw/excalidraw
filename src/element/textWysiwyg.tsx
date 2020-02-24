@@ -84,8 +84,8 @@ export function textWysiwyg({
       selection.addRange(range);
 
       ev.preventDefault();
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 

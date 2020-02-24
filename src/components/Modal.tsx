@@ -12,9 +12,9 @@ export function Modal(props: {
 }) {
   const modalRoot = useBodyRoot();
 
-  const handleKeydown = (e: React.KeyboardEvent) => {
-    if (e.key === KEYS.ESCAPE) {
-      e.nativeEvent.stopImmediatePropagation();
+  const handleKeydown = (event: React.KeyboardEvent) => {
+    if (event.key === KEYS.ESCAPE) {
+      event.nativeEvent.stopImmediatePropagation();
       props.onCloseRequest();
     }
   };

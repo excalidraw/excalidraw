@@ -31,8 +31,8 @@ export const actionChangeExportBackground: Action = {
       <input
         type="checkbox"
         checked={appState.exportBackground}
-        onChange={e => {
-          updateData(e.target.checked);
+        onChange={event => {
+          updateData(event.target.checked);
         }}
       />{" "}
       {t("labels.withBackground")}
@@ -43,7 +43,7 @@ export const actionChangeExportBackground: Action = {
 export const actionSaveScene: Action = {
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState).catch(err => console.error(err));
+    saveAsJSON(elements, appState).catch(error => console.error(error));
     return {};
   },
   PanelComponent: ({ updateData }) => (
@@ -79,7 +79,7 @@ export const actionLoadScene: Action = {
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch(err => console.error(err));
+          .catch(error => console.error(error));
       }}
     />
   ),

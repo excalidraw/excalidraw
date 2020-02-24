@@ -89,22 +89,22 @@ function ExportModal({
     pngButton.current?.focus();
   }, []);
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === KEYS.TAB) {
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (event.key === KEYS.TAB) {
       const { activeElement } = document;
-      if (e.shiftKey) {
+      if (event.shiftKey) {
         if (activeElement === pngButton.current) {
           closeButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       } else {
         if (activeElement === closeButton.current) {
           pngButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
         if (activeElement === onlySelectedInput.current) {
           closeButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       }
     }
@@ -186,7 +186,9 @@ function ExportModal({
                   <input
                     type="checkbox"
                     checked={exportSelected}
-                    onChange={e => setExportSelected(e.currentTarget.checked)}
+                    onChange={event =>
+                      setExportSelected(event.currentTarget.checked)
+                    }
                     ref={onlySelectedInput}
                   />{" "}
                   {t("labels.onlySelected")}

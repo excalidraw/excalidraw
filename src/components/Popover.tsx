@@ -40,8 +40,8 @@ export function Popover({
       <div
         className="cover"
         onClick={onCloseRequest}
-        onContextMenu={e => {
-          e.preventDefault();
+        onContextMenu={event => {
+          event.preventDefault();
           if (onCloseRequest) {
             onCloseRequest();
           }
