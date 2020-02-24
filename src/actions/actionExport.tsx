@@ -31,9 +31,7 @@ export const actionChangeExportBackground: Action = {
       <input
         type="checkbox"
         checked={appState.exportBackground}
-        onChange={event => {
-          updateData(event.target.checked);
-        }}
+        onChange={event => updateData(event.target.checked)}
       />{" "}
       {t("labels.withBackground")}
     </label>
