@@ -40,8 +40,8 @@
     "colorPicker": "Выбор цвета",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Рисование холста",
-    "layers": "Layers",
-    "language": "Language"
+    "layers": "Слои",
+    "language": "Язык"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",
@@ -54,13 +54,13 @@
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
     "selectLanguage": "Выбрать язык",
-    "scrollBackToContent": "Scroll back to content",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
-    "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "scrollBackToContent": "Вернуться к содержимому",
+    "zoomIn": "Увеличить",
+    "zoomOut": "Уменьшить",
+    "resetZoom": "Сбросить масштаб",
+    "menu": "Меню",
+    "done": "Готово",
+    "edit": "Изменить"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -68,7 +68,7 @@
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое."
   },
   "toolBar": {
     "selection": "Выделение области",

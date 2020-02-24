@@ -4,7 +4,7 @@
     "selectAll": "Seleccionar todo",
     "copy": "Copiar",
     "bringForward": "Adelantar",
-    "sendToBack": "Send To Back",
+    "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
     "sendBackward": "Enviar átras",
     "delete": "Borrar",
@@ -40,7 +40,7 @@
     "colorPicker": "Selector de color",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
-    "layers": "Layers",
+    "layers": "Capas",
     "language": "Language"
   },
   "buttons": {
@@ -58,9 +58,9 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
-    "menu": "Menu",
+    "menu": "Menú",
     "done": "Done",
-    "edit": "Edit"
+    "edit": "Editar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
