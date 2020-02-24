@@ -5,6 +5,7 @@ import { saveAsJSON, loadFromJSON } from "../scene";
 import { load, save } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
 
 export const actionChangeProjectName: Action = {
   name: "changeProjectName",
@@ -51,6 +52,7 @@ export const actionSaveScene: Action = {
       icon={save}
       title={t("buttons.save")}
       aria-label={t("buttons.save")}
+      showAriaLabel={useIsMobile()}
       onClick={() => updateData(null)}
     />
   ),
@@ -71,6 +73,7 @@ export const actionLoadScene: Action = {
       icon={load}
       title={t("buttons.load")}
       aria-label={t("buttons.load")}
+      showAriaLabel={useIsMobile()}
       onClick={() => {
         loadFromJSON()
           .then(({ elements, appState }) => {

@@ -1,5 +1,7 @@
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, PointerType } from "./element/types";
 import { SHAPES } from "./shapes";
+
+export type FlooredNumber = number & { _brand: "FlooredNumber" };
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
@@ -20,8 +22,8 @@ export type AppState = {
   currentItemOpacity: number;
   currentItemFont: string;
   viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
+  scrollX: FlooredNumber;
+  scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
   scrolledOutside: boolean;
@@ -29,4 +31,19 @@ export type AppState = {
   selectedId?: string;
   isResizing: boolean;
   zoom: number;
+  openedMenu: "canvas" | "shape" | null;
+  lastPointerDownWith: PointerType;
+};
+
+export type Pointer = Readonly<{
+  id: number;
+  x: number;
+  y: number;
+}>;
+
+export type Gesture = {
+  pointers: Array<Pointer>;
+  lastCenter: { x: number; y: number } | null;
+  initialDistance: number | null;
+  initialScale: number | null;
 };

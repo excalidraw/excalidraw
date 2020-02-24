@@ -6,7 +6,7 @@ import {
   clearAppStateForLocalStorage,
 } from "../appState";
 
-import { AppState } from "../types";
+import { AppState, FlooredNumber } from "../types";
 import { ExportType } from "./types";
 import { exportToCanvas, exportToSvg } from "./export";
 import nanoid from "nanoid";
@@ -47,7 +47,7 @@ export function serializeAsJSON(
       type: "excalidraw",
       version: 1,
       source: window.location.origin,
-      elements: elements.map(({ shape, isSelected, ...el }) => el),
+      elements: elements.map(({ shape, canvas, isSelected, ...el }) => el),
       appState: cleanAppStateForExport(appState),
     },
     null,
@@ -55,17 +55,21 @@ export function serializeAsJSON(
   );
 }
 
+export function normalizeScroll(pos: number) {
+  return Math.floor(pos) as FlooredNumber;
+}
+
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
-): { scrollX: number; scrollY: number } {
+): { scrollX: FlooredNumber; scrollY: FlooredNumber } {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
   return {
-    scrollX: window.innerWidth / 2 - centerX,
-    scrollY: window.innerHeight / 2 - centerY,
+    scrollX: normalizeScroll(window.innerWidth / 2 - centerX),
+    scrollY: normalizeScroll(window.innerHeight / 2 - centerY),
   };
 }
 
@@ -255,11 +259,19 @@ function restore(
             ? 100
             : element.opacity,
         points,
+        shape: null,
+        canvas: null,
+        canvasOffsetX: element.canvasOffsetX || 0,
+        canvasOffsetY: element.canvasOffsetY || 0,
       };
     });
 
   if (opts?.scrollToContent && savedState) {
     savedState = { ...savedState, ...calculateScrollCenter(elements) };
+  }
+
+  if (savedState) {
+    savedState.zoom = savedState.zoom || getDefaultAppState().zoom;
   }
 
   return {
@@ -302,7 +314,9 @@ export function saveToLocalStorage(
   localStorage.setItem(
     LOCAL_STORAGE_KEY,
     JSON.stringify(
-      elements.map(({ shape, ...element }: ExcalidrawElement) => element),
+      elements.map(
+        ({ shape, canvas, ...element }: ExcalidrawElement) => element,
+      ),
     ),
   );
   localStorage.setItem(

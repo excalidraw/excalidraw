@@ -20,7 +20,7 @@ export async function copyToAppClipboard(
   elements: readonly ExcalidrawElement[],
 ) {
   CLIPBOARD = JSON.stringify(
-    getSelectedElements(elements).map(({ shape, ...el }) => el),
+    getSelectedElements(elements).map(({ shape, canvas, ...el }) => el),
   );
   try {
     // when copying to in-app clipboard, clear system clipboard so that if

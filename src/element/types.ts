@@ -9,3 +9,5 @@ export type ExcalidrawTextElement = ExcalidrawElement & {
   actualBoundingBoxAscent?: number;
   baseline: number;
 };
+
+export type PointerType = "mouse" | "pen" | "touch";

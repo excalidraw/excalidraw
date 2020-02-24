@@ -13,9 +13,10 @@ class SceneHistory {
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(({ shape, ...element }) => ({
+      elements: elements.map(({ shape, canvas, ...element }) => ({
         ...element,
         shape: null,
+        canvas: null,
         points:
           appState.multiElement && appState.multiElement.id === element.id
             ? element.points.slice(0, -1)
