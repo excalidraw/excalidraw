@@ -40,7 +40,8 @@
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers"
+    "layers": "Layers",
+    "language": "Language"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -56,8 +57,10 @@
     "scrollBackToContent": "Scroll back to content",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
+    "resetZoom": "Reset zoom",
     "menu": "Menu",
-    "done": "Done"
+    "done": "Done",
+    "edit": "Edit"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

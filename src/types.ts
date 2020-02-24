@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, PointerType } from "./element/types";
 import { SHAPES } from "./shapes";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
@@ -32,6 +32,7 @@ export type AppState = {
   isResizing: boolean;
   zoom: number;
   openedMenu: "canvas" | "shape" | null;
+  lastPointerDownWith: PointerType;
 };
 
 export type Pointer = Readonly<{
