@@ -1,5 +1,9 @@
 import { Action } from "./types";
-import { isTextElement, redrawTextBoundingBox } from "../element";
+import {
+  isTextElement,
+  isExcalidrawElement,
+  redrawTextBoundingBox,
+} from "../element";
 import { KEYS } from "../keys";
 
 let copiedStyles: string = "{}";
@@ -22,6 +26,9 @@ export const actionPasteStyles: Action = {
   name: "pasteStyles",
   perform: elements => {
     const pastedElement = JSON.parse(copiedStyles);
+    if (!isExcalidrawElement(pastedElement)) {
+      return { elements };
+    }
     return {
       elements: elements.map(element => {
         if (element.isSelected) {
