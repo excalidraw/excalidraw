@@ -6,7 +6,7 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "browser-nativefs": "0.2.2",
+    "browser-nativefs": "0.3.1",
     "i18next-browser-languagedetector": "4.0.1",
     "nanoid": "2.1.11",
     "react": "16.12.0",
