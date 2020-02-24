@@ -36,12 +36,12 @@
     "architect": "Architecte",
     "artist": "Artiste",
     "cartoonist": "Cartooniste",
-    "fileTitle": "File title",
+    "fileTitle": "Nom du fichier",
     "colorPicker": "Color picker",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
     "layers": "Layers",
-    "language": "Language"
+    "language": "Langue"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -53,7 +53,7 @@
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Close",
-    "selectLanguage": "Select Language",
+    "selectLanguage": "Sélectionner une langue",
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
