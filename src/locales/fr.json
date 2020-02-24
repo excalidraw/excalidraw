@@ -37,10 +37,10 @@
     "artist": "Artiste",
     "cartoonist": "Cartooniste",
     "fileTitle": "Nom du fichier",
-    "colorPicker": "Color picker",
+    "colorPicker": "Sélecteur de couleur",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
+    "layers": "Calques",
     "language": "Langue"
   },
   "buttons": {
@@ -52,15 +52,15 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "close": "Close",
+    "close": "Fermer",
     "selectLanguage": "Sélectionner une langue",
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
+    "resetZoom": "Réinitialiser le zoom",
     "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "done": "Terminé",
+    "edit": "Éditer"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -78,16 +78,16 @@
     "arrow": "Flèche",
     "line": "Ligne",
     "text": "Texte",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Garder l'outil sélectionné actif après le dessin"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "Actions du canevas",
+    "selectedShapeActions": "Actions pour la forme séléctionnée",
+    "shapes": "Formes"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
+    "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   }
 }
