@@ -5,6 +5,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { KEYS } from "../keys";
+import { DEFAULT_FONT } from "../appState";
 
 let copiedStyles: string = "{}";
 
@@ -43,7 +44,7 @@ export const actionPasteStyles: Action = {
             roughness: pastedElement?.roughness,
           };
           if (isTextElement(newElement)) {
-            newElement.font = pastedElement?.font || "20px Virgil";
+            newElement.font = pastedElement?.font || DEFAULT_FONT;
             redrawTextBoundingBox(newElement);
           }
           return newElement;
