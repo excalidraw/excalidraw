@@ -1,5 +1,4 @@
 import { Action } from "./types";
-// import { ExcalidrawElement } from "../element/types";
 import {
   isTextElement,
   isExcalidrawElement,
