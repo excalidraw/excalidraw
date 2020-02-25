@@ -39,7 +39,7 @@
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
     "canvasBackground": "Fond du canvas",
-    "drawingCanvas": "Toile de dessin",
+    "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
     "language": "Langue"
   },
@@ -57,7 +57,7 @@
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoomer",
     "zoomOut": "Dézoomer",
-    "resetZoom": "Réinitialiser le zoom",
+    "resetZoom": "Zoom par défaut",
     "menu": "Menu",
     "done": "Terminé",
     "edit": "Modifier"
@@ -82,7 +82,7 @@
   },
   "headings": {
     "canvasActions": "Actions du canevas",
-    "selectedShapeActions": "Actions pour la forme séléctionnée",
+    "selectedShapeActions": "Actions pour la forme sélectionnée",
     "shapes": "Formes"
   },
   "hints": {
