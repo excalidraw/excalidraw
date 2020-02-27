@@ -343,7 +343,6 @@ function restore(
   opts?: { scrollToContent: boolean },
 ): DataState {
   const elements = savedElements
-    .filter(el => !isInvisiblySmallElement(el))
     .map(element => {
       let points: Point[] = [];
       if (element.type === "arrow") {
@@ -392,7 +391,8 @@ function restore(
         canvasOffsetX: element.canvasOffsetX || 0,
         canvasOffsetY: element.canvasOffsetY || 0,
       };
-    });
+    })
+    .filter(el => !isInvisiblySmallElement(el));
 
   if (opts?.scrollToContent && savedState) {
     savedState = { ...savedState, ...calculateScrollCenter(elements) };
