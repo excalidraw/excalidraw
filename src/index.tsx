@@ -502,7 +502,7 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              {showSelectedShapeActions && (
+              {showSelectedShapeActions(appState, elements) && (
                 <section
                   className="App-right-menu"
                   aria-labelledby="selected-shape-title"
