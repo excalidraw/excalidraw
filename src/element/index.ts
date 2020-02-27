@@ -23,4 +23,4 @@ export {
   resizePerfectLineForNWHandler,
   normalizeDimensions,
 } from "./sizeHelpers";
-export { showSelectedShapeActions } from "./needsShapeEditor";
+export { showSelectedShapeActions } from "./showSelectedShapeActions";
