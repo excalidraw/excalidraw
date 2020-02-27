@@ -79,7 +79,7 @@ export class ActionManager implements ActionsManagerInterface {
       }));
   }
 
-  renderAction(name: string) {
+  renderAction = (name: string) => {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -103,5 +103,5 @@ export class ActionManager implements ActionsManagerInterface {
     }
 
     return null;
-  }
+  };
 }

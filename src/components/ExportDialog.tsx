@@ -22,7 +22,7 @@ import useIsMobile from "../is-mobile";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (
+export type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
 ) => void;

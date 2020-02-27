@@ -28,9 +28,6 @@ import {
   getElementAtPosition,
   createScene,
   getElementContainingPosition,
-  hasBackground,
-  hasStroke,
-  hasText,
   exportCanvas,
   loadScene,
   calculateScrollCenter,
@@ -39,6 +36,7 @@ import {
   getNormalizedZoom,
   getSelectedElements,
   isSomeElementSelected,
+  getTargetElement,
 } from "./scene";
 
 import { renderScene } from "./renderer";
@@ -50,14 +48,13 @@ import {
   isInputLike,
   isToolIcon,
   debounce,
-  capitalizeString,
   distance,
   distance2d,
   resetCursor,
 } from "./utils";
 import { KEYS, isArrowKey } from "./keys";
 
-import { findShapeByKey, shapesShortcutKeys, SHAPES } from "./shapes";
+import { findShapeByKey, shapesShortcutKeys } from "./shapes";
 import { createHistory } from "./history";
 
 import ContextMenu from "./components/ContextMenu";
@@ -100,9 +97,8 @@ import { getDefaultAppState } from "./appState";
 import { Island } from "./components/Island";
 import Stack from "./components/Stack";
 import { FixedSideContainer } from "./components/FixedSideContainer";
-import { ToolButton } from "./components/ToolButton";
 import { LockIcon } from "./components/LockIcon";
-import { ExportDialog } from "./components/ExportDialog";
+import { ExportDialog, ExportCB } from "./components/ExportDialog";
 import { LanguageList } from "./components/LanguageList";
 import { Point } from "roughjs/bin/geometry";
 import { t, languages, setLanguage, getLanguage } from "./i18n";
@@ -114,6 +110,14 @@ import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
 import { ScrollBars } from "./scene/types";
 import { createUndoAction, createRedoAction } from "./actions/actionHistory";
+import { ExportType } from "./scene/types";
+import { MobileMenu } from "./components/MobileMenu";
+import { CURSOR_TYPE } from "./constants";
+import {
+  ZoomActions,
+  SelectedShapeActions,
+  ShapesSwitcher,
+} from "./components/Actions";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -126,22 +130,6 @@ function setCursorForShape(shape: string) {
       shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
   }
 }
-
-const DRAGGING_THRESHOLD = 10; // 10px
-const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
-const ELEMENT_TRANSLATE_AMOUNT = 1;
-const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
-const CURSOR_TYPE = {
-  TEXT: "text",
-  CROSSHAIR: "crosshair",
-  GRABBING: "grabbing",
-};
-const POINTER_BUTTON = {
-  MAIN: 0,
-  WHEEL: 1,
-  SECONDARY: 2,
-  TOUCH: -1,
-};
 
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(
@@ -241,41 +229,27 @@ const LayerUI = React.memo(
     const isMobile = useIsMobile();
 
     function renderExportDialog() {
+      const createExporter = (type: ExportType): ExportCB => (
+        exportedElements,
+        scale,
+      ) => {
+        if (canvas) {
+          exportCanvas(type, exportedElements, canvas, {
+            exportBackground: appState.exportBackground,
+            name: appState.name,
+            viewBackgroundColor: appState.viewBackgroundColor,
+            scale,
+          });
+        }
+      };
       return (
         <ExportDialog
           elements={elements}
           appState={appState}
           actionManager={actionManager}
-          onExportToPng={(exportedElements, scale) => {
-            if (canvas) {
-              exportCanvas("png", exportedElements, canvas, {
-                exportBackground: appState.exportBackground,
-                name: appState.name,
-                viewBackgroundColor: appState.viewBackgroundColor,
-                scale,
-              });
-            }
-          }}
-          onExportToSvg={(exportedElements, scale) => {
-            if (canvas) {
-              exportCanvas("svg", exportedElements, canvas, {
-                exportBackground: appState.exportBackground,
-                name: appState.name,
-                viewBackgroundColor: appState.viewBackgroundColor,
-                scale,
-              });
-            }
-          }}
-          onExportToClipboard={(exportedElements, scale) => {
-            if (canvas) {
-              exportCanvas("clipboard", exportedElements, canvas, {
-                exportBackground: appState.exportBackground,
-                name: appState.name,
-                viewBackgroundColor: appState.viewBackgroundColor,
-                scale,
-              });
-            }
-          }}
+          onExportToPng={createExporter("png")}
+          onExportToSvg={createExporter("svg")}
+          onExportToClipboard={createExporter("clipboard")}
           onExportToBackend={exportedElements => {
             if (canvas) {
               exportCanvas(
@@ -293,189 +267,15 @@ const LayerUI = React.memo(
       );
     }
 
-    function renderSelectedShapeActions() {
-      const { elementType, editingElement } = appState;
-      const targetElements = editingElement
-        ? [editingElement]
-        : getSelectedElements(elements);
-      return (
-        <div className="panelColumn">
-          {actionManager.renderAction("changeStrokeColor")}
-          {(hasBackground(elementType) ||
-            targetElements.some(element => hasBackground(element.type))) && (
-            <>
-              {actionManager.renderAction("changeBackgroundColor")}
-
-              {actionManager.renderAction("changeFillStyle")}
-            </>
-          )}
-
-          {(hasStroke(elementType) ||
-            targetElements.some(element => hasStroke(element.type))) && (
-            <>
-              {actionManager.renderAction("changeStrokeWidth")}
-
-              {actionManager.renderAction("changeSloppiness")}
-            </>
-          )}
-
-          {(hasText(elementType) ||
-            targetElements.some(element => hasText(element.type))) && (
-            <>
-              {actionManager.renderAction("changeFontSize")}
-
-              {actionManager.renderAction("changeFontFamily")}
-            </>
-          )}
-
-          {actionManager.renderAction("changeOpacity")}
-
-          <fieldset>
-            <legend>{t("labels.layers")}</legend>
-            <div className="buttonList">
-              {actionManager.renderAction("sendToBack")}
-              {actionManager.renderAction("sendBackward")}
-              {actionManager.renderAction("bringToFront")}
-              {actionManager.renderAction("bringForward")}
-            </div>
-          </fieldset>
-        </div>
-      );
-    }
-
-    function renderShapesSwitcher() {
-      return (
-        <>
-          {SHAPES.map(({ value, icon }, index) => {
-            const label = t(`toolBar.${value}`);
-            return (
-              <ToolButton
-                key={value}
-                type="radio"
-                icon={icon}
-                checked={appState.elementType === value}
-                name="editor-current-shape"
-                title={`${capitalizeString(label)} — ${
-                  capitalizeString(value)[0]
-                }, ${index + 1}`}
-                keyBindingLabel={`${index + 1}`}
-                aria-label={capitalizeString(label)}
-                aria-keyshortcuts={`${label[0]} ${index + 1}`}
-                onChange={() => {
-                  setAppState({ elementType: value, multiElement: null });
-                  setElements(clearSelection(elements));
-                  document.documentElement.style.cursor =
-                    value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-                  setAppState({});
-                }}
-              ></ToolButton>
-            );
-          })}
-        </>
-      );
-    }
-
-    function renderZoomActions() {
-      return (
-        <Stack.Col gap={1}>
-          <Stack.Row gap={1} align="center">
-            {actionManager.renderAction(actionZoomIn.name)}
-            {actionManager.renderAction(actionZoomOut.name)}
-            {actionManager.renderAction(actionResetZoom.name)}
-            <div style={{ marginLeft: 4 }}>
-              {(appState.zoom * 100).toFixed(0)}%
-            </div>
-          </Stack.Row>
-        </Stack.Col>
-      );
-    }
-
     return isMobile ? (
-      <>
-        {appState.openMenu === "canvas" ? (
-          <section
-            className="App-mobile-menu"
-            aria-labelledby="canvas-actions-title"
-          >
-            <h2 className="visually-hidden" id="canvas-actions-title">
-              {t("headings.canvasActions")}
-            </h2>
-            <div className="App-mobile-menu-scroller panelColumn">
-              <Stack.Col gap={4}>
-                {actionManager.renderAction("loadScene")}
-                {actionManager.renderAction("saveScene")}
-                {renderExportDialog()}
-                {actionManager.renderAction("clearCanvas")}
-                {actionManager.renderAction("changeViewBackgroundColor")}
-                <fieldset>
-                  <legend>{t("labels.language")}</legend>
-                  <LanguageList
-                    onChange={lng => {
-                      setLanguage(lng);
-                      setAppState({});
-                    }}
-                    languages={languages}
-                    currentLanguage={language}
-                  />
-                </fieldset>
-              </Stack.Col>
-            </div>
-          </section>
-        ) : appState.openMenu === "shape" &&
-          showSelectedShapeActions(appState, elements) ? (
-          <section
-            className="App-mobile-menu"
-            aria-labelledby="selected-shape-title"
-          >
-            <h2 className="visually-hidden" id="selected-shape-title">
-              {t("headings.selectedShapeActions")}
-            </h2>
-            <div className="App-mobile-menu-scroller">
-              {renderSelectedShapeActions()}
-            </div>
-          </section>
-        ) : null}
-        <FixedSideContainer side="top">
-          <section aria-labelledby="shapes-title">
-            <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1}>
-                <Island padding={1}>
-                  <h2 className="visually-hidden" id="shapes-title">
-                    {t("headings.shapes")}
-                  </h2>
-                  <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
-                </Island>
-              </Stack.Row>
-            </Stack.Col>
-          </section>
-          <HintViewer
-            elementType={appState.elementType}
-            multiMode={appState.multiElement !== null}
-            isResizing={appState.isResizing}
-            elements={elements}
-          />
-        </FixedSideContainer>
-        <footer className="App-toolbar">
-          <div className="App-toolbar-content">
-            {actionManager.renderAction("toggleCanvasMenu")}
-            {actionManager.renderAction("toggleEditMenu")}
-            {actionManager.renderAction("undo")}
-            {actionManager.renderAction("redo")}
-            {actionManager.renderAction("finalize")}
-            {actionManager.renderAction("deleteSelectedElements")}
-          </div>
-          {appState.scrolledOutside && (
-            <button
-              className="scroll-back-to-content"
-              onClick={() => {
-                setAppState({ ...calculateScrollCenter(elements) });
-              }}
-            >
-              {t("buttons.scrollBackToContent")}
-            </button>
-          )}
-        </footer>
-      </>
+      <MobileMenu
+        appState={appState}
+        elements={elements}
+        setElements={setElements}
+        actionManager={actionManager}
+        exportButton={renderExportDialog()}
+        setAppState={setAppState}
+      />
     ) : (
       <>
         <FixedSideContainer side="top">
@@ -514,7 +314,16 @@ const LayerUI = React.memo(
                   <h2 className="visually-hidden" id="selected-shape-title">
                     {t("headings.selectedShapeActions")}
                   </h2>
-                  <Island padding={4}>{renderSelectedShapeActions()}</Island>
+                  <Island padding={4}>
+                    <SelectedShapeActions
+                      targetElements={getTargetElement(
+                        appState.editingElement,
+                        elements,
+                      )}
+                      renderAction={actionManager.renderAction}
+                      elementType={appState.elementType}
+                    />
+                  </Island>
                 </section>
               )}
             </Stack.Col>
@@ -525,7 +334,14 @@ const LayerUI = React.memo(
                     <h2 className="visually-hidden" id="shapes-title">
                       {t("headings.shapes")}
                     </h2>
-                    <Stack.Row gap={1}>{renderShapesSwitcher()}</Stack.Row>
+                    <Stack.Row gap={1}>
+                      <ShapesSwitcher
+                        elementType={appState.elementType}
+                        setAppState={setAppState}
+                        setElements={setElements}
+                        elements={elements}
+                      />
+                    </Stack.Row>
                   </Island>
                   <LockIcon
                     checked={appState.elementLocked}
@@ -551,7 +367,12 @@ const LayerUI = React.memo(
                 <h2 className="visually-hidden" id="canvas-zoom-actions-title">
                   {t("headings.canvasActions")}
                 </h2>
-                <Island padding={1}>{renderZoomActions()}</Island>
+                <Island padding={1}>
+                  <ZoomActions
+                    renderAction={actionManager.renderAction}
+                    zoom={appState.zoom}
+                  />
+                </Island>
               </section>
             </Stack.Col>
           </div>
