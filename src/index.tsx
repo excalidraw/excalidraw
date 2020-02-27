@@ -388,7 +388,7 @@ const LayerUI = React.memo(
 
     return isMobile ? (
       <>
-        {appState.openedMenu === "canvas" ? (
+        {appState.openMenu === "canvas" ? (
           <section
             className="App-mobile-menu"
             aria-labelledby="canvas-actions-title"
@@ -417,7 +417,7 @@ const LayerUI = React.memo(
               </Stack.Col>
             </div>
           </section>
-        ) : appState.openedMenu === "shape" &&
+        ) : appState.openMenu === "shape" &&
           showSelectedShapeActions(appState, elements) ? (
           <section
             className="App-mobile-menu"

@@ -31,7 +31,7 @@ export type AppState = {
   selectedId?: string;
   isResizing: boolean;
   zoom: number;
-  openedMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
 };
 

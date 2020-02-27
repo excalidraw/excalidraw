@@ -10,7 +10,7 @@ export const actionToggleCanvasMenu: Action = {
   perform: (_, appState) => ({
     appState: {
       ...appState,
-      openedMenu: appState.openedMenu === "canvas" ? null : "canvas",
+      openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
   }),
   PanelComponent: ({ appState, updateData }) => (
@@ -19,7 +19,7 @@ export const actionToggleCanvasMenu: Action = {
       icon={menu}
       aria-label={t("buttons.menu")}
       onClick={updateData}
-      selected={appState.openedMenu === "canvas"}
+      selected={appState.openMenu === "canvas"}
     />
   ),
 };
@@ -29,7 +29,7 @@ export const actionToggleEditMenu: Action = {
   perform: (_elements, appState) => ({
     appState: {
       ...appState,
-      openedMenu: appState.openedMenu === "shape" ? null : "shape",
+      openMenu: appState.openMenu === "shape" ? null : "shape",
     },
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -39,7 +39,7 @@ export const actionToggleEditMenu: Action = {
       icon={palette}
       aria-label={t("buttons.edit")}
       onClick={updateData}
-      selected={appState.openedMenu === "shape"}
+      selected={appState.openMenu === "shape"}
     />
   ),
 };
