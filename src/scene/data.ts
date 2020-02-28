@@ -23,10 +23,10 @@ import { copyCanvasToClipboardAsPng } from "../clipboard";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
+const BACKEND_GET = "https://excalidraw-json.appspot.com/api/v1/";
 
-const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
-const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
+const BACKEND_V2_POST = "https://excalidraw-json.appspot.com/api/v2/post/";
+const BACKEND_V2_GET = "https://excalidraw-json.appspot.com/api/v2/";
 
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
