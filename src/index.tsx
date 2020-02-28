@@ -118,6 +118,7 @@ import {
   SelectedShapeActions,
   ShapesSwitcher,
 } from "./components/Actions";
+import { Section } from "./components/Section";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -287,13 +288,7 @@ const LayerUI = React.memo(
           />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
-              <section
-                className="App-right-menu"
-                aria-labelledby="canvas-actions-title"
-              >
-                <h2 className="visually-hidden" id="canvas-actions-title">
-                  {t("headings.canvasActions")}
-                </h2>
+              <Section className="App-right-menu" heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
                     <Stack.Row justifyContent={"space-between"}>
@@ -305,15 +300,12 @@ const LayerUI = React.memo(
                     {actionManager.renderAction("changeViewBackgroundColor")}
                   </Stack.Col>
                 </Island>
-              </section>
+              </Section>
               {showSelectedShapeActions(appState, elements) && (
-                <section
+                <Section
                   className="App-right-menu"
-                  aria-labelledby="selected-shape-title"
+                  heading="selectedShapeActions"
                 >
-                  <h2 className="visually-hidden" id="selected-shape-title">
-                    {t("headings.selectedShapeActions")}
-                  </h2>
                   <Island padding={4}>
                     <SelectedShapeActions
                       targetElements={getTargetElement(
@@ -324,56 +316,53 @@ const LayerUI = React.memo(
                       elementType={appState.elementType}
                     />
                   </Island>
-                </section>
+                </Section>
               )}
             </Stack.Col>
-            <section aria-labelledby="shapes-title">
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island padding={1}>
-                    <h2 className="visually-hidden" id="shapes-title">
-                      {t("headings.shapes")}
-                    </h2>
-                    <Stack.Row gap={1}>
-                      <ShapesSwitcher
-                        elementType={appState.elementType}
-                        setAppState={setAppState}
-                        setElements={setElements}
-                        elements={elements}
-                      />
-                    </Stack.Row>
-                  </Island>
-                  <LockIcon
-                    checked={appState.elementLocked}
-                    onChange={() => {
-                      setAppState({
-                        elementLocked: !appState.elementLocked,
-                        elementType: appState.elementLocked
-                          ? "selection"
-                          : appState.elementType,
-                      });
-                    }}
-                    title={t("toolBar.lock")}
-                    isButton={isMobile}
-                  />
-                </Stack.Row>
-              </Stack.Col>
-            </section>
+            <Section heading="shapes">
+              {heading => (
+                <Stack.Col gap={4} align="start">
+                  <Stack.Row gap={1}>
+                    <Island padding={1}>
+                      {heading}
+                      <Stack.Row gap={1}>
+                        <ShapesSwitcher
+                          elementType={appState.elementType}
+                          setAppState={setAppState}
+                          setElements={setElements}
+                          elements={elements}
+                        />
+                      </Stack.Row>
+                    </Island>
+                    <LockIcon
+                      checked={appState.elementLocked}
+                      onChange={() => {
+                        setAppState({
+                          elementLocked: !appState.elementLocked,
+                          elementType: appState.elementLocked
+                            ? "selection"
+                            : appState.elementType,
+                        });
+                      }}
+                      title={t("toolBar.lock")}
+                      isButton={isMobile}
+                    />
+                  </Stack.Row>
+                </Stack.Col>
+              )}
+            </Section>
             <div />
           </div>
           <div className="App-menu App-menu_bottom">
             <Stack.Col gap={2}>
-              <section aria-labelledby="canvas-zoom-actions-title">
-                <h2 className="visually-hidden" id="canvas-zoom-actions-title">
-                  {t("headings.canvasActions")}
-                </h2>
+              <Section heading="canvasActions">
                 <Island padding={1}>
                   <ZoomActions
                     renderAction={actionManager.renderAction}
                     zoom={appState.zoom}
                   />
                 </Island>
-              </section>
+              </Section>
             </Stack.Col>
           </div>
         </FixedSideContainer>

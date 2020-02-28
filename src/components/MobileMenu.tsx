@@ -11,6 +11,7 @@ import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter, getTargetElement } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { Section } from "./Section";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -32,13 +33,7 @@ export function MobileMenu({
   return (
     <>
       {appState.openMenu === "canvas" ? (
-        <section
-          className="App-mobile-menu"
-          aria-labelledby="canvas-actions-title"
-        >
-          <h2 className="visually-hidden" id="canvas-actions-title">
-            {t("headings.canvasActions")}
-          </h2>
+        <Section className="App-mobile-menu" heading="canvasActions">
           <div className="App-mobile-menu-scroller panelColumn">
             <Stack.Col gap={4}>
               {actionManager.renderAction("loadScene")}
@@ -57,16 +52,10 @@ export function MobileMenu({
               </fieldset>
             </Stack.Col>
           </div>
-        </section>
+        </Section>
       ) : appState.openMenu === "shape" &&
         showSelectedShapeActions(appState, elements) ? (
-        <section
-          className="App-mobile-menu"
-          aria-labelledby="selected-shape-title"
-        >
-          <h2 className="visually-hidden" id="selected-shape-title">
-            {t("headings.selectedShapeActions")}
-          </h2>
+        <Section className="App-mobile-menu" heading="selectedShapeActions">
           <div className="App-mobile-menu-scroller">
             <SelectedShapeActions
               targetElements={getTargetElement(
@@ -77,28 +66,28 @@ export function MobileMenu({
               elementType={appState.elementType}
             />
           </div>
-        </section>
+        </Section>
       ) : null}
       <FixedSideContainer side="top">
-        <section aria-labelledby="shapes-title">
-          <Stack.Col gap={4} align="center">
-            <Stack.Row gap={1}>
-              <Island padding={1}>
-                <h2 className="visually-hidden" id="shapes-title">
-                  {t("headings.shapes")}
-                </h2>
-                <Stack.Row gap={1}>
-                  <ShapesSwitcher
-                    elementType={appState.elementType}
-                    setAppState={setAppState}
-                    setElements={setElements}
-                    elements={elements}
-                  />
-                </Stack.Row>
-              </Island>
-            </Stack.Row>
-          </Stack.Col>
-        </section>
+        <Section heading="shapes">
+          {heading => (
+            <Stack.Col gap={4} align="center">
+              <Stack.Row gap={1}>
+                <Island padding={1}>
+                  {heading}
+                  <Stack.Row gap={1}>
+                    <ShapesSwitcher
+                      elementType={appState.elementType}
+                      setAppState={setAppState}
+                      setElements={setElements}
+                      elements={elements}
+                    />
+                  </Stack.Row>
+                </Island>
+              </Stack.Row>
+            </Stack.Col>
+          )}
+        </Section>
         <HintViewer
           elementType={appState.elementType}
           multiMode={appState.multiElement !== null}
