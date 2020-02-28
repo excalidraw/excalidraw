@@ -64,7 +64,7 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 
 - [React](https://reactjs.org)
 - [Rough.js](https://roughjs.com)
-- [Netlify](https://www.netlify.com)
+- [ZEIT Now](https://zeit.co/)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 
