@@ -32,6 +32,10 @@ export class ActionManager implements ActionsManagerInterface {
     this.actions[action.name] = action;
   }
 
+  registerAll(actions: readonly Action[]) {
+    actions.forEach(action => this.registerAction(action));
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))

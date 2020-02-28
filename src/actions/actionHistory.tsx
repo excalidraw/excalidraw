@@ -21,12 +21,12 @@ const writeData = (
   return {};
 };
 
-const testUndo = (shift: boolean) => (
-  event: KeyboardEvent,
-  appState: AppState,
-) => event[KEYS.META] && /z/i.test(event.key) && event.shiftKey === shift;
+const testUndo = (shift: boolean) => (event: KeyboardEvent) =>
+  event[KEYS.META] && /z/i.test(event.key) && event.shiftKey === shift;
 
-export const createUndoAction: (h: SceneHistory) => Action = history => ({
+type ActionCreator = (history: SceneHistory) => Action;
+
+export const createUndoAction: ActionCreator = history => ({
   name: "undo",
   perform: (_, appState) =>
     [
@@ -49,7 +49,7 @@ export const createUndoAction: (h: SceneHistory) => Action = history => ({
   commitToHistory: () => false,
 });
 
-export const createRedoAction: (h: SceneHistory) => Action = history => ({
+export const createRedoAction: ActionCreator = history => ({
   name: "redo",
   perform: (_, appState) =>
     [

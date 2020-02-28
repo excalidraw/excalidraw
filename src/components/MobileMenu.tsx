@@ -1,6 +1,6 @@
 import React from "react";
 import { AppState } from "../types";
-import { ActionManager } from "../actions";
+import { ActionManager } from "../actions/manager";
 import { t, setLanguage } from "../i18n";
 import Stack from "./Stack";
 import { LanguageList } from "./LanguageList";

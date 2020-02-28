@@ -9,7 +9,7 @@ import {
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 
-import { ActionManager } from "../actions";
+import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";

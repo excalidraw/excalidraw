@@ -1,4 +1,3 @@
-import { Action } from "./types";
 import {
   isTextElement,
   isExcalidrawElement,
@@ -6,10 +5,11 @@ import {
 } from "../element";
 import { KEYS } from "../keys";
 import { DEFAULT_FONT } from "../appState";
+import { register } from "./register";
 
 let copiedStyles: string = "{}";
 
-export const actionCopyStyles: Action = {
+export const actionCopyStyles = register({
   name: "copyStyles",
   perform: elements => {
     const element = elements.find(el => el.isSelected);
@@ -21,9 +21,9 @@ export const actionCopyStyles: Action = {
   contextItemLabel: "labels.copyStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "C",
   contextMenuOrder: 0,
-};
+});
 
-export const actionPasteStyles: Action = {
+export const actionPasteStyles = register({
   name: "pasteStyles",
   perform: elements => {
     const pastedElement = JSON.parse(copiedStyles);
@@ -57,4 +57,4 @@ export const actionPasteStyles: Action = {
   contextItemLabel: "labels.pasteStyles",
   keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,
-};
+});

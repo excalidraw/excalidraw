@@ -1,5 +1,4 @@
 import React from "react";
-import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
@@ -11,6 +10,7 @@ import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { DEFAULT_FONT } from "../appState";
+import { register } from "./register";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -39,7 +39,7 @@ const getFormValue = function<T>(
   );
 };
 
-export const actionChangeStrokeColor: Action = {
+export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
@@ -68,9 +68,9 @@ export const actionChangeStrokeColor: Action = {
       />
     </>
   ),
-};
+});
 
-export const actionChangeBackgroundColor: Action = {
+export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
@@ -99,9 +99,9 @@ export const actionChangeBackgroundColor: Action = {
       />
     </>
   ),
-};
+});
 
-export const actionChangeFillStyle: Action = {
+export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
     return {
@@ -136,9 +136,9 @@ export const actionChangeFillStyle: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeStrokeWidth: Action = {
+export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
     return {
@@ -171,9 +171,9 @@ export const actionChangeStrokeWidth: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeSloppiness: Action = {
+export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
     return {
@@ -206,9 +206,9 @@ export const actionChangeSloppiness: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeOpacity: Action = {
+export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
     return {
@@ -255,9 +255,9 @@ export const actionChangeOpacity: Action = {
       />
     </label>
   ),
-};
+});
 
-export const actionChangeFontSize: Action = {
+export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
     return {
@@ -304,9 +304,9 @@ export const actionChangeFontSize: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeFontFamily: Action = {
+export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
     return {
@@ -352,4 +352,4 @@ export const actionChangeFontFamily: Action = {
       />
     </fieldset>
   ),
-};
+});

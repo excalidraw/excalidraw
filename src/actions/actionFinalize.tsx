@@ -1,4 +1,3 @@
-import { Action } from "./types";
 import { KEYS } from "../keys";
 import { clearSelection } from "../scene";
 import { isInvisiblySmallElement } from "../element";
@@ -7,8 +6,9 @@ import React from "react";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
+import { register } from "./register";
 
-export const actionFinalize: Action = {
+export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
     let newElements = clearSelection(elements);
@@ -63,4 +63,4 @@ export const actionFinalize: Action = {
       visible={appState.multiElement != null}
     />
   ),
-};
+});

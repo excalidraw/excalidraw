@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
+import "./styles.scss";
 
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(

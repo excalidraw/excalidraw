@@ -1,6 +1,6 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
-import { ActionManager } from "../actions";
+import { ActionManager } from "../actions/manager";
 import { hasBackground, hasStroke, hasText, clearSelection } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";

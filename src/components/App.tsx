@@ -57,39 +57,11 @@ import { createHistory } from "../history";
 import ContextMenu from "./ContextMenu";
 
 import { getElementWithResizeHandler } from "../element/resizeTest";
-import {
-  ActionManager,
-  actionDeleteSelected,
-  actionSendBackward,
-  actionBringForward,
-  actionSendToBack,
-  actionBringToFront,
-  actionSelectAll,
-  actionChangeStrokeColor,
-  actionChangeBackgroundColor,
-  actionChangeOpacity,
-  actionChangeStrokeWidth,
-  actionChangeFillStyle,
-  actionChangeSloppiness,
-  actionChangeFontSize,
-  actionChangeFontFamily,
-  actionChangeViewBackgroundColor,
-  actionClearCanvas,
-  actionZoomIn,
-  actionZoomOut,
-  actionResetZoom,
-  actionChangeProjectName,
-  actionChangeExportBackground,
-  actionLoadScene,
-  actionSaveScene,
-  actionCopyStyles,
-  actionPasteStyles,
-  actionFinalize,
-  actionToggleCanvasMenu,
-  actionToggleEditMenu,
-} from "../actions";
+import { ActionManager } from "../actions/manager";
+import "../actions";
+import { actions } from "../actions/register";
 
-import { Action, ActionResult } from "../actions/types";
+import { ActionResult } from "../actions/types";
 import { getDefaultAppState } from "../appState";
 import { t, getLanguage } from "../i18n";
 
@@ -137,7 +109,7 @@ export class App extends React.Component<any, AppState> {
   rc: RoughCanvas | null = null;
 
   actionManager: ActionManager;
-  canvasOnlyActions: Array<Action>;
+  canvasOnlyActions = ["selectAll"];
   constructor(props: any) {
     super(props);
     this.actionManager = new ActionManager(
@@ -145,44 +117,10 @@ export class App extends React.Component<any, AppState> {
       () => this.state,
       () => elements,
     );
-    this.actionManager.registerAction(actionFinalize);
-    this.actionManager.registerAction(actionDeleteSelected);
-    this.actionManager.registerAction(actionSendToBack);
-    this.actionManager.registerAction(actionBringToFront);
-    this.actionManager.registerAction(actionSendBackward);
-    this.actionManager.registerAction(actionBringForward);
-    this.actionManager.registerAction(actionSelectAll);
-
-    this.actionManager.registerAction(actionChangeStrokeColor);
-    this.actionManager.registerAction(actionChangeBackgroundColor);
-    this.actionManager.registerAction(actionChangeFillStyle);
-    this.actionManager.registerAction(actionChangeStrokeWidth);
-    this.actionManager.registerAction(actionChangeOpacity);
-    this.actionManager.registerAction(actionChangeSloppiness);
-    this.actionManager.registerAction(actionChangeFontSize);
-    this.actionManager.registerAction(actionChangeFontFamily);
-
-    this.actionManager.registerAction(actionChangeViewBackgroundColor);
-    this.actionManager.registerAction(actionClearCanvas);
-    this.actionManager.registerAction(actionZoomIn);
-    this.actionManager.registerAction(actionZoomOut);
-    this.actionManager.registerAction(actionResetZoom);
-
-    this.actionManager.registerAction(actionChangeProjectName);
-    this.actionManager.registerAction(actionChangeExportBackground);
-    this.actionManager.registerAction(actionSaveScene);
-    this.actionManager.registerAction(actionLoadScene);
-
-    this.actionManager.registerAction(actionCopyStyles);
-    this.actionManager.registerAction(actionPasteStyles);
-
-    this.actionManager.registerAction(actionToggleCanvasMenu);
-    this.actionManager.registerAction(actionToggleEditMenu);
+    this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
-
-    this.canvasOnlyActions = [actionSelectAll];
   }
 
   private syncActionResult = (
@@ -558,7 +496,7 @@ export class App extends React.Component<any, AppState> {
                       action: () => this.pasteFromClipboard(null),
                     },
                     ...this.actionManager.getContextMenuItems(action =>
-                      this.canvasOnlyActions.includes(action),
+                      this.canvasOnlyActions.includes(action.name),
                     ),
                   ],
                   top: e.clientY,
@@ -584,7 +522,7 @@ export class App extends React.Component<any, AppState> {
                     action: () => this.pasteFromClipboard(null),
                   },
                   ...this.actionManager.getContextMenuItems(
-                    action => !this.canvasOnlyActions.includes(action),
+                    action => !this.canvasOnlyActions.includes(action.name),
                   ),
                 ],
                 top: e.clientY,
