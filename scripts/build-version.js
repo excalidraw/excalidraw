@@ -30,7 +30,7 @@ const data = JSON.stringify(
 fs.writeFileSync(path.join("build", "version.json"), data);
 
 const filename = path.join("build", `excalidraw-${versionDate(now)}.zip`);
-exec(`jszip-cli add build/ > ${filename}`, (error, stdout, stderr) => {
+exec(`jszip-cli add build/* > ${filename}`, (error, stdout, stderr) => {
   if (error) {
     return;
   }
