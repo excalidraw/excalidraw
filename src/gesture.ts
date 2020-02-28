@@ -3,8 +3,8 @@ import { normalizeScroll } from "./scene/data";
 
 export function getCenter(pointers: readonly Pointer[]) {
   return {
-    x: normalizeScroll(sum(pointers, p => p.x) / pointers.length),
-    y: normalizeScroll(sum(pointers, p => p.y) / pointers.length),
+    x: normalizeScroll(sum(pointers, pointer => pointer.x) / pointers.length),
+    y: normalizeScroll(sum(pointers, pointer => pointer.y) / pointers.length),
   };
 }
 

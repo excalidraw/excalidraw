@@ -10,25 +10,25 @@ type Props = {
 };
 
 export class ProjectName extends Component<Props> {
-  private handleFocus = (e: React.FocusEvent<HTMLElement>) => {
-    selectNode(e.currentTarget);
+  private handleFocus = (event: React.FocusEvent<HTMLElement>) => {
+    selectNode(event.currentTarget);
   };
 
-  private handleBlur = (e: React.FocusEvent<HTMLElement>) => {
-    const value = e.currentTarget.innerText.trim();
+  private handleBlur = (event: React.FocusEvent<HTMLElement>) => {
+    const value = event.currentTarget.innerText.trim();
     if (value !== this.props.value) {
       this.props.onChange(value);
     }
     removeSelection();
   };
 
-  private handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (e.nativeEvent.isComposing || e.keyCode === 229) {
+  private handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (event.nativeEvent.isComposing || event.keyCode === 229) {
         return;
       }
-      e.currentTarget.blur();
+      event.currentTarget.blur();
     }
   };
   private makeEditable = (editable: HTMLSpanElement | null) => {
