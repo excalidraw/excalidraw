@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { exec } = require("child_process");
 
 const zero = digit => `0${digit}`.slice(-2);
 
@@ -27,3 +28,11 @@ const data = JSON.stringify(
 );
 
 fs.writeFileSync(path.join("build", "version.json"), data);
+
+const filename = path.join("build", `excalidraw-${versionDate(now)}.zip`);
+exec(`jszip-cli add build/ > ${filename}`, (error, stdout, stderr) => {
+  if (error) {
+    return;
+  }
+  console.info(`Archive saved in: ${filename}`);
+});
