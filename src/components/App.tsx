@@ -23,16 +23,14 @@ import {
   deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
-  saveToLocalStorage,
   getElementAtPosition,
   createScene,
   getElementContainingPosition,
-  loadScene,
-  loadFromBlob,
   getNormalizedZoom,
   getSelectedElements,
   isSomeElementSelected,
 } from "../scene";
+import { saveToLocalStorage, loadScene, loadFromBlob } from "../data";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -66,7 +64,7 @@ import { getDefaultAppState } from "../appState";
 import { t, getLanguage } from "../i18n";
 
 import { copyToAppClipboard, getClipboardContent } from "../clipboard";
-import { normalizeScroll } from "../scene/data";
+import { normalizeScroll } from "../scene";
 import { getCenter, getDistance } from "../gesture";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import {

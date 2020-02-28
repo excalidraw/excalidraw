@@ -9,18 +9,7 @@ export {
   getSelectedElements,
   getTargetElement,
 } from "./selection";
-export {
-  exportCanvas,
-  loadFromJSON,
-  loadFromBlob,
-  saveAsJSON,
-  restoreFromLocalStorage,
-  saveToLocalStorage,
-  exportToBackend,
-  importFromBackend,
-  loadScene,
-  calculateScrollCenter,
-} from "./data";
+export { normalizeScroll, calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
   hasStroke,

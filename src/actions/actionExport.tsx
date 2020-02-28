@@ -1,6 +1,6 @@
 import React from "react";
 import { ProjectName } from "../components/ProjectName";
-import { saveAsJSON, loadFromJSON } from "../scene";
+import { saveAsJSON, loadFromJSON } from "../data";
 import { load, save } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";

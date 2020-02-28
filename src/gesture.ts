@@ -1,5 +1,5 @@
 import { Pointer } from "./types";
-import { normalizeScroll } from "./scene/data";
+import { normalizeScroll } from "./scene";
 
 export function getCenter(pointers: readonly Pointer[]) {
   return {

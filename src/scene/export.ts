@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
-import { normalizeScroll } from "./data";
+import { normalizeScroll } from "./scroll";
 
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],

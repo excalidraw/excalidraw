@@ -1,10 +1,7 @@
 import React from "react";
 import { showSelectedShapeActions } from "../element";
-import {
-  exportCanvas,
-  calculateScrollCenter,
-  getTargetElement,
-} from "../scene";
+import { calculateScrollCenter, getTargetElement } from "../scene";
+import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
