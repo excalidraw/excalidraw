@@ -81,9 +81,9 @@
   "name": "excalidraw",
   "scripts": {
     "build:app": "react-scripts build",
-    "build:zip": "./scripts/build-version.js",
+    "build:zip": "node ./scripts/build-version.js",
     "build": "npm run build:app && npm run build:zip",
-    "build-node": "./scripts/build-node.js",
+    "build-node": "node ./scripts/build-node.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
