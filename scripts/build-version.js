@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { exec } = require("child_process");
+const asar = require("asar");
 
 const zero = digit => `0${digit}`.slice(-2);
 
@@ -20,7 +20,7 @@ const now = new Date();
 
 const data = JSON.stringify(
   {
-    app: `excalidraw-${versionDate(now)}.zip`,
+    app: `excalidraw-${versionDate(now)}.asar`,
     version: versionDate(now),
   },
   undefined,
@@ -29,10 +29,9 @@ const data = JSON.stringify(
 
 fs.writeFileSync(path.join("build", "version.json"), data);
 
-const filename = path.join("build", `excalidraw-${versionDate(now)}.zip`);
-exec(`jszip-cli add build/* > ${filename}`, (error, stdout, stderr) => {
-  if (error) {
-    return;
-  }
-  console.info(`Archive saved in: ${filename}`);
-});
+(async () => {
+  const src = "build/";
+  const dest = path.join("build", `excalidraw-${versionDate(now)}.asar  `);
+
+  await asar.createPackage(src, dest);
+})();

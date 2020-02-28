@@ -15,9 +15,8 @@
     "roughjs": "4.0.4",
     "stacktrace-js": "2.0.2"
   },
-  "description": "",
   "devDependencies": {
-    "@ffflorian/jszip-cli": "3.1.0",
+    "asar": "2.1.0",
     "@testing-library/jest-dom": "5.1.1",
     "@testing-library/react": "9.4.1",
     "@types/jest": "25.1.3",
