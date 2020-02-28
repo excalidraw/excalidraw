@@ -114,7 +114,7 @@ export async function loadFromBlob(blob: any) {
       }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
-    } catch (e) {
+    } catch (error) {
       // Do nothing because elements array is already empty
     }
     return { elements, appState };
@@ -195,8 +195,8 @@ export async function exportToBackend(
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
 }
@@ -320,7 +320,7 @@ export async function exportCanvas(
   } else if (type === "clipboard") {
     try {
       copyCanvasToClipboardAsPng(tempCanvas);
-    } catch (err) {
+    } catch (error) {
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
@@ -418,7 +418,7 @@ export function restoreFromLocalStorage() {
       elements = JSON.parse(savedElements).map(
         ({ shape, ...element }: ExcalidrawElement) => element,
       );
-    } catch (e) {
+    } catch (error) {
       // Do nothing because elements array is already empty
     }
   }
@@ -427,7 +427,7 @@ export function restoreFromLocalStorage() {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
-    } catch (e) {
+    } catch (error) {
       // Do nothing because appState is already null
     }
   }
