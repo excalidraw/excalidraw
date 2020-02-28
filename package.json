@@ -17,6 +17,7 @@
   },
   "description": "",
   "devDependencies": {
+    "@ffflorian/jszip-cli": "3.1.0",
     "@testing-library/jest-dom": "5.1.1",
     "@testing-library/react": "9.4.1",
     "@types/jest": "25.1.3",
@@ -80,7 +81,9 @@
   "main": "src/index.js",
   "name": "excalidraw",
   "scripts": {
-    "build": "react-scripts build",
+    "build:app": "react-scripts build",
+    "build:zip": "./scripts/build-version.js",
+    "build": "npm run build:app && npm run build:zip",
     "build-node": "./scripts/build-node.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",
