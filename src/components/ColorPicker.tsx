@@ -45,25 +45,25 @@ const Picker = function({
     }
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === KEYS.TAB) {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEYS.TAB) {
       const { activeElement } = document;
-      if (e.shiftKey) {
+      if (event.shiftKey) {
         if (activeElement === firstItem.current) {
           colorInput.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       } else {
         if (activeElement === colorInput.current) {
           firstItem.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       }
     } else if (
-      e.key === KEYS.ARROW_RIGHT ||
-      e.key === KEYS.ARROW_LEFT ||
-      e.key === KEYS.ARROW_UP ||
-      e.key === KEYS.ARROW_DOWN
+      event.key === KEYS.ARROW_RIGHT ||
+      event.key === KEYS.ARROW_LEFT ||
+      event.key === KEYS.ARROW_UP ||
+      event.key === KEYS.ARROW_DOWN
     ) {
       const { activeElement } = document;
       const index = Array.prototype.indexOf.call(
@@ -73,30 +73,30 @@ const Picker = function({
       if (index !== -1) {
         const length = gallery!.current!.children.length;
         const nextIndex =
-          e.key === KEYS.ARROW_RIGHT
+          event.key === KEYS.ARROW_RIGHT
             ? (index + 1) % length
-            : e.key === KEYS.ARROW_LEFT
+            : event.key === KEYS.ARROW_LEFT
             ? (length + index - 1) % length
-            : e.key === KEYS.ARROW_DOWN
+            : event.key === KEYS.ARROW_DOWN
             ? (index + 5) % length
-            : e.key === KEYS.ARROW_UP
+            : event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
         (gallery!.current!.children![nextIndex] as any).focus();
       }
-      e.preventDefault();
+      event.preventDefault();
     } else if (
-      keyBindings.includes(e.key.toLowerCase()) &&
-      !isWritableElement(e.target)
+      keyBindings.includes(event.key.toLowerCase()) &&
+      !isWritableElement(event.target)
     ) {
-      const index = keyBindings.indexOf(e.key.toLowerCase());
+      const index = keyBindings.indexOf(event.key.toLowerCase());
       (gallery!.current!.children![index] as any).focus();
-      e.preventDefault();
-    } else if (e.key === KEYS.ESCAPE || e.key === KEYS.ENTER) {
-      e.preventDefault();
+      event.preventDefault();
+    } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+      event.preventDefault();
       onClose();
     }
-    e.nativeEvent.stopImmediatePropagation();
+    event.nativeEvent.stopImmediatePropagation();
   };
 
   return (
@@ -193,15 +193,15 @@ const ColorInput = React.forwardRef(
           spellCheck={false}
           className="color-picker-input"
           aria-label={label}
-          onChange={e => {
-            const value = e.target.value.toLowerCase();
+          onChange={event => {
+            const value = event.target.value.toLowerCase();
             if (value.match(colorRegex)) {
               onChange(value === "transparent" ? "transparent" : `#${value}`);
             }
             setInnerValue(value);
           }}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={e => onChange(e.clipboardData.getData("text"))}
+          onPaste={event => onChange(event.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />

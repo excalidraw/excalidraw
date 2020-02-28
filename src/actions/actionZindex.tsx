@@ -93,7 +93,7 @@ export const actionSendBackward: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={`${t("labels.sendBackward")} ${getShortcutKey("CtrlOrCmd+[")}`}
     >
       {ICONS.sendBackward}
@@ -118,7 +118,7 @@ export const actionBringForward: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={`${t("labels.bringForward")} ${getShortcutKey("CtrlOrCmd+]")}`}
     >
       {ICONS.bringForward}
@@ -142,7 +142,7 @@ export const actionSendToBack: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={`${t("labels.sendToBack")} ${getShortcutKey("Alt+CtrlOrCmd+[")}`}
     >
       {ICONS.sendToBack}
@@ -166,7 +166,7 @@ export const actionBringToFront: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={`${t("labels.bringToFront")} ${getShortcutKey("Alt+CtrlOrCmd+]")}`}
     >
       {ICONS.bringToFront}

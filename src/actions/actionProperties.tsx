@@ -10,6 +10,7 @@ import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
+import { DEFAULT_FONT } from "../appState";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -228,18 +229,18 @@ export const actionChangeOpacity: Action = {
         min="0"
         max="100"
         step="10"
-        onChange={e => updateData(+e.target.value)}
-        onWheel={e => {
-          e.stopPropagation();
-          const target = e.target as HTMLInputElement;
+        onChange={event => updateData(+event.target.value)}
+        onWheel={event => {
+          event.stopPropagation();
+          const target = event.target as HTMLInputElement;
           const STEP = 10;
           const MAX = 100;
           const MIN = 0;
           const value = +target.value;
 
-          if (e.deltaY < 0 && value < MAX) {
+          if (event.deltaY < 0 && value < MAX) {
             updateData(value + STEP);
-          } else if (e.deltaY > 0 && value > MIN) {
+          } else if (event.deltaY > 0 && value > MIN) {
             updateData(value - STEP);
           }
         }}
@@ -297,7 +298,7 @@ export const actionChangeFontSize: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && +element.font.split("px ")[0],
-          +(appState.currentItemFont || "20px Virgil").split("px ")[0],
+          +(appState.currentItemFont || DEFAULT_FONT).split("px ")[0],
         )}
         onChange={value => updateData(value)}
       />
@@ -345,7 +346,7 @@ export const actionChangeFontFamily: Action = {
           appState.editingElement,
           elements,
           element => isTextElement(element) && element.font.split("px ")[1],
-          (appState.currentItemFont || "20px Virgil").split("px ")[1],
+          (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
         )}
         onChange={value => updateData(value)}
       />

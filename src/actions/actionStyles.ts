@@ -1,6 +1,11 @@
 import { Action } from "./types";
-import { isTextElement, redrawTextBoundingBox } from "../element";
+import {
+  isTextElement,
+  isExcalidrawElement,
+  redrawTextBoundingBox,
+} from "../element";
 import { KEYS } from "../keys";
+import { DEFAULT_FONT } from "../appState";
 
 let copiedStyles: string = "{}";
 
@@ -23,6 +28,9 @@ export const actionPasteStyles: Action = {
   name: "pasteStyles",
   perform: elements => {
     const pastedElement = JSON.parse(copiedStyles);
+    if (!isExcalidrawElement(pastedElement)) {
+      return { elements };
+    }
     return {
       elements: elements.map(element => {
         if (element.isSelected) {
@@ -37,7 +45,7 @@ export const actionPasteStyles: Action = {
             roughness: pastedElement?.roughness,
           };
           if (isTextElement(newElement)) {
-            newElement.font = pastedElement?.font;
+            newElement.font = pastedElement?.font || DEFAULT_FONT;
             redrawTextBoundingBox(newElement);
           }
           return newElement;
