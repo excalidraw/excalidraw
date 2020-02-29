@@ -1191,6 +1191,59 @@ export class App extends React.Component<any, AppState> {
                 this.state,
                 this.canvas,
               );
+              let lastX = x;
+              let lastY = y;
+
+              if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
+                lastX = event.clientX;
+                lastY = event.clientY;
+                const onPointerMove = (event: PointerEvent) => {
+                  const target = event.target;
+                  if (!(target instanceof HTMLElement)) {
+                    return;
+                  }
+
+                  if (isOverHorizontalScrollBar) {
+                    const x = event.clientX;
+                    const dx = x - lastX;
+                    this.setState({
+                      scrollX: normalizeScroll(
+                        this.state.scrollX - dx / this.state.zoom,
+                      ),
+                    });
+                    lastX = x;
+                    return;
+                  }
+
+                  if (isOverVerticalScrollBar) {
+                    const y = event.clientY;
+                    const dy = y - lastY;
+                    this.setState({
+                      scrollY: normalizeScroll(
+                        this.state.scrollY - dy / this.state.zoom,
+                      ),
+                    });
+                    lastY = y;
+                  }
+                };
+
+                const onPointerUp = (event: PointerEvent) => {
+                  this.setState({
+                    isResizing: false,
+                    resizingElement: null,
+                    selectionElement: null,
+                  });
+                  lastPointerUp = null;
+                  window.removeEventListener("pointermove", onPointerMove);
+                  window.removeEventListener("pointerup", onPointerUp);
+                };
+
+                lastPointerUp = onPointerUp;
+
+                window.addEventListener("pointermove", onPointerMove);
+                window.addEventListener("pointerup", onPointerUp);
+                return;
+              }
 
               const originX = x;
               const originY = y;
@@ -1390,14 +1443,6 @@ export class App extends React.Component<any, AppState> {
               } else {
                 elements = [...elements, element];
                 this.setState({ multiElement: null, draggingElement: element });
-              }
-
-              let lastX = x;
-              let lastY = y;
-
-              if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = event.clientX;
-                lastY = event.clientY;
               }
 
               let resizeArrowFn:
