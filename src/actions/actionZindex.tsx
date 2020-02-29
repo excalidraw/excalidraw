@@ -87,8 +87,7 @@ export const actionSendBackward: Action = {
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && !event.altKey && event.key === "[",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "[",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -112,8 +111,7 @@ export const actionBringForward: Action = {
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   commitToHistory: () => true,
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && !event.altKey && event.key === "]",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "]",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
@@ -136,14 +134,13 @@ export const actionSendToBack: Action = {
   },
   contextItemLabel: "labels.sendToBack",
   commitToHistory: () => true,
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "[",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "{",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={event => updateData(null)}
-      title={`${t("labels.sendToBack")} ${getShortcutKey("Alt+CtrlOrCmd+[")}`}
+      title={`${t("labels.sendToBack")} ${getShortcutKey("CtrlOrCmd+Shift+[")}`}
     >
       {ICONS.sendToBack}
     </button>
@@ -160,14 +157,15 @@ export const actionBringToFront: Action = {
   },
   commitToHistory: () => true,
   contextItemLabel: "labels.bringToFront",
-  keyTest: event =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === "]",
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "}",
   PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={event => updateData(null)}
-      title={`${t("labels.bringToFront")} ${getShortcutKey("Alt+CtrlOrCmd+]")}`}
+      title={`${t("labels.bringToFront")} ${getShortcutKey(
+        "CtrlOrCmd+Shift+]",
+      )}`}
     >
       {ICONS.bringToFront}
     </button>
