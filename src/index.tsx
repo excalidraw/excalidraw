@@ -1179,8 +1179,8 @@ export class App extends React.Component<any, AppState> {
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
                 elements,
-                event.clientX / window.devicePixelRatio,
-                event.clientY / window.devicePixelRatio,
+                event.clientX,
+                event.clientY,
                 canvasWidth / window.devicePixelRatio,
                 canvasHeight / window.devicePixelRatio,
                 this.state,
