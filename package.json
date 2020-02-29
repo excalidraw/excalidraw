@@ -71,7 +71,7 @@
       "prettier/prettier": "warn"
     }
   },
-  "homepage": "https://excalidraw.com",
+  "homepage": ".",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
