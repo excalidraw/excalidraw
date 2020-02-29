@@ -10,8 +10,6 @@
 
 ## Try it now
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6a2f94e6-20d1-42ba-8af5-2f91802debe8/deploy-status)](https://app.netlify.com/sites/excalidraw/deploys)
-
 Go to https://excalidraw.com to start sketching
 
 ## Testimonials
