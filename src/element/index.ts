@@ -14,7 +14,7 @@ export {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
-export { isTextElement } from "./typeChecks";
+export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
 export {

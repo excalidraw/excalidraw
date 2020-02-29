@@ -4,7 +4,7 @@
     "selectAll": "Seleccionar todo",
     "copy": "Copiar",
     "bringForward": "Adelantar",
-    "sendToBack": "Send To Back",
+    "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
     "sendBackward": "Enviar átras",
     "delete": "Borrar",
@@ -39,7 +39,9 @@
     "fileTitle": "Título del archivo",
     "colorPicker": "Selector de color",
     "canvasBackground": "Fondo del lienzo",
-    "drawingCanvas": "Lienzo de dibujo"
+    "drawingCanvas": "Lienzo de dibujo",
+    "layers": "Capas",
+    "language": "Lenguaje"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -50,16 +52,23 @@
     "save": "Guardar",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
-    "showExportDialog": "Mostrar diálogo para exportar",
     "close": "Cerrar",
-    "selectLanguage": "Seleccionar idioma"
+    "selectLanguage": "Seleccionar idioma",
+    "scrollBackToContent": "Volver al contenido",
+    "zoomIn": "Acercarse",
+    "zoomOut": "Alejarse",
+    "resetZoom": "Restablecer zoom",
+    "menu": "Menú",
+    "done": "Terminado",
+    "edit": "Editar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
-    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador."
+    "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -75,5 +84,10 @@
     "canvasActions": "Acciones del lienzo",
     "selectedShapeActions": "Acciones de la forma seleccionada",
     "shapes": "Formas"
+  },
+  "hints": {
+    "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
+    "linearElementMulti": "Presione Escape o Enter para finalizar",
+    "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
   }
 }

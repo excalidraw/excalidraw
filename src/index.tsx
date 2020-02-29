@@ -154,7 +154,7 @@ document.addEventListener(
   { passive: false },
 );
 
-let lastPointerUp: ((e: any) => void) | null = null;
+let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
   pointers: [],
   lastCenter: null,
@@ -376,8 +376,9 @@ const LayerUI = React.memo(
       return (
         <Stack.Col gap={1}>
           <Stack.Row gap={1} align="center">
-            {actionManager.renderAction("zoomIn")}
-            {actionManager.renderAction("zoomOut")}
+            {actionManager.renderAction(actionZoomIn.name)}
+            {actionManager.renderAction(actionZoomOut.name)}
+            {actionManager.renderAction(actionResetZoom.name)}
             <div style={{ marginLeft: 4 }}>
               {(appState.zoom * 100).toFixed(0)}%
             </div>
@@ -679,22 +680,22 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private onCut = (e: ClipboardEvent) => {
-    if (isWritableElement(e.target)) {
+  private onCut = (event: ClipboardEvent) => {
+    if (isWritableElement(event.target)) {
       return;
     }
     copyToAppClipboard(elements);
     elements = deleteSelectedElements(elements);
     history.resumeRecording();
     this.setState({});
-    e.preventDefault();
+    event.preventDefault();
   };
-  private onCopy = (e: ClipboardEvent) => {
-    if (isWritableElement(e.target)) {
+  private onCopy = (event: ClipboardEvent) => {
+    if (isWritableElement(event.target)) {
       return;
     }
     copyToAppClipboard(elements);
-    e.preventDefault();
+    event.preventDefault();
   };
 
   private onUnload = () => {
@@ -703,8 +704,8 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   };
 
-  private disableEvent: EventHandlerNonNull = e => {
-    e.preventDefault();
+  private disableEvent: EventHandlerNonNull = event => {
+    event.preventDefault();
   };
 
   private unmounted = false;
@@ -795,9 +796,9 @@ export class App extends React.Component<any, AppState> {
     this.setState({});
   };
 
-  private updateCurrentCursorPosition = (e: MouseEvent) => {
-    cursorX = e.x;
-    cursorY = e.y;
+  private updateCurrentCursorPosition = (event: MouseEvent) => {
+    cursorX = event.x;
+    cursorY = event.y;
   };
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -871,18 +872,18 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements);
   };
 
-  private pasteFromClipboard = async (e: ClipboardEvent | null) => {
+  private pasteFromClipboard = async (event: ClipboardEvent | null) => {
     // #686
     const target = document.activeElement;
     const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
     if (
       // if no ClipboardEvent supplied, assume we're pasting via contextMenu
       //  thus these checks don't make sense
-      !e ||
+      !event ||
       (elementUnderCursor instanceof HTMLCanvasElement &&
         !isWritableElement(target))
     ) {
-      const data = await getClipboardContent(e);
+      const data = await getClipboardContent(event);
       if (data.elements) {
         this.addElementsFromPaste(data.elements);
       } else if (data.text) {
@@ -914,7 +915,7 @@ export class App extends React.Component<any, AppState> {
         history.resumeRecording();
       }
       this.selectShapeTool("selection");
-      e?.preventDefault();
+      event?.preventDefault();
     }
   };
 
@@ -956,8 +957,10 @@ export class App extends React.Component<any, AppState> {
     this.setState({});
   };
 
-  removePointer = (e: React.PointerEvent<HTMLElement>) => {
-    gesture.pointers = gesture.pointers.filter(p => p.id !== e.pointerId);
+  removePointer = (event: React.PointerEvent<HTMLElement>) => {
+    gesture.pointers = gesture.pointers.filter(
+      pointer => pointer.id !== event.pointerId,
+    );
   };
 
   public render() {
@@ -1006,11 +1009,11 @@ export class App extends React.Component<any, AppState> {
                 this.canvas?.removeEventListener("wheel", this.handleWheel);
               }
             }}
-            onContextMenu={e => {
-              e.preventDefault();
+            onContextMenu={event => {
+              event.preventDefault();
 
               const { x, y } = viewportCoordsToSceneCoords(
-                e,
+                event,
                 this.state,
                 this.canvas,
               );
@@ -1032,8 +1035,8 @@ export class App extends React.Component<any, AppState> {
                       this.canvasOnlyActions.includes(action),
                     ),
                   ],
-                  top: e.clientY,
-                  left: e.clientX,
+                  top: event.clientY,
+                  left: event.clientX,
                 });
                 return;
               }
@@ -1058,38 +1061,38 @@ export class App extends React.Component<any, AppState> {
                     action => !this.canvasOnlyActions.includes(action),
                   ),
                 ],
-                top: e.clientY,
-                left: e.clientX,
+                top: event.clientY,
+                left: event.clientX,
               });
             }}
-            onPointerDown={e => {
+            onPointerDown={event => {
               if (lastPointerUp !== null) {
                 // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
                 // this can happen when a contextual menu or alert is triggered. In order to avoid
                 // being in a weird state, we clean up on the next pointerdown
-                lastPointerUp(e);
+                lastPointerUp(event);
               }
 
               if (isPanning) {
                 return;
               }
 
-              this.setState({ lastPointerDownWith: e.pointerType });
+              this.setState({ lastPointerDownWith: event.pointerType });
 
               // pan canvas on wheel button drag or space+drag
               if (
                 gesture.pointers.length === 0 &&
-                (e.button === POINTER_BUTTON.WHEEL ||
-                  (e.button === POINTER_BUTTON.MAIN && isHoldingSpace))
+                (event.button === POINTER_BUTTON.WHEEL ||
+                  (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
               ) {
                 isPanning = true;
                 document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
-                let { clientX: lastX, clientY: lastY } = e;
-                const onPointerMove = (e: PointerEvent) => {
-                  const deltaX = lastX - e.clientX;
-                  const deltaY = lastY - e.clientY;
-                  lastX = e.clientX;
-                  lastY = e.clientY;
+                let { clientX: lastX, clientY: lastY } = event;
+                const onPointerMove = (event: PointerEvent) => {
+                  const deltaX = lastX - event.clientX;
+                  const deltaY = lastY - event.clientY;
+                  lastX = event.clientX;
+                  lastY = event.clientY;
 
                   this.setState({
                     scrollX: normalizeScroll(
@@ -1120,16 +1123,16 @@ export class App extends React.Component<any, AppState> {
 
               // only handle left mouse button or touch
               if (
-                e.button !== POINTER_BUTTON.MAIN &&
-                e.button !== POINTER_BUTTON.TOUCH
+                event.button !== POINTER_BUTTON.MAIN &&
+                event.button !== POINTER_BUTTON.TOUCH
               ) {
                 return;
               }
 
               gesture.pointers.push({
-                id: e.pointerId,
-                x: e.clientX,
-                y: e.clientY,
+                id: event.pointerId,
+                x: event.clientX,
+                y: event.clientY,
               });
               if (gesture.pointers.length === 2) {
                 gesture.lastCenter = getCenter(gesture.pointers);
@@ -1138,7 +1141,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               // fixes pointermove causing selection of UI texts #32
-              e.preventDefault();
+              event.preventDefault();
               // Preventing the event above disables default behavior
               //  of defocusing potentially focused element, which is what we
               //  want when clicking inside the canvas.
@@ -1157,15 +1160,15 @@ export class App extends React.Component<any, AppState> {
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
                 elements,
-                e.clientX / window.devicePixelRatio,
-                e.clientY / window.devicePixelRatio,
+                event.clientX / window.devicePixelRatio,
+                event.clientY / window.devicePixelRatio,
                 canvasWidth / window.devicePixelRatio,
                 canvasHeight / window.devicePixelRatio,
                 this.state,
               );
 
               const { x, y } = viewportCoordsToSceneCoords(
-                e,
+                event,
                 this.state,
                 this.canvas,
               );
@@ -1204,7 +1207,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
-                  e.pointerType,
+                  event.pointerType,
                 );
 
                 const selectedElements = getSelectedElements(elements);
@@ -1228,7 +1231,7 @@ export class App extends React.Component<any, AppState> {
                     this.state.zoom,
                   );
                   // clear selection if shift is not clicked
-                  if (!hitElement?.isSelected && !e.shiftKey) {
+                  if (!hitElement?.isSelected && !event.shiftKey) {
                     elements = clearSelection(elements);
                   }
 
@@ -1245,7 +1248,7 @@ export class App extends React.Component<any, AppState> {
                     }
 
                     // We duplicate the selected element if alt is pressed on pointer down
-                    if (e.altKey) {
+                    if (event.altKey) {
                       elements = [
                         ...elements.map(element => ({
                           ...element,
@@ -1274,9 +1277,9 @@ export class App extends React.Component<any, AppState> {
                 if (elementIsAddedToSelection) {
                   element = hitElement!;
                 }
-                let textX = e.clientX;
-                let textY = e.clientY;
-                if (!e.altKey) {
+                let textX = event.clientX;
+                let textY = event.clientY;
+                if (!event.altKey) {
                   const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                     x,
                     y,
@@ -1347,7 +1350,8 @@ export class App extends React.Component<any, AppState> {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
-                  multiElement.isSelected = true;
+                  //force LayerUI rerender
+                  elements = elements.slice();
                   multiElement.points.push([x - rx, y - ry]);
                   multiElement.shape = null;
                 } else {
@@ -1373,8 +1377,8 @@ export class App extends React.Component<any, AppState> {
               let lastY = y;
 
               if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = e.clientX;
-                lastY = e.clientY;
+                lastX = event.clientX;
+                lastY = event.clientY;
               }
 
               let resizeArrowFn:
@@ -1445,14 +1449,14 @@ export class App extends React.Component<any, AppState> {
                 }
               };
 
-              const onPointerMove = (e: PointerEvent) => {
-                const target = e.target;
+              const onPointerMove = (event: PointerEvent) => {
+                const target = event.target;
                 if (!(target instanceof HTMLElement)) {
                   return;
                 }
 
                 if (isOverHorizontalScrollBar) {
-                  const x = e.clientX;
+                  const x = event.clientX;
                   const dx = x - lastX;
                   this.setState({
                     scrollX: normalizeScroll(
@@ -1464,7 +1468,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 if (isOverVerticalScrollBar) {
-                  const y = e.clientY;
+                  const y = event.clientY;
                   const dy = y - lastY;
                   this.setState({
                     scrollY: normalizeScroll(
@@ -1485,7 +1489,7 @@ export class App extends React.Component<any, AppState> {
                     this.state.elementType === "line")
                 ) {
                   const { x, y } = viewportCoordsToSceneCoords(
-                    e,
+                    event,
                     this.state,
                     this.canvas,
                   );
@@ -1500,7 +1504,7 @@ export class App extends React.Component<any, AppState> {
                   const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length === 1) {
                     const { x, y } = viewportCoordsToSceneCoords(
-                      e,
+                      event,
                       this.state,
                       this.canvas,
                     );
@@ -1528,13 +1532,13 @@ export class App extends React.Component<any, AppState> {
                             deltaY,
                             x,
                             y,
-                            e.shiftKey,
+                            event.shiftKey,
                           );
                         } else {
                           element.width -= deltaX;
                           element.x += deltaX;
 
-                          if (e.shiftKey) {
+                          if (event.shiftKey) {
                             element.y += element.height - element.width;
                             element.height = element.width;
                           } else {
@@ -1560,11 +1564,11 @@ export class App extends React.Component<any, AppState> {
                             deltaY,
                             x,
                             y,
-                            e.shiftKey,
+                            event.shiftKey,
                           );
                         } else {
                           element.width += deltaX;
-                          if (e.shiftKey) {
+                          if (event.shiftKey) {
                             element.y += element.height - element.width;
                             element.height = element.width;
                           } else {
@@ -1590,12 +1594,12 @@ export class App extends React.Component<any, AppState> {
                             deltaY,
                             x,
                             y,
-                            e.shiftKey,
+                            event.shiftKey,
                           );
                         } else {
                           element.width -= deltaX;
                           element.x += deltaX;
-                          if (e.shiftKey) {
+                          if (event.shiftKey) {
                             element.height = element.width;
                           } else {
                             element.height += deltaY;
@@ -1619,10 +1623,10 @@ export class App extends React.Component<any, AppState> {
                             deltaY,
                             x,
                             y,
-                            e.shiftKey,
+                            event.shiftKey,
                           );
                         } else {
-                          if (e.shiftKey) {
+                          if (event.shiftKey) {
                             element.width += deltaX;
                             element.height = element.width;
                           } else {
@@ -1727,7 +1731,7 @@ export class App extends React.Component<any, AppState> {
                   const selectedElements = getSelectedElements(elements);
                   if (selectedElements.length > 0) {
                     const { x, y } = viewportCoordsToSceneCoords(
-                      e,
+                      event,
                       this.state,
                       this.canvas,
                     );
@@ -1751,7 +1755,7 @@ export class App extends React.Component<any, AppState> {
                 }
 
                 const { x, y } = viewportCoordsToSceneCoords(
-                  e,
+                  event,
                   this.state,
                   this.canvas,
                 );
@@ -1769,7 +1773,7 @@ export class App extends React.Component<any, AppState> {
                   let dx = x - draggingElement.x;
                   let dy = y - draggingElement.y;
 
-                  if (e.shiftKey && points.length === 2) {
+                  if (event.shiftKey && points.length === 2) {
                     ({ width: dx, height: dy } = getPerfectElementSize(
                       this.state.elementType,
                       dx,
@@ -1785,7 +1789,7 @@ export class App extends React.Component<any, AppState> {
                     pnt[1] = dy;
                   }
                 } else {
-                  if (e.shiftKey) {
+                  if (event.shiftKey) {
                     ({ width, height } = getPerfectElementSize(
                       this.state.elementType,
                       width,
@@ -1807,7 +1811,7 @@ export class App extends React.Component<any, AppState> {
                 draggingElement.shape = null;
 
                 if (this.state.elementType === "selection") {
-                  if (!e.shiftKey && isSomeElementSelected(elements)) {
+                  if (!event.shiftKey && isSomeElementSelected(elements)) {
                     elements = clearSelection(elements);
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
@@ -1821,7 +1825,7 @@ export class App extends React.Component<any, AppState> {
                 this.setState({});
               };
 
-              const onPointerUp = (e: PointerEvent) => {
+              const onPointerUp = (event: PointerEvent) => {
                 const {
                   draggingElement,
                   resizingElement,
@@ -1848,7 +1852,7 @@ export class App extends React.Component<any, AppState> {
                   }
                   if (!draggingOccurred && draggingElement && !multiElement) {
                     const { x, y } = viewportCoordsToSceneCoords(
-                      e,
+                      event,
                       this.state,
                       this.canvas,
                     );
@@ -1919,7 +1923,7 @@ export class App extends React.Component<any, AppState> {
                   !draggingOccurred &&
                   !elementIsAddedToSelection
                 ) {
-                  if (e.shiftKey) {
+                  if (event.shiftKey) {
                     hitElement.isSelected = false;
                   } else {
                     elements = clearSelection(elements);
@@ -1963,11 +1967,11 @@ export class App extends React.Component<any, AppState> {
               window.addEventListener("pointermove", onPointerMove);
               window.addEventListener("pointerup", onPointerUp);
             }}
-            onDoubleClick={e => {
+            onDoubleClick={event => {
               resetCursor();
 
               const { x, y } = viewportCoordsToSceneCoords(
-                e,
+                event,
                 this.state,
                 this.canvas,
               );
@@ -2000,8 +2004,8 @@ export class App extends React.Component<any, AppState> {
 
               this.setState({ editingElement: element });
 
-              let textX = e.clientX;
-              let textY = e.clientY;
+              let textX = event.clientX;
+              let textY = event.clientY;
 
               if (elementAtPosition && isTextElement(elementAtPosition)) {
                 elements = elements.filter(
@@ -2029,7 +2033,7 @@ export class App extends React.Component<any, AppState> {
                 // x and y will change after calling newTextElement function
                 element.x = centerElementX;
                 element.y = centerElementY;
-              } else if (!e.altKey) {
+              } else if (!event.altKey) {
                 const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
                   x,
                   y,
@@ -2078,15 +2082,15 @@ export class App extends React.Component<any, AppState> {
                 },
               });
             }}
-            onPointerMove={e => {
-              gesture.pointers = gesture.pointers.map(p =>
-                p.id === e.pointerId
+            onPointerMove={event => {
+              gesture.pointers = gesture.pointers.map(pointer =>
+                pointer.id === event.pointerId
                   ? {
-                      id: e.pointerId,
-                      x: e.clientX,
-                      y: e.clientY,
+                      id: event.pointerId,
+                      x: event.clientX,
+                      y: event.clientY,
                     }
-                  : p,
+                  : pointer,
               );
 
               if (gesture.pointers.length === 2) {
@@ -2114,10 +2118,10 @@ export class App extends React.Component<any, AppState> {
               if (isHoldingSpace || isPanning) {
                 return;
               }
-              const hasDeselectedButton = Boolean(e.buttons);
+              const hasDeselectedButton = Boolean(event.buttons);
 
               const { x, y } = viewportCoordsToSceneCoords(
-                e,
+                event,
                 this.state,
                 this.canvas,
               );
@@ -2147,7 +2151,7 @@ export class App extends React.Component<any, AppState> {
                   elements,
                   { x, y },
                   this.state.zoom,
-                  e.pointerType,
+                  event.pointerType,
                 );
                 if (resizeElement && resizeElement.resizeHandle) {
                   document.documentElement.style.cursor = getCursorForResizingElement(
@@ -2165,15 +2169,15 @@ export class App extends React.Component<any, AppState> {
               document.documentElement.style.cursor = hitElement ? "move" : "";
             }}
             onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
-            onDrop={e => {
-              const file = e.dataTransfer.files[0];
+            onPointerLeave={this.removePointer}
+            onDrop={event => {
+              const file = event.dataTransfer.files[0];
               if (file?.type === "application/json") {
                 loadFromBlob(file)
                   .then(({ elements, appState }) =>
                     this.syncActionResult({ elements, appState }),
                   )
-                  .catch(err => console.error(err));
+                  .catch(error => console.error(error));
               }
             }}
           >
@@ -2184,11 +2188,11 @@ export class App extends React.Component<any, AppState> {
     );
   }
 
-  private handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    const { deltaX, deltaY } = e;
+  private handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    const { deltaX, deltaY } = event;
 
-    if (e.metaKey || e.ctrlKey) {
+    if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);
@@ -2301,20 +2305,70 @@ export class App extends React.Component<any, AppState> {
 
 const rootElement = document.getElementById("root");
 
-class TopErrorBoundary extends React.Component {
-  state = { hasError: false, stack: "", localStorage: "" };
+interface TopErrorBoundaryState {
+  unresolvedError: Error[] | null;
+  hasError: boolean;
+  stack: string;
+  localStorage: string;
+}
 
-  static getDerivedStateFromError(error: any) {
-    console.error(error);
-    return {
+class TopErrorBoundary extends React.Component<any, TopErrorBoundaryState> {
+  state: TopErrorBoundaryState = {
+    unresolvedError: null,
+    hasError: false,
+    stack: "",
+    localStorage: "",
+  };
+
+  componentDidCatch(error: Error) {
+    const _localStorage: any = {};
+    for (const [key, value] of Object.entries({ ...localStorage })) {
+      try {
+        _localStorage[key] = JSON.parse(value);
+      } catch (error) {
+        _localStorage[key] = value;
+      }
+    }
+    this.setState(state => ({
       hasError: true,
-      localStorage: JSON.stringify({ ...localStorage }),
-      stack: error.stack,
-    };
+      unresolvedError: state.unresolvedError
+        ? state.unresolvedError.concat(error)
+        : [error],
+      localStorage: JSON.stringify(_localStorage),
+    }));
+  }
+
+  async componentDidUpdate() {
+    if (this.state.unresolvedError !== null) {
+      let stack = "";
+      for (const error of this.state.unresolvedError) {
+        if (stack) {
+          stack += `\n\n================\n\n`;
+        }
+        stack += `${error.message}:\n\n`;
+        try {
+          const StackTrace = await import("stacktrace-js");
+          stack += (await StackTrace.fromError(error)).join("\n");
+        } catch (error) {
+          console.error(error);
+          stack += error.stack || "";
+        }
+      }
+
+      this.setState(state => ({
+        unresolvedError: null,
+        stack: `${
+          state.stack ? `${state.stack}\n\n================\n\n${stack}` : stack
+        }`,
+      }));
+    }
   }
 
   private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
-    (event.target as HTMLTextAreaElement).select();
+    if (event.target !== document.activeElement) {
+      event.preventDefault();
+      (event.target as HTMLTextAreaElement).select();
+    }
   }
 
   private async createGithubIssue() {
@@ -2370,14 +2424,20 @@ class TopErrorBoundary extends React.Component {
                   <label>Error stack trace:</label>
                   <textarea
                     rows={10}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.stack}
+                    onPointerDown={this.selectTextArea}
+                    readOnly={true}
+                    value={
+                      this.state.unresolvedError
+                        ? "Loading data. please wait..."
+                        : this.state.stack
+                    }
                   />
                   <label>LocalStorage content:</label>
                   <textarea
                     rows={5}
-                    onClick={this.selectTextArea}
-                    defaultValue={this.state.localStorage}
+                    onPointerDown={this.selectTextArea}
+                    readOnly={true}
+                    value={this.state.localStorage}
                   />
                 </div>
               </div>

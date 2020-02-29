@@ -2,7 +2,7 @@ import React from "react";
 import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut } from "../components/icons";
+import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
@@ -131,6 +131,17 @@ export const actionResetZoom: Action = {
       },
     };
   },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={resetZoom}
+      title={t("buttons.resetZoom")}
+      aria-label={t("buttons.resetZoom")}
+      onClick={() => {
+        updateData(null);
+      }}
+    />
+  ),
   keyTest: event =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.META] || event.shiftKey),

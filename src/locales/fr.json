@@ -35,7 +35,13 @@
     "extraBold": "Très épais",
     "architect": "Architecte",
     "artist": "Artiste",
-    "cartoonist": "Cartooniste"
+    "cartoonist": "Cartooniste",
+    "fileTitle": "Titre du fichier",
+    "colorPicker": "Sélecteur de couleur",
+    "canvasBackground": "Fond du canvas",
+    "drawingCanvas": "Canevas de dessin",
+    "layers": "Calques",
+    "language": "Langue"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -46,14 +52,23 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "scrollBackToContent": "Revenir au contenu"
+    "close": "Fermer",
+    "selectLanguage": "Sélectionner une langue",
+    "scrollBackToContent": "Revenir au contenu",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "resetZoom": "Zoom par défaut",
+    "menu": "Menu",
+    "done": "Terminé",
+    "edit": "Modifier"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
-    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome."
+    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
+    "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -62,6 +77,17 @@
     "ellipse": "Ellipse",
     "arrow": "Flèche",
     "line": "Ligne",
-    "text": "Texte"
+    "text": "Texte",
+    "lock": "Garder l'outil sélectionné actif après le dessin"
+  },
+  "headings": {
+    "canvasActions": "Actions du canevas",
+    "selectedShapeActions": "Actions pour la forme sélectionnée",
+    "shapes": "Formes"
+  },
+  "hints": {
+    "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
+    "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
+    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   }
 }

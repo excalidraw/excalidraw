@@ -91,7 +91,7 @@ export const actionSendBackward: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={t("labels.sendBackward")}
     >
       {ICONS.sendBackward}
@@ -115,7 +115,7 @@ export const actionBringForward: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={t("labels.bringForward")}
     >
       {ICONS.bringForward}
@@ -138,7 +138,7 @@ export const actionSendToBack: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={t("labels.sendToBack")}
     >
       {ICONS.sendToBack}
@@ -161,7 +161,7 @@ export const actionBringToFront: Action = {
     <button
       type="button"
       className="zIndexButton"
-      onClick={e => updateData(null)}
+      onClick={event => updateData(null)}
       title={t("labels.bringToFront")}
     >
       {ICONS.bringToFront}

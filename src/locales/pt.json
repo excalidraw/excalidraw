@@ -35,7 +35,13 @@
     "extraBold": "Muito espesso",
     "architect": "Arquitecto",
     "artist": "Artista",
-    "cartoonist": "Caricaturista"
+    "cartoonist": "Caricaturista",
+    "fileTitle": "Título do arquivo",
+    "colorPicker": "Seletor de cores",
+    "canvasBackground": "Fundo da tela",
+    "drawingCanvas": "Tela de desenho",
+    "layers": "Camadas",
+    "language": "Idioma"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -46,14 +52,23 @@
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
-    "scrollBackToContent": "Voltar ao conteúdo"
+    "close": "Fechar",
+    "selectLanguage": "Selecionar Idioma",
+    "scrollBackToContent": "Voltar ao conteúdo",
+    "zoomIn": "Aumentar zoom",
+    "zoomOut": "Diminuir zoom",
+    "resetZoom": "Redefinir zoom",
+    "menu": "Menu",
+    "done": "Concluído",
+    "edit": "Editar"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
-    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome."
+    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
+    "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -62,6 +77,17 @@
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Linha",
-    "text": "Texto"
+    "text": "Texto",
+    "lock": "Manter a ferramenta selecionada ativa após desenhar"
+  },
+  "headings": {
+    "canvasActions": "Ações da tela",
+    "selectedShapeActions": "Ações das formas selecionadas",
+    "shapes": "Formas"
+  },
+  "hints": {
+    "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "linearElementMulti": "Pressione Escape ou Enter para concluir",
+    "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   }
 }

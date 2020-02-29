@@ -314,8 +314,7 @@ export function renderElementToSvg(
     }
     case "rectangle":
     case "diamond":
-    case "ellipse":
-    case "line": {
+    case "ellipse": {
       generateElement(element, generator);
       const node = rsvg.draw(element.shape as Drawable);
       const opacity = element.opacity / 100;
@@ -330,6 +329,7 @@ export function renderElementToSvg(
       svgRoot.appendChild(node);
       break;
     }
+    case "line":
     case "arrow": {
       generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");

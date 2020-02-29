@@ -10,8 +10,6 @@
 
 ## Try it now
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6a2f94e6-20d1-42ba-8af5-2f91802debe8/deploy-status)](https://app.netlify.com/sites/excalidraw/deploys)
-
 Go to https://excalidraw.com to start sketching
 
 ## Testimonials
@@ -64,7 +62,7 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 
 - [React](https://reactjs.org)
 - [Rough.js](https://roughjs.com)
-- [Netlify](https://www.netlify.com)
+- [ZEIT Now](https://zeit.co/)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 

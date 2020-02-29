@@ -68,6 +68,7 @@
 .ToolIcon_type_checkbox {
   position: absolute;
   opacity: 0;
+  pointer-events: none;
 
   &:checked + .ToolIcon__icon {
     background-color: var(--button-gray-2);
