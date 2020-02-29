@@ -83,7 +83,7 @@ export async function saveAsJSON(
 ) {
   const serialized = serializeAsJSON(elements, appState);
 
-  const name = `${appState.name}.json`;
+  const name = `${appState.name}.excalidraw`;
   await fileSave(
     new Blob([serialized], { type: "application/json" }),
     {
@@ -96,7 +96,7 @@ export async function saveAsJSON(
 export async function loadFromJSON() {
   const blob = await fileOpen({
     description: "Excalidraw files",
-    extensions: ["json"],
+    extensions: ["json", "excalidraw"],
     mimeTypes: ["application/json"],
   });
   return loadFromBlob(blob);
