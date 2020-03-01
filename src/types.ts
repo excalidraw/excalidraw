@@ -31,7 +31,7 @@ export type AppState = {
   selectedId?: string;
   isResizing: boolean;
   zoom: number;
-  openedMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
 };
 
@@ -47,3 +47,8 @@ export type Gesture = {
   initialDistance: number | null;
   initialScale: number | null;
 };
+
+export declare class GestureEvent extends UIEvent {
+  readonly rotation: number;
+  readonly scale: number;
+}

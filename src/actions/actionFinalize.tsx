@@ -54,18 +54,13 @@ export const actionFinalize: Action = {
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData }) => (
-    <div
-      style={{
-        visibility: appState.multiElement != null ? "visible" : "hidden",
-      }}
-    >
-      <ToolButton
-        type="button"
-        icon={done}
-        title={t("buttons.done")}
-        aria-label={t("buttons.done")}
-        onClick={() => updateData(null)}
-      />
-    </div>
+    <ToolButton
+      type="button"
+      icon={done}
+      title={t("buttons.done")}
+      aria-label={t("buttons.done")}
+      onClick={updateData}
+      visible={appState.multiElement != null}
+    />
   ),
 };
