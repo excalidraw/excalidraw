@@ -1194,7 +1194,10 @@ export class App extends React.Component<any, AppState> {
               let lastX = x;
               let lastY = y;
 
-              if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
+              if (
+                (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
+                !this.state.multiElement
+              ) {
                 isDraggingScrollBar = true;
                 lastX = event.clientX;
                 lastY = event.clientY;
@@ -2191,7 +2194,7 @@ export class App extends React.Component<any, AppState> {
               );
               const isOverScrollBar =
                 isOverVerticalScrollBar || isOverHorizontalScrollBar;
-              if (!this.state.draggingElement || this.state.multiElement) {
+              if (!this.state.draggingElement && !this.state.multiElement) {
                 if (isOverScrollBar) {
                   resetCursor();
                 } else {
