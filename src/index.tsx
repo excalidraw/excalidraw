@@ -110,6 +110,7 @@ import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
 import { menu, palette } from "./components/icons";
+import { ScrollBars } from "./scene/types";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -211,6 +212,7 @@ let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -1178,12 +1180,9 @@ export class App extends React.Component<any, AppState> {
                 isOverHorizontalScrollBar,
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
-                elements,
+                currentScrollBars,
                 event.clientX,
                 event.clientY,
-                canvasWidth / window.devicePixelRatio,
-                canvasHeight / window.devicePixelRatio,
-                this.state,
               );
 
               const { x, y } = viewportCoordsToSceneCoords(
@@ -2343,7 +2342,7 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    const atLeastOneVisibleElement = renderScene(
+    const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state.selectionElement,
       this.rc!,
@@ -2358,6 +2357,9 @@ export class App extends React.Component<any, AppState> {
         renderOptimizations: true,
       },
     );
+    if (scrollBars) {
+      currentScrollBars = scrollBars;
+    }
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
