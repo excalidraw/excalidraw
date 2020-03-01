@@ -1226,12 +1226,7 @@ export class App extends React.Component<any, AppState> {
                   }
                 };
 
-                const onPointerUp = (event: PointerEvent) => {
-                  this.setState({
-                    isResizing: false,
-                    resizingElement: null,
-                    selectionElement: null,
-                  });
+                const onPointerUp = () => {
                   lastPointerUp = null;
                   window.removeEventListener("pointermove", onPointerMove);
                   window.removeEventListener("pointerup", onPointerUp);
