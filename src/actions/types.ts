@@ -21,7 +21,7 @@ export interface Action {
   PanelComponent?: React.FC<{
     elements: readonly ExcalidrawElement[];
     appState: AppState;
-    updateData: (formData: any) => void;
+    updateData: (formData?: any) => void;
   }>;
   perform: ActionFn;
   keyPriority?: number;

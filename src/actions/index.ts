@@ -36,3 +36,4 @@ export {
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+export { actionToggleCanvasMenu, actionToggleEditMenu } from "./actionMenu";
