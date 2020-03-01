@@ -60,7 +60,9 @@
     "resetZoom": "Restablecer zoom",
     "menu": "Menú",
     "done": "Terminado",
-    "edit": "Editar"
+    "edit": "Editar",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
