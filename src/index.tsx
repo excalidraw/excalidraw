@@ -112,6 +112,7 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
+import { ScrollBars } from "./scene/types";
 import { createUndoAction, createRedoAction } from "./actions/actionHistory";
 
 let { elements } = createScene();
@@ -214,6 +215,8 @@ let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isDraggingScrollBar: boolean = false;
+let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -1159,12 +1162,9 @@ export class App extends React.Component<any, AppState> {
                 isOverHorizontalScrollBar,
                 isOverVerticalScrollBar,
               } = isOverScrollBars(
-                elements,
-                event.clientX / window.devicePixelRatio,
-                event.clientY / window.devicePixelRatio,
-                canvasWidth / window.devicePixelRatio,
-                canvasHeight / window.devicePixelRatio,
-                this.state,
+                currentScrollBars,
+                event.clientX,
+                event.clientY,
               );
 
               const { x, y } = viewportCoordsToSceneCoords(
@@ -1172,6 +1172,60 @@ export class App extends React.Component<any, AppState> {
                 this.state,
                 this.canvas,
               );
+              let lastX = x;
+              let lastY = y;
+
+              if (
+                (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
+                !this.state.multiElement
+              ) {
+                isDraggingScrollBar = true;
+                lastX = event.clientX;
+                lastY = event.clientY;
+                const onPointerMove = (event: PointerEvent) => {
+                  const target = event.target;
+                  if (!(target instanceof HTMLElement)) {
+                    return;
+                  }
+
+                  if (isOverHorizontalScrollBar) {
+                    const x = event.clientX;
+                    const dx = x - lastX;
+                    this.setState({
+                      scrollX: normalizeScroll(
+                        this.state.scrollX - dx / this.state.zoom,
+                      ),
+                    });
+                    lastX = x;
+                    return;
+                  }
+
+                  if (isOverVerticalScrollBar) {
+                    const y = event.clientY;
+                    const dy = y - lastY;
+                    this.setState({
+                      scrollY: normalizeScroll(
+                        this.state.scrollY - dy / this.state.zoom,
+                      ),
+                    });
+                    lastY = y;
+                  }
+                };
+
+                const onPointerUp = () => {
+                  isDraggingScrollBar = false;
+                  setCursorForShape(this.state.elementType);
+                  lastPointerUp = null;
+                  window.removeEventListener("pointermove", onPointerMove);
+                  window.removeEventListener("pointerup", onPointerUp);
+                };
+
+                lastPointerUp = onPointerUp;
+
+                window.addEventListener("pointermove", onPointerMove);
+                window.addEventListener("pointerup", onPointerUp);
+                return;
+              }
 
               const originX = x;
               const originY = y;
@@ -1371,14 +1425,6 @@ export class App extends React.Component<any, AppState> {
               } else {
                 elements = [...elements, element];
                 this.setState({ multiElement: null, draggingElement: element });
-              }
-
-              let lastX = x;
-              let lastY = y;
-
-              if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
-                lastX = event.clientX;
-                lastY = event.clientY;
               }
 
               let resizeArrowFn:
@@ -2115,10 +2161,27 @@ export class App extends React.Component<any, AppState> {
                 gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
               }
 
-              if (isHoldingSpace || isPanning) {
+              if (isHoldingSpace || isPanning || isDraggingScrollBar) {
                 return;
               }
-              const hasDeselectedButton = Boolean(event.buttons);
+
+              const {
+                isOverHorizontalScrollBar,
+                isOverVerticalScrollBar,
+              } = isOverScrollBars(
+                currentScrollBars,
+                event.clientX,
+                event.clientY,
+              );
+              const isOverScrollBar =
+                isOverVerticalScrollBar || isOverHorizontalScrollBar;
+              if (!this.state.draggingElement && !this.state.multiElement) {
+                if (isOverScrollBar) {
+                  resetCursor();
+                } else {
+                  setCursorForShape(this.state.elementType);
+                }
+              }
 
               const { x, y } = viewportCoordsToSceneCoords(
                 event,
@@ -2138,6 +2201,7 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
+              const hasDeselectedButton = Boolean(event.buttons);
               if (
                 hasDeselectedButton ||
                 this.state.elementType !== "selection"
@@ -2146,7 +2210,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               const selectedElements = getSelectedElements(elements);
-              if (selectedElements.length === 1) {
+              if (selectedElements.length === 1 && !isOverScrollBar) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
@@ -2166,7 +2230,8 @@ export class App extends React.Component<any, AppState> {
                 y,
                 this.state.zoom,
               );
-              document.documentElement.style.cursor = hitElement ? "move" : "";
+              document.documentElement.style.cursor =
+                hitElement && !isOverScrollBar ? "move" : "";
             }}
             onPointerUp={this.removePointer}
             onPointerLeave={this.removePointer}
@@ -2279,7 +2344,7 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-    const atLeastOneVisibleElement = renderScene(
+    const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state.selectionElement,
       this.rc!,
@@ -2294,6 +2359,9 @@ export class App extends React.Component<any, AppState> {
         renderOptimizations: true,
       },
     );
+    if (scrollBars) {
+      currentScrollBars = scrollBars;
+    }
     const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
