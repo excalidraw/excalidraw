@@ -60,7 +60,9 @@
     "resetZoom": "Zresetuj powiększenie",
     "menu": "Menu",
     "done": "Gotowe",
-    "edit": "Edytuj"
+    "edit": "Edytuj",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
