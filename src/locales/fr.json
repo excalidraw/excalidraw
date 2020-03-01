@@ -60,7 +60,9 @@
     "resetZoom": "Zoom par défaut",
     "menu": "Menu",
     "done": "Terminé",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
