@@ -17,6 +17,7 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   normalizeDimensions,
+  showSelectedShapeActions,
 } from "./element";
 import {
   clearSelection,
@@ -41,7 +42,7 @@ import {
 } from "./scene";
 
 import { renderScene } from "./renderer";
-import { AppState, FlooredNumber, Gesture } from "./types";
+import { AppState, FlooredNumber, Gesture, GestureEvent } from "./types";
 import { ExcalidrawElement } from "./element/types";
 
 import {
@@ -91,6 +92,8 @@ import {
   actionCopyStyles,
   actionPasteStyles,
   actionFinalize,
+  actionToggleCanvasMenu,
+  actionToggleEditMenu,
 } from "./actions";
 import { Action, ActionResult } from "./actions/types";
 import { getDefaultAppState } from "./appState";
@@ -109,8 +112,8 @@ import useIsMobile, { IsMobileProvider } from "./is-mobile";
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
 import { normalizeScroll } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
-import { menu, palette } from "./components/icons";
 import { ScrollBars } from "./scene/types";
+import { createUndoAction, createRedoAction } from "./actions/actionHistory";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -290,12 +293,6 @@ const LayerUI = React.memo(
       );
     }
 
-    const showSelectedShapeActions = Boolean(
-      appState.editingElement ||
-        getSelectedElements(elements).length ||
-        appState.elementType !== "selection",
-    );
-
     function renderSelectedShapeActions() {
       const { elementType, editingElement } = appState;
       const targetElements = editingElement
@@ -395,7 +392,7 @@ const LayerUI = React.memo(
 
     return isMobile ? (
       <>
-        {appState.openedMenu === "canvas" ? (
+        {appState.openMenu === "canvas" ? (
           <section
             className="App-mobile-menu"
             aria-labelledby="canvas-actions-title"
@@ -424,7 +421,8 @@ const LayerUI = React.memo(
               </Stack.Col>
             </div>
           </section>
-        ) : appState.openedMenu === "shape" && showSelectedShapeActions ? (
+        ) : appState.openMenu === "shape" &&
+          showSelectedShapeActions(appState, elements) ? (
           <section
             className="App-mobile-menu"
             aria-labelledby="selected-shape-title"
@@ -459,59 +457,23 @@ const LayerUI = React.memo(
         </FixedSideContainer>
         <footer className="App-toolbar">
           <div className="App-toolbar-content">
-            {appState.multiElement ? (
-              <>
-                {actionManager.renderAction("deleteSelectedElements")}
-                <ToolButton
-                  visible={showSelectedShapeActions}
-                  type="button"
-                  icon={palette}
-                  aria-label={t("buttons.edit")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "shape" ? null : "shape",
-                    }))
-                  }
-                />
-                {actionManager.renderAction("finalize")}
-              </>
-            ) : (
-              <>
-                <ToolButton
-                  type="button"
-                  icon={menu}
-                  aria-label={t("buttons.menu")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "canvas" ? null : "canvas",
-                    }))
-                  }
-                />
-                <ToolButton
-                  visible={showSelectedShapeActions}
-                  type="button"
-                  icon={palette}
-                  aria-label={t("buttons.edit")}
-                  onClick={() =>
-                    setAppState(({ openedMenu }: any) => ({
-                      openedMenu: openedMenu === "shape" ? null : "shape",
-                    }))
-                  }
-                />
-                {actionManager.renderAction("deleteSelectedElements")}
-                {appState.scrolledOutside && (
-                  <button
-                    className="scroll-back-to-content"
-                    onClick={() => {
-                      setAppState({ ...calculateScrollCenter(elements) });
-                    }}
-                  >
-                    {t("buttons.scrollBackToContent")}
-                  </button>
-                )}
-              </>
-            )}
+            {actionManager.renderAction("toggleCanvasMenu")}
+            {actionManager.renderAction("toggleEditMenu")}
+            {actionManager.renderAction("undo")}
+            {actionManager.renderAction("redo")}
+            {actionManager.renderAction("finalize")}
+            {actionManager.renderAction("deleteSelectedElements")}
           </div>
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({ ...calculateScrollCenter(elements) });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
         </footer>
       </>
     ) : (
@@ -544,7 +506,7 @@ const LayerUI = React.memo(
                   </Stack.Col>
                 </Island>
               </section>
-              {showSelectedShapeActions && (
+              {showSelectedShapeActions(appState, elements) && (
                 <section
                   className="App-right-menu"
                   aria-labelledby="selected-shape-title"
@@ -689,6 +651,12 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(actionCopyStyles);
     this.actionManager.registerAction(actionPasteStyles);
 
+    this.actionManager.registerAction(actionToggleCanvasMenu);
+    this.actionManager.registerAction(actionToggleEditMenu);
+
+    this.actionManager.registerAction(createUndoAction(history));
+    this.actionManager.registerAction(createRedoAction(history));
+
     this.canvasOnlyActions = [actionSelectAll];
   }
 
@@ -758,6 +726,19 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
 
+    // Safari-only desktop pinch zoom
+    document.addEventListener(
+      "gesturestart",
+      this.onGestureStart as any,
+      false,
+    );
+    document.addEventListener(
+      "gesturechange",
+      this.onGestureChange as any,
+      false,
+    );
+    document.addEventListener("gestureend", this.onGestureEnd as any, false);
+
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
 
@@ -797,6 +778,18 @@ export class App extends React.Component<any, AppState> {
     window.removeEventListener("blur", this.onUnload, false);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
+
+    document.removeEventListener(
+      "gesturestart",
+      this.onGestureStart as any,
+      false,
+    );
+    document.removeEventListener(
+      "gesturechange",
+      this.onGestureChange as any,
+      false,
+    );
+    document.removeEventListener("gestureend", this.onGestureEnd as any, false);
   }
 
   public state: AppState = getDefaultAppState();
@@ -856,34 +849,6 @@ export class App extends React.Component<any, AppState> {
       this.state.draggingElement === null
     ) {
       this.selectShapeTool(shape);
-      // Undo action
-    } else if (event[KEYS.META] && /z/i.test(event.key)) {
-      event.preventDefault();
-
-      if (
-        this.state.multiElement ||
-        this.state.resizingElement ||
-        this.state.editingElement ||
-        this.state.draggingElement
-      ) {
-        return;
-      }
-
-      if (event.shiftKey) {
-        // Redo action
-        const data = history.redoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState({ ...data.appState });
-        }
-      } else {
-        // undo action
-        const data = history.undoOnce();
-        if (data !== null) {
-          elements = data.elements;
-          this.setState({ ...data.appState });
-        }
-      }
     } else if (event.key === KEYS.SPACE && gesture.pointers.length === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
@@ -969,6 +934,22 @@ export class App extends React.Component<any, AppState> {
     }
     this.setState({ elementType });
   }
+
+  private onGestureStart = (event: GestureEvent) => {
+    event.preventDefault();
+    gesture.initialScale = this.state.zoom;
+  };
+  private onGestureChange = (event: GestureEvent) => {
+    event.preventDefault();
+
+    this.setState({
+      zoom: getNormalizedZoom(gesture.initialScale! * event.scale),
+    });
+  };
+  private onGestureEnd = (event: GestureEvent) => {
+    event.preventDefault();
+    gesture.initialScale = null;
+  };
 
   setAppState = (obj: any) => {
     this.setState(obj);
@@ -2279,7 +2260,7 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
     const { deltaX, deltaY } = event;
 
-    if (event[KEYS.META]) {
+    if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);

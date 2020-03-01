@@ -2,7 +2,12 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { clearAppStatePropertiesForHistory } from "./appState";
 
-class SceneHistory {
+type Result = {
+  appState: AppState;
+  elements: ExcalidrawElement[];
+};
+
+export class SceneHistory {
   private recording: boolean = true;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
@@ -53,7 +58,7 @@ class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce() {
+  redoOnce(): Result | null {
     if (this.redoStack.length === 0) {
       return null;
     }
@@ -68,7 +73,7 @@ class SceneHistory {
     return null;
   }
 
-  undoOnce() {
+  undoOnce(): Result | null {
     if (this.stateHistory.length === 0) {
       return null;
     }
