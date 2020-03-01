@@ -60,7 +60,9 @@
     "resetZoom": "Nullstill zoom",
     "menu": "Meny",
     "done": "Ferdig",
-    "edit": "Rediger"
+    "edit": "Rediger",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
