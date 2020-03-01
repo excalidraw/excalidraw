@@ -36,9 +36,9 @@ export function renderScene(
     renderSelection?: boolean;
     renderOptimizations?: boolean;
   } = {},
-): boolean {
+) {
   if (!canvas) {
-    return false;
+    return { atLeastOneVisibleElement: false };
   }
 
   const context = canvas.getContext("2d")!;
@@ -196,9 +196,10 @@ export function renderScene(
       }
     });
     context.restore();
+    return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
   }
 
-  return visibleElements.length > 0;
+  return { atLeastOneVisibleElement: visibleElements.length > 0 };
 }
 
 function isVisibleElement(
