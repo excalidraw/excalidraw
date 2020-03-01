@@ -212,6 +212,7 @@ let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 
 interface LayerUIProps {
@@ -1194,6 +1195,7 @@ export class App extends React.Component<any, AppState> {
               let lastY = y;
 
               if (isOverHorizontalScrollBar || isOverVerticalScrollBar) {
+                isDraggingScrollBar = true;
                 lastX = event.clientX;
                 lastY = event.clientY;
                 const onPointerMove = (event: PointerEvent) => {
@@ -1227,6 +1229,8 @@ export class App extends React.Component<any, AppState> {
                 };
 
                 const onPointerUp = () => {
+                  isDraggingScrollBar = false;
+                  setCursorForShape(this.state.elementType);
                   lastPointerUp = null;
                   window.removeEventListener("pointermove", onPointerMove);
                   window.removeEventListener("pointerup", onPointerUp);
@@ -2173,10 +2177,27 @@ export class App extends React.Component<any, AppState> {
                 gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
               }
 
-              if (isHoldingSpace || isPanning) {
+              if (isHoldingSpace || isPanning || isDraggingScrollBar) {
                 return;
               }
-              const hasDeselectedButton = Boolean(event.buttons);
+
+              const {
+                isOverHorizontalScrollBar,
+                isOverVerticalScrollBar,
+              } = isOverScrollBars(
+                currentScrollBars,
+                event.clientX,
+                event.clientY,
+              );
+              const isOverScrollBar =
+                isOverVerticalScrollBar || isOverHorizontalScrollBar;
+              if (!this.state.draggingElement || this.state.multiElement) {
+                if (isOverScrollBar) {
+                  resetCursor();
+                } else {
+                  setCursorForShape(this.state.elementType);
+                }
+              }
 
               const { x, y } = viewportCoordsToSceneCoords(
                 event,
@@ -2196,6 +2217,7 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
+              const hasDeselectedButton = Boolean(event.buttons);
               if (
                 hasDeselectedButton ||
                 this.state.elementType !== "selection"
@@ -2204,7 +2226,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               const selectedElements = getSelectedElements(elements);
-              if (selectedElements.length === 1) {
+              if (selectedElements.length === 1 && !isOverScrollBar) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
                   { x, y },
@@ -2224,7 +2246,8 @@ export class App extends React.Component<any, AppState> {
                 y,
                 this.state.zoom,
               );
-              document.documentElement.style.cursor = hitElement ? "move" : "";
+              document.documentElement.style.cursor =
+                hitElement && !isOverScrollBar ? "move" : "";
             }}
             onPointerUp={this.removePointer}
             onPointerLeave={this.removePointer}
