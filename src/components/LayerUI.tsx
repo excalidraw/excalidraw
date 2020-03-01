@@ -227,7 +227,7 @@ export const LayerUI = React.memo(
     return (
       prev.language === next.language &&
       prev.elements === next.elements &&
-      keys.every(k => prevAppState[k] === nextAppState[k])
+      keys.every(key => prevAppState[key] === nextAppState[key])
     );
   },
 );

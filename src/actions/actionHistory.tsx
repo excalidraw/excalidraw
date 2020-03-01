@@ -10,13 +10,24 @@ import { KEYS } from "../keys";
 
 const writeData = (
   appState: AppState,
-  data: { elements: ExcalidrawElement[]; appState: AppState } | null,
+  updater: () => { elements: ExcalidrawElement[]; appState: AppState } | null,
 ) => {
-  if (data !== null) {
-    return {
-      elements: data.elements,
-      appState: { ...appState, ...data.appState },
-    };
+  if (
+    [
+      appState.multiElement,
+      appState.resizingElement,
+      appState.editingElement,
+      appState.draggingElement,
+    ].some(Boolean)
+  ) {
+    const data = updater();
+
+    return data === null
+      ? {}
+      : {
+          elements: data.elements,
+          appState: { ...appState, ...data.appState },
+        };
   }
   return {};
 };
@@ -28,15 +39,7 @@ type ActionCreator = (history: SceneHistory) => Action;
 
 export const createUndoAction: ActionCreator = history => ({
   name: "undo",
-  perform: (_, appState) =>
-    [
-      appState.multiElement,
-      appState.resizingElement,
-      appState.editingElement,
-      appState.draggingElement,
-    ].every(x => x === null)
-      ? writeData(appState, history.undoOnce())
-      : {},
+  perform: (_, appState) => writeData(appState, () => history.undoOnce()),
   keyTest: testUndo(false),
   PanelComponent: ({ updateData }) => (
     <ToolButton
@@ -51,15 +54,7 @@ export const createUndoAction: ActionCreator = history => ({
 
 export const createRedoAction: ActionCreator = history => ({
   name: "redo",
-  perform: (_, appState) =>
-    [
-      appState.multiElement,
-      appState.resizingElement,
-      appState.editingElement,
-      appState.draggingElement,
-    ].every(x => x === null)
-      ? writeData(appState, history.redoOnce())
-      : {},
+  perform: (_, appState) => writeData(appState, () => history.redoOnce()),
   keyTest: testUndo(true),
   PanelComponent: ({ updateData }) => (
     <ToolButton

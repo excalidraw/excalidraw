@@ -164,7 +164,7 @@ export function hitTest(
     const relY = y - element.y;
 
     // hit thest all "subshapes" of the linear element
-    return shape.some(s => hitTestRoughShape(s.sets, relX, relY));
+    return shape.some(subshape => hitTestRoughShape(subshape.sets, relX, relY));
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 

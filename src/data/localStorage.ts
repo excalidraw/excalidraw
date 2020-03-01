@@ -34,7 +34,7 @@ export function restoreFromLocalStorage() {
       elements = JSON.parse(savedElements).map(
         ({ shape, ...element }: ExcalidrawElement) => element,
       );
-    } catch (e) {
+    } catch {
       // Do nothing because elements array is already empty
     }
   }
@@ -43,7 +43,7 @@ export function restoreFromLocalStorage() {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
-    } catch (e) {
+    } catch {
       // Do nothing because appState is already null
     }
   }

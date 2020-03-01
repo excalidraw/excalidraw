@@ -85,28 +85,28 @@ export async function exportToBackend(
 
 export async function importFromBackend(
   id: string | null,
-  k: string | undefined,
+  privateKey: string | undefined,
 ) {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
 
   try {
     const response = await fetch(
-      k ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+      privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
       return restore(elements, appState, { scrollToContent: true });
     }
     let data;
-    if (k) {
+    if (privateKey) {
       const buffer = await response.arrayBuffer();
       const key = await window.crypto.subtle.importKey(
         "jwk",
         {
           alg: "A128GCM",
           ext: true,
-          k: k,
+          k: privateKey,
           key_ops: ["encrypt", "decrypt"],
           kty: "oct",
         },
@@ -202,7 +202,7 @@ export async function exportCanvas(
   } else if (type === "clipboard") {
     try {
       copyCanvasToClipboardAsPng(tempCanvas);
-    } catch (err) {
+    } catch {
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
@@ -219,13 +219,13 @@ export async function exportCanvas(
   }
 }
 
-export async function loadScene(id: string | null, k?: string) {
+export async function loadScene(id: string | null, privateKey?: string) {
   let data;
   let selectedId;
   if (id != null) {
-    // k is the private key used to decrypt the content from the server, take
+    // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    data = await importFromBackend(id, k);
+    data = await importFromBackend(id, privateKey);
     selectedId = id;
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {

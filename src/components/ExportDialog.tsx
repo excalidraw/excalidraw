@@ -173,7 +173,7 @@ function ExportModal({
                     name="export-canvas-scale"
                     aria-label={`Scale ${s} x`}
                     id="export-canvas-scale"
-                    checked={scale === s}
+                    checked={s === scale}
                     onChange={() => setScale(s)}
                   />
                 ))}

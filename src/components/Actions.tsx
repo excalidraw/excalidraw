@@ -117,6 +117,7 @@ export function ZoomActions({
       <Stack.Row gap={1} align="center">
         {renderAction("zoomIn")}
         {renderAction("zoomOut")}
+        {renderAction("resetZoom")}
         <div style={{ marginLeft: 4 }}>{(zoom * 100).toFixed(0)}%</div>
       </Stack.Row>
     </Stack.Col>
