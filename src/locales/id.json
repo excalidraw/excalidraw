@@ -83,8 +83,8 @@
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
   },
   "headings": {
-    "canvasActions": "Aksi Kanvas",
-    "selectedShapeActions": "Aksi bentuk yang dipilih",
+    "canvasActions": "Opsi Kanvas",
+    "selectedShapeActions": "Opsi bentuk yang dipilih",
     "shapes": "Bentuk"
   },
   "hints": {
