@@ -5,7 +5,7 @@
 
 import React from "react";
 
-const ACTIVE_ELEM_COLOR = "#ffa94d"; // OC ORANGE 4
+const ACTIVE_ELEMENT_COLOR = "#ffa94d"; // OC ORANGE 4
 
 const createIcon = (d: string, width = 512) => (
   <svg
@@ -104,8 +104,8 @@ export const bringForward = (
     />
     <path
       d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEM_COLOR}
-      stroke={ACTIVE_ELEM_COLOR}
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
       strokeWidth="2"
     />
   </svg>
@@ -115,8 +115,8 @@ export const sendBackward = (
   <svg viewBox="0 0 24 24">
     <path
       d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEM_COLOR}
-      stroke={ACTIVE_ELEM_COLOR}
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
       strokeWidth="2"
     />
     <path
@@ -136,8 +136,8 @@ export const bringToFront = (
     />
     <path
       d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEM_COLOR}
-      stroke={ACTIVE_ELEM_COLOR}
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
       strokeWidth="2"
     />
   </svg>
@@ -147,8 +147,8 @@ export const sendToBack = (
   <svg viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
     <path
       d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEM_COLOR}
-      stroke={ACTIVE_ELEM_COLOR}
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
       strokeWidth="2"
     />
     <path
