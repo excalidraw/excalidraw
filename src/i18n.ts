@@ -5,6 +5,7 @@ export const languages = [
   { lng: "de", label: "Deutsch", data: require("./locales/de.json") },
   { lng: "es", label: "Español", data: require("./locales/es.json") },
   { lng: "fr", label: "Français", data: require("./locales/fr.json") },
+  { lng: "id", label: "Bahasa Indonesia", data: require("./locales/id.json") },
   { lng: "no", label: "Norsk", data: require("./locales/no.json") },
   { lng: "pl", label: "Polski", data: require("./locales/pl.json") },
   { lng: "pt", label: "Português", data: require("./locales/pt.json") },
