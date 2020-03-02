@@ -76,7 +76,9 @@ export class TopErrorBoundary extends React.Component<
       if (typeof templateStr === "string") {
         body = encodeURIComponent(templateStr);
       }
-    } catch {}
+    } catch (error) {
+      console.error(error);
+    }
 
     window.open(
       `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,

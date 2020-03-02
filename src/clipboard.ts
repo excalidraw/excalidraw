@@ -105,7 +105,9 @@ export async function copyTextToSystemClipboard(text: string | null) {
       //  not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
-    } catch {}
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   // Note that execCommand doesn't allow copying empty strings, so if we're
@@ -143,7 +145,9 @@ function copyTextViaExecCommand(text: string) {
     textarea.setSelectionRange(0, textarea.value.length);
 
     success = document.execCommand("copy");
-  } catch {}
+  } catch (error) {
+    console.error(error);
+  }
 
   textarea.remove();
 
