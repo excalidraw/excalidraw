@@ -61,8 +61,8 @@
     "menu": "Menu",
     "done": "Terminé",
     "edit": "Modifier",
-    "undo": "Undo",
-    "redo": "Redo"
+    "undo": "Annuler",
+    "redo": "Rétablir"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
