@@ -10,7 +10,7 @@
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
     "react": "16.13.0",
-    "react-dom": "16.12.0",
+    "react-dom": "16.13.0",
     "react-scripts": "3.4.0",
     "roughjs": "4.0.4",
     "stacktrace-js": "2.0.2"
