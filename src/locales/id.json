@@ -6,7 +6,7 @@
     "bringForward": "Memajukan",
     "sendToBack": "Bawa ke Belakang",
     "bringToFront": "Bawa ke Depan",
-    "sendBackward": "Kirim Mundur",
+    "sendBackward": "Mundurkan",
     "delete": "Hapus",
     "copyStyles": "Salin Style",
     "pasteStyles": "Tempel Style",
@@ -20,7 +20,7 @@
     "fontFamily": "Font Family",
     "onlySelected": "Hanya yang Dipilih",
     "withBackground": "Dengan Latar",
-    "handDrawn": "Hand-Drawn",
+    "handDrawn": "Tulisan Tangan",
     "normal": "Normal",
     "code": "Kode",
     "small": "Kecil",
@@ -46,15 +46,15 @@
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
     "export": "Ekspor",
-    "exportToPng": "Expor ke PNG",
-    "exportToSvg": "Expor ke SVG",
+    "exportToPng": "Ekspor ke PNG",
+    "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
     "save": "Simpan",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
     "close": "Tutup",
     "selectLanguage": "Pilih Bahasa",
-    "scrollBackToContent": "Scroll back to content",
+    "scrollBackToContent": "Gulir kembali ke konten",
     "zoomIn": "Besarkan",
     "zoomOut": "Kecilkan",
     "resetZoom": "Reset Pembesaran",
@@ -84,12 +84,12 @@
   },
   "headings": {
     "canvasActions": "Aksi Kanvas",
-    "selectedShapeActions": "Selected shape actions | Aksi bentuk yang dipilih",
+    "selectedShapeActions": "Aksi bentuk yang dipilih",
     "shapes": "Bentuk"
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
-    "linearElementMulti": "Press Escape or Enter to finish | Tekan Escape atau Enter untuk menyelesaikan",
+    "linearElementMulti": "Tekan Escape atau Enter untuk menyelesaikan",
     "resize": "Anda dapat membatasi proporsi dengan menahan SHIFT sambil mengubah ukuran"
   }
 }
