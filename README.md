@@ -3,9 +3,14 @@
     <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
   <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams with a hand-drawn feel.</h3>
-  <a href="https://twitter.com/Excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
-  </a>
+  <p>
+    <a href="https://twitter.com/Excalidraw">
+      <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
+    </a>
+    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
+      <img src="https://badges.crowdin.net/excalidraw/localized.svg">
+    </a>
+  </p>
 </div>
 
 ## Try it now
@@ -53,6 +58,8 @@ git clone https://github.com/excalidraw/excalidraw.git
 ## Contributing
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, open an issue so we can get things set up on our end first.
 
 You can also discuss the app on our [Gitter channel](https://gitter.im/excalidraw/community).
 
