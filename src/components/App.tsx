@@ -78,7 +78,35 @@ import {
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 
+// -----------------------------------------------------------------------------
+// TEST HOOKS
+// -----------------------------------------------------------------------------
+
+declare global {
+  interface Window {
+    __TEST__: {
+      elements: typeof elements;
+      appState: AppState;
+    };
+  }
+}
+
+if (process.env.NODE_ENV === "test") {
+  window.__TEST__ = {} as Window["__TEST__"];
+}
+
+// -----------------------------------------------------------------------------
+
 let { elements } = createScene();
+
+if (process.env.NODE_ENV === "test") {
+  Object.defineProperty(window.__TEST__, "elements", {
+    get() {
+      return elements;
+    },
+  });
+}
+
 const { history } = createHistory();
 
 let cursorX = 0;
@@ -177,6 +205,15 @@ export class App extends React.Component<any, AppState> {
 
   private unmounted = false;
   public async componentDidMount() {
+    if (process.env.NODE_ENV === "test") {
+      Object.defineProperty(window.__TEST__, "appState", {
+        configurable: true,
+        get: () => {
+          return this.state;
+        },
+      });
+    }
+
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.pasteFromClipboard);
     document.addEventListener("cut", this.onCut);
