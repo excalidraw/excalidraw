@@ -2,27 +2,30 @@
   <a href="https://excalidraw.com">
     <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
-  <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.</h3>
-  <a href="https://twitter.com/Excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=flat-square&logo=twitter">
-  </a>
+  <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams with a hand-drawn feel.</h3>
+  <p>
+    <a href="https://twitter.com/Excalidraw">
+      <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
+    </a>
+    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
+      <img src="https://badges.crowdin.net/excalidraw/localized.svg">
+    </a>
+  </p>
 </div>
 
 ## Try it now
 
-Go to https://excalidraw.com to start sketching
+Go to https://excalidraw.com to start sketching.
 
 ## Testimonials
 
 <a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
-
 <a href="https://twitter.com/dan_abramov/status/1213762494428262400"><img width="398" src="https://user-images.githubusercontent.com/197597/71783990-4d395880-2fa3-11ea-9ad7-186138db5003.png"></a>
 
 <a href="https://twitter.com/kyehohenberger/status/1214288572037025792"><img width="423" src="https://user-images.githubusercontent.com/197597/71851802-34f13880-308c-11ea-9416-191099e6349c.png"></a>
+<a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
 
 <a href="https://twitter.com/jordwalke/status/1214858186789806080"><img width="434" src="https://user-images.githubusercontent.com/197597/72036874-07a1b780-3251-11ea-99e8-6bafd93483a0.png"></a>
-
-<a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
 
 ## Run the code
 
@@ -46,7 +49,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 | Command             | Description                       |
 | ------------------- | --------------------------------- |
 | `npm install`       | Install the dependencies          |
-| `npm run start`     | Run the project                   |
+| `npm start`         | Run the project                   |
 | `npm run fix`       | Reformat all files with Prettier  |
 | `npm run test:code` | Test for formatting with Prettier |
 | `npm run test:app`  | Test the app                      |
@@ -54,7 +57,9 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an [issue](https://github.com/excalidraw/excalidraw/issues) first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, open an issue so we can get things set up on our end first.
 
 You can also discuss the app on our [Gitter channel](https://gitter.im/excalidraw/community).
 
@@ -62,7 +67,8 @@ You can also discuss the app on our [Gitter channel](https://gitter.im/excalidra
 
 - [React](https://reactjs.org)
 - [Rough.js](https://roughjs.com)
-- [ZEIT Now](https://zeit.co/)
+- [TypeScript](https://typescriptlang.org)
+- [ZEIT Now](https://zeit.co)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 
