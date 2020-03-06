@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 
 // Unmount ReactDOM from root
@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("resize element", () => {
+describe("resize element", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -55,7 +55,7 @@ describe.skip("resize element", () => {
   });
 });
 
-describe.skip("resize element with aspect ratio when SHIFT is clicked", () => {
+describe("resize element with aspect ratio when SHIFT is clicked", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;

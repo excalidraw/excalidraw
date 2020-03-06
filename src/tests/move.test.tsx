@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 
 // Unmount ReactDOM from root
@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("move element", () => {
+describe("move element", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -49,7 +49,7 @@ describe.skip("move element", () => {
   });
 });
 
-describe.skip("duplicate element on move when ALT is clicked", () => {
+describe("duplicate element on move when ALT is clicked", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 
@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("selection element", () => {
+describe("selection element", () => {
   it("create selection element on pointer down", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -73,7 +73,7 @@ describe.skip("selection element", () => {
   });
 });
 
-describe.skip("select single element on the scene", () => {
+describe("select single element on the scene", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;

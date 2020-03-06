@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 
@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("remove shape in non linear elements", () => {
+describe("remove shape in non linear elements", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -61,7 +61,7 @@ describe.skip("remove shape in non linear elements", () => {
   });
 });
 
-describe.skip("multi point mode in linear elements", () => {
+describe("multi point mode in linear elements", () => {
   it("arrow", () => {
     const { getByToolName, container } = render(<App />);
     // select tool

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("add element to the scene when pointer dragging long enough", () => {
+describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -163,7 +163,7 @@ describe.skip("add element to the scene when pointer dragging long enough", () =
   });
 });
 
-describe.skip("do not add element to the scene if size is too small", () => {
+describe("do not add element to the scene if size is too small", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
