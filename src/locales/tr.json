@@ -60,7 +60,9 @@
     "resetZoom": "Zoom'u Sıfırla",
     "menu": "Menü",
     "done": "Tamam",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",

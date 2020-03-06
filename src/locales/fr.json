@@ -25,7 +25,7 @@
     "code": "Code",
     "small": "Petit",
     "medium": "Moyen",
-    "large": "Large",
+    "large": "Grand",
     "veryLarge": "Très Large",
     "solid": "Solide",
     "hachure": "Hachure",
@@ -38,7 +38,7 @@
     "cartoonist": "Cartooniste",
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
-    "canvasBackground": "Fond du canvas",
+    "canvasBackground": "Fond du canevas",
     "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
     "language": "Langue"
@@ -57,10 +57,12 @@
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoomer",
     "zoomOut": "Dézoomer",
-    "resetZoom": "Zoom par défaut",
+    "resetZoom": "Réinitialiser le zoom",
     "menu": "Menu",
     "done": "Terminé",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "undo": "Annuler",
+    "redo": "Rétablir"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
