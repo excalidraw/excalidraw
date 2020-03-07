@@ -786,6 +786,7 @@ export class App extends React.Component<any, AppState> {
           this.setState({});
         }
       });
+      return;
     }
     const scene = await loadScene(null);
     this.syncActionResult(scene);
