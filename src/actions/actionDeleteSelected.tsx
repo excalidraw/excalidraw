@@ -1,12 +1,12 @@
-import { Action } from "./types";
 import { deleteSelectedElements, isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import React from "react";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
+import { register } from "./register";
 
-export const actionDeleteSelected: Action = {
+export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   perform: (elements, appState) => {
     return {
@@ -28,4 +28,4 @@ export const actionDeleteSelected: Action = {
       visible={isSomeElementSelected(elements)}
     />
   ),
-};
+});

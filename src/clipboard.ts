@@ -28,7 +28,7 @@ export async function copyToAppClipboard(
     //  copied elements, and thus we should prefer the text content.
     await copyTextToSystemClipboard(null);
     PREFER_APP_CLIPBOARD = false;
-  } catch (error) {
+  } catch {
     // if clearing system clipboard didn't work, we should prefer in-app
     //  clipboard even if there's text in system clipboard on paste, because
     //  we can't be sure of the order of copy operations
@@ -105,7 +105,9 @@ export async function copyTextToSystemClipboard(text: string | null) {
       //  not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   // Note that execCommand doesn't allow copying empty strings, so if we're
@@ -143,7 +145,9 @@ function copyTextViaExecCommand(text: string) {
     textarea.setSelectionRange(0, textarea.value.length);
 
     success = document.execCommand("copy");
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 
   textarea.remove();
 

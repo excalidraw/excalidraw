@@ -22,7 +22,7 @@ import useIsMobile from "../is-mobile";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (
+export type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
 ) => void;
@@ -173,7 +173,7 @@ function ExportModal({
                     name="export-canvas-scale"
                     aria-label={`Scale ${s} x`}
                     id="export-canvas-scale"
-                    checked={scale === s}
+                    checked={s === scale}
                     onChange={() => setScale(s)}
                   />
                 ))}

@@ -32,6 +32,10 @@ export class ActionManager implements ActionsManagerInterface {
     this.actions[action.name] = action;
   }
 
+  registerAll(actions: readonly Action[]) {
+    actions.forEach(action => this.registerAction(action));
+  }
+
   handleKeyDown(event: KeyboardEvent) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
@@ -79,7 +83,7 @@ export class ActionManager implements ActionsManagerInterface {
       }));
   }
 
-  renderAction(name: string) {
+  renderAction = (name: string) => {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -103,5 +107,5 @@ export class ActionManager implements ActionsManagerInterface {
     }
 
     return null;
-  }
+  };
 }

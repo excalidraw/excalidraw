@@ -1,3 +1,6 @@
+import { FlooredNumber } from "./types";
+import { getZoomOrigin } from "./scene";
+
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
 export function getDateTime() {
@@ -124,9 +127,57 @@ export function distance(x: number, y: number) {
 export function distance2d(x1: number, y1: number, x2: number, y2: number) {
   const xd = x2 - x1;
   const yd = y2 - y1;
-  return Math.sqrt(xd * xd + yd * yd);
+  return Math.hypot(xd, yd);
 }
 
 export function resetCursor() {
   document.documentElement.style.cursor = "";
+}
+
+export function viewportCoordsToSceneCoords(
+  { clientX, clientY }: { clientX: number; clientY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
+) {
+  const zoomOrigin = getZoomOrigin(canvas);
+  const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
+  const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
+
+  const x = clientXWithZoom - scrollX;
+  const y = clientYWithZoom - scrollY;
+
+  return { x, y };
+}
+
+export function sceneCoordsToViewportCoords(
+  { sceneX, sceneY }: { sceneX: number; sceneY: number },
+  {
+    scrollX,
+    scrollY,
+    zoom,
+  }: {
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
+    zoom: number;
+  },
+  canvas: HTMLCanvasElement | null,
+) {
+  const zoomOrigin = getZoomOrigin(canvas);
+  const sceneXWithZoomAndScroll =
+    zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
+  const sceneYWithZoomAndScroll =
+    zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
+
+  const x = sceneXWithZoomAndScroll;
+  const y = sceneYWithZoomAndScroll;
+
+  return { x, y };
 }

@@ -81,13 +81,13 @@ function _duplicateElement(val: any, depth: number = 0) {
       typeof val.constructor === "function"
         ? Object.create(Object.getPrototypeOf(val))
         : {};
-    for (const k in val) {
-      if (val.hasOwnProperty(k)) {
+    for (const key in val) {
+      if (val.hasOwnProperty(key)) {
         // don't copy top-level shape property, which we want to regenerate
-        if (depth === 0 && (k === "shape" || k === "canvas")) {
+        if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
-        tmp[k] = _duplicateElement(val[k], depth + 1);
+        tmp[key] = _duplicateElement(val[key], depth + 1);
       }
     }
     return tmp;

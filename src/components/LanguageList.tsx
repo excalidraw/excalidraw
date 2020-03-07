@@ -1,15 +1,15 @@
 import React from "react";
-import { t } from "../i18n";
+import * as i18n from "../i18n";
 
-export function LanguageList<T>({
+export function LanguageList({
   onChange,
-  languages,
-  currentLanguage,
+  languages = i18n.languages,
+  currentLanguage = i18n.getLanguage(),
   floating,
 }: {
-  languages: { lng: string; label: string }[];
+  languages?: { lng: string; label: string }[];
   onChange: (value: string) => void;
-  currentLanguage: string;
+  currentLanguage?: string;
   floating?: boolean;
 }) {
   return (
@@ -20,7 +20,7 @@ export function LanguageList<T>({
         }`}
         onChange={({ target }) => onChange(target.value)}
         value={currentLanguage}
-        aria-label={t("buttons.selectLanguage")}
+        aria-label={i18n.t("buttons.selectLanguage")}
       >
         {languages.map(language => (
           <option key={language.lng} value={language.lng}>

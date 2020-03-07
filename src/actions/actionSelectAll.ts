@@ -1,7 +1,7 @@
-import { Action } from "./types";
 import { KEYS } from "../keys";
+import { register } from "./register";
 
-export const actionSelectAll: Action = {
+export const actionSelectAll = register({
   name: "selectAll",
   perform: elements => {
     return {
@@ -10,4 +10,4 @@ export const actionSelectAll: Action = {
   },
   contextItemLabel: "labels.selectAll",
   keyTest: event => event[KEYS.META] && event.key === "a",
-};
+});

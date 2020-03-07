@@ -1,4 +1,3 @@
-export { ActionManager } from "./manager";
 export { actionDeleteSelected } from "./actionDeleteSelected";
 export {
   actionBringForward,
