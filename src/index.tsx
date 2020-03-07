@@ -720,14 +720,6 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
-  private receiveUpdate = async (encryptedData: ArrayBuffer) => {
-    if (this.roomKey) {
-      const scene = await decryptSocketUpdateData(encryptedData, this.roomKey);
-      elements = scene.elements;
-      this.setState({});
-    }
-  };
-
   private unmounted = false;
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
@@ -796,11 +788,27 @@ export class App extends React.Component<any, AppState> {
       this.socket.on(
         "new-user-receive-update",
         async (encryptedData: ArrayBuffer) => {
-          await this.receiveUpdate(encryptedData);
+          if (this.roomKey) {
+            const scene = await decryptSocketUpdateData(
+              encryptedData,
+              this.roomKey,
+            );
+            elements = scene.elements;
+            this.setState({});
+          }
           this.socket && this.socket.off("new-user-receive-update");
         },
       );
-      this.socket.on("receive-update", this.receiveUpdate);
+      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
+        if (this.roomKey) {
+          const scene = await decryptSocketUpdateData(
+            encryptedData,
+            this.roomKey,
+          );
+          elements = scene.elements;
+          this.setState({});
+        }
+      });
       return;
     }
     const scene = await loadScene(null);
