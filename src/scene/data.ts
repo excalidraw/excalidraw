@@ -28,6 +28,8 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
 const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
+export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
+
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
 // part of `AppState`.

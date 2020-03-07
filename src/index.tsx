@@ -115,12 +115,11 @@ import {
   decryptSocketUpdateData,
   encryptSocketUpdateData,
   normalizeScroll,
+  SOCKET_SERVER,
 } from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
 import { ScrollBars } from "./scene/types";
 import { createUndoAction, createRedoAction } from "./actions/actionHistory";
-
-const SOCKET_SERVER = "http://localhost:4000";
 
 let { elements } = createScene();
 const { history } = createHistory();
