@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 
@@ -14,7 +14,9 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("selection element", () => {
+const { __TEST__: h } = window;
+
+describe("selection element", () => {
   it("create selection element on pointer down", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -25,7 +27,7 @@ describe.skip("selection element", () => {
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
 
     expect(renderScene).toHaveBeenCalledTimes(1);
-    const selectionElement = renderScene.mock.calls[0][1]!;
+    const selectionElement = h.appState.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
     expect([selectionElement.x, selectionElement.y]).toEqual([60, 100]);
@@ -46,7 +48,7 @@ describe.skip("selection element", () => {
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
 
     expect(renderScene).toHaveBeenCalledTimes(2);
-    const selectionElement = renderScene.mock.calls[1][1]!;
+    const selectionElement = h.appState.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
     expect([selectionElement.x, selectionElement.y]).toEqual([60, 30]);
@@ -68,12 +70,11 @@ describe.skip("selection element", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    const selectionElement = renderScene.mock.calls[2][1];
-    expect(selectionElement).toBeNull();
+    expect(h.appState.selectionElement).toBeNull();
   });
 });
 
-describe.skip("select single element on the scene", () => {
+describe("select single element on the scene", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -94,11 +95,9 @@ describe.skip("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
-    const elements = renderScene.mock.calls[6][0];
-    const selectionElement = renderScene.mock.calls[6][1];
-    expect(selectionElement).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect(elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].isSelected).toBeTruthy();
   });
 
   it("diamond", () => {
@@ -121,11 +120,9 @@ describe.skip("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
-    const elements = renderScene.mock.calls[6][0];
-    const selectionElement = renderScene.mock.calls[6][1];
-    expect(selectionElement).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect(elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].isSelected).toBeTruthy();
   });
 
   it("ellipse", () => {
@@ -148,11 +145,9 @@ describe.skip("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
-    const elements = renderScene.mock.calls[6][0];
-    const selectionElement = renderScene.mock.calls[6][1];
-    expect(selectionElement).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect(elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].isSelected).toBeTruthy();
   });
 
   it("arrow", () => {
@@ -175,11 +170,9 @@ describe.skip("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
-    const elements = renderScene.mock.calls[6][0];
-    const selectionElement = renderScene.mock.calls[6][1];
-    expect(selectionElement).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect(elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].isSelected).toBeTruthy();
   });
 
   it("arrow", () => {
@@ -202,10 +195,8 @@ describe.skip("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
-    const elements = renderScene.mock.calls[6][0];
-    const selectionElement = renderScene.mock.calls[6][1];
-    expect(selectionElement).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect(elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].isSelected).toBeTruthy();
   });
 });

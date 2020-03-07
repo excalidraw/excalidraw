@@ -82,3 +82,10 @@ export function getSelectedElements(
 ): readonly ExcalidrawElement[] {
   return elements.filter(element => element.isSelected);
 }
+
+export function getTargetElement(
+  editingElement: ExcalidrawElement | null,
+  elements: readonly ExcalidrawElement[],
+) {
+  return editingElement ? [editingElement] : getSelectedElements(elements);
+}

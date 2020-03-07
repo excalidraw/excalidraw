@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 
 // Unmount ReactDOM from root
@@ -13,7 +13,9 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("resize element", () => {
+const { __TEST__: h } = window;
+
+describe("resize element", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -27,12 +29,12 @@ describe.skip("resize element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      const elements = renderScene.mock.calls[3][0];
-      const selectionElement = renderScene.mock.calls[3][1];
-      expect(selectionElement).toBeNull();
-      expect(elements.length).toEqual(1);
-      expect(elements[0].isSelected).toBeTruthy();
-      expect([elements[0].x, elements[0].y]).toEqual([30, 20]);
+      expect(h.appState.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(1);
+      expect(h.elements[0].isSelected).toBeTruthy();
+      expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+
+      expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
 
       renderScene.mockClear();
     }
@@ -47,15 +49,14 @@ describe.skip("resize element", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(5);
-    const elements = renderScene.mock.calls[4][0];
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect([elements[0].x, elements[0].y]).toEqual([29, 47]);
-    expect([elements[0].width, elements[0].height]).toEqual([31, 23]);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
+    expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
   });
 });
 
-describe.skip("resize element with aspect ratio when SHIFT is clicked", () => {
+describe("resize element with aspect ratio when SHIFT is clicked", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
@@ -69,12 +70,12 @@ describe.skip("resize element with aspect ratio when SHIFT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      const elements = renderScene.mock.calls[3][0];
-      const selectionElement = renderScene.mock.calls[3][1];
-      expect(selectionElement).toBeNull();
-      expect(elements.length).toEqual(1);
-      expect(elements[0].isSelected).toBeTruthy();
-      expect([elements[0].x, elements[0].y]).toEqual([30, 20]);
+      expect(h.appState.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(1);
+      expect(h.elements[0].isSelected).toBeTruthy();
+      expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+      expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+      expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
 
       renderScene.mockClear();
     }
@@ -89,10 +90,9 @@ describe.skip("resize element with aspect ratio when SHIFT is clicked", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(5);
-    const elements = renderScene.mock.calls[4][0];
-    expect(renderScene.mock.calls[4][1]).toBeNull();
-    expect(elements.length).toEqual(1);
-    expect([elements[0].x, elements[0].y]).toEqual([29, 39]);
-    expect([elements[0].width, elements[0].height]).toEqual([31, 31]);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(1);
+    expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
+    expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
   });
 });

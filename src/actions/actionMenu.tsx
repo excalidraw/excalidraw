@@ -1,11 +1,11 @@
-import { Action } from "./types";
 import React from "react";
 import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
+import { register } from "./register";
 
-export const actionToggleCanvasMenu: Action = {
+export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
   perform: (_, appState) => ({
     appState: {
@@ -22,9 +22,9 @@ export const actionToggleCanvasMenu: Action = {
       selected={appState.openMenu === "canvas"}
     />
   ),
-};
+});
 
-export const actionToggleEditMenu: Action = {
+export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
   perform: (_elements, appState) => ({
     appState: {
@@ -42,4 +42,4 @@ export const actionToggleEditMenu: Action = {
       selected={appState.openMenu === "shape"}
     />
   ),
-};
+});

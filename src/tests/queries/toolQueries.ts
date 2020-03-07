@@ -14,9 +14,9 @@ const _getAllByToolName = (container: HTMLElement, tool: string) => {
   return queries.getAllByTitle(container, toolTitle);
 };
 
-const getMultipleError = (c: any, tool: any) =>
+const getMultipleError = (_container: any, tool: any) =>
   `Found multiple elements with tool name: ${tool}`;
-const getMissingError = (c: any, tool: any) =>
+const getMissingError = (_container: any, tool: any) =>
   `Unable to find an element with tool name: ${tool}`;
 
 export const [

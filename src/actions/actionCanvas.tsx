@@ -1,5 +1,4 @@
 import React from "react";
-import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
@@ -8,8 +7,9 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { KEYS } from "../keys";
 import useIsMobile from "../is-mobile";
+import { register } from "./register";
 
-export const actionChangeViewBackgroundColor: Action = {
+export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
@@ -27,9 +27,9 @@ export const actionChangeViewBackgroundColor: Action = {
     );
   },
   commitToHistory: () => true,
-};
+});
 
-export const actionClearCanvas: Action = {
+export const actionClearCanvas = register({
   name: "clearCanvas",
   commitToHistory: () => true,
   perform: () => {
@@ -56,7 +56,7 @@ export const actionClearCanvas: Action = {
       }}
     />
   ),
-};
+});
 
 const ZOOM_STEP = 0.1;
 
@@ -69,9 +69,9 @@ const KEY_CODES = {
   NUM_ZERO: "Numpad0",
 };
 
-export const actionZoomIn: Action = {
+export const actionZoomIn = register({
   name: "zoomIn",
-  perform: (elements, appState) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -93,11 +93,11 @@ export const actionZoomIn: Action = {
   keyTest: event =>
     (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
     (event[KEYS.META] || event.shiftKey),
-};
+});
 
-export const actionZoomOut: Action = {
+export const actionZoomOut = register({
   name: "zoomOut",
-  perform: (elements, appState) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -119,11 +119,11 @@ export const actionZoomOut: Action = {
   keyTest: event =>
     (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
     (event[KEYS.META] || event.shiftKey),
-};
+});
 
-export const actionResetZoom: Action = {
+export const actionResetZoom = register({
   name: "resetZoom",
-  perform: (elements, appState) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -145,4 +145,4 @@ export const actionResetZoom: Action = {
   keyTest: event =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.META] || event.shiftKey),
-};
+});
