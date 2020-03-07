@@ -15,6 +15,8 @@ export {
   saveAsJSON,
   restoreFromLocalStorage,
   saveToLocalStorage,
+  decryptSocketUpdateData,
+  encryptSocketUpdateData,
   exportToBackend,
   importFromBackend,
   loadScene,

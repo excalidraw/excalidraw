@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import socketIOClient from "socket.io-client";
 
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -110,10 +111,16 @@ import { HintViewer } from "./components/HintViewer";
 import useIsMobile, { IsMobileProvider } from "./is-mobile";
 
 import { copyToAppClipboard, getClipboardContent } from "./clipboard";
-import { normalizeScroll } from "./scene/data";
+import {
+  decryptSocketUpdateData,
+  encryptSocketUpdateData,
+  normalizeScroll,
+} from "./scene/data";
 import { getCenter, getDistance } from "./gesture";
 import { ScrollBars } from "./scene/types";
 import { createUndoAction, createRedoAction } from "./actions/actionHistory";
+
+const SOCKET_SERVER = "http://localhost:4000";
 
 let { elements } = createScene();
 const { history } = createHistory();
@@ -610,6 +617,9 @@ const LayerUI = React.memo(
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
+  socket: SocketIOClient.Socket | null = null;
+  roomID: string | null = null;
+  roomKey: string | null = null;
 
   actionManager: ActionManager;
   canvasOnlyActions: Array<Action>;
@@ -746,18 +756,39 @@ export class App extends React.Component<any, AppState> {
       // Backwards compatibility with legacy url format
       const scene = await loadScene(id);
       this.syncActionResult(scene);
-    } else {
-      const match = window.location.hash.match(
-        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-      );
-      if (match) {
-        const scene = await loadScene(match[1], match[2]);
-        this.syncActionResult(scene);
-      } else {
-        const scene = await loadScene(null);
-        this.syncActionResult(scene);
-      }
+      return;
     }
+
+    const jsonMatch = window.location.hash.match(
+      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    if (jsonMatch) {
+      const scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+      this.syncActionResult(scene);
+      return;
+    }
+
+    const roomMatch = window.location.hash.match(
+      /^#room_id=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    if (roomMatch) {
+      this.socket = socketIOClient(SOCKET_SERVER);
+      this.roomID = roomMatch[1];
+      this.roomKey = roomMatch[2];
+      this.socket.emit("join-room", this.roomID);
+      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
+        if (this.roomKey) {
+          const scene = await decryptSocketUpdateData(
+            encryptedData,
+            this.roomKey,
+          );
+          elements = scene.elements;
+          this.setState({});
+        }
+      });
+    }
+    const scene = await loadScene(null);
+    this.syncActionResult(scene);
   }
 
   public componentWillUnmount() {
@@ -2368,6 +2399,16 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
+      (async () => {
+        this.socket &&
+          this.roomID &&
+          this.roomKey &&
+          this.socket.emit(
+            "send-update",
+            this.roomID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
+          );
+      })();
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
