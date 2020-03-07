@@ -720,6 +720,14 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private receiveUpdate = async (encryptedData: ArrayBuffer) => {
+    if (this.roomKey) {
+      const scene = await decryptSocketUpdateData(encryptedData, this.roomKey);
+      elements = scene.elements;
+      this.setState({});
+    }
+  };
+
   private unmounted = false;
   public async componentDidMount() {
     document.addEventListener("copy", this.onCopy);
@@ -775,16 +783,24 @@ export class App extends React.Component<any, AppState> {
       this.roomID = roomMatch[1];
       this.roomKey = roomMatch[2];
       this.socket.emit("join-room", this.roomID);
-      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
-        if (this.roomKey) {
-          const scene = await decryptSocketUpdateData(
-            encryptedData,
-            this.roomKey,
+      this.socket.on("new-user", async (socketID: string) => {
+        this.socket &&
+          this.roomID &&
+          this.roomKey &&
+          this.socket.emit(
+            "new-user-send-update",
+            socketID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
           );
-          elements = scene.elements;
-          this.setState({});
-        }
       });
+      this.socket.on(
+        "new-user-receive-update",
+        async (encryptedData: ArrayBuffer) => {
+          await this.receiveUpdate(encryptedData);
+          this.socket && this.socket.off("new-user-receive-update");
+        },
+      );
+      this.socket.on("receive-update", this.receiveUpdate);
       return;
     }
     const scene = await loadScene(null);
