@@ -21,9 +21,7 @@ export async function copyToAppClipboard(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  CLIPBOARD = JSON.stringify(
-    getSelectedElements(elements, appState).map(({ shape, ...el }) => el),
-  );
+  CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
     //  system clip contains text on paste we know it was copied *after* user

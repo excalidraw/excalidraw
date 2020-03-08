@@ -78,12 +78,14 @@ function drawElementOnCanvas(
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      rc.draw(element.shape as Drawable);
+      rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
     case "arrow":
     case "line": {
-      (element.shape as Drawable[]).forEach(shape => rc.draw(shape));
+      (getShapeForElement(element) as Drawable[]).forEach(shape =>
+        rc.draw(shape),
+      );
       break;
     }
     default: {
@@ -114,31 +116,39 @@ const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+const shapeCache = new WeakMap<
+  ExcalidrawElement,
+  Drawable | Drawable[] | null
+>();
+
+export function getShapeForElement(element: ExcalidrawElement) {
+  return shapeCache.get(element);
+}
+
+export function invalidateShapeForElement(element: ExcalidrawElement) {
+  shapeCache.delete(element);
+}
+
 function generateElement(
   element: ExcalidrawElement,
   generator: RoughGenerator,
   sceneState?: SceneState,
 ) {
-  if (!element.shape) {
+  let shape = shapeCache.get(element) || null;
+  if (!shape) {
     switch (element.type) {
       case "rectangle":
-        element.shape = generator.rectangle(
-          0,
-          0,
-          element.width,
-          element.height,
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
-            seed: element.seed,
-          },
-        );
+        shape = generator.rectangle(0, 0, element.width, element.height, {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed,
+        });
 
         break;
       case "diamond": {
@@ -152,7 +162,7 @@ function generateElement(
           leftX,
           leftY,
         ] = getDiamondPoints(element);
-        element.shape = generator.polygon(
+        shape = generator.polygon(
           [
             [topX, topY],
             [rightX, rightY],
@@ -174,7 +184,7 @@ function generateElement(
         break;
       }
       case "ellipse":
-        element.shape = generator.ellipse(
+        shape = generator.ellipse(
           element.width / 2,
           element.height / 2,
           element.width,
@@ -209,12 +219,12 @@ function generateElement(
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        element.shape = [generator.curve(points, options)];
+        shape = [generator.curve(points, options)];
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element);
-          element.shape.push(
+          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
+          shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
               generator.line(x4, y4, x2, y2, options),
@@ -225,10 +235,11 @@ function generateElement(
       }
       case "text": {
         // just to ensure we don't regenerate element.canvas on rerenders
-        element.shape = [];
+        shape = [];
         break;
       }
     }
+    shapeCache.set(element, shape);
   }
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -334,7 +345,7 @@ export function renderElementToSvg(
     case "diamond":
     case "ellipse": {
       generateElement(element, generator);
-      const node = rsvg.draw(element.shape as Drawable);
+      const node = rsvg.draw(getShapeForElement(element) as Drawable);
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
@@ -352,7 +363,7 @@ export function renderElementToSvg(
       generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
-      (element.shape as Drawable[]).forEach(shape => {
+      (getShapeForElement(element) as Drawable[]).forEach(shape => {
         const node = rsvg.draw(shape);
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);

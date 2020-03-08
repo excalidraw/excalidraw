@@ -76,6 +76,7 @@ import {
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -295,7 +296,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
-    elements = elements.map(el => ({ ...el, shape: null }));
+    elements.forEach(element => invalidateShapeForElement(element));
     this.setState({});
   };
 
@@ -931,7 +932,7 @@ export class App extends React.Component<any, AppState> {
                     },
                   }));
                   multiElement.points.push([x - rx, y - ry]);
-                  multiElement.shape = null;
+                  invalidateShapeForElement(multiElement);
                 } else {
                   this.setState(prevState => ({
                     selectedElementIds: {
@@ -940,7 +941,7 @@ export class App extends React.Component<any, AppState> {
                     },
                   }));
                   element.points.push([0, 0]);
-                  element.shape = null;
+                  invalidateShapeForElement(element);
                   elements = [...elements, element];
                   this.setState({
                     draggingElement: element,
@@ -1293,7 +1294,7 @@ export class App extends React.Component<any, AppState> {
                     );
                     el.x = element.x;
                     el.y = element.y;
-                    el.shape = null;
+                    invalidateShapeForElement(el);
 
                     lastX = x;
                     lastY = y;
@@ -1392,7 +1393,7 @@ export class App extends React.Component<any, AppState> {
                   draggingElement.height = height;
                 }
 
-                draggingElement.shape = null;
+                invalidateShapeForElement(draggingElement);
 
                 if (this.state.elementType === "selection") {
                   if (
@@ -1455,7 +1456,7 @@ export class App extends React.Component<any, AppState> {
                       x - draggingElement.x,
                       y - draggingElement.y,
                     ]);
-                    draggingElement.shape = null;
+                    invalidateShapeForElement(draggingElement);
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
                     if (!elementLocked) {
@@ -1767,7 +1768,7 @@ export class App extends React.Component<any, AppState> {
                 const pnt = points[points.length - 1];
                 pnt[0] = x - originX;
                 pnt[1] = y - originY;
-                multiElement.shape = null;
+                invalidateShapeForElement(multiElement);
                 this.setState({});
                 return;
               }

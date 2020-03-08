@@ -57,7 +57,6 @@ export function restore(
             ? 100
             : element.opacity,
         points,
-        shape: null,
       };
     });
 

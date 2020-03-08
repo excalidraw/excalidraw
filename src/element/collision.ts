@@ -10,6 +10,7 @@ import {
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
 import { AppState } from "../types";
+import { getShapeForElement } from "../renderer/renderElement";
 
 function isElementDraggableFromInside(
   element: ExcalidrawElement,
@@ -158,10 +159,10 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow" || element.type === "line") {
-    if (!element.shape) {
+    if (!getShapeForElement(element)) {
       return false;
     }
-    const shape = element.shape as Drawable[];
+    const shape = getShapeForElement(element) as Drawable[];
 
     const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
     if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) {

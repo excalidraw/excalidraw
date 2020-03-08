@@ -1,6 +1,5 @@
 import { randomSeed } from "roughjs/bin/math";
 import nanoid from "nanoid";
-import { Drawable } from "roughjs/bin/core";
 import { Point } from "roughjs/bin/geometry";
 
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
@@ -33,7 +32,6 @@ export function newElement(
     roughness,
     opacity,
     seed: randomSeed(),
-    shape: null as Drawable | Drawable[] | null,
     points: [] as Point[],
   };
   return element;
@@ -47,7 +45,6 @@ export function newTextElement(
   const metrics = measureText(text, font);
   const textElement: ExcalidrawTextElement = {
     ...element,
-    shape: null,
     type: "text",
     text: text,
     font: font,
