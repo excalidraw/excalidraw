@@ -58,10 +58,7 @@ export function MobileMenu({
         <Section className="App-mobile-menu" heading="selectedShapeActions">
           <div className="App-mobile-menu-scroller">
             <SelectedShapeActions
-              targetElements={getTargetElement(
-                appState.editingElement,
-                elements,
-              )}
+              targetElements={getTargetElement(elements, appState)}
               renderAction={actionManager.renderAction}
               elementType={appState.elementType}
             />
@@ -88,12 +85,7 @@ export function MobileMenu({
             </Stack.Col>
           )}
         </Section>
-        <HintViewer
-          elementType={appState.elementType}
-          multiMode={appState.multiElement !== null}
-          isResizing={appState.isResizing}
-          elements={elements}
-        />
+        <HintViewer appState={appState} elements={elements} />
       </FixedSideContainer>
       <footer className="App-toolbar">
         <div className="App-toolbar-content">

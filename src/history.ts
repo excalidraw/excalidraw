@@ -18,7 +18,7 @@ export class SceneHistory {
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(({ shape, canvas, ...element }) => ({
+      elements: elements.map(({ shape, ...element }) => ({
         ...element,
         shape: null,
         canvas: null,

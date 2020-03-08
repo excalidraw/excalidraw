@@ -16,11 +16,25 @@ import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
 
-function generateElementCanvas(element: ExcalidrawElement, zoom: number) {
+export interface ExcalidrawElementWithCanvas {
+  element: ExcalidrawElement | ExcalidrawTextElement;
+  canvas: HTMLCanvasElement;
+  canvasZoom: number;
+  canvasOffsetX: number;
+  canvasOffsetY: number;
+}
+
+function generateElementCanvas(
+  element: ExcalidrawElement,
+  zoom: number,
+): ExcalidrawElementWithCanvas {
   const canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d")!;
+  const context = canvas.getContext("2d")!;
 
   const isLinear = /\b(arrow|line)\b/.test(element.type);
+
+  let canvasOffsetX = 0;
+  let canvasOffsetY = 0;
 
   if (isLinear) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -29,18 +43,15 @@ function generateElementCanvas(element: ExcalidrawElement, zoom: number) {
     canvas.height =
       distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
 
-    element.canvasOffsetX =
+    canvasOffsetX =
       element.x > x1
         ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
         : 0;
-    element.canvasOffsetY =
+    canvasOffsetY =
       element.y > y1
         ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
         : 0;
-    context.translate(
-      element.canvasOffsetX * zoom,
-      element.canvasOffsetY * zoom,
-    );
+    context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   } else {
     canvas.width =
       element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
@@ -53,9 +64,8 @@ function generateElementCanvas(element: ExcalidrawElement, zoom: number) {
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
-  element.canvas = canvas;
-  element.canvasZoom = zoom;
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+  return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
 }
 
 function drawElementOnCanvas(
@@ -99,13 +109,17 @@ function drawElementOnCanvas(
   context.globalAlpha = 1;
 }
 
+const elementWithCanvasCache = new WeakMap<
+  ExcalidrawElement,
+  ExcalidrawElementWithCanvas
+>();
+
 function generateElement(
   element: ExcalidrawElement,
   generator: RoughGenerator,
   sceneState?: SceneState,
 ) {
   if (!element.shape) {
-    element.canvas = null;
     switch (element.type) {
       case "rectangle":
         element.shape = generator.rectangle(
@@ -217,13 +231,15 @@ function generateElement(
     }
   }
   const zoom = sceneState ? sceneState.zoom : 1;
-  if (!element.canvas || element.canvasZoom !== zoom) {
-    generateElementCanvas(element, zoom);
+  const prevElementWithCanvas = elementWithCanvasCache.get(element);
+  if (!prevElementWithCanvas || prevElementWithCanvas.canvasZoom !== zoom) {
+    return generateElementCanvas(element, zoom);
   }
+  return prevElementWithCanvas;
 }
 
 function drawElementFromCanvas(
-  element: ExcalidrawElement | ExcalidrawTextElement,
+  elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
@@ -234,17 +250,19 @@ function drawElementFromCanvas(
     -CANVAS_PADDING / sceneState.zoom,
   );
   context.drawImage(
-    element.canvas!,
+    elementWithCanvas.canvas!,
     Math.floor(
-      -element.canvasOffsetX +
-        (Math.floor(element.x) + sceneState.scrollX) * window.devicePixelRatio,
+      -elementWithCanvas.canvasOffsetX +
+        (Math.floor(elementWithCanvas.element.x) + sceneState.scrollX) *
+          window.devicePixelRatio,
     ),
     Math.floor(
-      -element.canvasOffsetY +
-        (Math.floor(element.y) + sceneState.scrollY) * window.devicePixelRatio,
+      -elementWithCanvas.canvasOffsetY +
+        (Math.floor(elementWithCanvas.element.y) + sceneState.scrollY) *
+          window.devicePixelRatio,
     ),
-    element.canvas!.width / sceneState.zoom,
-    element.canvas!.height / sceneState.zoom,
+    elementWithCanvas.canvas!.width / sceneState.zoom,
+    elementWithCanvas.canvas!.height / sceneState.zoom,
   );
   context.translate(
     CANVAS_PADDING / sceneState.zoom,
@@ -279,10 +297,10 @@ export function renderElement(
     case "line":
     case "arrow":
     case "text": {
-      generateElement(element, generator, sceneState);
+      const elementWithCanvas = generateElement(element, generator, sceneState);
 
       if (renderOptimizations) {
-        drawElementFromCanvas(element, rc, context, sceneState);
+        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const offsetX = Math.floor(element.x + sceneState.scrollX);
         const offsetY = Math.floor(element.y + sceneState.scrollY);

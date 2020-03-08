@@ -1,5 +1,4 @@
 import { KEYS } from "../keys";
-import { clearSelection } from "../scene";
 import { isInvisiblySmallElement } from "../element";
 import { resetCursor } from "../utils";
 import React from "react";
@@ -11,7 +10,7 @@ import { register } from "./register";
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
-    let newElements = clearSelection(elements);
+    let newElements = elements;
     if (window.document.activeElement instanceof HTMLElement) {
       window.document.activeElement.blur();
     }
@@ -28,7 +27,7 @@ export const actionFinalize = register({
       }
       appState.multiElement.shape = null;
       if (!appState.elementLocked) {
-        appState.multiElement.isSelected = true;
+        appState.selectedElementIds[appState.multiElement.id] = true;
       }
     }
     if (!appState.elementLocked || !appState.multiElement) {
@@ -44,6 +43,7 @@ export const actionFinalize = register({
             : "selection",
         draggingElement: null,
         multiElement: null,
+        selectedElementIds: {},
       },
     };
   },

@@ -50,7 +50,7 @@ export const LayerUI = React.memo(
         scale,
       ) => {
         if (canvas) {
-          exportCanvas(type, exportedElements, canvas, {
+          exportCanvas(type, exportedElements, appState, canvas, {
             exportBackground: appState.exportBackground,
             name: appState.name,
             viewBackgroundColor: appState.viewBackgroundColor,
@@ -74,6 +74,7 @@ export const LayerUI = React.memo(
                   ...element,
                   isSelected: false,
                 })),
+                appState,
                 canvas,
                 appState,
               );
@@ -95,12 +96,7 @@ export const LayerUI = React.memo(
     ) : (
       <>
         <FixedSideContainer side="top">
-          <HintViewer
-            elementType={appState.elementType}
-            multiMode={appState.multiElement !== null}
-            isResizing={appState.isResizing}
-            elements={elements}
-          />
+          <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4} align="end">
               <Section className="App-right-menu" heading="canvasActions">
@@ -123,10 +119,7 @@ export const LayerUI = React.memo(
                 >
                   <Island padding={4}>
                     <SelectedShapeActions
-                      targetElements={getTargetElement(
-                        appState.editingElement,
-                        elements,
-                      )}
+                      targetElements={getTargetElement(elements, appState)}
                       renderAction={actionManager.renderAction}
                       elementType={appState.elementType}
                     />

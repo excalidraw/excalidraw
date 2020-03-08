@@ -32,6 +32,7 @@ export function getDefaultAppState(): AppState {
     zoom: 1,
     openMenu: null,
     lastPointerDownWith: "mouse",
+    selectedElementIds: {},
   };
 }
 

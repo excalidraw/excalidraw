@@ -149,6 +149,7 @@ export async function importFromBackend(
 export async function exportCanvas(
   type: ExportType,
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   canvas: HTMLCanvasElement,
   {
     exportBackground,
@@ -181,7 +182,7 @@ export async function exportCanvas(
     return;
   }
 
-  const tempCanvas = exportToCanvas(elements, {
+  const tempCanvas = exportToCanvas(elements, appState, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,

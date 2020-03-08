@@ -32,14 +32,9 @@ export function newElement(
     strokeWidth,
     roughness,
     opacity,
-    isSelected: false,
     seed: randomSeed(),
     shape: null as Drawable | Drawable[] | null,
     points: [] as Point[],
-    canvas: null as HTMLCanvasElement | null,
-    canvasZoom: 1, // The zoom level used to render the cached canvas
-    canvasOffsetX: 0,
-    canvasOffsetY: 0,
   };
   return element;
 }
