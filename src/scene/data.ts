@@ -148,6 +148,7 @@ export async function loadFromBlob(blob: any) {
   });
 }
 
+
 function byteToHex(byte: number): string {
   return `0${byte.toString(16)}`.slice(-2);
 }
