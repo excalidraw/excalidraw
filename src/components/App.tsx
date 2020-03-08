@@ -1969,7 +1969,6 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-
     if (this.state.isCollaborating && !this.socket) {
       this.initializeSocketClient();
     }
