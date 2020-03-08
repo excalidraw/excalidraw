@@ -34,6 +34,7 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
+  remotePointers: { [id: string]: { x: number; y: number } };
 };
 
 export type Pointer = Readonly<{
