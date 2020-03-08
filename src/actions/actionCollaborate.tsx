@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import {
   generateCollaborationLink,
   getCollaborationLinkData,
-} from "../scene/data";
+} from "../data";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 

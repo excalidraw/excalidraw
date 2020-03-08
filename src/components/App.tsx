@@ -86,7 +86,7 @@ import {
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
-import { getCollaborationLinkData } from "../scene/data";
+import { getCollaborationLinkData } from "../data";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
