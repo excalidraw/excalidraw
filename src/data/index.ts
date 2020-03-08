@@ -30,6 +30,43 @@ export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
 // part of `AppState`.
 (window as any).handle = null;
 
+
+function byteToHex(byte: number): string {
+  return `0${byte.toString(16)}`.slice(-2);
+}
+
+async function generateRandomID() {
+  var arr = new Uint8Array(20);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr, byteToHex).join("");
+}
+
+async function generateEncryptionKey() {
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true, // extractable
+    ["encrypt", "decrypt"],
+  );
+  return (await window.crypto.subtle.exportKey("jwk", key)).k;
+}
+
+export function getCollaborationLinkData(link: string) {
+  if (link.length === 0) {
+    return;
+  }
+  const hash = new URL(link).hash;
+  return hash.match(/^#room_id=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+}
+
+export async function generateCollaborationLink() {
+  const id = await generateRandomID();
+  const key = await generateEncryptionKey();
+  return `${window.location.href}#room_id=${id},${key}`;
+}
+
 async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
   return await window.crypto.subtle.importKey(
     "jwk",
