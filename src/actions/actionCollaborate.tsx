@@ -1,11 +1,7 @@
 import React from "react";
-import { share } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { LiveButton } from "../components/LiveButton";
 import { t } from "../i18n";
-import {
-  generateCollaborationLink,
-  getCollaborationLinkData,
-} from "../data";
+import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 
@@ -18,10 +14,10 @@ export const actionCollaborate = register({
     }
     return {};
   },
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={share}
+  PanelComponent: ({ appState, updateData }) => (
+    <LiveButton
+      isLive={appState.isCollaborating}
+      count={appState.collaboratorCount}
       title={t("buttons.enableCollaboration")}
       aria-label={t("buttons.enableCollaboration")}
       showAriaLabel={useIsMobile()}
