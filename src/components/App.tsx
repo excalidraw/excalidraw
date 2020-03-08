@@ -147,6 +147,7 @@ export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   socket: SocketIOClient.Socket | null = null;
+  socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
   roomID: string | null = null;
   roomKey: string | null = null;
 
@@ -232,16 +233,7 @@ export class App extends React.Component<any, AppState> {
       this.socket.on("init-room", () => {
         this.socket && this.socket.emit("join-room", this.roomID);
       });
-      this.socket.on("new-user", async (socketID: string) => {
-        this.socket &&
-          this.roomID &&
-          this.roomKey &&
-          this.socket.emit(
-            "new-user-send-update",
-            socketID,
-            await encryptSocketUpdateData(elements, this.state, this.roomKey),
-          );
-      });
+
       this.socket.on(
         "new-user-receive-update",
         async (encryptedData: ArrayBuffer) => {
@@ -253,9 +245,33 @@ export class App extends React.Component<any, AppState> {
             elements = scene.elements;
             this.setState({});
           }
-          this.socket && this.socket.off("new-user-receive-update");
+          if (this.socket) {
+            this.socket.off("new-user-receive-update");
+            this.socket.off("new-user-first-in-room");
+          }
+          this.socketInitialized = true;
         },
       );
+      this.socket.on("new-user-first-in-room", () => {
+        if (this.socket) {
+          this.socket.off("new-user-receive-update");
+          this.socket.off("new-user-first-in-room");
+        }
+        this.socketInitialized = true;
+      });
+      this.socket.on("room-user-count", (collaboratorCount: number) => {
+        this.setState({ collaboratorCount });
+      });
+      this.socket.on("new-user", async (socketID: string) => {
+        this.socketInitialized &&
+          this.socket &&
+          this.roomKey &&
+          this.socket.emit(
+            "new-user-send-update",
+            socketID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
+          );
+      });
       this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
         if (this.roomKey) {
           const scene = await decryptSocketUpdateData(
@@ -265,6 +281,7 @@ export class App extends React.Component<any, AppState> {
           elements = scene.elements;
           this.setState({});
         }
+        this.socketInitialized = true;
       });
       this.socket.on(
         "receive-mouse-location",
@@ -1940,7 +1957,8 @@ export class App extends React.Component<any, AppState> {
         // sometimes the pointer goes off screen
         return;
       }
-      this.socket &&
+      this.socketInitialized &&
+        this.socket &&
         this.socket.emit("send-mouse-location", this.roomID, pointerCoords);
     },
     50,
@@ -1996,7 +2014,8 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced();
     if (history.isRecording()) {
       (async () => {
-        this.socket &&
+        this.socketInitialized &&
+          this.socket &&
           this.roomID &&
           this.roomKey &&
           this.socket.emit(
