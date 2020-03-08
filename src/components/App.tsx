@@ -1402,14 +1402,17 @@ export class App extends React.Component<any, AppState> {
                     elements,
                     draggingElement,
                   );
-                  this.setState({
-                    selectedElementIds: Object.fromEntries(
-                      elementsWithinSelection.map(element => [
-                        element.id,
-                        true,
-                      ]),
-                    ),
-                  });
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      ...Object.fromEntries(
+                        elementsWithinSelection.map(element => [
+                          element.id,
+                          true,
+                        ]),
+                      ),
+                    },
+                  }));
                 }
                 this.setState({});
               };
