@@ -19,7 +19,6 @@ import {
   normalizeDimensions,
 } from "../element";
 import {
-  clearSelection,
   deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
@@ -77,6 +76,7 @@ import {
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -179,8 +179,8 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(elements);
-    elements = deleteSelectedElements(elements);
+    copyToAppClipboard(elements, this.state);
+    elements = deleteSelectedElements(elements, this.state);
     history.resumeRecording();
     this.setState({});
     event.preventDefault();
@@ -189,7 +189,7 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(elements);
+    copyToAppClipboard(elements, this.state);
     event.preventDefault();
   };
 
@@ -296,7 +296,7 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
-    elements = elements.map(el => ({ ...el, shape: null }));
+    elements.forEach(element => invalidateShapeForElement(element));
     this.setState({});
   };
 
@@ -325,7 +325,7 @@ export class App extends React.Component<any, AppState> {
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
       elements = elements.map(el => {
-        if (el.isSelected) {
+        if (this.state.selectedElementIds[el.id]) {
           const element = { ...el };
           if (event.key === KEYS.ARROW_LEFT) {
             element.x -= step;
@@ -361,19 +361,18 @@ export class App extends React.Component<any, AppState> {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
-        elements = clearSelection(elements);
         document.documentElement.style.cursor =
           this.state.elementType === "text"
             ? CURSOR_TYPE.TEXT
             : CURSOR_TYPE.CROSSHAIR;
-        this.setState({});
+        this.setState({ selectedElementIds: {} });
       }
       isHoldingSpace = false;
     }
   };
 
   private copyToAppClipboard = () => {
-    copyToAppClipboard(elements);
+    copyToAppClipboard(elements, this.state);
   };
 
   private pasteFromClipboard = async (event: ClipboardEvent | null) => {
@@ -413,9 +412,8 @@ export class App extends React.Component<any, AppState> {
           this.state.currentItemFont,
         );
 
-        element.isSelected = true;
-
-        elements = [...clearSelection(elements), element];
+        elements = [...elements, element];
+        this.setState({ selectedElementIds: { [element.id]: true } });
         history.resumeRecording();
       }
       this.selectShapeTool("selection");
@@ -431,9 +429,10 @@ export class App extends React.Component<any, AppState> {
       document.activeElement.blur();
     }
     if (elementType !== "selection") {
-      elements = clearSelection(elements);
+      this.setState({ elementType, selectedElementIds: {} });
+    } else {
+      this.setState({ elementType });
     }
-    this.setState({ elementType });
   }
 
   private onGestureStart = (event: GestureEvent) => {
@@ -524,6 +523,7 @@ export class App extends React.Component<any, AppState> {
 
               const element = getElementAtPosition(
                 elements,
+                this.state,
                 x,
                 y,
                 this.state.zoom,
@@ -545,10 +545,8 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              if (!element.isSelected) {
-                elements = clearSelection(elements);
-                element.isSelected = true;
-                this.setState({});
+              if (!this.state.selectedElementIds[element.id]) {
+                this.setState({ selectedElementIds: { [element.id]: true } });
               }
 
               ContextMenu.push({
@@ -760,12 +758,16 @@ export class App extends React.Component<any, AppState> {
               if (this.state.elementType === "selection") {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
+                  this.state,
                   { x, y },
                   this.state.zoom,
                   event.pointerType,
                 );
 
-                const selectedElements = getSelectedElements(elements);
+                const selectedElements = getSelectedElements(
+                  elements,
+                  this.state,
+                );
                 if (selectedElements.length === 1 && resizeElement) {
                   this.setState({
                     resizingElement: resizeElement
@@ -781,13 +783,19 @@ export class App extends React.Component<any, AppState> {
                 } else {
                   hitElement = getElementAtPosition(
                     elements,
+                    this.state,
                     x,
                     y,
                     this.state.zoom,
                   );
                   // clear selection if shift is not clicked
-                  if (!hitElement?.isSelected && !event.shiftKey) {
-                    elements = clearSelection(elements);
+                  if (
+                    !(
+                      hitElement && this.state.selectedElementIds[hitElement.id]
+                    ) &&
+                    !event.shiftKey
+                  ) {
+                    this.setState({ selectedElementIds: {} });
                   }
 
                   // If we click on something
@@ -796,30 +804,37 @@ export class App extends React.Component<any, AppState> {
                     // if shift is not clicked, this will always return true
                     // otherwise, it will trigger selection based on current
                     // state of the box
-                    if (!hitElement.isSelected) {
-                      hitElement.isSelected = true;
+                    if (!this.state.selectedElementIds[hitElement.id]) {
+                      this.setState(prevState => ({
+                        selectedElementIds: {
+                          ...prevState.selectedElementIds,
+                          [hitElement!.id]: true,
+                        },
+                      }));
                       elements = elements.slice();
                       elementIsAddedToSelection = true;
                     }
 
                     // We duplicate the selected element if alt is pressed on pointer down
                     if (event.altKey) {
-                      elements = [
-                        ...elements.map(element => ({
-                          ...element,
-                          isSelected: false,
-                        })),
-                        ...getSelectedElements(elements).map(element => {
-                          const newElement = duplicateElement(element);
-                          newElement.isSelected = true;
-                          return newElement;
-                        }),
-                      ];
+                      // Move the currently selected elements to the top of the z index stack, and
+                      // put the duplicates where the selected elements used to be.
+                      const nextElements = [];
+                      const elementsToAppend = [];
+                      for (const element of elements) {
+                        if (this.state.selectedElementIds[element.id]) {
+                          nextElements.push(duplicateElement(element));
+                          elementsToAppend.push(element);
+                        } else {
+                          nextElements.push(element);
+                        }
+                      }
+                      elements = [...nextElements, ...elementsToAppend];
                     }
                   }
                 }
               } else {
-                elements = clearSelection(elements);
+                this.setState({ selectedElementIds: {} });
               }
 
               if (isTextElement(element)) {
@@ -872,10 +887,15 @@ export class App extends React.Component<any, AppState> {
                             text,
                             this.state.currentItemFont,
                           ),
-                          isSelected: true,
                         },
                       ];
                     }
+                    this.setState(prevState => ({
+                      selectedElementIds: {
+                        ...prevState.selectedElementIds,
+                        [element.id]: true,
+                      },
+                    }));
                     if (this.state.elementLocked) {
                       setCursorForShape(this.state.elementType);
                     }
@@ -905,13 +925,23 @@ export class App extends React.Component<any, AppState> {
                 if (this.state.multiElement) {
                   const { multiElement } = this.state;
                   const { x: rx, y: ry } = multiElement;
-                  multiElement.isSelected = true;
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [multiElement.id]: true,
+                    },
+                  }));
                   multiElement.points.push([x - rx, y - ry]);
-                  multiElement.shape = null;
+                  invalidateShapeForElement(multiElement);
                 } else {
-                  element.isSelected = false;
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [element.id]: false,
+                    },
+                  }));
                   element.points.push([0, 0]);
-                  element.shape = null;
+                  invalidateShapeForElement(element);
                   elements = [...elements, element];
                   this.setState({
                     draggingElement: element,
@@ -1047,7 +1077,10 @@ export class App extends React.Component<any, AppState> {
                 if (isResizingElements && this.state.resizingElement) {
                   this.setState({ isResizing: true });
                   const el = this.state.resizingElement;
-                  const selectedElements = getSelectedElements(elements);
+                  const selectedElements = getSelectedElements(
+                    elements,
+                    this.state,
+                  );
                   if (selectedElements.length === 1) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       event,
@@ -1261,7 +1294,7 @@ export class App extends React.Component<any, AppState> {
                     );
                     el.x = element.x;
                     el.y = element.y;
-                    el.shape = null;
+                    invalidateShapeForElement(el);
 
                     lastX = x;
                     lastY = y;
@@ -1270,11 +1303,17 @@ export class App extends React.Component<any, AppState> {
                   }
                 }
 
-                if (hitElement?.isSelected) {
+                if (
+                  hitElement &&
+                  this.state.selectedElementIds[hitElement.id]
+                ) {
                   // Marking that click was used for dragging to check
                   // if elements should be deselected on pointerup
                   draggingOccurred = true;
-                  const selectedElements = getSelectedElements(elements);
+                  const selectedElements = getSelectedElements(
+                    elements,
+                    this.state,
+                  );
                   if (selectedElements.length > 0) {
                     const { x, y } = viewportCoordsToSceneCoords(
                       event,
@@ -1354,19 +1393,30 @@ export class App extends React.Component<any, AppState> {
                   draggingElement.height = height;
                 }
 
-                draggingElement.shape = null;
+                invalidateShapeForElement(draggingElement);
 
                 if (this.state.elementType === "selection") {
-                  if (!event.shiftKey && isSomeElementSelected(elements)) {
-                    elements = clearSelection(elements);
+                  if (
+                    !event.shiftKey &&
+                    isSomeElementSelected(elements, this.state)
+                  ) {
+                    this.setState({ selectedElementIds: {} });
                   }
                   const elementsWithinSelection = getElementsWithinSelection(
                     elements,
                     draggingElement,
                   );
-                  elementsWithinSelection.forEach(element => {
-                    element.isSelected = true;
-                  });
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      ...Object.fromEntries(
+                        elementsWithinSelection.map(element => [
+                          element.id,
+                          true,
+                        ]),
+                      ),
+                    },
+                  }));
                 }
                 this.setState({});
               };
@@ -1406,20 +1456,27 @@ export class App extends React.Component<any, AppState> {
                       x - draggingElement.x,
                       y - draggingElement.y,
                     ]);
-                    draggingElement.shape = null;
+                    invalidateShapeForElement(draggingElement);
                     this.setState({ multiElement: this.state.draggingElement });
                   } else if (draggingOccurred && !multiElement) {
-                    this.state.draggingElement!.isSelected = true;
                     if (!elementLocked) {
                       resetCursor();
-                      this.setState({
+                      this.setState(prevState => ({
                         draggingElement: null,
                         elementType: "selection",
-                      });
+                        selectedElementIds: {
+                          ...prevState.selectedElementIds,
+                          [this.state.draggingElement!.id]: true,
+                        },
+                      }));
                     } else {
-                      this.setState({
+                      this.setState(prevState => ({
                         draggingElement: null,
-                      });
+                        selectedElementIds: {
+                          ...prevState.selectedElementIds,
+                          [this.state.draggingElement!.id]: true,
+                        },
+                      }));
                     }
                   }
                   return;
@@ -1470,27 +1527,37 @@ export class App extends React.Component<any, AppState> {
                   !elementIsAddedToSelection
                 ) {
                   if (event.shiftKey) {
-                    hitElement.isSelected = false;
+                    this.setState(prevState => ({
+                      selectedElementIds: {
+                        ...prevState.selectedElementIds,
+                        [hitElement!.id]: false,
+                      },
+                    }));
                   } else {
-                    elements = clearSelection(elements);
-                    hitElement.isSelected = true;
+                    this.setState(prevState => ({
+                      selectedElementIds: { [hitElement!.id]: true },
+                    }));
                   }
                 }
 
                 if (draggingElement === null) {
                   // if no element is clicked, clear the selection and redraw
-                  elements = clearSelection(elements);
-                  this.setState({});
+                  this.setState({ selectedElementIds: {} });
                   return;
                 }
 
                 if (!elementLocked) {
-                  draggingElement.isSelected = true;
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [draggingElement.id]: true,
+                    },
+                  }));
                 }
 
                 if (
                   elementType !== "selection" ||
-                  isSomeElementSelected(elements)
+                  isSomeElementSelected(elements, this.state)
                 ) {
                   history.resumeRecording();
                 }
@@ -1524,6 +1591,7 @@ export class App extends React.Component<any, AppState> {
 
               const elementAtPosition = getElementAtPosition(
                 elements,
+                this.state,
                 x,
                 y,
                 this.state.zoom,
@@ -1616,10 +1684,15 @@ export class App extends React.Component<any, AppState> {
                         // we need to recreate the element to update dimensions &
                         //  position
                         ...newTextElement(element, text, element.font),
-                        isSelected: true,
                       },
                     ];
                   }
+                  this.setState(prevState => ({
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [element.id]: true,
+                    },
+                  }));
                   history.resumeRecording();
                   resetSelection();
                 },
@@ -1695,7 +1768,7 @@ export class App extends React.Component<any, AppState> {
                 const pnt = points[points.length - 1];
                 pnt[0] = x - originX;
                 pnt[1] = y - originY;
-                multiElement.shape = null;
+                invalidateShapeForElement(multiElement);
                 this.setState({});
                 return;
               }
@@ -1708,10 +1781,14 @@ export class App extends React.Component<any, AppState> {
                 return;
               }
 
-              const selectedElements = getSelectedElements(elements);
+              const selectedElements = getSelectedElements(
+                elements,
+                this.state,
+              );
               if (selectedElements.length === 1 && !isOverScrollBar) {
                 const resizeElement = getElementWithResizeHandler(
                   elements,
+                  this.state,
                   { x, y },
                   this.state.zoom,
                   event.pointerType,
@@ -1725,6 +1802,7 @@ export class App extends React.Component<any, AppState> {
               }
               const hitElement = getElementAtPosition(
                 elements,
+                this.state,
                 x,
                 y,
                 this.state.zoom,
@@ -1782,8 +1860,6 @@ export class App extends React.Component<any, AppState> {
   private addElementsFromPaste = (
     clipboardElements: readonly ExcalidrawElement[],
   ) => {
-    elements = clearSelection(elements);
-
     const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -1798,17 +1874,20 @@ export class App extends React.Component<any, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    elements = [
-      ...elements,
-      ...clipboardElements.map(clipboardElements => {
-        const duplicate = duplicateElement(clipboardElements);
-        duplicate.x += dx - minX;
-        duplicate.y += dy - minY;
-        return duplicate;
-      }),
-    ];
+    const newElements = clipboardElements.map(clipboardElements => {
+      const duplicate = duplicateElement(clipboardElements);
+      duplicate.x += dx - minX;
+      duplicate.y += dy - minY;
+      return duplicate;
+    });
+
+    elements = [...elements, ...newElements];
     history.resumeRecording();
-    this.setState({});
+    this.setState({
+      selectedElementIds: Object.fromEntries(
+        newElements.map(element => [element.id, true]),
+      ),
+    });
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
@@ -1845,6 +1924,7 @@ export class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
+      this.state,
       this.state.selectionElement,
       this.rc!,
       this.canvas!,

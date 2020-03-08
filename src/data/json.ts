@@ -14,7 +14,7 @@ export function serializeAsJSON(
       type: "excalidraw",
       version: 1,
       source: window.location.origin,
-      elements: elements.map(({ shape, canvas, isSelected, ...el }) => el),
+      elements,
       appState: cleanAppStateForExport(appState),
     },
     null,

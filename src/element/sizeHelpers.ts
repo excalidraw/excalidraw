@@ -1,4 +1,5 @@
 import { ExcalidrawElement } from "./types";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
   if (element.type === "arrow" || element.type === "line") {
@@ -86,7 +87,7 @@ export function normalizeDimensions(
     element.y -= element.height;
   }
 
-  element.shape = null;
+  invalidateShapeForElement(element);
 
   return true;
 }

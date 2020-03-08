@@ -4,9 +4,11 @@ import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
+import { AppState } from "../types";
 
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   {
     exportBackground,
     exportPadding = 10,
@@ -38,6 +40,7 @@ export function exportToCanvas(
 
   renderScene(
     elements,
+    appState,
     null,
     rough.canvas(tempCanvas),
     tempCanvas,

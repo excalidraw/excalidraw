@@ -20,7 +20,10 @@ export const actionSendBackward = register({
   name: "sendBackward",
   perform: (elements, appState) => {
     return {
-      elements: moveOneLeft([...elements], getSelectedIndices(elements)),
+      elements: moveOneLeft(
+        [...elements],
+        getSelectedIndices(elements, appState),
+      ),
       appState,
     };
   },
@@ -44,7 +47,10 @@ export const actionBringForward = register({
   name: "bringForward",
   perform: (elements, appState) => {
     return {
-      elements: moveOneRight([...elements], getSelectedIndices(elements)),
+      elements: moveOneRight(
+        [...elements],
+        getSelectedIndices(elements, appState),
+      ),
       appState,
     };
   },
@@ -68,7 +74,10 @@ export const actionSendToBack = register({
   name: "sendToBack",
   perform: (elements, appState) => {
     return {
-      elements: moveAllLeft([...elements], getSelectedIndices(elements)),
+      elements: moveAllLeft(
+        [...elements],
+        getSelectedIndices(elements, appState),
+      ),
       appState,
     };
   },
@@ -91,7 +100,10 @@ export const actionBringToFront = register({
   name: "bringToFront",
   perform: (elements, appState) => {
     return {
-      elements: moveAllRight([...elements], getSelectedIndices(elements)),
+      elements: moveAllRight(
+        [...elements],
+        getSelectedIndices(elements, appState),
+      ),
       appState,
     };
   },

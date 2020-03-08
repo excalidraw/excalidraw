@@ -9,13 +9,22 @@ import {
 } from "./bounds";
 import { Point } from "roughjs/bin/geometry";
 import { Drawable, OpSet } from "roughjs/bin/core";
+import { AppState } from "../types";
+import { getShapeForElement } from "../renderer/renderElement";
 
-function isElementDraggableFromInside(element: ExcalidrawElement): boolean {
-  return element.backgroundColor !== "transparent" || element.isSelected;
+function isElementDraggableFromInside(
+  element: ExcalidrawElement,
+  appState: AppState,
+): boolean {
+  return (
+    element.backgroundColor !== "transparent" ||
+    appState.selectedElementIds[element.id]
+  );
 }
 
 export function hitTest(
   element: ExcalidrawElement,
+  appState: AppState,
   x: number,
   y: number,
   zoom: number,
@@ -58,7 +67,7 @@ export function hitTest(
       ty /= t;
     });
 
-    if (isElementDraggableFromInside(element)) {
+    if (isElementDraggableFromInside(element, appState)) {
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
@@ -67,7 +76,7 @@ export function hitTest(
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-    if (isElementDraggableFromInside(element)) {
+    if (isElementDraggableFromInside(element, appState)) {
       return (
         x > x1 - lineThreshold &&
         x < x2 + lineThreshold &&
@@ -99,7 +108,7 @@ export function hitTest(
       leftY,
     ] = getDiamondPoints(element);
 
-    if (isElementDraggableFromInside(element)) {
+    if (isElementDraggableFromInside(element, appState)) {
       // TODO: remove this when we normalize coordinates globally
       if (topY > bottomY) {
         [bottomY, topY] = [topY, bottomY];
@@ -150,10 +159,10 @@ export function hitTest(
         lineThreshold
     );
   } else if (element.type === "arrow" || element.type === "line") {
-    if (!element.shape) {
+    if (!getShapeForElement(element)) {
       return false;
     }
-    const shape = element.shape as Drawable[];
+    const shape = getShapeForElement(element) as Drawable[];
 
     const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
     if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) {

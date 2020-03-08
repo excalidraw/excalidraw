@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords } from "../element";
+import { AppState } from "../types";
 
 export function getElementsWithinSelection(
   elements: readonly ExcalidrawElement[],
@@ -29,26 +30,20 @@ export function getElementsWithinSelection(
   });
 }
 
-export function clearSelection(elements: readonly ExcalidrawElement[]) {
-  let someWasSelected = false;
-  elements.forEach(element => {
-    if (element.isSelected) {
-      someWasSelected = true;
-      element.isSelected = false;
-    }
-  });
-
-  return someWasSelected ? elements.slice() : elements;
+export function deleteSelectedElements(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) {
+  return elements.filter(el => !appState.selectedElementIds[el.id]);
 }
 
-export function deleteSelectedElements(elements: readonly ExcalidrawElement[]) {
-  return elements.filter(el => !el.isSelected);
-}
-
-export function getSelectedIndices(elements: readonly ExcalidrawElement[]) {
+export function getSelectedIndices(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) {
   const selectedIndices: number[] = [];
   elements.forEach((element, index) => {
-    if (element.isSelected) {
+    if (appState.selectedElementIds[element.id]) {
       selectedIndices.push(index);
     }
   });
@@ -57,8 +52,9 @@ export function getSelectedIndices(elements: readonly ExcalidrawElement[]) {
 
 export function isSomeElementSelected(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
 ): boolean {
-  return elements.some(element => element.isSelected);
+  return elements.some(element => appState.selectedElementIds[element.id]);
 }
 
 /**
@@ -67,11 +63,14 @@ export function isSomeElementSelected(
  */
 export function getCommonAttributeOfSelectedElements<T>(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
 ): T | null {
   const attributes = Array.from(
     new Set(
-      getSelectedElements(elements).map(element => getAttribute(element)),
+      getSelectedElements(elements, appState).map(element =>
+        getAttribute(element),
+      ),
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;
@@ -79,13 +78,16 @@ export function getCommonAttributeOfSelectedElements<T>(
 
 export function getSelectedElements(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
 ): readonly ExcalidrawElement[] {
-  return elements.filter(element => element.isSelected);
+  return elements.filter(element => appState.selectedElementIds[element.id]);
 }
 
 export function getTargetElement(
-  editingElement: ExcalidrawElement | null,
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
 ) {
-  return editingElement ? [editingElement] : getSelectedElements(elements);
+  return appState.editingElement
+    ? [appState.editingElement]
+    : getSelectedElements(elements, appState);
 }

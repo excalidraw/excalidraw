@@ -10,14 +10,7 @@ export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  localStorage.setItem(
-    LOCAL_STORAGE_KEY,
-    JSON.stringify(
-      elements.map(
-        ({ shape, canvas, ...element }: ExcalidrawElement) => element,
-      ),
-    ),
-  );
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
   localStorage.setItem(
     LOCAL_STORAGE_KEY_STATE,
     JSON.stringify(clearAppStateForLocalStorage(appState)),
@@ -31,9 +24,7 @@ export function restoreFromLocalStorage() {
   let elements = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements).map(
-        ({ shape, ...element }: ExcalidrawElement) => element,
-      );
+      elements = JSON.parse(savedElements);
     } catch {
       // Do nothing because elements array is already empty
     }
