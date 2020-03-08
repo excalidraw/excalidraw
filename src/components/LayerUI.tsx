@@ -70,11 +70,11 @@ export const LayerUI = React.memo(
             if (canvas) {
               exportCanvas(
                 "backend",
-                exportedElements.map(element => ({
-                  ...element,
-                  isSelected: false,
-                })),
-                appState,
+                exportedElements,
+                {
+                  ...appState,
+                  selectedElementIds: {},
+                },
                 canvas,
                 appState,
               );

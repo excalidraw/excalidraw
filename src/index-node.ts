@@ -17,7 +17,6 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
-    isSelected: false,
     seed: 749612521,
   },
   {
@@ -33,7 +32,6 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
-    isSelected: false,
     seed: 952056308,
   },
   {
@@ -49,7 +47,6 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
-    isSelected: false,
     seed: 1683771448,
     text: "test",
     font: "20px Virgil",

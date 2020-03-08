@@ -817,19 +817,11 @@ export class App extends React.Component<any, AppState> {
                     // We duplicate the selected element if alt is pressed on pointer down
                     if (event.altKey) {
                       elements = [
-                        ...elements.map(element => ({
-                          ...element,
-                          isSelected: false,
-                        })),
+                        ...elements,
                         ...getSelectedElements(elements, this.state).map(
                           element => {
                             const newElement = duplicateElement(element);
-                            this.setState(prevState => ({
-                              selectedElementIds: {
-                                ...prevState.selectedElementIds,
-                                [newElement.id]: true,
-                              },
-                            }));
+                            // TODO: focus the duplicated elements here, not the original ones?
                             return newElement;
                           },
                         ),
