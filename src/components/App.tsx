@@ -1436,7 +1436,6 @@ export class App extends React.Component<any, AppState> {
                   } else {
                     resizeArrowFn = arrowResizeOrigin;
                   }
-<<<<<<< HEAD
                 }
                 resizeArrowFn(
                   element,
@@ -1447,57 +1446,6 @@ export class App extends React.Component<any, AppState> {
                   y,
                   event.shiftKey,
                 );
-=======
-                  this.setState(prevState => ({
-                    selectedElementIds: {
-                      ...prevState.selectedElementIds,
-                      [element.id]: true,
-                    },
-                  }));
-                  history.resumeRecording();
-                  resetSelection();
-                },
-                onCancel: () => {
-                  resetSelection();
-                },
-              });
-            }}
-            onPointerMove={event => {
-              const pointerCoords = viewportCoordsToSceneCoords(
-                event,
-                this.state,
-                this.canvas,
-              );
-              this.savePointerDebounced(pointerCoords);
-              gesture.pointers = gesture.pointers.map(pointer =>
-                pointer.id === event.pointerId
-                  ? {
-                      id: event.pointerId,
-                      x: event.clientX,
-                      y: event.clientY,
-                    }
-                  : pointer,
-              );
-
-              if (gesture.pointers.length === 2) {
-                const center = getCenter(gesture.pointers);
-                const deltaX = center.x - gesture.lastCenter!.x;
-                const deltaY = center.y - gesture.lastCenter!.y;
-                gesture.lastCenter = center;
-
-                const distance = getDistance(gesture.pointers);
-                const scaleFactor = distance / gesture.initialDistance!;
-
-                this.setState({
-                  scrollX: normalizeScroll(
-                    this.state.scrollX + deltaX / this.state.zoom,
-                  ),
-                  scrollY: normalizeScroll(
-                    this.state.scrollY + deltaY / this.state.zoom,
-                  ),
-                  zoom: getNormalizedZoom(gesture.initialScale! * scaleFactor),
-                });
->>>>>>> enable collaboration, rooms, and mouse tracking
               } else {
                 element.width += deltaX;
                 if (event.shiftKey) {
@@ -2003,12 +1951,10 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
-<<<<<<< HEAD
+
     if (this.state.isCollaborating && !this.socket) {
       this.initializeSocketClient();
     }
-=======
->>>>>>> enable collaboration, rooms, and mouse tracking
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
