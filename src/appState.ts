@@ -36,6 +36,7 @@ export function getDefaultAppState(): AppState {
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     remotePointers: {},
+    collaboratorCount: 0,
   };
 }
 

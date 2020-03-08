@@ -36,6 +36,7 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   remotePointers: { [id: string]: { x: number; y: number } };
+  collaboratorCount: number;
 };
 
 export type Pointer = Readonly<{

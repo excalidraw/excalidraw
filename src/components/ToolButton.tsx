@@ -2,7 +2,7 @@ import "./ToolIcon.scss";
 
 import React from "react";
 
-type ToolIconSize = "s" | "m";
+export type ToolIconSize = "s" | "m";
 
 type ToolButtonBaseProps = {
   icon?: React.ReactNode;

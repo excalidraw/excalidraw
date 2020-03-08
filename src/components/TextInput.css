@@ -1,5 +1,5 @@
 .text-input {
-  width: 8.5rem;
+  width: 8rem;
   color: #343a40;
   border: 0px;
   outline: none;
@@ -8,4 +8,5 @@
   border-radius: 4px;
   padding: 1px;
   appearance: none;
+  margin-left: 12px;
 }
