@@ -1,0 +1,11 @@
+.text-input {
+  width: 8.5rem;
+  color: #343a40;
+  border: 0px;
+  outline: none;
+  box-shadow: #dee2e6 0px 0px 0px 1px inset;
+  box-sizing: content-box;
+  border-radius: 4px;
+  padding: 1px;
+  appearance: none;
+}
