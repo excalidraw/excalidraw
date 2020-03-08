@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import socketIOClient from "socket.io-client";
 
+import throttle from "lodash.throttle";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
@@ -809,6 +810,17 @@ export class App extends React.Component<any, AppState> {
           this.setState({});
         }
       });
+      this.socket.on(
+        "receive-mouse-location",
+        (socketID: string, pointerCoords: { x: number; y: number }) => {
+          this.setState({
+            remotePointers: {
+              ...this.state.remotePointers,
+              [socketID]: pointerCoords,
+            },
+          });
+        },
+      );
       return;
     }
     const scene = await loadScene(null);
@@ -2184,6 +2196,12 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onPointerMove={event => {
+              const pointerCoords = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+                this.canvas,
+              );
+              this.savePointerDebounced(pointerCoords);
               gesture.pointers = gesture.pointers.map(pointer =>
                 pointer.id === event.pointerId
                   ? {
@@ -2394,11 +2412,37 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
+  private savePointerDebounced = throttle(
+    (pointerCoords: { x: number; y: number }) => {
+      if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
+        // sometimes the pointer goes off screen
+        return;
+      }
+      this.socket &&
+        this.socket.emit("send-mouse-location", this.roomID, pointerCoords);
+    },
+    50,
+  );
+
   private saveDebounced = debounce(() => {
     saveToLocalStorage(elements, this.state);
   }, 300);
 
   componentDidUpdate() {
+    const pointerViewportCoords: {
+      [id: string]: { x: number; y: number };
+    } = {};
+    for (const clientId in this.state.remotePointers) {
+      const remotePointerCoord = this.state.remotePointers[clientId];
+      pointerViewportCoords[clientId] = sceneCoordsToViewportCoords(
+        {
+          sceneX: remotePointerCoord.x,
+          sceneY: remotePointerCoord.y,
+        },
+        this.state,
+        this.canvas,
+      );
+    }
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state.selectionElement,
@@ -2409,6 +2453,7 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
+        remotePointerViewportCoords: this.state.remotePointers,
       },
       {
         renderOptimizations: true,
