@@ -233,7 +233,6 @@ export class App extends React.Component<any, AppState> {
       this.socket.on("init-room", () => {
         this.socket && this.socket.emit("join-room", this.roomID);
       });
-
       this.socket.on(
         "new-user-receive-update",
         async (encryptedData: ArrayBuffer) => {
