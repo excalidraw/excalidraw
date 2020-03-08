@@ -33,6 +33,7 @@ export type AppState = {
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
+  remotePointers: { [id: string]: { x: number; y: number } };
 };
 
 export type Pointer = Readonly<{

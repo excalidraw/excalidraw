@@ -46,6 +46,7 @@ export function exportToCanvas(
       scrollX: normalizeScroll(-minX + exportPadding),
       scrollY: normalizeScroll(-minY + exportPadding),
       zoom: 1,
+      remotePointerViewportCoords: {},
     },
     {
       renderScrollbars: false,

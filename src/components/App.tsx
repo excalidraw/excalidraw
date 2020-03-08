@@ -1,5 +1,7 @@
 import React from "react";
 
+import socketIOClient from "socket.io-client";
+import throttle from "lodash.throttle";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Point } from "roughjs/bin/geometry";
@@ -30,7 +32,14 @@ import {
   getSelectedElements,
   isSomeElementSelected,
 } from "../scene";
-import { saveToLocalStorage, loadScene, loadFromBlob } from "../data";
+import {
+  decryptSocketUpdateData,
+  encryptSocketUpdateData,
+  saveToLocalStorage,
+  loadScene,
+  loadFromBlob,
+  SOCKET_SERVER,
+} from "../data";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -136,6 +145,9 @@ function setCursorForShape(shape: string) {
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
+  socket: SocketIOClient.Socket | null = null;
+  roomID: string | null = null;
+  roomKey: string | null = null;
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
@@ -247,18 +259,74 @@ export class App extends React.Component<any, AppState> {
       // Backwards compatibility with legacy url format
       const scene = await loadScene(id);
       this.syncActionResult(scene);
-    } else {
-      const match = window.location.hash.match(
-        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-      );
-      if (match) {
-        const scene = await loadScene(match[1], match[2]);
-        this.syncActionResult(scene);
-      } else {
-        const scene = await loadScene(null);
-        this.syncActionResult(scene);
-      }
     }
+
+    const jsonMatch = window.location.hash.match(
+      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    if (jsonMatch) {
+      const scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+      this.syncActionResult(scene);
+      return;
+    }
+
+    const roomMatch = window.location.hash.match(
+      /^#room_id=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    if (roomMatch) {
+      this.socket = socketIOClient(SOCKET_SERVER);
+      this.roomID = roomMatch[1];
+      this.roomKey = roomMatch[2];
+      this.socket.emit("join-room", this.roomID);
+      this.socket.on("new-user", async (socketID: string) => {
+        this.socket &&
+          this.roomID &&
+          this.roomKey &&
+          this.socket.emit(
+            "new-user-send-update",
+            socketID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
+          );
+      });
+      this.socket.on(
+        "new-user-receive-update",
+        async (encryptedData: ArrayBuffer) => {
+          if (this.roomKey) {
+            const scene = await decryptSocketUpdateData(
+              encryptedData,
+              this.roomKey,
+            );
+            elements = scene.elements;
+            this.setState({});
+          }
+          this.socket && this.socket.off("new-user-receive-update");
+        },
+      );
+      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
+        if (this.roomKey) {
+          const scene = await decryptSocketUpdateData(
+            encryptedData,
+            this.roomKey,
+          );
+          elements = scene.elements;
+          this.setState({});
+        }
+      });
+      this.socket.on(
+        "receive-mouse-location",
+        (socketID: string, pointerCoords: { x: number; y: number }) => {
+          this.setState({
+            remotePointers: {
+              ...this.state.remotePointers,
+              [socketID]: pointerCoords,
+            },
+          });
+        },
+      );
+      return;
+    }
+    const scene = await loadScene(null);
+    this.syncActionResult(scene);
   }
 
   public componentWillUnmount() {
@@ -1629,6 +1697,12 @@ export class App extends React.Component<any, AppState> {
               });
             }}
             onPointerMove={event => {
+              const pointerCoords = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+                this.canvas,
+              );
+              this.savePointerDebounced(pointerCoords);
               gesture.pointers = gesture.pointers.map(pointer =>
                 pointer.id === event.pointerId
                   ? {
@@ -1838,11 +1912,37 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
+  private savePointerDebounced = throttle(
+    (pointerCoords: { x: number; y: number }) => {
+      if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
+        // sometimes the pointer goes off screen
+        return;
+      }
+      this.socket &&
+        this.socket.emit("send-mouse-location", this.roomID, pointerCoords);
+    },
+    50,
+  );
+
   private saveDebounced = debounce(() => {
     saveToLocalStorage(elements, this.state);
   }, 300);
 
   componentDidUpdate() {
+    const pointerViewportCoords: {
+      [id: string]: { x: number; y: number };
+    } = {};
+    for (const clientId in this.state.remotePointers) {
+      const remotePointerCoord = this.state.remotePointers[clientId];
+      pointerViewportCoords[clientId] = sceneCoordsToViewportCoords(
+        {
+          sceneX: remotePointerCoord.x,
+          sceneY: remotePointerCoord.y,
+        },
+        this.state,
+        this.canvas,
+      );
+    }
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state.selectionElement,
@@ -1853,6 +1953,7 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
+        remotePointerViewportCoords: this.state.remotePointers,
       },
       {
         renderOptimizations: true,
@@ -1867,6 +1968,16 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
+      (async () => {
+        this.socket &&
+          this.roomID &&
+          this.roomKey &&
+          this.socket.emit(
+            "send-update",
+            this.roomID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
+          );
+      })();
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
