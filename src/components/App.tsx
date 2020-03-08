@@ -1867,17 +1867,20 @@ export class App extends React.Component<any, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    elements = [
-      ...elements,
-      ...clipboardElements.map(clipboardElements => {
-        const duplicate = duplicateElement(clipboardElements);
-        duplicate.x += dx - minX;
-        duplicate.y += dy - minY;
-        return duplicate;
-      }),
-    ];
+    const newElements = clipboardElements.map(clipboardElements => {
+      const duplicate = duplicateElement(clipboardElements);
+      duplicate.x += dx - minX;
+      duplicate.y += dy - minY;
+      return duplicate;
+    });
+
+    elements = [...elements, ...newElements];
     history.resumeRecording();
-    this.setState({ selectedElementIds: {} });
+    this.setState({
+      selectedElementIds: Object.fromEntries(
+        newElements.map(element => [element.id, true]),
+      ),
+    });
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
