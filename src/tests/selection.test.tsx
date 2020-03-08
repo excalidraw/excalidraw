@@ -97,7 +97,7 @@ describe("select single element on the scene", () => {
     expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.appState.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 
   it("diamond", () => {
@@ -122,7 +122,7 @@ describe("select single element on the scene", () => {
     expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.appState.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 
   it("ellipse", () => {
@@ -147,7 +147,7 @@ describe("select single element on the scene", () => {
     expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.appState.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 
   it("arrow", () => {
@@ -172,7 +172,7 @@ describe("select single element on the scene", () => {
     expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.appState.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 
   it("arrow", () => {
@@ -197,6 +197,6 @@ describe("select single element on the scene", () => {
     expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.appState.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].isSelected).toBeTruthy();
+    expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 });

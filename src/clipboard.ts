@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "./element/types";
 import { getSelectedElements } from "./scene";
+import { AppState } from "./types";
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -18,10 +19,9 @@ export const probablySupportsClipboardBlob =
 
 export async function copyToAppClipboard(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
 ) {
-  CLIPBOARD = JSON.stringify(
-    getSelectedElements(elements).map(({ shape, canvas, ...el }) => el),
-  );
+  CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
     //  system clip contains text on paste we know it was copied *after* user

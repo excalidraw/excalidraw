@@ -10,22 +10,23 @@ export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   perform: (elements, appState) => {
     return {
-      elements: deleteSelectedElements(elements),
+      elements: deleteSelectedElements(elements, appState),
       appState: { ...appState, elementType: "selection", multiElement: null },
     };
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
-  commitToHistory: (_, elements) => isSomeElementSelected(elements),
+  commitToHistory: (appState, elements) =>
+    isSomeElementSelected(elements, appState),
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
-  PanelComponent: ({ elements, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
       icon={trash}
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(elements)}
+      visible={isSomeElementSelected(elements, appState)}
     />
   ),
 });

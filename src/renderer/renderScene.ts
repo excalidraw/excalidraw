@@ -1,7 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
-import { FlooredNumber } from "../types";
+import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
@@ -19,6 +19,7 @@ import { renderElement, renderElementToSvg } from "./renderElement";
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   selectionElement: ExcalidrawElement | null,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
@@ -129,7 +130,7 @@ export function renderScene(
 
   // Pain selected elements
   if (renderSelection) {
-    const selectedElements = getSelectedElements(elements);
+    const selectedElements = getSelectedElements(elements, appState);
     const dashledLinePadding = 4 / sceneState.zoom;
 
     applyZoom(context);

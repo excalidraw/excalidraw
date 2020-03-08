@@ -11,8 +11,8 @@ let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
-  perform: elements => {
-    const element = elements.find(el => el.isSelected);
+  perform: (elements, appState) => {
+    const element = elements.find(el => appState.selectedElementIds[el.id]);
     if (element) {
       copiedStyles = JSON.stringify(element);
     }
@@ -25,17 +25,16 @@ export const actionCopyStyles = register({
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
-  perform: elements => {
+  perform: (elements, appState) => {
     const pastedElement = JSON.parse(copiedStyles);
     if (!isExcalidrawElement(pastedElement)) {
       return { elements };
     }
     return {
       elements: elements.map(element => {
-        if (element.isSelected) {
+        if (appState.selectedElementIds[element.id]) {
           const newElement = {
             ...element,
-            shape: null,
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,

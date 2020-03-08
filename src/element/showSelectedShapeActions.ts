@@ -8,6 +8,6 @@ export const showSelectedShapeActions = (
 ) =>
   Boolean(
     appState.editingElement ||
-      getSelectedElements(elements).length ||
+      getSelectedElements(elements, appState).length ||
       appState.elementType !== "selection",
   );

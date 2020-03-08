@@ -33,6 +33,7 @@ export type AppState = {
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
+  selectedElementIds: { [id: string]: boolean };
 };
 
 export type Pointer = Readonly<{

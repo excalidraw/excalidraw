@@ -31,7 +31,7 @@ describe("resize element", () => {
       expect(renderScene).toHaveBeenCalledTimes(4);
       expect(h.appState.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.elements[0].isSelected).toBeTruthy();
+      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
       expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
@@ -72,7 +72,7 @@ describe("resize element with aspect ratio when SHIFT is clicked", () => {
       expect(renderScene).toHaveBeenCalledTimes(4);
       expect(h.appState.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.elements[0].isSelected).toBeTruthy();
+      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
       expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);

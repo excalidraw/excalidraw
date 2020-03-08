@@ -57,10 +57,6 @@ export function restore(
             ? 100
             : element.opacity,
         points,
-        shape: null,
-        canvas: null,
-        canvasOffsetX: element.canvasOffsetX || 0,
-        canvasOffsetY: element.canvasOffsetY || 0,
       };
     });
 

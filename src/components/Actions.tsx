@@ -1,7 +1,7 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
-import { hasBackground, hasStroke, hasText, clearSelection } from "../scene";
+import { hasBackground, hasStroke, hasText } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
@@ -92,8 +92,11 @@ export function ShapesSwitcher({
             aria-label={capitalizeString(label)}
             aria-keyshortcuts={`${label[0]} ${index + 1}`}
             onChange={() => {
-              setAppState({ elementType: value, multiElement: null });
-              setElements(clearSelection(elements));
+              setAppState({
+                elementType: value,
+                multiElement: null,
+                selectedElementIds: {},
+              });
               document.documentElement.style.cursor =
                 value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
               setAppState({});
