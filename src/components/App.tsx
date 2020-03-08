@@ -86,6 +86,7 @@ import {
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { getCollaborationLinkData } from "../data";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -219,6 +220,66 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private initializeSocketClient = () => {
+    if (this.socket) {
+      return;
+    }
+    const roomMatch = getCollaborationLinkData(window.location.href);
+    if (roomMatch) {
+      this.socket = socketIOClient(SOCKET_SERVER);
+      this.roomID = roomMatch[1];
+      this.roomKey = roomMatch[2];
+      this.socket.on("init-room", () => {
+        this.socket && this.socket.emit("join-room", this.roomID);
+      });
+      this.socket.on("new-user", async (socketID: string) => {
+        this.socket &&
+          this.roomID &&
+          this.roomKey &&
+          this.socket.emit(
+            "new-user-send-update",
+            socketID,
+            await encryptSocketUpdateData(elements, this.state, this.roomKey),
+          );
+      });
+      this.socket.on(
+        "new-user-receive-update",
+        async (encryptedData: ArrayBuffer) => {
+          if (this.roomKey) {
+            const scene = await decryptSocketUpdateData(
+              encryptedData,
+              this.roomKey,
+            );
+            elements = scene.elements;
+            this.setState({});
+          }
+          this.socket && this.socket.off("new-user-receive-update");
+        },
+      );
+      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
+        if (this.roomKey) {
+          const scene = await decryptSocketUpdateData(
+            encryptedData,
+            this.roomKey,
+          );
+          elements = scene.elements;
+          this.setState({});
+        }
+      });
+      this.socket.on(
+        "receive-mouse-location",
+        (socketID: string, pointerCoords: { x: number; y: number }) => {
+          this.setState({
+            remotePointers: {
+              ...this.state.remotePointers,
+              [socketID]: pointerCoords,
+            },
+          });
+        },
+      );
+    }
+  };
+
   private unmounted = false;
   public async componentDidMount() {
     if (process.env.NODE_ENV === "test") {
@@ -274,59 +335,9 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const roomMatch = window.location.hash.match(
-      /^#room_id=([0-9]+),([a-zA-Z0-9_-]+)$/,
-    );
+    const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
-      this.socket = socketIOClient(SOCKET_SERVER);
-      this.roomID = roomMatch[1];
-      this.roomKey = roomMatch[2];
-      this.socket.emit("join-room", this.roomID);
-      this.socket.on("new-user", async (socketID: string) => {
-        this.socket &&
-          this.roomID &&
-          this.roomKey &&
-          this.socket.emit(
-            "new-user-send-update",
-            socketID,
-            await encryptSocketUpdateData(elements, this.state, this.roomKey),
-          );
-      });
-      this.socket.on(
-        "new-user-receive-update",
-        async (encryptedData: ArrayBuffer) => {
-          if (this.roomKey) {
-            const scene = await decryptSocketUpdateData(
-              encryptedData,
-              this.roomKey,
-            );
-            elements = scene.elements;
-            this.setState({});
-          }
-          this.socket && this.socket.off("new-user-receive-update");
-        },
-      );
-      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
-        if (this.roomKey) {
-          const scene = await decryptSocketUpdateData(
-            encryptedData,
-            this.roomKey,
-          );
-          elements = scene.elements;
-          this.setState({});
-        }
-      });
-      this.socket.on(
-        "receive-mouse-location",
-        (socketID: string, pointerCoords: { x: number; y: number }) => {
-          this.setState({
-            remotePointers: {
-              ...this.state.remotePointers,
-              [socketID]: pointerCoords,
-            },
-          });
-        },
-      );
+      this.initializeSocketClient();
       return;
     }
     const scene = await loadScene(null);
@@ -1940,6 +1951,9 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   componentDidUpdate() {
+    if (this.state.isCollaborating && !this.socket) {
+      this.initializeSocketClient();
+    }
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};

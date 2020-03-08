@@ -45,6 +45,7 @@
   },
   "buttons": {
     "clearReset": "Reset the canvas",
+    "enableCollaboration": "Enable collaboration",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
