@@ -13,12 +13,10 @@ const writeData = (
   updater: () => { elements: ExcalidrawElement[]; appState: AppState } | null,
 ) => {
   if (
-    [
-      appState.multiElement,
-      appState.resizingElement,
-      appState.editingElement,
-      appState.draggingElement,
-    ].some(Boolean)
+    !appState.multiElement &&
+    !appState.resizingElement &&
+    !appState.editingElement &&
+    !appState.draggingElement
   ) {
     const data = updater();
 
