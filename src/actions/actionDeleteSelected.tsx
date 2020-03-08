@@ -9,9 +9,17 @@ import { register } from "./register";
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   perform: (elements, appState) => {
+    const {
+      elements: nextElements,
+      appState: nextAppState,
+    } = deleteSelectedElements(elements, appState);
     return {
-      elements: deleteSelectedElements(elements, appState),
-      appState: { ...appState, elementType: "selection", multiElement: null },
+      elements: nextElements,
+      appState: {
+        ...nextAppState,
+        elementType: "selection",
+        multiElement: null,
+      },
     };
   },
   contextItemLabel: "labels.delete",

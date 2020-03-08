@@ -34,7 +34,13 @@ export function deleteSelectedElements(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  return elements.filter(el => !appState.selectedElementIds[el.id]);
+  return {
+    elements: elements.filter(el => !appState.selectedElementIds[el.id]),
+    appState: {
+      ...appState,
+      selectedElementIds: {},
+    },
+  };
 }
 
 export function getSelectedIndices(

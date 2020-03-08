@@ -180,9 +180,13 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     copyToAppClipboard(elements, this.state);
-    elements = deleteSelectedElements(elements, this.state);
+    const { elements: nextElements, appState } = deleteSelectedElements(
+      elements,
+      this.state,
+    );
+    elements = nextElements;
     history.resumeRecording();
-    this.setState({});
+    this.setState({ ...appState });
     event.preventDefault();
   };
   private onCopy = (event: ClipboardEvent) => {
