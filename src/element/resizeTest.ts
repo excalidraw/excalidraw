@@ -1,17 +1,19 @@
 import { ExcalidrawElement, PointerType } from "./types";
 
 import { handlerRectangles } from "./handlerRectangles";
+import { AppState } from "../types";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
 export function resizeTest(
   element: ExcalidrawElement,
+  appState: AppState,
   x: number,
   y: number,
   zoom: number,
   pointerType: PointerType,
 ): HandlerRectanglesRet | false {
-  if (!element.isSelected || element.type === "text") {
+  if (!appState.selectedElementIds[element.id] || element.type === "text") {
     return false;
   }
 
@@ -40,6 +42,7 @@ export function resizeTest(
 
 export function getElementWithResizeHandler(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   { x, y }: { x: number; y: number },
   zoom: number,
   pointerType: PointerType,
@@ -48,7 +51,7 @@ export function getElementWithResizeHandler(
     if (result) {
       return result;
     }
-    const resizeHandle = resizeTest(element, x, y, zoom, pointerType);
+    const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
 }

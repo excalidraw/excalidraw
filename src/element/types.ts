@@ -1,5 +1,10 @@
 import { newElement } from "./newElement";
 
+/**
+ * ExcalidrawElement should be JSON serializable and (eventually) contain
+ * no computed data. The list of all ExcalidrawElements should be shareable
+ * between peers and contain no state local to the peer.
+ */
 export type ExcalidrawElement = ReturnType<typeof newElement>;
 export type ExcalidrawTextElement = ExcalidrawElement & {
   type: "text";

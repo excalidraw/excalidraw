@@ -41,7 +41,7 @@
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
-    "language": "Language"
+    "language": "Språk"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -55,11 +55,14 @@
     "close": "Lukk",
     "selectLanguage": "Velg språk",
     "scrollBackToContent": "Skroll tilbake til innhold",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "zoomIn": "Zoom inn",
+    "zoomOut": "Zoom ut",
+    "resetZoom": "Nullstill zoom",
+    "menu": "Meny",
+    "done": "Ferdig",
+    "edit": "Rediger",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",

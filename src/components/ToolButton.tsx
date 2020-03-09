@@ -16,6 +16,7 @@ type ToolButtonBaseProps = {
   keyBindingLabel?: string;
   showAriaLabel?: boolean;
   visible?: boolean;
+  selected?: boolean;
 };
 
 type ToolButtonProps =
@@ -40,7 +41,9 @@ export const ToolButton = React.forwardRef(function(
   if (props.type === "button") {
     return (
       <button
-        className={`ToolIcon_type_button ToolIcon ${sizeCn}`}
+        className={`ToolIcon_type_button ToolIcon ${sizeCn}${
+          props.selected ? " ToolIcon--selected" : ""
+        }`}
         title={props.title}
         aria-label={props["aria-label"]}
         type="button"

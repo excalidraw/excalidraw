@@ -22,7 +22,7 @@ import useIsMobile from "../is-mobile";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (
+export type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
 ) => void;
@@ -48,7 +48,7 @@ function ExportModal({
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
 }) {
-  const someElementIsSelected = isSomeElementSelected(elements);
+  const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ function ExportModal({
   const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
-    ? getSelectedElements(elements)
+    ? getSelectedElements(elements, appState)
     : elements;
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, appState, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -78,6 +78,7 @@ function ExportModal({
       previewNode?.removeChild(canvas);
     };
   }, [
+    appState,
     exportedElements,
     exportBackground,
     exportPadding,
@@ -89,22 +90,22 @@ function ExportModal({
     pngButton.current?.focus();
   }, []);
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === KEYS.TAB) {
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (event.key === KEYS.TAB) {
       const { activeElement } = document;
-      if (e.shiftKey) {
+      if (event.shiftKey) {
         if (activeElement === pngButton.current) {
           closeButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       } else {
         if (activeElement === closeButton.current) {
           pngButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
         if (activeElement === onlySelectedInput.current) {
           closeButton.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       }
     }
@@ -173,7 +174,7 @@ function ExportModal({
                     name="export-canvas-scale"
                     aria-label={`Scale ${s} x`}
                     id="export-canvas-scale"
-                    checked={scale === s}
+                    checked={s === scale}
                     onChange={() => setScale(s)}
                   />
                 ))}
@@ -186,7 +187,9 @@ function ExportModal({
                   <input
                     type="checkbox"
                     checked={exportSelected}
-                    onChange={e => setExportSelected(e.currentTarget.checked)}
+                    onChange={event =>
+                      setExportSelected(event.currentTarget.checked)
+                    }
                     ref={onlySelectedInput}
                   />{" "}
                   {t("labels.onlySelected")}

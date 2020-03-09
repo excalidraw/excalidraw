@@ -40,8 +40,8 @@
     "colorPicker": "Выбор цвета",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Рисование холста",
-    "layers": "Layers",
-    "language": "Language"
+    "layers": "Слои",
+    "language": "Язык"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",
@@ -54,12 +54,15 @@
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
     "selectLanguage": "Выбрать язык",
-    "scrollBackToContent": "Scroll back to content",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit"
+    "scrollBackToContent": "Вернуться к содержимому",
+    "zoomIn": "Увеличить",
+    "zoomOut": "Уменьшить",
+    "resetZoom": "Сбросить масштаб",
+    "menu": "Меню",
+    "done": "Готово",
+    "edit": "Изменить",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -67,7 +70,7 @@
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое."
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -85,8 +88,8 @@
     "shapes": "Фигуры"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
+    "linearElementMulti": "Нажмите Escape или Enter, чтобы закончить",
+    "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
   }
 }

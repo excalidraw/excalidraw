@@ -54,8 +54,6 @@ it("clones arrow element", () => {
     ...element,
     id: copy.id,
     seed: copy.seed,
-    shape: undefined,
-    canvas: undefined,
   });
 });
 

@@ -1,13 +1,18 @@
-import { Action } from "./types";
 import { KEYS } from "../keys";
+import { register } from "./register";
 
-export const actionSelectAll: Action = {
+export const actionSelectAll = register({
   name: "selectAll",
-  perform: elements => {
+  perform: (elements, appState) => {
     return {
-      elements: elements.map(elem => ({ ...elem, isSelected: true })),
+      appState: {
+        ...appState,
+        selectedElementIds: Object.fromEntries(
+          elements.map(element => [element.id, true]),
+        ),
+      },
     };
   },
   contextItemLabel: "labels.selectAll",
-  keyTest: event => event[KEYS.META] && event.key === "a",
-};
+  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "a",
+});

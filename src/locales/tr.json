@@ -41,7 +41,7 @@
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
-    "language": "Language"
+    "language": "Dil"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -57,9 +57,12 @@
     "scrollBackToContent": "İçeriğe geri dön",
     "zoomIn": "Yakınlaştır",
     "zoomOut": "Uzaklaştır",
+    "resetZoom": "Zoom'u Sıfırla",
     "menu": "Menü",
     "done": "Tamam",
-    "edit": "Edit"
+    "edit": "Düzenle",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",

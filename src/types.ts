@@ -31,19 +31,24 @@ export type AppState = {
   selectedId?: string;
   isResizing: boolean;
   zoom: number;
-  openedMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
+  selectedElementIds: { [id: string]: boolean };
 };
 
-export type Pointer = Readonly<{
-  id: number;
+export type PointerCoords = Readonly<{
   x: number;
   y: number;
 }>;
 
 export type Gesture = {
-  pointers: Array<Pointer>;
+  pointers: Map<number, PointerCoords>;
   lastCenter: { x: number; y: number } | null;
   initialDistance: number | null;
   initialScale: number | null;
 };
+
+export declare class GestureEvent extends UIEvent {
+  readonly rotation: number;
+  readonly scale: number;
+}
