@@ -28,7 +28,7 @@
 | Paste          |  ⌘V  |     `Ctrl + V`     |
 | Copy styles    | ⌘⇧V  | `Ctrl + Shift + V` |
 | Paste styles   | ⌘⇧C  | `Ctrl + Shift + C` |
-| Delete         |  ⌫   |       `del`        |
+| Delete         |  ⌫   |       `Del`        |
 | Send to back   | ⌥⌘\[ | `Ctrl + Shift + [` |
 | Bring to front | ⌥⌘\] | `Ctrl + Shift + ]` |
 | Send backwards | ⌘\[  |     `Ctrl + [`     |
