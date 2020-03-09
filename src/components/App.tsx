@@ -1,5 +1,6 @@
 import React from "react";
 
+import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Point } from "roughjs/bin/geometry";
@@ -29,7 +30,16 @@ import {
   getSelectedElements,
   isSomeElementSelected,
 } from "../scene";
-import { saveToLocalStorage, loadScene, loadFromBlob } from "../data";
+import {
+  decryptAESGEM,
+  encryptAESGEM,
+  saveToLocalStorage,
+  loadScene,
+  loadFromBlob,
+  SOCKET_SERVER,
+  SocketUpdateData,
+} from "../data";
+import { restore } from "../data/restore";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -77,6 +87,7 @@ import {
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -88,12 +99,15 @@ declare global {
       elements: typeof elements;
       appState: AppState;
     };
+    // TEMPORARY until we have a UI to support this
+    generateCollaborationLink: () => Promise<string>;
   }
 }
 
 if (process.env.NODE_ENV === "test") {
   window.__TEST__ = {} as Window["__TEST__"];
 }
+window.generateCollaborationLink = generateCollaborationLink;
 
 // -----------------------------------------------------------------------------
 
@@ -136,6 +150,10 @@ function setCursorForShape(shape: string) {
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
+  socket: SocketIOClient.Socket | null = null;
+  socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
+  roomID: string | null = null;
+  roomKey: string | null = null;
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
@@ -207,6 +225,96 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private initializeSocketClient = () => {
+    if (this.socket) {
+      return;
+    }
+    const roomMatch = getCollaborationLinkData(window.location.href);
+    if (roomMatch) {
+      this.socket = socketIOClient(SOCKET_SERVER);
+      this.roomID = roomMatch[1];
+      this.roomKey = roomMatch[2];
+      this.socket.on("init-room", () => {
+        this.socket && this.socket.emit("join-room", this.roomID);
+      });
+      this.socket.on(
+        "client-broadcast",
+        async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
+          if (!this.roomKey) {
+            return;
+          }
+          const decryptedData = await decryptAESGEM(
+            encryptedData,
+            this.roomKey,
+            iv,
+          );
+
+          switch (decryptedData.type) {
+            case "INVALID_RESPONSE":
+              return;
+            case "SCENE_UPDATE":
+              const {
+                elements: sceneElements,
+                appState: sceneAppState,
+              } = decryptedData.payload;
+              const restoredState = restore(
+                sceneElements || [],
+                sceneAppState || getDefaultAppState(),
+                { scrollToContent: true },
+              );
+              elements = restoredState.elements;
+              this.setState({});
+              if (this.socketInitialized === false) {
+                this.socketInitialized = true;
+              }
+              break;
+            case "MOUSE_LOCATION":
+              const { socketID, pointerCoords } = decryptedData.payload;
+              this.setState({
+                remotePointers: {
+                  ...this.state.remotePointers,
+                  [socketID]: pointerCoords,
+                },
+              });
+              break;
+          }
+        },
+      );
+      this.socket.on("first-in-room", () => {
+        if (this.socket) {
+          this.socket.off("first-in-room");
+        }
+        this.socketInitialized = true;
+      });
+      this.socket.on("room-user-count", (collaboratorCount: number) => {
+        this.setState({ collaboratorCount });
+      });
+      this.socket.on("new-user", async (socketID: string) => {
+        this.broadcastSocketData({
+          type: "SCENE_UPDATE",
+          payload: {
+            elements,
+            appState: this.state,
+          },
+        });
+      });
+    }
+  };
+
+  private broadcastSocketData = async (data: SocketUpdateData) => {
+    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+      const json = JSON.stringify(data);
+      const encoded = new TextEncoder().encode(json);
+      const encrypted = await encryptAESGEM(encoded, this.roomKey);
+      this.socket.emit(
+        "server-broadcast",
+        this.roomID,
+        encrypted.data,
+        encrypted.iv,
+      );
+    }
+  };
+
   private unmounted = false;
   public async componentDidMount() {
     if (process.env.NODE_ENV === "test") {
@@ -251,18 +359,24 @@ export class App extends React.Component<any, AppState> {
       // Backwards compatibility with legacy url format
       const scene = await loadScene(id);
       this.syncActionResult(scene);
-    } else {
-      const match = window.location.hash.match(
-        /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-      );
-      if (match) {
-        const scene = await loadScene(match[1], match[2]);
-        this.syncActionResult(scene);
-      } else {
-        const scene = await loadScene(null);
-        this.syncActionResult(scene);
-      }
     }
+
+    const jsonMatch = window.location.hash.match(
+      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    if (jsonMatch) {
+      const scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+      this.syncActionResult(scene);
+      return;
+    }
+
+    const roomMatch = getCollaborationLinkData(window.location.href);
+    if (roomMatch) {
+      this.initializeSocketClient();
+      return;
+    }
+    const scene = await loadScene(null);
+    this.syncActionResult(scene);
   }
 
   public componentWillUnmount() {
@@ -720,6 +834,12 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    const pointerCoords = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+    );
+    this.savePointer(pointerCoords);
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
@@ -1850,11 +1970,43 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
+  private savePointer = (pointerCoords: { x: number; y: number }) => {
+    if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
+      // sometimes the pointer goes off screen
+      return;
+    }
+    this.socket &&
+      this.broadcastSocketData({
+        type: "MOUSE_LOCATION",
+        payload: {
+          socketID: this.socket.id,
+          pointerCoords,
+        },
+      });
+  };
+
   private saveDebounced = debounce(() => {
     saveToLocalStorage(elements, this.state);
   }, 300);
 
   componentDidUpdate() {
+    if (this.state.isCollaborating && !this.socket) {
+      this.initializeSocketClient();
+    }
+    const pointerViewportCoords: {
+      [id: string]: { x: number; y: number };
+    } = {};
+    for (const clientId in this.state.remotePointers) {
+      const remotePointerCoord = this.state.remotePointers[clientId];
+      pointerViewportCoords[clientId] = sceneCoordsToViewportCoords(
+        {
+          sceneX: remotePointerCoord.x,
+          sceneY: remotePointerCoord.y,
+        },
+        this.state,
+        this.canvas,
+      );
+    }
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state,
@@ -1866,6 +2018,7 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
+        remotePointerViewportCoords: pointerViewportCoords,
       },
       {
         renderOptimizations: true,
@@ -1880,6 +2033,13 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
+      this.broadcastSocketData({
+        type: "SCENE_UPDATE",
+        payload: {
+          elements,
+          appState: this.state,
+        },
+      });
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
