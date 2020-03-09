@@ -34,6 +34,9 @@ export function restoreFromLocalStorage() {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
+      // If we're retrieving from local storage, we should not be collaborating
+      appState.isCollaborating = false;
+      appState.collaboratorCount = 0;
     } catch {
       // Do nothing because appState is already null
     }
