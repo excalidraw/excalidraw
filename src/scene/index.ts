@@ -9,7 +9,6 @@ export {
   getTargetElement,
 } from "./selection";
 export { normalizeScroll, calculateScrollCenter } from "./scroll";
-
 export {
   hasBackground,
   hasStroke,

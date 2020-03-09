@@ -1,4 +1,3 @@
-import "./TextInput.css";
 import React from "react";
 import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getTargetElement } from "../scene";
