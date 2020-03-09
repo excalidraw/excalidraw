@@ -136,6 +136,7 @@ function generateElement(
 ) {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
+    elementWithCanvasCache.delete(element);
     switch (element.type) {
       case "rectangle":
         shape = generator.rectangle(0, 0, element.width, element.height, {
@@ -244,7 +245,9 @@ function generateElement(
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   if (!prevElementWithCanvas || prevElementWithCanvas.canvasZoom !== zoom) {
-    return generateElementCanvas(element, zoom);
+    const elementWithCanvas = generateElementCanvas(element, zoom);
+    elementWithCanvasCache.set(element, elementWithCanvas);
+    return elementWithCanvas;
   }
   return prevElementWithCanvas;
 }
