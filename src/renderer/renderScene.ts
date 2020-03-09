@@ -162,10 +162,12 @@ export function renderScene(
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
       applyZoom(context);
       context.translate(sceneState.scrollX, sceneState.scrollY);
+      context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
+          context.fillRect(handler[0], handler[1], handler[2], handler[3]);
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
         });
       resetZoom(context);
