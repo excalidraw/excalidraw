@@ -1769,7 +1769,7 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
     const { deltaX, deltaY } = event;
 
-    if (event.metaKey || event.ctrlKey) {
+    if (event[KEYS.CTRL_OR_CMD]) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);

@@ -19,7 +19,8 @@ export const actionCopyStyles = register({
     return {};
   },
   contextItemLabel: "labels.copyStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "C",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C",
   contextMenuOrder: 0,
 });
 
@@ -54,6 +55,7 @@ export const actionPasteStyles = register({
   },
   commitToHistory: () => true,
   contextItemLabel: "labels.pasteStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.key === "V",
+  keyTest: event =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,
 });

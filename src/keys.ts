@@ -1,3 +1,5 @@
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
+
 export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
@@ -7,14 +9,10 @@ export const KEYS = {
   ESCAPE: "Escape",
   DELETE: "Delete",
   BACKSPACE: "Backspace",
-  get META() {
-    return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-      ? "metaKey"
-      : "ctrlKey";
-  },
+  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
   TAB: "Tab",
   SPACE: " ",
-};
+} as const;
 
 export function isArrowKey(keyCode: string) {
   return (
