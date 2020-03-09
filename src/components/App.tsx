@@ -1769,7 +1769,8 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
     const { deltaX, deltaY } = event;
 
-    if (event[KEYS.CTRL_OR_CMD]) {
+    // note that event.ctrlKey is necessary to handle pinch zooming
+    if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
       let delta = Math.abs(deltaY);
