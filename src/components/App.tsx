@@ -1996,7 +1996,7 @@ export class App extends React.Component<any, AppState> {
         scrollY: this.state.scrollY,
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
-        remotePointerViewportCoords: this.state.remotePointers,
+        remotePointerViewportCoords: pointerViewportCoords,
       },
       {
         renderOptimizations: true,
