@@ -1,7 +1,6 @@
 import React from "react";
 
 import socketIOClient from "socket.io-client";
-import throttle from "lodash.throttle";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Point } from "roughjs/bin/geometry";
@@ -32,13 +31,15 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import {
-  decryptSocketUpdateData,
-  encryptSocketUpdateData,
+  decryptAESGEM,
+  encryptAESGEM,
   saveToLocalStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
+  SocketUpdateData,
 } from "../data";
+import { restore } from "../data/restore";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -98,6 +99,7 @@ declare global {
       elements: typeof elements;
       appState: AppState;
     };
+    // TEMPORARY until we have a UI to support this
     generateCollaborationLink: () => Promise<string>;
   }
 }
@@ -236,27 +238,51 @@ export class App extends React.Component<any, AppState> {
         this.socket && this.socket.emit("join-room", this.roomID);
       });
       this.socket.on(
-        "new-user-receive-update",
-        async (encryptedData: ArrayBuffer) => {
-          if (this.roomKey) {
-            const scene = await decryptSocketUpdateData(
-              encryptedData,
-              this.roomKey,
-            );
-            elements = scene.elements;
-            this.setState({});
+        "client-broadcast",
+        async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
+          if (!this.roomKey) {
+            return;
           }
-          if (this.socket) {
-            this.socket.off("new-user-receive-update");
-            this.socket.off("new-user-first-in-room");
+          const decryptedData = await decryptAESGEM(
+            encryptedData,
+            this.roomKey,
+            iv,
+          );
+
+          switch (decryptedData.type) {
+            case "INVALID_RESPONSE":
+              return;
+            case "SCENE_UPDATE":
+              const {
+                elements: sceneElements,
+                appState: sceneAppState,
+              } = decryptedData.payload;
+              const restoredState = restore(
+                sceneElements || [],
+                sceneAppState || getDefaultAppState(),
+                { scrollToContent: true },
+              );
+              elements = restoredState.elements;
+              this.setState({});
+              if (this.socketInitialized === false) {
+                this.socketInitialized = true;
+              }
+              break;
+            case "MOUSE_LOCATION":
+              const { socketID, pointerCoords } = decryptedData.payload;
+              this.setState({
+                remotePointers: {
+                  ...this.state.remotePointers,
+                  [socketID]: pointerCoords,
+                },
+              });
+              break;
           }
-          this.socketInitialized = true;
         },
       );
-      this.socket.on("new-user-first-in-room", () => {
+      this.socket.on("first-in-room", () => {
         if (this.socket) {
-          this.socket.off("new-user-receive-update");
-          this.socket.off("new-user-first-in-room");
+          this.socket.off("first-in-room");
         }
         this.socketInitialized = true;
       });
@@ -264,36 +290,27 @@ export class App extends React.Component<any, AppState> {
         this.setState({ collaboratorCount });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.socketInitialized &&
-          this.socket &&
-          this.roomKey &&
-          this.socket.emit(
-            "new-user-send-update",
-            socketID,
-            await encryptSocketUpdateData(elements, this.state, this.roomKey),
-          );
+        this.broadcastSocketData({
+          type: "SCENE_UPDATE",
+          payload: {
+            elements,
+            appState: this.state,
+          },
+        });
       });
-      this.socket.on("receive-update", async (encryptedData: ArrayBuffer) => {
-        if (this.roomKey) {
-          const scene = await decryptSocketUpdateData(
-            encryptedData,
-            this.roomKey,
-          );
-          elements = scene.elements;
-          this.setState({});
-        }
-        this.socketInitialized = true;
-      });
-      this.socket.on(
-        "receive-mouse-location",
-        (socketID: string, pointerCoords: { x: number; y: number }) => {
-          this.setState({
-            remotePointers: {
-              ...this.state.remotePointers,
-              [socketID]: pointerCoords,
-            },
-          });
-        },
+    }
+  };
+
+  private broadcastSocketData = async (data: SocketUpdateData) => {
+    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+      const json = JSON.stringify(data);
+      const encoded = new TextEncoder().encode(json);
+      const encrypted = await encryptAESGEM(encoded, this.roomKey);
+      this.socket.emit(
+        "server-broadcast",
+        this.roomID,
+        encrypted.data,
+        encrypted.iv,
       );
     }
   };
@@ -822,7 +839,7 @@ export class App extends React.Component<any, AppState> {
       this.state,
       this.canvas,
     );
-    this.savePointerDebounced(pointerCoords);
+    this.savePointer(pointerCoords);
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
@@ -1952,18 +1969,20 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private savePointerDebounced = throttle(
-    (pointerCoords: { x: number; y: number }) => {
-      if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
-        // sometimes the pointer goes off screen
-        return;
-      }
-      this.socketInitialized &&
-        this.socket &&
-        this.socket.emit("send-mouse-location", this.roomID, pointerCoords);
-    },
-    50,
-  );
+  private savePointer = (pointerCoords: { x: number; y: number }) => {
+    if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
+      // sometimes the pointer goes off screen
+      return;
+    }
+    this.socket &&
+      this.broadcastSocketData({
+        type: "MOUSE_LOCATION",
+        payload: {
+          socketID: this.socket.id,
+          pointerCoords,
+        },
+      });
+  };
 
   private saveDebounced = debounce(() => {
     saveToLocalStorage(elements, this.state);
@@ -2013,17 +2032,13 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      (async () => {
-        this.socketInitialized &&
-          this.socket &&
-          this.roomID &&
-          this.roomKey &&
-          this.socket.emit(
-            "send-update",
-            this.roomID,
-            await encryptSocketUpdateData(elements, this.state, this.roomKey),
-          );
-      })();
+      this.broadcastSocketData({
+        type: "SCENE_UPDATE",
+        payload: {
+          elements,
+          appState: this.state,
+        },
+      });
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }

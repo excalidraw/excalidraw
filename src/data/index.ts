@@ -25,6 +25,30 @@ const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
 export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
 
+export type EncryptedData = {
+  data: ArrayBuffer;
+  iv: Uint8Array;
+};
+
+export type SocketUpdateData =
+  | {
+      type: "SCENE_UPDATE";
+      payload: {
+        elements: readonly ExcalidrawElement[];
+        appState: AppState | null;
+      };
+    }
+  | {
+      type: "MOUSE_LOCATION";
+      payload: {
+        socketID: string;
+        pointerCoords: { x: number; y: number };
+      };
+    }
+  | {
+      type: "INVALID_RESPONSE";
+    };
+
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
 // part of `AppState`.
@@ -35,7 +59,7 @@ function byteToHex(byte: number): string {
 }
 
 async function generateRandomID() {
-  var arr = new Uint8Array(20);
+  const arr = new Uint8Array(10);
   window.crypto.getRandomValues(arr);
   return Array.from(arr, byteToHex).join("");
 }
@@ -52,18 +76,23 @@ async function generateEncryptionKey() {
   return (await window.crypto.subtle.exportKey("jwk", key)).k;
 }
 
+function createIV() {
+  const arr = new Uint8Array(12);
+  return window.crypto.getRandomValues(arr);
+}
+
 export function getCollaborationLinkData(link: string) {
   if (link.length === 0) {
     return;
   }
   const hash = new URL(link).hash;
-  return hash.match(/^#room_id=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  return hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
 }
 
 export async function generateCollaborationLink() {
   const id = await generateRandomID();
   const key = await generateEncryptionKey();
-  return `${window.location.href}#room_id=${id},${key}`;
+  return `${window.location.href}#room=${id},${key}`;
 }
 
 async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
@@ -85,61 +114,52 @@ async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
   );
 }
 
-export async function decryptSocketUpdateData(
-  encryptedData: ArrayBuffer,
+export async function encryptAESGEM(
+  data: Uint8Array,
   key: string,
-) {
-  let elements: readonly ExcalidrawElement[] = [];
-  let appState: AppState = getDefaultAppState();
+): Promise<EncryptedData> {
+  const importedKey = await getImportedKey(key, "encrypt");
+  const iv = createIV();
+  return {
+    data: await window.crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv,
+      },
+      importedKey,
+      data,
+    ),
+    iv,
+  };
+}
+
+export async function decryptAESGEM(
+  data: ArrayBuffer,
+  key: string,
+  iv: Uint8Array,
+): Promise<SocketUpdateData> {
   try {
     const importedKey = await getImportedKey(key, "decrypt");
-
-    const iv = new Uint8Array(12);
     const decrypted = await window.crypto.subtle.decrypt(
       {
         name: "AES-GCM",
         iv: iv,
       },
       importedKey,
-      encryptedData,
+      data,
     );
-    // We need to convert the decrypted array buffer to a string
-    const decodedData = new window.TextDecoder("utf-8").decode(
+
+    const decodedData = new TextDecoder("utf-8").decode(
       new Uint8Array(decrypted) as any,
     );
-    const data = JSON.parse(decodedData);
-    elements = data.elements || elements;
-    appState = data.appState || appState;
+    return JSON.parse(decodedData);
   } catch (error) {
-    window.alert(t("alerts.decryptSyncFailed"));
+    window.alert(t("alerts.decryptFailed"));
     console.error(error);
-  } finally {
-    return restore(elements, appState, { scrollToContent: true });
   }
-}
-
-export async function encryptSocketUpdateData(
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  key: string,
-): Promise<ArrayBuffer> {
-  const json = serializeAsJSON(elements, appState);
-  const encoded = new TextEncoder().encode(json);
-  const importedKey = await getImportedKey(key, "encrypt");
-
-  // The iv is set to 0. We are never going to reuse the same key so we don't
-  // need to have an iv. (I hope that's correct...)
-  const iv = new Uint8Array(12);
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
-  // includes checks that the ciphertext has not been modified by an attacker.
-  return await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv: iv,
-    },
-    importedKey,
-    encoded,
-  );
+  return {
+    type: "INVALID_RESPONSE",
+  };
 }
 
 export async function exportToBackend(

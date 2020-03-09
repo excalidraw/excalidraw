@@ -8,7 +8,6 @@
   "dependencies": {
     "browser-nativefs": "0.3.1",
     "i18next-browser-languagedetector": "4.0.2",
-    "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
     "react": "16.13.0",
     "react-dom": "16.13.0",
