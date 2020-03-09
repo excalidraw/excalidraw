@@ -86,7 +86,7 @@ import {
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
-import { getCollaborationLinkData } from "../data";
+import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -98,12 +98,14 @@ declare global {
       elements: typeof elements;
       appState: AppState;
     };
+    generateCollaborationLink: () => Promise<string>;
   }
 }
 
 if (process.env.NODE_ENV === "test") {
   window.__TEST__ = {} as Window["__TEST__"];
 }
+window.generateCollaborationLink = generateCollaborationLink;
 
 // -----------------------------------------------------------------------------
 
