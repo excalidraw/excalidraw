@@ -26,7 +26,7 @@ export class TopErrorBoundary extends React.Component<
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
         _localStorage[key] = JSON.parse(value);
-      } catch (err) {
+      } catch (error) {
         _localStorage[key] = value;
       }
     }
@@ -50,8 +50,8 @@ export class TopErrorBoundary extends React.Component<
         try {
           const StackTrace = await import("stacktrace-js");
           stack += (await StackTrace.fromError(error)).join("\n");
-        } catch (err) {
-          console.error(err);
+        } catch (error) {
+          console.error(error);
           stack += error.stack || "";
         }
       }
