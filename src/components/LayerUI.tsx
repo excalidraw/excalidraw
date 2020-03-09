@@ -66,20 +66,6 @@ export const LayerUI = React.memo(
           onExportToPng={createExporter("png")}
           onExportToSvg={createExporter("svg")}
           onExportToClipboard={createExporter("clipboard")}
-          onExportToBackend={exportedElements => {
-            if (canvas) {
-              exportCanvas(
-                "backend",
-                exportedElements,
-                {
-                  ...appState,
-                  selectedElementIds: {},
-                },
-                canvas,
-                appState,
-              );
-            }
-          }}
         />
       );
     }
