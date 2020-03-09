@@ -30,7 +30,6 @@ export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
 // part of `AppState`.
 (window as any).handle = null;
 
-
 function byteToHex(byte: number): string {
   return `0${byte.toString(16)}`.slice(-2);
 }
