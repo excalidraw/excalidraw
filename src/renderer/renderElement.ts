@@ -244,7 +244,9 @@ function generateElement(
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   if (!prevElementWithCanvas || prevElementWithCanvas.canvasZoom !== zoom) {
-    return generateElementCanvas(element, zoom);
+    const elementWithCanvas = generateElementCanvas(element, zoom);
+    elementWithCanvasCache.set(element, elementWithCanvas);
+    return elementWithCanvas;
   }
   return prevElementWithCanvas;
 }
