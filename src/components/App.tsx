@@ -118,7 +118,7 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
-  pointers: [],
+  pointers: new Map(),
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
@@ -354,7 +354,7 @@ export class App extends React.Component<any, AppState> {
       this.state.draggingElement === null
     ) {
       this.selectShapeTool(shape);
-    } else if (event.key === KEYS.SPACE && gesture.pointers.length === 0) {
+    } else if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
@@ -465,9 +465,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement>) => {
-    gesture.pointers = gesture.pointers.filter(
-      pointer => pointer.id !== event.pointerId,
-    );
+    gesture.pointers.delete(event.pointerId);
   };
 
   public render() {
@@ -722,23 +720,18 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    gesture.pointers = gesture.pointers.map(pointer =>
-      pointer.id === event.pointerId
-        ? {
-            id: event.pointerId,
-            x: event.clientX,
-            y: event.clientY,
-          }
-        : pointer,
-    );
+    gesture.pointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
 
-    if (gesture.pointers.length === 2) {
+    if (gesture.pointers.size === 2) {
       const center = getCenter(gesture.pointers);
       const deltaX = center.x - gesture.lastCenter!.x;
       const deltaY = center.y - gesture.lastCenter!.y;
       gesture.lastCenter = center;
 
-      const distance = getDistance(gesture.pointers);
+      const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor = distance / gesture.initialDistance!;
 
       this.setState({
@@ -835,7 +828,7 @@ export class App extends React.Component<any, AppState> {
 
     // pan canvas on wheel button drag or space+drag
     if (
-      gesture.pointers.length === 0 &&
+      gesture.pointers.size === 0 &&
       (event.button === POINTER_BUTTON.WHEEL ||
         (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
     ) {
@@ -883,15 +876,17 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    gesture.pointers.push({
-      id: event.pointerId,
+    gesture.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
     });
-    if (gesture.pointers.length === 2) {
+
+    if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
       gesture.initialScale = this.state.zoom;
-      gesture.initialDistance = getDistance(gesture.pointers);
+      gesture.initialDistance = getDistance(
+        Array.from(gesture.pointers.values()),
+      );
     }
 
     // fixes pointermove causing selection of UI texts #32
@@ -904,7 +899,7 @@ export class App extends React.Component<any, AppState> {
     }
 
     // don't select while panning
-    if (gesture.pointers.length > 1) {
+    if (gesture.pointers.size > 1) {
       return;
     }
 

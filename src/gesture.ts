@@ -1,14 +1,15 @@
-import { Pointer } from "./types";
+import { PointerCoords } from "./types";
 import { normalizeScroll } from "./scene";
 
-export function getCenter(pointers: readonly Pointer[]) {
+export function getCenter(pointers: Map<number, PointerCoords>) {
+  const allCoords = Array.from(pointers.values());
   return {
-    x: normalizeScroll(sum(pointers, pointer => pointer.x) / pointers.length),
-    y: normalizeScroll(sum(pointers, pointer => pointer.y) / pointers.length),
+    x: normalizeScroll(sum(allCoords, coords => coords.x) / allCoords.length),
+    y: normalizeScroll(sum(allCoords, coords => coords.y) / allCoords.length),
   };
 }
 
-export function getDistance([a, b]: readonly Pointer[]) {
+export function getDistance([a, b]: readonly PointerCoords[]) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
