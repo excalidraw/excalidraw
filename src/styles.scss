@@ -250,6 +250,7 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: text;
 
   .ErrorSplash-messageContainer {
     display: flex;
@@ -264,8 +265,11 @@ button,
 
   .ErrorSplash-paragraph {
     margin: 15px 0;
-    text-align: center;
     max-width: 600px;
+
+    &.align-center {
+      text-align: center;
+    }
   }
 
   .bigger,
