@@ -109,28 +109,7 @@ export const LayerUI = React.memo(
                       {renderExportDialog()}
                       {actionManager.renderAction("clearCanvas")}
                     </Stack.Row>
-                    <Stack.Row>
-                      {actionManager.renderAction("changeViewBackgroundColor")}
-                    </Stack.Row>
-                    <Stack.Row justifyContent={"space-between"}>
-                      {actionManager.renderAction("enableCollaboration")}
-                      {appState.isCollaborating && (
-                        <input
-                          onClick={event => {
-                            if (event.target) {
-                              const target = event.target as HTMLInputElement;
-                              target.select && target.select();
-                            }
-                            window.navigator.clipboard.writeText(
-                              window.location.href,
-                            );
-                          }}
-                          className="text-input"
-                          readOnly={true}
-                          value={window.location.href}
-                        />
-                      )}
-                    </Stack.Row>
+                    {actionManager.renderAction("changeViewBackgroundColor")}
                   </Stack.Col>
                 </Island>
               </Section>
