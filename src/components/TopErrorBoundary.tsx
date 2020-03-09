@@ -1,5 +1,6 @@
 import React from "react";
 import { resetCursor } from "../utils";
+import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
   unresolvedError: Error[] | null;
@@ -91,27 +92,27 @@ export class TopErrorBoundary extends React.Component<
         <div className="ErrorSplash">
           <div className="ErrorSplash-messageContainer">
             <div className="ErrorSplash-paragraph bigger align-center">
-              Encountered an error. Try{" "}
+              {t("errorSplash.headingMain_pre")}{" "}
               <button onClick={() => window.location.reload()}>
-                reloading the page.
+                {t("errorSplash.headingMain_button")}
               </button>
             </div>
             <div className="ErrorSplash-paragraph align-center">
-              If reloading doesn't work, try{" "}
+              {t("errorSplash.clearCanvasMessage")}{" "}
               <button
                 onClick={() => {
                   localStorage.clear();
                   window.location.reload();
                 }}
               >
-                clearing the canvas.
+                {t("errorSplash.clearCanvasMessage_button")}
               </button>
               <br />
               <div className="smaller">
                 <span role="img" aria-label="warning">
                   ⚠️
                 </span>{" "}
-                This will result in loss of work{" "}
+                {t("errorSplash.clearCanvasCaveat")}{" "}
                 <span role="img" aria-hidden="true">
                   ⚠️
                 </span>
@@ -119,25 +120,26 @@ export class TopErrorBoundary extends React.Component<
             </div>
             <div>
               <div className="ErrorSplash-paragraph">
-                Before doing so, we'd appreciate if you opened an issue on our{" "}
-                <button onClick={this.createGithubIssue}>bug tracker.</button>{" "}
-                Please include the following error stack trace (and if it's not
-                private, also the scene content):
+                {t("errorSplash.openIssueMessage_pre")}{" "}
+                <button onClick={this.createGithubIssue}>
+                  {t("errorSplash.openIssueMessage_button")}
+                </button>{" "}
+                {t("errorSplash.openIssueMessage_post")}
               </div>
               <div className="ErrorSplash-paragraph">
                 <div className="ErrorSplash-details">
-                  <label>Error stack trace:</label>
+                  <label>{t("errorSplash.errorStack")}</label>
                   <textarea
                     rows={10}
                     onPointerDown={this.selectTextArea}
                     readOnly={true}
                     value={
                       this.state.unresolvedError
-                        ? "Loading data. please wait..."
+                        ? t("errorSplash.errorStack_loading")
                         : this.state.stack
                     }
                   />
-                  <label>Scene content:</label>
+                  <label>{t("errorSplash.sceneContent")}</label>
                   <textarea
                     rows={5}
                     onPointerDown={this.selectTextArea}
