@@ -134,6 +134,17 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+export const getShortcutKey = (shortcut: string): string => {
+  const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
+  if (isMac) {
+    return ` — ${shortcut
+      .replace("CtrlOrCmd+", "⌘")
+      .replace("Alt+", "⌥")
+      .replace("Ctrl+", "⌃")
+      .replace("Shift+", "⇧")}`;
+  }
+  return ` — ${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+};
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
   {

@@ -5,7 +5,7 @@ import { hasBackground, hasStroke, hasText } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString } from "../utils";
+import { capitalizeString, getShortcutKey } from "../utils";
 import { CURSOR_TYPE } from "../constants";
 import Stack from "./Stack";
 
@@ -78,6 +78,9 @@ export function ShapesSwitcher({
     <>
       {SHAPES.map(({ value, icon }, index) => {
         const label = t(`toolBar.${value}`);
+        const shortcut = getShortcutKey(
+          `${capitalizeString(value)[0]}, ${index + 1}`,
+        );
         return (
           <ToolButton
             key={value}
@@ -85,9 +88,7 @@ export function ShapesSwitcher({
             icon={icon}
             checked={elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${
-              capitalizeString(value)[0]
-            }, ${index + 1}`}
+            title={`${capitalizeString(label)} ${shortcut}`}
             keyBindingLabel={`${index + 1}`}
             aria-label={capitalizeString(label)}
             aria-keyshortcuts={`${label[0]} ${index + 1}`}
