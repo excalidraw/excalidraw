@@ -1,5 +1,4 @@
 import React from "react";
-import { Action } from "./types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
@@ -11,13 +10,15 @@ import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { DEFAULT_FONT } from "../appState";
+import { register } from "./register";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
 ) => {
   return elements.map(element => {
-    if (element.isSelected) {
+    if (appState.selectedElementIds[element.id]) {
       return callback(element);
     }
     return element;
@@ -25,27 +26,27 @@ const changeProperty = (
 };
 
 const getFormValue = function<T>(
-  editingElement: AppState["editingElement"],
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
   defaultValue?: T,
 ): T | null {
+  const editingElement = appState.editingElement;
   return (
     (editingElement && getAttribute(editingElement)) ??
-    (isSomeElementSelected(elements)
-      ? getCommonAttributeOfSelectedElements(elements, getAttribute)
+    (isSomeElementSelected(elements, appState)
+      ? getCommonAttributeOfSelectedElements(elements, appState, getAttribute)
       : defaultValue) ??
     null
   );
 };
 
-export const actionChangeStrokeColor: Action = {
+export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         strokeColor: value,
       })),
       appState: { ...appState, currentItemStrokeColor: value },
@@ -59,8 +60,8 @@ export const actionChangeStrokeColor: Action = {
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => element.strokeColor,
           appState.currentItemStrokeColor,
         )}
@@ -68,15 +69,14 @@ export const actionChangeStrokeColor: Action = {
       />
     </>
   ),
-};
+});
 
-export const actionChangeBackgroundColor: Action = {
+export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         backgroundColor: value,
       })),
       appState: { ...appState, currentItemBackgroundColor: value },
@@ -90,8 +90,8 @@ export const actionChangeBackgroundColor: Action = {
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => element.backgroundColor,
           appState.currentItemBackgroundColor,
         )}
@@ -99,15 +99,14 @@ export const actionChangeBackgroundColor: Action = {
       />
     </>
   ),
-};
+});
 
-export const actionChangeFillStyle: Action = {
+export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         fillStyle: value,
       })),
       appState: { ...appState, currentItemFillStyle: value },
@@ -125,8 +124,8 @@ export const actionChangeFillStyle: Action = {
         ]}
         group="fill"
         value={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => element.fillStyle,
           appState.currentItemFillStyle,
         )}
@@ -136,15 +135,14 @@ export const actionChangeFillStyle: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeStrokeWidth: Action = {
+export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         strokeWidth: value,
       })),
       appState: { ...appState, currentItemStrokeWidth: value },
@@ -162,8 +160,8 @@ export const actionChangeStrokeWidth: Action = {
           { value: 4, text: t("labels.extraBold") },
         ]}
         value={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => element.strokeWidth,
           appState.currentItemStrokeWidth,
         )}
@@ -171,15 +169,14 @@ export const actionChangeStrokeWidth: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeSloppiness: Action = {
+export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         roughness: value,
       })),
       appState: { ...appState, currentItemRoughness: value },
@@ -197,8 +194,8 @@ export const actionChangeSloppiness: Action = {
           { value: 2, text: t("labels.cartoonist") },
         ]}
         value={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => element.roughness,
           appState.currentItemRoughness,
         )}
@@ -206,15 +203,14 @@ export const actionChangeSloppiness: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeOpacity: Action = {
+export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => ({
+      elements: changeProperty(elements, appState, el => ({
         ...el,
-        shape: null,
         opacity: value,
       })),
       appState: { ...appState, currentItemOpacity: value },
@@ -246,8 +242,8 @@ export const actionChangeOpacity: Action = {
         }}
         value={
           getFormValue(
-            appState.editingElement,
             elements,
+            appState,
             element => element.opacity,
             appState.currentItemOpacity,
           ) ?? undefined
@@ -255,17 +251,16 @@ export const actionChangeOpacity: Action = {
       />
     </label>
   ),
-};
+});
 
-export const actionChangeFontSize: Action = {
+export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => {
+      elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = {
             ...el,
-            shape: null,
             font: `${value}px ${el.font.split("px ")[1]}`,
           };
           redrawTextBoundingBox(element);
@@ -295,8 +290,8 @@ export const actionChangeFontSize: Action = {
           { value: 36, text: t("labels.veryLarge") },
         ]}
         value={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => isTextElement(element) && +element.font.split("px ")[0],
           +(appState.currentItemFont || DEFAULT_FONT).split("px ")[0],
         )}
@@ -304,17 +299,16 @@ export const actionChangeFontSize: Action = {
       />
     </fieldset>
   ),
-};
+});
 
-export const actionChangeFontFamily: Action = {
+export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, el => {
+      elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = {
             ...el,
-            shape: null,
             font: `${el.font.split("px ")[0]}px ${value}`,
           };
           redrawTextBoundingBox(element);
@@ -343,8 +337,8 @@ export const actionChangeFontFamily: Action = {
           { value: "Cascadia", text: t("labels.code") },
         ]}
         value={getFormValue(
-          appState.editingElement,
           elements,
+          appState,
           element => isTextElement(element) && element.font.split("px ")[1],
           (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
         )}
@@ -352,4 +346,4 @@ export const actionChangeFontFamily: Action = {
       />
     </fieldset>
   ),
-};
+});

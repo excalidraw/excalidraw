@@ -22,7 +22,7 @@ import useIsMobile from "../is-mobile";
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
-type ExportCB = (
+export type ExportCB = (
   elements: readonly ExcalidrawElement[],
   scale?: number,
 ) => void;
@@ -48,7 +48,7 @@ function ExportModal({
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
 }) {
-  const someElementIsSelected = isSomeElementSelected(elements);
+  const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ function ExportModal({
   const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
-    ? getSelectedElements(elements)
+    ? getSelectedElements(elements, appState)
     : elements;
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function ExportModal({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, {
+    const canvas = exportToCanvas(exportedElements, appState, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
@@ -78,6 +78,7 @@ function ExportModal({
       previewNode?.removeChild(canvas);
     };
   }, [
+    appState,
     exportedElements,
     exportBackground,
     exportPadding,
@@ -173,7 +174,7 @@ function ExportModal({
                     name="export-canvas-scale"
                     aria-label={`Scale ${s} x`}
                     id="export-canvas-scale"
-                    checked={scale === s}
+                    checked={s === scale}
                     onChange={() => setScale(s)}
                   />
                 ))}

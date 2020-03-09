@@ -30,8 +30,9 @@ export function getDefaultAppState(): AppState {
     isResizing: false,
     selectionElement: null,
     zoom: 1,
-    openedMenu: null,
+    openMenu: null,
     lastPointerDownWith: "mouse",
+    selectedElementIds: {},
   };
 }
 

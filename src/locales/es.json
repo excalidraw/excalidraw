@@ -6,7 +6,7 @@
     "bringForward": "Adelantar",
     "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
-    "sendBackward": "Enviar átras",
+    "sendBackward": "Enviar atrás",
     "delete": "Borrar",
     "copyStyles": "Copiar estilos",
     "pasteStyles": "Pegar estilos",
@@ -60,7 +60,9 @@
     "resetZoom": "Restablecer zoom",
     "menu": "Menú",
     "done": "Terminado",
-    "edit": "Editar"
+    "edit": "Editar",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",

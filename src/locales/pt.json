@@ -60,7 +60,9 @@
     "resetZoom": "Redefinir zoom",
     "menu": "Menu",
     "done": "Concluído",
-    "edit": "Editar"
+    "edit": "Editar",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",

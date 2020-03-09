@@ -20,7 +20,7 @@ const now = new Date();
 
 const data = JSON.stringify(
   {
-    app: `excalidraw-${versionDate(now)}.asar`,
+    asar: `excalidraw.asar`,
     version: versionDate(now),
   },
   undefined,
@@ -31,7 +31,7 @@ fs.writeFileSync(path.join("build", "version.json"), data);
 
 (async () => {
   const src = "build/";
-  const dest = path.join("build", `excalidraw-${versionDate(now)}.asar`);
+  const dest = path.join("build", `excalidraw.asar`);
 
   await asar.createPackage(src, dest);
 })();
