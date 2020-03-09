@@ -571,9 +571,9 @@ export class App extends React.Component<any, AppState> {
                 left: event.clientX,
               });
             }}
-            onPointerDown={event => this.handleCanvasPointerDown(event)}
-            onDoubleClick={event => this.handleCanvasDoubleClick(event)}
-            onPointerMove={event => this.handleCanvasPointerMove(event)}
+            onPointerDown={this.handleCanvasPointerDown}
+            onDoubleClick={this.handleCanvasDoubleClick}
+            onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
             onDrop={event => {
@@ -597,7 +597,9 @@ export class App extends React.Component<any, AppState> {
     );
   }
 
-  private handleCanvasDoubleClick(event: React.MouseEvent<HTMLCanvasElement>) {
+  private handleCanvasDoubleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
     resetCursor();
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -715,11 +717,11 @@ export class App extends React.Component<any, AppState> {
         resetSelection();
       },
     });
-  }
+  };
 
-  private handleCanvasPointerMove(
+  private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
-  ) {
+  ) => {
     gesture.pointers = gesture.pointers.map(pointer =>
       pointer.id === event.pointerId
         ? {
@@ -813,11 +815,11 @@ export class App extends React.Component<any, AppState> {
     );
     document.documentElement.style.cursor =
       hitElement && !isOverScrollBar ? "move" : "";
-  }
+  };
 
-  private handleCanvasPointerDown(
+  private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
-  ) {
+  ) => {
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid
@@ -1766,7 +1768,7 @@ export class App extends React.Component<any, AppState> {
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
-  }
+  };
 
   private handleWheel = (event: WheelEvent) => {
     event.preventDefault();
