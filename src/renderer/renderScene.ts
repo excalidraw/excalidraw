@@ -172,6 +172,15 @@ export function renderScene(
     }
   }
 
+  // Paint remote pointers
+  for (const clientId in sceneState.remotePointerViewportCoords) {
+    const { x, y } = sceneState.remotePointerViewportCoords[clientId];
+    context.beginPath();
+    context.arc(x, y, 5, 0, 2 * Math.PI);
+    context.fill();
+    context.stroke();
+  }
+
   // Paint scrollbars
   if (renderScrollbars) {
     const scrollBars = getScrollBars(

@@ -13,6 +13,7 @@
     "react-dom": "16.13.0",
     "react-scripts": "3.4.0",
     "roughjs": "4.0.4",
+    "socket.io-client": "2.3.0",
     "stacktrace-js": "2.0.2"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.23",
     "@types/react-dom": "16.9.5",
+    "@types/socket.io-client": "1.4.32",
     "asar": "2.1.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
