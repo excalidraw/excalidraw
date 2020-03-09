@@ -1,4 +1,3 @@
-export { ActionManager } from "./manager";
 export { actionDeleteSelected } from "./actionDeleteSelected";
 export {
   actionBringForward,
@@ -36,3 +35,4 @@ export {
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+export { actionToggleCanvasMenu, actionToggleEditMenu } from "./actionMenu";

@@ -1,23 +1,14 @@
 export { isOverScrollBars } from "./scrollbars";
 export {
-  clearSelection,
   getSelectedIndices,
   deleteSelectedElements,
   isSomeElementSelected,
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
+  getTargetElement,
 } from "./selection";
-export {
-  exportCanvas,
-  loadFromJSON,
-  loadFromBlob,
-  saveAsJSON,
-  restoreFromLocalStorage,
-  saveToLocalStorage,
-  loadScene,
-  calculateScrollCenter,
-} from "./data";
+export { normalizeScroll, calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
   hasStroke,

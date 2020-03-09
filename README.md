@@ -23,7 +23,7 @@ git clone https://github.com/nrgapple/excalidraw.git
 | Command             | Description                       |
 | ------------------- | --------------------------------- |
 | `npm install`       | Install the dependencies          |
-| `npm run start`     | Run the project                   |
+| `npm start`         | Run the project                   |
 | `npm run fix`       | Reformat all files with Prettier  |
 | `npm run test:code` | Test for formatting with Prettier |
 | `npm run test:app`  | Test the app                      |

@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "./element/types";
 import { getSelectedElements } from "./scene";
+import { AppState } from "./types";
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -18,17 +19,16 @@ export const probablySupportsClipboardBlob =
 
 export async function copyToAppClipboard(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
 ) {
-  CLIPBOARD = JSON.stringify(
-    getSelectedElements(elements).map(({ shape, canvas, ...el }) => el),
-  );
+  CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
     //  system clip contains text on paste we know it was copied *after* user
     //  copied elements, and thus we should prefer the text content.
     await copyTextToSystemClipboard(null);
     PREFER_APP_CLIPBOARD = false;
-  } catch (err) {
+  } catch {
     // if clearing system clipboard didn't work, we should prefer in-app
     //  clipboard even if there's text in system clipboard on paste, because
     //  we can't be sure of the order of copy operations
@@ -49,30 +49,30 @@ export function getAppClipboard(): {
     ) {
       return { elements: clipboardElements };
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
   }
 
   return {};
 }
 
 export async function getClipboardContent(
-  e: ClipboardEvent | null,
+  event: ClipboardEvent | null,
 ): Promise<{
   text?: string;
   elements?: readonly ExcalidrawElement[];
 }> {
   try {
-    const text = e
-      ? e.clipboardData?.getData("text/plain").trim()
+    const text = event
+      ? event.clipboardData?.getData("text/plain").trim()
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
     if (text && !PREFER_APP_CLIPBOARD) {
       return { text };
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
   }
 
   return getAppClipboard();
@@ -87,12 +87,12 @@ export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
             new window.ClipboardItem({ "image/png": blob }),
           ]);
           resolve();
-        } catch (err) {
-          reject(err);
+        } catch (error) {
+          reject(error);
         }
       });
-    } catch (err) {
-      reject(err);
+    } catch (error) {
+      reject(error);
     }
   });
 }
@@ -105,7 +105,9 @@ export async function copyTextToSystemClipboard(text: string | null) {
       //  not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
-    } catch (err) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   // Note that execCommand doesn't allow copying empty strings, so if we're
@@ -143,7 +145,9 @@ function copyTextViaExecCommand(text: string) {
     textarea.setSelectionRange(0, textarea.value.length);
 
     success = document.execCommand("copy");
-  } catch (err) {}
+  } catch (error) {
+    console.error(error);
+  }
 
   textarea.remove();
 

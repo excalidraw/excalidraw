@@ -19,3 +19,18 @@ export interface Scene {
 }
 
 export type ExportType = "png" | "clipboard" | "backend" | "svg";
+
+export type ScrollBars = {
+  horizontal: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
+  vertical: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
+};

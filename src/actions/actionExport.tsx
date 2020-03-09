@@ -1,15 +1,15 @@
 import React from "react";
-import { Action } from "./types";
 import { ProjectName } from "../components/ProjectName";
-import { saveAsJSON, loadFromJSON } from "../scene";
+import { saveAsJSON, loadFromJSON } from "../data";
 import { load, save } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
+import { register } from "./register";
 
-export const actionChangeProjectName: Action = {
+export const actionChangeProjectName = register({
   name: "changeProjectName",
-  perform: (elements, appState, value) => {
+  perform: (_elements, appState, value) => {
     return { appState: { ...appState, name: value } };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -19,11 +19,11 @@ export const actionChangeProjectName: Action = {
       onChange={(name: string) => updateData(name)}
     />
   ),
-};
+});
 
-export const actionChangeExportBackground: Action = {
+export const actionChangeExportBackground = register({
   name: "changeExportBackground",
-  perform: (elements, appState, value) => {
+  perform: (_elements, appState, value) => {
     return { appState: { ...appState, exportBackground: value } };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -31,19 +31,17 @@ export const actionChangeExportBackground: Action = {
       <input
         type="checkbox"
         checked={appState.exportBackground}
-        onChange={e => {
-          updateData(e.target.checked);
-        }}
+        onChange={event => updateData(event.target.checked)}
       />{" "}
       {t("labels.withBackground")}
     </label>
   ),
-};
+});
 
-export const actionSaveScene: Action = {
+export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState).catch(err => console.error(err));
+    saveAsJSON(elements, appState).catch(error => console.error(error));
     return {};
   },
   PanelComponent: ({ updateData }) => (
@@ -56,9 +54,9 @@ export const actionSaveScene: Action = {
       onClick={() => updateData(null)}
     />
   ),
-};
+});
 
-export const actionLoadScene: Action = {
+export const actionLoadScene = register({
   name: "loadScene",
   perform: (
     elements,
@@ -79,8 +77,8 @@ export const actionLoadScene: Action = {
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch(err => console.error(err));
+          .catch(error => console.error(error));
       }}
     />
   ),
-};
+});

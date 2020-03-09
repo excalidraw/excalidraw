@@ -5,14 +5,20 @@
 
 import React from "react";
 
-const createIcon = (d: string, width = 512) => (
+const ACTIVE_ELEMENT_COLOR = "#ffa94d"; // OC ORANGE 4
+
+const createIcon = (
+  d: string | React.ReactNode,
+  width = 512,
+  height = width,
+) => (
   <svg
     aria-hidden="true"
     focusable="false"
     role="img"
-    viewBox={`0 0 ${width} 512`}
+    viewBox={`0 0 ${width} ${height}`}
   >
-    <path fill="currentColor" d={d} />
+    {typeof d === "string" ? <path fill="currentColor" d={d} /> : d}
   </svg>
 );
 
@@ -23,26 +29,31 @@ export const link = createIcon(
 export const save = createIcon(
   "M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z",
   448,
+  512,
 );
 
 export const load = createIcon(
   "M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z",
   576,
+  512,
 );
 
 export const image = createIcon(
   "M384 121.941V128H256V0h6.059a24 24 0 0 1 16.97 7.029l97.941 97.941a24.002 24.002 0 0 1 7.03 16.971zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zm-135.455 16c26.51 0 48 21.49 48 48s-21.49 48-48 48-48-21.49-48-48 21.491-48 48-48zm208 240h-256l.485-48.485L104.545 328c4.686-4.686 11.799-4.201 16.485.485L160.545 368 264.06 264.485c4.686-4.686 12.284-4.686 16.971 0L320.545 304v112z",
   384,
+  512,
 );
 
 export const clipboard = createIcon(
   "M384 112v352c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h80c0-35.29 28.71-64 64-64s64 28.71 64 64h80c26.51 0 48 21.49 48 48zM192 40c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24m96 114v-20a6 6 0 0 0-6-6H102a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h180a6 6 0 0 0 6-6z",
   384,
+  512,
 );
 
 export const trash = createIcon(
   "M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z",
   448,
+  512,
 );
 
 export const palette = createIcon(
@@ -52,16 +63,19 @@ export const palette = createIcon(
 export const exportFile = createIcon(
   "M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z",
   576,
+  512,
 );
 
 export const zoomIn = createIcon(
   "M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z",
   448,
+  512,
 );
 
 export const zoomOut = createIcon(
   "M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z",
   448,
+  512,
 );
 
 export const done = createIcon(
@@ -82,13 +96,82 @@ export const redo = createIcon(
 
 // Icon imported form Storybook
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
-export const resetZoom = (
-  <svg aria-hidden="true" focusable="false" role="img" viewBox="0 0 1024 1024">
+export const resetZoom = createIcon(
+  <path
+    stroke="currentColor"
+    strokeWidth="40"
+    fill="currentColor"
+    d="M148 560a318 318 0 0 0 522 110 316 316 0 0 0 0-450 316 316 0 0 0-450 0c-11 11-21 22-30 34v4h47c25 0 46 21 46 46s-21 45-46 45H90c-13 0-25-6-33-14-9-9-14-20-14-33V156c0-25 20-45 45-45s45 20 45 45v32l1 1a401 401 0 0 1 623 509l212 212a42 42 0 0 1-59 59L698 757A401 401 0 0 1 65 570a42 42 0 0 1 83-10z"
+  />,
+  1024,
+);
+
+export const bringForward = createIcon(
+  <>
     <path
-      stroke="currentColor"
-      strokeWidth="40"
-      fill="currentColor"
-      d="M148 560a318 318 0 0 0 522 110 316 316 0 0 0 0-450 316 316 0 0 0-450 0c-11 11-21 22-30 34v4h47c25 0 46 21 46 46s-21 45-46 45H90c-13 0-25-6-33-14-9-9-14-20-14-33V156c0-25 20-45 45-45s45 20 45 45v32l1 1a401 401 0 0 1 623 509l212 212a42 42 0 0 1-59 59L698 757A401 401 0 0 1 65 570a42 42 0 0 1 83-10z"
+      d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+      stroke="#000"
+      strokeWidth="2"
     />
-  </svg>
+    <path
+      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
+      strokeWidth="2"
+    />
+  </>,
+  24,
+);
+
+export const sendBackward = createIcon(
+  <>
+    <path
+      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
+      strokeWidth="2"
+    />
+    <path
+      d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+      stroke="#000"
+      strokeWidth="2"
+    />
+  </>,
+  24,
+);
+
+export const bringToFront = createIcon(
+  <>
+    <path
+      d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
+      stroke="#000"
+      strokeWidth="2"
+    />
+    <path
+      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
+      strokeWidth="2"
+    />
+  </>,
+  24,
+);
+
+export const sendToBack = createIcon(
+  <>
+    <path
+      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+      fill={ACTIVE_ELEMENT_COLOR}
+      stroke={ACTIVE_ELEMENT_COLOR}
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+    <path
+      d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
+      stroke="#000"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    />
+  </>,
+  24,
 );

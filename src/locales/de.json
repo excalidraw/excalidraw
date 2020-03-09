@@ -60,7 +60,9 @@
     "resetZoom": "Zoom zurücksetzen",
     "menu": "Menü",
     "done": "Fertig",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",

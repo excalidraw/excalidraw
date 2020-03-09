@@ -24,7 +24,10 @@ function ContextMenu({ options, onCloseRequest, top, left }: Props) {
       left={left}
       fitInViewport={true}
     >
-      <ul className="context-menu" onContextMenu={e => e.preventDefault()}>
+      <ul
+        className="context-menu"
+        onContextMenu={event => event.preventDefault()}
+      >
         {options.map((option, idx) => (
           <li key={idx} onClick={onCloseRequest}>
             <ContextMenuOption {...option} />

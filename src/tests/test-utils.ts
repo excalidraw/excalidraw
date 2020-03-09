@@ -1,3 +1,5 @@
+import "pepjs";
+
 import {
   render,
   queries,

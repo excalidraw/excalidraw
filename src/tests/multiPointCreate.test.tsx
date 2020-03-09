@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 
@@ -14,7 +14,9 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe.skip("remove shape in non linear elements", () => {
+const { __TEST__: h } = window;
+
+describe("remove shape in non linear elements", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -26,8 +28,7 @@ describe.skip("remove shape in non linear elements", () => {
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    const elements = renderScene.mock.calls[2][0];
-    expect(elements.length).toEqual(0);
+    expect(h.elements.length).toEqual(0);
   });
 
   it("ellipse", () => {
@@ -41,8 +42,7 @@ describe.skip("remove shape in non linear elements", () => {
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    const elements = renderScene.mock.calls[2][0];
-    expect(elements.length).toEqual(0);
+    expect(h.elements.length).toEqual(0);
   });
 
   it("diamond", () => {
@@ -56,12 +56,11 @@ describe.skip("remove shape in non linear elements", () => {
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    const elements = renderScene.mock.calls[2][0];
-    expect(elements.length).toEqual(0);
+    expect(h.elements.length).toEqual(0);
   });
 });
 
-describe.skip("multi point mode in linear elements", () => {
+describe("multi point mode in linear elements", () => {
   it("arrow", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -86,14 +85,13 @@ describe.skip("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(8);
-    const elements = renderScene.mock.calls[7][0];
-    expect(elements.length).toEqual(1);
+    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(h.elements.length).toEqual(1);
 
-    expect(elements[0].type).toEqual("arrow");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(30);
-    expect(elements[0].points).toEqual([
+    expect(h.elements[0].type).toEqual("arrow");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(30);
+    expect(h.elements[0].points).toEqual([
       [0, 0],
       [20, 30],
       [70, 110],
@@ -124,14 +122,13 @@ describe.skip("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(8);
-    const elements = renderScene.mock.calls[7][0];
-    expect(elements.length).toEqual(1);
+    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(h.elements.length).toEqual(1);
 
-    expect(elements[0].type).toEqual("line");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(30);
-    expect(elements[0].points).toEqual([
+    expect(h.elements[0].type).toEqual("line");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(30);
+    expect(h.elements[0].points).toEqual([
       [0, 0],
       [20, 30],
       [70, 110],

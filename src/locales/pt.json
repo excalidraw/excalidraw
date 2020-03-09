@@ -56,11 +56,13 @@
     "selectLanguage": "Selecionar Idioma",
     "scrollBackToContent": "Voltar ao conteúdo",
     "zoomIn": "Aumentar zoom",
-    "zoomOut": "Afastar zoom",
+    "zoomOut": "Diminuir zoom",
     "resetZoom": "Redefinir zoom",
     "menu": "Menu",
     "done": "Concluído",
-    "edit": "Editar"
+    "edit": "Editar",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
