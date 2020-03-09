@@ -840,10 +840,12 @@ export class App extends React.Component<any, AppState> {
       this.canvas,
     );
     this.savePointer(pointerCoords);
-    gesture.pointers.set(event.pointerId, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    if (gesture.pointers.has(event.pointerId)) {
+      gesture.pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
 
     if (gesture.pointers.size === 2) {
       const center = getCenter(gesture.pointers);
