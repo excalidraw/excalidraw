@@ -23,10 +23,144 @@ const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
 const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
 
+export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
+
+export type EncryptedData = {
+  data: ArrayBuffer;
+  iv: Uint8Array;
+};
+
+export type SocketUpdateData =
+  | {
+      type: "SCENE_UPDATE";
+      payload: {
+        elements: readonly ExcalidrawElement[];
+        appState: AppState | null;
+      };
+    }
+  | {
+      type: "MOUSE_LOCATION";
+      payload: {
+        socketID: string;
+        pointerCoords: { x: number; y: number };
+      };
+    }
+  | {
+      type: "INVALID_RESPONSE";
+    };
+
 // TODO: Defined globally, since file handles aren't yet serializable.
 // Once `FileSystemFileHandle` can be serialized, make this
 // part of `AppState`.
 (window as any).handle = null;
+
+function byteToHex(byte: number): string {
+  return `0${byte.toString(16)}`.slice(-2);
+}
+
+async function generateRandomID() {
+  const arr = new Uint8Array(10);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr, byteToHex).join("");
+}
+
+async function generateEncryptionKey() {
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true, // extractable
+    ["encrypt", "decrypt"],
+  );
+  return (await window.crypto.subtle.exportKey("jwk", key)).k;
+}
+
+function createIV() {
+  const arr = new Uint8Array(12);
+  return window.crypto.getRandomValues(arr);
+}
+
+export function getCollaborationLinkData(link: string) {
+  if (link.length === 0) {
+    return;
+  }
+  const hash = new URL(link).hash;
+  return hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+}
+
+export async function generateCollaborationLink() {
+  const id = await generateRandomID();
+  const key = await generateEncryptionKey();
+  return `${window.location.href}#room=${id},${key}`;
+}
+
+async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
+  return await window.crypto.subtle.importKey(
+    "jwk",
+    {
+      alg: "A128GCM",
+      ext: true,
+      k: key,
+      key_ops: ["encrypt", "decrypt"],
+      kty: "oct",
+    },
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    false, // extractable
+    [usage],
+  );
+}
+
+export async function encryptAESGEM(
+  data: Uint8Array,
+  key: string,
+): Promise<EncryptedData> {
+  const importedKey = await getImportedKey(key, "encrypt");
+  const iv = createIV();
+  return {
+    data: await window.crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv,
+      },
+      importedKey,
+      data,
+    ),
+    iv,
+  };
+}
+
+export async function decryptAESGEM(
+  data: ArrayBuffer,
+  key: string,
+  iv: Uint8Array,
+): Promise<SocketUpdateData> {
+  try {
+    const importedKey = await getImportedKey(key, "decrypt");
+    const decrypted = await window.crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      importedKey,
+      data,
+    );
+
+    const decodedData = new TextDecoder("utf-8").decode(
+      new Uint8Array(decrypted) as any,
+    );
+    return JSON.parse(decodedData);
+  } catch (error) {
+    window.alert(t("alerts.decryptFailed"));
+    console.error(error);
+  }
+  return {
+    type: "INVALID_RESPONSE",
+  };
+}
 
 export async function exportToBackend(
   elements: readonly ExcalidrawElement[],
@@ -101,22 +235,7 @@ export async function importFromBackend(
     let data;
     if (privateKey) {
       const buffer = await response.arrayBuffer();
-      const key = await window.crypto.subtle.importKey(
-        "jwk",
-        {
-          alg: "A128GCM",
-          ext: true,
-          k: privateKey,
-          key_ops: ["encrypt", "decrypt"],
-          kty: "oct",
-        },
-        {
-          name: "AES-GCM",
-          length: 128,
-        },
-        false, // extractable
-        ["decrypt"],
-      );
+      const key = await getImportedKey(privateKey, "decrypt");
       const iv = new Uint8Array(12);
       const decrypted = await window.crypto.subtle.decrypt(
         {
