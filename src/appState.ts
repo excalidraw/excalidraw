@@ -1,6 +1,5 @@
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
-import { getCollaborationLinkData } from "./data";
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
 export const DEFAULT_FONT = "20px Virgil";
@@ -28,7 +27,6 @@ export function getDefaultAppState(): AppState {
     cursorY: 0,
     scrolledOutside: false,
     name: DEFAULT_PROJECT_NAME,
-    isCollaborating: !!getCollaborationLinkData(window.location.href),
     isResizing: false,
     selectionElement: null,
     zoom: 1,

@@ -29,7 +29,6 @@ export type AppState = {
   scrolledOutside: boolean;
   name: string;
   selectedId?: string;
-  isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
