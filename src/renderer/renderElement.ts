@@ -136,6 +136,7 @@ function generateElement(
 ) {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
+    elementWithCanvasCache.delete(element);
     switch (element.type) {
       case "rectangle":
         shape = generator.rectangle(0, 0, element.width, element.height, {
