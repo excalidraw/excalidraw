@@ -32,9 +32,20 @@
       property="og:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta property="og:image" name="twitter:image" content="og-image.png" />
+    <!-- OG tags require an absolute url for images -->
+    <meta
+      property="og:image"
+      name="twitter:image"
+      content="http://www.excalidraw.com/og-image.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      name="twitter:image"
+      content="https://www.excalidraw.com/og-image.png"
+    />
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="669" />
+    <meta property="og:image:alt" content="Excalidraw logo with byline." />
 
     <!-- Chrome -->
     <meta name="theme-color" content="#FFFF" />
@@ -48,7 +59,11 @@
       name="twitter:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta name="twitter:image" content="og-image.png" />
+    <!-- OG tags require absolute url for images -->
+    <meta
+      name="twitter:image"
+      content="https://www.excalidraw.com/og-image.png"
+    />
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="fonts.css" />
