@@ -36,14 +36,13 @@ export type AppState = {
   selectedElementIds: { [id: string]: boolean };
 };
 
-export type Pointer = Readonly<{
-  id: number;
+export type PointerCoords = Readonly<{
   x: number;
   y: number;
 }>;
 
 export type Gesture = {
-  pointers: Array<Pointer>;
+  pointers: Map<number, PointerCoords>;
   lastCenter: { x: number; y: number } | null;
   initialDistance: number | null;
   initialScale: number | null;
