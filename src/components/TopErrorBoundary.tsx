@@ -1,4 +1,6 @@
 import React from "react";
+import { resetCursor } from "../utils";
+import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
   unresolvedError: Error[] | null;
@@ -19,11 +21,12 @@ export class TopErrorBoundary extends React.Component<
   };
 
   componentDidCatch(error: Error) {
+    resetCursor();
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
         _localStorage[key] = JSON.parse(value);
-      } catch {
+      } catch (error) {
         _localStorage[key] = value;
       }
     }
@@ -90,49 +93,55 @@ export class TopErrorBoundary extends React.Component<
       return (
         <div className="ErrorSplash">
           <div className="ErrorSplash-messageContainer">
-            <div className="ErrorSplash-paragraph bigger">
-              Encountered an error. Please{" "}
+            <div className="ErrorSplash-paragraph bigger align-center">
+              {t("errorSplash.headingMain_pre")}
               <button onClick={() => window.location.reload()}>
-                reload the page
+                {t("errorSplash.headingMain_button")}
               </button>
-              .
             </div>
-            <div className="ErrorSplash-paragraph">
-              If reloading doesn't work. Try{" "}
+            <div className="ErrorSplash-paragraph align-center">
+              {t("errorSplash.clearCanvasMessage")}
               <button
                 onClick={() => {
                   localStorage.clear();
                   window.location.reload();
                 }}
               >
-                clearing the canvas
+                {t("errorSplash.clearCanvasMessage_button")}
               </button>
-              .<br />
+              <br />
               <div className="smaller">
-                (This will unfortunately result in loss of work.)
+                <span role="img" aria-label="warning">
+                  ⚠️
+                </span>
+                {t("errorSplash.clearCanvasCaveat")}
+                <span role="img" aria-hidden="true">
+                  ⚠️
+                </span>
               </div>
             </div>
             <div>
               <div className="ErrorSplash-paragraph">
-                Before doing so, we'd appreciate if you opened an issue on our{" "}
-                <button onClick={this.createGithubIssue}>bug tracker</button>.
-                Please include the following error stack trace & localStorage
-                content (provided it's not private):
+                {t("errorSplash.openIssueMessage_pre")}
+                <button onClick={this.createGithubIssue}>
+                  {t("errorSplash.openIssueMessage_button")}
+                </button>
+                {t("errorSplash.openIssueMessage_post")}
               </div>
               <div className="ErrorSplash-paragraph">
                 <div className="ErrorSplash-details">
-                  <label>Error stack trace:</label>
+                  <label>{t("errorSplash.errorStack")}</label>
                   <textarea
                     rows={10}
                     onPointerDown={this.selectTextArea}
                     readOnly={true}
                     value={
                       this.state.unresolvedError
-                        ? "Loading data. please wait..."
+                        ? t("errorSplash.errorStack_loading")
                         : this.state.stack
                     }
                   />
-                  <label>LocalStorage content:</label>
+                  <label>{t("errorSplash.sceneContent")}</label>
                   <textarea
                     rows={5}
                     onPointerDown={this.selectTextArea}
