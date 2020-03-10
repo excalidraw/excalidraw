@@ -263,9 +263,14 @@ export class App extends React.Component<any, AppState> {
                 sceneAppState || getDefaultAppState(),
                 { scrollToContent: true },
               );
+              // Perform reconciliation - in collaboration, if we encounter
+              // elements with more staler versions than ours, ignore them
+              // and keep ours.
               if (elements == null || elements.length === 0) {
                 elements = restoredState.elements;
               } else {
+                // create a map of ids so we don't have to iterate
+                // over the array more than once.
                 const elementMap = elements.reduce(
                   (
                     acc: { [key: string]: ExcalidrawElement },
@@ -276,6 +281,7 @@ export class App extends React.Component<any, AppState> {
                   },
                   {},
                 );
+                // Reconcile
                 elements = restoredState.elements.map(element => {
                   if (
                     elementMap.hasOwnProperty(element.id) &&
