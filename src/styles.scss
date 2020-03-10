@@ -189,7 +189,7 @@ button,
 }
 
 .App-menu_top {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;

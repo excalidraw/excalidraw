@@ -21,6 +21,7 @@ import { ExportType } from "../scene/types";
 import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
+import GitHubCorner from "./GitHubCorner";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -159,7 +160,7 @@ export const LayerUI = React.memo(
                 </Stack.Col>
               )}
             </Section>
-            <div />
+            <GitHubCorner />
           </div>
           <div className="App-menu App-menu_bottom">
             <Stack.Col gap={2}>
