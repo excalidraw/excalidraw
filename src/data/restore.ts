@@ -13,7 +13,11 @@ export function restore(
   opts?: { scrollToContent: boolean },
 ): DataState {
   const elements = savedElements
-    .filter(el => !isInvisiblySmallElement(el))
+    .filter(el => {
+      // filtering out selection, which is legacy, no longer kept in elements,
+      //  and causing issues if retained
+      return el.type !== "selection" && !isInvisiblySmallElement(el);
+    })
     .map(element => {
       let points: Point[] = [];
       if (element.type === "arrow") {
