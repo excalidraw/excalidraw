@@ -129,7 +129,7 @@ export const LayerUI = React.memo(
             </Stack.Col>
             <Section heading="shapes">
               {heading => (
-                <Stack.Col gap={4} align="start">
+                <Stack.Col gap={4} align="center">
                   <Stack.Row gap={1}>
                     <Island padding={1}>
                       {heading}
