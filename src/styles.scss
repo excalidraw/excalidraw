@@ -364,9 +364,6 @@ button,
 }
 
 @media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
-  aside {
-    display: none;
-  }
   .scroll-back-to-content {
     bottom: 80px;
     bottom: calc(80px + env(safe-area-inset-bottom));
