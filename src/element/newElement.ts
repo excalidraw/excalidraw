@@ -33,6 +33,7 @@ export function newElement(
     opacity,
     seed: randomSeed(),
     points: [] as Point[],
+    version: 1,
   };
   return element;
 }
