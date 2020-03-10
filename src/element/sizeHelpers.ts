@@ -1,5 +1,6 @@
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, MutableExcalidrawElement } from "./types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { mutateElement } from "./mutateElement";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
   if (element.type === "arrow" || element.type === "line") {
@@ -35,7 +36,7 @@ export function getPerfectElementSize(
 }
 
 export function resizePerfectLineForNWHandler(
-  element: ExcalidrawElement,
+  element: MutableExcalidrawElement,
   x: number,
   y: number,
 ) {
@@ -78,13 +79,17 @@ export function normalizeDimensions(
   }
 
   if (element.width < 0) {
-    element.width = Math.abs(element.width);
-    element.x -= element.width;
+    mutateElement(element, element => {
+      element.width = Math.abs(element.width);
+      element.x -= element.width;
+    });
   }
 
   if (element.height < 0) {
-    element.height = Math.abs(element.height);
-    element.y -= element.height;
+    mutateElement(element, element => {
+      element.height = Math.abs(element.height);
+      element.y -= element.height;
+    });
   }
 
   invalidateShapeForElement(element);

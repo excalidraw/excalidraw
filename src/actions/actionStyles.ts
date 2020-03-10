@@ -6,6 +6,7 @@ import {
 import { KEYS } from "../keys";
 import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
+import { mutateTextElement } from "../element/mutateElement";
 
 let copiedStyles: string = "{}";
 
@@ -44,8 +45,10 @@ export const actionPasteStyles = register({
             roughness: pastedElement?.roughness,
           };
           if (isTextElement(newElement)) {
-            newElement.font = pastedElement?.font || DEFAULT_FONT;
-            redrawTextBoundingBox(newElement);
+            mutateTextElement(newElement, newElement => {
+              newElement.font = pastedElement?.font || DEFAULT_FONT;
+              redrawTextBoundingBox(newElement);
+            });
           }
           return newElement;
         }

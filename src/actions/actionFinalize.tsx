@@ -7,6 +7,7 @@ import { done } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { mutateElement } from "../element/mutateElement";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -18,10 +19,12 @@ export const actionFinalize = register({
     if (appState.multiElement) {
       // pen and mouse have hover
       if (appState.lastPointerDownWith !== "touch") {
-        appState.multiElement.points = appState.multiElement.points.slice(
-          0,
-          appState.multiElement.points.length - 1,
-        );
+        mutateElement(appState.multiElement, multiElement => {
+          multiElement.points = multiElement.points.slice(
+            0,
+            multiElement.points.length - 1,
+          );
+        });
       }
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);

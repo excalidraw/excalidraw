@@ -5,8 +5,10 @@ import { newElement } from "./newElement";
  * no computed data. The list of all ExcalidrawElements should be shareable
  * between peers and contain no state local to the peer.
  */
-export type ExcalidrawElement = ReturnType<typeof newElement>;
-export type ExcalidrawTextElement = ExcalidrawElement & {
+export type ExcalidrawElement = Readonly<ReturnType<typeof newElement>>;
+export type MutableExcalidrawElement = ReturnType<typeof newElement>;
+
+export type MutableExcalidrawTextElement = MutableExcalidrawElement & {
   type: "text";
   font: string;
   text: string;
@@ -14,5 +16,7 @@ export type ExcalidrawTextElement = ExcalidrawElement & {
   actualBoundingBoxAscent?: number;
   baseline: number;
 };
+
+export type ExcalidrawTextElement = Readonly<MutableExcalidrawTextElement>;
 
 export type PointerType = "mouse" | "pen" | "touch";
