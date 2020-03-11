@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ToolButton } from "./ToolButton";
 import { Island } from "./Island";
-import Stack from "./Stack";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { users, clipboard, start } from "./icons";
@@ -85,22 +84,6 @@ function RoomModal({
             </div>
             <p>{t("roomDialog.desc_privacy")}</p>
             <p>{t("roomDialog.desc_exitSession")}</p>
-            <p>{t("roomDialog.desc_createAnotherSession")}</p>
-            <div className="RoomDialog-sessionStartButtonContainer">
-              <Stack.Col gap={1}>
-                <Stack.Row gap={2}>
-                  <ToolButton
-                    className="RoomDialog-createLink"
-                    type="button"
-                    icon={start}
-                    title={t("roomDialog.button_startAnotherSession")}
-                    aria-label={t("roomDialog.button_startAnotherSession")}
-                    showAriaLabel={true}
-                    onClick={onStartSession}
-                  />
-                </Stack.Row>
-              </Stack.Col>
-            </div>
           </>
         )}
       </Island>

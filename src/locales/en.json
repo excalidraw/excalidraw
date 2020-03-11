@@ -114,10 +114,8 @@
     "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
     "desc_start": "To begin, click the button below. (Will open a room in a new tab.)",
     "button_startSession": "Start session",
-    "button_startAnotherSession": "Start another session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "To exit the session, simply close this tab. (Note that this won't prevent other people with the access to this link to still use the room.)",
-    "desc_createAnotherSession": "You can also create a new session:"
+    "desc_exitSession": "To exit the session, simply close this tab. (Note that this won't prevent other people with the access to this link to still use the room.)"
   }
 }
