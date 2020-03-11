@@ -190,7 +190,12 @@ export class App extends React.Component<any, AppState> {
       if (commitToHistory) {
         history.resumeRecording();
       }
-      this.setState({ ...res.appState });
+      this.setState(state => ({
+        ...res.appState,
+        isCollaborating: state.isCollaborating,
+        remotePointers: state.remotePointers,
+        collaboratorCount: state.collaboratorCount,
+      }));
     }
   };
 
