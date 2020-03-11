@@ -6,17 +6,15 @@ import { newElement } from "./newElement";
  * between peers and contain no state local to the peer.
  */
 export type ExcalidrawElement = Readonly<ReturnType<typeof newElement>>;
-export type MutableExcalidrawElement = ReturnType<typeof newElement>;
 
-export type MutableExcalidrawTextElement = MutableExcalidrawElement & {
-  type: "text";
-  font: string;
-  text: string;
-  // for backward compatibility
-  actualBoundingBoxAscent?: number;
-  baseline: number;
-};
-
-export type ExcalidrawTextElement = Readonly<MutableExcalidrawTextElement>;
+export type ExcalidrawTextElement = ExcalidrawElement &
+  Readonly<{
+    type: "text";
+    font: string;
+    text: string;
+    // for backward compatibility
+    actualBoundingBoxAscent?: number;
+    baseline: number;
+  }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

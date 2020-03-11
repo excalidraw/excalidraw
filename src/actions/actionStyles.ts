@@ -6,7 +6,7 @@ import {
 import { KEYS } from "../keys";
 import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
-import { mutateTextElement } from "../element/mutateElement";
+import { mutateTextElement, newElementWith } from "../element/mutateElement";
 
 let copiedStyles: string = "{}";
 
@@ -35,20 +35,19 @@ export const actionPasteStyles = register({
     return {
       elements: elements.map(element => {
         if (appState.selectedElementIds[element.id]) {
-          const newElement = {
-            ...element,
+          const newElement = newElementWith(element, {
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
             fillStyle: pastedElement?.fillStyle,
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
-          };
+          });
           if (isTextElement(newElement)) {
-            mutateTextElement(newElement, newElement => {
-              newElement.font = pastedElement?.font || DEFAULT_FONT;
-              redrawTextBoundingBox(newElement);
+            mutateTextElement(newElement, {
+              font: pastedElement?.font || DEFAULT_FONT,
             });
+            redrawTextBoundingBox(newElement);
           }
           return newElement;
         }
