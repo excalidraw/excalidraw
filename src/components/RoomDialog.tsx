@@ -47,7 +47,7 @@ function RoomModal({
         {!activeRoomLink && (
           <>
             <p>{t("roomDialog.desc_intro")}</p>
-            <p>{t("roomDialog.desc_privacy")}</p>
+            <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
             <p>{t("roomDialog.desc_start")}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
               <ToolButton
@@ -82,7 +82,7 @@ function RoomModal({
                 onPointerDown={selectInput}
               />
             </div>
-            <p>{t("roomDialog.desc_privacy")}</p>
+            <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
             <p>{t("roomDialog.desc_exitSession")}</p>
           </>
         )}
