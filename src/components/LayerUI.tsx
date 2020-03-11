@@ -99,7 +99,7 @@ export const LayerUI = React.memo(
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
-            <Stack.Col gap={4} align="end">
+            <Stack.Col gap={4}>
               <Section className="App-right-menu" heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
