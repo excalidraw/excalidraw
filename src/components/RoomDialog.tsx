@@ -3,9 +3,8 @@ import { ToolButton } from "./ToolButton";
 import { Island } from "./Island";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { users, clipboard, start } from "./icons";
+import { users, clipboard, start, stop } from "./icons";
 import { Modal } from "./Modal";
-import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 
 import "./RoomDialog.scss";
 import { copyTextToSystemClipboard } from "../clipboard";
@@ -13,11 +12,13 @@ import { copyTextToSystemClipboard } from "../clipboard";
 function RoomModal({
   onCloseRequest,
   activeRoomLink,
-  onStartSession,
+  onRoomCreate,
+  onRoomDestroy,
 }: {
   onCloseRequest: () => void;
   activeRoomLink: string;
-  onStartSession: () => void;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
 }) {
   const roomLinkInput = useRef<HTMLInputElement>(null);
   function copyRoomLink() {
@@ -57,7 +58,7 @@ function RoomModal({
                 title={t("roomDialog.button_startSession")}
                 aria-label={t("roomDialog.button_startSession")}
                 showAriaLabel={true}
-                onClick={onStartSession}
+                onClick={onRoomCreate}
               />
             </div>
           </>
@@ -83,7 +84,24 @@ function RoomModal({
               />
             </div>
             <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
+            <p>
+              <span role="img" aria-hidden="true">
+                ⚠️
+              </span>{" "}
+              {t("roomDialog.desc_persistenceWarning")}
+            </p>
             <p>{t("roomDialog.desc_exitSession")}</p>
+            <div className="RoomDialog-sessionStartButtonContainer">
+              <ToolButton
+                className="RoomDialog-stopSession"
+                type="button"
+                icon={stop}
+                title={t("roomDialog.button_stopSession")}
+                aria-label={t("roomDialog.button_stopSession")}
+                showAriaLabel={true}
+                onClick={onRoomDestroy}
+              />
+            </div>
           </>
         )}
       </Island>
@@ -91,10 +109,16 @@ function RoomModal({
   );
 }
 
-export function RoomDialog({ isCollaborating }: { isCollaborating: boolean }) {
-  const [modalIsShown, setModalIsShown] = useState(
-    window.location.href.includes("showSessionSplash=true"),
-  );
+export function RoomDialog({
+  isCollaborating,
+  onRoomCreate,
+  onRoomDestroy,
+}: {
+  isCollaborating: boolean;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
+}) {
+  const [modalIsShown, setModalIsShown] = useState(false);
   const [activeRoomLink, setActiveRoomLink] = useState("");
 
   const triggerButton = useRef<HTMLButtonElement>(null);
@@ -105,19 +129,8 @@ export function RoomDialog({ isCollaborating }: { isCollaborating: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (getCollaborationLinkData(window.location.href)) {
-      window.history.replaceState(
-        {},
-        "Excalidraw",
-        window.location.href.replace("?showSessionSplash=true", ""),
-      );
-      setActiveRoomLink(window.location.href);
-    }
+    setActiveRoomLink(isCollaborating ? window.location.href : "");
   }, [isCollaborating]);
-
-  async function startSession() {
-    window.open(await generateCollaborationLink());
-  }
 
   return (
     <>
@@ -142,7 +155,8 @@ export function RoomDialog({ isCollaborating }: { isCollaborating: boolean }) {
           <RoomModal
             onCloseRequest={handleClose}
             activeRoomLink={activeRoomLink}
-            onStartSession={startSession}
+            onRoomCreate={onRoomCreate}
+            onRoomDestroy={onRoomDestroy}
           />
         </Modal>
       )}

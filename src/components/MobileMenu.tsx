@@ -21,6 +21,8 @@ type MobileMenuProps = {
   setAppState: any;
   elements: readonly ExcalidrawElement[];
   setElements: any;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
 };
 
 export function MobileMenu({
@@ -30,6 +32,8 @@ export function MobileMenu({
   actionManager,
   exportButton,
   setAppState,
+  onRoomCreate,
+  onRoomDestroy,
 }: MobileMenuProps) {
   return (
     <>
@@ -41,7 +45,11 @@ export function MobileMenu({
               {actionManager.renderAction("saveScene")}
               {exportButton}
               {actionManager.renderAction("clearCanvas")}
-              <RoomDialog isCollaborating={appState.isCollaborating} />
+              <RoomDialog
+                isCollaborating={appState.isCollaborating}
+                onRoomCreate={onRoomCreate}
+                onRoomDestroy={onRoomDestroy}
+              />
               {actionManager.renderAction("changeViewBackgroundColor")}
               <fieldset>
                 <legend>{t("labels.language")}</legend>

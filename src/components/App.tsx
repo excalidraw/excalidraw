@@ -226,12 +226,27 @@ export class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private destroySocketClient = () => {
+    this.setState({
+      isCollaborating: false,
+    });
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+      this.roomID = null;
+      this.roomKey = null;
+    }
+  };
+
   private initializeSocketClient = () => {
     if (this.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
+      this.setState({
+        isCollaborating: true,
+      });
       this.socket = socketIOClient(SOCKET_SERVER);
       this.roomID = roomMatch[1];
       this.roomKey = roomMatch[2];
@@ -611,6 +626,20 @@ export class App extends React.Component<any, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
+  createRoom = async () => {
+    window.history.pushState(
+      {},
+      "Excalidraw",
+      await generateCollaborationLink(),
+    );
+    this.initializeSocketClient();
+  };
+
+  destroyRoom = () => {
+    window.history.pushState({}, "Excalidraw", window.location.origin);
+    this.destroySocketClient();
+  };
+
   public render() {
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
@@ -630,6 +659,8 @@ export class App extends React.Component<any, AppState> {
           elements={elements}
           setElements={this.setElements}
           language={getLanguage()}
+          onRoomCreate={this.createRoom}
+          onRoomDestroy={this.destroyRoom}
         />
         <main>
           <canvas

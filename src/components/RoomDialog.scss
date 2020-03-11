@@ -9,6 +9,7 @@
 }
 
 .RoomDialog-link {
+  min-width: 0;
   flex: 1 1 auto;
   margin-left: 1.5em;
   display: inline-block;
@@ -34,4 +35,9 @@
 .RoomDialog-sessionStartButtonContainer {
   display: flex;
   justify-content: center;
+}
+
+.RoomDialog-stopSession {
+  background-color: #ffe3e3; // OC RED-1
+  color: #c92a2a; // OC RED-9
 }

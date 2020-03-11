@@ -31,6 +31,8 @@ interface LayerUIProps {
   elements: readonly ExcalidrawElement[];
   language: string;
   setElements: (elements: readonly ExcalidrawElement[]) => void;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
 }
 
 export const LayerUI = React.memo(
@@ -42,6 +44,8 @@ export const LayerUI = React.memo(
     elements,
     language,
     setElements,
+    onRoomCreate,
+    onRoomDestroy,
   }: LayerUIProps) => {
     const isMobile = useIsMobile();
 
@@ -93,6 +97,8 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onRoomCreate={onRoomCreate}
+        onRoomDestroy={onRoomDestroy}
       />
     ) : (
       <>
@@ -108,7 +114,11 @@ export const LayerUI = React.memo(
                       {actionManager.renderAction("saveScene")}
                       {renderExportDialog()}
                       {actionManager.renderAction("clearCanvas")}
-                      <RoomDialog isCollaborating={appState.isCollaborating} />
+                      <RoomDialog
+                        isCollaborating={appState.isCollaborating}
+                        onRoomCreate={onRoomCreate}
+                        onRoomDestroy={onRoomDestroy}
+                      />
                     </Stack.Row>
                     {actionManager.renderAction("changeViewBackgroundColor")}
                   </Stack.Col>
