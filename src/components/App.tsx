@@ -88,7 +88,7 @@ import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
-import { mutateElement } from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -473,17 +473,17 @@ export class App extends React.Component<any, AppState> {
         : ELEMENT_TRANSLATE_AMOUNT;
       elements = elements.map(el => {
         if (this.state.selectedElementIds[el.id]) {
-          const element = { ...el };
+          const update: { x?: number; y?: number } = {};
           if (event.key === KEYS.ARROW_LEFT) {
-            element.x -= step;
+            update.x = el.x - step;
           } else if (event.key === KEYS.ARROW_RIGHT) {
-            element.x += step;
+            update.x = el.x + step;
           } else if (event.key === KEYS.ARROW_UP) {
-            element.y -= step;
+            update.y = el.y - step;
           } else if (event.key === KEYS.ARROW_DOWN) {
-            element.y += step;
+            update.y = el.y + step;
           }
-          return element;
+          return newElementWith(el, update);
         }
         return el;
       });
@@ -803,9 +803,9 @@ export class App extends React.Component<any, AppState> {
       textY = centerElementYInViewport;
 
       // x and y will change after calling newTextElement function
-      mutateElement(element, element => {
-        element.x = centerElementX;
-        element.y = centerElementY;
+      mutateElement(element, {
+        x: centerElementX,
+        y: centerElementY,
       });
     } else if (!event.altKey) {
       const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
@@ -814,9 +814,9 @@ export class App extends React.Component<any, AppState> {
       );
 
       if (snappedToCenterPosition) {
-        mutateElement(element, element => {
-          element.x = snappedToCenterPosition.elementCenterX;
-          element.y = snappedToCenterPosition.elementCenterY;
+        mutateElement(element, {
+          x: snappedToCenterPosition.elementCenterX,
+          y: snappedToCenterPosition.elementCenterY,
         });
         textX = snappedToCenterPosition.wysiwygX;
         textY = snappedToCenterPosition.wysiwygY;
@@ -1369,17 +1369,18 @@ export class App extends React.Component<any, AppState> {
 
         const dx = element.x + width + p1[0];
         const dy = element.y + height + p1[1];
-        mutateElement(element, element => {
-          element.x = dx;
-          element.y = dy;
+        mutateElement(element, {
+          x: dx,
+          y: dy,
         });
         p1[0] = absPx - element.x;
         p1[1] = absPy - element.y;
       } else {
-        mutateElement(element, element => {
-          element.x += deltaX;
-          element.y += deltaY;
+        mutateElement(element, {
+          x: element.x + deltaX,
+          y: element.y + deltaY,
         });
+
         p1[0] -= deltaX;
         p1[1] -= deltaY;
       }
@@ -1489,16 +1490,15 @@ export class App extends React.Component<any, AppState> {
                   event.shiftKey,
                 );
               } else {
-                mutateElement(element, element => {
-                  element.width -= deltaX;
-                  element.x += deltaX;
-                  if (event.shiftKey) {
-                    element.y += element.height - element.width;
-                    element.height = element.width;
-                  } else {
-                    element.height -= deltaY;
-                    element.y += deltaY;
-                  }
+                mutateElement(element, {
+                  x: element.x + deltaX,
+                  y: event.shiftKey
+                    ? element.y + element.height - element.width
+                    : element.y + deltaY,
+                  width: element.width - deltaX,
+                  height: event.shiftKey
+                    ? element.width
+                    : element.height - deltaY,
                 });
               }
               break;
@@ -1522,15 +1522,13 @@ export class App extends React.Component<any, AppState> {
                   event.shiftKey,
                 );
               } else {
-                mutateElement(element, element => {
-                  element.width += deltaX;
-                  if (event.shiftKey) {
-                    element.y += element.height - element.width;
-                    element.height = element.width;
-                  } else {
-                    element.height -= deltaY;
-                    element.y += deltaY;
-                  }
+                const nextWidth = element.width + deltaX;
+                mutateElement(element, {
+                  y: event.shiftKey
+                    ? element.y + element.height - nextWidth
+                    : element.y + deltaY,
+                  width: nextWidth,
+                  height: event.shiftKey ? nextWidth : element.height - deltaY,
                 });
               }
               break;
@@ -1554,14 +1552,12 @@ export class App extends React.Component<any, AppState> {
                   event.shiftKey,
                 );
               } else {
-                mutateElement(element, element => {
-                  element.width -= deltaX;
-                  element.x += deltaX;
-                  if (event.shiftKey) {
-                    element.height = element.width;
-                  } else {
-                    element.height += deltaY;
-                  }
+                mutateElement(element, {
+                  x: element.x + deltaX,
+                  width: element.width - deltaX,
+                  height: event.shiftKey
+                    ? element.width
+                    : element.height + deltaY,
                 });
               }
               break;
@@ -1585,26 +1581,17 @@ export class App extends React.Component<any, AppState> {
                   event.shiftKey,
                 );
               } else {
-                mutateElement(element, element => {
-                  if (event.shiftKey) {
-                    element.width += deltaX;
-                    element.height = element.width;
-                  } else {
-                    element.width += deltaX;
-                    element.height += deltaY;
-                  }
+                mutateElement(element, {
+                  width: element.width + deltaX,
+                  height: event.shiftKey
+                    ? element.width
+                    : element.height + deltaY,
                 });
               }
               break;
             case "n": {
-              mutateElement(element, element => {
-                element.height -= deltaY;
-                element.y += deltaY;
-              });
-
               if (element.points.length > 0) {
                 const len = element.points.length;
-
                 const points = [...element.points].sort((a, b) => a[1] - b[1]);
 
                 for (let i = 1; i < points.length; ++i) {
@@ -1612,14 +1599,14 @@ export class App extends React.Component<any, AppState> {
                   pnt[1] -= deltaY / (len - i);
                 }
               }
+
+              mutateElement(element, {
+                height: element.height - deltaY,
+                y: element.y + deltaY,
+              });
               break;
             }
             case "w": {
-              mutateElement(element, element => {
-                element.width -= deltaX;
-                element.x += deltaX;
-              });
-
               if (element.points.length > 0) {
                 const len = element.points.length;
                 const points = [...element.points].sort((a, b) => a[0] - b[0]);
@@ -1629,39 +1616,44 @@ export class App extends React.Component<any, AppState> {
                   pnt[0] -= deltaX / (len - i);
                 }
               }
+
+              mutateElement(element, {
+                width: element.width - deltaX,
+                x: element.x + deltaX,
+              });
               break;
             }
             case "s": {
-              mutateElement(element, element => {
-                element.height += deltaY;
-                if (element.points.length > 0) {
-                  const len = element.points.length;
-                  const points = [...element.points].sort(
-                    (a, b) => a[1] - b[1],
-                  );
+              if (element.points.length > 0) {
+                const len = element.points.length;
+                const points = [...element.points].sort((a, b) => a[1] - b[1]);
 
-                  for (let i = 1; i < points.length; ++i) {
-                    const pnt = points[i];
-                    pnt[1] += deltaY / (len - i);
-                  }
+                for (let i = 1; i < points.length; ++i) {
+                  const pnt = points[i];
+                  pnt[1] += deltaY / (len - i);
                 }
+              }
+
+              mutateElement(element, {
+                height: element.height + deltaY,
+                points: element.points, // no-op, but signifies that we mutated points in-place above
               });
               break;
             }
             case "e": {
-              mutateElement(element, element => {
-                element.width += deltaX;
-                if (element.points.length > 0) {
-                  const len = element.points.length;
-                  const points = [...element.points].sort(
-                    (a, b) => a[0] - b[0],
-                  );
+              if (element.points.length > 0) {
+                const len = element.points.length;
+                const points = [...element.points].sort((a, b) => a[0] - b[0]);
 
-                  for (let i = 1; i < points.length; ++i) {
-                    const pnt = points[i];
-                    pnt[0] += deltaX / (len - i);
-                  }
+                for (let i = 1; i < points.length; ++i) {
+                  const pnt = points[i];
+                  pnt[0] += deltaX / (len - i);
                 }
+              }
+
+              mutateElement(element, {
+                width: element.width + deltaX,
+                points: element.points, // no-op, but signifies that we mutated points in-place above
               });
               break;
             }
@@ -1676,9 +1668,9 @@ export class App extends React.Component<any, AppState> {
             element,
             resizeHandle,
           });
-          mutateElement(el, el => {
-            el.x = element.x;
-            el.y = element.y;
+          mutateElement(el, {
+            x: element.x,
+            y: element.y,
           });
           invalidateShapeForElement(el);
 
@@ -1702,9 +1694,9 @@ export class App extends React.Component<any, AppState> {
           );
 
           selectedElements.forEach(element => {
-            mutateElement(element, element => {
-              element.x += x - lastX;
-              element.y += y - lastY;
+            mutateElement(element, {
+              x: element.x + x - lastX,
+              y: element.y + y - lastY,
             });
           });
           lastX = x;
@@ -1767,12 +1759,11 @@ export class App extends React.Component<any, AppState> {
           }
         }
 
-        mutateElement(draggingElement, draggingElement => {
-          draggingElement.x = x < originX ? originX - width : originX;
-          draggingElement.y = y < originY ? originY - height : originY;
-
-          draggingElement.width = width;
-          draggingElement.height = height;
+        mutateElement(draggingElement, {
+          x: x < originX ? originX - width : originX,
+          y: y < originY ? originY - height : originY,
+          width: width,
+          height: height,
         });
       }
 

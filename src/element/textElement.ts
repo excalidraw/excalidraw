@@ -1,11 +1,12 @@
 import { measureText } from "../utils";
-import { MutableExcalidrawTextElement } from "./types";
+import { ExcalidrawTextElement } from "./types";
+import { mutateTextElement } from "./mutateElement";
 
-export const redrawTextBoundingBox = (
-  element: MutableExcalidrawTextElement,
-) => {
+export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
   const metrics = measureText(element.text, element.font);
-  element.width = metrics.width;
-  element.height = metrics.height;
-  element.baseline = metrics.baseline;
+  mutateTextElement(element, {
+    width: metrics.width,
+    height: metrics.height,
+    baseline: metrics.baseline,
+  });
 };

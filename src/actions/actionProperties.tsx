@@ -11,6 +11,7 @@ import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
+import { newElementWith, newTextElementWith } from "../element/mutateElement";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -45,10 +46,11 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        strokeColor: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          strokeColor: value,
+        }),
+      ),
       appState: { ...appState, currentItemStrokeColor: value },
     };
   },
@@ -75,10 +77,11 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        backgroundColor: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          backgroundColor: value,
+        }),
+      ),
       appState: { ...appState, currentItemBackgroundColor: value },
     };
   },
@@ -105,10 +108,11 @@ export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        fillStyle: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          fillStyle: value,
+        }),
+      ),
       appState: { ...appState, currentItemFillStyle: value },
     };
   },
@@ -141,10 +145,11 @@ export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        strokeWidth: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          strokeWidth: value,
+        }),
+      ),
       appState: { ...appState, currentItemStrokeWidth: value },
     };
   },
@@ -175,10 +180,11 @@ export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        roughness: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          roughness: value,
+        }),
+      ),
       appState: { ...appState, currentItemRoughness: value },
     };
   },
@@ -209,10 +215,11 @@ export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => ({
-        ...el,
-        opacity: value,
-      })),
+      elements: changeProperty(elements, appState, el =>
+        newElementWith(el, {
+          opacity: value,
+        }),
+      ),
       appState: { ...appState, currentItemOpacity: value },
     };
   },
@@ -259,10 +266,9 @@ export const actionChangeFontSize = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = {
-            ...el,
+          const element: ExcalidrawTextElement = newTextElementWith(el, {
             font: `${value}px ${el.font.split("px ")[1]}`,
-          };
+          });
           redrawTextBoundingBox(element);
           return element;
         }
@@ -307,10 +313,9 @@ export const actionChangeFontFamily = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = {
-            ...el,
+          const element: ExcalidrawTextElement = newTextElementWith(el, {
             font: `${el.font.split("px ")[0]}px ${value}`,
-          };
+          });
           redrawTextBoundingBox(element);
           return element;
         }
