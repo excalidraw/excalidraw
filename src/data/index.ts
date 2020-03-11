@@ -92,7 +92,7 @@ export function getCollaborationLinkData(link: string) {
 export async function generateCollaborationLink() {
   const id = await generateRandomID();
   const key = await generateEncryptionKey();
-  return `${window.location.href}#room=${id},${key}`;
+  return `${window.location.origin}#room=${id},${key}`;
 }
 
 async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {

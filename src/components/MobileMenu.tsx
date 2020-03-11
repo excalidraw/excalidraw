@@ -12,6 +12,7 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter, getTargetElement } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
+import { RoomDialog } from "./RoomDialog";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -20,6 +21,8 @@ type MobileMenuProps = {
   setAppState: any;
   elements: readonly ExcalidrawElement[];
   setElements: any;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
 };
 
 export function MobileMenu({
@@ -29,6 +32,8 @@ export function MobileMenu({
   actionManager,
   exportButton,
   setAppState,
+  onRoomCreate,
+  onRoomDestroy,
 }: MobileMenuProps) {
   return (
     <>
@@ -40,6 +45,11 @@ export function MobileMenu({
               {actionManager.renderAction("saveScene")}
               {exportButton}
               {actionManager.renderAction("clearCanvas")}
+              <RoomDialog
+                isCollaborating={appState.isCollaborating}
+                onRoomCreate={onRoomCreate}
+                onRoomDestroy={onRoomDestroy}
+              />
               {actionManager.renderAction("changeViewBackgroundColor")}
               <fieldset>
                 <legend>{t("labels.language")}</legend>
