@@ -340,6 +340,12 @@ export class App extends React.Component<any, AppState> {
       this.socket.on("room-user-count", (collaboratorCount: number) => {
         this.setState({ collaboratorCount });
       });
+      this.socket.on("client-disconnected", (socketID: number) => {
+        this.setState(state => {
+          const { [socketID]: omit, ...remotePointers } = state.remotePointers;
+          return { remotePointers };
+        });
+      });
       this.socket.on("new-user", async (socketID: string) => {
         this.broadcastSocketData({
           type: "SCENE_UPDATE",
