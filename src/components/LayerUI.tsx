@@ -21,6 +21,7 @@ import { ExportType } from "../scene/types";
 import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
+import { RoomDialog } from "./RoomDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -172,6 +173,7 @@ export const LayerUI = React.memo(
                 </Island>
               </Section>
             </Stack.Col>
+            <RoomDialog isCollaborating={appState.isCollaborating} />
           </div>
         </FixedSideContainer>
         <footer role="contentinfo">

@@ -1,0 +1,47 @@
+.RoomDialog-modalButton {
+  align-self: center;
+  margin-left: 1rem;
+
+  &.is-collaborating {
+    background-color: #ebfbee;
+    color: #2b8a3e;
+  }
+}
+
+.RoomDialog-linkContainer {
+  display: flex;
+  margin: 1.5em 0;
+}
+
+.RoomDialog-link {
+  flex: 1 1 auto;
+  margin-left: 1.5em;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  background-color: #eee;
+}
+
+.RoomDialog-link:hover {
+  background-color: #eee;
+}
+
+.RoomDialog-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px steelblue;
+}
+
+.RoomDialog-sessionStartButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.RoomDialog-stopSession {
+  background-color: #ffe3e3; // OC RED-1
+  color: #c92a2a; // OC RED-9
+}
