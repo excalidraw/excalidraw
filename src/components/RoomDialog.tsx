@@ -93,8 +93,8 @@ function RoomModal({
                     className="RoomDialog-createLink"
                     type="button"
                     icon={start}
-                    title={t("roomDialog.button_startSession")}
-                    aria-label={t("roomDialog.button_startSession")}
+                    title={t("roomDialog.button_startAnotherSession")}
+                    aria-label={t("roomDialog.button_startAnotherSession")}
                     showAriaLabel={true}
                     onClick={onStartSession}
                   />
