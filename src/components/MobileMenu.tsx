@@ -41,8 +41,8 @@ export function MobileMenu({
               {actionManager.renderAction("saveScene")}
               {exportButton}
               {actionManager.renderAction("clearCanvas")}
-              {actionManager.renderAction("changeViewBackgroundColor")}
               <RoomDialog isCollaborating={appState.isCollaborating} />
+              {actionManager.renderAction("changeViewBackgroundColor")}
               <fieldset>
                 <legend>{t("labels.language")}</legend>
                 <LanguageList
