@@ -112,10 +112,10 @@ function ExportModal({
   }
 
   return (
-    <div className="ExportDialog__dialog" onKeyDown={handleKeyDown}>
+    <div onKeyDown={handleKeyDown}>
       <Island padding={4}>
         <button
-          className="ExportDialog__close"
+          className="Modal__close"
           onClick={onCloseRequest}
           aria-label={t("buttons.close")}
           ref={closeButton}
