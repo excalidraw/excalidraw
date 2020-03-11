@@ -1,11 +1,6 @@
-.RoomDialog-modalButton {
-  align-self: center;
-  margin-left: 1rem;
-
-  &.is-collaborating {
-    background-color: #ebfbee; // OC GREEN-0
-    color: #2b8a3e; // OC GREEN-9
-  }
+.RoomDialog-modalButton.is-collaborating {
+  background-color: #ebfbee; // OC GREEN-0
+  color: #2b8a3e; // OC GREEN-9
 }
 
 .RoomDialog-linkContainer {

@@ -12,6 +12,7 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter, getTargetElement } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
+import { RoomDialog } from "./RoomDialog";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -41,6 +42,7 @@ export function MobileMenu({
               {exportButton}
               {actionManager.renderAction("clearCanvas")}
               {actionManager.renderAction("changeViewBackgroundColor")}
+              <RoomDialog isCollaborating={appState.isCollaborating} />
               <fieldset>
                 <legend>{t("labels.language")}</legend>
                 <LanguageList
