@@ -5,9 +5,9 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { users, clipboard, start, stop } from "./icons";
 import { Modal } from "./Modal";
-
-import "./RoomDialog.scss";
 import { copyTextToSystemClipboard } from "../clipboard";
+import { AppState } from "../types";
+import "./RoomDialog.scss";
 
 function RoomModal({
   onCloseRequest,
@@ -111,10 +111,12 @@ function RoomModal({
 
 export function RoomDialog({
   isCollaborating,
+  collaboratorCount,
   onRoomCreate,
   onRoomDestroy,
 }: {
-  isCollaborating: boolean;
+  isCollaborating: AppState["isCollaborating"];
+  collaboratorCount: AppState["collaboratorCount"];
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -145,7 +147,13 @@ export function RoomDialog({
         aria-label={t("buttons.roomDialog")}
         showAriaLabel={useIsMobile()}
         ref={triggerButton}
-      />
+      >
+        {collaboratorCount > 0 && (
+          <div className="RoomDialog-modalButton-collaborators">
+            {collaboratorCount}
+          </div>
+        )}
+      </ToolButton>
       {modalIsShown && (
         <Modal
           maxWidth={800}

@@ -21,7 +21,11 @@ type ToolButtonBaseProps = {
 };
 
 type ToolButtonProps =
-  | (ToolButtonBaseProps & { type: "button"; onClick?(): void })
+  | (ToolButtonBaseProps & {
+      type: "button";
+      children?: React.ReactNode;
+      onClick?(): void;
+    })
   | (ToolButtonBaseProps & {
       type: "radio";
 
@@ -61,6 +65,7 @@ export const ToolButton = React.forwardRef(function(
         {props.showAriaLabel && (
           <div className="ToolIcon__label">{props["aria-label"]}</div>
         )}
+        {props.children}
       </button>
     );
   }
