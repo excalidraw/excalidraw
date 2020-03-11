@@ -70,6 +70,7 @@
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
+    "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое."
   },
   "toolBar": {
@@ -91,5 +92,18 @@
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "linearElementMulti": "Нажмите Escape или Enter, чтобы закончить",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
   }
 }

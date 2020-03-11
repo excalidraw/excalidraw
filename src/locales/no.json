@@ -70,6 +70,7 @@
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
+    "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
   },
   "toolBar": {
@@ -91,5 +92,18 @@
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "linearElementMulti": "Trykk Escape eller Enter for å fullføre",
     "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
   }
 }

@@ -14,7 +14,7 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Épaisseur contour",
-    "sloppiness": "Laisser-aller",
+    "sloppiness": "Style de tracé",
     "opacity": "Opacité",
     "fontSize": "Taille police",
     "fontFamily": "Police",
@@ -70,6 +70,7 @@
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
+    "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
@@ -91,5 +92,18 @@
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
     "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
   }
 }

@@ -70,6 +70,7 @@
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş canvas dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
+    "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır."
   },
   "toolBar": {
@@ -91,5 +92,18 @@
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "linearElementMulti": "Bitirmek için Escape veya Enter tuşuna basınız",
     "resize": "SHIFT'e basılı tutarak orantılı şekilde boyutlandırabilirsiniz"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
   }
 }

@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { mutateElement } from "./mutateElement";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
   if (element.type === "arrow" || element.type === "line") {
@@ -44,21 +45,28 @@ export function resizePerfectLineForNWHandler(
   const distanceToAnchorX = x - anchorX;
   const distanceToAnchorY = y - anchorY;
   if (Math.abs(distanceToAnchorX) < Math.abs(distanceToAnchorY) / 2) {
-    element.x = anchorX;
-    element.width = 0;
-    element.y = y;
-    element.height = -distanceToAnchorY;
+    mutateElement(element, {
+      x: anchorX,
+      width: 0,
+      y,
+      height: -distanceToAnchorY,
+    });
   } else if (Math.abs(distanceToAnchorY) < Math.abs(element.width) / 2) {
-    element.y = anchorY;
-    element.height = 0;
+    mutateElement(element, {
+      y: anchorY,
+      height: 0,
+    });
   } else {
-    element.x = x;
-    element.width = -distanceToAnchorX;
-    element.height =
+    const nextHeight =
       Math.sign(distanceToAnchorY) *
       Math.sign(distanceToAnchorX) *
       element.width;
-    element.y = anchorY - element.height;
+    mutateElement(element, {
+      x,
+      y: anchorY - nextHeight,
+      width: -distanceToAnchorX,
+      height: nextHeight,
+    });
   }
 }
 
@@ -78,13 +86,19 @@ export function normalizeDimensions(
   }
 
   if (element.width < 0) {
-    element.width = Math.abs(element.width);
-    element.x -= element.width;
+    const nextWidth = Math.abs(element.width);
+    mutateElement(element, {
+      width: nextWidth,
+      x: element.x - nextWidth,
+    });
   }
 
   if (element.height < 0) {
-    element.height = Math.abs(element.height);
-    element.y -= element.height;
+    const nextHeight = Math.abs(element.height);
+    mutateElement(element, {
+      height: nextHeight,
+      y: element.y - nextHeight,
+    });
   }
 
   invalidateShapeForElement(element);
