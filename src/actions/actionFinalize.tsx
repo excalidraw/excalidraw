@@ -19,11 +19,11 @@ export const actionFinalize = register({
     if (appState.multiElement) {
       // pen and mouse have hover
       if (appState.lastPointerDownWith !== "touch") {
-        mutateElement(appState.multiElement, multiElement => {
-          multiElement.points = multiElement.points.slice(
+        mutateElement(appState.multiElement, {
+          points: appState.multiElement.points.slice(
             0,
-            multiElement.points.length - 1,
-          );
+            appState.multiElement.points.length - 1,
+          ),
         });
       }
       if (isInvisiblySmallElement(appState.multiElement)) {

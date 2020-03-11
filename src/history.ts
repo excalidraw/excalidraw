@@ -1,6 +1,7 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { clearAppStatePropertiesForHistory } from "./appState";
+import { newElementWith } from "./element/mutateElement";
 
 type Result = {
   appState: AppState;
@@ -18,13 +19,14 @@ export class SceneHistory {
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(element => ({
-        ...element,
-        points:
-          appState.multiElement && appState.multiElement.id === element.id
-            ? element.points.slice(0, -1)
-            : element.points,
-      })),
+      elements: elements.map(element =>
+        newElementWith(element, {
+          points:
+            appState.multiElement && appState.multiElement.id === element.id
+              ? element.points.slice(0, -1)
+              : element.points,
+        }),
+      ),
     });
   }
 
