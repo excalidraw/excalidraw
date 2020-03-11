@@ -70,6 +70,7 @@
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
+    "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
@@ -91,5 +92,18 @@
     "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
     "linearElementMulti": "Presione Escape o Enter para finalizar",
     "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
   }
 }
