@@ -109,13 +109,14 @@ export const LayerUI = React.memo(
               <Section className="App-right-menu" heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
-                    <Stack.Row gap={2.25} justifyContent={"space-between"}>
+                    <Stack.Row gap={1} justifyContent={"space-between"}>
                       {actionManager.renderAction("loadScene")}
                       {actionManager.renderAction("saveScene")}
                       {renderExportDialog()}
                       {actionManager.renderAction("clearCanvas")}
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
+                        collaboratorCount={appState.collaboratorCount}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />

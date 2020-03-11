@@ -234,6 +234,8 @@ export class App extends React.Component<any, AppState> {
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
+      remotePointers: {},
+      collaboratorCount: 0,
     });
     if (this.socket) {
       this.socket.close();
