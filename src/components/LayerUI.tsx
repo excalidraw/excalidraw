@@ -21,6 +21,7 @@ import { ExportType } from "../scene/types";
 import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
+import { RoomDialog } from "./RoomDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -30,6 +31,8 @@ interface LayerUIProps {
   elements: readonly ExcalidrawElement[];
   language: string;
   setElements: (elements: readonly ExcalidrawElement[]) => void;
+  onRoomCreate: () => void;
+  onRoomDestroy: () => void;
 }
 
 export const LayerUI = React.memo(
@@ -41,6 +44,8 @@ export const LayerUI = React.memo(
     elements,
     language,
     setElements,
+    onRoomCreate,
+    onRoomDestroy,
   }: LayerUIProps) => {
     const isMobile = useIsMobile();
 
@@ -92,21 +97,28 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onRoomCreate={onRoomCreate}
+        onRoomDestroy={onRoomDestroy}
       />
     ) : (
       <>
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
-            <Stack.Col gap={4} align="end">
+            <Stack.Col gap={4}>
               <Section className="App-right-menu" heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
-                    <Stack.Row justifyContent={"space-between"}>
+                    <Stack.Row gap={2.25} justifyContent={"space-between"}>
                       {actionManager.renderAction("loadScene")}
                       {actionManager.renderAction("saveScene")}
                       {renderExportDialog()}
                       {actionManager.renderAction("clearCanvas")}
+                      <RoomDialog
+                        isCollaborating={appState.isCollaborating}
+                        onRoomCreate={onRoomCreate}
+                        onRoomDestroy={onRoomDestroy}
+                      />
                     </Stack.Row>
                     {actionManager.renderAction("changeViewBackgroundColor")}
                   </Stack.Col>

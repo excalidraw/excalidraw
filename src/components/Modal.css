@@ -27,4 +27,26 @@
   z-index: 2;
   width: 100%;
   max-width: 100%;
+
+  opacity: 0;
+  transform: translateY(10px);
+  animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
+  position: relative;
+}
+
+@keyframes Modal__content_fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.Modal__close {
+  position: absolute;
+  right: calc(var(--space-factor) * 5);
+  top: calc(var(--space-factor) * 5);
 }
