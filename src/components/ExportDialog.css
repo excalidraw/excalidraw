@@ -14,14 +14,10 @@
 }
 
 .ExportDialog__actions {
-  display: flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, auto) 1fr repeat(3, auto);
+  grid-gap: calc(var(--space-factor) * 2);
   align-items: top;
   justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.ExportDialog__scales {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
 }

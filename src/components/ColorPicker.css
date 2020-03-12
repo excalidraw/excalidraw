@@ -8,7 +8,8 @@
 }
 
 .color-picker-control-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
 }
 
@@ -36,11 +37,13 @@
 
 .color-picker-content {
   padding: 1rem 0.5rem 0.5rem 1rem;
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  grid-gap: 0.375rem;
 }
 
-.colors-gallery {
-  display: flex;
-  flex-wrap: wrap;
+.color-picker-content .color-input-container {
+  grid-column: 1 / span 5;
 }
 
 .color-picker-swatch {
@@ -49,7 +52,7 @@
   width: 1.875rem;
   cursor: pointer;
   border-radius: 4px;
-  margin: 0px 0.375rem 0.375rem 0px;
+  margin: 0;
   box-sizing: border-box;
   border: 1px solid #ddd;
 }
@@ -81,14 +84,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
+  position: relative;
+}
+.color-input-container:focus-within .color-picker-hash {
+  box-shadow: 0 0 0 2px #a5d8ff;
+}
+.color-input-container:focus-within .color-picker-hash::before,
+.color-input-container:focus-within .color-picker-hash::after {
+  content: "";
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+.color-input-container:focus-within .color-picker-hash::before {
+  background: #dee2e6;
+  right: -1px;
+}
+.color-input-container:focus-within .color-picker-hash::after {
+  background: white;
+  right: -2px;
 }
 
 .color-input-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
 }
 
 .color-picker-input {
-  width: 6.25em;
+  min-width: 0;
+  margin: 0;
   font-size: 1rem;
   color: #343a40;
   border: 0px;

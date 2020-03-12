@@ -124,80 +124,74 @@ function ExportModal({
         </button>
         <h2 id="export-title">{t("buttons.export")}</h2>
         <div className="ExportDialog__preview" ref={previewRef}></div>
-        <div className="ExportDialog__actions">
-          <Stack.Col gap={1}>
-            <Stack.Row gap={2}>
+        <Stack.Col gap={2} align="end">
+          <div className="ExportDialog__actions">
+            <ToolButton
+              type="button"
+              label="PNG"
+              title={t("buttons.exportToPng")}
+              aria-label={t("buttons.exportToPng")}
+              onClick={() => onExportToPng(exportedElements, scale)}
+              ref={pngButton}
+            />
+            <ToolButton
+              type="button"
+              label="SVG"
+              title={t("buttons.exportToSvg")}
+              aria-label={t("buttons.exportToSvg")}
+              onClick={() => onExportToSvg(exportedElements, scale)}
+            />
+            {probablySupportsClipboardBlob && (
               <ToolButton
                 type="button"
-                label="PNG"
-                title={t("buttons.exportToPng")}
-                aria-label={t("buttons.exportToPng")}
-                onClick={() => onExportToPng(exportedElements, scale)}
-                ref={pngButton}
+                icon={clipboard}
+                title={t("buttons.copyToClipboard")}
+                aria-label={t("buttons.copyToClipboard")}
+                onClick={() => onExportToClipboard(exportedElements, scale)}
               />
-              <ToolButton
-                type="button"
-                label="SVG"
-                title={t("buttons.exportToSvg")}
-                aria-label={t("buttons.exportToSvg")}
-                onClick={() => onExportToSvg(exportedElements, scale)}
-              />
-              {probablySupportsClipboardBlob && (
-                <ToolButton
-                  type="button"
-                  icon={clipboard}
-                  title={t("buttons.copyToClipboard")}
-                  aria-label={t("buttons.copyToClipboard")}
-                  onClick={() => onExportToClipboard(exportedElements, scale)}
-                />
-              )}
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
-            </Stack.Row>
-          </Stack.Col>
-
-          {actionManager.renderAction("changeProjectName")}
-          <Stack.Col gap={1}>
-            <div className="ExportDialog__scales">
-              <Stack.Row gap={2} align="baseline">
-                {scales.map(s => (
-                  <ToolButton
-                    key={s}
-                    size="s"
-                    type="radio"
-                    icon={`x${s}`}
-                    name="export-canvas-scale"
-                    aria-label={`Scale ${s} x`}
-                    id="export-canvas-scale"
-                    checked={s === scale}
-                    onChange={() => setScale(s)}
-                  />
-                ))}
-              </Stack.Row>
-            </div>
-            {actionManager.renderAction("changeExportBackground")}
-            {someElementIsSelected && (
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={exportSelected}
-                    onChange={event =>
-                      setExportSelected(event.currentTarget.checked)
-                    }
-                    ref={onlySelectedInput}
-                  />{" "}
-                  {t("labels.onlySelected")}
-                </label>
-              </div>
             )}
-          </Stack.Col>
-        </div>
+            <ToolButton
+              type="button"
+              icon={link}
+              title={t("buttons.getShareableLink")}
+              aria-label={t("buttons.getShareableLink")}
+              onClick={() => onExportToBackend(exportedElements)}
+            />
+
+            <div style={{ margin: "auto" }}>
+              {actionManager.renderAction("changeProjectName")}
+            </div>
+            {scales.map(s => (
+              <ToolButton
+                key={s}
+                size="s"
+                type="radio"
+                icon={`x${s}`}
+                name="export-canvas-scale"
+                aria-label={`Scale ${s} x`}
+                id="export-canvas-scale"
+                checked={s === scale}
+                onChange={() => setScale(s)}
+              />
+            ))}
+          </div>
+          {actionManager.renderAction("changeExportBackground")}
+          {someElementIsSelected && (
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={exportSelected}
+                  onChange={event =>
+                    setExportSelected(event.currentTarget.checked)
+                  }
+                  ref={onlySelectedInput}
+                />{" "}
+                {t("labels.onlySelected")}
+              </label>
+            </div>
+          )}
+        </Stack.Col>
       </Island>
     </div>
   );

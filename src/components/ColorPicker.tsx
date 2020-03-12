@@ -71,7 +71,7 @@ const Picker = function({
         activeElement,
       );
       if (index !== -1) {
-        const length = gallery!.current!.children.length;
+        const length = gallery!.current!.children.length - 1;
         const nextIndex =
           event.key === KEYS.ARROW_RIGHT
             ? (index + 1) % length
@@ -109,47 +109,45 @@ const Picker = function({
     >
       <div className="color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
-      <div className="color-picker-content">
-        <div
-          className="colors-gallery"
-          ref={el => {
-            if (el) {
-              gallery.current = el;
-            }
-          }}
-        >
-          {colors.map((_color, i) => (
-            <button
-              className="color-picker-swatch"
-              onClick={() => {
-                onChange(_color);
-              }}
-              title={`${_color} — ${keyBindings[i].toUpperCase()}`}
-              aria-label={_color}
-              aria-keyshortcuts={keyBindings[i]}
-              style={{ backgroundColor: _color }}
-              key={_color}
-              ref={el => {
-                if (el && i === 0) {
-                  firstItem.current = el;
-                }
-                if (el && _color === color) {
-                  activeItem.current = el;
-                }
-              }}
-              onFocus={() => {
-                onChange(_color);
-              }}
-            >
-              {_color === "transparent" ? (
-                <div className="color-picker-transparent"></div>
-              ) : (
-                undefined
-              )}
-              <span className="color-picker-keybinding">{keyBindings[i]}</span>
-            </button>
-          ))}
-        </div>
+      <div
+        className="color-picker-content"
+        ref={el => {
+          if (el) {
+            gallery.current = el;
+          }
+        }}
+      >
+        {colors.map((_color, i) => (
+          <button
+            className="color-picker-swatch"
+            onClick={() => {
+              onChange(_color);
+            }}
+            title={`${_color} — ${keyBindings[i].toUpperCase()}`}
+            aria-label={_color}
+            aria-keyshortcuts={keyBindings[i]}
+            style={{ backgroundColor: _color }}
+            key={_color}
+            ref={el => {
+              if (el && i === 0) {
+                firstItem.current = el;
+              }
+              if (el && _color === color) {
+                activeItem.current = el;
+              }
+            }}
+            onFocus={() => {
+              onChange(_color);
+            }}
+          >
+            {_color === "transparent" ? (
+              <div className="color-picker-transparent"></div>
+            ) : (
+              undefined
+            )}
+            <span className="color-picker-keybinding">{keyBindings[i]}</span>
+          </button>
+        ))}
         <ColorInput
           color={color}
           label={label}
@@ -187,7 +185,7 @@ const ColorInput = React.forwardRef(
     React.useImperativeHandle(ref, () => inputRef.current);
 
     return (
-      <div className="color-input-container">
+      <label className="color-input-container">
         <div className="color-picker-hash">#</div>
         <input
           spellCheck={false}
@@ -205,7 +203,7 @@ const ColorInput = React.forwardRef(
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
-      </div>
+      </label>
     );
   },
 );
