@@ -34,8 +34,7 @@ export function getDefaultAppState(): AppState {
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
-    remotePointers: {},
-    collaboratorCount: 0,
+    collaborators: new Map(),
   };
 }
 
@@ -47,6 +46,8 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     editingElement,
     selectionElement,
     isResizing,
+    collaborators,
+    isCollaborating,
     ...exportedState
   } = appState;
   return exportedState;
