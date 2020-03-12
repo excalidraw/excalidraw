@@ -23,12 +23,14 @@ const Picker = function({
   onChange,
   onClose,
   label,
+  showInput = true,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
   label: string;
+  showInput: boolean;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -71,7 +73,7 @@ const Picker = function({
         activeElement,
       );
       if (index !== -1) {
-        const length = gallery!.current!.children.length - 1;
+        const length = gallery!.current!.children.length - (showInput ? 1 : 0);
         const nextIndex =
           event.key === KEYS.ARROW_RIGHT
             ? (index + 1) % length
@@ -148,14 +150,16 @@ const Picker = function({
             <span className="color-picker-keybinding">{keyBindings[i]}</span>
           </button>
         ))}
-        <ColorInput
-          color={color}
-          label={label}
-          onChange={color => {
-            onChange(color);
-          }}
-          ref={colorInput}
-        />
+        {showInput && (
+          <ColorInput
+            color={color}
+            label={label}
+            onChange={color => {
+              onChange(color);
+            }}
+            ref={colorInput}
+          />
+        )}
       </div>
     </div>
   );
@@ -254,6 +258,7 @@ export function ColorPicker({
                 pickerButton.current?.focus();
               }}
               label={label}
+              showInput={false}
             />
           </Popover>
         ) : null}
