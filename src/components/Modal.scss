@@ -49,6 +49,12 @@
 .Modal__close {
   width: calc(var(--space-factor) * 7);
   height: calc(var(--space-factor) * 7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    height: calc(var(--space-factor) * 5);
+  }
 }
 .Modal__close--floating {
   position: absolute;

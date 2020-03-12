@@ -3,6 +3,7 @@ import { Modal } from "./Modal";
 import { Island } from "./Island";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
+import { back, close } from "./icons";
 
 import "./Dialog.scss";
 
@@ -30,7 +31,7 @@ export function Dialog(props: {
             aria-label={t("buttons.close")}
             ref={props.closeButtonRef}
           >
-            {useIsMobile() ? "<" : "╳"}
+            {useIsMobile() ? back : close}
           </button>
         </h2>
         {props.children}
