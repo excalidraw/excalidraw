@@ -13,6 +13,8 @@
   cursor: pointer;
   background-color: var(--button-gray-1);
   -webkit-tap-highlight-color: transparent;
+
+  border-radius: var(--space-factor);
 }
 
 .ToolIcon__icon {

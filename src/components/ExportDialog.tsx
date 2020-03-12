@@ -1,11 +1,9 @@
-import "./ExportDialog.css";
+import "./ExportDialog.scss";
 
 import React, { useState, useEffect, useRef } from "react";
 
-import { Modal } from "./Modal";
 import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
-import { Island } from "./Island";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
@@ -18,6 +16,7 @@ import { KEYS } from "../keys";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import useIsMobile from "../is-mobile";
+import { Dialog } from "./Dialog";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -36,7 +35,7 @@ function ExportModal({
   onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
-  onCloseRequest,
+  closeButton,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -47,6 +46,7 @@ function ExportModal({
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
+  closeButton: React.RefObject<HTMLButtonElement>;
 }) {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
@@ -54,7 +54,6 @@ function ExportModal({
   const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
   const pngButton = useRef<HTMLButtonElement>(null);
-  const closeButton = useRef<HTMLButtonElement>(null);
   const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
@@ -113,92 +112,80 @@ function ExportModal({
 
   return (
     <div onKeyDown={handleKeyDown}>
-      <Island padding={4}>
-        <button
-          className="Modal__close"
-          onClick={onCloseRequest}
-          aria-label={t("buttons.close")}
-          ref={closeButton}
-        >
-          ╳
-        </button>
-        <h2 id="export-title">{t("buttons.export")}</h2>
-        <div className="ExportDialog__preview" ref={previewRef}></div>
-        <div className="ExportDialog__actions">
-          <Stack.Col gap={1}>
-            <Stack.Row gap={2}>
+      <div className="ExportDialog__preview" ref={previewRef}></div>
+      <div className="ExportDialog__actions">
+        <Stack.Col gap={1}>
+          <Stack.Row gap={2}>
+            <ToolButton
+              type="button"
+              label="PNG"
+              title={t("buttons.exportToPng")}
+              aria-label={t("buttons.exportToPng")}
+              onClick={() => onExportToPng(exportedElements, scale)}
+              ref={pngButton}
+            />
+            <ToolButton
+              type="button"
+              label="SVG"
+              title={t("buttons.exportToSvg")}
+              aria-label={t("buttons.exportToSvg")}
+              onClick={() => onExportToSvg(exportedElements, scale)}
+            />
+            {probablySupportsClipboardBlob && (
               <ToolButton
                 type="button"
-                label="PNG"
-                title={t("buttons.exportToPng")}
-                aria-label={t("buttons.exportToPng")}
-                onClick={() => onExportToPng(exportedElements, scale)}
-                ref={pngButton}
+                icon={clipboard}
+                title={t("buttons.copyToClipboard")}
+                aria-label={t("buttons.copyToClipboard")}
+                onClick={() => onExportToClipboard(exportedElements, scale)}
               />
-              <ToolButton
-                type="button"
-                label="SVG"
-                title={t("buttons.exportToSvg")}
-                aria-label={t("buttons.exportToSvg")}
-                onClick={() => onExportToSvg(exportedElements, scale)}
-              />
-              {probablySupportsClipboardBlob && (
-                <ToolButton
-                  type="button"
-                  icon={clipboard}
-                  title={t("buttons.copyToClipboard")}
-                  aria-label={t("buttons.copyToClipboard")}
-                  onClick={() => onExportToClipboard(exportedElements, scale)}
-                />
-              )}
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
-            </Stack.Row>
-          </Stack.Col>
-
-          {actionManager.renderAction("changeProjectName")}
-          <Stack.Col gap={1}>
-            <div className="ExportDialog__scales">
-              <Stack.Row gap={2} align="baseline">
-                {scales.map(s => (
-                  <ToolButton
-                    key={s}
-                    size="s"
-                    type="radio"
-                    icon={`x${s}`}
-                    name="export-canvas-scale"
-                    aria-label={`Scale ${s} x`}
-                    id="export-canvas-scale"
-                    checked={s === scale}
-                    onChange={() => setScale(s)}
-                  />
-                ))}
-              </Stack.Row>
-            </div>
-            {actionManager.renderAction("changeExportBackground")}
-            {someElementIsSelected && (
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={exportSelected}
-                    onChange={event =>
-                      setExportSelected(event.currentTarget.checked)
-                    }
-                    ref={onlySelectedInput}
-                  />{" "}
-                  {t("labels.onlySelected")}
-                </label>
-              </div>
             )}
-          </Stack.Col>
-        </div>
-      </Island>
+            <ToolButton
+              type="button"
+              icon={link}
+              title={t("buttons.getShareableLink")}
+              aria-label={t("buttons.getShareableLink")}
+              onClick={() => onExportToBackend(exportedElements)}
+            />
+          </Stack.Row>
+        </Stack.Col>
+        {actionManager.renderAction("changeProjectName")}
+        <Stack.Col gap={1}>
+          <div className="ExportDialog__scales">
+            <Stack.Row gap={2} align="baseline">
+              {scales.map(s => (
+                <ToolButton
+                  key={s}
+                  size="s"
+                  type="radio"
+                  icon={`x${s}`}
+                  name="export-canvas-scale"
+                  aria-label={`Scale ${s} x`}
+                  id="export-canvas-scale"
+                  checked={s === scale}
+                  onChange={() => setScale(s)}
+                />
+              ))}
+            </Stack.Row>
+          </div>
+          {actionManager.renderAction("changeExportBackground")}
+          {someElementIsSelected && (
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={exportSelected}
+                  onChange={event =>
+                    setExportSelected(event.currentTarget.checked)
+                  }
+                  ref={onlySelectedInput}
+                />{" "}
+                {t("labels.onlySelected")}
+              </label>
+            </div>
+          )}
+        </Stack.Col>
+      </div>
     </div>
   );
 }
@@ -224,6 +211,7 @@ export function ExportDialog({
 }) {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
@@ -242,10 +230,11 @@ export function ExportDialog({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Modal
+        <Dialog
           maxWidth={800}
           onCloseRequest={handleClose}
-          labelledBy="export-title"
+          title={t("buttons.export")}
+          closeButtonRef={closeButton}
         >
           <ExportModal
             elements={elements}
@@ -257,8 +246,9 @@ export function ExportDialog({
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
+            closeButton={closeButton}
           />
-        </Modal>
+        </Dialog>
       )}
     </>
   );
