@@ -130,6 +130,7 @@
   padding: 1px;
   padding-left: 0.5em;
   appearance: none;
+  font-family: Cascadia, monospace;
 }
 
 .color-picker-label-swatch {
