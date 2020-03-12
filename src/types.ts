@@ -28,7 +28,6 @@ export type AppState = {
   cursorY: number;
   scrolledOutside: boolean;
   name: string;
-  selectedId?: string;
   isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
