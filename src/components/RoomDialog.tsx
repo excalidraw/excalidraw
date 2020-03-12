@@ -116,7 +116,7 @@ export function RoomDialog({
   onRoomDestroy,
 }: {
   isCollaborating: AppState["isCollaborating"];
-  collaboratorCount: AppState["collaboratorCount"];
+  collaboratorCount: number;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {

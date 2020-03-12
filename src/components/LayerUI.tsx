@@ -116,7 +116,7 @@ export const LayerUI = React.memo(
                       {actionManager.renderAction("clearCanvas")}
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
-                        collaboratorCount={appState.collaboratorCount}
+                        collaboratorCount={appState.collaborators.size}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />

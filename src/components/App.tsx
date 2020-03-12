@@ -193,8 +193,7 @@ export class App extends React.Component<any, AppState> {
       this.setState(state => ({
         ...res.appState,
         isCollaborating: state.isCollaborating,
-        remotePointers: state.remotePointers,
-        collaboratorCount: state.collaboratorCount,
+        collaborators: state.collaborators,
       }));
     }
   };
@@ -234,8 +233,7 @@ export class App extends React.Component<any, AppState> {
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
-      remotePointers: {},
-      collaboratorCount: 0,
+      collaborators: new Map(),
     });
     if (this.socket) {
       this.socket.close();
@@ -321,11 +319,14 @@ export class App extends React.Component<any, AppState> {
               break;
             case "MOUSE_LOCATION":
               const { socketID, pointerCoords } = decryptedData.payload;
-              this.setState({
-                remotePointers: {
-                  ...this.state.remotePointers,
-                  [socketID]: pointerCoords,
-                },
+              this.setState(state => {
+                if (state.collaborators.has(socketID)) {
+                  const user = state.collaborators.get(socketID)!;
+                  user.pointer = pointerCoords;
+                  state.collaborators.set(socketID, user);
+                  return state;
+                }
+                return null;
               });
               break;
           }
@@ -337,13 +338,20 @@ export class App extends React.Component<any, AppState> {
         }
         this.socketInitialized = true;
       });
-      this.socket.on("room-user-count", (collaboratorCount: number) => {
-        this.setState({ collaboratorCount });
-      });
-      this.socket.on("client-disconnected", (socketID: number) => {
+      this.socket.on("room-user-change", (clients: string[]) => {
         this.setState(state => {
-          const { [socketID]: omit, ...remotePointers } = state.remotePointers;
-          return { remotePointers };
+          const collaborators: typeof state.collaborators = new Map();
+          for (const socketID of clients) {
+            if (state.collaborators.has(socketID)) {
+              collaborators.set(socketID, state.collaborators.get(socketID)!);
+            } else {
+              collaborators.set(socketID, {});
+            }
+          }
+          return {
+            ...state,
+            collaborators,
+          };
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
@@ -2095,17 +2103,19 @@ export class App extends React.Component<any, AppState> {
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
-    for (const clientId in this.state.remotePointers) {
-      const remotePointerCoord = this.state.remotePointers[clientId];
-      pointerViewportCoords[clientId] = sceneCoordsToViewportCoords(
+    this.state.collaborators.forEach((user, socketID) => {
+      if (!user.pointer) {
+        return;
+      }
+      pointerViewportCoords[socketID] = sceneCoordsToViewportCoords(
         {
-          sceneX: remotePointerCoord.x,
-          sceneY: remotePointerCoord.y,
+          sceneX: user.pointer.x,
+          sceneY: user.pointer.y,
         },
         this.state,
         this.canvas,
       );
-    }
+    });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state,
