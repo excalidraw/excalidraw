@@ -232,7 +232,11 @@ export function ColorPicker({
         <button
           className="color-picker-label-swatch"
           aria-label={label}
-          style={color ? { backgroundColor: color } : undefined}
+          style={
+            color
+              ? ({ "--swatch-color": color } as React.CSSProperties)
+              : undefined
+          }
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
         />

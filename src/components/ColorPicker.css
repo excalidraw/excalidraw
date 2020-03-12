@@ -71,6 +71,9 @@
   right: 0px;
   bottom: 0px;
   left: 0px;
+}
+.color-picker-transparent,
+.color-picker-label-swatch {
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
     left center;
 }
@@ -134,6 +137,19 @@
   width: 1.875rem;
   margin-right: 0.25rem;
   border: 1px solid #dee2e6;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent !important;
+}
+
+.color-picker-label-swatch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--swatch-color);
 }
 
 .color-picker-keybinding {
