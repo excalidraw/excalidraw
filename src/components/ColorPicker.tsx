@@ -109,7 +109,7 @@ const Picker = function({
       aria-label={t("labels.colorPicker")}
       onKeyDown={handleKeyDown}
     >
-      <div className="color-picker-triangle-shadow"></div>
+      <div className="color-picker-triangle color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
       <div
         className="color-picker-content"

@@ -42,8 +42,8 @@ export function Popover({
           onCloseRequest();
         }
       };
-      document.addEventListener("click", handler, false);
-      return () => document.removeEventListener("click", handler, false);
+      document.addEventListener("pointerdown", handler, false);
+      return () => document.removeEventListener("pointerdown", handler, false);
     }
   }, [onCloseRequest]);
 

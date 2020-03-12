@@ -1,27 +1,16 @@
 .color-picker {
-  width: 205px;
   background: rgb(255, 255, 255);
   border: 0px solid rgba(0, 0, 0, 0.25);
   box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
   border-radius: 4px;
   position: absolute;
+  left: -5.5px;
 }
 
 .color-picker-control-container {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-}
-
-.color-picker-triangle-shadow {
-  width: 0px;
-  height: 0px;
-  border-style: solid;
-  border-width: 0px 9px 10px;
-  border-color: transparent transparent rgba(0, 0, 0, 0.1);
-  position: absolute;
-  top: -11px;
-  left: 12px;
 }
 
 .color-picker-triangle {
@@ -33,6 +22,11 @@
   position: absolute;
   top: -10px;
   left: 12px;
+}
+
+.color-picker-triangle-shadow {
+  border-color: transparent transparent rgba(0, 0, 0, 0.1);
+  top: -11px;
 }
 
 .color-picker-content {
