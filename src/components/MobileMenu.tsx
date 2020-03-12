@@ -47,6 +47,7 @@ export function MobileMenu({
               {actionManager.renderAction("clearCanvas")}
               <RoomDialog
                 isCollaborating={appState.isCollaborating}
+                collaboratorCount={appState.collaborators.size}
                 onRoomCreate={onRoomCreate}
                 onRoomDestroy={onRoomDestroy}
               />

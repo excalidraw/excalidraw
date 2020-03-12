@@ -7,6 +7,7 @@ import { users, clipboard, start, stop } from "./icons";
 import "./RoomDialog.scss";
 import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
+import { AppState } from "../types";
 
 function RoomModal({
   activeRoomLink,
@@ -98,10 +99,12 @@ function RoomModal({
 
 export function RoomDialog({
   isCollaborating,
+  collaboratorCount,
   onRoomCreate,
   onRoomDestroy,
 }: {
-  isCollaborating: boolean;
+  isCollaborating: AppState["isCollaborating"];
+  collaboratorCount: number;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -132,7 +135,13 @@ export function RoomDialog({
         aria-label={t("buttons.roomDialog")}
         showAriaLabel={useIsMobile()}
         ref={triggerButton}
-      />
+      >
+        {collaboratorCount > 0 && (
+          <div className="RoomDialog-modalButton-collaborators">
+            {collaboratorCount}
+          </div>
+        )}
+      </ToolButton>
       {modalIsShown && (
         <Dialog
           maxWidth={800}
