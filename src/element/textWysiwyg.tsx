@@ -92,13 +92,7 @@ export function textWysiwyg({
   editable.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
-      if (initText) {
-        editable.innerText = initText;
-        handleSubmit();
-        return;
-      }
-      cleanup();
-      return;
+      handleSubmit();
     }
     if (ev.key === KEYS.ENTER && !ev.shiftKey) {
       ev.preventDefault();

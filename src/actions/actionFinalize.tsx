@@ -47,6 +47,7 @@ export const actionFinalize = register({
             : "selection",
         draggingElement: null,
         multiElement: null,
+        editingElement: null,
         selectedElementIds: {},
       },
     };
