@@ -111,12 +111,11 @@
 }
 
 .color-input-container {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
 }
 
 .color-picker-input {
-  min-width: 0;
+  width: 12ch; /* length of `transparent` + 1 */
   margin: 0;
   font-size: 1rem;
   color: #343a40;
@@ -124,7 +123,6 @@
   outline: none;
   height: 1.75em;
   box-shadow: #dee2e6 0px 0px 0px 1px inset;
-  box-sizing: content-box;
   border-radius: 0px 4px 4px 0px;
   float: left;
   padding: 1px;
