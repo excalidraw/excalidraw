@@ -779,6 +779,12 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    // case: double-clicking with arrow/line tool selected would both create
+    //  text and enter multiElement mode
+    if (this.state.multiElement) {
+      return;
+    }
+
     resetCursor();
 
     const { x, y } = viewportCoordsToSceneCoords(
