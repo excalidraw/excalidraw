@@ -63,7 +63,7 @@ export function measureText(text: string, font: string) {
   const line = document.createElement("div");
   const body = document.body;
   line.style.position = "absolute";
-  line.style.whiteSpace = "nowrap";
+  line.style.whiteSpace = "pre";
   line.style.font = font;
   body.appendChild(line);
   // Now we can measure width and height of the letter
