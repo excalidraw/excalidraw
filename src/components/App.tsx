@@ -270,19 +270,18 @@ export class App extends React.Component<any, AppState> {
             iv,
           );
 
+          let deletedIds = this.state.deletedIds;
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_UPDATE":
               const {
-                elements: sceneElements,
-                appState: sceneAppState,
+                elements: remoteElements,
+                appState: remoteAppState,
               } = decryptedData.payload;
-              const restoredState = restore(
-                sceneElements || [],
-                sceneAppState || getDefaultAppState(),
-                { scrollToContent: true },
-              );
+              const restoredState = restore(remoteElements || [], null, {
+                scrollToContent: true,
+              });
               // Perform reconciliation - in collaboration, if we encounter
               // elements with more staler versions than ours, ignore them
               // and keep ours.
@@ -301,6 +300,23 @@ export class App extends React.Component<any, AppState> {
                   },
                   {},
                 );
+
+                deletedIds = { ...deletedIds };
+
+                for (const [id, remoteDeletedEl] of Object.entries(
+                  remoteAppState.deletedIds,
+                )) {
+                  if (
+                    !localElementMap[id] ||
+                    // don't remove local element if we've local is newer than
+                    //  the one deleted on remote
+                    remoteDeletedEl.version >= localElementMap[id].version
+                  ) {
+                    deletedIds[id] = remoteDeletedEl;
+                    delete localElementMap[id];
+                  }
+                }
+
                 // Reconcile
                 elements = restoredState.elements
                   .reduce((elements, element) => {
@@ -320,26 +336,28 @@ export class App extends React.Component<any, AppState> {
                       localElementMap[element.id].version > element.version
                     ) {
                       elements.push(localElementMap[element.id]);
+                      delete localElementMap[element.id];
                     } else {
-                      elements.push(element);
+                      if (deletedIds.hasOwnProperty(element.id)) {
+                        if (element.version > deletedIds[element.id].version) {
+                          elements.push(element);
+                          delete deletedIds[element.id];
+                          delete localElementMap[element.id];
+                        }
+                      } else {
+                        elements.push(element);
+                        delete localElementMap[element.id];
+                      }
                     }
 
                     return elements;
                   }, [] as any)
-                  // add local elements that are currently being edited
-                  // (can't be done in the step above because the elements may
-                  //  not exist on remote at all)
-                  .concat(
-                    elements.filter(element => {
-                      return (
-                        element.id === this.state.editingElement?.id ||
-                        element.id === this.state.resizingElement?.id ||
-                        element.id === this.state.draggingElement?.id
-                      );
-                    }),
-                  );
+                  // add local elements that weren't deleted or on remote
+                  .concat(...Object.values(localElementMap));
               }
-              this.setState({});
+              this.setState({
+                deletedIds,
+              });
               if (this.socketInitialized === false) {
                 this.socketInitialized = true;
               }
@@ -388,7 +406,11 @@ export class App extends React.Component<any, AppState> {
             elements: elements.filter(element => {
               return element.id !== this.state.editingElement?.id;
             }),
-            appState: this.state,
+            appState: {
+              viewBackgroundColor: this.state.viewBackgroundColor,
+              name: this.state.name,
+              deletedIds: this.state.deletedIds,
+            },
           },
         });
       });
@@ -2194,7 +2216,11 @@ export class App extends React.Component<any, AppState> {
           elements: elements.filter(element => {
             return element.id !== this.state.editingElement?.id;
           }),
-          appState: this.state,
+          appState: {
+            viewBackgroundColor: this.state.viewBackgroundColor,
+            name: this.state.name,
+            deletedIds: this.state.deletedIds,
+          },
         },
       });
       history.pushEntry(this.state, elements);

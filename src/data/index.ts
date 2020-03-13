@@ -35,7 +35,7 @@ export type SocketUpdateData =
       type: "SCENE_UPDATE";
       payload: {
         elements: readonly ExcalidrawElement[];
-        appState: AppState | null;
+        appState: Pick<AppState, "viewBackgroundColor" | "name" | "deletedIds">;
       };
     }
   | {
