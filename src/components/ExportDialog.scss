@@ -17,14 +17,27 @@
 
 .ExportDialog__actions {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, auto) 1fr repeat(3, auto);
+  display: flex;
   grid-gap: calc(var(--space-factor) * 2);
   align-items: top;
   justify-content: space-between;
 }
 
+.ExportDialog__name {
+  grid-column: project-name;
+  margin: auto;
+}
+
 @media #{$media-query} {
+  .ExportDialog {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 5rem);
+
+    > :last-child {
+      margin: auto;
+    }
+  }
   .ExportDialog__preview canvas {
     max-height: 30vh;
   }
@@ -38,11 +51,9 @@
   }
   .ExportDialog__actions {
     flex-direction: column;
+    align-items: center;
   }
   .ExportDialog__actions > * {
     margin-bottom: calc(var(--space-factor) * 3);
-  }
-  .ExportDialog__scales {
-    justify-content: flex-start;
   }
 }

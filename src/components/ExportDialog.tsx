@@ -111,10 +111,10 @@ function ExportModal({
   }
 
   return (
-    <div onKeyDown={handleKeyDown}>
+    <div onKeyDown={handleKeyDown} className="ExportDialog">
       <div className="ExportDialog__preview" ref={previewRef}></div>
-      <div className="ExportDialog__actions">
-        <Stack.Col gap={1}>
+      <Stack.Col gap={2} align="center">
+        <div className="ExportDialog__actions">
           <Stack.Row gap={2}>
             <ToolButton
               type="button"
@@ -148,44 +148,42 @@ function ExportModal({
               onClick={() => onExportToBackend(exportedElements)}
             />
           </Stack.Row>
-        </Stack.Col>
-        {actionManager.renderAction("changeProjectName")}
-        <Stack.Col gap={1}>
-          <div className="ExportDialog__scales">
-            <Stack.Row gap={2} align="baseline">
-              {scales.map(s => (
-                <ToolButton
-                  key={s}
-                  size="s"
-                  type="radio"
-                  icon={`x${s}`}
-                  name="export-canvas-scale"
-                  aria-label={`Scale ${s} x`}
-                  id="export-canvas-scale"
-                  checked={s === scale}
-                  onChange={() => setScale(s)}
-                />
-              ))}
-            </Stack.Row>
+          <div className="ExportDialog__name">
+            {actionManager.renderAction("changeProjectName")}
           </div>
-          {actionManager.renderAction("changeExportBackground")}
-          {someElementIsSelected && (
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={exportSelected}
-                  onChange={event =>
-                    setExportSelected(event.currentTarget.checked)
-                  }
-                  ref={onlySelectedInput}
-                />{" "}
-                {t("labels.onlySelected")}
-              </label>
-            </div>
-          )}
-        </Stack.Col>
-      </div>
+          <Stack.Row gap={2}>
+            {scales.map(s => (
+              <ToolButton
+                key={s}
+                size="s"
+                type="radio"
+                icon={`x${s}`}
+                name="export-canvas-scale"
+                aria-label={`Scale ${s} x`}
+                id="export-canvas-scale"
+                checked={s === scale}
+                onChange={() => setScale(s)}
+              />
+            ))}
+          </Stack.Row>
+        </div>
+        {actionManager.renderAction("changeExportBackground")}
+        {someElementIsSelected && (
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={exportSelected}
+                onChange={event =>
+                  setExportSelected(event.currentTarget.checked)
+                }
+                ref={onlySelectedInput}
+              />{" "}
+              {t("labels.onlySelected")}
+            </label>
+          </div>
+        )}
+      </Stack.Col>
     </div>
   );
 }
