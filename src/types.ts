@@ -28,15 +28,13 @@ export type AppState = {
   cursorY: number;
   scrolledOutside: boolean;
   name: string;
-  selectedId?: string;
   isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  remotePointers: { [id: string]: { x: number; y: number } };
-  collaboratorCount: number;
+  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
 
 export type PointerCoords = Readonly<{

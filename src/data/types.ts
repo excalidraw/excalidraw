@@ -7,5 +7,4 @@ export interface DataState {
   source?: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState | null;
-  selectedId?: number;
 }

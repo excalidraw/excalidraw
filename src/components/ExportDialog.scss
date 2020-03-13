@@ -1,3 +1,5 @@
+@import "../_variables";
+
 .ExportDialog__preview {
   --preview-padding: calc(var(--space-factor) * 4);
 
@@ -20,4 +22,27 @@
   grid-gap: calc(var(--space-factor) * 2);
   align-items: top;
   justify-content: space-between;
+}
+
+@media #{$media-query} {
+  .ExportDialog__preview canvas {
+    max-height: 30vh;
+  }
+  .ExportDialog__dialog,
+  .ExportDialog__dialog .Island {
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .ExportDialog__dialog .Island {
+    overflow-y: auto;
+  }
+  .ExportDialog__actions {
+    flex-direction: column;
+  }
+  .ExportDialog__actions > * {
+    margin-bottom: calc(var(--space-factor) * 3);
+  }
+  .ExportDialog__scales {
+    justify-content: flex-start;
+  }
 }

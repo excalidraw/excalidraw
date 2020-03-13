@@ -193,8 +193,7 @@ export class App extends React.Component<any, AppState> {
       this.setState(state => ({
         ...res.appState,
         isCollaborating: state.isCollaborating,
-        remotePointers: state.remotePointers,
-        collaboratorCount: state.collaboratorCount,
+        collaborators: state.collaborators,
       }));
     }
   };
@@ -234,8 +233,7 @@ export class App extends React.Component<any, AppState> {
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
-      remotePointers: {},
-      collaboratorCount: 0,
+      collaborators: new Map(),
     });
     if (this.socket) {
       this.socket.close();
@@ -293,7 +291,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 // create a map of ids so we don't have to iterate
                 // over the array more than once.
-                const elementMap = elements.reduce(
+                const localElementMap = elements.reduce(
                   (
                     acc: { [key: string]: ExcalidrawElement },
                     element: ExcalidrawElement,
@@ -304,15 +302,42 @@ export class App extends React.Component<any, AppState> {
                   {},
                 );
                 // Reconcile
-                elements = restoredState.elements.map(element => {
-                  if (
-                    elementMap.hasOwnProperty(element.id) &&
-                    elementMap[element.id].version > element.version
-                  ) {
-                    return elementMap[element.id];
-                  }
-                  return element;
-                });
+                elements = restoredState.elements
+                  .reduce((elements, element) => {
+                    // if the remote element references one that's currently
+                    //  edited on local, skip it (it'll be added in the next
+                    //  step)
+                    if (
+                      element.id === this.state.editingElement?.id ||
+                      element.id === this.state.resizingElement?.id ||
+                      element.id === this.state.draggingElement?.id
+                    ) {
+                      return elements;
+                    }
+
+                    if (
+                      localElementMap.hasOwnProperty(element.id) &&
+                      localElementMap[element.id].version > element.version
+                    ) {
+                      elements.push(localElementMap[element.id]);
+                    } else {
+                      elements.push(element);
+                    }
+
+                    return elements;
+                  }, [] as any)
+                  // add local elements that are currently being edited
+                  // (can't be done in the step above because the elements may
+                  //  not exist on remote at all)
+                  .concat(
+                    elements.filter(element => {
+                      return (
+                        element.id === this.state.editingElement?.id ||
+                        element.id === this.state.resizingElement?.id ||
+                        element.id === this.state.draggingElement?.id
+                      );
+                    }),
+                  );
               }
               this.setState({});
               if (this.socketInitialized === false) {
@@ -321,11 +346,14 @@ export class App extends React.Component<any, AppState> {
               break;
             case "MOUSE_LOCATION":
               const { socketID, pointerCoords } = decryptedData.payload;
-              this.setState({
-                remotePointers: {
-                  ...this.state.remotePointers,
-                  [socketID]: pointerCoords,
-                },
+              this.setState(state => {
+                if (state.collaborators.has(socketID)) {
+                  const user = state.collaborators.get(socketID)!;
+                  user.pointer = pointerCoords;
+                  state.collaborators.set(socketID, user);
+                  return state;
+                }
+                return null;
               });
               break;
           }
@@ -337,14 +365,29 @@ export class App extends React.Component<any, AppState> {
         }
         this.socketInitialized = true;
       });
-      this.socket.on("room-user-count", (collaboratorCount: number) => {
-        this.setState({ collaboratorCount });
+      this.socket.on("room-user-change", (clients: string[]) => {
+        this.setState(state => {
+          const collaborators: typeof state.collaborators = new Map();
+          for (const socketID of clients) {
+            if (state.collaborators.has(socketID)) {
+              collaborators.set(socketID, state.collaborators.get(socketID)!);
+            } else {
+              collaborators.set(socketID, {});
+            }
+          }
+          return {
+            ...state,
+            collaborators,
+          };
+        });
       });
       this.socket.on("new-user", async (socketID: string) => {
         this.broadcastSocketData({
           type: "SCENE_UPDATE",
           payload: {
-            elements,
+            elements: elements.filter(element => {
+              return element.id !== this.state.editingElement?.id;
+            }),
             appState: this.state,
           },
         });
@@ -779,6 +822,12 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    // case: double-clicking with arrow/line tool selected would both create
+    //  text and enter multiElement mode
+    if (this.state.multiElement) {
+      return;
+    }
+
     resetCursor();
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -1362,6 +1411,7 @@ export class App extends React.Component<any, AppState> {
         elements = [...elements, element];
         this.setState({
           draggingElement: element,
+          editingElement: element,
         });
       }
     } else if (element.type === "selection") {
@@ -1371,7 +1421,11 @@ export class App extends React.Component<any, AppState> {
       });
     } else {
       elements = [...elements, element];
-      this.setState({ multiElement: null, draggingElement: element });
+      this.setState({
+        multiElement: null,
+        draggingElement: element,
+        editingElement: element,
+      });
     }
 
     let resizeArrowFn:
@@ -1818,9 +1872,10 @@ export class App extends React.Component<any, AppState> {
         this.setState(prevState => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
-            ...Object.fromEntries(
-              elementsWithinSelection.map(element => [element.id, true]),
-            ),
+            ...elementsWithinSelection.reduce((map, element) => {
+              map[element.id] = true;
+              return map;
+            }, {} as any),
           },
         }));
       }
@@ -1840,6 +1895,7 @@ export class App extends React.Component<any, AppState> {
         isResizing: false,
         resizingElement: null,
         selectionElement: null,
+        editingElement: multiElement ? this.state.editingElement : null,
       });
 
       resizeArrowFn = null;
@@ -1863,7 +1919,10 @@ export class App extends React.Component<any, AppState> {
             y - draggingElement.y,
           ]);
           invalidateShapeForElement(draggingElement);
-          this.setState({ multiElement: this.state.draggingElement });
+          this.setState({
+            multiElement: this.state.draggingElement,
+            editingElement: this.state.draggingElement,
+          });
         } else if (draggingOccurred && !multiElement) {
           if (!elementLocked) {
             resetCursor();
@@ -2030,9 +2089,10 @@ export class App extends React.Component<any, AppState> {
     elements = [...elements, ...newElements];
     history.resumeRecording();
     this.setState({
-      selectedElementIds: Object.fromEntries(
-        newElements.map(element => [element.id, true]),
-      ),
+      selectedElementIds: newElements.reduce((map, element) => {
+        map[element.id] = true;
+        return map;
+      }, {} as any),
     });
   };
 
@@ -2089,17 +2149,19 @@ export class App extends React.Component<any, AppState> {
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
-    for (const clientId in this.state.remotePointers) {
-      const remotePointerCoord = this.state.remotePointers[clientId];
-      pointerViewportCoords[clientId] = sceneCoordsToViewportCoords(
+    this.state.collaborators.forEach((user, socketID) => {
+      if (!user.pointer) {
+        return;
+      }
+      pointerViewportCoords[socketID] = sceneCoordsToViewportCoords(
         {
-          sceneX: remotePointerCoord.x,
-          sceneY: remotePointerCoord.y,
+          sceneX: user.pointer.x,
+          sceneY: user.pointer.y,
         },
         this.state,
         this.canvas,
       );
-    }
+    });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements,
       this.state,
@@ -2129,7 +2191,9 @@ export class App extends React.Component<any, AppState> {
       this.broadcastSocketData({
         type: "SCENE_UPDATE",
         payload: {
-          elements,
+          elements: elements.filter(element => {
+            return element.id !== this.state.editingElement?.id;
+          }),
           appState: this.state,
         },
       });

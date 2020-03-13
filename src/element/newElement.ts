@@ -98,7 +98,9 @@ function _duplicateElement(val: any, depth: number = 0) {
   return val;
 }
 
-export function duplicateElement(element: ReturnType<typeof newElement>) {
+export function duplicateElement(
+  element: ReturnType<typeof newElement>,
+): ReturnType<typeof newElement> {
   const copy = _duplicateElement(element);
   copy.id = nanoid();
   copy.seed = randomSeed();

@@ -7,9 +7,10 @@ export const actionSelectAll = register({
     return {
       appState: {
         ...appState,
-        selectedElementIds: Object.fromEntries(
-          elements.map(element => [element.id, true]),
-        ),
+        selectedElementIds: elements.reduce((map, element) => {
+          map[element.id] = true;
+          return map;
+        }, {} as any),
       },
     };
   },

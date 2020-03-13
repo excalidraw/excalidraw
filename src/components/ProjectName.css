@@ -1,7 +1,7 @@
 .ProjectName {
   display: inline-block;
   cursor: pointer;
-  border: none;
+  border: 1.5px solid #eee;
   height: 2.5rem;
   line-height: 2.5rem;
   padding: 0 0.5rem;
