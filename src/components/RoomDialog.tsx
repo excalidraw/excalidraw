@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ToolButton } from "./ToolButton";
-import { Island } from "./Island";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { users, clipboard, start, stop } from "./icons";
-import { Modal } from "./Modal";
-import { copyTextToSystemClipboard } from "../clipboard";
-import { AppState } from "../types";
+
 import "./RoomDialog.scss";
+import { copyTextToSystemClipboard } from "../clipboard";
+import { Dialog } from "./Dialog";
+import { AppState } from "../types";
 
 function RoomModal({
-  onCloseRequest,
   activeRoomLink,
   onRoomCreate,
   onRoomDestroy,
 }: {
-  onCloseRequest: () => void;
   activeRoomLink: string;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
@@ -36,75 +34,65 @@ function RoomModal({
 
   return (
     <div className="RoomDialog-modal">
-      <Island padding={4}>
-        <button
-          className="Modal__close"
-          onClick={onCloseRequest}
-          aria-label={t("buttons.close")}
-        >
-          ╳
-        </button>
-        <h2 id="export-title">{t("labels.createRoom")}</h2>
-        {!activeRoomLink && (
-          <>
-            <p>{t("roomDialog.desc_intro")}</p>
-            <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
-            <p>{t("roomDialog.desc_start")}</p>
-            <div className="RoomDialog-sessionStartButtonContainer">
-              <ToolButton
-                className="RoomDialog-startSession"
-                type="button"
-                icon={start}
-                title={t("roomDialog.button_startSession")}
-                aria-label={t("roomDialog.button_startSession")}
-                showAriaLabel={true}
-                onClick={onRoomCreate}
-              />
-            </div>
-          </>
-        )}
-        {activeRoomLink && (
-          <>
-            <p>{t("roomDialog.desc_inProgressIntro")}</p>
-            <p>{t("roomDialog.desc_shareLink")}</p>
-            <div className="RoomDialog-linkContainer">
-              <ToolButton
-                type="button"
-                icon={clipboard}
-                title={t("labels.copy")}
-                aria-label={t("labels.copy")}
-                onClick={copyRoomLink}
-              />
-              <input
-                value={activeRoomLink}
-                readOnly={true}
-                className="RoomDialog-link"
-                ref={roomLinkInput}
-                onPointerDown={selectInput}
-              />
-            </div>
-            <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
-            <p>
-              <span role="img" aria-hidden="true">
-                ⚠️
-              </span>{" "}
-              {t("roomDialog.desc_persistenceWarning")}
-            </p>
-            <p>{t("roomDialog.desc_exitSession")}</p>
-            <div className="RoomDialog-sessionStartButtonContainer">
-              <ToolButton
-                className="RoomDialog-stopSession"
-                type="button"
-                icon={stop}
-                title={t("roomDialog.button_stopSession")}
-                aria-label={t("roomDialog.button_stopSession")}
-                showAriaLabel={true}
-                onClick={onRoomDestroy}
-              />
-            </div>
-          </>
-        )}
-      </Island>
+      {!activeRoomLink && (
+        <>
+          <p>{t("roomDialog.desc_intro")}</p>
+          <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
+          <p>{t("roomDialog.desc_start")}</p>
+          <div className="RoomDialog-sessionStartButtonContainer">
+            <ToolButton
+              className="RoomDialog-startSession"
+              type="button"
+              icon={start}
+              title={t("roomDialog.button_startSession")}
+              aria-label={t("roomDialog.button_startSession")}
+              showAriaLabel={true}
+              onClick={onRoomCreate}
+            />
+          </div>
+        </>
+      )}
+      {activeRoomLink && (
+        <>
+          <p>{t("roomDialog.desc_inProgressIntro")}</p>
+          <p>{t("roomDialog.desc_shareLink")}</p>
+          <div className="RoomDialog-linkContainer">
+            <ToolButton
+              type="button"
+              icon={clipboard}
+              title={t("labels.copy")}
+              aria-label={t("labels.copy")}
+              onClick={copyRoomLink}
+            />
+            <input
+              value={activeRoomLink}
+              readOnly={true}
+              className="RoomDialog-link"
+              ref={roomLinkInput}
+              onPointerDown={selectInput}
+            />
+          </div>
+          <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
+          <p>
+            <span role="img" aria-hidden="true">
+              ⚠️
+            </span>{" "}
+            {t("roomDialog.desc_persistenceWarning")}
+          </p>
+          <p>{t("roomDialog.desc_exitSession")}</p>
+          <div className="RoomDialog-sessionStartButtonContainer">
+            <ToolButton
+              className="RoomDialog-stopSession"
+              type="button"
+              icon={stop}
+              title={t("roomDialog.button_stopSession")}
+              aria-label={t("roomDialog.button_stopSession")}
+              showAriaLabel={true}
+              onClick={onRoomDestroy}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -155,18 +143,17 @@ export function RoomDialog({
         )}
       </ToolButton>
       {modalIsShown && (
-        <Modal
+        <Dialog
           maxWidth={800}
-          labelledBy="room-title"
           onCloseRequest={handleClose}
+          title={t("labels.createRoom")}
         >
           <RoomModal
-            onCloseRequest={handleClose}
             activeRoomLink={activeRoomLink}
             onRoomCreate={onRoomCreate}
             onRoomDestroy={onRoomDestroy}
           />
-        </Modal>
+        </Dialog>
       )}
     </>
   );

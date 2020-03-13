@@ -1,3 +1,5 @@
+@import "../_variables";
+
 .HintViewer {
   color: #868e96; /* OC: GRAY 6*/
   font-size: 0.8rem;
@@ -6,19 +8,16 @@
   position: absolute;
   top: 54px;
   transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
-}
-
-.HintViewer > span {
-  background-color: rgba(255, 255, 255, 0.88);
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-}
-
-@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
-  .HintViewer {
+  @media #{$media-query} {
     position: static;
     transform: none;
     margin-top: 0.5rem;
     text-align: center;
+  }
+
+  > span {
+    background-color: rgba(255, 255, 255, 0.88);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
   }
 }

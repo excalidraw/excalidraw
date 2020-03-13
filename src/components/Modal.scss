@@ -1,3 +1,5 @@
+@import "../_variables";
+
 .Modal {
   position: fixed;
   top: 0;
@@ -44,9 +46,31 @@
     transform: translateY(0);
   }
 }
-
 .Modal__close {
+  width: calc(var(--space-factor) * 7);
+  height: calc(var(--space-factor) * 7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    height: calc(var(--space-factor) * 5);
+  }
+}
+.Modal__close--floating {
   position: absolute;
   right: calc(var(--space-factor) * 5);
   top: calc(var(--space-factor) * 5);
+}
+
+@media #{$media-query} {
+  .Modal {
+    padding: 0;
+  }
+  .Modal__content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 }
