@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import { ExcalidrawElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 
-import "./HintViewer.css";
+import "./HintViewer.scss";
 import { AppState } from "../types";
 
 interface Hint {
