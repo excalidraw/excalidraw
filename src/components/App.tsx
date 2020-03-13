@@ -1872,9 +1872,10 @@ export class App extends React.Component<any, AppState> {
         this.setState(prevState => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
-            ...Object.fromEntries(
-              elementsWithinSelection.map(element => [element.id, true]),
-            ),
+            ...elementsWithinSelection.reduce((map, element) => {
+              map[element.id] = true;
+              return map;
+            }, {} as any),
           },
         }));
       }
@@ -2088,9 +2089,10 @@ export class App extends React.Component<any, AppState> {
     elements = [...elements, ...newElements];
     history.resumeRecording();
     this.setState({
-      selectedElementIds: Object.fromEntries(
-        newElements.map(element => [element.id, true]),
-      ),
+      selectedElementIds: newElements.reduce((map, element) => {
+        map[element.id] = true;
+        return map;
+      }, {} as any),
     });
   };
 
