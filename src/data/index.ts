@@ -341,12 +341,10 @@ export async function exportCanvas(
 
 export async function loadScene(id: string | null, privateKey?: string) {
   let data;
-  let selectedId;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
-    selectedId = id;
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {
     data = restoreFromLocalStorage();
@@ -354,6 +352,6 @@ export async function loadScene(id: string | null, privateKey?: string) {
 
   return {
     elements: data.elements,
-    appState: data.appState && { ...data.appState, selectedId },
+    appState: data.appState && { ...data.appState },
   };
 }
