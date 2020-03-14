@@ -37,7 +37,6 @@ import {
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
-  SocketUpdateData,
   SocketUpdateDataSource,
 } from "../data";
 import { restore } from "../data/restore";
@@ -401,24 +400,14 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.broadcastSocketData(
-          this.getSocketData({
-            type: "SCENE_UPDATE",
-          }),
-        );
+        this.broadcastSocketData({ type: "SCENE_UPDATE" });
       });
     }
   };
 
-  // brands socketData to ensure we're using the getSocketData() helper
-  private _getSocketData<T>(data: T): T & { _brand: "socketData" } {
-    return data as typeof data & { _brand: "socketData" };
-  }
-
-  private getSocketData(
-    data: SocketUpdateDataSource[keyof SocketUpdateDataSource],
-  ): (SocketUpdateData & { _brand: "socketData" }) | null {
+  private broadcastSocketData = async (data: SocketUpdateDataSource) => {
     if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+      let socketData;
       switch (data.type) {
         case "SCENE_UPDATE":
           const deletedIds = { ...this.state.deletedIds };
@@ -428,7 +417,7 @@ export class App extends React.Component<any, AppState> {
             }
             return element.id !== this.state.editingElement?.id;
           });
-          return this._getSocketData({
+          socketData = {
             type: data.type,
             payload: {
               elements: _elements,
@@ -438,31 +427,20 @@ export class App extends React.Component<any, AppState> {
                 deletedIds,
               },
             },
-          });
+          };
+          break;
         case "MOUSE_LOCATION":
-          return this._getSocketData({
+          socketData = {
             type: data.type,
             payload: {
               socketID: this.socket.id,
               pointerCoords: data.payload.pointerCoords,
             },
-          });
+          };
+          break;
       }
-    }
-    return null;
-  }
 
-  private broadcastSocketData = async (
-    data: (SocketUpdateData & { _brand: "socketData" }) | null,
-  ) => {
-    if (
-      data &&
-      this.socketInitialized &&
-      this.socket &&
-      this.roomID &&
-      this.roomKey
-    ) {
-      const json = JSON.stringify(data);
+      const json = JSON.stringify(socketData);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey);
       this.socket.emit(
@@ -2194,12 +2172,10 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     this.socket &&
-      this.broadcastSocketData(
-        this.getSocketData({
-          type: "MOUSE_LOCATION",
-          payload: { pointerCoords },
-        }),
-      );
+      this.broadcastSocketData({
+        type: "MOUSE_LOCATION",
+        payload: { pointerCoords },
+      });
   };
 
   private saveDebounced = debounce(() => {
@@ -2252,7 +2228,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      this.broadcastSocketData(this.getSocketData({ type: "SCENE_UPDATE" }));
+      this.broadcastSocketData({ type: "SCENE_UPDATE" });
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }

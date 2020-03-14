@@ -30,8 +30,7 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
-// internal, don't use
-export type SocketUpdateDataSource = {
+type _SocketUpdateDataSource = {
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
   };
@@ -43,7 +42,9 @@ export type SocketUpdateDataSource = {
   };
 };
 
-export type SocketUpdateData =
+export type SocketUpdateDataSource = _SocketUpdateDataSource[keyof _SocketUpdateDataSource];
+
+export type SocketUpdateDataIncoming =
   | {
       type: "SCENE_UPDATE";
       payload: {
@@ -55,12 +56,9 @@ export type SocketUpdateData =
       type: "MOUSE_LOCATION";
       payload: {
         socketID: string;
-        pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+        pointerCoords: _SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
       };
-    };
-
-export type SocketUpdateDataIncoming =
-  | SocketUpdateData
+    }
   | {
       type: "INVALID_RESPONSE";
     };
