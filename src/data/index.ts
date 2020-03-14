@@ -30,35 +30,25 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
-type _SocketUpdateDataSource = {
+export type SocketUpdateDataSource = {
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
+    payload: {
+      elements: readonly ExcalidrawElement[];
+      appState: Pick<AppState, "viewBackgroundColor" | "name" | "deletedIds">;
+    };
   };
   MOUSE_LOCATION: {
     type: "MOUSE_LOCATION";
     payload: {
+      socketID: string;
       pointerCoords: { x: number; y: number };
     };
   };
 };
 
-export type SocketUpdateDataSource = _SocketUpdateDataSource[keyof _SocketUpdateDataSource];
-
 export type SocketUpdateDataIncoming =
-  | {
-      type: "SCENE_UPDATE";
-      payload: {
-        elements: readonly ExcalidrawElement[];
-        appState: Pick<AppState, "viewBackgroundColor" | "name" | "deletedIds">;
-      };
-    }
-  | {
-      type: "MOUSE_LOCATION";
-      payload: {
-        socketID: string;
-        pointerCoords: _SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
-      };
-    }
+  | SocketUpdateDataSource[keyof SocketUpdateDataSource]
   | {
       type: "INVALID_RESPONSE";
     };

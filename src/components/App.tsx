@@ -400,47 +400,60 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.broadcastSocketData({ type: "SCENE_UPDATE" });
+        this.broadcastSceneUpdate();
       });
     }
   };
 
-  private broadcastSocketData = async (data: SocketUpdateDataSource) => {
-    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
-      let socketData;
-      switch (data.type) {
-        case "SCENE_UPDATE":
-          const deletedIds = { ...this.state.deletedIds };
-          const _elements = elements.filter(element => {
-            if (element.id in deletedIds) {
-              delete deletedIds[element.id];
-            }
-            return element.id !== this.state.editingElement?.id;
-          });
-          socketData = {
-            type: data.type,
-            payload: {
-              elements: _elements,
-              appState: {
-                viewBackgroundColor: this.state.viewBackgroundColor,
-                name: this.state.name,
-                deletedIds,
-              },
-            },
-          };
-          break;
-        case "MOUSE_LOCATION":
-          socketData = {
-            type: data.type,
-            payload: {
-              socketID: this.socket.id,
-              pointerCoords: data.payload.pointerCoords,
-            },
-          };
-          break;
-      }
+  private broadcastMouseLocation = (payload: {
+    pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+  }) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
+        type: "MOUSE_LOCATION",
+        payload: {
+          socketID: this.socket.id,
+          pointerCoords: payload.pointerCoords,
+        },
+      };
+      return this._broadcastSocketData(
+        data as typeof data & { _brand: "socketUpdateData" },
+      );
+    }
+  };
 
-      const json = JSON.stringify(socketData);
+  private broadcastSceneUpdate = () => {
+    const deletedIds = { ...this.state.deletedIds };
+    const _elements = elements.filter(element => {
+      if (element.id in deletedIds) {
+        delete deletedIds[element.id];
+      }
+      return element.id !== this.state.editingElement?.id;
+    });
+    const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
+      type: "SCENE_UPDATE",
+      payload: {
+        elements: _elements,
+        appState: {
+          viewBackgroundColor: this.state.viewBackgroundColor,
+          name: this.state.name,
+          deletedIds,
+        },
+      },
+    };
+    return this._broadcastSocketData(
+      data as typeof data & { _brand: "socketUpdateData" },
+    );
+  };
+
+  // Low-level. Use type-specific broadcast* method.
+  private async _broadcastSocketData(
+    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+      _brand: "socketUpdateData";
+    },
+  ) {
+    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+      const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey);
       this.socket.emit(
@@ -450,7 +463,7 @@ export class App extends React.Component<any, AppState> {
         encrypted.iv,
       );
     }
-  };
+  }
 
   private unmounted = false;
   public async componentDidMount() {
@@ -2171,11 +2184,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket &&
-      this.broadcastSocketData({
-        type: "MOUSE_LOCATION",
-        payload: { pointerCoords },
-      });
+    this.socket && this.broadcastMouseLocation({ pointerCoords });
   };
 
   private saveDebounced = debounce(() => {
@@ -2228,7 +2237,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      this.broadcastSocketData({ type: "SCENE_UPDATE" });
+      this.broadcastSceneUpdate();
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
