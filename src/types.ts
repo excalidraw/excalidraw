@@ -34,6 +34,7 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
+  deletedIds: { [id: string]: { version: ExcalidrawElement["version"] } };
   collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
 

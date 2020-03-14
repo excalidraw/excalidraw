@@ -37,7 +37,7 @@ import {
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
-  SocketUpdateData,
+  SocketUpdateDataSource,
 } from "../data";
 import { restore } from "../data/restore";
 
@@ -270,19 +270,18 @@ export class App extends React.Component<any, AppState> {
             iv,
           );
 
+          let deletedIds = this.state.deletedIds;
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_UPDATE":
               const {
-                elements: sceneElements,
-                appState: sceneAppState,
+                elements: remoteElements,
+                appState: remoteAppState,
               } = decryptedData.payload;
-              const restoredState = restore(
-                sceneElements || [],
-                sceneAppState || getDefaultAppState(),
-                { scrollToContent: true },
-              );
+              const restoredState = restore(remoteElements || [], null, {
+                scrollToContent: true,
+              });
               // Perform reconciliation - in collaboration, if we encounter
               // elements with more staler versions than ours, ignore them
               // and keep ours.
@@ -301,6 +300,23 @@ export class App extends React.Component<any, AppState> {
                   },
                   {},
                 );
+
+                deletedIds = { ...deletedIds };
+
+                for (const [id, remoteDeletedEl] of Object.entries(
+                  remoteAppState.deletedIds,
+                )) {
+                  if (
+                    !localElementMap[id] ||
+                    // don't remove local element if it's newer than the one
+                    //  deleted on remote
+                    remoteDeletedEl.version >= localElementMap[id].version
+                  ) {
+                    deletedIds[id] = remoteDeletedEl;
+                    delete localElementMap[id];
+                  }
+                }
+
                 // Reconcile
                 elements = restoredState.elements
                   .reduce((elements, element) => {
@@ -320,26 +336,28 @@ export class App extends React.Component<any, AppState> {
                       localElementMap[element.id].version > element.version
                     ) {
                       elements.push(localElementMap[element.id]);
+                      delete localElementMap[element.id];
                     } else {
-                      elements.push(element);
+                      if (deletedIds.hasOwnProperty(element.id)) {
+                        if (element.version > deletedIds[element.id].version) {
+                          elements.push(element);
+                          delete deletedIds[element.id];
+                          delete localElementMap[element.id];
+                        }
+                      } else {
+                        elements.push(element);
+                        delete localElementMap[element.id];
+                      }
                     }
 
                     return elements;
                   }, [] as any)
-                  // add local elements that are currently being edited
-                  // (can't be done in the step above because the elements may
-                  //  not exist on remote at all)
-                  .concat(
-                    elements.filter(element => {
-                      return (
-                        element.id === this.state.editingElement?.id ||
-                        element.id === this.state.resizingElement?.id ||
-                        element.id === this.state.draggingElement?.id
-                      );
-                    }),
-                  );
+                  // add local elements that weren't deleted or on remote
+                  .concat(...Object.values(localElementMap));
               }
-              this.setState({});
+              this.setState({
+                deletedIds,
+              });
               if (this.socketInitialized === false) {
                 this.socketInitialized = true;
               }
@@ -382,20 +400,58 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.broadcastSocketData({
-          type: "SCENE_UPDATE",
-          payload: {
-            elements: elements.filter(element => {
-              return element.id !== this.state.editingElement?.id;
-            }),
-            appState: this.state,
-          },
-        });
+        this.broadcastSceneUpdate();
       });
     }
   };
 
-  private broadcastSocketData = async (data: SocketUpdateData) => {
+  private broadcastMouseLocation = (payload: {
+    pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+  }) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
+        type: "MOUSE_LOCATION",
+        payload: {
+          socketID: this.socket.id,
+          pointerCoords: payload.pointerCoords,
+        },
+      };
+      return this._broadcastSocketData(
+        data as typeof data & { _brand: "socketUpdateData" },
+      );
+    }
+  };
+
+  private broadcastSceneUpdate = () => {
+    const deletedIds = { ...this.state.deletedIds };
+    const _elements = elements.filter(element => {
+      if (element.id in deletedIds) {
+        delete deletedIds[element.id];
+      }
+      return element.id !== this.state.editingElement?.id;
+    });
+    const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
+      type: "SCENE_UPDATE",
+      payload: {
+        elements: _elements,
+        appState: {
+          viewBackgroundColor: this.state.viewBackgroundColor,
+          name: this.state.name,
+          deletedIds,
+        },
+      },
+    };
+    return this._broadcastSocketData(
+      data as typeof data & { _brand: "socketUpdateData" },
+    );
+  };
+
+  // Low-level. Use type-specific broadcast* method.
+  private async _broadcastSocketData(
+    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+      _brand: "socketUpdateData";
+    },
+  ) {
     if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
@@ -407,7 +463,7 @@ export class App extends React.Component<any, AppState> {
         encrypted.iv,
       );
     }
-  };
+  }
 
   private unmounted = false;
   public async componentDidMount() {
@@ -2128,14 +2184,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket &&
-      this.broadcastSocketData({
-        type: "MOUSE_LOCATION",
-        payload: {
-          socketID: this.socket.id,
-          pointerCoords,
-        },
-      });
+    this.socket && this.broadcastMouseLocation({ pointerCoords });
   };
 
   private saveDebounced = debounce(() => {
@@ -2188,15 +2237,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      this.broadcastSocketData({
-        type: "SCENE_UPDATE",
-        payload: {
-          elements: elements.filter(element => {
-            return element.id !== this.state.editingElement?.id;
-          }),
-          appState: this.state,
-        },
-      });
+      this.broadcastSceneUpdate();
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
