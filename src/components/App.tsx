@@ -309,8 +309,8 @@ export class App extends React.Component<any, AppState> {
                 )) {
                   if (
                     !localElementMap[id] ||
-                    // don't remove local element if we've local is newer than
-                    //  the one deleted on remote
+                    // don't remove local element if it's newer than the one
+                    //  deleted on remote
                     remoteDeletedEl.version >= localElementMap[id].version
                   ) {
                     deletedIds[id] = remoteDeletedEl;
@@ -410,7 +410,7 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  // brands socketData to ensure we using the getSocketData() helper
+  // brands socketData to ensure we're using the getSocketData() helper
   private _getSocketData<T>(data: T): T & { _brand: "socketData" } {
     return data as typeof data & { _brand: "socketData" };
   }
