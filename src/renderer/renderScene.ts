@@ -183,14 +183,32 @@ export function renderScene(
 
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
-    const { x, y } = sceneState.remotePointerViewportCoords[clientId];
+    let { x, y } = sceneState.remotePointerViewportCoords[clientId];
+
+    const width = 9;
+    const height = 14;
+
+    const isOutOfBounds =
+      x < 0 ||
+      x > normalizedCanvasWidth - width ||
+      y < 0 ||
+      y > normalizedCanvasHeight - height;
+
+    x = Math.max(x, 0);
+    x = Math.min(x, normalizedCanvasWidth - width);
+    y = Math.max(y, 0);
+    y = Math.min(y, normalizedCanvasHeight - height);
 
     const color = colorForClientId(clientId);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
+    const globalAlpha = context.globalAlpha;
     context.strokeStyle = color;
     context.fillStyle = color;
+    if (isOutOfBounds) {
+      context.globalAlpha = 0.2;
+    }
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + 1, y + 14);
@@ -201,6 +219,7 @@ export function renderScene(
     context.stroke();
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
+    context.globalAlpha = globalAlpha;
   }
 
   // Paint scrollbars
