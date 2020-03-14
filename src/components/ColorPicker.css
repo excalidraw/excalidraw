@@ -100,7 +100,7 @@
   right: -1px;
 }
 .color-input-container:focus-within .color-picker-hash::after {
-  background: white;
+  background: #fff;
   right: -2px;
 }
 
