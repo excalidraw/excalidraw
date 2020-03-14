@@ -178,7 +178,11 @@ export function renderScene(
   for (const clientId in sceneState.remotePointerViewportCoords) {
     const { x, y } = sceneState.remotePointerViewportCoords[clientId];
     context.beginPath();
-    context.arc(x, y, 5, 0, 2 * Math.PI);
+    context.moveTo(x, y);
+    context.lineTo(x + 1, y + 14);
+    context.lineTo(x + 4, y + 9);
+    context.lineTo(x + 9, y + 10);
+    context.lineTo(x, y);
     context.fill();
     context.stroke();
   }
