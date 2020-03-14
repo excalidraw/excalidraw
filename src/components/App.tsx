@@ -531,6 +531,12 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
+    if (event.key === "c" && event[KEYS.CTRL_OR_CMD] && event.altKey) {
+      this.copyToClipboardAsPng();
+      event.preventDefault();
+      return;
+    }
+
     if (this.actionManager.handleKeyDown(event)) {
       return;
     }
