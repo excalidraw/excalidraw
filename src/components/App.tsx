@@ -587,7 +587,7 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    if (event.key === "c" && event[KEYS.CTRL_OR_CMD] && event.altKey) {
+    if (event.code === "KeyC" && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;

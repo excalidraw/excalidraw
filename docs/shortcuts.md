@@ -26,7 +26,7 @@
 | ------------------------ | :--: | :----------------: |
 | Copy                     |  ⌘C  |     `Ctrl + C`     |
 | Paste                    |  ⌘V  |     `Ctrl + V`     |
-| Copy to clipboard as PNG | ⌘⌥C  |  `Ctrl + Alt + C`  |
+| Copy to clipboard as PNG | ⇧⌘C  | `Alt + Shift + C`  |
 | Copy styles              | ⇧⌘V  | `Ctrl + Shift + V` |
 | Paste styles             | ⇧⌘C  | `Ctrl + Shift + C` |
 | Delete                   |  ⌫   |       `Del`        |
