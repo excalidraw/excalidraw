@@ -13,12 +13,6 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
-// When WYSIWYG text ends with white spaces, the text gets vertically misaligned
-// in order to fix this issue, we remove those white spaces
-function trimText(text: string) {
-  return text.trim();
-}
-
 export function textWysiwyg({
   initText,
   x,
@@ -30,9 +24,6 @@ export function textWysiwyg({
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
-  // Using contenteditable here as it has dynamic width.
-  // But this solution has an issue — it allows to paste
-  // multiline text, which is not currently supported
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -110,7 +101,7 @@ export function textWysiwyg({
 
   function handleSubmit() {
     if (editable.innerText) {
-      onSubmit(trimText(editable.innerText));
+      onSubmit(editable.innerText);
     } else {
       onCancel();
     }
