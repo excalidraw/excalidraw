@@ -34,11 +34,24 @@ export function deleteSelectedElements(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
+  const deletedIds: AppState["deletedIds"] = {};
   return {
-    elements: elements.filter(el => !appState.selectedElementIds[el.id]),
+    elements: elements.filter(el => {
+      if (appState.selectedElementIds[el.id]) {
+        deletedIds[el.id] = {
+          version: el.version,
+        };
+        return false;
+      }
+      return true;
+    }),
     appState: {
       ...appState,
       selectedElementIds: {},
+      deletedIds: {
+        ...appState.deletedIds,
+        ...deletedIds,
+      },
     },
   };
 }
