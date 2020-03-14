@@ -3,6 +3,7 @@
     "paste": "粘贴",
     "selectAll": "全选",
     "copy": "复制",
+    "copyAsPng": "Copy to clipboard as PNG",
     "bringForward": "上移一层",
     "sendToBack": "移至最后",
     "bringToFront": "移至最前",
