@@ -30,6 +30,19 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
+// internal, don't use
+export type SocketUpdateDataSource = {
+  SCENE_UPDATE: {
+    type: "SCENE_UPDATE";
+  };
+  MOUSE_LOCATION: {
+    type: "MOUSE_LOCATION";
+    payload: {
+      pointerCoords: { x: number; y: number };
+    };
+  };
+};
+
 export type SocketUpdateData =
   | {
       type: "SCENE_UPDATE";
@@ -42,9 +55,12 @@ export type SocketUpdateData =
       type: "MOUSE_LOCATION";
       payload: {
         socketID: string;
-        pointerCoords: { x: number; y: number };
+        pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
       };
-    }
+    };
+
+export type SocketUpdateDataIncoming =
+  | SocketUpdateData
   | {
       type: "INVALID_RESPONSE";
     };
@@ -137,7 +153,7 @@ export async function decryptAESGEM(
   data: ArrayBuffer,
   key: string,
   iv: Uint8Array,
-): Promise<SocketUpdateData> {
+): Promise<SocketUpdateDataIncoming> {
   try {
     const importedKey = await getImportedKey(key, "decrypt");
     const decrypted = await window.crypto.subtle.decrypt(

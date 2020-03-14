@@ -38,6 +38,7 @@ import {
   loadFromBlob,
   SOCKET_SERVER,
   SocketUpdateData,
+  SocketUpdateDataSource,
 } from "../data";
 import { restore } from "../data/restore";
 
@@ -400,25 +401,67 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.broadcastSocketData({
-          type: "SCENE_UPDATE",
-          payload: {
-            elements: elements.filter(element => {
-              return element.id !== this.state.editingElement?.id;
-            }),
-            appState: {
-              viewBackgroundColor: this.state.viewBackgroundColor,
-              name: this.state.name,
-              deletedIds: this.state.deletedIds,
-            },
-          },
-        });
+        this.broadcastSocketData(
+          this.getSocketData({
+            type: "SCENE_UPDATE",
+          }),
+        );
       });
     }
   };
 
-  private broadcastSocketData = async (data: SocketUpdateData) => {
+  // brands socketData to ensure we using the getSocketData() helper
+  private _getSocketData<T>(data: T): T & { _brand: "socketData" } {
+    return data as typeof data & { _brand: "socketData" };
+  }
+
+  private getSocketData(
+    data: SocketUpdateDataSource[keyof SocketUpdateDataSource],
+  ): (SocketUpdateData & { _brand: "socketData" }) | null {
     if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+      switch (data.type) {
+        case "SCENE_UPDATE":
+          const deletedIds = { ...this.state.deletedIds };
+          const _elements = elements.filter(element => {
+            if (element.id in deletedIds) {
+              delete deletedIds[element.id];
+            }
+            return element.id !== this.state.editingElement?.id;
+          });
+          return this._getSocketData({
+            type: data.type,
+            payload: {
+              elements: _elements,
+              appState: {
+                viewBackgroundColor: this.state.viewBackgroundColor,
+                name: this.state.name,
+                deletedIds,
+              },
+            },
+          });
+        case "MOUSE_LOCATION":
+          return this._getSocketData({
+            type: data.type,
+            payload: {
+              socketID: this.socket.id,
+              pointerCoords: data.payload.pointerCoords,
+            },
+          });
+      }
+    }
+    return null;
+  }
+
+  private broadcastSocketData = async (
+    data: (SocketUpdateData & { _brand: "socketData" }) | null,
+  ) => {
+    if (
+      data &&
+      this.socketInitialized &&
+      this.socket &&
+      this.roomID &&
+      this.roomKey
+    ) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey);
@@ -2151,13 +2194,12 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     this.socket &&
-      this.broadcastSocketData({
-        type: "MOUSE_LOCATION",
-        payload: {
-          socketID: this.socket.id,
-          pointerCoords,
-        },
-      });
+      this.broadcastSocketData(
+        this.getSocketData({
+          type: "MOUSE_LOCATION",
+          payload: { pointerCoords },
+        }),
+      );
   };
 
   private saveDebounced = debounce(() => {
@@ -2210,19 +2252,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.saveDebounced();
     if (history.isRecording()) {
-      this.broadcastSocketData({
-        type: "SCENE_UPDATE",
-        payload: {
-          elements: elements.filter(element => {
-            return element.id !== this.state.editingElement?.id;
-          }),
-          appState: {
-            viewBackgroundColor: this.state.viewBackgroundColor,
-            name: this.state.name,
-            deletedIds: this.state.deletedIds,
-          },
-        },
-      });
+      this.broadcastSocketData(this.getSocketData({ type: "SCENE_UPDATE" }));
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }
