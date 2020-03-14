@@ -3,6 +3,7 @@
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
     "copy": "Copier",
+    "copyAsPng": "Copy to clipboard as PNG",
     "bringForward": "Mettre en avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
