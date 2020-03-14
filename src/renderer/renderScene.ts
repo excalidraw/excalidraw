@@ -16,6 +16,13 @@ import { getZoomTranslation } from "../scene/zoom";
 import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
+import colors from "../colors";
+
+function colorForClientId(clientId: string) {
+  // Naive way of getting an integer out of the clientId
+  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+  return colors.elementBackground[sum % colors.elementBackground.length];
+}
 
 export function renderScene(
   elements: readonly ExcalidrawElement[],
@@ -177,6 +184,13 @@ export function renderScene(
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
     const { x, y } = sceneState.remotePointerViewportCoords[clientId];
+
+    const color = colorForClientId(clientId);
+
+    const strokeStyle = context.strokeStyle;
+    const fillStyle = context.fillStyle;
+    context.strokeStyle = color;
+    context.fillStyle = color;
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + 1, y + 14);
@@ -185,6 +199,8 @@ export function renderScene(
     context.lineTo(x, y);
     context.fill();
     context.stroke();
+    context.strokeStyle = strokeStyle;
+    context.fillStyle = fillStyle;
   }
 
   // Paint scrollbars
