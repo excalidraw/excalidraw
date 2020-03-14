@@ -1,13 +1,13 @@
 {
   "labels": {
     "paste": "粘贴",
-    "selectAll": "Select All",
+    "selectAll": "全选",
     "copy": "复制",
     "bringForward": "Bring Forward",
     "sendToBack": "Send To Back",
     "bringToFront": "Bring To Front",
     "sendBackward": "Send Backward",
-    "delete": "Delete",
+    "delete": "删除",
     "copyStyles": "Copy Styles",
     "pasteStyles": "Paste Styles",
     "stroke": "Stroke",
