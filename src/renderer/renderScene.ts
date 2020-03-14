@@ -155,12 +155,15 @@ export function renderScene(
 
       const initialLineDash = context.getLineDash();
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
+      const lineWidth = context.lineWidth;
+      context.lineWidth = 1 / sceneState.zoom;
       context.strokeRect(
         elementX1 - dashledLinePadding,
         elementY1 - dashledLinePadding,
         elementWidth + dashledLinePadding * 2,
         elementHeight + dashledLinePadding * 2,
       );
+      context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
     resetZoom(context);
@@ -174,8 +177,11 @@ export function renderScene(
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
+          const lineWidth = context.lineWidth;
+          context.lineWidth = 1 / sceneState.zoom;
           context.fillRect(handler[0], handler[1], handler[2], handler[3]);
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          context.lineWidth = lineWidth;
         });
       resetZoom(context);
     }
