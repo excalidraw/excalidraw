@@ -73,7 +73,11 @@ import { ActionResult } from "../actions/types";
 import { getDefaultAppState } from "../appState";
 import { t, getLanguage } from "../i18n";
 
-import { copyToAppClipboard, getClipboardContent } from "../clipboard";
+import {
+  copyToAppClipboard,
+  getClipboardContent,
+  probablySupportsClipboardBlob,
+} from "../clipboard";
 import { normalizeScroll } from "../scene";
 import { getCenter, getDistance } from "../gesture";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
@@ -217,7 +221,6 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    console.log("HEY", event)
     copyToAppClipboard(elements, this.state);
     event.preventDefault();
   };
@@ -589,13 +592,15 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements, this.state);
   };
 
-  private copyToPng = () => {
-    exportCanvas('clipboard', getSelectedElements(elements, this.state), this.state, document.createElement('canvas'), {
-      exportBackground: this.state.exportBackground,
-      name: this.state.name,
-      viewBackgroundColor: this.state.viewBackgroundColor,
-      scale: 1,
-    });
+  private copyToClipboardAsPng = () => {
+    const selectedElements = getSelectedElements(elements, this.state);
+    exportCanvas(
+      "clipboard",
+      selectedElements.length ? selectedElements : elements,
+      this.state,
+      this.canvas!,
+      this.state,
+    );
   };
 
   private pasteFromClipboard = async (event: ClipboardEvent | null) => {
@@ -772,6 +777,11 @@ export class App extends React.Component<any, AppState> {
                       label: t("labels.paste"),
                       action: () => this.pasteFromClipboard(null),
                     },
+                    probablySupportsClipboardBlob &&
+                      elements.length > 0 && {
+                        label: t("labels.copyAsPng"),
+                        action: this.copyToClipboardAsPng,
+                      },
                     ...this.actionManager.getContextMenuItems(action =>
                       this.canvasOnlyActions.includes(action.name),
                     ),
@@ -796,9 +806,9 @@ export class App extends React.Component<any, AppState> {
                     label: t("labels.paste"),
                     action: () => this.pasteFromClipboard(null),
                   },
-                  navigator.clipboard && {
-                    label: t("labels.copyToPng"),
-                    action: this.copyToPng,
+                  probablySupportsClipboardBlob && {
+                    label: t("labels.copyAsPng"),
+                    action: this.copyToClipboardAsPng,
                   },
                   ...this.actionManager.getContextMenuItems(
                     action => !this.canvasOnlyActions.includes(action.name),
