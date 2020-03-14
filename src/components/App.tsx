@@ -38,6 +38,7 @@ import {
   loadFromBlob,
   SOCKET_SERVER,
   SocketUpdateData,
+  exportCanvas,
 } from "../data";
 import { restore } from "../data/restore";
 
@@ -216,6 +217,7 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
+    console.log("HEY", event)
     copyToAppClipboard(elements, this.state);
     event.preventDefault();
   };
@@ -587,6 +589,15 @@ export class App extends React.Component<any, AppState> {
     copyToAppClipboard(elements, this.state);
   };
 
+  private copyToPng = () => {
+    exportCanvas('clipboard', getSelectedElements(elements, this.state), this.state, document.createElement('canvas'), {
+      exportBackground: this.state.exportBackground,
+      name: this.state.name,
+      viewBackgroundColor: this.state.viewBackgroundColor,
+      scale: 1,
+    });
+  };
+
   private pasteFromClipboard = async (event: ClipboardEvent | null) => {
     // #686
     const target = document.activeElement;
@@ -784,6 +795,10 @@ export class App extends React.Component<any, AppState> {
                   navigator.clipboard && {
                     label: t("labels.paste"),
                     action: () => this.pasteFromClipboard(null),
+                  },
+                  navigator.clipboard && {
+                    label: t("labels.copyToPng"),
+                    action: this.copyToPng,
                   },
                   ...this.actionManager.getContextMenuItems(
                     action => !this.canvasOnlyActions.includes(action.name),

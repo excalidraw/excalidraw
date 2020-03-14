@@ -35,7 +35,6 @@ export async function copyToAppClipboard(
     PREFER_APP_CLIPBOARD = true;
   }
 }
-
 export function getAppClipboard(): {
   elements?: readonly ExcalidrawElement[];
 } {
