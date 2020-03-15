@@ -7,7 +7,7 @@ import {
   getElementAbsoluteCoords,
   getLinearElementAbsoluteBounds,
 } from "./bounds";
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 import { Drawable, OpSet } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
@@ -231,7 +231,7 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
       // change starting point
-      currentP = data as Point;
+      currentP = (data as unknown) as Point;
       // move operation does not draw anything; so, it always
       // returns false
     } else if (op === "bcurveTo") {

@@ -10,7 +10,10 @@ export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(elements.filter(element => !element.isDeleted)),
+  );
   localStorage.setItem(
     LOCAL_STORAGE_KEY_STATE,
     JSON.stringify(clearAppStateForLocalStorage(appState)),

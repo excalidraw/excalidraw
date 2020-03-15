@@ -11,7 +11,7 @@ import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
-import { newElementWith, newTextElementWith } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -266,7 +266,7 @@ export const actionChangeFontSize = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newTextElementWith(el, {
+          const element: ExcalidrawTextElement = newElementWith(el, {
             font: `${value}px ${el.font.split("px ")[1]}`,
           });
           redrawTextBoundingBox(element);
@@ -313,7 +313,7 @@ export const actionChangeFontFamily = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newTextElementWith(el, {
+          const element: ExcalidrawTextElement = newElementWith(el, {
             font: `${el.font.split("px ")[0]}px ${value}`,
           });
           redrawTextBoundingBox(element);

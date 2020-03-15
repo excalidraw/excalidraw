@@ -6,7 +6,7 @@ import {
 import { KEYS } from "../keys";
 import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
-import { mutateTextElement, newElementWith } from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 let copiedStyles: string = "{}";
 
@@ -44,7 +44,7 @@ export const actionPasteStyles = register({
             roughness: pastedElement?.roughness,
           });
           if (isTextElement(newElement)) {
-            mutateTextElement(newElement, {
+            mutateElement(newElement, {
               font: pastedElement?.font || DEFAULT_FONT,
             });
             redrawTextBoundingBox(newElement);
