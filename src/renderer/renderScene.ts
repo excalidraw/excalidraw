@@ -123,17 +123,33 @@ export function renderScene(
       const elementWidth = elementX2 - elementX1;
       const elementHeight = elementY2 - elementY1;
 
+      const count = 4;
+
       const initialLineDash = context.getLineDash();
-      context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
+      const lineDashOffset = context.lineDashOffset;
+      const strokeStyle = context.strokeStyle;
       context.lineWidth = 1 / sceneState.zoom;
-      context.strokeRect(
-        elementX1 - dashledLinePadding,
-        elementY1 - dashledLinePadding,
-        elementWidth + dashledLinePadding * 2,
-        elementHeight + dashledLinePadding * 2,
-      );
+      const x = elementX1 - dashledLinePadding;
+      const y = elementY1 - dashledLinePadding;
+      const width = elementWidth + dashledLinePadding * 2;
+      const height = elementHeight + dashledLinePadding * 2;
+
+      const dashWidth = 8 / sceneState.zoom;
+      const spaceWidth = 4 / sceneState.zoom;
+      for (var i = 0; i < count; ++i) {
+        context.strokeStyle =
+          colors.elementBackground[(i + 3) % colors.elementBackground.length];
+        context.setLineDash([
+          dashWidth,
+          spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+        ]);
+        context.lineDashOffset = (dashWidth + spaceWidth) * i;
+        context.strokeRect(x, y, width, height);
+      }
       context.lineWidth = lineWidth;
+      context.lineDashOffset = lineDashOffset;
+      context.strokeStyle = strokeStyle;
       context.setLineDash(initialLineDash);
     });
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
