@@ -1,4 +1,4 @@
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";

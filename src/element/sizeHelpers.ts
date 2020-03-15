@@ -1,5 +1,4 @@
 import { ExcalidrawElement } from "./types";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { mutateElement } from "./mutateElement";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
@@ -100,8 +99,6 @@ export function normalizeDimensions(
       y: element.y - nextHeight,
     });
   }
-
-  invalidateShapeForElement(element);
 
   return true;
 }

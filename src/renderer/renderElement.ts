@@ -7,7 +7,6 @@ import {
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
-import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
@@ -214,13 +213,11 @@ function generateElement(
         };
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
-        const points: Point[] = element.points.length
-          ? element.points
-          : [[0, 0]];
+        const points = element.points.length ? element.points : [[0, 0]];
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        shape = [generator.curve(points, options)];
+        shape = [generator.curve(points as [number, number][], options)];
 
         // add lines only in arrow
         if (element.type === "arrow") {

@@ -3,7 +3,6 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { Point } from "roughjs/bin/geometry";
 
 import {
   newElement,
@@ -95,9 +94,9 @@ import {
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -106,27 +105,24 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 declare global {
   interface Window {
     __TEST__: {
-      elements: typeof elements;
+      elements: readonly ExcalidrawElement[];
       appState: AppState;
     };
-    // TEMPORARY until we have a UI to support this
-    generateCollaborationLink: () => Promise<string>;
   }
 }
 
 if (process.env.NODE_ENV === "test") {
   window.__TEST__ = {} as Window["__TEST__"];
 }
-window.generateCollaborationLink = generateCollaborationLink;
 
 // -----------------------------------------------------------------------------
 
-let { elements } = createScene();
+const scene = createScene();
 
 if (process.env.NODE_ENV === "test") {
   Object.defineProperty(window.__TEST__, "elements", {
     get() {
-      return elements;
+      return scene.getAllElements();
     },
   });
 }
@@ -173,13 +169,18 @@ export class App extends React.Component<any, AppState> {
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
-      () => elements,
+      () => scene.getAllElements(),
     );
     this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
   }
+
+  private replaceElements = (nextElements: readonly ExcalidrawElement[]) => {
+    scene.replaceAllElements(nextElements);
+    this.setState({});
+  };
 
   private syncActionResult = (
     res: ActionResult,
@@ -189,11 +190,10 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     if (res.elements) {
-      elements = res.elements;
+      this.replaceElements(res.elements);
       if (commitToHistory) {
         history.resumeRecording();
       }
-      this.setState({});
     }
 
     if (res.appState) {
@@ -212,12 +212,12 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(elements, this.state);
+    copyToAppClipboard(scene.getAllElements(), this.state);
     const { elements: nextElements, appState } = deleteSelectedElements(
-      elements,
+      scene.getAllElements(),
       this.state,
     );
-    elements = nextElements;
+    this.replaceElements(nextElements);
     history.resumeRecording();
     this.setState({ ...appState });
     event.preventDefault();
@@ -226,7 +226,7 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(elements, this.state);
+    copyToAppClipboard(scene.getAllElements(), this.state);
     event.preventDefault();
   };
 
@@ -291,70 +291,75 @@ export class App extends React.Component<any, AppState> {
               // Perform reconciliation - in collaboration, if we encounter
               // elements with more staler versions than ours, ignore them
               // and keep ours.
-              if (elements == null || elements.length === 0) {
-                elements = restoredState.elements;
+              if (
+                scene.getAllElements() == null ||
+                scene.getAllElements().length === 0
+              ) {
+                this.replaceElements(restoredState.elements);
               } else {
                 // create a map of ids so we don't have to iterate
                 // over the array more than once.
-                const localElementMap = getElementMap(elements);
+                const localElementMap = getElementMap(scene.getAllElements());
 
                 // Reconcile
-                elements = restoredState.elements
-                  .reduce((elements, element) => {
-                    // if the remote element references one that's currently
-                    //  edited on local, skip it (it'll be added in the next
-                    //  step)
-                    if (
-                      element.id === this.state.editingElement?.id ||
-                      element.id === this.state.resizingElement?.id ||
-                      element.id === this.state.draggingElement?.id
-                    ) {
-                      return elements;
-                    }
-
-                    if (
-                      localElementMap.hasOwnProperty(element.id) &&
-                      localElementMap[element.id].version > element.version
-                    ) {
-                      elements.push(localElementMap[element.id]);
-                      delete localElementMap[element.id];
-                    } else if (
-                      localElementMap.hasOwnProperty(element.id) &&
-                      localElementMap[element.id].version === element.version &&
-                      localElementMap[element.id].versionNonce !==
-                        element.versionNonce
-                    ) {
-                      // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+                this.replaceElements(
+                  restoredState.elements
+                    .reduce((elements, element) => {
+                      // if the remote element references one that's currently
+                      //  edited on local, skip it (it'll be added in the next
+                      //  step)
                       if (
-                        localElementMap[element.id].versionNonce <
-                        element.versionNonce
+                        element.id === this.state.editingElement?.id ||
+                        element.id === this.state.resizingElement?.id ||
+                        element.id === this.state.draggingElement?.id
+                      ) {
+                        return elements;
+                      }
+
+                      if (
+                        localElementMap.hasOwnProperty(element.id) &&
+                        localElementMap[element.id].version > element.version
                       ) {
                         elements.push(localElementMap[element.id]);
+                        delete localElementMap[element.id];
+                      } else if (
+                        localElementMap.hasOwnProperty(element.id) &&
+                        localElementMap[element.id].version ===
+                          element.version &&
+                        localElementMap[element.id].versionNonce !==
+                          element.versionNonce
+                      ) {
+                        // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+                        if (
+                          localElementMap[element.id].versionNonce <
+                          element.versionNonce
+                        ) {
+                          elements.push(localElementMap[element.id]);
+                        } else {
+                          // it should be highly unlikely that the two versionNonces are the same. if we are
+                          // really worried about this, we can replace the versionNonce with the socket id.
+                          elements.push(element);
+                        }
+                        delete localElementMap[element.id];
                       } else {
-                        // it should be highly unlikely that the two versionNonces are the same. if we are
-                        // really worried about this, we can replace the versionNonce with the socket id.
                         elements.push(element);
+                        delete localElementMap[element.id];
                       }
-                      delete localElementMap[element.id];
-                    } else {
-                      elements.push(element);
-                      delete localElementMap[element.id];
-                    }
 
-                    return elements;
-                  }, [] as any)
-                  // add local elements that weren't deleted or on remote
-                  .concat(...Object.values(localElementMap));
+                      return elements;
+                    }, [] as any)
+                    // add local elements that weren't deleted or on remote
+                    .concat(...Object.values(localElementMap)),
+                );
               }
               this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
-                elements,
+                scene.getAllElements(),
               );
               // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
               // when we receive any messages from another peer. This UX can be pretty rough -- if you
               // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
               // right now we think this is the right tradeoff.
               history.clear();
-              this.setState({});
               if (this.socketInitialized === false) {
                 this.socketInitialized = true;
               }
@@ -423,12 +428,12 @@ export class App extends React.Component<any, AppState> {
     const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
       type: "SCENE_UPDATE",
       payload: {
-        elements: getSyncableElements(elements),
+        elements: getSyncableElements(scene.getAllElements()),
       },
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(elements),
+      getDrawingVersion(scene.getAllElements()),
     );
     return this._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
@@ -553,7 +558,9 @@ export class App extends React.Component<any, AppState> {
   public state: AppState = getDefaultAppState();
 
   private onResize = () => {
-    elements.forEach(element => invalidateShapeForElement(element));
+    scene
+      .getAllElements()
+      .forEach(element => invalidateShapeForElement(element));
     this.setState({});
   };
 
@@ -587,23 +594,24 @@ export class App extends React.Component<any, AppState> {
       const step = event.shiftKey
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
-      elements = elements.map(el => {
-        if (this.state.selectedElementIds[el.id]) {
-          const update: { x?: number; y?: number } = {};
-          if (event.key === KEYS.ARROW_LEFT) {
-            update.x = el.x - step;
-          } else if (event.key === KEYS.ARROW_RIGHT) {
-            update.x = el.x + step;
-          } else if (event.key === KEYS.ARROW_UP) {
-            update.y = el.y - step;
-          } else if (event.key === KEYS.ARROW_DOWN) {
-            update.y = el.y + step;
+      this.replaceElements(
+        scene.getAllElements().map(el => {
+          if (this.state.selectedElementIds[el.id]) {
+            const update: { x?: number; y?: number } = {};
+            if (event.key === KEYS.ARROW_LEFT) {
+              update.x = el.x - step;
+            } else if (event.key === KEYS.ARROW_RIGHT) {
+              update.x = el.x + step;
+            } else if (event.key === KEYS.ARROW_UP) {
+              update.y = el.y - step;
+            } else if (event.key === KEYS.ARROW_DOWN) {
+              update.y = el.y + step;
+            }
+            return newElementWith(el, update);
           }
-          return newElementWith(el, update);
-        }
-        return el;
-      });
-      this.setState({});
+          return el;
+        }),
+      );
       event.preventDefault();
     } else if (
       shapesShortcutKeys.includes(event.key.toLowerCase()) &&
@@ -635,14 +643,17 @@ export class App extends React.Component<any, AppState> {
   };
 
   private copyToAppClipboard = () => {
-    copyToAppClipboard(elements, this.state);
+    copyToAppClipboard(scene.getAllElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
-    const selectedElements = getSelectedElements(elements, this.state);
+    const selectedElements = getSelectedElements(
+      scene.getAllElements(),
+      this.state,
+    );
     exportCanvas(
       "clipboard",
-      selectedElements.length ? selectedElements : elements,
+      selectedElements.length ? selectedElements : scene.getAllElements(),
       this.state,
       this.canvas!,
       this.state,
@@ -686,7 +697,7 @@ export class App extends React.Component<any, AppState> {
           this.state.currentItemFont,
         );
 
-        elements = [...elements, element];
+        this.replaceElements([...scene.getAllElements(), element]);
         this.setState({ selectedElementIds: { [element.id]: true } });
         history.resumeRecording();
       }
@@ -729,11 +740,6 @@ export class App extends React.Component<any, AppState> {
     this.setState(obj);
   };
 
-  setElements = (elements_: readonly ExcalidrawElement[]) => {
-    elements = elements_;
-    this.setState({});
-  };
-
   removePointer = (event: React.PointerEvent<HTMLElement>) => {
     gesture.pointers.delete(event.pointerId);
   };
@@ -768,8 +774,8 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={elements}
-          setElements={this.setElements}
+          elements={scene.getAllElements()}
+          setElements={this.replaceElements}
           language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
@@ -810,7 +816,7 @@ export class App extends React.Component<any, AppState> {
               );
 
               const element = getElementAtPosition(
-                elements,
+                scene.getAllElements(),
                 this.state,
                 x,
                 y,
@@ -824,7 +830,7 @@ export class App extends React.Component<any, AppState> {
                       action: () => this.pasteFromClipboard(null),
                     },
                     probablySupportsClipboardBlob &&
-                      hasNonDeletedElements(elements) && {
+                      hasNonDeletedElements(scene.getAllElements()) && {
                         label: t("labels.copyAsPng"),
                         action: this.copyToClipboardAsPng,
                       },
@@ -908,7 +914,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     const elementAtPosition = getElementAtPosition(
-      elements,
+      scene.getAllElements(),
       this.state,
       x,
       y,
@@ -940,10 +946,11 @@ export class App extends React.Component<any, AppState> {
     let textY = event.clientY;
 
     if (elementAtPosition && isTextElement(elementAtPosition)) {
-      elements = elements.filter(
-        element => element.id !== elementAtPosition.id,
+      this.replaceElements(
+        scene
+          .getAllElements()
+          .filter(element => element.id !== elementAtPosition.id),
       );
-      this.setState({});
 
       const centerElementX = elementAtPosition.x + elementAtPosition.width / 2;
       const centerElementY = elementAtPosition.y + elementAtPosition.height / 2;
@@ -998,14 +1005,14 @@ export class App extends React.Component<any, AppState> {
       zoom: this.state.zoom,
       onSubmit: text => {
         if (text) {
-          elements = [
-            ...elements,
+          this.replaceElements([
+            ...scene.getAllElements(),
             {
               // we need to recreate the element to update dimensions &
               //  position
               ...newTextElement(element, text, element.font),
             },
-          ];
+          ]);
         }
         this.setState(prevState => ({
           selectedElementIds: {
@@ -1083,11 +1090,11 @@ export class App extends React.Component<any, AppState> {
       const originX = multiElement.x;
       const originY = multiElement.y;
       const points = multiElement.points;
-      const pnt = points[points.length - 1];
-      pnt[0] = x - originX;
-      pnt[1] = y - originY;
-      mutateElement(multiElement);
-      invalidateShapeForElement(multiElement);
+
+      mutateElement(multiElement, {
+        points: [...points.slice(0, -1), [x - originX, y - originY]],
+      });
+
       this.setState({});
       return;
     }
@@ -1097,10 +1104,13 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const selectedElements = getSelectedElements(elements, this.state);
+    const selectedElements = getSelectedElements(
+      scene.getAllElements(),
+      this.state,
+    );
     if (selectedElements.length === 1 && !isOverScrollBar) {
       const resizeElement = getElementWithResizeHandler(
-        elements,
+        scene.getAllElements(),
         this.state,
         { x, y },
         this.state.zoom,
@@ -1114,7 +1124,7 @@ export class App extends React.Component<any, AppState> {
       }
     }
     const hitElement = getElementAtPosition(
-      elements,
+      scene.getAllElements(),
       this.state,
       x,
       y,
@@ -1306,14 +1316,17 @@ export class App extends React.Component<any, AppState> {
     let elementIsAddedToSelection = false;
     if (this.state.elementType === "selection") {
       const resizeElement = getElementWithResizeHandler(
-        elements,
+        scene.getAllElements(),
         this.state,
         { x, y },
         this.state.zoom,
         event.pointerType,
       );
 
-      const selectedElements = getSelectedElements(elements, this.state);
+      const selectedElements = getSelectedElements(
+        scene.getAllElements(),
+        this.state,
+      );
       if (selectedElements.length === 1 && resizeElement) {
         this.setState({
           resizingElement: resizeElement ? resizeElement.element : null,
@@ -1326,7 +1339,7 @@ export class App extends React.Component<any, AppState> {
         isResizingElements = true;
       } else {
         hitElement = getElementAtPosition(
-          elements,
+          scene.getAllElements(),
           this.state,
           x,
           y,
@@ -1353,7 +1366,7 @@ export class App extends React.Component<any, AppState> {
                 [hitElement!.id]: true,
               },
             }));
-            elements = elements.slice();
+            this.replaceElements(scene.getAllElements());
             elementIsAddedToSelection = true;
           }
 
@@ -1363,7 +1376,7 @@ export class App extends React.Component<any, AppState> {
             // put the duplicates where the selected elements used to be.
             const nextElements = [];
             const elementsToAppend = [];
-            for (const element of elements) {
+            for (const element of scene.getAllElements()) {
               if (this.state.selectedElementIds[element.id]) {
                 nextElements.push(duplicateElement(element));
                 elementsToAppend.push(element);
@@ -1371,7 +1384,7 @@ export class App extends React.Component<any, AppState> {
                 nextElements.push(element);
               }
             }
-            elements = [...nextElements, ...elementsToAppend];
+            this.replaceElements([...nextElements, ...elementsToAppend]);
           }
         }
       }
@@ -1421,12 +1434,12 @@ export class App extends React.Component<any, AppState> {
         zoom: this.state.zoom,
         onSubmit: text => {
           if (text) {
-            elements = [
-              ...elements,
+            this.replaceElements([
+              ...scene.getAllElements(),
               {
                 ...newTextElement(element, text, this.state.currentItemFont),
               },
-            ];
+            ]);
           }
           this.setState(prevState => ({
             selectedElementIds: {
@@ -1469,9 +1482,9 @@ export class App extends React.Component<any, AppState> {
             [multiElement.id]: true,
           },
         }));
-        multiElement.points.push([x - rx, y - ry]);
-        mutateElement(multiElement);
-        invalidateShapeForElement(multiElement);
+        mutateElement(multiElement, {
+          points: [...multiElement.points, [x - rx, y - ry]],
+        });
       } else {
         this.setState(prevState => ({
           selectedElementIds: {
@@ -1479,10 +1492,10 @@ export class App extends React.Component<any, AppState> {
             [element.id]: false,
           },
         }));
-        element.points.push([0, 0]);
-        mutateElement(element);
-        invalidateShapeForElement(element);
-        elements = [...elements, element];
+        mutateElement(element, {
+          points: [...element.points, [0, 0]],
+        });
+        this.replaceElements([...scene.getAllElements(), element]);
         this.setState({
           draggingElement: element,
           editingElement: element,
@@ -1494,7 +1507,7 @@ export class App extends React.Component<any, AppState> {
         draggingElement: element,
       });
     } else {
-      elements = [...elements, element];
+      this.replaceElements([...scene.getAllElements(), element]);
       this.setState({
         multiElement: null,
         draggingElement: element,
@@ -1505,7 +1518,7 @@ export class App extends React.Component<any, AppState> {
     let resizeArrowFn:
       | ((
           element: ExcalidrawElement,
-          p1: Point,
+          pointIndex: number,
           deltaX: number,
           deltaY: number,
           pointerX: number,
@@ -1516,13 +1529,14 @@ export class App extends React.Component<any, AppState> {
 
     const arrowResizeOrigin = (
       element: ExcalidrawElement,
-      p1: Point,
+      pointIndex: number,
       deltaX: number,
       deltaY: number,
       pointerX: number,
       pointerY: number,
       perfect: boolean,
     ) => {
+      const p1 = element.points[pointIndex];
       if (perfect) {
         const absPx = p1[0] + element.x;
         const absPy = p1[1] + element.y;
@@ -1535,44 +1549,52 @@ export class App extends React.Component<any, AppState> {
 
         const dx = element.x + width + p1[0];
         const dy = element.y + height + p1[1];
-        p1[0] = absPx - element.x;
-        p1[1] = absPy - element.y;
         mutateElement(element, {
           x: dx,
           y: dy,
+          points: element.points.map((point, i) =>
+            i === pointIndex ? [absPx - element.x, absPy - element.y] : point,
+          ),
         });
       } else {
-        p1[0] -= deltaX;
-        p1[1] -= deltaY;
         mutateElement(element, {
           x: element.x + deltaX,
           y: element.y + deltaY,
+          points: element.points.map((point, i) =>
+            i === pointIndex ? [p1[0] - deltaX, p1[1] - deltaY] : point,
+          ),
         });
       }
     };
 
     const arrowResizeEnd = (
       element: ExcalidrawElement,
-      p1: Point,
+      pointIndex: number,
       deltaX: number,
       deltaY: number,
       pointerX: number,
       pointerY: number,
       perfect: boolean,
     ) => {
+      const p1 = element.points[pointIndex];
       if (perfect) {
         const { width, height } = getPerfectElementSize(
           element.type,
           pointerX - element.x,
           pointerY - element.y,
         );
-        p1[0] = width;
-        p1[1] = height;
+        mutateElement(element, {
+          points: element.points.map((point, i) =>
+            i === pointIndex ? [width, height] : point,
+          ),
+        });
       } else {
-        p1[0] += deltaX;
-        p1[1] += deltaY;
+        mutateElement(element, {
+          points: element.points.map((point, i) =>
+            i === pointIndex ? [p1[0] + deltaX, p1[1] + deltaY] : point,
+          ),
+        });
       }
-      mutateElement(element);
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -1623,7 +1645,10 @@ export class App extends React.Component<any, AppState> {
       if (isResizingElements && this.state.resizingElement) {
         this.setState({ isResizing: true });
         const el = this.state.resizingElement;
-        const selectedElements = getSelectedElements(elements, this.state);
+        const selectedElements = getSelectedElements(
+          scene.getAllElements(),
+          this.state,
+        );
         if (selectedElements.length === 1) {
           const { x, y } = viewportCoordsToSceneCoords(
             event,
@@ -1646,15 +1671,7 @@ export class App extends React.Component<any, AppState> {
                     resizeArrowFn = arrowResizeOrigin;
                   }
                 }
-                resizeArrowFn(
-                  element,
-                  p1,
-                  deltaX,
-                  deltaY,
-                  x,
-                  y,
-                  event.shiftKey,
-                );
+                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 mutateElement(element, {
                   x: element.x + deltaX,
@@ -1678,15 +1695,7 @@ export class App extends React.Component<any, AppState> {
                     resizeArrowFn = arrowResizeOrigin;
                   }
                 }
-                resizeArrowFn(
-                  element,
-                  p1,
-                  deltaX,
-                  deltaY,
-                  x,
-                  y,
-                  event.shiftKey,
-                );
+                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const nextWidth = element.width + deltaX;
                 mutateElement(element, {
@@ -1708,15 +1717,7 @@ export class App extends React.Component<any, AppState> {
                     resizeArrowFn = arrowResizeOrigin;
                   }
                 }
-                resizeArrowFn(
-                  element,
-                  p1,
-                  deltaX,
-                  deltaY,
-                  x,
-                  y,
-                  event.shiftKey,
-                );
+                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 mutateElement(element, {
                   x: element.x + deltaX,
@@ -1737,15 +1738,7 @@ export class App extends React.Component<any, AppState> {
                     resizeArrowFn = arrowResizeOrigin;
                   }
                 }
-                resizeArrowFn(
-                  element,
-                  p1,
-                  deltaX,
-                  deltaY,
-                  x,
-                  y,
-                  event.shiftKey,
-                );
+                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 mutateElement(element, {
                   width: element.width + deltaX,
@@ -1756,9 +1749,13 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "n": {
+              let points;
               if (element.points.length > 0) {
                 const len = element.points.length;
-                const points = [...element.points].sort((a, b) => a[1] - b[1]);
+                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
+                  number,
+                  number,
+                ][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
@@ -1769,13 +1766,18 @@ export class App extends React.Component<any, AppState> {
               mutateElement(element, {
                 height: element.height - deltaY,
                 y: element.y + deltaY,
+                points,
               });
               break;
             }
             case "w": {
+              let points;
               if (element.points.length > 0) {
                 const len = element.points.length;
-                const points = [...element.points].sort((a, b) => a[0] - b[0]);
+                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
+                  number,
+                  number,
+                ][];
 
                 for (let i = 0; i < points.length; ++i) {
                   const pnt = points[i];
@@ -1786,13 +1788,19 @@ export class App extends React.Component<any, AppState> {
               mutateElement(element, {
                 width: element.width - deltaX,
                 x: element.x + deltaX,
+                points,
               });
               break;
             }
             case "s": {
+              let points;
+
               if (element.points.length > 0) {
                 const len = element.points.length;
-                const points = [...element.points].sort((a, b) => a[1] - b[1]);
+                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
+                  number,
+                  number,
+                ][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
@@ -1802,14 +1810,18 @@ export class App extends React.Component<any, AppState> {
 
               mutateElement(element, {
                 height: element.height + deltaY,
-                points: element.points, // no-op, but signifies that we mutated points in-place above
+                points,
               });
               break;
             }
             case "e": {
+              let points;
               if (element.points.length > 0) {
                 const len = element.points.length;
-                const points = [...element.points].sort((a, b) => a[0] - b[0]);
+                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
+                  number,
+                  number,
+                ][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
@@ -1819,7 +1831,7 @@ export class App extends React.Component<any, AppState> {
 
               mutateElement(element, {
                 width: element.width + deltaX,
-                points: element.points, // no-op, but signifies that we mutated points in-place above
+                points,
               });
               break;
             }
@@ -1838,7 +1850,6 @@ export class App extends React.Component<any, AppState> {
             x: element.x,
             y: element.y,
           });
-          invalidateShapeForElement(el);
 
           lastX = x;
           lastY = y;
@@ -1851,7 +1862,10 @@ export class App extends React.Component<any, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         draggingOccurred = true;
-        const selectedElements = getSelectedElements(elements, this.state);
+        const selectedElements = getSelectedElements(
+          scene.getAllElements(),
+          this.state,
+        );
         if (selectedElements.length > 0) {
           const { x, y } = viewportCoordsToSceneCoords(
             event,
@@ -1906,14 +1920,12 @@ export class App extends React.Component<any, AppState> {
         }
 
         if (points.length === 1) {
-          points.push([dx, dy]);
+          mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          const pnt = points[points.length - 1];
-          pnt[0] = dx;
-          pnt[1] = dy;
+          mutateElement(draggingElement, {
+            points: [...points.slice(0, -1), [dx, dy]],
+          });
         }
-
-        mutateElement(draggingElement, { points });
       } else {
         if (event.shiftKey) {
           ({ width, height } = getPerfectElementSize(
@@ -1935,14 +1947,15 @@ export class App extends React.Component<any, AppState> {
         });
       }
 
-      invalidateShapeForElement(draggingElement);
-
       if (this.state.elementType === "selection") {
-        if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+        if (
+          !event.shiftKey &&
+          isSomeElementSelected(scene.getAllElements(), this.state)
+        ) {
           this.setState({ selectedElementIds: {} });
         }
         const elementsWithinSelection = getElementsWithinSelection(
-          elements,
+          scene.getAllElements(),
           draggingElement,
         );
         this.setState(prevState => ({
@@ -1990,12 +2003,12 @@ export class App extends React.Component<any, AppState> {
             this.state,
             this.canvas,
           );
-          draggingElement.points.push([
-            x - draggingElement.x,
-            y - draggingElement.y,
-          ]);
-          mutateElement(draggingElement);
-          invalidateShapeForElement(draggingElement);
+          mutateElement(draggingElement, {
+            points: [
+              ...draggingElement.points,
+              [x - draggingElement.x, y - draggingElement.y],
+            ],
+          });
           this.setState({
             multiElement: this.state.draggingElement,
             editingElement: this.state.draggingElement,
@@ -2030,7 +2043,7 @@ export class App extends React.Component<any, AppState> {
         isInvisiblySmallElement(draggingElement)
       ) {
         // remove invisible element which was added in onPointerDown
-        elements = elements.slice(0, -1);
+        this.replaceElements(scene.getAllElements().slice(0, -1));
         this.setState({
           draggingElement: null,
         });
@@ -2047,7 +2060,9 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        elements = elements.filter(el => el.id !== resizingElement.id);
+        this.replaceElements(
+          scene.getAllElements().filter(el => el.id !== resizingElement.id),
+        );
       }
 
       // If click occurred on already selected element
@@ -2090,7 +2105,7 @@ export class App extends React.Component<any, AppState> {
 
       if (
         elementType !== "selection" ||
-        isSomeElementSelected(elements, this.state)
+        isSomeElementSelected(scene.getAllElements(), this.state)
       ) {
         history.resumeRecording();
       }
@@ -2163,7 +2178,7 @@ export class App extends React.Component<any, AppState> {
       return duplicate;
     });
 
-    elements = [...elements, ...newElements];
+    this.replaceElements([...scene.getAllElements(), ...newElements]);
     history.resumeRecording();
     this.setState({
       selectedElementIds: newElements.reduce((map, element) => {
@@ -2174,7 +2189,11 @@ export class App extends React.Component<any, AppState> {
   };
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
-    const elementClickedInside = getElementContainingPosition(elements, x, y);
+    const elementClickedInside = getElementContainingPosition(
+      scene.getAllElements(),
+      x,
+      y,
+    );
     if (elementClickedInside) {
       const elementCenterX =
         elementClickedInside.x + elementClickedInside.width / 2;
@@ -2209,7 +2228,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(elements, this.state);
+    saveToLocalStorage(scene.getAllElements(), this.state);
   }, 300);
 
   componentDidUpdate() {
@@ -2233,7 +2252,7 @@ export class App extends React.Component<any, AppState> {
       );
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      elements,
+      scene.getAllElements(),
       this.state,
       this.state.selectionElement,
       window.devicePixelRatio,
@@ -2254,20 +2273,22 @@ export class App extends React.Component<any, AppState> {
       currentScrollBars = scrollBars;
     }
     const scrolledOutside =
-      !atLeastOneVisibleElement && hasNonDeletedElements(elements);
+      !atLeastOneVisibleElement &&
+      hasNonDeletedElements(scene.getAllElements());
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
     this.saveDebounced();
 
     if (
-      getDrawingVersion(elements) > this.lastBroadcastedOrReceivedSceneVersion
+      getDrawingVersion(scene.getAllElements()) >
+      this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastSceneUpdate();
     }
 
     if (history.isRecording()) {
-      history.pushEntry(this.state, elements);
+      history.pushEntry(this.state, scene.getAllElements());
       history.skipRecording();
     }
   }

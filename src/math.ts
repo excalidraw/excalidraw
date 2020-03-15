@@ -1,4 +1,4 @@
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "./types";
 
 // https://stackoverflow.com/a/6853926/232122
 export function distanceBetweenPointAndSegment(
