@@ -522,6 +522,8 @@ export class App extends React.Component<any, AppState> {
     }
     const scene = await loadScene(null);
     this.syncActionResult(scene);
+
+    window.addEventListener("beforeunload", this.beforeUnload);
   }
 
   public componentWillUnmount() {
@@ -554,6 +556,7 @@ export class App extends React.Component<any, AppState> {
       false,
     );
     document.removeEventListener("gestureend", this.onGestureEnd as any, false);
+    window.removeEventListener("beforeunload", this.beforeUnload);
   }
 
   public state: AppState = getDefaultAppState();
@@ -2178,6 +2181,17 @@ export class App extends React.Component<any, AppState> {
       scrollX: normalizeScroll(scrollX - deltaX / zoom),
       scrollY: normalizeScroll(scrollY - deltaY / zoom),
     }));
+  };
+
+  private beforeUnload = (event: BeforeUnloadEvent) => {
+    if (
+      this.state.isCollaborating &&
+      hasNonDeletedElements(globalSceneState.getAllElements())
+    ) {
+      event.preventDefault();
+      // NOTE: modern browsers no longer allow showing a custom message here
+      event.returnValue = "";
+    }
   };
 
   private addElementsFromPaste = (
