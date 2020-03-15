@@ -16,5 +16,5 @@ export {
   getElementContainingPosition,
   hasText,
 } from "./comparisons";
-export { createScene } from "./createScene";
 export { getZoomOrigin, getNormalizedZoom } from "./zoom";
+export { globalSceneState } from "./globalScene";
