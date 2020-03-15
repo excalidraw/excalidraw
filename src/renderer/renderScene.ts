@@ -55,6 +55,7 @@ export function renderScene(
   const elements = allElements.filter(element => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
+  context.scale(scale, scale);
 
   // When doing calculations based on canvas width we should used normalized one
   const normalizedCanvasWidth = canvas.width / scale;
@@ -205,8 +206,9 @@ export function renderScene(
   }
 
   // Paint scrollbars
+  let scrollBars;
   if (renderScrollbars) {
-    const scrollBars = getScrollBars(
+    scrollBars = getScrollBars(
       elements,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
@@ -231,10 +233,11 @@ export function renderScene(
     });
     context.fillStyle = fillStyle;
     context.strokeStyle = strokeStyle;
-    return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
   }
 
-  return { atLeastOneVisibleElement: visibleElements.length > 0 };
+  context.scale(1 / scale, 1 / scale);
+
+  return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 }
 
 function isVisibleElement(

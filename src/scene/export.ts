@@ -36,7 +36,6 @@ export function exportToCanvas(
   const height = distance(minY, maxY) + exportPadding * 2;
 
   const tempCanvas: any = createCanvas(width, height);
-  tempCanvas.getContext("2d")?.scale(scale, scale);
 
   renderScene(
     elements,

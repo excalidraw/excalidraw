@@ -64,6 +64,10 @@ function generateElementCanvas(
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+  context.scale(
+    1 / (window.devicePixelRatio * zoom),
+    1 / (window.devicePixelRatio * zoom),
+  );
   return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
 }
 
