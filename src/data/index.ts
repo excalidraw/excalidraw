@@ -13,7 +13,7 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
-import { countNonDeletedElements } from "../element";
+import { hasNonDeletedElements } from "../element";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -288,7 +288,7 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!countNonDeletedElements(elements)) {
+  if (!hasNonDeletedElements(elements)) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   // calculate smallest area to fit the contents in

@@ -21,7 +21,7 @@ import {
   getElementMap,
   getDrawingVersion,
   getSyncableElements,
-  countNonDeletedElements,
+  hasNonDeletedElements,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -349,6 +349,10 @@ export class App extends React.Component<any, AppState> {
               this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
                 elements,
               );
+              // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+              // when we receive any messages from another peer. This UX can be pretty rough -- if you
+              // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+              // right now we think this is the right tradeoff.
               history.clear();
               this.setState({});
               if (this.socketInitialized === false) {
@@ -820,7 +824,7 @@ export class App extends React.Component<any, AppState> {
                       action: () => this.pasteFromClipboard(null),
                     },
                     probablySupportsClipboardBlob &&
-                      countNonDeletedElements(elements) > 0 && {
+                      hasNonDeletedElements(elements) && {
                         label: t("labels.copyAsPng"),
                         action: this.copyToClipboardAsPng,
                       },
@@ -2250,7 +2254,7 @@ export class App extends React.Component<any, AppState> {
       currentScrollBars = scrollBars;
     }
     const scrolledOutside =
-      !atLeastOneVisibleElement && countNonDeletedElements(elements) > 0;
+      !atLeastOneVisibleElement && hasNonDeletedElements(elements);
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
