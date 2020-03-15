@@ -303,6 +303,10 @@ export function renderElement(
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
       context.fillRect(0, 0, element.width, element.height);
       context.fillStyle = fillStyle;
+      context.translate(
+        -element.x - sceneState.scrollX,
+        -element.y - sceneState.scrollY,
+      );
       break;
     }
     case "rectangle":

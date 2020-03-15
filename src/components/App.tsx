@@ -2246,6 +2246,7 @@ export class App extends React.Component<any, AppState> {
       elements,
       this.state,
       this.state.selectionElement,
+      window.devicePixelRatio,
       this.rc!,
       this.canvas!,
       {
