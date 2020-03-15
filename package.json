@@ -97,6 +97,7 @@
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:code": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "test:typecheck": "tsc",
     "test:other": "npm run prettier -- --list-different"
   },
   "version": "1.0.0",
