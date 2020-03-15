@@ -1,4 +1,4 @@
-export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
+export function getZoomOrigin(canvas: HTMLCanvasElement | null, scale: number) {
   if (canvas === null) {
     return { x: 0, y: 0 };
   }
@@ -7,8 +7,8 @@ export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
     return { x: 0, y: 0 };
   }
 
-  const normalizedCanvasWidth = canvas.width / context.getTransform().a;
-  const normalizedCanvasHeight = canvas.height / context.getTransform().d;
+  const normalizedCanvasWidth = canvas.width / scale;
+  const normalizedCanvasHeight = canvas.height / scale;
 
   return {
     x: normalizedCanvasWidth / 2,

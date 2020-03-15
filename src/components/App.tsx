@@ -682,6 +682,7 @@ export class App extends React.Component<any, AppState> {
           { clientX: cursorX, clientY: cursorY },
           this.state,
           this.canvas,
+          window.devicePixelRatio,
         );
 
         const element = newTextElement(
@@ -808,10 +809,6 @@ export class App extends React.Component<any, AppState> {
                 this.canvas.addEventListener("wheel", this.handleWheel, {
                   passive: false,
                 });
-
-                this.canvas
-                  .getContext("2d")
-                  ?.setTransform(canvasScale, 0, 0, canvasScale, 0, 0);
               } else {
                 this.canvas?.removeEventListener("wheel", this.handleWheel);
               }
@@ -823,6 +820,7 @@ export class App extends React.Component<any, AppState> {
                 event,
                 this.state,
                 this.canvas,
+                window.devicePixelRatio,
               );
 
               const element = getElementAtPosition(
@@ -923,6 +921,7 @@ export class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
+      window.devicePixelRatio,
     );
 
     const elementAtPosition = getElementAtPosition(
@@ -974,6 +973,7 @@ export class App extends React.Component<any, AppState> {
         { sceneX: centerElementX, sceneY: centerElementY },
         this.state,
         this.canvas,
+        window.devicePixelRatio,
       );
 
       textX = centerElementXInViewport;
@@ -1048,6 +1048,7 @@ export class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
+      window.devicePixelRatio,
     );
     this.savePointer(pointerCoords);
     if (gesture.pointers.has(event.pointerId)) {
@@ -1096,6 +1097,7 @@ export class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
+      window.devicePixelRatio,
     );
     if (this.state.multiElement) {
       const { multiElement } = this.state;
@@ -1247,6 +1249,7 @@ export class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
+      window.devicePixelRatio,
     );
     let lastX = x;
     let lastY = y;
@@ -1657,6 +1660,7 @@ export class App extends React.Component<any, AppState> {
           event,
           this.state,
           this.canvas,
+          window.devicePixelRatio,
         );
         if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
           return;
@@ -1675,6 +1679,7 @@ export class App extends React.Component<any, AppState> {
             event,
             this.state,
             this.canvas,
+            window.devicePixelRatio,
           );
           const deltaX = x - lastX;
           const deltaY = y - lastY;
@@ -1891,6 +1896,7 @@ export class App extends React.Component<any, AppState> {
             event,
             this.state,
             this.canvas,
+            window.devicePixelRatio,
           );
 
           selectedElements.forEach(element => {
@@ -1916,6 +1922,7 @@ export class App extends React.Component<any, AppState> {
         event,
         this.state,
         this.canvas,
+        window.devicePixelRatio,
       );
 
       let width = distance(originX, x);
@@ -2019,6 +2026,7 @@ export class App extends React.Component<any, AppState> {
             event,
             this.state,
             this.canvas,
+            window.devicePixelRatio,
           );
           mutateElement(draggingElement, {
             points: [
@@ -2184,6 +2192,7 @@ export class App extends React.Component<any, AppState> {
       { clientX: cursorX, clientY: cursorY },
       this.state,
       this.canvas,
+      window.devicePixelRatio,
     );
 
     const dx = x - elementsCenterX;
@@ -2270,6 +2279,7 @@ export class App extends React.Component<any, AppState> {
         },
         this.state,
         this.canvas,
+        window.devicePixelRatio,
       );
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
