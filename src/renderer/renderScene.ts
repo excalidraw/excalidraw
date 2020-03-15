@@ -17,10 +17,13 @@ import { getSelectedElements } from "../scene/selection";
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
 
-function colorForClientId(clientId: string) {
+function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
-  return colors.elementBackground[sum % colors.elementBackground.length];
+  return {
+    background: colors.elementBackground[sum % colors.elementBackground.length],
+    stroke: colors.elementStroke[sum % colors.elementBackground.length],
+  };
 }
 
 export function renderScene(
@@ -178,13 +181,13 @@ export function renderScene(
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const color = colorForClientId(clientId);
+    const { background, stroke } = colorsForClientId(clientId);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
     const globalAlpha = context.globalAlpha;
-    context.strokeStyle = color;
-    context.fillStyle = color;
+    context.strokeStyle = stroke;
+    context.fillStyle = background;
     if (isOutOfBounds) {
       context.globalAlpha = 0.2;
     }
