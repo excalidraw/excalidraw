@@ -24,7 +24,7 @@ function colorForClientId(clientId: string) {
 }
 
 export function renderScene(
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
   selectionElement: ExcalidrawElement | null,
   scale: number,
@@ -48,6 +48,8 @@ export function renderScene(
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
   }
+
+  const elements = allElements.filter(element => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
 
