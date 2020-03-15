@@ -42,6 +42,7 @@ import {
   SOCKET_SERVER,
   SocketUpdateDataSource,
   exportCanvas,
+  createNameFromSocketId,
 } from "../data";
 import { restore } from "../data/restore";
 
@@ -371,7 +372,7 @@ export class App extends React.Component<any, AppState> {
                 username,
               } = decryptedData.payload;
               this.setState(state => {
-                const user = state.collaborators.get(socketID)!;
+                const user = state.collaborators.get(socketID) || {};
                 user.pointer = pointerCoords;
                 user.username = username;
                 state.collaborators.set(socketID, user);
@@ -418,7 +419,7 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
-          username: "vjeux",
+          username: createNameFromSocketId(this.socket.id),
         },
       };
       return this._broadcastSocketData(
