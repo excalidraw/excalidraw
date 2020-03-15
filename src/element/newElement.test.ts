@@ -41,6 +41,7 @@ it("clones arrow element", () => {
 
   assertCloneObjects(element, copy);
 
+  // @ts-ignore
   expect(copy.__proto__).toEqual({ hello: "world" });
   expect(copy.hasOwnProperty("hello")).toBe(false);
 

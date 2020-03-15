@@ -12,15 +12,22 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { getZoomTranslation } from "../scene/zoom";
 import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
+import colors from "../colors";
+
+function colorForClientId(clientId: string) {
+  // Naive way of getting an integer out of the clientId
+  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+  return colors.elementBackground[sum % colors.elementBackground.length];
+}
 
 export function renderScene(
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
   selectionElement: ExcalidrawElement | null,
+  scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
@@ -42,48 +49,15 @@ export function renderScene(
     return { atLeastOneVisibleElement: false };
   }
 
+  const elements = allElements.filter(element => !element.isDeleted);
+
   const context = canvas.getContext("2d")!;
 
-  // Get initial scale transform as reference for later usage
-  const initialContextTransform = context.getTransform();
-
   // When doing calculations based on canvas width we should used normalized one
-  const normalizedCanvasWidth =
-    canvas.width / getContextTransformScaleX(initialContextTransform);
-  const normalizedCanvasHeight =
-    canvas.height / getContextTransformScaleY(initialContextTransform);
-
-  const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
-  function applyZoom(context: CanvasRenderingContext2D): void {
-    context.save();
-
-    // Handle zoom scaling
-    context.setTransform(
-      getContextTransformScaleX(initialContextTransform) * sceneState.zoom,
-      0,
-      0,
-      getContextTransformScaleY(initialContextTransform) * sceneState.zoom,
-      getContextTransformTranslateX(context.getTransform()),
-      getContextTransformTranslateY(context.getTransform()),
-    );
-    // Handle zoom translation
-    context.setTransform(
-      getContextTransformScaleX(context.getTransform()),
-      0,
-      0,
-      getContextTransformScaleY(context.getTransform()),
-      getContextTransformTranslateX(initialContextTransform) -
-        zoomTranslation.x,
-      getContextTransformTranslateY(initialContextTransform) -
-        zoomTranslation.y,
-    );
-  }
-  function resetZoom(context: CanvasRenderingContext2D): void {
-    context.restore();
-  }
+  const normalizedCanvasWidth = canvas.width / scale;
+  const normalizedCanvasHeight = canvas.height / scale;
 
   // Paint background
-  context.save();
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
       sceneState.viewBackgroundColor === "transparent" ||
@@ -92,12 +66,20 @@ export function renderScene(
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
+    const fillStyle = context.fillStyle;
     context.fillStyle = sceneState.viewBackgroundColor;
     context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
+    context.fillStyle = fillStyle;
   } else {
     context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   }
-  context.restore();
+
+  // Apply zoom
+  const zoomTranslationX = (-normalizedCanvasWidth * (sceneState.zoom - 1)) / 2;
+  const zoomTranslationY =
+    (-normalizedCanvasHeight * (sceneState.zoom - 1)) / 2;
+  context.translate(zoomTranslationX, zoomTranslationY);
+  context.scale(sceneState.zoom, sceneState.zoom);
 
   // Paint visible elements
   const visibleElements = elements.filter(element =>
@@ -109,15 +91,12 @@ export function renderScene(
     ),
   );
 
-  applyZoom(context);
   visibleElements.forEach(element => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
   });
-  resetZoom(context);
 
   // Pain selection element
   if (selectionElement) {
-    applyZoom(context);
     renderElement(
       selectionElement,
       rc,
@@ -125,7 +104,6 @@ export function renderScene(
       renderOptimizations,
       sceneState,
     );
-    resetZoom(context);
   }
 
   // Pain selected elements
@@ -133,7 +111,6 @@ export function renderScene(
     const selectedElements = getSelectedElements(elements, appState);
     const dashledLinePadding = 4 / sceneState.zoom;
 
-    applyZoom(context);
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
       const [
@@ -148,39 +125,80 @@ export function renderScene(
 
       const initialLineDash = context.getLineDash();
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
+      const lineWidth = context.lineWidth;
+      context.lineWidth = 1 / sceneState.zoom;
       context.strokeRect(
         elementX1 - dashledLinePadding,
         elementY1 - dashledLinePadding,
         elementWidth + dashledLinePadding * 2,
         elementHeight + dashledLinePadding * 2,
       );
+      context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
-    resetZoom(context);
+    context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      applyZoom(context);
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
+          const lineWidth = context.lineWidth;
+          context.lineWidth = 1 / sceneState.zoom;
           context.fillRect(handler[0], handler[1], handler[2], handler[3]);
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          context.lineWidth = lineWidth;
         });
-      resetZoom(context);
+      context.translate(-sceneState.scrollX, -sceneState.scrollY);
     }
   }
 
+  // Reset zoom
+  context.scale(1 / sceneState.zoom, 1 / sceneState.zoom);
+  context.translate(-zoomTranslationX, -zoomTranslationY);
+
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
-    const { x, y } = sceneState.remotePointerViewportCoords[clientId];
+    let { x, y } = sceneState.remotePointerViewportCoords[clientId];
+
+    const width = 9;
+    const height = 14;
+
+    const isOutOfBounds =
+      x < 0 ||
+      x > normalizedCanvasWidth - width ||
+      y < 0 ||
+      y > normalizedCanvasHeight - height;
+
+    x = Math.max(x, 0);
+    x = Math.min(x, normalizedCanvasWidth - width);
+    y = Math.max(y, 0);
+    y = Math.min(y, normalizedCanvasHeight - height);
+
+    const color = colorForClientId(clientId);
+
+    const strokeStyle = context.strokeStyle;
+    const fillStyle = context.fillStyle;
+    const globalAlpha = context.globalAlpha;
+    context.strokeStyle = color;
+    context.fillStyle = color;
+    if (isOutOfBounds) {
+      context.globalAlpha = 0.2;
+    }
     context.beginPath();
-    context.arc(x, y, 5, 0, 2 * Math.PI);
+    context.moveTo(x, y);
+    context.lineTo(x + 1, y + 14);
+    context.lineTo(x + 4, y + 9);
+    context.lineTo(x + 9, y + 10);
+    context.lineTo(x, y);
     context.fill();
     context.stroke();
+    context.strokeStyle = strokeStyle;
+    context.fillStyle = fillStyle;
+    context.globalAlpha = globalAlpha;
   }
 
   // Paint scrollbars
@@ -192,7 +210,8 @@ export function renderScene(
       sceneState,
     );
 
-    context.save();
+    const fillStyle = context.fillStyle;
+    const strokeStyle = context.strokeStyle;
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
     [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
@@ -207,7 +226,8 @@ export function renderScene(
         );
       }
     });
-    context.restore();
+    context.fillStyle = fillStyle;
+    context.strokeStyle = strokeStyle;
     return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
   }
 
@@ -271,17 +291,4 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
-}
-
-function getContextTransformScaleX(transform: DOMMatrix): number {
-  return transform.a;
-}
-function getContextTransformScaleY(transform: DOMMatrix): number {
-  return transform.d;
-}
-function getContextTransformTranslateX(transform: DOMMatrix): number {
-  return transform.e;
-}
-function getContextTransformTranslateY(transform: DOMMatrix): number {
-  return transform.f;
 }

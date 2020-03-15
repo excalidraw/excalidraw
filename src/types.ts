@@ -1,7 +1,9 @@
 import { ExcalidrawElement, PointerType } from "./element/types";
 import { SHAPES } from "./shapes";
+import { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
+export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
@@ -28,15 +30,13 @@ export type AppState = {
   cursorY: number;
   scrolledOutside: boolean;
   name: string;
-  selectedId?: string;
   isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  remotePointers: { [id: string]: { x: number; y: number } };
-  collaboratorCount: number;
+  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
 
 export type PointerCoords = Readonly<{

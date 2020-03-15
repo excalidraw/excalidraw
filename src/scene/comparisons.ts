@@ -25,6 +25,9 @@ export function getElementAtPosition(
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
+    if (elements[i].isDeleted) {
+      continue;
+    }
     if (hitTest(elements[i], appState, x, y, zoom)) {
       hitElement = elements[i];
       break;
@@ -42,6 +45,9 @@ export function getElementContainingPosition(
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
+    if (elements[i].isDeleted) {
+      continue;
+    }
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[i]);
     if (x1 < x && x < x2 && y1 < y && y < y2) {
       hitElement = elements[i];

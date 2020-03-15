@@ -1,4 +1,5 @@
 @import "./theme.css";
+@import "./_variables";
 
 body {
   margin: 0;
@@ -239,10 +240,6 @@ button,
   height: 100%;
 }
 
-.App-right-menu {
-  width: 13.75rem;
-}
-
 .ErrorSplash {
   min-height: 100vh;
   padding: 20px 0;
@@ -363,7 +360,7 @@ button,
   padding: 10px 20px;
 }
 
-@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
+@media #{$media-query} {
   aside {
     display: none;
   }

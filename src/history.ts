@@ -13,6 +13,11 @@ export class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
+  clear() {
+    this.stateHistory.length = 0;
+    this.redoStack.length = 0;
+  }
+
   private generateEntry(
     appState: AppState,
     elements: readonly ExcalidrawElement[],

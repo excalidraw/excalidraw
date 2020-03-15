@@ -1,27 +1,4 @@
-.ExportDialog__dialog {
-  /* transition: opacity 0.15s ease-in, transform 0.15s ease-in; */
-  opacity: 0;
-  transform: translateY(10px);
-  animation: ExportDialog__fade-in 0.1s ease-out 0.05s forwards;
-  position: relative;
-}
-
-@keyframes ExportDialog__fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ExportDialog__close {
-  position: absolute;
-  right: calc(var(--space-factor) * 5);
-  top: calc(var(--space-factor) * 5);
-}
+@import "../_variables";
 
 .ExportDialog__preview {
   --preview-padding: calc(var(--space-factor) * 4);
@@ -49,4 +26,27 @@
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
+}
+
+@media #{$media-query} {
+  .ExportDialog__preview canvas {
+    max-height: 30vh;
+  }
+  .ExportDialog__dialog,
+  .ExportDialog__dialog .Island {
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .ExportDialog__dialog .Island {
+    overflow-y: auto;
+  }
+  .ExportDialog__actions {
+    flex-direction: column;
+  }
+  .ExportDialog__actions > * {
+    margin-bottom: calc(var(--space-factor) * 3);
+  }
+  .ExportDialog__scales {
+    justify-content: flex-start;
+  }
 }

@@ -1,4 +1,4 @@
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -52,11 +52,12 @@ export function restore(
 
       return {
         ...element,
-        version: element.id ? element.version + 1 : element.version || 0,
+        // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
+        version: element.version || 1,
         id: element.id || nanoid(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
-        roughness: element.roughness || 1,
+        roughness: element.roughness ?? 1,
         opacity:
           element.opacity === null || element.opacity === undefined
             ? 100

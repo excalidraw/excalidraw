@@ -1,6 +1,6 @@
 import { randomSeed } from "roughjs/bin/math";
 import nanoid from "nanoid";
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../utils";
@@ -32,8 +32,10 @@ export function newElement(
     roughness,
     opacity,
     seed: randomSeed(),
-    points: [] as Point[],
+    points: [] as readonly Point[],
     version: 1,
+    versionNonce: 0,
+    isDeleted: false,
   };
   return element;
 }
@@ -98,7 +100,9 @@ function _duplicateElement(val: any, depth: number = 0) {
   return val;
 }
 
-export function duplicateElement(element: ReturnType<typeof newElement>) {
+export function duplicateElement(
+  element: ReturnType<typeof newElement>,
+): ReturnType<typeof newElement> {
   const copy = _duplicateElement(element);
   copy.id = nanoid();
   copy.seed = randomSeed();

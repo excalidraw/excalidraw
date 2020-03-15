@@ -13,6 +13,8 @@
   cursor: pointer;
   background-color: var(--button-gray-1);
   -webkit-tap-highlight-color: transparent;
+
+  border-radius: var(--space-factor);
 }
 
 .ToolIcon__icon {
@@ -29,10 +31,15 @@
     position: relative;
     height: 1em;
   }
+
+  & + .ToolIcon__label {
+    margin-left: 0;
+  }
 }
 
 .ToolIcon__label {
   font-family: var(--ui-font);
+  margin: 0 0.8em;
 }
 
 .ToolIcon_size_s .ToolIcon__icon {

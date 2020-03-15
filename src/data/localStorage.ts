@@ -10,7 +10,10 @@ export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));
+  localStorage.setItem(
+    LOCAL_STORAGE_KEY,
+    JSON.stringify(elements.filter(element => !element.isDeleted)),
+  );
   localStorage.setItem(
     LOCAL_STORAGE_KEY_STATE,
     JSON.stringify(clearAppStateForLocalStorage(appState)),
@@ -36,7 +39,7 @@ export function restoreFromLocalStorage() {
       appState = JSON.parse(savedState) as AppState;
       // If we're retrieving from local storage, we should not be collaborating
       appState.isCollaborating = false;
-      appState.collaboratorCount = 0;
+      appState.collaborators = new Map();
     } catch {
       // Do nothing because appState is already null
     }
