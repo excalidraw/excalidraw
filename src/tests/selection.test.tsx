@@ -163,10 +163,23 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
+    /*
+        1 2 3 4 5 6 7 8 9
+      1
+      2     x
+      3
+      4       .
+      5
+      6
+      7           x
+      8
+      9
+    */
+
     const tool = getByToolName("selection");
     fireEvent.click(tool);
-    // click on a line on the rectangle
-    fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
+    // click on a line on the arrow
+    fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
@@ -175,7 +188,7 @@ describe("select single element on the scene", () => {
     expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
   });
 
-  it("arrow", () => {
+  it("arrow escape", () => {
     const { getByToolName, container } = render(<App />);
     const canvas = container.querySelector("canvas")!;
     {
@@ -188,10 +201,23 @@ describe("select single element on the scene", () => {
       fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
+    /*
+        1 2 3 4 5 6 7 8 9
+      1
+      2     x
+      3
+      4       .
+      5
+      6
+      7           x
+      8
+      9
+    */
+
     const tool = getByToolName("selection");
     fireEvent.click(tool);
-    // click on a line on the rectangle
-    fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
+    // click on a line on the arrow
+    fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(7);
