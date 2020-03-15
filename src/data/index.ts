@@ -43,6 +43,7 @@ export type SocketUpdateDataSource = {
     payload: {
       socketID: string;
       pointerCoords: { x: number; y: number };
+      username: string;
     };
   };
 };
