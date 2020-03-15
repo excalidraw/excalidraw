@@ -6,7 +6,6 @@ import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { mutateElement } from "../element/mutateElement";
 
 export const actionFinalize = register({
@@ -29,7 +28,7 @@ export const actionFinalize = register({
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
       }
-      invalidateShapeForElement(appState.multiElement);
+
       if (!appState.elementLocked) {
         appState.selectedElementIds[appState.multiElement.id] = true;
       }
