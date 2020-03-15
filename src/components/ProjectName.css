@@ -2,9 +2,8 @@
   display: inline-block;
   cursor: pointer;
   border: 1.5px solid #eee;
-  height: 2.5rem;
-  line-height: 2.5rem;
-  padding: 0 0.5rem;
+  line-height: 1;
+  padding: 0.75rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
 }
