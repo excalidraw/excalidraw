@@ -18,6 +18,10 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   normalizeDimensions,
+  getElementMap,
+  getDrawingVersion,
+  getSyncableElements,
+  hasNonDeletedElements,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -160,6 +164,7 @@ export class App extends React.Component<any, AppState> {
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
   roomID: string | null = null;
   roomKey: string | null = null;
+  lastBroadcastedOrReceivedSceneVersion: number = -1;
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
@@ -275,15 +280,11 @@ export class App extends React.Component<any, AppState> {
             iv,
           );
 
-          let deletedIds = this.state.deletedIds;
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_UPDATE":
-              const {
-                elements: remoteElements,
-                appState: remoteAppState,
-              } = decryptedData.payload;
+              const { elements: remoteElements } = decryptedData.payload;
               const restoredState = restore(remoteElements || [], null, {
                 scrollToContent: true,
               });
@@ -295,32 +296,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 // create a map of ids so we don't have to iterate
                 // over the array more than once.
-                const localElementMap = elements.reduce(
-                  (
-                    acc: { [key: string]: ExcalidrawElement },
-                    element: ExcalidrawElement,
-                  ) => {
-                    acc[element.id] = element;
-                    return acc;
-                  },
-                  {},
-                );
-
-                deletedIds = { ...deletedIds };
-
-                for (const [id, remoteDeletedEl] of Object.entries(
-                  remoteAppState.deletedIds,
-                )) {
-                  if (
-                    !localElementMap[id] ||
-                    // don't remove local element if it's newer than the one
-                    //  deleted on remote
-                    remoteDeletedEl.version >= localElementMap[id].version
-                  ) {
-                    deletedIds[id] = remoteDeletedEl;
-                    delete localElementMap[id];
-                  }
-                }
+                const localElementMap = getElementMap(elements);
 
                 // Reconcile
                 elements = restoredState.elements
@@ -342,17 +318,27 @@ export class App extends React.Component<any, AppState> {
                     ) {
                       elements.push(localElementMap[element.id]);
                       delete localElementMap[element.id];
-                    } else {
-                      if (deletedIds.hasOwnProperty(element.id)) {
-                        if (element.version > deletedIds[element.id].version) {
-                          elements.push(element);
-                          delete deletedIds[element.id];
-                          delete localElementMap[element.id];
-                        }
+                    } else if (
+                      localElementMap.hasOwnProperty(element.id) &&
+                      localElementMap[element.id].version === element.version &&
+                      localElementMap[element.id].versionNonce !==
+                        element.versionNonce
+                    ) {
+                      // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+                      if (
+                        localElementMap[element.id].versionNonce <
+                        element.versionNonce
+                      ) {
+                        elements.push(localElementMap[element.id]);
                       } else {
+                        // it should be highly unlikely that the two versionNonces are the same. if we are
+                        // really worried about this, we can replace the versionNonce with the socket id.
                         elements.push(element);
-                        delete localElementMap[element.id];
                       }
+                      delete localElementMap[element.id];
+                    } else {
+                      elements.push(element);
+                      delete localElementMap[element.id];
                     }
 
                     return elements;
@@ -360,9 +346,15 @@ export class App extends React.Component<any, AppState> {
                   // add local elements that weren't deleted or on remote
                   .concat(...Object.values(localElementMap));
               }
-              this.setState({
-                deletedIds,
-              });
+              this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
+                elements,
+              );
+              // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+              // when we receive any messages from another peer. This UX can be pretty rough -- if you
+              // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+              // right now we think this is the right tradeoff.
+              history.clear();
+              this.setState({});
               if (this.socketInitialized === false) {
                 this.socketInitialized = true;
               }
@@ -370,13 +362,13 @@ export class App extends React.Component<any, AppState> {
             case "MOUSE_LOCATION":
               const { socketID, pointerCoords } = decryptedData.payload;
               this.setState(state => {
-                if (state.collaborators.has(socketID)) {
-                  const user = state.collaborators.get(socketID)!;
-                  user.pointer = pointerCoords;
-                  state.collaborators.set(socketID, user);
-                  return state;
+                if (!state.collaborators.has(socketID)) {
+                  state.collaborators.set(socketID, {});
                 }
-                return null;
+                const user = state.collaborators.get(socketID)!;
+                user.pointer = pointerCoords;
+                state.collaborators.set(socketID, user);
+                return state;
               });
               break;
           }
@@ -428,24 +420,16 @@ export class App extends React.Component<any, AppState> {
   };
 
   private broadcastSceneUpdate = () => {
-    const deletedIds = { ...this.state.deletedIds };
-    const _elements = elements.filter(element => {
-      if (element.id in deletedIds) {
-        delete deletedIds[element.id];
-      }
-      return element.id !== this.state.editingElement?.id;
-    });
     const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
       type: "SCENE_UPDATE",
       payload: {
-        elements: _elements,
-        appState: {
-          viewBackgroundColor: this.state.viewBackgroundColor,
-          name: this.state.name,
-          deletedIds,
-        },
+        elements: getSyncableElements(elements),
       },
     };
+    this.lastBroadcastedOrReceivedSceneVersion = Math.max(
+      this.lastBroadcastedOrReceivedSceneVersion,
+      getDrawingVersion(elements),
+    );
     return this._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
     );
@@ -840,7 +824,7 @@ export class App extends React.Component<any, AppState> {
                       action: () => this.pasteFromClipboard(null),
                     },
                     probablySupportsClipboardBlob &&
-                      elements.length > 0 && {
+                      hasNonDeletedElements(elements) && {
                         label: t("labels.copyAsPng"),
                         action: this.copyToClipboardAsPng,
                       },
@@ -1102,6 +1086,7 @@ export class App extends React.Component<any, AppState> {
       const pnt = points[points.length - 1];
       pnt[0] = x - originX;
       pnt[1] = y - originY;
+      mutateElement(multiElement);
       invalidateShapeForElement(multiElement);
       this.setState({});
       return;
@@ -1485,6 +1470,7 @@ export class App extends React.Component<any, AppState> {
           },
         }));
         multiElement.points.push([x - rx, y - ry]);
+        mutateElement(multiElement);
         invalidateShapeForElement(multiElement);
       } else {
         this.setState(prevState => ({
@@ -1494,6 +1480,7 @@ export class App extends React.Component<any, AppState> {
           },
         }));
         element.points.push([0, 0]);
+        mutateElement(element);
         invalidateShapeForElement(element);
         elements = [...elements, element];
         this.setState({
@@ -1548,20 +1535,19 @@ export class App extends React.Component<any, AppState> {
 
         const dx = element.x + width + p1[0];
         const dy = element.y + height + p1[1];
+        p1[0] = absPx - element.x;
+        p1[1] = absPy - element.y;
         mutateElement(element, {
           x: dx,
           y: dy,
         });
-        p1[0] = absPx - element.x;
-        p1[1] = absPy - element.y;
       } else {
+        p1[0] -= deltaX;
+        p1[1] -= deltaY;
         mutateElement(element, {
           x: element.x + deltaX,
           y: element.y + deltaY,
         });
-
-        p1[0] -= deltaX;
-        p1[1] -= deltaY;
       }
     };
 
@@ -1586,6 +1572,7 @@ export class App extends React.Component<any, AppState> {
         p1[0] += deltaX;
         p1[1] += deltaY;
       }
+      mutateElement(element);
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -1925,6 +1912,8 @@ export class App extends React.Component<any, AppState> {
           pnt[0] = dx;
           pnt[1] = dy;
         }
+
+        mutateElement(draggingElement, { points });
       } else {
         if (event.shiftKey) {
           ({ width, height } = getPerfectElementSize(
@@ -2005,6 +1994,7 @@ export class App extends React.Component<any, AppState> {
             x - draggingElement.x,
             y - draggingElement.y,
           ]);
+          mutateElement(draggingElement);
           invalidateShapeForElement(draggingElement);
           this.setState({
             multiElement: this.state.draggingElement,
@@ -2263,13 +2253,20 @@ export class App extends React.Component<any, AppState> {
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
-    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
+    const scrolledOutside =
+      !atLeastOneVisibleElement && hasNonDeletedElements(elements);
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
     this.saveDebounced();
-    if (history.isRecording()) {
+
+    if (
+      getDrawingVersion(elements) > this.lastBroadcastedOrReceivedSceneVersion
+    ) {
       this.broadcastSceneUpdate();
+    }
+
+    if (history.isRecording()) {
       history.pushEntry(this.state, elements);
       history.skipRecording();
     }

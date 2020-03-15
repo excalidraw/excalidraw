@@ -52,7 +52,8 @@ export function restore(
 
       return {
         ...element,
-        version: element.version || 0,
+        // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
+        version: element.version || 1,
         id: element.id || nanoid(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,

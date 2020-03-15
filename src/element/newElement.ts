@@ -34,6 +34,8 @@ export function newElement(
     seed: randomSeed(),
     points: [] as Point[],
     version: 1,
+    versionNonce: 0,
+    isDeleted: false,
   };
   return element;
 }

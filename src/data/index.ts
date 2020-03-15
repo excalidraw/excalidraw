@@ -13,6 +13,7 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
+import { hasNonDeletedElements } from "../element";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -35,7 +36,6 @@ export type SocketUpdateDataSource = {
     type: "SCENE_UPDATE";
     payload: {
       elements: readonly ExcalidrawElement[];
-      appState: Pick<AppState, "viewBackgroundColor" | "name" | "deletedIds">;
     };
   };
   MOUSE_LOCATION: {
@@ -288,7 +288,7 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length) {
+  if (!hasNonDeletedElements(elements)) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   // calculate smallest area to fit the contents in
