@@ -16,19 +16,6 @@ export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
   };
 }
 
-export function getZoomTranslation(canvas: HTMLCanvasElement, zoom: number) {
-  const diffMiddleOfTheCanvas = {
-    x: (canvas.width / 2) * (zoom - 1),
-    y: (canvas.height / 2) * (zoom - 1),
-  };
-
-  // Due to JavaScript float precision, we fix to fix decimals count to have symmetric zoom
-  return {
-    x: parseFloat(diffMiddleOfTheCanvas.x.toFixed(8)),
-    y: parseFloat(diffMiddleOfTheCanvas.y.toFixed(8)),
-  };
-}
-
 export function getNormalizedZoom(zoom: number): number {
   const normalizedZoom = parseFloat(zoom.toFixed(2));
   const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));

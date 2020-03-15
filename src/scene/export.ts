@@ -42,6 +42,7 @@ export function exportToCanvas(
     elements,
     appState,
     null,
+    scale,
     rough.canvas(tempCanvas),
     tempCanvas,
     {

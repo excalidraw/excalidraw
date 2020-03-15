@@ -17,4 +17,4 @@ export {
   hasText,
 } from "./comparisons";
 export { createScene } from "./createScene";
-export { getZoomOrigin, getZoomTranslation, getNormalizedZoom } from "./zoom";
+export { getZoomOrigin, getNormalizedZoom } from "./zoom";
