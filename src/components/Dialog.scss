@@ -1,7 +1,6 @@
 @import "../_variables";
 
 .Dialog__title {
-  --metric: calc(var(--space-factor) * 4);
   display: grid;
   align-items: center;
   margin-top: 0;
@@ -18,15 +17,23 @@
 }
 
 @media #{$media-query} {
+  .Dialog {
+    --metric: calc(var(--space-factor) * 4);
+    --inset-left: #{"max(var(--metric), env(safe-area-inset-left))"};
+    --inset-right: #{"max(var(--metric), env(safe-area-inset-right))"};
+  }
   .Dialog__title {
     grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
         var(--space-factor) * 7
       );
     position: sticky;
     top: calc(-1 * var(--metric));
-    margin: calc(-1 * var(--metric));
+    margin: calc(-1 * var(--inset-right));
+    margin-top: calc(-1 * var(--metric));
     margin-bottom: var(--metric);
-    padding: calc(var(--space-factor) * 2) var(--metric);
+    padding: calc(var(--space-factor) * 2);
+    padding-left: var(--inset-left);
+    padding-right: var(--inset-right);
     background: white;
     font-size: 1.25em;
 
@@ -38,9 +45,13 @@
     text-align: center;
   }
   .Dialog .Island {
+    width: 100vw;
     height: 100%;
     box-sizing: border-box;
     overflow-y: auto;
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-left))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-right))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-bottom))"};
   }
 
   .Dialog .Modal__close {

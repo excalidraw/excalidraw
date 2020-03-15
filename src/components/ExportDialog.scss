@@ -16,16 +16,30 @@
 }
 
 .ExportDialog__actions {
+  width: 100%;
   display: flex;
+  grid-gap: calc(var(--space-factor) * 2);
   align-items: top;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
-.ExportDialog__scales {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
+.ExportDialog__name {
+  grid-column: project-name;
+  margin: auto;
+}
+
+@media (max-width: 550px) {
+  .ExportDialog {
+    display: flex;
+    flex-direction: column;
+  }
+  .ExportDialog__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .ExportDialog__actions > * {
+    margin-bottom: calc(var(--space-factor) * 3);
+  }
 }
 
 @media #{$media-query} {
@@ -39,14 +53,5 @@
   }
   .ExportDialog__dialog .Island {
     overflow-y: auto;
-  }
-  .ExportDialog__actions {
-    flex-direction: column;
-  }
-  .ExportDialog__actions > * {
-    margin-bottom: calc(var(--space-factor) * 3);
-  }
-  .ExportDialog__scales {
-    justify-content: flex-start;
   }
 }

@@ -24,12 +24,14 @@ const Picker = function({
   onChange,
   onClose,
   label,
+  showInput = true,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
   label: string;
+  showInput: boolean;
 }) {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -72,7 +74,7 @@ const Picker = function({
         activeElement,
       );
       if (index !== -1) {
-        const length = gallery!.current!.children.length;
+        const length = gallery!.current!.children.length - (showInput ? 1 : 0);
         const nextIndex =
           event.key === KEYS.ARROW_RIGHT
             ? (index + 1) % length
@@ -108,57 +110,57 @@ const Picker = function({
       aria-label={t("labels.colorPicker")}
       onKeyDown={handleKeyDown}
     >
-      <div className="color-picker-triangle-shadow"></div>
+      <div className="color-picker-triangle color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
-      <div className="color-picker-content">
-        <div
-          className="colors-gallery"
-          ref={el => {
-            if (el) {
-              gallery.current = el;
-            }
-          }}
-        >
-          {colors.map((_color, i) => (
-            <button
-              className="color-picker-swatch"
-              onClick={() => {
-                onChange(_color);
-              }}
-              title={`${_color} — ${keyBindings[i].toUpperCase()}`}
-              aria-label={_color}
-              aria-keyshortcuts={keyBindings[i]}
-              style={{ backgroundColor: _color }}
-              key={_color}
-              ref={el => {
-                if (el && i === 0) {
-                  firstItem.current = el;
-                }
-                if (el && _color === color) {
-                  activeItem.current = el;
-                }
-              }}
-              onFocus={() => {
-                onChange(_color);
-              }}
-            >
-              {_color === "transparent" ? (
-                <div className="color-picker-transparent"></div>
-              ) : (
-                undefined
-              )}
-              <span className="color-picker-keybinding">{keyBindings[i]}</span>
-            </button>
-          ))}
-        </div>
-        <ColorInput
-          color={color}
-          label={label}
-          onChange={color => {
-            onChange(color);
-          }}
-          ref={colorInput}
-        />
+      <div
+        className="color-picker-content"
+        ref={el => {
+          if (el) {
+            gallery.current = el;
+          }
+        }}
+      >
+        {colors.map((_color, i) => (
+          <button
+            className="color-picker-swatch"
+            onClick={() => {
+              onChange(_color);
+            }}
+            title={`${_color} — ${keyBindings[i].toUpperCase()}`}
+            aria-label={_color}
+            aria-keyshortcuts={keyBindings[i]}
+            style={{ backgroundColor: _color }}
+            key={_color}
+            ref={el => {
+              if (el && i === 0) {
+                firstItem.current = el;
+              }
+              if (el && _color === color) {
+                activeItem.current = el;
+              }
+            }}
+            onFocus={() => {
+              onChange(_color);
+            }}
+          >
+            {_color === "transparent" ? (
+              <div className="color-picker-transparent"></div>
+            ) : (
+              undefined
+            )}
+            <span className="color-picker-keybinding">{keyBindings[i]}</span>
+          </button>
+        ))}
+        {showInput && (
+          <ColorInput
+            color={color}
+            label={label}
+            onChange={color => {
+              onChange(color);
+            }}
+            ref={colorInput}
+          />
+        )}
       </div>
     </div>
   );
@@ -188,7 +190,7 @@ const ColorInput = React.forwardRef(
     React.useImperativeHandle(ref, () => inputRef.current);
 
     return (
-      <div className="color-input-container">
+      <label className="color-input-container">
         <div className="color-picker-hash">#</div>
         <input
           spellCheck={false}
@@ -206,7 +208,7 @@ const ColorInput = React.forwardRef(
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
-      </div>
+      </label>
     );
   },
 );
@@ -231,7 +233,11 @@ export function ColorPicker({
         <button
           className="color-picker-label-swatch"
           aria-label={label}
-          style={color ? { backgroundColor: color } : undefined}
+          style={
+            color
+              ? ({ "--swatch-color": color } as React.CSSProperties)
+              : undefined
+          }
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
         />
@@ -257,6 +263,7 @@ export function ColorPicker({
                 pickerButton.current?.focus();
               }}
               label={label}
+              showInput={false}
             />
           </Popover>
         ) : null}
