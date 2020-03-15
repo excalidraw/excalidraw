@@ -3,6 +3,7 @@
     "paste": "Вставить",
     "selectAll": "Выделить всё",
     "copy": "Копировать",
+    "copyAsPng": "Copy to clipboard as PNG",
     "bringForward": "Переложить вперёд",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -41,7 +42,8 @@
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Рисование холста",
     "layers": "Слои",
-    "language": "Язык"
+    "language": "Язык",
+    "createRoom": "Share a live-collaboration session"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",
@@ -62,7 +64,9 @@
     "done": "Готово",
     "edit": "Изменить",
     "undo": "Undo",
-    "redo": "Redo"
+    "redo": "Redo",
+    "roomDialog": "Share a live-collaboration session",
+    "createNewRoom": "Create new room"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -105,5 +109,16 @@
     "errorStack": "Error stack trace:",
     "errorStack_loading": "Loading data. please wait...",
     "sceneContent": "Scene content:"
+  },
+  "roomDialog": {
+    "desc_intro": "You can invite people to your current scene to collaborate with you.",
+    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
+    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
+    "button_startSession": "Start session",
+    "button_stopSession": "Stop session",
+    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
+    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
+    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
+    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   }
 }
