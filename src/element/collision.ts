@@ -165,7 +165,12 @@ export function hitTest(
     const shape = getShapeForElement(element) as Drawable[];
 
     const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
-    if (x < x1 || y < y1 - 10 || x > x2 || y > y2 + 10) {
+    if (
+      x < x1 - lineThreshold ||
+      y < y1 - lineThreshold ||
+      x > x2 + lineThreshold ||
+      y > y2 + lineThreshold
+    ) {
       return false;
     }
 
@@ -173,7 +178,9 @@ export function hitTest(
     const relY = y - element.y;
 
     // hit thest all "subshapes" of the linear element
-    return shape.some(subshape => hitTestRoughShape(subshape.sets, relX, relY));
+    return shape.some(subshape =>
+      hitTestRoughShape(subshape.sets, relX, relY, lineThreshold),
+    );
   } else if (element.type === "text") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
@@ -191,6 +198,7 @@ const pointInBezierEquation = (
   p2: Point,
   p3: Point,
   [mx, my]: Point,
+  lineThreshold: number,
 ) => {
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
   const equation = (t: number, idx: number) =>
@@ -199,7 +207,6 @@ const pointInBezierEquation = (
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
 
-  const epsilon = 20;
   // go through t in increments of 0.01
   let t = 0;
   while (t <= 1.0) {
@@ -208,7 +215,7 @@ const pointInBezierEquation = (
 
     const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
 
-    if (diff < epsilon) {
+    if (diff < lineThreshold) {
       return true;
     }
 
@@ -218,7 +225,12 @@ const pointInBezierEquation = (
   return false;
 };
 
-const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
+const hitTestRoughShape = (
+  opSet: OpSet[],
+  x: number,
+  y: number,
+  lineThreshold: number,
+) => {
   // read operations from first opSet
   const ops = opSet[0].ops;
 
@@ -248,7 +260,14 @@ const hitTestRoughShape = (opSet: OpSet[], x: number, y: number) => {
       // check if points are on the curve
       // cubic bezier curves require four parameters
       // the first parameter is the last stored position (p0)
-      const retVal = pointInBezierEquation(p0, p1, p2, p3, [x, y]);
+      const retVal = pointInBezierEquation(
+        p0,
+        p1,
+        p2,
+        p3,
+        [x, y],
+        lineThreshold,
+      );
 
       // set end point of bezier curve as the new starting point for
       // upcoming operations as each operation is based on the last drawn
