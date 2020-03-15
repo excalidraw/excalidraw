@@ -21,8 +21,8 @@ function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
   return {
-    stroke: colors.elementStroke[sum % colors.elementBackground.length],
     background: colors.elementBackground[sum % colors.elementBackground.length],
+    stroke: colors.elementStroke[sum % colors.elementBackground.length],
   };
 }
 
@@ -181,7 +181,7 @@ export function renderScene(
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { stroke, background } = colorsForClientId(clientId);
+    const { background, stroke } = colorsForClientId(clientId);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
