@@ -2,6 +2,7 @@ import nanoid from "nanoid";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
+import { duplicateElement } from "../element";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -11,12 +12,9 @@ export const actionDuplicateSelection = register({
       elements: elements.reduce(
         (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
           if (appState.selectedElementIds[element.id]) {
-            const newElement = {
-              ...element,
-              id: nanoid(),
-              x: element.x + 10,
-              y: element.y + 10,
-            };
+            const newElement = duplicateElement(element);
+            newElement.x = newElement.x + 10;
+            newElement.y = newElement.y + 10;
             return acc.concat([element, newElement]);
           }
           return acc.concat(element);
