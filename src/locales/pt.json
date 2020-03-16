@@ -104,21 +104,21 @@
     "clearCanvasMessage_button": "limpar a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
     "openIssueMessage_pre": "Antes de fazer isso, gostaríamos que você relatasse o problema em nosso ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
+    "openIssueMessage_button": "rastreador de bugs.",
+    "openIssueMessage_post": " Inclua o seguinte rastreamento de pilha de erros (e, se não for confidencial, também o conteúdo da cena):",
+    "errorStack": "Rastreamento de pilha de erros:",
     "errorStack_loading": "Carregando os dados. por favor aguarde...",
     "sceneContent": "Conteúdo da cena:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
+    "desc_intro": "Você pode convidar pessoas para sua cena atual para colaborar com você.",
+    "desc_privacy": "Não se preocupe, a sessão usa criptografia de ponta a ponta; portanto, o que você desenhar permanecerá privado. Nem mesmo nosso servidor poderá ver o que você cria.",
+    "desc_start": "120/5000\nPara começar, clique no botão abaixo. (Usará a cena atual. Se você não quiser, pode limpá-la manualmente, primeiro)",
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
+    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
+    "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
+    "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   }
 }
