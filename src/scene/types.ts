@@ -8,7 +8,6 @@ export type SceneState = {
   viewBackgroundColor: string | null;
   zoom: number;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
-  remotePointerUsernames: { [id: string]: string };
 };
 
 export type SceneScroll = {

@@ -36,10 +36,7 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  collaborators: Map<
-    string,
-    { pointer?: { x: number; y: number }; username?: string }
-  >;
+  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
 
 export type PointerCoords = Readonly<{
