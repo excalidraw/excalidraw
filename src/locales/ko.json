@@ -65,12 +65,12 @@
     "edit": "수정",
     "undo": "실행 취소",
     "redo": "다시 실행",
-    "roomDialog": "Share a live-collaboration session",
+    "roomDialog": "실시간 협업 세션 공유",
     "createNewRoom": "Create new room"
   },
   "alerts": {
-    "clearReset": "This will clear the whole canvas. Are you sure?",
-    "couldNotCreateShareableLink": "Couldn't create shareable link.",
+    "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
+    "couldNotCreateShareableLink": "공유 가능한 링크를 생성할 수 없습니다.",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
