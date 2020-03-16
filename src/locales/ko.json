@@ -71,10 +71,10 @@
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
     "couldNotCreateShareableLink": "공유 가능한 링크를 생성할 수 없습니다.",
-    "importBackendFailed": "Importing from backend failed.",
-    "cannotExportEmptyCanvas": "Cannot export empty canvas.",
-    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
+    "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
+    "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
+    "decryptFailed": "데이터를 복호화하지 못했습니다.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
