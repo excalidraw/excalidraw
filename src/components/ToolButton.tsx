@@ -14,10 +14,18 @@ type ToolButtonBaseProps = {
   id?: string;
   size?: ToolIconSize;
   keyBindingLabel?: string;
+  showAriaLabel?: boolean;
+  visible?: boolean;
+  selected?: boolean;
+  className?: string;
 };
 
 type ToolButtonProps =
-  | (ToolButtonBaseProps & { type: "button"; onClick?(): void })
+  | (ToolButtonBaseProps & {
+      type: "button";
+      children?: React.ReactNode;
+      onClick?(): void;
+    })
   | (ToolButtonBaseProps & {
       type: "radio";
 
@@ -38,16 +46,26 @@ export const ToolButton = React.forwardRef(function(
   if (props.type === "button") {
     return (
       <button
-        className={`ToolIcon_type_button ToolIcon ${sizeCn}`}
+        className={`ToolIcon_type_button ToolIcon ${sizeCn}${
+          props.selected ? " ToolIcon--selected" : ""
+        } ${props.className || ""}`}
         title={props.title}
         aria-label={props["aria-label"]}
         type="button"
         onClick={props.onClick}
         ref={innerRef}
+        style={{
+          visibility:
+            props.visible || props.visible == null ? "visible" : "hidden",
+        }}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
           {props.icon || props.label}
         </div>
+        {props.showAriaLabel && (
+          <div className="ToolIcon__label">{props["aria-label"]}</div>
+        )}
+        {props.children}
       </button>
     );
   }

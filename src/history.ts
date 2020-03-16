@@ -1,11 +1,22 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { clearAppStatePropertiesForHistory } from "./appState";
+import { newElementWith } from "./element/mutateElement";
 
-class SceneHistory {
+type Result = {
+  appState: AppState;
+  elements: ExcalidrawElement[];
+};
+
+export class SceneHistory {
   private recording: boolean = true;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
+
+  clear() {
+    this.stateHistory.length = 0;
+    this.redoStack.length = 0;
+  }
 
   private generateEntry(
     appState: AppState,
@@ -13,14 +24,14 @@ class SceneHistory {
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(({ shape, ...element }) => ({
-        ...element,
-        shape: null,
-        points:
-          appState.multiElement && appState.multiElement.id === element.id
-            ? element.points.slice(0, -1)
-            : element.points,
-      })),
+      elements: elements.map(element =>
+        newElementWith(element, {
+          points:
+            appState.multiElement && appState.multiElement.id === element.id
+              ? element.points.slice(0, -1)
+              : element.points,
+        }),
+      ),
     });
   }
 
@@ -52,7 +63,7 @@ class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce() {
+  redoOnce(): Result | null {
     if (this.redoStack.length === 0) {
       return null;
     }
@@ -67,7 +78,7 @@ class SceneHistory {
     return null;
   }
 
-  undoOnce() {
+  undoOnce(): Result | null {
     if (this.stateHistory.length === 0) {
       return null;
     }

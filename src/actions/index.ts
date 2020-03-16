@@ -1,4 +1,3 @@
-export { ActionManager } from "./manager";
 export { actionDeleteSelected } from "./actionDeleteSelected";
 export {
   actionBringForward,
@@ -23,6 +22,7 @@ export {
   actionClearCanvas,
   actionZoomIn,
   actionZoomOut,
+  actionResetZoom,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";
@@ -35,3 +35,4 @@ export {
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+export { actionToggleCanvasMenu, actionToggleEditMenu } from "./actionMenu";

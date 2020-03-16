@@ -1,7 +1,8 @@
 import { ExcalidrawElement } from "./types";
 import { rotate } from "../math";
 import { Drawable } from "roughjs/bin/core";
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
+import { getShapeForElement } from "../renderer/renderElement";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -33,7 +34,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 }
 
 export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
-  if (element.points.length < 2 || !element.shape) {
+  if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
         limits.minY = Math.min(limits.minY, y);
@@ -54,7 +55,7 @@ export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
     ];
   }
 
-  const shape = element.shape as Drawable[];
+  const shape = getShapeForElement(element) as Drawable[];
 
   // first element is always the curve
   const ops = shape[0].sets[0].ops;
@@ -67,7 +68,7 @@ export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
       // move, bcurveTo, lineTo, and curveTo
       if (op === "move") {
         // change starting point
-        currentP = data as Point;
+        currentP = (data as unknown) as Point;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
@@ -118,8 +119,7 @@ export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
   ];
 }
 
-export function getArrowPoints(element: ExcalidrawElement) {
-  const shape = element.shape as Drawable[];
+export function getArrowPoints(element: ExcalidrawElement, shape: Drawable[]) {
   const ops = shape[0].sets[0].ops;
 
   const data = ops[ops.length - 1].data;
@@ -133,7 +133,7 @@ export function getArrowPoints(element: ExcalidrawElement) {
   const prevOp = ops[ops.length - 2];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
-    p0 = prevOp.data as Point;
+    p0 = (prevOp.data as unknown) as Point;
   } else if (prevOp.op === "bcurveTo") {
     p0 = [prevOp.data[4], prevOp.data[5]];
   }

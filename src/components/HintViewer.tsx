@@ -1,17 +1,19 @@
 import React from "react";
 import { t } from "../i18n";
 import { ExcalidrawElement } from "../element/types";
+import { getSelectedElements } from "../scene";
 
-import "./HintViewer.css";
+import "./HintViewer.scss";
+import { AppState } from "../types";
 
 interface Hint {
-  elementType: string;
-  multiMode: boolean;
-  isResizing: boolean;
+  appState: AppState;
   elements: readonly ExcalidrawElement[];
 }
 
-const getHints = ({ elementType, multiMode, isResizing, elements }: Hint) => {
+const getHints = ({ appState, elements }: Hint) => {
+  const { elementType, isResizing } = appState;
+  const multiMode = appState.multiElement !== null;
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
@@ -20,7 +22,7 @@ const getHints = ({ elementType, multiMode, isResizing, elements }: Hint) => {
   }
 
   if (isResizing) {
-    const selectedElements = elements.filter(el => el.isSelected);
+    const selectedElements = getSelectedElements(elements, appState);
     if (
       selectedElements.length === 1 &&
       (selectedElements[0].type === "arrow" ||
@@ -35,21 +37,18 @@ const getHints = ({ elementType, multiMode, isResizing, elements }: Hint) => {
   return null;
 };
 
-export const HintViewer = ({
-  elementType,
-  multiMode,
-  isResizing,
-  elements,
-}: Hint) => {
+export const HintViewer = ({ appState, elements }: Hint) => {
   const hint = getHints({
-    elementType,
-    multiMode,
-    isResizing,
+    appState,
     elements,
   });
   if (!hint) {
     return null;
   }
 
-  return <div className="HintViewer">{hint}</div>;
+  return (
+    <div className="HintViewer">
+      <span>{hint}</span>
+    </div>
+  );
 };

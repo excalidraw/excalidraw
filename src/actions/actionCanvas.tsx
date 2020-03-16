@@ -1,12 +1,17 @@
 import React from "react";
-import { Action } from "./types";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut } from "../components/icons";
+import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
+import { getNormalizedZoom } from "../scene";
+import { KEYS } from "../keys";
+import { getShortcutKey } from "../utils";
+import useIsMobile from "../is-mobile";
+import { register } from "./register";
+import { newElementWith } from "../element/mutateElement";
 
-export const actionChangeViewBackgroundColor: Action = {
+export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     return { appState: { ...appState, viewBackgroundColor: value } };
@@ -24,14 +29,16 @@ export const actionChangeViewBackgroundColor: Action = {
     );
   },
   commitToHistory: () => true,
-};
+});
 
-export const actionClearCanvas: Action = {
+export const actionClearCanvas = register({
   name: "clearCanvas",
   commitToHistory: () => true,
-  perform: () => {
+  perform: elements => {
     return {
-      elements: [],
+      elements: elements.map(element =>
+        newElementWith(element, { isDeleted: true }),
+      ),
       appState: getDefaultAppState(),
     };
   },
@@ -41,6 +48,7 @@ export const actionClearCanvas: Action = {
       icon={trash}
       title={t("buttons.clearReset")}
       aria-label={t("buttons.clearReset")}
+      showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
           // TODO: Defined globally, since file handles aren't yet serializable.
@@ -52,19 +60,22 @@ export const actionClearCanvas: Action = {
       }}
     />
   ),
-};
+});
 
 const ZOOM_STEP = 0.1;
 
-function getNormalizedZoom(zoom: number): number {
-  const normalizedZoom = parseFloat(zoom.toFixed(2));
-  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
-  return clampedZoom;
-}
+const KEY_CODES = {
+  MINUS: "Minus",
+  EQUAL: "Equal",
+  ZERO: "Digit0",
+  NUM_SUBTRACT: "NumpadSubtract",
+  NUM_ADD: "NumpadAdd",
+  NUM_ZERO: "Numpad0",
+};
 
-export const actionZoomIn: Action = {
+export const actionZoomIn = register({
   name: "zoomIn",
-  perform: (elements, appState) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -76,18 +87,21 @@ export const actionZoomIn: Action = {
     <ToolButton
       type="button"
       icon={zoomIn}
-      title={t("buttons.zoomIn")}
+      title={`${t("buttons.zoomIn")} ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
       }}
     />
   ),
-};
+  keyTest: event =>
+    (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
 
-export const actionZoomOut: Action = {
+export const actionZoomOut = register({
   name: "zoomOut",
-  perform: (elements, appState) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -99,11 +113,40 @@ export const actionZoomOut: Action = {
     <ToolButton
       type="button"
       icon={zoomOut}
-      title={t("buttons.zoomOut")}
+      title={`${t("buttons.zoomOut")} ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);
       }}
     />
   ),
-};
+  keyTest: event =>
+    (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
+
+export const actionResetZoom = register({
+  name: "resetZoom",
+  perform: (_elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        zoom: 1,
+      },
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={resetZoom}
+      title={t("buttons.resetZoom")}
+      aria-label={t("buttons.resetZoom")}
+      onClick={() => {
+        updateData(null);
+      }}
+    />
+  ),
+  keyTest: event =>
+    (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});

@@ -1,6 +1,7 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
+import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
@@ -11,80 +12,56 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { getZoomTranslation } from "../scene/zoom";
+import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
+import colors from "../colors";
+
+function colorsForClientId(clientId: string) {
+  // Naive way of getting an integer out of the clientId
+  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+  return {
+    background: colors.elementBackground[sum % colors.elementBackground.length],
+    stroke: colors.elementStroke[sum % colors.elementBackground.length],
+  };
+}
 
 export function renderScene(
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
+  appState: AppState,
   selectionElement: ExcalidrawElement | null,
+  scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
   // extra options, currently passed by export helper
   {
-    offsetX,
-    offsetY,
     renderScrollbars = true,
     renderSelection = true,
+    // Whether to employ render optimizations to improve performance.
+    // Should not be turned on for export operations and similar, because it
+    //  doesn't guarantee pixel-perfect output.
+    renderOptimizations = false,
   }: {
-    offsetX?: number;
-    offsetY?: number;
     renderScrollbars?: boolean;
     renderSelection?: boolean;
+    renderOptimizations?: boolean;
   } = {},
-): boolean {
+) {
   if (!canvas) {
-    return false;
+    return { atLeastOneVisibleElement: false };
   }
 
-  // Use offsets insteads of scrolls if available
-  sceneState = {
-    ...sceneState,
-    scrollX: typeof offsetX === "number" ? offsetX : sceneState.scrollX,
-    scrollY: typeof offsetY === "number" ? offsetY : sceneState.scrollY,
-  };
+  const elements = allElements.filter(element => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
-
-  // Get initial scale transform as reference for later usage
-  const initialContextTransform = context.getTransform();
+  context.scale(scale, scale);
 
   // When doing calculations based on canvas width we should used normalized one
-  const normalizedCanvasWidth =
-    canvas.width / getContextTransformScaleX(initialContextTransform);
-  const normalizedCanvasHeight =
-    canvas.height / getContextTransformScaleY(initialContextTransform);
-
-  // Handle zoom scaling
-  function scaleContextToZoom() {
-    context.setTransform(
-      getContextTransformScaleX(initialContextTransform) * sceneState.zoom,
-      0,
-      0,
-      getContextTransformScaleY(initialContextTransform) * sceneState.zoom,
-      getContextTransformTranslateX(context.getTransform()),
-      getContextTransformTranslateY(context.getTransform()),
-    );
-  }
-
-  // Handle zoom translation
-  const zoomTranslation = getZoomTranslation(canvas, sceneState.zoom);
-  function translateContextToZoom() {
-    context.setTransform(
-      getContextTransformScaleX(context.getTransform()),
-      0,
-      0,
-      getContextTransformScaleY(context.getTransform()),
-      getContextTransformTranslateX(initialContextTransform) -
-        zoomTranslation.x,
-      getContextTransformTranslateY(initialContextTransform) -
-        zoomTranslation.y,
-    );
-  }
+  const normalizedCanvasWidth = canvas.width / scale;
+  const normalizedCanvasHeight = canvas.height / scale;
 
   // Paint background
-  context.save();
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
       sceneState.viewBackgroundColor === "transparent" ||
@@ -93,12 +70,20 @@ export function renderScene(
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
+    const fillStyle = context.fillStyle;
     context.fillStyle = sceneState.viewBackgroundColor;
     context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
+    context.fillStyle = fillStyle;
   } else {
     context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
   }
-  context.restore();
+
+  // Apply zoom
+  const zoomTranslationX = (-normalizedCanvasWidth * (sceneState.zoom - 1)) / 2;
+  const zoomTranslationY =
+    (-normalizedCanvasHeight * (sceneState.zoom - 1)) / 2;
+  context.translate(zoomTranslationX, zoomTranslationY);
+  context.scale(sceneState.zoom, sceneState.zoom);
 
   // Paint visible elements
   const visibleElements = elements.filter(element =>
@@ -110,37 +95,26 @@ export function renderScene(
     ),
   );
 
-  context.save();
-  scaleContextToZoom();
-  translateContextToZoom();
-  context.translate(sceneState.scrollX, sceneState.scrollY);
   visibleElements.forEach(element => {
-    context.save();
-    context.translate(element.x, element.y);
-    renderElement(element, rc, context);
-    context.restore();
+    renderElement(element, rc, context, renderOptimizations, sceneState);
   });
-  context.restore();
 
   // Pain selection element
   if (selectionElement) {
-    context.save();
-    scaleContextToZoom();
-    translateContextToZoom();
-    context.translate(sceneState.scrollX, sceneState.scrollY);
-    context.translate(selectionElement.x, selectionElement.y);
-    renderElement(selectionElement, rc, context);
-    context.restore();
+    renderElement(
+      selectionElement,
+      rc,
+      context,
+      renderOptimizations,
+      sceneState,
+    );
   }
 
   // Pain selected elements
   if (renderSelection) {
-    const selectedElements = elements.filter(element => element.isSelected);
+    const selectedElements = getSelectedElements(elements, appState);
     const dashledLinePadding = 4 / sceneState.zoom;
 
-    context.save();
-    scaleContextToZoom();
-    translateContextToZoom();
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach(element => {
       const [
@@ -155,42 +129,94 @@ export function renderScene(
 
       const initialLineDash = context.getLineDash();
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
+      const lineWidth = context.lineWidth;
+      context.lineWidth = 1 / sceneState.zoom;
       context.strokeRect(
         elementX1 - dashledLinePadding,
         elementY1 - dashledLinePadding,
         elementWidth + dashledLinePadding * 2,
         elementHeight + dashledLinePadding * 2,
       );
+      context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
-    context.restore();
+    context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      context.save();
-      scaleContextToZoom();
-      translateContextToZoom();
       context.translate(sceneState.scrollX, sceneState.scrollY);
+      context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
         .filter(handler => handler !== undefined)
         .forEach(handler => {
+          const lineWidth = context.lineWidth;
+          context.lineWidth = 1 / sceneState.zoom;
+          context.fillRect(handler[0], handler[1], handler[2], handler[3]);
           context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          context.lineWidth = lineWidth;
         });
-      context.restore();
+      context.translate(-sceneState.scrollX, -sceneState.scrollY);
     }
   }
 
+  // Reset zoom
+  context.scale(1 / sceneState.zoom, 1 / sceneState.zoom);
+  context.translate(-zoomTranslationX, -zoomTranslationY);
+
+  // Paint remote pointers
+  for (const clientId in sceneState.remotePointerViewportCoords) {
+    let { x, y } = sceneState.remotePointerViewportCoords[clientId];
+
+    const width = 9;
+    const height = 14;
+
+    const isOutOfBounds =
+      x < 0 ||
+      x > normalizedCanvasWidth - width ||
+      y < 0 ||
+      y > normalizedCanvasHeight - height;
+
+    x = Math.max(x, 0);
+    x = Math.min(x, normalizedCanvasWidth - width);
+    y = Math.max(y, 0);
+    y = Math.min(y, normalizedCanvasHeight - height);
+
+    const { background, stroke } = colorsForClientId(clientId);
+
+    const strokeStyle = context.strokeStyle;
+    const fillStyle = context.fillStyle;
+    const globalAlpha = context.globalAlpha;
+    context.strokeStyle = stroke;
+    context.fillStyle = background;
+    if (isOutOfBounds) {
+      context.globalAlpha = 0.2;
+    }
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + 1, y + 14);
+    context.lineTo(x + 4, y + 9);
+    context.lineTo(x + 9, y + 10);
+    context.lineTo(x, y);
+    context.fill();
+    context.stroke();
+    context.strokeStyle = strokeStyle;
+    context.fillStyle = fillStyle;
+    context.globalAlpha = globalAlpha;
+  }
+
   // Paint scrollbars
+  let scrollBars;
   if (renderScrollbars) {
-    const scrollBars = getScrollBars(
+    scrollBars = getScrollBars(
       elements,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
       sceneState,
     );
 
-    context.save();
+    const fillStyle = context.fillStyle;
+    const strokeStyle = context.strokeStyle;
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
     [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
@@ -205,10 +231,13 @@ export function renderScene(
         );
       }
     });
-    context.restore();
+    context.fillStyle = fillStyle;
+    context.strokeStyle = strokeStyle;
   }
 
-  return visibleElements.length > 0;
+  context.scale(1 / scale, 1 / scale);
+
+  return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 }
 
 function isVisibleElement(
@@ -220,8 +249,8 @@ function isVisibleElement(
     scrollY,
     zoom,
   }: {
-    scrollX: number;
-    scrollY: number;
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
     zoom: number;
   },
 ) {
@@ -268,17 +297,4 @@ export function renderSceneToSvg(
       element.y + offsetY,
     );
   });
-}
-
-function getContextTransformScaleX(transform: DOMMatrix): number {
-  return transform.a;
-}
-function getContextTransformScaleY(transform: DOMMatrix): number {
-  return transform.d;
-}
-function getContextTransformTranslateX(transform: DOMMatrix): number {
-  return transform.e;
-}
-function getContextTransformTranslateY(transform: DOMMatrix): number {
-  return transform.f;
 }

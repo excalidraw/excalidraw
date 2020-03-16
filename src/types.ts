@@ -1,5 +1,9 @@
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, PointerType } from "./element/types";
 import { SHAPES } from "./shapes";
+import { Point as RoughPoint } from "roughjs/bin/geometry";
+
+export type FlooredNumber = number & { _brand: "FlooredNumber" };
+export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
@@ -20,13 +24,34 @@ export type AppState = {
   currentItemOpacity: number;
   currentItemFont: string;
   viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
+  scrollX: FlooredNumber;
+  scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
   scrolledOutside: boolean;
   name: string;
-  selectedId?: string;
+  isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
+  openMenu: "canvas" | "shape" | null;
+  lastPointerDownWith: PointerType;
+  selectedElementIds: { [id: string]: boolean };
+  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
+
+export type PointerCoords = Readonly<{
+  x: number;
+  y: number;
+}>;
+
+export type Gesture = {
+  pointers: Map<number, PointerCoords>;
+  lastCenter: { x: number; y: number } | null;
+  initialDistance: number | null;
+  initialScale: number | null;
+};
+
+export declare class GestureEvent extends UIEvent {
+  readonly rotation: number;
+  readonly scale: number;
+}

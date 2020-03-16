@@ -10,22 +10,35 @@ type Props = {
 };
 
 export class ProjectName extends Component<Props> {
-  private handleFocus = (e: React.FocusEvent<HTMLElement>) => {
-    selectNode(e.currentTarget);
+  private handleFocus = (event: React.FocusEvent<HTMLElement>) => {
+    selectNode(event.currentTarget);
   };
 
-  private handleBlur = (e: React.FocusEvent<HTMLElement>) => {
-    const value = e.currentTarget.innerText.trim();
+  private handleBlur = (event: React.FocusEvent<HTMLElement>) => {
+    const value = event.currentTarget.innerText.trim();
     if (value !== this.props.value) {
       this.props.onChange(value);
     }
     removeSelection();
   };
 
-  private handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.currentTarget.blur();
+  private handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (event.nativeEvent.isComposing || event.keyCode === 229) {
+        return;
+      }
+      event.currentTarget.blur();
+    }
+  };
+  private makeEditable = (editable: HTMLSpanElement | null) => {
+    if (!editable) {
+      return;
+    }
+    try {
+      editable.contentEditable = "plaintext-only";
+    } catch {
+      editable.contentEditable = "true";
     }
   };
 
@@ -33,7 +46,7 @@ export class ProjectName extends Component<Props> {
     return (
       <span
         suppressContentEditableWarning
-        contentEditable="true"
+        ref={this.makeEditable}
         data-type="wysiwyg"
         className="ProjectName"
         role="textbox"

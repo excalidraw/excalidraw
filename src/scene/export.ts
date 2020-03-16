@@ -3,9 +3,12 @@ import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
+import { normalizeScroll } from "./scroll";
+import { AppState } from "../types";
 
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   {
     exportBackground,
     exportPadding = 10,
@@ -33,24 +36,25 @@ export function exportToCanvas(
   const height = distance(minY, maxY) + exportPadding * 2;
 
   const tempCanvas: any = createCanvas(width, height);
-  tempCanvas.getContext("2d")?.scale(scale, scale);
 
   renderScene(
     elements,
+    appState,
     null,
+    scale,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: 0,
-      scrollY: 0,
+      scrollX: normalizeScroll(-minX + exportPadding),
+      scrollY: normalizeScroll(-minY + exportPadding),
       zoom: 1,
+      remotePointerViewportCoords: {},
     },
     {
-      offsetX: -minX + exportPadding,
-      offsetY: -minY + exportPadding,
       renderScrollbars: false,
       renderSelection: false,
+      renderOptimizations: false,
     },
   );
   return tempCanvas;

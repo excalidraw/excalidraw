@@ -1,4 +1,4 @@
-export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
+export function getZoomOrigin(canvas: HTMLCanvasElement | null, scale: number) {
   if (canvas === null) {
     return { x: 0, y: 0 };
   }
@@ -7,8 +7,8 @@ export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
     return { x: 0, y: 0 };
   }
 
-  const normalizedCanvasWidth = canvas.width / context.getTransform().a;
-  const normalizedCanvasHeight = canvas.height / context.getTransform().d;
+  const normalizedCanvasWidth = canvas.width / scale;
+  const normalizedCanvasHeight = canvas.height / scale;
 
   return {
     x: normalizedCanvasWidth / 2,
@@ -16,15 +16,8 @@ export function getZoomOrigin(canvas: HTMLCanvasElement | null) {
   };
 }
 
-export function getZoomTranslation(canvas: HTMLCanvasElement, zoom: number) {
-  const diffMiddleOfTheCanvas = {
-    x: (canvas.width / 2) * (zoom - 1),
-    y: (canvas.height / 2) * (zoom - 1),
-  };
-
-  // Due to JavaScript float precision, we fix to fix decimals count to have symmetric zoom
-  return {
-    x: parseFloat(diffMiddleOfTheCanvas.x.toFixed(8)),
-    y: parseFloat(diffMiddleOfTheCanvas.y.toFixed(8)),
-  };
+export function getNormalizedZoom(zoom: number): number {
+  const normalizedZoom = parseFloat(zoom.toFixed(2));
+  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
+  return clampedZoom;
 }

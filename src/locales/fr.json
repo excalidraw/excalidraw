@@ -3,6 +3,7 @@
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
     "copy": "Copier",
+    "copyAsPng": "Copier dans le presse-papier en PNG",
     "bringForward": "Mettre en avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -14,7 +15,7 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Épaisseur contour",
-    "sloppiness": "Laisser-aller",
+    "sloppiness": "Style de tracé",
     "opacity": "Opacité",
     "fontSize": "Taille police",
     "fontFamily": "Police",
@@ -25,7 +26,7 @@
     "code": "Code",
     "small": "Petit",
     "medium": "Moyen",
-    "large": "Large",
+    "large": "Grand",
     "veryLarge": "Très Large",
     "solid": "Solide",
     "hachure": "Hachure",
@@ -35,7 +36,14 @@
     "extraBold": "Très épais",
     "architect": "Architecte",
     "artist": "Artiste",
-    "cartoonist": "Cartooniste"
+    "cartoonist": "Caricaturiste",
+    "fileTitle": "Titre du fichier",
+    "colorPicker": "Sélecteur de couleur",
+    "canvasBackground": "Fond du canevas",
+    "drawingCanvas": "Canevas de dessin",
+    "layers": "Calques",
+    "language": "Langue",
+    "createRoom": "Share a live-collaboration session"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -46,14 +54,28 @@
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
-    "scrollBackToContent": "Revenir au contenu"
+    "close": "Fermer",
+    "selectLanguage": "Sélectionner une langue",
+    "scrollBackToContent": "Revenir au contenu",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "resetZoom": "Réinitialiser le zoom",
+    "menu": "Menu",
+    "done": "Terminé",
+    "edit": "Modifier",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "roomDialog": "Share a live-collaboration session",
+    "createNewRoom": "Create new room"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
-    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome."
+    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
+    "decryptFailed": "Couldn't decrypt data.",
+    "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -62,6 +84,41 @@
     "ellipse": "Ellipse",
     "arrow": "Flèche",
     "line": "Ligne",
-    "text": "Texte"
+    "text": "Texte",
+    "lock": "Garder l'outil sélectionné actif après le dessin"
+  },
+  "headings": {
+    "canvasActions": "Actions du canevas",
+    "selectedShapeActions": "Actions pour la forme sélectionnée",
+    "shapes": "Formes"
+  },
+  "hints": {
+    "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
+    "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
+    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
+  },
+  "errorSplash": {
+    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_button": "reloading the page.",
+    "clearCanvasMessage": "If reloading doesn't work, try ",
+    "clearCanvasMessage_button": "clearing the canvas.",
+    "clearCanvasCaveat": " This will result in loss of work ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Loading data. please wait...",
+    "sceneContent": "Scene content:"
+  },
+  "roomDialog": {
+    "desc_intro": "You can invite people to your current scene to collaborate with you.",
+    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
+    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
+    "button_startSession": "Start session",
+    "button_stopSession": "Stop session",
+    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
+    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
+    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
+    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   }
 }

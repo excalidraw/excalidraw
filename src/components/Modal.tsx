@@ -1,10 +1,11 @@
-import "./Modal.css";
+import "./Modal.scss";
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { KEYS } from "../keys";
 
 export function Modal(props: {
+  className?: string;
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
@@ -12,15 +13,15 @@ export function Modal(props: {
 }) {
   const modalRoot = useBodyRoot();
 
-  const handleKeydown = (e: React.KeyboardEvent) => {
-    if (e.key === KEYS.ESCAPE) {
-      e.nativeEvent.stopImmediatePropagation();
+  const handleKeydown = (event: React.KeyboardEvent) => {
+    if (event.key === KEYS.ESCAPE) {
+      event.nativeEvent.stopImmediatePropagation();
       props.onCloseRequest();
     }
   };
   return createPortal(
     <div
-      className="Modal"
+      className={`Modal ${props.className ?? ""}`}
       role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}

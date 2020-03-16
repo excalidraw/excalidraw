@@ -1,7 +1,8 @@
-import { AppState } from "./types";
+import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 
 const DEFAULT_PROJECT_NAME = `excalidraw-${getDateTime()}`;
+export const DEFAULT_FONT = "20px Virgil";
 
 export function getDefaultAppState(): AppState {
   return {
@@ -18,17 +19,22 @@ export function getDefaultAppState(): AppState {
     currentItemStrokeWidth: 1,
     currentItemRoughness: 1,
     currentItemOpacity: 100,
-    currentItemFont: "20px Virgil",
+    currentItemFont: DEFAULT_FONT,
     viewBackgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
+    scrollX: 0 as FlooredNumber,
+    scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
     scrolledOutside: false,
     name: DEFAULT_PROJECT_NAME,
+    isCollaborating: false,
     isResizing: false,
     selectionElement: null,
     zoom: 1,
+    openMenu: null,
+    lastPointerDownWith: "mouse",
+    selectedElementIds: {},
+    collaborators: new Map(),
   };
 }
 
@@ -40,6 +46,8 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     editingElement,
     selectionElement,
     isResizing,
+    collaborators,
+    isCollaborating,
     ...exportedState
   } = appState;
   return exportedState;

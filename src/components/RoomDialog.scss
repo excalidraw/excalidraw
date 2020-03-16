@@ -1,0 +1,56 @@
+.RoomDialog-modalButton.is-collaborating {
+  background-color: #ebfbee; // OC GREEN-0
+  color: #2b8a3e; // OC GREEN-9
+}
+
+.RoomDialog-modalButton-collaborators {
+  min-width: 1em;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  padding: 3px;
+  border-radius: 50%;
+  background-color: #40c057; // OC GREEN-6
+  color: #fff;
+  font-size: 0.7em;
+  font-family: var(--ui-font);
+}
+
+.RoomDialog-linkContainer {
+  display: flex;
+  margin: 1.5em 0;
+}
+
+.RoomDialog-link {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin-left: 1em;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  background-color: #eee;
+}
+
+.RoomDialog-link:hover {
+  background-color: #eee;
+}
+
+.RoomDialog-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px steelblue;
+}
+
+.RoomDialog-sessionStartButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.RoomDialog-stopSession {
+  background-color: #ffe3e3; // OC RED-1
+  color: #c92a2a; // OC RED-9
+}

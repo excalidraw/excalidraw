@@ -5,9 +5,9 @@ export default `
 // paste stack trace here
 \`\`\`
 
-### localStorage
+### Scene content
 
 \`\`\`
-// paste localStorage content here (if it doesn't contain sensitive data)
+// paste scene content here (if it doesn't contain sensitive data)
 \`\`\`
 `;

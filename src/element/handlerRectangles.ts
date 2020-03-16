@@ -1,15 +1,26 @@
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, PointerType } from "./types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
-export function handlerRectangles(element: ExcalidrawElement, zoom: number) {
-  const handlerWidth = 8 / zoom;
-  const handlerHeight = 8 / zoom;
+const handleSizes: { [k in PointerType]: number } = {
+  mouse: 8,
+  pen: 16,
+  touch: 28,
+};
 
-  const handlerMarginX = 8 / zoom;
-  const handlerMarginY = 8 / zoom;
+export function handlerRectangles(
+  element: ExcalidrawElement,
+  zoom: number,
+  pointerType: PointerType = "mouse",
+) {
+  const size = handleSizes[pointerType];
+  const handlerWidth = size / zoom;
+  const handlerHeight = size / zoom;
+
+  const handlerMarginX = size / zoom;
+  const handlerMarginY = size / zoom;
 
   const [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
     element,
@@ -20,59 +31,61 @@ export function handlerRectangles(element: ExcalidrawElement, zoom: number) {
 
   const dashedLineMargin = 4 / zoom;
 
+  const centeringOffset = (size - 8) / (2 * zoom);
+
   const handlers = {
     nw: [
-      elementX1 - dashedLineMargin - handlerMarginX,
-      elementY1 - dashedLineMargin - handlerMarginY,
+      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
       handlerWidth,
       handlerHeight,
     ],
     ne: [
-      elementX2 + dashedLineMargin,
-      elementY1 - dashedLineMargin - handlerMarginY,
+      elementX2 + dashedLineMargin - centeringOffset,
+      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
       handlerWidth,
       handlerHeight,
     ],
     sw: [
-      elementX1 - dashedLineMargin - handlerMarginX,
-      elementY2 + dashedLineMargin,
+      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+      elementY2 + dashedLineMargin - centeringOffset,
       handlerWidth,
       handlerHeight,
     ],
     se: [
-      elementX2 + dashedLineMargin,
-      elementY2 + dashedLineMargin,
+      elementX2 + dashedLineMargin - centeringOffset,
+      elementY2 + dashedLineMargin - centeringOffset,
       handlerWidth,
       handlerHeight,
     ],
   } as { [T in Sides]: number[] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandlers = 40 / zoom;
+  const minimumSizeForEightHandlers = (5 * size) / zoom;
   if (Math.abs(elementWidth) > minimumSizeForEightHandlers) {
     handlers["n"] = [
-      elementX1 + elementWidth / 2,
-      elementY1 - dashedLineMargin - handlerMarginY,
+      elementX1 + elementWidth / 2 - handlerWidth / 2,
+      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
       handlerWidth,
       handlerHeight,
     ];
     handlers["s"] = [
-      elementX1 + elementWidth / 2,
-      elementY2 + dashedLineMargin,
+      elementX1 + elementWidth / 2 - handlerWidth / 2,
+      elementY2 + dashedLineMargin - centeringOffset,
       handlerWidth,
       handlerHeight,
     ];
   }
   if (Math.abs(elementHeight) > minimumSizeForEightHandlers) {
     handlers["w"] = [
-      elementX1 - dashedLineMargin - handlerMarginX,
-      elementY1 + elementHeight / 2,
+      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+      elementY1 + elementHeight / 2 - handlerHeight / 2,
       handlerWidth,
       handlerHeight,
     ];
     handlers["e"] = [
-      elementX2 + dashedLineMargin,
-      elementY1 + elementHeight / 2,
+      elementX2 + dashedLineMargin - centeringOffset,
+      elementY1 + elementHeight / 2 - handlerHeight / 2,
       handlerWidth,
       handlerHeight,
     ];

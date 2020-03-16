@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { App } from "../index";
+import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
@@ -14,7 +14,9 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-describe("add element to the scene when mouse dragging long enough", () => {
+const { __TEST__: h } = window;
+
+describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {
     const { getByToolName, container } = render(<App />);
     // select tool
@@ -24,24 +26,23 @@ describe("add element to the scene when mouse dragging long enough", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // move to (60,70)
-    fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(h.appState.selectionElement).toBeNull();
 
-    expect(elements.length).toEqual(1);
-    expect(elements[0].type).toEqual("rectangle");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(20);
-    expect(elements[0].width).toEqual(30); // 60 - 30
-    expect(elements[0].height).toEqual(50); // 70 - 20
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].type).toEqual("rectangle");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(20);
+    expect(h.elements[0].width).toEqual(30); // 60 - 30
+    expect(h.elements[0].height).toEqual(50); // 70 - 20
   });
 
   it("ellipse", () => {
@@ -53,24 +54,23 @@ describe("add element to the scene when mouse dragging long enough", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // move to (60,70)
-    fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
+    expect(h.appState.selectionElement).toBeNull();
 
-    const elements = renderScene.mock.calls[3][0];
-    expect(elements.length).toEqual(1);
-    expect(elements[0].type).toEqual("ellipse");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(20);
-    expect(elements[0].width).toEqual(30); // 60 - 30
-    expect(elements[0].height).toEqual(50); // 70 - 20
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].type).toEqual("ellipse");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(20);
+    expect(h.elements[0].width).toEqual(30); // 60 - 30
+    expect(h.elements[0].height).toEqual(50); // 70 - 20
   });
 
   it("diamond", () => {
@@ -82,24 +82,23 @@ describe("add element to the scene when mouse dragging long enough", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // move to (60,70)
-    fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
+    expect(h.appState.selectionElement).toBeNull();
 
-    const elements = renderScene.mock.calls[3][0];
-    expect(elements.length).toEqual(1);
-    expect(elements[0].type).toEqual("diamond");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(20);
-    expect(elements[0].width).toEqual(30); // 60 - 30
-    expect(elements[0].height).toEqual(50); // 70 - 20
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].type).toEqual("diamond");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(20);
+    expect(h.elements[0].width).toEqual(30); // 60 - 30
+    expect(h.elements[0].height).toEqual(50); // 70 - 20
   });
 
   it("arrow", () => {
@@ -111,25 +110,24 @@ describe("add element to the scene when mouse dragging long enough", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // move to (60,70)
-    fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(h.appState.selectionElement).toBeNull();
 
-    expect(elements.length).toEqual(1);
-    expect(elements[0].type).toEqual("arrow");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(20);
-    expect(elements[0].points.length).toEqual(2);
-    expect(elements[0].points[0]).toEqual([0, 0]);
-    expect(elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].type).toEqual("arrow");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(20);
+    expect(h.elements[0].points.length).toEqual(2);
+    expect(h.elements[0].points[0]).toEqual([0, 0]);
+    expect(h.elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
   });
 
   it("line", () => {
@@ -141,25 +139,24 @@ describe("add element to the scene when mouse dragging long enough", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // move to (60,70)
-    fireEvent.mouseMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
+    expect(h.appState.selectionElement).toBeNull();
 
-    expect(elements.length).toEqual(1);
-    expect(elements[0].type).toEqual("line");
-    expect(elements[0].x).toEqual(30);
-    expect(elements[0].y).toEqual(20);
-    expect(elements[0].points.length).toEqual(2);
-    expect(elements[0].points[0]).toEqual([0, 0]);
-    expect(elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+    expect(h.elements.length).toEqual(1);
+    expect(h.elements[0].type).toEqual("line");
+    expect(h.elements[0].x).toEqual(30);
+    expect(h.elements[0].y).toEqual(20);
+    expect(h.elements[0].points.length).toEqual(2);
+    expect(h.elements[0].points[0]).toEqual([0, 0]);
+    expect(h.elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
   });
 });
 
@@ -173,16 +170,14 @@ describe("do not add element to the scene if size is too small", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(renderScene.mock.calls[2][1]).toBeNull();
-    const elements = renderScene.mock.calls[2][0];
-
-    expect(elements.length).toEqual(0);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(0);
   });
 
   it("ellipse", () => {
@@ -194,16 +189,14 @@ describe("do not add element to the scene if size is too small", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(renderScene.mock.calls[2][1]).toBeNull();
-    const elements = renderScene.mock.calls[2][0];
-
-    expect(elements.length).toEqual(0);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(0);
   });
 
   it("diamond", () => {
@@ -215,16 +208,14 @@ describe("do not add element to the scene if size is too small", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(renderScene.mock.calls[2][1]).toBeNull();
-    const elements = renderScene.mock.calls[2][0];
-
-    expect(elements.length).toEqual(0);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(0);
   });
 
   it("arrow", () => {
@@ -236,19 +227,17 @@ describe("do not add element to the scene if size is too small", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
-
-    expect(elements.length).toEqual(0);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(0);
   });
 
   it("line", () => {
@@ -260,18 +249,16 @@ describe("do not add element to the scene if size is too small", () => {
     const canvas = container.querySelector("canvas")!;
 
     // start from (30, 20)
-    fireEvent.mouseDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
     // finish (position does not matter)
-    fireEvent.mouseUp(canvas);
+    fireEvent.pointerUp(canvas);
 
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(renderScene.mock.calls[3][1]).toBeNull();
-    const elements = renderScene.mock.calls[3][0];
-
-    expect(elements.length).toEqual(0);
+    expect(h.appState.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(0);
   });
 });
