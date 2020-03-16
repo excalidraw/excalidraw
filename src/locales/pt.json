@@ -44,7 +44,7 @@
     "layers": "Camadas",
     "language": "Idioma",
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
-    "duplicateSelection": "Duplicate selected elements"
+    "duplicateSelection": "Duplicar os elementos selecionados"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
