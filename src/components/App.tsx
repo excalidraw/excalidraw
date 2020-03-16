@@ -42,7 +42,6 @@ import {
   SOCKET_SERVER,
   SocketUpdateDataSource,
   exportCanvas,
-  createNameFromSocketId,
 } from "../data";
 import { restore } from "../data/restore";
 
@@ -361,15 +360,13 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "MOUSE_LOCATION":
-              const {
-                socketID,
-                pointerCoords,
-                username,
-              } = decryptedData.payload;
+              const { socketID, pointerCoords } = decryptedData.payload;
               this.setState(state => {
-                const user = state.collaborators.get(socketID) || {};
+                if (!state.collaborators.has(socketID)) {
+                  state.collaborators.set(socketID, {});
+                }
+                const user = state.collaborators.get(socketID)!;
                 user.pointer = pointerCoords;
-                user.username = username;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -414,7 +411,6 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
-          username: createNameFromSocketId(this.socket.id),
         },
       };
       return this._broadcastSocketData(
@@ -2286,7 +2282,6 @@ export class App extends React.Component<any, AppState> {
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
-    const pointerUsernames: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketID) => {
       if (!user.pointer) {
         return;
@@ -2300,9 +2295,6 @@ export class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
-      if (user.username) {
-        pointerUsernames[socketID] = user.username;
-      }
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       globalSceneState.getAllElements(),
@@ -2317,7 +2309,6 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
-        remotePointerUsernames: pointerUsernames,
       },
       {
         renderOptimizations: true,
