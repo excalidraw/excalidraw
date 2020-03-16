@@ -43,6 +43,7 @@ export type SocketUpdateDataSource = {
     payload: {
       socketID: string;
       pointerCoords: { x: number; y: number };
+      username: string;
     };
   };
 };
@@ -358,4 +359,94 @@ export async function loadScene(id: string | null, privateKey?: string) {
     elements: data.elements,
     appState: data.appState && { ...data.appState },
   };
+}
+
+const ADJ = [
+  "aggressive",
+  "agreeable",
+  "ambitious",
+  "brave",
+  "calm",
+  "delightful",
+  "eager",
+  "faithful",
+  "gentle",
+  "happy",
+  "jolly",
+  "kind",
+  "lively",
+  "nice",
+  "obedient",
+  "polite",
+  "proud",
+  "silly",
+  "thankful",
+  "victorious",
+  "witty",
+  "wonderful",
+  "zealous",
+];
+
+const NOUN = [
+  "alligator",
+  "ant",
+  "bear",
+  "bee",
+  "bird",
+  "camel",
+  "cat",
+  "cheetah",
+  "chicken",
+  "chimpanzee",
+  "cow",
+  "crocodile",
+  "deer",
+  "dog",
+  "dolphin",
+  "duck",
+  "eagle",
+  "elephant",
+  "fish",
+  "fly",
+  "fox",
+  "frog",
+  "giraffe",
+  "goat",
+  "goldfish",
+  "hamster",
+  "hippopotamus",
+  "horse",
+  "kangaroo",
+  "kitten",
+  "lion",
+  "lobster",
+  "monkey",
+  "octopus",
+  "owl",
+  "panda",
+  "pig",
+  "puppy",
+  "rabbit",
+  "rat",
+  "scorpion",
+  "seal",
+  "shark",
+  "sheep",
+  "snail",
+  "snake",
+  "spider",
+  "squirrel",
+  "tiger",
+  "turtle",
+  "wolf",
+  "zebra",
+];
+
+export function createNameFromSocketId(socketId: string) {
+  const buf = new Buffer(socketId, "utf8");
+
+  return [
+    ADJ[buf.readUInt32LE(0) % ADJ.length],
+    NOUN[buf.readUInt32LE(4) % NOUN.length],
+  ].join(" ");
 }
