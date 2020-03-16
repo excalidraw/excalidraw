@@ -14,6 +14,8 @@ export const actionDuplicateSelection = register({
             const newElement = duplicateElement(element);
             newElement.x = newElement.x + 10;
             newElement.y = newElement.y + 10;
+            appState.selectedElementIds[newElement.id] = true;
+            delete appState.selectedElementIds[element.id];
             return acc.concat([element, newElement]);
           }
           return acc.concat(element);
