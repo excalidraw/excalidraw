@@ -43,7 +43,8 @@
     "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
     "language": "Langue",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Dupliquer les éléments sélectionnés"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",

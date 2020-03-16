@@ -43,7 +43,8 @@
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
     "language": "Lenguaje",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

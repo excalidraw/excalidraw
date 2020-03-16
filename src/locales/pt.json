@@ -43,7 +43,8 @@
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
     "language": "Idioma",
-    "createRoom": "Compartilhar uma sessão de colaboração ao vivo"
+    "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
+    "duplicateSelection": "Duplicar os elementos selecionados"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",

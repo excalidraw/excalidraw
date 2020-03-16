@@ -43,7 +43,8 @@
     "drawingCanvas": "Kanvas",
     "layers": "Lapisan",
     "language": "Bahasa",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",

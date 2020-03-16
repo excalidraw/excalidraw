@@ -43,7 +43,8 @@
     "drawingCanvas": "Zeichenfläche",
     "layers": "Ebenen",
     "language": "Sprache",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
