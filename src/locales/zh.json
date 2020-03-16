@@ -43,7 +43,8 @@
     "drawingCanvas": "Drawing Canvas",
     "layers": "图层",
     "language": "语言",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "重置画布",
