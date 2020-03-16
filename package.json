@@ -34,7 +34,7 @@
     "node-sass": "4.13.1",
     "pepjs": "0.5.2",
     "prettier": "1.19.1",
-    "rewire": "4.0.1",
+    "rewire": "5.0.0",
     "typescript": "3.8.3"
   },
   "jest": {
