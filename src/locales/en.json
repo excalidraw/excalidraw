@@ -43,7 +43,8 @@
     "drawingCanvas": "Drawing Canvas",
     "layers": "Layers",
     "language": "Language",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
