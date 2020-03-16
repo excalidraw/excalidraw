@@ -46,6 +46,7 @@ import {
   SOCKET_SERVER,
   SocketUpdateDataSource,
   exportCanvas,
+  createNameFromSocketId,
 } from "../data";
 
 import { renderScene } from "../renderer";
@@ -450,6 +451,7 @@ export class App extends React.Component<any, AppState> {
     } = {};
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
+    const pointerUsernames: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketID) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
@@ -461,6 +463,9 @@ export class App extends React.Component<any, AppState> {
       }
       if (!user.pointer) {
         return;
+      }
+      if (user.username) {
+        pointerUsernames[socketID] = user.username;
       }
       pointerViewportCoords[socketID] = sceneCoordsToViewportCoords(
         {
@@ -496,6 +501,7 @@ export class App extends React.Component<any, AppState> {
         remotePointerViewportCoords: pointerViewportCoords,
         remotePointerButton: cursorButton,
         remoteSelectedElementIds: remoteSelectedElementIds,
+        remotePointerUsernames: pointerUsernames,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -897,6 +903,7 @@ export class App extends React.Component<any, AppState> {
                 socketID,
                 pointerCoords,
                 button,
+                username,
                 selectedElementIds,
               } = decryptedData.payload;
               this.setState((state) => {
@@ -907,6 +914,7 @@ export class App extends React.Component<any, AppState> {
                 user.pointer = pointerCoords;
                 user.button = button;
                 user.selectedElementIds = selectedElementIds;
+                user.username = username;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -960,6 +968,7 @@ export class App extends React.Component<any, AppState> {
           pointerCoords: payload.pointerCoords,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
+          username: createNameFromSocketId(this.socket.id),
         },
       };
       return this._broadcastSocketData(

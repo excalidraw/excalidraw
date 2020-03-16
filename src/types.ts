@@ -53,6 +53,7 @@ export type AppState = {
       };
       button?: "up" | "down";
       selectedElementIds?: AppState["selectedElementIds"];
+      username?: string;
     }
   >;
   shouldCacheIgnoreZoom: boolean;
