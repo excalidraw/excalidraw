@@ -43,7 +43,8 @@
     "drawingCanvas": "Рисование холста",
     "layers": "Слои",
     "language": "Язык",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",

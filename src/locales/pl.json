@@ -43,7 +43,8 @@
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
     "language": "Język",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",

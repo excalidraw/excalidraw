@@ -43,7 +43,8 @@
     "drawingCanvas": "Lerret",
     "layers": "Lag",
     "language": "Språk",
-    "createRoom": "Share a live-collaboration session"
+    "createRoom": "Share a live-collaboration session",
+    "duplicateSelection": "Duplicate selected elements"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
