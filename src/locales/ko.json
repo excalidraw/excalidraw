@@ -39,15 +39,15 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "파일 제목",
     "colorPicker": "색상 선택기",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
+    "canvasBackground": "캔버스 배경",
+    "drawingCanvas": "캔버스 그리기",
+    "layers": "레이어",
     "language": "언어",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "실시간 협업 세션 공유",
+    "duplicateSelection": "선택 영역 복제하기"
   },
   "buttons": {
-    "clearReset": "Reset the canvas",
+    "clearReset": "캔버스 초기화",
     "export": "내보내기",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
@@ -76,17 +76,17 @@
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
     "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다."
   },
   "toolBar": {
-    "selection": "Selection",
-    "rectangle": "Rectangle",
-    "diamond": "Diamond",
-    "ellipse": "Ellipse",
-    "arrow": "Arrow",
-    "line": "Line",
-    "text": "Text",
-    "lock": "Keep selected tool active after drawing"
+    "selection": "선택",
+    "rectangle": "사각형",
+    "diamond": "다이아몬드",
+    "ellipse": "타원",
+    "arrow": "화살표",
+    "line": "라인",
+    "text": "텍스트",
+    "lock": "선택된 도구 유지하기"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
+    "linearElementMulti": "ESC 또는 Enter 키를 눌러 완료하세요.",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   },
   "errorSplash": {
@@ -108,18 +108,18 @@
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "데이터를 불러오는 중입니다. 잠시만 기다려 주세요...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "현재 화면에 공동 작업자를 초대해 협업할 수 있습니다.",
+    "desc_privacy": "안심하세요, 세션은 종단 간 암호화를 사용하므로 당신의 작업은 비공개로 유지되며 서버조차도 작업 내용을 알 수 없습니다.",
+    "desc_start": "아래 버튼을 눌러 시작하세요. (현재 화면을 공유합니다. 이를 원하지 않는다면 직접 제거한 뒤 시작해주세요.)",
+    "button_startSession": "세션 시작",
+    "button_stopSession": "세션 중단",
+    "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
+    "desc_persistenceWarning": "모든 데이터는 P2P 방식으로 공동 작업자 간에 공유되며 서버에는 저장되지 않습니다. 따라서 모든 작업자의 연결이 끊어지면 파일 또는 공유 가능한 링크로 보관하지 않는 한 데이터가 유실됩니다.",
+    "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
+    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 로컬에서 작업을 이어갈 수 있습니다. 로컬 작업은 다른 작업자에게 영향을 미치지 않으며 그들의 공동 작업은 계속 유지됩니다."
   }
 }

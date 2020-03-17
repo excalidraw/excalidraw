@@ -43,7 +43,7 @@
     "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
     "language": "Langue",
-    "createRoom": "Share a live-collaboration session",
+    "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer les éléments sélectionnés"
   },
   "buttons": {
@@ -66,8 +66,8 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Share a live-collaboration session",
-    "createNewRoom": "Create new room"
+    "roomDialog": "Partager une session de collaboration en direct",
+    "createNewRoom": "Créer un nouveau salon"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
@@ -99,27 +99,27 @@
     "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Une erreur est survenue. Essayez ",
+    "headingMain_button": "de recharger la page.",
+    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
+    "clearCanvasMessage_button": "d'effacer la scène.",
+    "clearCanvasCaveat": " Cela entraînera une perte du travail ",
+    "openIssueMessage_pre": "Avant de le faire, nous vous serions reconnaissants d'ouvrir un ticket sur notre ",
+    "openIssueMessage_button": "outil de suivi des bugs.",
+    "openIssueMessage_post": " Veuillez inclure la trace de la pile d'erreur suivante (et si ce n'est pas privé, aussi le contenu de la scène) :",
+    "errorStack": "Trace de la pile d'erreur:",
+    "errorStack_loading": "Chargement des données. Veuillez patienter...",
+    "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Vous pouvez inviter des personnes dans votre scène actuelle à collaborer avec vous.",
+    "desc_privacy": "Ne vous inquiétez pas, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne sera pas en mesure de voir ce que vous faites.",
+    "desc_start": "Pour commencer, cliquez sur le bouton ci-dessous. (La scène actuelle sera utilisée. Si vous ne voulez pas cela, vous pouvez la supprimer manuellement, d'abord)",
+    "button_startSession": "Démarrer la session",
+    "button_stopSession": "Arrêter la session",
+    "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
+    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
+    "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
+    "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   }
 }
