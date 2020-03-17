@@ -99,6 +99,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
+import { rescalePoints } from "../points";
 
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
@@ -1801,89 +1802,68 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "n": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] -= deltaY / (len - i);
-                }
+              const height = element.height - deltaY;
+              if (height <= 0) {
+                break;
               }
 
               mutateElement(element, {
-                height: element.height - deltaY,
+                height,
                 y: element.y + deltaY,
-                points,
+                points:
+                  element.points.length > 0
+                    ? rescalePoints(1, height, element.points)
+                    : undefined,
               });
+
               break;
             }
             case "w": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
+              const width = element.width - deltaX;
 
-                for (let i = 0; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] -= deltaX / (len - i);
-                }
+              if (width <= 0) {
+                // Someday we should implement logic to flip the shape. But for now, just stop.
+                break;
               }
 
               mutateElement(element, {
-                width: element.width - deltaX,
+                width,
                 x: element.x + deltaX,
-                points,
+                points:
+                  element.points.length > 0
+                    ? rescalePoints(0, width, element.points)
+                    : undefined,
               });
               break;
             }
             case "s": {
-              let points;
-
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] += deltaY / (len - i);
-                }
+              const height = element.height + deltaY;
+              if (height <= 0) {
+                break;
               }
 
               mutateElement(element, {
-                height: element.height + deltaY,
-                points,
+                height,
+                points:
+                  element.points.length > 0
+                    ? rescalePoints(1, height, element.points)
+                    : undefined,
               });
+
               break;
             }
             case "e": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] += deltaX / (len - i);
-                }
+              const width = element.width + deltaX;
+              if (width <= 0) {
+                break;
               }
 
               mutateElement(element, {
-                width: element.width + deltaX,
-                points,
+                width,
+                points:
+                  element.points.length > 0
+                    ? rescalePoints(0, width, element.points)
+                    : undefined,
               });
               break;
             }

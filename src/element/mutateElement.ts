@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./types";
 import { randomSeed } from "roughjs/bin/math";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { globalSceneState } from "../scene";
+import { getSizeFromPoints } from "../points";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -17,6 +18,10 @@ export function mutateElement<TElement extends ExcalidrawElement>(
   updates: ElementUpdate<TElement>,
 ) {
   const mutableElement = element as any;
+
+  if (typeof updates.points !== "undefined") {
+    updates = { ...getSizeFromPoints(updates.points!), ...updates };
+  }
 
   for (const key in updates) {
     const value = (updates as any)[key];
