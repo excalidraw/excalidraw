@@ -95,7 +95,7 @@ export function newLinearElement(
   } & ElementConstructorOpts,
 ): ExcalidrawLinearElement {
   return {
-    ..._newElementBase<ExcalidrawLinearElement>("arrow", opts),
+    ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
   };
 }
