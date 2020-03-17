@@ -12,29 +12,28 @@ type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 // The version is used to compare updates when more than one user is working in
 // the same drawing. Note: this will trigger the component to update. Make sure you
 // are calling it either from a React event handler or within unstable_batchedUpdates().
-export function mutateElement<TElement extends ExcalidrawElement>(
+export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ) {
-  const mutableElement = element as any;
-
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
-      mutableElement[key] = value;
+      // @ts-ignore
+      element[key] = value;
     }
   }
 
   if (
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
-    typeof updates.points !== "undefined"
+    typeof (updates as any).points !== "undefined"
   ) {
     invalidateShapeForElement(element);
   }
 
-  mutableElement.version++;
-  mutableElement.versionNonce = randomSeed();
+  element.version++;
+  element.versionNonce = randomSeed();
 
   globalSceneState.informMutation();
 }

@@ -1,7 +1,12 @@
 import { ExcalidrawElement } from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
 
-export { newElement, newTextElement, duplicateElement } from "./newElement";
+export {
+  newElement,
+  newTextElement,
+  newLinearElement,
+  duplicateElement,
+} from "./newElement";
 export {
   getElementAbsoluteCoords,
   getCommonBounds,

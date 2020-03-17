@@ -21,6 +21,7 @@ import {
   getDrawingVersion,
   getSyncableElements,
   hasNonDeletedElements,
+  newLinearElement,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -47,7 +48,7 @@ import { restore } from "../data/restore";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
 
 import {
   isWritableElement,
@@ -99,6 +100,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
+import { isLinearElement } from "../element/typeChecks";
 
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
@@ -706,21 +708,18 @@ export class App extends React.Component<any, AppState> {
             window.devicePixelRatio,
           );
 
-          const element = newTextElement(
-            newElement(
-              "text",
-              x,
-              y,
-              this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor,
-              this.state.currentItemFillStyle,
-              this.state.currentItemStrokeWidth,
-              this.state.currentItemRoughness,
-              this.state.currentItemOpacity,
-            ),
-            data.text,
-            this.state.currentItemFont,
-          );
+          const element = newTextElement({
+            x: x,
+            y: y,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            text: data.text,
+            font: this.state.currentItemFont,
+          });
 
           globalSceneState.replaceAllElements([
             ...globalSceneState.getAllElements(),
@@ -959,21 +958,18 @@ export class App extends React.Component<any, AppState> {
     const element =
       elementAtPosition && isTextElement(elementAtPosition)
         ? elementAtPosition
-        : newTextElement(
-            newElement(
-              "text",
-              x,
-              y,
-              this.state.currentItemStrokeColor,
-              this.state.currentItemBackgroundColor,
-              this.state.currentItemFillStyle,
-              this.state.currentItemStrokeWidth,
-              this.state.currentItemRoughness,
-              this.state.currentItemOpacity,
-            ),
-            "", // default text
-            this.state.currentItemFont, // default font
-          );
+        : newTextElement({
+            x: x,
+            y: y,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            text: "",
+            font: this.state.currentItemFont,
+          });
 
     this.setState({ editingElement: element });
 
@@ -1046,7 +1042,7 @@ export class App extends React.Component<any, AppState> {
             {
               // we need to recreate the element to update dimensions &
               //  position
-              ...newTextElement(element, text, element.font),
+              ...newTextElement({ ...element, text, font: element.font }),
             },
           ]);
         }
@@ -1331,22 +1327,6 @@ export class App extends React.Component<any, AppState> {
     const originX = x;
     const originY = y;
 
-    let element = newElement(
-      this.state.elementType,
-      x,
-      y,
-      this.state.currentItemStrokeColor,
-      this.state.currentItemBackgroundColor,
-      this.state.currentItemFillStyle,
-      this.state.currentItemStrokeWidth,
-      this.state.currentItemRoughness,
-      this.state.currentItemOpacity,
-    );
-
-    if (isTextElement(element)) {
-      element = newTextElement(element, "", this.state.currentItemFont);
-    }
-
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
     let isResizingElements = false;
@@ -1436,30 +1416,30 @@ export class App extends React.Component<any, AppState> {
       this.setState({ selectedElementIds: {} });
     }
 
-    if (isTextElement(element)) {
+    if (this.state.elementType === "text") {
       // if we're currently still editing text, clicking outside
       //  should only finalize it, not create another (irrespective
       //  of state.elementLocked)
       if (this.state.editingElement?.type === "text") {
         return;
       }
-      if (elementIsAddedToSelection) {
-        element = hitElement!;
-      }
-      let textX = event.clientX;
-      let textY = event.clientY;
-      if (!event.altKey) {
-        const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
-          x,
-          y,
-        );
-        if (snappedToCenterPosition) {
-          element.x = snappedToCenterPosition.elementCenterX;
-          element.y = snappedToCenterPosition.elementCenterY;
-          textX = snappedToCenterPosition.wysiwygX;
-          textY = snappedToCenterPosition.wysiwygY;
-        }
-      }
+
+      const snappedToCenterPosition = !event.altKey
+        ? this.getTextWysiwygSnappedToCenterPosition(x, y)
+        : null;
+
+      const element = newTextElement({
+        x: snappedToCenterPosition?.elementCenterX ?? x,
+        y: snappedToCenterPosition?.elementCenterY ?? y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+        text: "",
+        font: this.state.currentItemFont,
+      });
 
       const resetSelection = () => {
         this.setState({
@@ -1470,8 +1450,8 @@ export class App extends React.Component<any, AppState> {
 
       textWysiwyg({
         initText: "",
-        x: textX,
-        y: textY,
+        x: snappedToCenterPosition?.wysiwygX ?? event.clientX,
+        y: snappedToCenterPosition?.wysiwygY ?? event.clientY,
         strokeColor: this.state.currentItemStrokeColor,
         opacity: this.state.currentItemOpacity,
         font: this.state.currentItemFont,
@@ -1481,7 +1461,11 @@ export class App extends React.Component<any, AppState> {
             globalSceneState.replaceAllElements([
               ...globalSceneState.getAllElements(),
               {
-                ...newTextElement(element, text, this.state.currentItemFont),
+                ...newTextElement({
+                  ...element,
+                  text,
+                  font: this.state.currentItemFont,
+                }),
               },
             ]);
           }
@@ -1530,6 +1514,17 @@ export class App extends React.Component<any, AppState> {
           points: [...multiElement.points, [x - rx, y - ry]],
         });
       } else {
+        const element = newLinearElement({
+          type: this.state.elementType,
+          x: x,
+          y: y,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+        });
         this.setState(prevState => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -1548,26 +1543,40 @@ export class App extends React.Component<any, AppState> {
           editingElement: element,
         });
       }
-    } else if (element.type === "selection") {
-      this.setState({
-        selectionElement: element,
-        draggingElement: element,
-      });
     } else {
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements(),
-        element,
-      ]);
-      this.setState({
-        multiElement: null,
-        draggingElement: element,
-        editingElement: element,
+      const element = newElement({
+        type: this.state.elementType,
+        x: x,
+        y: y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
       });
+
+      if (element.type === "selection") {
+        this.setState({
+          selectionElement: element,
+          draggingElement: element,
+        });
+      } else {
+        globalSceneState.replaceAllElements([
+          ...globalSceneState.getAllElements(),
+          element,
+        ]);
+        this.setState({
+          multiElement: null,
+          draggingElement: element,
+          editingElement: element,
+        });
+      }
     }
 
     let resizeArrowFn:
       | ((
-          element: ExcalidrawElement,
+          element: ExcalidrawLinearElement,
           pointIndex: number,
           deltaX: number,
           deltaY: number,
@@ -1578,7 +1587,7 @@ export class App extends React.Component<any, AppState> {
       | null = null;
 
     const arrowResizeOrigin = (
-      element: ExcalidrawElement,
+      element: ExcalidrawLinearElement,
       pointIndex: number,
       deltaX: number,
       deltaY: number,
@@ -1603,7 +1612,9 @@ export class App extends React.Component<any, AppState> {
           x: dx,
           y: dy,
           points: element.points.map((point, i) =>
-            i === pointIndex ? [absPx - element.x, absPy - element.y] : point,
+            i === pointIndex
+              ? ([absPx - element.x, absPy - element.y] as const)
+              : point,
           ),
         });
       } else {
@@ -1611,14 +1622,16 @@ export class App extends React.Component<any, AppState> {
           x: element.x + deltaX,
           y: element.y + deltaY,
           points: element.points.map((point, i) =>
-            i === pointIndex ? [p1[0] - deltaX, p1[1] - deltaY] : point,
+            i === pointIndex
+              ? ([p1[0] - deltaX, p1[1] - deltaY] as const)
+              : point,
           ),
         });
       }
     };
 
     const arrowResizeEnd = (
-      element: ExcalidrawElement,
+      element: ExcalidrawLinearElement,
       pointIndex: number,
       deltaX: number,
       deltaY: number,
@@ -1635,13 +1648,15 @@ export class App extends React.Component<any, AppState> {
         );
         mutateElement(element, {
           points: element.points.map((point, i) =>
-            i === pointIndex ? [width, height] : point,
+            i === pointIndex ? ([width, height] as const) : point,
           ),
         });
       } else {
         mutateElement(element, {
           points: element.points.map((point, i) =>
-            i === pointIndex ? [p1[0] + deltaX, p1[1] + deltaY] : point,
+            i === pointIndex
+              ? ([p1[0] + deltaX, p1[1] + deltaY] as const)
+              : point,
           ),
         });
       }
@@ -1710,10 +1725,9 @@ export class App extends React.Component<any, AppState> {
           const deltaX = x - lastX;
           const deltaY = y - lastY;
           const element = selectedElements[0];
-          const isLinear = element.type === "line" || element.type === "arrow";
           switch (resizeHandle) {
             case "nw":
-              if (isLinear && element.points.length === 2) {
+              if (isLinearElement(element) && element.points.length === 2) {
                 const [, p1] = element.points;
 
                 if (!resizeArrowFn) {
@@ -1738,7 +1752,7 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "ne":
-              if (isLinear && element.points.length === 2) {
+              if (isLinearElement(element) && element.points.length === 2) {
                 const [, p1] = element.points;
                 if (!resizeArrowFn) {
                   if (p1[0] >= 0) {
@@ -1760,7 +1774,7 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "sw":
-              if (isLinear && element.points.length === 2) {
+              if (isLinearElement(element) && element.points.length === 2) {
                 const [, p1] = element.points;
                 if (!resizeArrowFn) {
                   if (p1[0] <= 0) {
@@ -1781,7 +1795,7 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "se":
-              if (isLinear && element.points.length === 2) {
+              if (isLinearElement(element) && element.points.length === 2) {
                 const [, p1] = element.points;
                 if (!resizeArrowFn) {
                   if (p1[0] > 0 || p1[1] > 0) {
@@ -1801,90 +1815,97 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "n": {
-              let points;
-              if (element.points.length > 0) {
+              if (isLinearElement(element) && element.points.length > 0) {
                 const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
+                const points = [...element.points].sort(
+                  (a, b) => a[1] - b[1],
+                ) as [number, number][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
                   pnt[1] -= deltaY / (len - i);
                 }
+
+                mutateElement(element, {
+                  height: element.height - deltaY,
+                  y: element.y + deltaY,
+                  points,
+                });
+              } else {
+                mutateElement(element, {
+                  height: element.height - deltaY,
+                  y: element.y + deltaY,
+                });
               }
 
-              mutateElement(element, {
-                height: element.height - deltaY,
-                y: element.y + deltaY,
-                points,
-              });
               break;
             }
             case "w": {
-              let points;
-              if (element.points.length > 0) {
+              if (isLinearElement(element) && element.points.length > 0) {
                 const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
+                const points = [...element.points].sort(
+                  (a, b) => a[0] - b[0],
+                ) as [number, number][];
 
                 for (let i = 0; i < points.length; ++i) {
                   const pnt = points[i];
                   pnt[0] -= deltaX / (len - i);
                 }
+                mutateElement(element, {
+                  width: element.width - deltaX,
+                  x: element.x + deltaX,
+                  points,
+                });
+              } else {
+                mutateElement(element, {
+                  width: element.width - deltaX,
+                  x: element.x + deltaX,
+                });
               }
-
-              mutateElement(element, {
-                width: element.width - deltaX,
-                x: element.x + deltaX,
-                points,
-              });
               break;
             }
             case "s": {
-              let points;
-
-              if (element.points.length > 0) {
+              if (isLinearElement(element) && element.points.length > 0) {
                 const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
+                const points = [...element.points].sort(
+                  (a, b) => a[1] - b[1],
+                ) as [number, number][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
                   pnt[1] += deltaY / (len - i);
                 }
+                mutateElement(element, {
+                  height: element.height + deltaY,
+                  points,
+                });
+              } else {
+                mutateElement(element, {
+                  height: element.height + deltaY,
+                });
               }
-
-              mutateElement(element, {
-                height: element.height + deltaY,
-                points,
-              });
               break;
             }
             case "e": {
-              let points;
-              if (element.points.length > 0) {
+              if (isLinearElement(element) && element.points.length > 0) {
                 const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
+                const points = [...element.points].sort(
+                  (a, b) => a[0] - b[0],
+                ) as [number, number][];
 
                 for (let i = 1; i < points.length; ++i) {
                   const pnt = points[i];
                   pnt[0] += deltaX / (len - i);
                 }
+                mutateElement(element, {
+                  width: element.width + deltaX,
+                  points,
+                });
+              } else {
+                mutateElement(element, {
+                  width: element.width + deltaX,
+                });
               }
-
-              mutateElement(element, {
-                width: element.width + deltaX,
-                points,
-              });
               break;
             }
           }
@@ -1954,10 +1975,7 @@ export class App extends React.Component<any, AppState> {
       let width = distance(originX, x);
       let height = distance(originY, y);
 
-      const isLinear =
-        this.state.elementType === "line" || this.state.elementType === "arrow";
-
-      if (isLinear) {
+      if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
         const points = draggingElement.points;
         let dx = x - draggingElement.x;
@@ -2043,7 +2061,7 @@ export class App extends React.Component<any, AppState> {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
 
-      if (elementType === "arrow" || elementType === "line") {
+      if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
         }
@@ -2061,7 +2079,7 @@ export class App extends React.Component<any, AppState> {
             ],
           });
           this.setState({
-            multiElement: this.state.draggingElement,
+            multiElement: draggingElement,
             editingElement: this.state.draggingElement,
           });
         } else if (draggingOccurred && !multiElement) {
@@ -2235,10 +2253,11 @@ export class App extends React.Component<any, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    const newElements = clipboardElements.map(clipboardElements => {
-      const duplicate = duplicateElement(clipboardElements);
-      duplicate.x += dx - minX;
-      duplicate.y += dy - minY;
+    const newElements = clipboardElements.map(element => {
+      const duplicate = duplicateElement(element, {
+        x: element.x + dx - minX,
+        y: element.y + dy - minY,
+      });
       return duplicate;
     });
 
