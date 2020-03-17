@@ -10,7 +10,8 @@ type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 
 // This function tracks updates of text elements for the purposes for collaboration.
 // The version is used to compare updates when more than one user is working in
-// the same drawing.
+// the same drawing. Note: this will trigger the component to update. Make sure you
+// are calling it either from a React event handler or within unstable_batchedUpdates().
 export function mutateElement<TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
