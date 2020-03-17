@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
@@ -1625,378 +1626,418 @@ export class App extends React.Component<any, AppState> {
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
+      ReactDOM.unstable_batchedUpdates(() => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
 
-      if (isOverHorizontalScrollBar) {
-        const x = event.clientX;
-        const dx = x - lastX;
-        this.setState({
-          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-        });
-        lastX = x;
-        return;
-      }
+        if (isOverHorizontalScrollBar) {
+          const x = event.clientX;
+          const dx = x - lastX;
+          this.setState({
+            scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+          });
+          lastX = x;
+          return;
+        }
 
-      if (isOverVerticalScrollBar) {
-        const y = event.clientY;
-        const dy = y - lastY;
-        this.setState({
-          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-        });
-        lastY = y;
-        return;
-      }
+        if (isOverVerticalScrollBar) {
+          const y = event.clientY;
+          const dy = y - lastY;
+          this.setState({
+            scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+          });
+          lastY = y;
+          return;
+        }
 
-      // for arrows, don't start dragging until a given threshold
-      //  to ensure we don't create a 2-point arrow by mistake when
-      //  user clicks mouse in a way that it moves a tiny bit (thus
-      //  triggering pointermove)
-      if (
-        !draggingOccurred &&
-        (this.state.elementType === "arrow" ||
-          this.state.elementType === "line")
-      ) {
+        // for arrows, don't start dragging until a given threshold
+        //  to ensure we don't create a 2-point arrow by mistake when
+        //  user clicks mouse in a way that it moves a tiny bit (thus
+        //  triggering pointermove)
+        if (
+          !draggingOccurred &&
+          (this.state.elementType === "arrow" ||
+            this.state.elementType === "line")
+        ) {
+          const { x, y } = viewportCoordsToSceneCoords(
+            event,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
+          if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
+            return;
+          }
+        }
+
+        if (isResizingElements && this.state.resizingElement) {
+          this.setState({ isResizing: true });
+          const el = this.state.resizingElement;
+          const selectedElements = getSelectedElements(
+            globalSceneState.getAllElements(),
+            this.state,
+          );
+          if (selectedElements.length === 1) {
+            const { x, y } = viewportCoordsToSceneCoords(
+              event,
+              this.state,
+              this.canvas,
+              window.devicePixelRatio,
+            );
+            const deltaX = x - lastX;
+            const deltaY = y - lastY;
+            const element = selectedElements[0];
+            const isLinear =
+              element.type === "line" || element.type === "arrow";
+            switch (resizeHandle) {
+              case "nw":
+                if (isLinear && element.points.length === 2) {
+                  const [, p1] = element.points;
+
+                  if (!resizeArrowFn) {
+                    if (p1[0] < 0 || p1[1] < 0) {
+                      resizeArrowFn = arrowResizeEnd;
+                    } else {
+                      resizeArrowFn = arrowResizeOrigin;
+                    }
+                  }
+                  resizeArrowFn(
+                    element,
+                    1,
+                    deltaX,
+                    deltaY,
+                    x,
+                    y,
+                    event.shiftKey,
+                  );
+                } else {
+                  mutateElement(element, {
+                    x: element.x + deltaX,
+                    y: event.shiftKey
+                      ? element.y + element.height - element.width
+                      : element.y + deltaY,
+                    width: element.width - deltaX,
+                    height: event.shiftKey
+                      ? element.width
+                      : element.height - deltaY,
+                  });
+                }
+                break;
+              case "ne":
+                if (isLinear && element.points.length === 2) {
+                  const [, p1] = element.points;
+                  if (!resizeArrowFn) {
+                    if (p1[0] >= 0) {
+                      resizeArrowFn = arrowResizeEnd;
+                    } else {
+                      resizeArrowFn = arrowResizeOrigin;
+                    }
+                  }
+                  resizeArrowFn(
+                    element,
+                    1,
+                    deltaX,
+                    deltaY,
+                    x,
+                    y,
+                    event.shiftKey,
+                  );
+                } else {
+                  const nextWidth = element.width + deltaX;
+                  mutateElement(element, {
+                    y: event.shiftKey
+                      ? element.y + element.height - nextWidth
+                      : element.y + deltaY,
+                    width: nextWidth,
+                    height: event.shiftKey
+                      ? nextWidth
+                      : element.height - deltaY,
+                  });
+                }
+                break;
+              case "sw":
+                if (isLinear && element.points.length === 2) {
+                  const [, p1] = element.points;
+                  if (!resizeArrowFn) {
+                    if (p1[0] <= 0) {
+                      resizeArrowFn = arrowResizeEnd;
+                    } else {
+                      resizeArrowFn = arrowResizeOrigin;
+                    }
+                  }
+                  resizeArrowFn(
+                    element,
+                    1,
+                    deltaX,
+                    deltaY,
+                    x,
+                    y,
+                    event.shiftKey,
+                  );
+                } else {
+                  mutateElement(element, {
+                    x: element.x + deltaX,
+                    width: element.width - deltaX,
+                    height: event.shiftKey
+                      ? element.width
+                      : element.height + deltaY,
+                  });
+                }
+                break;
+              case "se":
+                if (isLinear && element.points.length === 2) {
+                  const [, p1] = element.points;
+                  if (!resizeArrowFn) {
+                    if (p1[0] > 0 || p1[1] > 0) {
+                      resizeArrowFn = arrowResizeEnd;
+                    } else {
+                      resizeArrowFn = arrowResizeOrigin;
+                    }
+                  }
+                  resizeArrowFn(
+                    element,
+                    1,
+                    deltaX,
+                    deltaY,
+                    x,
+                    y,
+                    event.shiftKey,
+                  );
+                } else {
+                  mutateElement(element, {
+                    width: element.width + deltaX,
+                    height: event.shiftKey
+                      ? element.width
+                      : element.height + deltaY,
+                  });
+                }
+                break;
+              case "n": {
+                let points;
+                if (element.points.length > 0) {
+                  const len = element.points.length;
+                  points = [...element.points].sort((a, b) => a[1] - b[1]) as [
+                    number,
+                    number,
+                  ][];
+
+                  for (let i = 1; i < points.length; ++i) {
+                    const pnt = points[i];
+                    pnt[1] -= deltaY / (len - i);
+                  }
+                }
+
+                mutateElement(element, {
+                  height: element.height - deltaY,
+                  y: element.y + deltaY,
+                  points,
+                });
+                break;
+              }
+              case "w": {
+                let points;
+                if (element.points.length > 0) {
+                  const len = element.points.length;
+                  points = [...element.points].sort((a, b) => a[0] - b[0]) as [
+                    number,
+                    number,
+                  ][];
+
+                  for (let i = 0; i < points.length; ++i) {
+                    const pnt = points[i];
+                    pnt[0] -= deltaX / (len - i);
+                  }
+                }
+
+                mutateElement(element, {
+                  width: element.width - deltaX,
+                  x: element.x + deltaX,
+                  points,
+                });
+                break;
+              }
+              case "s": {
+                let points;
+
+                if (element.points.length > 0) {
+                  const len = element.points.length;
+                  points = [...element.points].sort((a, b) => a[1] - b[1]) as [
+                    number,
+                    number,
+                  ][];
+
+                  for (let i = 1; i < points.length; ++i) {
+                    const pnt = points[i];
+                    pnt[1] += deltaY / (len - i);
+                  }
+                }
+
+                mutateElement(element, {
+                  height: element.height + deltaY,
+                  points,
+                });
+                break;
+              }
+              case "e": {
+                let points;
+                if (element.points.length > 0) {
+                  const len = element.points.length;
+                  points = [...element.points].sort((a, b) => a[0] - b[0]) as [
+                    number,
+                    number,
+                  ][];
+
+                  for (let i = 1; i < points.length; ++i) {
+                    const pnt = points[i];
+                    pnt[0] += deltaX / (len - i);
+                  }
+                }
+
+                mutateElement(element, {
+                  width: element.width + deltaX,
+                  points,
+                });
+                break;
+              }
+            }
+
+            if (resizeHandle) {
+              resizeHandle = normalizeResizeHandle(element, resizeHandle);
+            }
+            normalizeDimensions(element);
+
+            document.documentElement.style.cursor = getCursorForResizingElement(
+              {
+                element,
+                resizeHandle,
+              },
+            );
+            mutateElement(el, {
+              x: element.x,
+              y: element.y,
+            });
+
+            lastX = x;
+            lastY = y;
+            return;
+          }
+        }
+
+        if (hitElement && this.state.selectedElementIds[hitElement.id]) {
+          // Marking that click was used for dragging to check
+          // if elements should be deselected on pointerup
+          draggingOccurred = true;
+          const selectedElements = getSelectedElements(
+            globalSceneState.getAllElements(),
+            this.state,
+          );
+          if (selectedElements.length > 0) {
+            const { x, y } = viewportCoordsToSceneCoords(
+              event,
+              this.state,
+              this.canvas,
+              window.devicePixelRatio,
+            );
+
+            selectedElements.forEach(element => {
+              mutateElement(element, {
+                x: element.x + x - lastX,
+                y: element.y + y - lastY,
+              });
+            });
+            lastX = x;
+            lastY = y;
+            return;
+          }
+        }
+
+        // It is very important to read this.state within each move event,
+        // otherwise we would read a stale one!
+        const draggingElement = this.state.draggingElement;
+        if (!draggingElement) {
+          return;
+        }
+
         const { x, y } = viewportCoordsToSceneCoords(
           event,
           this.state,
           this.canvas,
           window.devicePixelRatio,
         );
-        if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
-          return;
-        }
-      }
 
-      if (isResizingElements && this.state.resizingElement) {
-        this.setState({ isResizing: true });
-        const el = this.state.resizingElement;
-        const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
-          this.state,
-        );
-        if (selectedElements.length === 1) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-          const deltaX = x - lastX;
-          const deltaY = y - lastY;
-          const element = selectedElements[0];
-          const isLinear = element.type === "line" || element.type === "arrow";
-          switch (resizeHandle) {
-            case "nw":
-              if (isLinear && element.points.length === 2) {
-                const [, p1] = element.points;
+        let width = distance(originX, x);
+        let height = distance(originY, y);
 
-                if (!resizeArrowFn) {
-                  if (p1[0] < 0 || p1[1] < 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                mutateElement(element, {
-                  x: element.x + deltaX,
-                  y: event.shiftKey
-                    ? element.y + element.height - element.width
-                    : element.y + deltaY,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height - deltaY,
-                });
-              }
-              break;
-            case "ne":
-              if (isLinear && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] >= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const nextWidth = element.width + deltaX;
-                mutateElement(element, {
-                  y: event.shiftKey
-                    ? element.y + element.height - nextWidth
-                    : element.y + deltaY,
-                  width: nextWidth,
-                  height: event.shiftKey ? nextWidth : element.height - deltaY,
-                });
-              }
-              break;
-            case "sw":
-              if (isLinear && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] <= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                mutateElement(element, {
-                  x: element.x + deltaX,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
-                });
-              }
-              break;
-            case "se":
-              if (isLinear && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] > 0 || p1[1] > 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                mutateElement(element, {
-                  width: element.width + deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
-                });
-              }
-              break;
-            case "n": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
+        const isLinear =
+          this.state.elementType === "line" ||
+          this.state.elementType === "arrow";
 
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] -= deltaY / (len - i);
-                }
-              }
+        if (isLinear) {
+          draggingOccurred = true;
+          const points = draggingElement.points;
+          let dx = x - draggingElement.x;
+          let dy = y - draggingElement.y;
 
-              mutateElement(element, {
-                height: element.height - deltaY,
-                y: element.y + deltaY,
-                points,
-              });
-              break;
-            }
-            case "w": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 0; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] -= deltaX / (len - i);
-                }
-              }
-
-              mutateElement(element, {
-                width: element.width - deltaX,
-                x: element.x + deltaX,
-                points,
-              });
-              break;
-            }
-            case "s": {
-              let points;
-
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[1] - b[1]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] += deltaY / (len - i);
-                }
-              }
-
-              mutateElement(element, {
-                height: element.height + deltaY,
-                points,
-              });
-              break;
-            }
-            case "e": {
-              let points;
-              if (element.points.length > 0) {
-                const len = element.points.length;
-                points = [...element.points].sort((a, b) => a[0] - b[0]) as [
-                  number,
-                  number,
-                ][];
-
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] += deltaX / (len - i);
-                }
-              }
-
-              mutateElement(element, {
-                width: element.width + deltaX,
-                points,
-              });
-              break;
-            }
+          if (event.shiftKey && points.length === 2) {
+            ({ width: dx, height: dy } = getPerfectElementSize(
+              this.state.elementType,
+              dx,
+              dy,
+            ));
           }
 
-          if (resizeHandle) {
-            resizeHandle = normalizeResizeHandle(element, resizeHandle);
-          }
-          normalizeDimensions(element);
-
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            element,
-            resizeHandle,
-          });
-          mutateElement(el, {
-            x: element.x,
-            y: element.y,
-          });
-
-          lastX = x;
-          lastY = y;
-          return;
-        }
-      }
-
-      if (hitElement && this.state.selectedElementIds[hitElement.id]) {
-        // Marking that click was used for dragging to check
-        // if elements should be deselected on pointerup
-        draggingOccurred = true;
-        const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
-          this.state,
-        );
-        if (selectedElements.length > 0) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-
-          selectedElements.forEach(element => {
-            mutateElement(element, {
-              x: element.x + x - lastX,
-              y: element.y + y - lastY,
+          if (points.length === 1) {
+            mutateElement(draggingElement, { points: [...points, [dx, dy]] });
+          } else if (points.length > 1) {
+            mutateElement(draggingElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
             });
-          });
-          lastX = x;
-          lastY = y;
-          return;
-        }
-      }
-
-      // It is very important to read this.state within each move event,
-      // otherwise we would read a stale one!
-      const draggingElement = this.state.draggingElement;
-      if (!draggingElement) {
-        return;
-      }
-
-      const { x, y } = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
-
-      let width = distance(originX, x);
-      let height = distance(originY, y);
-
-      const isLinear =
-        this.state.elementType === "line" || this.state.elementType === "arrow";
-
-      if (isLinear) {
-        draggingOccurred = true;
-        const points = draggingElement.points;
-        let dx = x - draggingElement.x;
-        let dy = y - draggingElement.y;
-
-        if (event.shiftKey && points.length === 2) {
-          ({ width: dx, height: dy } = getPerfectElementSize(
-            this.state.elementType,
-            dx,
-            dy,
-          ));
-        }
-
-        if (points.length === 1) {
-          mutateElement(draggingElement, { points: [...points, [dx, dy]] });
-        } else if (points.length > 1) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
-        }
-      } else {
-        if (event.shiftKey) {
-          ({ width, height } = getPerfectElementSize(
-            this.state.elementType,
-            width,
-            y < originY ? -height : height,
-          ));
-
-          if (height < 0) {
-            height = -height;
           }
+        } else {
+          if (event.shiftKey) {
+            ({ width, height } = getPerfectElementSize(
+              this.state.elementType,
+              width,
+              y < originY ? -height : height,
+            ));
+
+            if (height < 0) {
+              height = -height;
+            }
+          }
+
+          mutateElement(draggingElement, {
+            x: x < originX ? originX - width : originX,
+            y: y < originY ? originY - height : originY,
+            width: width,
+            height: height,
+          });
         }
 
-        mutateElement(draggingElement, {
-          x: x < originX ? originX - width : originX,
-          y: y < originY ? originY - height : originY,
-          width: width,
-          height: height,
-        });
-      }
-
-      if (this.state.elementType === "selection") {
-        if (
-          !event.shiftKey &&
-          isSomeElementSelected(globalSceneState.getAllElements(), this.state)
-        ) {
-          this.setState({ selectedElementIds: {} });
+        if (this.state.elementType === "selection") {
+          if (
+            !event.shiftKey &&
+            isSomeElementSelected(globalSceneState.getAllElements(), this.state)
+          ) {
+            this.setState({ selectedElementIds: {} });
+          }
+          const elementsWithinSelection = getElementsWithinSelection(
+            globalSceneState.getAllElements(),
+            draggingElement,
+          );
+          this.setState(prevState => ({
+            selectedElementIds: {
+              ...prevState.selectedElementIds,
+              ...elementsWithinSelection.reduce((map, element) => {
+                map[element.id] = true;
+                return map;
+              }, {} as any),
+            },
+          }));
         }
-        const elementsWithinSelection = getElementsWithinSelection(
-          globalSceneState.getAllElements(),
-          draggingElement,
-        );
-        this.setState(prevState => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            ...elementsWithinSelection.reduce((map, element) => {
-              map[element.id] = true;
-              return map;
-            }, {} as any),
-          },
-        }));
-      }
+      });
     };
 
     const onPointerUp = (event: PointerEvent) => {
