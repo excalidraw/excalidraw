@@ -1,4 +1,8 @@
-import { ExcalidrawElement, PointerType } from "./element/types";
+import {
+  ExcalidrawElement,
+  PointerType,
+  ExcalidrawLinearElement,
+} from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 
@@ -8,7 +12,7 @@ export type Point = Readonly<RoughPoint>;
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  multiElement: ExcalidrawElement | null;
+  multiElement: ExcalidrawLinearElement | null;
   selectionElement: ExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)

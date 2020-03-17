@@ -8,7 +8,9 @@ import nanoid from "nanoid";
 import { calculateScrollCenter } from "../scene";
 
 export function restore(
-  savedElements: readonly ExcalidrawElement[],
+  // we're making the elements mutable for this API because we want to
+  //  efficiently remove/tweak properties on them (to migrate old scenes)
+  savedElements: readonly Mutable<ExcalidrawElement>[],
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
 ): DataState {
@@ -35,6 +37,7 @@ export function restore(
             [element.width, element.height],
           ];
         }
+        element.points = points;
       } else if (element.type === "line") {
         // old spec, pre-arrows
         // old spec, post-arrows
@@ -46,8 +49,13 @@ export function restore(
         } else {
           points = element.points;
         }
+        element.points = points;
       } else {
         normalizeDimensions(element);
+        // old spec, where non-linear elements used to have empty points arrays
+        if ("points" in element) {
+          delete element.points;
+        }
       }
 
       return {
@@ -62,7 +70,6 @@ export function restore(
           element.opacity === null || element.opacity === undefined
             ? 100
             : element.opacity,
-        points,
       };
     });
 

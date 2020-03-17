@@ -1,9 +1,21 @@
-import { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawLinearElement,
+} from "./types";
 
 export function isTextElement(
   element: ExcalidrawElement,
 ): element is ExcalidrawTextElement {
   return element.type === "text";
+}
+
+export function isLinearElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLinearElement {
+  return (
+    element != null && (element.type === "arrow" || element.type === "line")
+  );
 }
 
 export function isExcalidrawElement(element: any): boolean {

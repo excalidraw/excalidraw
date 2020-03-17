@@ -5,6 +5,7 @@ import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
 import { AppState } from "../types";
+import { isLinearElement } from "../element/typeChecks";
 
 interface Hint {
   appState: AppState;
@@ -23,12 +24,8 @@ const getHints = ({ appState, elements }: Hint) => {
 
   if (isResizing) {
     const selectedElements = getSelectedElements(elements, appState);
-    if (
-      selectedElements.length === 1 &&
-      (selectedElements[0].type === "arrow" ||
-        selectedElements[0].type === "line") &&
-      selectedElements[0].points.length > 2
-    ) {
+    const targetElement = selectedElements[0];
+    if (isLinearElement(targetElement) && targetElement.points.length > 2) {
       return null;
     }
     return t("hints.resize");

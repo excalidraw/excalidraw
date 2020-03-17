@@ -11,6 +11,7 @@ import { Point } from "../types";
 import { Drawable, OpSet } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
+import { isLinearElement } from "./typeChecks";
 
 function isElementDraggableFromInside(
   element: ExcalidrawElement,
@@ -158,7 +159,7 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
         lineThreshold
     );
-  } else if (element.type === "arrow" || element.type === "line") {
+  } else if (isLinearElement(element)) {
     if (!getShapeForElement(element)) {
       return false;
     }

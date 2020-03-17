@@ -1,4 +1,9 @@
-import { newElement, newTextElement, duplicateElement } from "./newElement";
+import {
+  newTextElement,
+  duplicateElement,
+  newLinearElement,
+} from "./newElement";
+import { mutateElement } from "./mutateElement";
 
 function isPrimitive(val: any) {
   const type = typeof val;
@@ -17,25 +22,27 @@ function assertCloneObjects(source: any, clone: any) {
 }
 
 it("clones arrow element", () => {
-  const element = newElement(
-    "arrow",
-    0,
-    0,
-    "#000000",
-    "transparent",
-    "hachure",
-    1,
-    1,
-    100,
-  );
+  const element = newLinearElement({
+    type: "arrow",
+    x: 0,
+    y: 0,
+    strokeColor: "#000000",
+    backgroundColor: "transparent",
+    fillStyle: "hachure",
+    strokeWidth: 1,
+    roughness: 1,
+    opacity: 100,
+  });
 
   // @ts-ignore
   element.__proto__ = { hello: "world" };
 
-  element.points = [
-    [1, 2],
-    [3, 4],
-  ];
+  mutateElement(element, {
+    points: [
+      [1, 2],
+      [3, 4],
+    ],
+  });
 
   const copy = duplicateElement(element);
 
@@ -59,17 +66,24 @@ it("clones arrow element", () => {
 });
 
 it("clones text element", () => {
-  const element = newTextElement(
-    newElement("text", 0, 0, "#000000", "transparent", "hachure", 1, 1, 100),
-    "hello",
-    "Arial 20px",
-  );
+  const element = newTextElement({
+    x: 0,
+    y: 0,
+    strokeColor: "#000000",
+    backgroundColor: "transparent",
+    fillStyle: "hachure",
+    strokeWidth: 1,
+    roughness: 1,
+    opacity: 100,
+    text: "hello",
+    font: "Arial 20px",
+  });
 
   const copy = duplicateElement(element);
 
   assertCloneObjects(element, copy);
 
-  expect(copy.points).not.toBe(element.points);
+  expect(copy).not.toHaveProperty("points");
   expect(copy).not.toHaveProperty("shape");
   expect(copy.id).not.toBe(element.id);
   expect(typeof copy.id).toBe("string");
