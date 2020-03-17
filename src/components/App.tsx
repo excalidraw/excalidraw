@@ -1330,7 +1330,7 @@ export class App extends React.Component<any, AppState> {
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
-    let elementIsAddedToSelection = false;
+    let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
       const resizeElement = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
@@ -1386,7 +1386,7 @@ export class App extends React.Component<any, AppState> {
             globalSceneState.replaceAllElements(
               globalSceneState.getAllElements(),
             );
-            elementIsAddedToSelection = true;
+            hitElementWasAddedToSelection = true;
           }
 
           // We duplicate the selected element if alt is pressed on pointer down
@@ -1396,7 +1396,10 @@ export class App extends React.Component<any, AppState> {
             const nextElements = [];
             const elementsToAppend = [];
             for (const element of globalSceneState.getAllElements()) {
-              if (this.state.selectedElementIds[element.id]) {
+              if (
+                this.state.selectedElementIds[element.id] ||
+                (element.id === hitElement.id && hitElementWasAddedToSelection)
+              ) {
                 nextElements.push(duplicateElement(element));
                 elementsToAppend.push(element);
               } else {
@@ -2123,7 +2126,7 @@ export class App extends React.Component<any, AppState> {
       // If click occurred and elements were dragged or some element
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
-      if (hitElement && !draggingOccurred && !elementIsAddedToSelection) {
+      if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
         if (event.shiftKey) {
           this.setState(prevState => ({
             selectedElementIds: {
