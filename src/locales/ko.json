@@ -76,13 +76,13 @@
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
     "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다."
   },
   "toolBar": {
-    "selection": "Selection",
-    "rectangle": "Rectangle",
-    "diamond": "Diamond",
-    "ellipse": "Ellipse",
+    "selection": "선택",
+    "rectangle": "사각형",
+    "diamond": "다이아몬드",
+    "ellipse": "타원",
     "arrow": "Arrow",
     "line": "Line",
     "text": "Text",
