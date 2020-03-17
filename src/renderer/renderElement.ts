@@ -330,6 +330,7 @@ export function renderElement(
       break;
     }
     default: {
+      // @ts-ignore
       throw new Error(`Unimplemented type ${element.type}`);
     }
   }
@@ -420,6 +421,7 @@ export function renderElementToSvg(
         }
         svgRoot.appendChild(node);
       } else {
+        // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }

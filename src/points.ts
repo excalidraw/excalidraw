@@ -12,7 +12,7 @@ export function rescalePoints(
   dimension: 0 | 1,
   nextDimensionSize: number,
   prevPoints: readonly Point[],
-): readonly Point[] {
+): Point[] {
   const prevDimValues = prevPoints.map(point => point[dimension]);
   const prevMaxDimension = Math.max(...prevDimValues);
   const prevMinDimension = Math.min(...prevDimValues);
