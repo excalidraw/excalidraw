@@ -44,6 +44,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "arrow" | "line";
     points: Point[];
+    lastCommittedPoint?: Point | null;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

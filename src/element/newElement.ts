@@ -91,12 +91,14 @@ export function newTextElement(
 
 export function newLinearElement(
   opts: {
-    type: "arrow" | "line";
+    type: ExcalidrawLinearElement["type"];
+    lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
 ): ExcalidrawLinearElement {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
+    lastCommittedPoint: opts.lastCommittedPoint || null,
   };
 }
 

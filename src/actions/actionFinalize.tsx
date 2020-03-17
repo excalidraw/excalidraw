@@ -18,12 +18,15 @@ export const actionFinalize = register({
     if (appState.multiElement) {
       // pen and mouse have hover
       if (appState.lastPointerDownWith !== "touch") {
-        mutateElement(appState.multiElement, {
-          points: appState.multiElement.points.slice(
-            0,
-            appState.multiElement.points.length - 1,
-          ),
-        });
+        const { points, lastCommittedPoint } = appState.multiElement;
+        if (
+          !lastCommittedPoint ||
+          points[points.length - 1] !== lastCommittedPoint
+        ) {
+          mutateElement(appState.multiElement, {
+            points: appState.multiElement.points.slice(0, -1),
+          });
+        }
       }
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
