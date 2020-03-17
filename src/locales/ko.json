@@ -39,15 +39,15 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "파일 제목",
     "colorPicker": "색상 선택기",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
+    "canvasBackground": "캔버스 배경",
+    "drawingCanvas": "캔버스 그리기",
+    "layers": "레이어",
     "language": "언어",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "실시간 협업 세션 공유",
+    "duplicateSelection": "선택 영역 복제하기"
   },
   "buttons": {
-    "clearReset": "Reset the canvas",
+    "clearReset": "캔버스 초기화",
     "export": "내보내기",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
@@ -83,10 +83,10 @@
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
-    "arrow": "Arrow",
-    "line": "Line",
-    "text": "Text",
-    "lock": "Keep selected tool active after drawing"
+    "arrow": "화살표",
+    "line": "라인",
+    "text": "텍스트",
+    "lock": "선택된 도구 유지하기"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
+    "linearElementMulti": "ESC 또는 Enter 키를 눌러 완료하세요.",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   },
   "errorSplash": {
@@ -115,9 +115,9 @@
     "desc_intro": "You can invite people to your current scene to collaborate with you.",
     "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
     "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
+    "button_startSession": "세션 시작",
+    "button_stopSession": "세션 중단",
+    "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
     "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
     "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
