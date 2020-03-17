@@ -97,6 +97,16 @@ import { ScrollBars } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { unstable_batchedUpdates } from "react-dom";
+import { SceneStateCallbackRemover } from "../scene/globalScene";
+
+function withBatchedUpdates<
+  TFunction extends ((event: any) => void) | (() => void)
+>(func: TFunction) {
+  return (event => {
+    unstable_batchedUpdates(func, event);
+  }) as TFunction;
+}
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
@@ -159,6 +169,7 @@ export class App extends React.Component<any, AppState> {
   roomID: string | null = null;
   roomKey: string | null = null;
   lastBroadcastedOrReceivedSceneVersion: number = -1;
+  removeSceneCallback: SceneStateCallbackRemover | null = null;
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
@@ -201,7 +212,7 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private onCut = (event: ClipboardEvent) => {
+  private onCut = withBatchedUpdates((event: ClipboardEvent) => {
     if (isWritableElement(event.target)) {
       return;
     }
@@ -214,20 +225,21 @@ export class App extends React.Component<any, AppState> {
     history.resumeRecording();
     this.setState({ ...appState });
     event.preventDefault();
-  };
-  private onCopy = (event: ClipboardEvent) => {
+  });
+
+  private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
     if (isWritableElement(event.target)) {
       return;
     }
     copyToAppClipboard(globalSceneState.getAllElements(), this.state);
     event.preventDefault();
-  };
+  });
 
-  private onUnload = () => {
+  private onUnload = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.saveDebounced();
     this.saveDebounced.flush();
-  };
+  });
 
   private disableEvent: EventHandlerNonNull = event => {
     event.preventDefault();
@@ -454,7 +466,7 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private handleSceneCallback = () => {
+  private onSceneUpdated = () => {
     this.setState({});
   };
 
@@ -469,7 +481,9 @@ export class App extends React.Component<any, AppState> {
       });
     }
 
-    globalSceneState.addCallback(this.handleSceneCallback);
+    this.removeSceneCallback = globalSceneState.addCallback(
+      this.onSceneUpdated,
+    );
 
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.pasteFromClipboard);
@@ -528,6 +542,8 @@ export class App extends React.Component<any, AppState> {
 
   public componentWillUnmount() {
     this.unmounted = true;
+    this.removeSceneCallback!();
+
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.pasteFromClipboard);
     document.removeEventListener("cut", this.onCut);
@@ -561,19 +577,21 @@ export class App extends React.Component<any, AppState> {
 
   public state: AppState = getDefaultAppState();
 
-  private onResize = () => {
+  private onResize = withBatchedUpdates(() => {
     globalSceneState
       .getAllElements()
       .forEach(element => invalidateShapeForElement(element));
     this.setState({});
-  };
+  });
 
-  private updateCurrentCursorPosition = (event: MouseEvent) => {
-    cursorX = event.x;
-    cursorY = event.y;
-  };
+  private updateCurrentCursorPosition = withBatchedUpdates(
+    (event: MouseEvent) => {
+      cursorX = event.x;
+      cursorY = event.y;
+    },
+  );
 
-  private onKeyDown = (event: KeyboardEvent) => {
+  private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
@@ -629,9 +647,9 @@ export class App extends React.Component<any, AppState> {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
-  };
+  });
 
-  private onKeyUp = (event: KeyboardEvent) => {
+  private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor();
@@ -644,7 +662,7 @@ export class App extends React.Component<any, AppState> {
       }
       isHoldingSpace = false;
     }
-  };
+  });
 
   private copyToAppClipboard = () => {
     copyToAppClipboard(globalSceneState.getAllElements(), this.state);
@@ -666,55 +684,57 @@ export class App extends React.Component<any, AppState> {
     );
   };
 
-  private pasteFromClipboard = async (event: ClipboardEvent | null) => {
-    // #686
-    const target = document.activeElement;
-    const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
-    if (
-      // if no ClipboardEvent supplied, assume we're pasting via contextMenu
-      //  thus these checks don't make sense
-      !event ||
-      (elementUnderCursor instanceof HTMLCanvasElement &&
-        !isWritableElement(target))
-    ) {
-      const data = await getClipboardContent(event);
-      if (data.elements) {
-        this.addElementsFromPaste(data.elements);
-      } else if (data.text) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
-          this.state,
-          this.canvas,
-          window.devicePixelRatio,
-        );
+  private pasteFromClipboard = withBatchedUpdates(
+    async (event: ClipboardEvent | null) => {
+      // #686
+      const target = document.activeElement;
+      const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+      if (
+        // if no ClipboardEvent supplied, assume we're pasting via contextMenu
+        //  thus these checks don't make sense
+        !event ||
+        (elementUnderCursor instanceof HTMLCanvasElement &&
+          !isWritableElement(target))
+      ) {
+        const data = await getClipboardContent(event);
+        if (data.elements) {
+          this.addElementsFromPaste(data.elements);
+        } else if (data.text) {
+          const { x, y } = viewportCoordsToSceneCoords(
+            { clientX: cursorX, clientY: cursorY },
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
 
-        const element = newTextElement(
-          newElement(
-            "text",
-            x,
-            y,
-            this.state.currentItemStrokeColor,
-            this.state.currentItemBackgroundColor,
-            this.state.currentItemFillStyle,
-            this.state.currentItemStrokeWidth,
-            this.state.currentItemRoughness,
-            this.state.currentItemOpacity,
-          ),
-          data.text,
-          this.state.currentItemFont,
-        );
+          const element = newTextElement(
+            newElement(
+              "text",
+              x,
+              y,
+              this.state.currentItemStrokeColor,
+              this.state.currentItemBackgroundColor,
+              this.state.currentItemFillStyle,
+              this.state.currentItemStrokeWidth,
+              this.state.currentItemRoughness,
+              this.state.currentItemOpacity,
+            ),
+            data.text,
+            this.state.currentItemFont,
+          );
 
-        globalSceneState.replaceAllElements([
-          ...globalSceneState.getAllElements(),
-          element,
-        ]);
-        this.setState({ selectedElementIds: { [element.id]: true } });
-        history.resumeRecording();
+          globalSceneState.replaceAllElements([
+            ...globalSceneState.getAllElements(),
+            element,
+          ]);
+          this.setState({ selectedElementIds: { [element.id]: true } });
+          history.resumeRecording();
+        }
+        this.selectShapeTool("selection");
+        event?.preventDefault();
       }
-      this.selectShapeTool("selection");
-      event?.preventDefault();
-    }
-  };
+    },
+  );
 
   private selectShapeTool(elementType: AppState["elementType"]) {
     if (!isHoldingSpace) {
@@ -730,21 +750,23 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private onGestureStart = (event: GestureEvent) => {
+  private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
     gesture.initialScale = this.state.zoom;
-  };
-  private onGestureChange = (event: GestureEvent) => {
+  });
+
+  private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
 
     this.setState({
       zoom: getNormalizedZoom(gesture.initialScale! * event.scale),
     });
-  };
-  private onGestureEnd = (event: GestureEvent) => {
+  });
+
+  private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
     gesture.initialScale = null;
-  };
+  });
 
   setAppState = (obj: any) => {
     this.setState(obj);
@@ -1174,7 +1196,7 @@ export class App extends React.Component<any, AppState> {
       isPanning = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
       let { clientX: lastX, clientY: lastY } = event;
-      const onPointerMove = (event: PointerEvent) => {
+      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
         const deltaX = lastX - event.clientX;
         const deltaY = lastY - event.clientY;
         lastX = event.clientX;
@@ -1188,17 +1210,19 @@ export class App extends React.Component<any, AppState> {
             this.state.scrollY - deltaY / this.state.zoom,
           ),
         });
-      };
-      const teardown = (lastPointerUp = () => {
-        lastPointerUp = null;
-        isPanning = false;
-        if (!isHoldingSpace) {
-          setCursorForShape(this.state.elementType);
-        }
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", teardown);
-        window.removeEventListener("blur", teardown);
       });
+      const teardown = withBatchedUpdates(
+        (lastPointerUp = () => {
+          lastPointerUp = null;
+          isPanning = false;
+          if (!isHoldingSpace) {
+            setCursorForShape(this.state.elementType);
+          }
+          window.removeEventListener("pointermove", onPointerMove);
+          window.removeEventListener("pointerup", teardown);
+          window.removeEventListener("blur", teardown);
+        }),
+      );
       window.addEventListener("blur", teardown);
       window.addEventListener("pointermove", onPointerMove, {
         passive: true,
@@ -1264,7 +1288,7 @@ export class App extends React.Component<any, AppState> {
       isDraggingScrollBar = true;
       lastX = event.clientX;
       lastY = event.clientY;
-      const onPointerMove = (event: PointerEvent) => {
+      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) {
           return;
@@ -1288,15 +1312,15 @@ export class App extends React.Component<any, AppState> {
           });
           lastY = y;
         }
-      };
+      });
 
-      const onPointerUp = () => {
+      const onPointerUp = withBatchedUpdates(() => {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
         lastPointerUp = null;
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
-      };
+      });
 
       lastPointerUp = onPointerUp;
 
@@ -1624,7 +1648,7 @@ export class App extends React.Component<any, AppState> {
       }
     };
 
-    const onPointerMove = (event: PointerEvent) => {
+    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
         return;
@@ -1997,9 +2021,9 @@ export class App extends React.Component<any, AppState> {
           },
         }));
       }
-    };
+    });
 
-    const onPointerUp = (event: PointerEvent) => {
+    const onPointerUp = withBatchedUpdates((event: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -2150,7 +2174,7 @@ export class App extends React.Component<any, AppState> {
           draggingElement: null,
         });
       }
-    };
+    });
 
     lastPointerUp = onPointerUp;
 
@@ -2158,7 +2182,7 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("pointerup", onPointerUp);
   };
 
-  private handleWheel = (event: WheelEvent) => {
+  private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
     const { deltaX, deltaY } = event;
 
@@ -2181,9 +2205,9 @@ export class App extends React.Component<any, AppState> {
       scrollX: normalizeScroll(scrollX - deltaX / zoom),
       scrollY: normalizeScroll(scrollY - deltaY / zoom),
     }));
-  };
+  });
 
-  private beforeUnload = (event: BeforeUnloadEvent) => {
+  private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
       this.state.isCollaborating &&
       hasNonDeletedElements(globalSceneState.getAllElements())
@@ -2192,7 +2216,7 @@ export class App extends React.Component<any, AppState> {
       // NOTE: modern browsers no longer allow showing a custom message here
       event.returnValue = "";
     }
-  };
+  });
 
   private addElementsFromPaste = (
     clipboardElements: readonly ExcalidrawElement[],

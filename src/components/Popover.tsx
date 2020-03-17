@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
 import "./Popover.css";
+import { unstable_batchedUpdates } from "react-dom";
 
 type Props = {
   top?: number;
@@ -39,7 +40,7 @@ export function Popover({
     if (onCloseRequest) {
       const handler = (e: Event) => {
         if (!popoverRef.current?.contains(e.target as Node)) {
-          onCloseRequest();
+          unstable_batchedUpdates(() => onCloseRequest());
         }
       };
       document.addEventListener("pointerdown", handler, false);
