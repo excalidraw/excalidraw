@@ -4,6 +4,7 @@ import { render, fireEvent } from "./test-utils";
 import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
+import { ExcalidrawLinearElement } from "../element/types";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -88,10 +89,12 @@ describe("multi point mode in linear elements", () => {
     expect(renderScene).toHaveBeenCalledTimes(10);
     expect(h.elements.length).toEqual(1);
 
-    expect(h.elements[0].type).toEqual("arrow");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(30);
-    expect(h.elements[0].points).toEqual([
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    expect(element.type).toEqual("arrow");
+    expect(element.x).toEqual(30);
+    expect(element.y).toEqual(30);
+    expect(element.points).toEqual([
       [0, 0],
       [20, 30],
       [70, 110],
@@ -125,10 +128,12 @@ describe("multi point mode in linear elements", () => {
     expect(renderScene).toHaveBeenCalledTimes(10);
     expect(h.elements.length).toEqual(1);
 
-    expect(h.elements[0].type).toEqual("line");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(30);
-    expect(h.elements[0].points).toEqual([
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    expect(element.type).toEqual("line");
+    expect(element.x).toEqual(30);
+    expect(element.y).toEqual(30);
+    expect(element.points).toEqual([
       [0, 0],
       [20, 30],
       [70, 110],
