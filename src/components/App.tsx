@@ -186,31 +186,30 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(createRedoAction(history));
   }
 
-  private syncActionResult = (
-    res: ActionResult,
-    commitToHistory: boolean = true,
-  ) => {
-    if (this.unmounted) {
-      return;
-    }
-    if (res.elements) {
-      globalSceneState.replaceAllElements(res.elements);
-      if (commitToHistory) {
-        history.resumeRecording();
+  private syncActionResult = withBatchedUpdates(
+    (res: ActionResult, commitToHistory: boolean = true) => {
+      if (this.unmounted) {
+        return;
       }
-    }
+      if (res.elements) {
+        globalSceneState.replaceAllElements(res.elements);
+        if (commitToHistory) {
+          history.resumeRecording();
+        }
+      }
 
-    if (res.appState) {
-      if (commitToHistory) {
-        history.resumeRecording();
+      if (res.appState) {
+        if (commitToHistory) {
+          history.resumeRecording();
+        }
+        this.setState(state => ({
+          ...res.appState,
+          isCollaborating: state.isCollaborating,
+          collaborators: state.collaborators,
+        }));
       }
-      this.setState(state => ({
-        ...res.appState,
-        isCollaborating: state.isCollaborating,
-        collaborators: state.collaborators,
-      }));
-    }
-  };
+    },
+  );
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
     if (isWritableElement(event.target)) {
