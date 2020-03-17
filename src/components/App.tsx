@@ -1039,11 +1039,8 @@ export class App extends React.Component<any, AppState> {
         if (text) {
           globalSceneState.replaceAllElements([
             ...globalSceneState.getAllElements(),
-            {
-              // we need to recreate the element to update dimensions &
-              //  position
-              ...newTextElement({ ...element, text, font: element.font }),
-            },
+            // we need to recreate the element to update dimensions & position
+            newTextElement({ ...element, text, font: element.font }),
           ]);
         }
         this.setState(prevState => ({
@@ -1424,9 +1421,9 @@ export class App extends React.Component<any, AppState> {
         return;
       }
 
-      const snappedToCenterPosition = !event.altKey
-        ? this.getTextWysiwygSnappedToCenterPosition(x, y)
-        : null;
+      const snappedToCenterPosition = event.altKey
+        ? null
+        : this.getTextWysiwygSnappedToCenterPosition(x, y);
 
       const element = newTextElement({
         x: snappedToCenterPosition?.elementCenterX ?? x,
@@ -1460,13 +1457,11 @@ export class App extends React.Component<any, AppState> {
           if (text) {
             globalSceneState.replaceAllElements([
               ...globalSceneState.getAllElements(),
-              {
-                ...newTextElement({
-                  ...element,
-                  text,
-                  font: this.state.currentItemFont,
-                }),
-              },
+              newTextElement({
+                ...element,
+                text,
+                font: this.state.currentItemFont,
+              }),
             ]);
           }
           this.setState(prevState => ({
@@ -2253,13 +2248,12 @@ export class App extends React.Component<any, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    const newElements = clipboardElements.map(element => {
-      const duplicate = duplicateElement(element, {
+    const newElements = clipboardElements.map(element =>
+      duplicateElement(element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
-      });
-      return duplicate;
-    });
+      }),
+    );
 
     globalSceneState.replaceAllElements([
       ...globalSceneState.getAllElements(),
