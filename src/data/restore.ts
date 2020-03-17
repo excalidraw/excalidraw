@@ -8,6 +8,8 @@ import nanoid from "nanoid";
 import { calculateScrollCenter } from "../scene";
 
 export function restore(
+  // we're making the elements mutable for this API because we want to
+  //  efficiently remove/tweak properties on them (to migrate old scenes)
   savedElements: readonly Mutable<ExcalidrawElement>[],
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
@@ -50,6 +52,7 @@ export function restore(
         element.points = points;
       } else {
         normalizeDimensions(element);
+        // old spec, where non-linear elements used to have empty points arrays
         if ("points" in element) {
           delete element.points;
         }
