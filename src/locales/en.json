@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Press Escape or Enter to finish",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   },
   "errorSplash": {
