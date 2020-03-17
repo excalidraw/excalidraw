@@ -101,6 +101,7 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
+import { rescalePoints } from "../points";
 
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
@@ -1810,25 +1811,20 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             case "n": {
-              if (isLinearElement(element) && element.points.length > 0) {
-                const len = element.points.length;
-                const points = [...element.points].sort(
-                  (a, b) => a[1] - b[1],
-                ) as [number, number][];
+              const height = element.height - deltaY;
+              if (height <= 0) {
+                break;
+              }
 
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] -= deltaY / (len - i);
-                }
-
+              if (isLinearElement(element)) {
                 mutateElement(element, {
-                  height: element.height - deltaY,
+                  height,
                   y: element.y + deltaY,
-                  points,
+                  points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
-                  height: element.height - deltaY,
+                  height,
                   y: element.y + deltaY,
                 });
               }
@@ -1836,69 +1832,58 @@ export class App extends React.Component<any, AppState> {
               break;
             }
             case "w": {
-              if (isLinearElement(element) && element.points.length > 0) {
-                const len = element.points.length;
-                const points = [...element.points].sort(
-                  (a, b) => a[0] - b[0],
-                ) as [number, number][];
+              const width = element.width - deltaX;
 
-                for (let i = 0; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] -= deltaX / (len - i);
-                }
+              if (width <= 0) {
+                // Someday we should implement logic to flip the shape. But for now, just stop.
+                break;
+              }
+              if (isLinearElement(element)) {
                 mutateElement(element, {
-                  width: element.width - deltaX,
+                  width,
                   x: element.x + deltaX,
-                  points,
+                  points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
-                  width: element.width - deltaX,
+                  width,
                   x: element.x + deltaX,
                 });
               }
               break;
             }
             case "s": {
-              if (isLinearElement(element) && element.points.length > 0) {
-                const len = element.points.length;
-                const points = [...element.points].sort(
-                  (a, b) => a[1] - b[1],
-                ) as [number, number][];
+              const height = element.height + deltaY;
+              if (height <= 0) {
+                break;
+              }
 
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[1] += deltaY / (len - i);
-                }
+              if (isLinearElement(element)) {
                 mutateElement(element, {
-                  height: element.height + deltaY,
-                  points,
+                  height,
+                  points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
-                  height: element.height + deltaY,
+                  height,
                 });
               }
               break;
             }
             case "e": {
-              if (isLinearElement(element) && element.points.length > 0) {
-                const len = element.points.length;
-                const points = [...element.points].sort(
-                  (a, b) => a[0] - b[0],
-                ) as [number, number][];
+              const width = element.width + deltaX;
+              if (width <= 0) {
+                break;
+              }
 
-                for (let i = 1; i < points.length; ++i) {
-                  const pnt = points[i];
-                  pnt[0] += deltaX / (len - i);
-                }
+              if (isLinearElement(element)) {
                 mutateElement(element, {
-                  width: element.width + deltaX,
-                  points,
+                  width,
+                  points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
-                  width: element.width + deltaX,
+                  width,
                 });
               }
               break;

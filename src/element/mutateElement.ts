@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./types";
 import { randomSeed } from "roughjs/bin/math";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { globalSceneState } from "../scene";
+import { getSizeFromPoints } from "../points";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -16,6 +17,14 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ) {
+  // casting to any because can't use `in` operator
+  // (see https://github.com/microsoft/TypeScript/issues/21732)
+  const { points } = updates as any;
+
+  if (typeof points !== "undefined") {
+    updates = { ...getSizeFromPoints(points), ...updates };
+  }
+
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
@@ -27,7 +36,7 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   if (
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
-    typeof (updates as any).points !== "undefined"
+    typeof points !== "undefined"
   ) {
     invalidateShapeForElement(element);
   }
