@@ -66,7 +66,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Partager une session de collaboration en direct",
+    "roomDialog": "Start live collaboration",
     "createNewRoom": "Créer un nouveau salon"
   },
   "alerts": {
@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
-    "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   },
   "errorSplash": {
@@ -114,7 +114,6 @@
   "roomDialog": {
     "desc_intro": "Vous pouvez inviter des personnes dans votre scène actuelle à collaborer avec vous.",
     "desc_privacy": "Ne vous inquiétez pas, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne sera pas en mesure de voir ce que vous faites.",
-    "desc_start": "Pour commencer, cliquez sur le bouton ci-dessous. (La scène actuelle sera utilisée. Si vous ne voulez pas cela, vous pouvez la supprimer manuellement, d'abord)",
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
