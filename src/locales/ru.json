@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
-    "linearElementMulti": "Нажмите Escape или Enter, чтобы закончить",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
   },
   "errorSplash": {
