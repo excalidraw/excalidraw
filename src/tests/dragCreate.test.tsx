@@ -15,7 +15,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {
@@ -36,7 +36,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("rectangle");
@@ -64,7 +64,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("ellipse");
@@ -92,7 +92,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("diamond");
@@ -120,7 +120,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
 
@@ -152,7 +152,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
 
@@ -183,7 +183,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -202,7 +202,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -221,7 +221,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -243,7 +243,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -265,7 +265,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 });
