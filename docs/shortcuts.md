@@ -22,18 +22,19 @@
 
 ### Editor
 
-| Function                 | Mac  |       Other        |
-| ------------------------ | :--: | :----------------: |
-| Copy                     |  ⌘C  |     `Ctrl + C`     |
-| Paste                    |  ⌘V  |     `Ctrl + V`     |
-| Copy to clipboard as PNG | ⇧⌥C  | `Alt + Shift + C`  |
-| Copy styles              | ⇧⌘V  | `Ctrl + Shift + V` |
-| Paste styles             | ⇧⌘C  | `Ctrl + Shift + C` |
-| Delete                   |  ⌫   |       `Del`        |
-| Send to back             | ⌥⌘\[ | `Ctrl + Shift + [` |
-| Bring to front           | ⌥⌘\] | `Ctrl + Shift + ]` |
-| Send backwards           | ⌘\[  |     `Ctrl + [`     |
-| Bring forward            | ⌘\]  |     `Ctrl + ]`     |
+| Function                      | Mac  |       Other        |
+| ----------------------------- | :--: | :----------------: |
+| Copy                          |  ⌘C  |     `Ctrl + C`     |
+| Paste                         |  ⌘V  |     `Ctrl + V`     |
+| Copy to clipboard as PNG      | ⇧⌥C  | `Alt + Shift + C`  |
+| Copy styles                   | ⇧⌘V  | `Ctrl + Shift + V` |
+| Paste styles                  | ⇧⌘C  | `Ctrl + Shift + C` |
+| Delete                        |  ⌫   |       `Del`        |
+| Send to back                  | ⌥⌘\[ | `Ctrl + Shift + [` |
+| Bring to front                | ⌥⌘\] | `Ctrl + Shift + ]` |
+| Send backwards                | ⌘\[  |     `Ctrl + [`     |
+| Bring forward                 | ⌘\]  |     `Ctrl + ]`     |
+| Duplicate selected element(s) |  ⌘D  |     `Ctrl + D`     |
 
 ### View
 
