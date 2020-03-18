@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
-    "linearElementMulti": "Appuyez sur Échap ou Entrée pour terminer",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   },
   "errorSplash": {
