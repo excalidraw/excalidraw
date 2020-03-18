@@ -13,6 +13,7 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
+import { hasNonDeletedElements } from "../element";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -30,21 +31,24 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
-export type SocketUpdateData =
-  | {
-      type: "SCENE_UPDATE";
-      payload: {
-        elements: readonly ExcalidrawElement[];
-        appState: AppState | null;
-      };
-    }
-  | {
-      type: "MOUSE_LOCATION";
-      payload: {
-        socketID: string;
-        pointerCoords: { x: number; y: number };
-      };
-    }
+export type SocketUpdateDataSource = {
+  SCENE_UPDATE: {
+    type: "SCENE_UPDATE";
+    payload: {
+      elements: readonly ExcalidrawElement[];
+    };
+  };
+  MOUSE_LOCATION: {
+    type: "MOUSE_LOCATION";
+    payload: {
+      socketID: string;
+      pointerCoords: { x: number; y: number };
+    };
+  };
+};
+
+export type SocketUpdateDataIncoming =
+  | SocketUpdateDataSource[keyof SocketUpdateDataSource]
   | {
       type: "INVALID_RESPONSE";
     };
@@ -137,7 +141,7 @@ export async function decryptAESGEM(
   data: ArrayBuffer,
   key: string,
   iv: Uint8Array,
-): Promise<SocketUpdateData> {
+): Promise<SocketUpdateDataIncoming> {
   try {
     const importedKey = await getImportedKey(key, "decrypt");
     const decrypted = await window.crypto.subtle.decrypt(
@@ -284,7 +288,7 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!elements.length) {
+  if (!hasNonDeletedElements(elements)) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   // calculate smallest area to fit the contents in
@@ -341,12 +345,10 @@ export async function exportCanvas(
 
 export async function loadScene(id: string | null, privateKey?: string) {
   let data;
-  let selectedId;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
-    selectedId = id;
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {
     data = restoreFromLocalStorage();
@@ -354,6 +356,6 @@ export async function loadScene(id: string | null, privateKey?: string) {
 
   return {
     elements: data.elements,
-    appState: data.appState && { ...data.appState, selectedId },
+    appState: data.appState && { ...data.appState },
   };
 }

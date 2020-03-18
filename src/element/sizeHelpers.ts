@@ -1,9 +1,9 @@
 import { ExcalidrawElement } from "./types";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { mutateElement } from "./mutateElement";
+import { isLinearElement } from "./typeChecks";
 
 export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
-  if (element.type === "arrow" || element.type === "line") {
+  if (isLinearElement(element)) {
     return element.points.length < 2;
   }
   return element.width === 0 && element.height === 0;
@@ -79,8 +79,7 @@ export function normalizeDimensions(
   if (
     !element ||
     (element.width >= 0 && element.height >= 0) ||
-    element.type === "line" ||
-    element.type === "arrow"
+    isLinearElement(element)
   ) {
     return false;
   }
@@ -100,8 +99,6 @@ export function normalizeDimensions(
       y: element.y - nextHeight,
     });
   }
-
-  invalidateShapeForElement(element);
 
   return true;
 }

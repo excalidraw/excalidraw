@@ -2,6 +2,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { clearAppStatePropertiesForHistory } from "./appState";
 import { newElementWith } from "./element/mutateElement";
+import { isLinearElement } from "./element/typeChecks";
 
 type Result = {
   appState: AppState;
@@ -13,20 +14,28 @@ export class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
+  clear() {
+    this.stateHistory.length = 0;
+    this.redoStack.length = 0;
+  }
+
   private generateEntry(
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(element =>
-        newElementWith(element, {
-          points:
-            appState.multiElement && appState.multiElement.id === element.id
-              ? element.points.slice(0, -1)
-              : element.points,
-        }),
-      ),
+      elements: elements.map(element => {
+        if (isLinearElement(element)) {
+          return newElementWith(element, {
+            points:
+              appState.multiElement && appState.multiElement.id === element.id
+                ? element.points.slice(0, -1)
+                : element.points,
+          });
+        }
+        return newElementWith(element, {});
+      }),
     });
   }
 

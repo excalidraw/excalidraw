@@ -1,6 +1,17 @@
 import { KEYS } from "../keys";
 import { selectNode } from "../utils";
 
+function trimText(text: string) {
+  // whitespace only → trim all because we'd end up inserting invisible element
+  if (!text.trim()) {
+    return "";
+  }
+  // replace leading/trailing newlines (only) otherwise it messes up bounding
+  //  box calculation (there's also a bug in FF which inserts trailing newline
+  //  for multiline texts)
+  return text.replace(/^\n+|\n+$/g, "");
+}
+
 type TextWysiwygParams = {
   initText: string;
   x: number;
@@ -13,12 +24,6 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
-// When WYSIWYG text ends with white spaces, the text gets vertically misaligned
-// in order to fix this issue, we remove those white spaces
-function trimText(text: string) {
-  return text.trim();
-}
-
 export function textWysiwyg({
   initText,
   x,
@@ -30,9 +35,6 @@ export function textWysiwyg({
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
-  // Using contenteditable here as it has dynamic width.
-  // But this solution has an issue — it allows to paste
-  // multiline text, which is not currently supported
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -92,13 +94,7 @@ export function textWysiwyg({
   editable.onkeydown = ev => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
-      if (initText) {
-        editable.innerText = initText;
-        handleSubmit();
-        return;
-      }
-      cleanup();
-      return;
+      handleSubmit();
     }
     if (ev.key === KEYS.ENTER && !ev.shiftKey) {
       ev.preventDefault();

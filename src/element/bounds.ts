@@ -1,13 +1,14 @@
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
 import { Drawable } from "roughjs/bin/core";
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
+import { isLinearElement } from "./typeChecks";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export function getElementAbsoluteCoords(element: ExcalidrawElement) {
-  if (element.type === "arrow" || element.type === "line") {
+  if (isLinearElement(element)) {
     return getLinearElementAbsoluteBounds(element);
   }
   return [
@@ -33,7 +34,9 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
-export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
+export function getLinearElementAbsoluteBounds(
+  element: ExcalidrawLinearElement,
+) {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
@@ -68,7 +71,7 @@ export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
       // move, bcurveTo, lineTo, and curveTo
       if (op === "move") {
         // change starting point
-        currentP = data as Point;
+        currentP = (data as unknown) as Point;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
@@ -119,7 +122,10 @@ export function getLinearElementAbsoluteBounds(element: ExcalidrawElement) {
   ];
 }
 
-export function getArrowPoints(element: ExcalidrawElement, shape: Drawable[]) {
+export function getArrowPoints(
+  element: ExcalidrawLinearElement,
+  shape: Drawable[],
+) {
   const ops = shape[0].sets[0].ops;
 
   const data = ops[ops.length - 1].data;
@@ -133,7 +139,7 @@ export function getArrowPoints(element: ExcalidrawElement, shape: Drawable[]) {
   const prevOp = ops[ops.length - 2];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
-    p0 = prevOp.data as Point;
+    p0 = (prevOp.data as unknown) as Point;
   } else if (prevOp.op === "bcurveTo") {
     p0 = [prevOp.data[4], prevOp.data[5]];
   }

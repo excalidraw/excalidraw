@@ -1,10 +1,11 @@
-import "./Modal.css";
+import "./Modal.scss";
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { KEYS } from "../keys";
 
 export function Modal(props: {
+  className?: string;
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
@@ -20,7 +21,7 @@ export function Modal(props: {
   };
   return createPortal(
     <div
-      className="Modal"
+      className={`Modal ${props.className ?? ""}`}
       role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}

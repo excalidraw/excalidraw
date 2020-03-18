@@ -1,4 +1,5 @@
 @import "./theme.css";
+@import "./_variables";
 
 body {
   margin: 0;
@@ -359,7 +360,7 @@ button,
   padding: 10px 20px;
 }
 
-@media (max-width: 600px), (max-height: 500px) and (max-width: 1000px) {
+@media #{$media-query} {
   aside {
     display: none;
   }

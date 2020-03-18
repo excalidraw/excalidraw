@@ -3,6 +3,7 @@
     "paste": "Colar",
     "selectAll": "Selecionar tudo",
     "copy": "Copiar",
+    "copyAsPng": "Copiar para a área de transferência como PNG",
     "bringForward": "Passar para o primeiro plano",
     "sendToBack": "Passar para trás",
     "bringToFront": "Passar para frente",
@@ -41,7 +42,9 @@
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
-    "language": "Idioma"
+    "language": "Idioma",
+    "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
+    "duplicateSelection": "Duplicar os elementos selecionados"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -61,8 +64,10 @@
     "menu": "Menu",
     "done": "Concluído",
     "edit": "Editar",
-    "undo": "Undo",
-    "redo": "Redo"
+    "undo": "Desfazer",
+    "redo": "Refazer",
+    "roomDialog": "Compartilhar uma sessão de colaboração ao vivo",
+    "createNewRoom": "Criar nova sala"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
@@ -70,7 +75,7 @@
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo."
   },
   "toolBar": {
@@ -94,16 +99,27 @@
     "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Foi encontrado um erro. Experimente ",
+    "headingMain_button": "recarregar a página.",
+    "clearCanvasMessage": "Se a recarga não funcionar, tente ",
+    "clearCanvasMessage_button": "limpar a tela.",
+    "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
+    "openIssueMessage_pre": "Antes de fazer isso, gostaríamos que você relatasse o problema em nosso ",
+    "openIssueMessage_button": "rastreador de bugs.",
+    "openIssueMessage_post": " Inclua o seguinte rastreamento de pilha de erros (e, se não for confidencial, também o conteúdo da cena):",
+    "errorStack": "Rastreamento de pilha de erros:",
+    "errorStack_loading": "Carregando os dados. por favor aguarde...",
+    "sceneContent": "Conteúdo da cena:"
+  },
+  "roomDialog": {
+    "desc_intro": "Você pode convidar pessoas para sua cena atual para colaborar com você.",
+    "desc_privacy": "Não se preocupe, a sessão usa criptografia de ponta a ponta; portanto, o que você desenhar permanecerá privado. Nem mesmo nosso servidor poderá ver o que você cria.",
+    "desc_start": "120/5000\nPara começar, clique no botão abaixo. (Usará a cena atual. Se você não quiser, pode limpá-la manualmente, primeiro)",
+    "button_startSession": "Iniciar sessão",
+    "button_stopSession": "Parar sessão",
+    "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
+    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
+    "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
+    "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   }
 }

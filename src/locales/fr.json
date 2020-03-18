@@ -3,6 +3,7 @@
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
     "copy": "Copier",
+    "copyAsPng": "Copier dans le presse-papier en PNG",
     "bringForward": "Mettre en avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -35,13 +36,15 @@
     "extraBold": "Très épais",
     "architect": "Architecte",
     "artist": "Artiste",
-    "cartoonist": "Cartooniste",
+    "cartoonist": "Caricaturiste",
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
     "canvasBackground": "Fond du canevas",
     "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
-    "language": "Langue"
+    "language": "Langue",
+    "createRoom": "Partager une session de collaboration en direct",
+    "duplicateSelection": "Dupliquer les éléments sélectionnés"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -62,7 +65,9 @@
     "done": "Terminé",
     "edit": "Modifier",
     "undo": "Annuler",
-    "redo": "Rétablir"
+    "redo": "Rétablir",
+    "roomDialog": "Partager une session de collaboration en direct",
+    "createNewRoom": "Créer un nouveau salon"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -70,7 +75,7 @@
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
   },
   "toolBar": {
@@ -94,16 +99,27 @@
     "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Une erreur est survenue. Essayez ",
+    "headingMain_button": "de recharger la page.",
+    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
+    "clearCanvasMessage_button": "d'effacer la scène.",
+    "clearCanvasCaveat": " Cela entraînera une perte du travail ",
+    "openIssueMessage_pre": "Avant de le faire, nous vous serions reconnaissants d'ouvrir un ticket sur notre ",
+    "openIssueMessage_button": "outil de suivi des bugs.",
+    "openIssueMessage_post": " Veuillez inclure la trace de la pile d'erreur suivante (et si ce n'est pas privé, aussi le contenu de la scène) :",
+    "errorStack": "Trace de la pile d'erreur:",
+    "errorStack_loading": "Chargement des données. Veuillez patienter...",
+    "sceneContent": "Contenu de la scène :"
+  },
+  "roomDialog": {
+    "desc_intro": "Vous pouvez inviter des personnes dans votre scène actuelle à collaborer avec vous.",
+    "desc_privacy": "Ne vous inquiétez pas, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne sera pas en mesure de voir ce que vous faites.",
+    "desc_start": "Pour commencer, cliquez sur le bouton ci-dessous. (La scène actuelle sera utilisée. Si vous ne voulez pas cela, vous pouvez la supprimer manuellement, d'abord)",
+    "button_startSession": "Démarrer la session",
+    "button_stopSession": "Arrêter la session",
+    "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
+    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
+    "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
+    "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   }
 }

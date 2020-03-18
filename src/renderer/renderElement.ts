@@ -7,7 +7,6 @@ import {
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
-import { Point } from "roughjs/bin/geometry";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
@@ -65,6 +64,10 @@ function generateElementCanvas(
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+  context.scale(
+    1 / (window.devicePixelRatio * zoom),
+    1 / (window.devicePixelRatio * zoom),
+  );
   return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
 }
 
@@ -214,13 +217,11 @@ function generateElement(
         };
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
-        const points: Point[] = element.points.length
-          ? element.points
-          : [[0, 0]];
+        const points = element.points.length ? element.points : [[0, 0]];
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        shape = [generator.curve(points, options)];
+        shape = [generator.curve(points as [number, number][], options)];
 
         // add lines only in arrow
         if (element.type === "arrow") {
@@ -303,6 +304,10 @@ export function renderElement(
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
       context.fillRect(0, 0, element.width, element.height);
       context.fillStyle = fillStyle;
+      context.translate(
+        -element.x - sceneState.scrollX,
+        -element.y - sceneState.scrollY,
+      );
       break;
     }
     case "rectangle":
@@ -325,6 +330,7 @@ export function renderElement(
       break;
     }
     default: {
+      // @ts-ignore
       throw new Error(`Unimplemented type ${element.type}`);
     }
   }
@@ -415,6 +421,7 @@ export function renderElementToSvg(
         }
         svgRoot.appendChild(node);
       } else {
+        // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }

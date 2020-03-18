@@ -1,4 +1,4 @@
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../types";
 
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -8,7 +8,9 @@ import nanoid from "nanoid";
 import { calculateScrollCenter } from "../scene";
 
 export function restore(
-  savedElements: readonly ExcalidrawElement[],
+  // we're making the elements mutable for this API because we want to
+  //  efficiently remove/tweak properties on them (to migrate old scenes)
+  savedElements: readonly Mutable<ExcalidrawElement>[],
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
 ): DataState {
@@ -35,6 +37,7 @@ export function restore(
             [element.width, element.height],
           ];
         }
+        element.points = points;
       } else if (element.type === "line") {
         // old spec, pre-arrows
         // old spec, post-arrows
@@ -46,22 +49,27 @@ export function restore(
         } else {
           points = element.points;
         }
+        element.points = points;
       } else {
         normalizeDimensions(element);
+        // old spec, where non-linear elements used to have empty points arrays
+        if ("points" in element) {
+          delete element.points;
+        }
       }
 
       return {
         ...element,
-        version: element.id ? element.version + 1 : element.version || 0,
+        // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
+        version: element.version || 1,
         id: element.id || nanoid(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
-        roughness: element.roughness || 1,
+        roughness: element.roughness ?? 1,
         opacity:
           element.opacity === null || element.opacity === undefined
             ? 100
             : element.opacity,
-        points,
       };
     });
 

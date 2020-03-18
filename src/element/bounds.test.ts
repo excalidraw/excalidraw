@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "./types";
 
 const _ce = ({ x, y, w, h }: { x: number; y: number; w: number; h: number }) =>
   ({
-    type: "test",
+    type: "rectangle",
     strokeColor: "#000",
     backgroundColor: "#000",
     fillStyle: "solid",

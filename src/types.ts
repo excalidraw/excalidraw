@@ -1,12 +1,18 @@
-import { ExcalidrawElement, PointerType } from "./element/types";
+import {
+  ExcalidrawElement,
+  PointerType,
+  ExcalidrawLinearElement,
+} from "./element/types";
 import { SHAPES } from "./shapes";
+import { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
+export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
-  multiElement: ExcalidrawElement | null;
+  multiElement: ExcalidrawLinearElement | null;
   selectionElement: ExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
@@ -28,15 +34,13 @@ export type AppState = {
   cursorY: number;
   scrolledOutside: boolean;
   name: string;
-  selectedId?: string;
   isCollaborating: boolean;
   isResizing: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  remotePointers: { [id: string]: { x: number; y: number } };
-  collaboratorCount: number;
+  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
 };
 
 export type PointerCoords = Readonly<{

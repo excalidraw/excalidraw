@@ -1,5 +1,6 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useEffect } from "react";
 import "./Popover.css";
+import { unstable_batchedUpdates } from "react-dom";
 
 type Props = {
   top?: number;
@@ -35,18 +36,20 @@ export function Popover({
     }
   }, [fitInViewport]);
 
+  useEffect(() => {
+    if (onCloseRequest) {
+      const handler = (e: Event) => {
+        if (!popoverRef.current?.contains(e.target as Node)) {
+          unstable_batchedUpdates(() => onCloseRequest());
+        }
+      };
+      document.addEventListener("pointerdown", handler, false);
+      return () => document.removeEventListener("pointerdown", handler, false);
+    }
+  }, [onCloseRequest]);
+
   return (
     <div className="popover" style={{ top: top, left: left }} ref={popoverRef}>
-      <div
-        className="cover"
-        onClick={onCloseRequest}
-        onContextMenu={event => {
-          event.preventDefault();
-          if (onCloseRequest) {
-            onCloseRequest();
-          }
-        }}
-      />
       {children}
     </div>
   );
