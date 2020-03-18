@@ -1,6 +1,7 @@
 import "./ToolIcon.scss";
 
 import React from "react";
+import { getShortcutKey } from "../utils";
 
 type LockIconSize = "s" | "m";
 
@@ -48,7 +49,7 @@ export function LockIcon(props: LockIconProps) {
       className={`ToolIcon ToolIcon__lock ${
         props.isButton ? "ToolIcon_type_button" : "ToolIcon_type_floating"
       } ${sizeCn}`}
-      title={props.title}
+      title={`${props.title} ${getShortcutKey("Q")}`}
     >
       <input
         className="ToolIcon_type_checkbox"
