@@ -65,7 +65,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Share a live-collaboration session",
+    "roomDialog": "Start collaborating live",
     "createNewRoom": "Create new room"
   },
   "alerts": {
