@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
-    "linearElementMulti": "Trykk Escape eller Enter for å fullføre",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
   },
   "errorSplash": {
