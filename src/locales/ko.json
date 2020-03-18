@@ -57,7 +57,7 @@
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",
     "selectLanguage": "언어 선택",
-    "scrollBackToContent": "Scroll back to content",
+    "scrollBackToContent": "콘텐츠 영역으로 스크롤 이동하기",
     "zoomIn": "확대",
     "zoomOut": "축소",
     "resetZoom": "줌 초기화",
@@ -94,9 +94,9 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElement": "곡선을 그리려면 클릭 후 드래그, 직선을 그리려면 바로 드래그하세요.",
     "linearElementMulti": "ESC 또는 Enter 키를 눌러 완료하세요.",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다."
   },
   "errorSplash": {
     "headingMain_pre": "Encountered an error. Try ",
