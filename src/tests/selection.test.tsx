@@ -14,7 +14,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("selection element", () => {
   it("create selection element on pointer down", () => {

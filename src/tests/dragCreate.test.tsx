@@ -15,7 +15,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {

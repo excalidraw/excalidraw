@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("resize element", () => {
   it("rectangle", () => {

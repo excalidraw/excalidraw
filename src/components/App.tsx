@@ -64,7 +64,7 @@ import {
 import { KEYS, isArrowKey } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
-import { createHistory } from "../history";
+import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
 
@@ -111,33 +111,6 @@ function withBatchedUpdates<
   return (event => {
     unstable_batchedUpdates(func, event);
   }) as TFunction;
-}
-
-// -----------------------------------------------------------------------------
-// TEST HOOKS
-// -----------------------------------------------------------------------------
-
-declare global {
-  interface Window {
-    __TEST__: {
-      elements: readonly ExcalidrawElement[];
-      appState: AppState;
-    };
-  }
-}
-
-if (process.env.NODE_ENV === "test") {
-  window.__TEST__ = {} as Window["__TEST__"];
-}
-
-// -----------------------------------------------------------------------------
-
-if (process.env.NODE_ENV === "test") {
-  Object.defineProperty(window.__TEST__, "elements", {
-    get() {
-      return globalSceneState.getAllElements();
-    },
-  });
 }
 
 const { history } = createHistory();
@@ -476,8 +449,11 @@ export class App extends React.Component<any, AppState> {
 
   private unmounted = false;
   public async componentDidMount() {
-    if (process.env.NODE_ENV === "test") {
-      Object.defineProperty(window.__TEST__, "appState", {
+    if (
+      process.env.NODE_ENV === "test" ||
+      process.env.NODE_ENV === "development"
+    ) {
+      Object.defineProperty(window.h, "appState", {
         configurable: true,
         get: () => {
           return this.state;
@@ -2447,3 +2423,36 @@ export class App extends React.Component<any, AppState> {
     }
   }
 }
+
+// -----------------------------------------------------------------------------
+// TEST HOOKS
+// -----------------------------------------------------------------------------
+
+declare global {
+  interface Window {
+    h: {
+      elements: readonly ExcalidrawElement[];
+      appState: AppState;
+      history: SceneHistory;
+    };
+  }
+}
+
+if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
+  window.h = {} as Window["h"];
+
+  Object.defineProperties(window.h, {
+    elements: {
+      get() {
+        return globalSceneState.getAllElements();
+      },
+    },
+    history: {
+      get() {
+        return history;
+      },
+    },
+  });
+}
+
+// -----------------------------------------------------------------------------
