@@ -1569,6 +1569,7 @@ export class App extends React.Component<any, AppState> {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
         });
+        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
         const element = newLinearElement({
           type: this.state.elementType,
