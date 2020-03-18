@@ -107,9 +107,13 @@ import { actionFinalize } from "../actions";
 
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
->(func: TFunction) {
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1
+    ? TFunction
+    : "max 1 arity function allowed",
+) {
   return (event => {
-    unstable_batchedUpdates(func, event);
+    unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
 }
 
@@ -164,30 +168,28 @@ export class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(createRedoAction(history));
   }
 
-  private syncActionResult = withBatchedUpdates(
-    (res: ActionResult, commitToHistory: boolean = true) => {
-      if (this.unmounted) {
-        return;
+  private syncActionResult = withBatchedUpdates((res: ActionResult) => {
+    if (this.unmounted) {
+      return;
+    }
+    if (res.elements) {
+      globalSceneState.replaceAllElements(res.elements);
+      if (res.commitToHistory) {
+        history.resumeRecording();
       }
-      if (res.elements) {
-        globalSceneState.replaceAllElements(res.elements);
-        if (commitToHistory) {
-          history.resumeRecording();
-        }
-      }
+    }
 
-      if (res.appState) {
-        if (commitToHistory) {
-          history.resumeRecording();
-        }
-        this.setState(state => ({
-          ...res.appState,
-          isCollaborating: state.isCollaborating,
-          collaborators: state.collaborators,
-        }));
+    if (res.appState) {
+      if (res.commitToHistory) {
+        history.resumeRecording();
       }
-    },
-  );
+      this.setState(state => ({
+        ...res.appState,
+        isCollaborating: state.isCollaborating,
+        collaborators: state.collaborators,
+      }));
+    }
+  });
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
     if (isWritableElement(event.target)) {
@@ -917,7 +919,11 @@ export class App extends React.Component<any, AppState> {
               ) {
                 loadFromBlob(file)
                   .then(({ elements, appState }) =>
-                    this.syncActionResult({ elements, appState }),
+                    this.syncActionResult({
+                      elements,
+                      appState,
+                      commitToHistory: false,
+                    }),
                   )
                   .catch(error => console.error(error));
               }

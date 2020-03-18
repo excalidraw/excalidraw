@@ -5,6 +5,7 @@ import { AppState } from "../types";
 export type ActionResult = {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: AppState | null;
+  commitToHistory: boolean;
 };
 
 type ActionFn = (
@@ -32,10 +33,6 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
-  commitToHistory?: (
-    appState: AppState,
-    elements: readonly ExcalidrawElement[],
-  ) => boolean;
 }
 
 export interface ActionsManagerInterface {

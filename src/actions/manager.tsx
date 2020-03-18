@@ -50,24 +50,12 @@ export class ActionManager implements ActionsManagerInterface {
     }
 
     event.preventDefault();
-    const commitToHistory =
-      data[0].commitToHistory &&
-      data[0].commitToHistory(this.getAppState(), this.getElements());
-    this.updater(
-      data[0].perform(this.getElements(), this.getAppState(), null),
-      commitToHistory,
-    );
+    this.updater(data[0].perform(this.getElements(), this.getAppState(), null));
     return true;
   }
 
   executeAction(action: Action) {
-    const commitToHistory =
-      action.commitToHistory &&
-      action.commitToHistory(this.getAppState(), this.getElements());
-    this.updater(
-      action.perform(this.getElements(), this.getAppState(), null),
-      commitToHistory,
-    );
+    this.updater(action.perform(this.getElements(), this.getAppState(), null));
   }
 
   getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
@@ -82,12 +70,8 @@ export class ActionManager implements ActionsManagerInterface {
       .map(action => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          const commitToHistory =
-            action.commitToHistory &&
-            action.commitToHistory(this.getAppState(), this.getElements());
           this.updater(
             action.perform(this.getElements(), this.getAppState(), null),
-            commitToHistory,
           );
         },
       }));
@@ -98,12 +82,8 @@ export class ActionManager implements ActionsManagerInterface {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState?: any) => {
-        const commitToHistory =
-          action.commitToHistory &&
-          action.commitToHistory(this.getAppState(), this.getElements());
         this.updater(
           action.perform(this.getElements(), this.getAppState(), formState),
-          commitToHistory,
         );
       };
 
