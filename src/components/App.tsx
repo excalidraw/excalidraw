@@ -1818,11 +1818,13 @@ export class App extends React.Component<any, AppState> {
               break;
             case "n": {
               const height = element.height - deltaY;
-              if (height <= 0) {
-                break;
-              }
 
               if (isLinearElement(element)) {
+                if (element.points.length > 2 && height <= 0) {
+                  // Someday we should implement logic to flip the shape.
+                  // But for now, just stop.
+                  break;
+                }
                 mutateElement(element, {
                   height,
                   y: element.y + deltaY,
@@ -1840,11 +1842,13 @@ export class App extends React.Component<any, AppState> {
             case "w": {
               const width = element.width - deltaX;
 
-              if (width <= 0) {
-                // Someday we should implement logic to flip the shape. But for now, just stop.
-                break;
-              }
               if (isLinearElement(element)) {
+                if (element.points.length > 2 && width <= 0) {
+                  // Someday we should implement logic to flip the shape.
+                  // But for now, just stop.
+                  break;
+                }
+
                 mutateElement(element, {
                   width,
                   x: element.x + deltaX,
@@ -1860,11 +1864,13 @@ export class App extends React.Component<any, AppState> {
             }
             case "s": {
               const height = element.height + deltaY;
-              if (height <= 0) {
-                break;
-              }
 
               if (isLinearElement(element)) {
+                if (element.points.length > 2 && height <= 0) {
+                  // Someday we should implement logic to flip the shape.
+                  // But for now, just stop.
+                  break;
+                }
                 mutateElement(element, {
                   height,
                   points: rescalePoints(1, height, element.points),
@@ -1878,11 +1884,13 @@ export class App extends React.Component<any, AppState> {
             }
             case "e": {
               const width = element.width + deltaX;
-              if (width <= 0) {
-                break;
-              }
 
               if (isLinearElement(element)) {
+                if (element.points.length > 2 && width <= 0) {
+                  // Someday we should implement logic to flip the shape.
+                  // But for now, just stop.
+                  break;
+                }
                 mutateElement(element, {
                   width,
                   points: rescalePoints(0, width, element.points),
