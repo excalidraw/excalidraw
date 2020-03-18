@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "linearElementMulti": "Pressione Escape ou Enter para concluir",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   },
   "errorSplash": {
