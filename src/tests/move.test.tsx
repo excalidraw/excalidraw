@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("move element", () => {
   it("rectangle", () => {
@@ -29,9 +29,9 @@ describe("move element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      expect(h.appState.selectionElement).toBeNull();
+      expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
+      expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
       renderScene.mockClear();
@@ -42,7 +42,7 @@ describe("move element", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
   });
@@ -62,9 +62,9 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      expect(h.appState.selectionElement).toBeNull();
+      expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
+      expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
       renderScene.mockClear();
@@ -75,7 +75,7 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 
     // previous element should stay intact

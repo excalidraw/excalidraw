@@ -13,7 +13,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("resize element", () => {
   it("rectangle", () => {
@@ -29,9 +29,9 @@ describe("resize element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      expect(h.appState.selectionElement).toBeNull();
+      expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
+      expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
       expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
@@ -49,7 +49,7 @@ describe("resize element", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
     expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
@@ -70,9 +70,9 @@ describe("resize element with aspect ratio when SHIFT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderScene).toHaveBeenCalledTimes(4);
-      expect(h.appState.selectionElement).toBeNull();
+      expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
-      expect(h.appState.selectedElementIds[h.elements[0].id]).toBeTruthy();
+      expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
       expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
@@ -90,7 +90,7 @@ describe("resize element with aspect ratio when SHIFT is clicked", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(5);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
     expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
