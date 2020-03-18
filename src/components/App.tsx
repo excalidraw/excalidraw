@@ -92,6 +92,7 @@ import {
   POINTER_BUTTON,
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
+  ARROW_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
@@ -102,6 +103,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
 import { rescalePoints } from "../points";
+import { actionFinalize } from "../actions";
 
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
@@ -1122,13 +1124,52 @@ export class App extends React.Component<any, AppState> {
     );
     if (this.state.multiElement) {
       const { multiElement } = this.state;
-      const originX = multiElement.x;
-      const originY = multiElement.y;
-      const points = multiElement.points;
+      const { x: rx, y: ry } = multiElement;
 
-      mutateElement(multiElement, {
-        points: [...points.slice(0, -1), [x - originX, y - originY]],
-      });
+      const { points, lastCommittedPoint } = multiElement;
+      const lastPoint = points[points.length - 1];
+
+      setCursorForShape(this.state.elementType);
+
+      if (lastPoint === lastCommittedPoint) {
+        // if we haven't yet created a temp point and we're beyond commit-zone
+        //  threshold, add a point
+        if (
+          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
+          ARROW_CONFIRM_THRESHOLD
+        ) {
+          mutateElement(multiElement, {
+            points: [...points, [x - rx, y - ry]],
+          });
+        } else {
+          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          // in this branch, we're inside the commit zone, and no uncommitted
+          //  point exists. Thus do nothing (don't add/remove points).
+        }
+      } else {
+        // cursor moved inside commit zone, and there's uncommitted point,
+        //  thus remove it
+        if (
+          points.length > 2 &&
+          lastCommittedPoint &&
+          distance2d(
+            x - rx,
+            y - ry,
+            lastCommittedPoint[0],
+            lastCommittedPoint[1],
+          ) < ARROW_CONFIRM_THRESHOLD
+        ) {
+          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          mutateElement(multiElement, {
+            points: points.slice(0, -1),
+          });
+        } else {
+          // update last uncommitted point
+          mutateElement(multiElement, {
+            points: [...points.slice(0, -1), [x - rx, y - ry]],
+          });
+        }
+      }
       return;
     }
 
@@ -1505,16 +1546,36 @@ export class App extends React.Component<any, AppState> {
     ) {
       if (this.state.multiElement) {
         const { multiElement } = this.state;
-        const { x: rx, y: ry } = multiElement;
+
+        const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+
+        // clicking inside commit zone → finalize arrow
+        if (
+          multiElement.points.length > 1 &&
+          lastCommittedPoint &&
+          distance2d(
+            x - rx,
+            y - ry,
+            lastCommittedPoint[0],
+            lastCommittedPoint[1],
+          ) < ARROW_CONFIRM_THRESHOLD
+        ) {
+          this.actionManager.executeAction(actionFinalize);
+          return;
+        }
         this.setState(prevState => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [multiElement.id]: true,
           },
         }));
+        // clicking outside commit zone → update reference for last committed
+        //  point
         mutateElement(multiElement, {
-          points: [...multiElement.points, [x - rx, y - ry]],
+          lastCommittedPoint:
+            multiElement.points[multiElement.points.length - 1],
         });
+        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
         const element = newLinearElement({
           type: this.state.elementType,
