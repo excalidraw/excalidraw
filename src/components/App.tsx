@@ -640,13 +640,16 @@ export class App extends React.Component<any, AppState> {
       );
       event.preventDefault();
     } else if (
-      shapesShortcutKeys.includes(event.key.toLowerCase()) &&
       !event.ctrlKey &&
       !event.altKey &&
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      this.selectShapeTool(shape);
+      if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+        this.selectShapeTool(shape);
+      } else if (event.key === "q") {
+        this.toggleLock();
+      }
     } else if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
@@ -791,6 +794,15 @@ export class App extends React.Component<any, AppState> {
     this.destroySocketClient();
   };
 
+  toggleLock = () => {
+    this.setState(prevState => ({
+      elementLocked: !prevState.elementLocked,
+      elementType: prevState.elementLocked
+        ? "selection"
+        : prevState.elementType,
+    }));
+  };
+
   private setElements = (elements: readonly ExcalidrawElement[]) => {
     globalSceneState.replaceAllElements(elements);
   };
@@ -816,6 +828,7 @@ export class App extends React.Component<any, AppState> {
           language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
+          onToggleLock={this.toggleLock}
         />
         <main>
           <canvas

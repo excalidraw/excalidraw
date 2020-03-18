@@ -33,6 +33,7 @@ interface LayerUIProps {
   setElements: (elements: readonly ExcalidrawElement[]) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
+  onToggleLock: () => void;
 }
 
 export const LayerUI = React.memo(
@@ -46,6 +47,7 @@ export const LayerUI = React.memo(
     setElements,
     onRoomCreate,
     onRoomDestroy,
+    onToggleLock,
   }: LayerUIProps) => {
     const isMobile = useIsMobile();
 
@@ -157,14 +159,7 @@ export const LayerUI = React.memo(
                     </Island>
                     <LockIcon
                       checked={appState.elementLocked}
-                      onChange={() => {
-                        setAppState({
-                          elementLocked: !appState.elementLocked,
-                          elementType: appState.elementLocked
-                            ? "selection"
-                            : appState.elementType,
-                        });
-                      }}
+                      onChange={onToggleLock}
                       title={t("toolBar.lock")}
                       isButton={isMobile}
                     />
