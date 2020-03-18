@@ -453,10 +453,19 @@ export class App extends React.Component<any, AppState> {
       process.env.NODE_ENV === "test" ||
       process.env.NODE_ENV === "development"
     ) {
-      Object.defineProperty(window.h, "appState", {
-        configurable: true,
-        get: () => {
-          return this.state;
+      const setState = this.setState.bind(this);
+      Object.defineProperties(window.h, {
+        state: {
+          configurable: true,
+          get: () => {
+            return this.state;
+          },
+        },
+        setState: {
+          configurable: true,
+          value: (...args: Parameters<typeof setState>) => {
+            return this.setState(...args);
+          },
         },
       });
     }
@@ -2432,7 +2441,7 @@ declare global {
   interface Window {
     h: {
       elements: readonly ExcalidrawElement[];
-      appState: AppState;
+      state: AppState;
       history: SceneHistory;
     };
   }
