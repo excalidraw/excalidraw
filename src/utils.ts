@@ -194,3 +194,9 @@ export function sceneCoordsToViewportCoords(
 
   return { x, y };
 }
+
+export function getGlobalCSSVariable(name: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(
+    `--${name}`,
+  );
+}

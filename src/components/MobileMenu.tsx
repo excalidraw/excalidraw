@@ -13,6 +13,7 @@ import { calculateScrollCenter, getTargetElement } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
+import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -59,7 +60,14 @@ export function MobileMenu({
         </Section>
         <HintViewer appState={appState} elements={elements} />
       </FixedSideContainer>
-      <div className="App-bottom-bar">
+      <div
+        className="App-bottom-bar"
+        style={{
+          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+        }}
+      >
         <Island padding={3}>
           {appState.openMenu === "canvas" ? (
             <Section className="App-mobile-menu" heading="canvasActions">
