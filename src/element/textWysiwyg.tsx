@@ -6,8 +6,8 @@ function trimText(text: string) {
   if (!text.trim()) {
     return "";
   }
-  // replace trailing newlines (only) otherwise it messes up bounding box
-  //  calculation (there's also a bug on FF which inserts trailing newline
+  // replace leading/trailing newlines (only) otherwise it messes up bounding
+  //  box calculation (there's also a bug in FF which inserts trailing newline
   //  for multiline texts)
   return text.replace(/^\n+|\n+$/g, "");
 }
