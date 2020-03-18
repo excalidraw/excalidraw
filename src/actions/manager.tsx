@@ -60,6 +60,16 @@ export class ActionManager implements ActionsManagerInterface {
     return true;
   }
 
+  executeAction(action: Action) {
+    const commitToHistory =
+      action.commitToHistory &&
+      action.commitToHistory(this.getAppState(), this.getElements());
+    this.updater(
+      action.perform(this.getElements(), this.getAppState(), null),
+      commitToHistory,
+    );
+  }
+
   getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
     return Object.values(this.actions)
       .filter(actionFilter)
