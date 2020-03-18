@@ -1028,6 +1028,9 @@ export class App extends React.Component<any, AppState> {
       });
     };
 
+    // deselect all other elements when inserting text
+    this.setState({ selectedElementIds: {} });
+
     textWysiwyg({
       initText: element.text,
       x: textX,
