@@ -645,7 +645,7 @@ export class App extends React.Component<any, AppState> {
     ) {
       if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
         this.selectShapeTool(shape);
-      } else if (event.code === "KeyQ") {
+      } else if (event.key === "q") {
         this.toggleLock();
       }
     } else if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
