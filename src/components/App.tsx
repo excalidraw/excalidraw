@@ -2455,6 +2455,9 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
       get() {
         return globalSceneState.getAllElements();
       },
+      set(elements: ExcalidrawElement[]) {
+        return globalSceneState.replaceAllElements(elements);
+      },
     },
     history: {
       get() {
