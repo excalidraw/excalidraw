@@ -18,7 +18,7 @@
 | Arrow     | `A` or `5` | `A` or `5` |
 | Line      | `L` or `6` | `L` or `6` |
 | Text      | `T` or `7` | `T` or `7` |
-| Lock      |            |            |
+| Lock      |    `Q`     |    `Q`     |
 
 ### Editor
 
