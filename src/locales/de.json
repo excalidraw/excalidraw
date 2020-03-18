@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
-    "linearElementMulti": "Drücke zum Beenden Escape- oder Eingabetaste",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten"
   },
   "errorSplash": {
