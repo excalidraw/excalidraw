@@ -1,6 +1,13 @@
 @import "./theme.css";
 @import "./_variables";
 
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
 body {
   margin: 0;
   --ui-font: Arial, Helvetica, sans-serif;
@@ -154,10 +161,10 @@ button,
   left: 0;
   right: 0;
   --bar-padding: calc(4 * var(--space-factor));
-  padding-top: #{"max(var(--bar-padding), env(safe-area-inset-top))"};
-  padding-left: #{"max(var(--bar-padding), env(safe-area-inset-left))"};
-  padding-right: #{"max(var(--bar-padding), env(safe-area-inset-right))"};
-  padding-bottom: #{"max(var(--bar-padding), env(safe-area-inset-bottom))"};
+  padding-top: #{"max(var(--bar-padding), var(--sat))"};
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+  padding-bottom: var(--sab);
   z-index: 4;
   display: flex;
   align-items: flex-end;
@@ -375,6 +382,6 @@ button,
   }
   .scroll-back-to-content {
     bottom: 80px;
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    bottom: calc(80px + var(--sab));
   }
 }

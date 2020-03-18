@@ -19,7 +19,7 @@
 @media #{$media-query} {
   .Dialog {
     --metric: calc(var(--space-factor) * 4);
-    --inset-left: #{"max(var(--metric), env(safe-area-inset-left))"};
+    --inset-left: #{"max(var(--metric), var(--sal))"};
     --inset-right: #{"max(var(--metric), env(safe-area-inset-right))"};
   }
   .Dialog__title {
@@ -49,9 +49,9 @@
     height: 100%;
     box-sizing: border-box;
     overflow-y: auto;
-    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-left))"};
-    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-right))"};
-    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), env(safe-area-inset-bottom))"};
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
   }
 
   .Dialog .Modal__close {
