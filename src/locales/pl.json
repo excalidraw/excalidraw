@@ -66,7 +66,7 @@
     "edit": "Edytuj",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Share a live-collaboration session",
+    "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room"
   },
   "alerts": {
@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "linearElementMulti": "Naciśnij Escape albo Enter, aby zakończyć",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
@@ -114,7 +114,6 @@
   "roomDialog": {
     "desc_intro": "You can invite people to your current scene to collaborate with you.",
     "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "desc_start": "To begin, click the button below. (Will use the current scene. If you don't want this, you can manually clear it, first)",
     "button_startSession": "Start session",
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",

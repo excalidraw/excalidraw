@@ -66,7 +66,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Compartilhar uma sessão de colaboração ao vivo",
+    "roomDialog": "Start live collaboration",
     "createNewRoom": "Criar nova sala"
   },
   "alerts": {
@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "linearElementMulti": "Pressione Escape ou Enter para concluir",
+    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   },
   "errorSplash": {
@@ -114,7 +114,6 @@
   "roomDialog": {
     "desc_intro": "Você pode convidar pessoas para sua cena atual para colaborar com você.",
     "desc_privacy": "Não se preocupe, a sessão usa criptografia de ponta a ponta; portanto, o que você desenhar permanecerá privado. Nem mesmo nosso servidor poderá ver o que você cria.",
-    "desc_start": "120/5000\nPara começar, clique no botão abaixo. (Usará a cena atual. Se você não quiser, pode limpá-la manualmente, primeiro)",
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
