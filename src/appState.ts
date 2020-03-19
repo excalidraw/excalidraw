@@ -34,7 +34,7 @@ export function getDefaultAppState(): AppState {
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
-    collaborators: new Map(),
+    collaborators: {},
   };
 }
 

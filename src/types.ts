@@ -44,8 +44,8 @@ export type AppState = {
 };
 
 export type ComponentProps = {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   initialState?: InternalState;
   onChange?: (internalState: InternalState) => void;
 };
@@ -53,6 +53,7 @@ export type ComponentProps = {
 export type InternalState = {
   elements: ExcalidrawElement[];
   appState: AppState;
+  commitToHistory?: boolean;
 };
 
 export type PointerCoords = Readonly<{

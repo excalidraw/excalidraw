@@ -37,7 +37,6 @@ import {
 import {
   decryptAESGEM,
   encryptAESGEM,
-  saveToLocalStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
@@ -233,7 +232,7 @@ export class App extends React.Component<ComponentProps, AppState> {
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
-      collaborators: new Map(),
+      collaborators: {},
     });
     if (this.socket) {
       this.socket.close();
@@ -359,12 +358,12 @@ export class App extends React.Component<ComponentProps, AppState> {
             case "MOUSE_LOCATION":
               const { socketID, pointerCoords } = decryptedData.payload;
               this.setState(state => {
-                if (!state.collaborators.has(socketID)) {
-                  state.collaborators.set(socketID, {});
+                if (!state.collaborators.hasOwnProperty(socketID)) {
+                  state.collaborators[socketID] = {};
                 }
-                const user = state.collaborators.get(socketID)!;
+                const user = state.collaborators[socketID]!;
                 user.pointer = pointerCoords;
-                state.collaborators.set(socketID, user);
+                state.collaborators[socketID] = user;
                 return state;
               });
               break;
@@ -379,12 +378,12 @@ export class App extends React.Component<ComponentProps, AppState> {
       });
       this.socket.on("room-user-change", (clients: string[]) => {
         this.setState(state => {
-          const collaborators: typeof state.collaborators = new Map();
+          const collaborators: typeof state.collaborators = {};
           for (const socketID of clients) {
-            if (state.collaborators.has(socketID)) {
-              collaborators.set(socketID, state.collaborators.get(socketID)!);
+            if (state.collaborators.hasOwnProperty(socketID)) {
+              collaborators[socketID] = state.collaborators[socketID];
             } else {
-              collaborators.set(socketID, {});
+              collaborators[socketID] = {};
             }
           }
           return {
@@ -508,27 +507,13 @@ export class App extends React.Component<ComponentProps, AppState> {
     );
     document.addEventListener("gestureend", this.onGestureEnd as any, false);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
-
-    if (id) {
-      // Backwards compatibility with legacy url format
-      const scene = await loadScene(id);
-      this.syncActionResult(scene);
-    }
-
-    const jsonMatch = window.location.hash.match(
-      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-    );
-    if (jsonMatch) {
-      const scene = await loadScene(jsonMatch[1], jsonMatch[2]);
-      this.syncActionResult(scene);
-      return;
-    }
-
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       this.initializeSocketClient();
+      return;
+    }
+    if (this.props.initialState) {
+      this.syncActionResult(this.props.initialState);
       return;
     }
     const scene = await loadScene(null);
@@ -2425,7 +2410,10 @@ export class App extends React.Component<ComponentProps, AppState> {
   };
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(globalSceneState.getAllElements(), this.state);
+    if (this.props.onChange) {
+      const elements = globalSceneState.getAllElements() as ExcalidrawElement[];
+      this.props.onChange({ appState: this.state, elements });
+    }
   }, 300);
 
   componentDidUpdate() {
@@ -2435,7 +2423,8 @@ export class App extends React.Component<ComponentProps, AppState> {
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
-    this.state.collaborators.forEach((user, socketID) => {
+
+    Object.entries(this.state.collaborators).forEach(([socketID, user]) => {
       if (!user.pointer) {
         return;
       }

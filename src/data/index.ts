@@ -356,8 +356,8 @@ export async function loadScene(
   }
 
   return {
-    elements: data.elements,
-    appState: data.appState && { ...data.appState },
+    elements: data.elements as ExcalidrawElement[],
+    appState: (data.appState && { ...data.appState }) as AppState,
     commitToHistory: false,
   };
 }
