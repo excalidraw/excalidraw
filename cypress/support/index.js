@@ -7,11 +7,11 @@ addMatchImageSnapshotCommand({
 
 beforeEach(() => {
   cy.visit("/");
-  cy.get(".language-select").select("English");
+  cy.get("[aria-label='Select Language']").select("English");
 });
 
 afterEach(() => {
-  cy.get('button[title="Clear the canvas & reset background color"]').click();
+  cy.get('button[title="Reset the canvas"]').click();
 });
 
 Cypress.Commands.add(
