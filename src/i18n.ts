@@ -12,6 +12,7 @@ export const languages = [
   { lng: "ru", label: "Русский", data: require("./locales/ru.json") },
   { lng: "tr", label: "Türkçe", data: require("./locales/tr.json") },
   { lng: "ko", label: "한국어", data: require("./locales/ko.json") },
+  { lng: "zh-tw", label: "繁體中文", data: require("./locales/zh-tw.json") },
 ];
 
 let currentLanguage = languages[0];
