@@ -357,5 +357,6 @@ export async function loadScene(id: string | null, privateKey?: string) {
   return {
     elements: data.elements,
     appState: data.appState && { ...data.appState },
+    commitToHistory: false,
   };
 }

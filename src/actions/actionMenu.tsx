@@ -12,6 +12,7 @@ export const actionToggleCanvasMenu = register({
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
+    commitToHistory: false,
   }),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
@@ -31,6 +32,7 @@ export const actionToggleEditMenu = register({
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
     },
+    commitToHistory: false,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

@@ -14,7 +14,10 @@ import { newElementWith } from "../element/mutateElement";
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
-    return { appState: { ...appState, viewBackgroundColor: value } };
+    return {
+      appState: { ...appState, viewBackgroundColor: value },
+      commitToHistory: true,
+    };
   },
   PanelComponent: ({ appState, updateData }) => {
     return (
@@ -28,18 +31,17 @@ export const actionChangeViewBackgroundColor = register({
       </div>
     );
   },
-  commitToHistory: () => true,
 });
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
-  commitToHistory: () => true,
   perform: elements => {
     return {
       elements: elements.map(element =>
         newElementWith(element, { isDeleted: true }),
       ),
       appState: getDefaultAppState(),
+      commitToHistory: true,
     };
   },
   PanelComponent: ({ updateData }) => (
@@ -81,6 +83,7 @@ export const actionZoomIn = register({
         ...appState,
         zoom: getNormalizedZoom(appState.zoom + ZOOM_STEP),
       },
+      commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (
@@ -107,6 +110,7 @@ export const actionZoomOut = register({
         ...appState,
         zoom: getNormalizedZoom(appState.zoom - ZOOM_STEP),
       },
+      commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (
@@ -133,6 +137,7 @@ export const actionResetZoom = register({
         ...appState,
         zoom: 1,
       },
+      commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (

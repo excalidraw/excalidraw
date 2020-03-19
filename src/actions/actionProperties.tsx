@@ -52,9 +52,9 @@ export const actionChangeStrokeColor = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeColor: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
@@ -83,9 +83,9 @@ export const actionChangeBackgroundColor = register({
         }),
       ),
       appState: { ...appState, currentItemBackgroundColor: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
@@ -114,9 +114,9 @@ export const actionChangeFillStyle = register({
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fill")}</legend>
@@ -151,9 +151,9 @@ export const actionChangeStrokeWidth = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
@@ -186,9 +186,9 @@ export const actionChangeSloppiness = register({
         }),
       ),
       appState: { ...appState, currentItemRoughness: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
@@ -221,9 +221,9 @@ export const actionChangeOpacity = register({
         }),
       ),
       appState: { ...appState, currentItemOpacity: value },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <label className="control-label">
       {t("labels.opacity")}
@@ -281,9 +281,9 @@ export const actionChangeFontSize = register({
           appState.currentItemFont.split("px ")[1]
         }`,
       },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
@@ -328,9 +328,9 @@ export const actionChangeFontFamily = register({
           appState.currentItemFont.split("px ")[0]
         }px ${value}`,
       },
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontFamily")}</legend>
