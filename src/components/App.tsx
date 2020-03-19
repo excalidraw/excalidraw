@@ -105,13 +105,12 @@ import { isLinearElement } from "../element/typeChecks";
 import { rescalePoints } from "../points";
 import { actionFinalize } from "../actions";
 
+/**
+ * @param func handler taking at most single parameter (event).
+ */
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1
-    ? TFunction
-    : "max 1 arity function allowed",
-) {
+>(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
   return (event => {
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
