@@ -40,7 +40,19 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  collaborators: { [key: string]: { pointer?: { x: number; y: number } } };
+};
+
+export type ComponentProps = {
+  width: number;
+  height: number;
+  initialState?: InternalState;
+  onChange?: (internalState: InternalState) => void;
+};
+
+export type InternalState = {
+  elements: ExcalidrawElement[];
+  appState: AppState;
 };
 
 export type PointerCoords = Readonly<{
