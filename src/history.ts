@@ -83,7 +83,7 @@ export class SceneHistory {
   }
 
   undoOnce(): Result | null {
-    if (this.stateHistory.length === 0) {
+    if (this.stateHistory.length === 1) {
       return null;
     }
 
