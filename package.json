@@ -1,4 +1,8 @@
 {
+  "name": "excalidraw",
+  "main": "dist/excalidraw.js",
+  "version": "1.0.0",
+  "license": "MIT",
   "browserslist": [
     ">0.2%",
     "not dead",
@@ -86,8 +90,6 @@
       "pre-commit": "lint-staged"
     }
   },
-  "main": "dist/excalidraw.js",
-  "name": "excalidraw",
   "scripts": {
     "prepare": "npm run build:lib",
     "build:app": "react-scripts build",
@@ -108,8 +110,6 @@
     "test:typecheck": "tsc",
     "test:other": "npm run prettier -- --list-different"
   },
-  "version": "1.0.0",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/excalidraw/excalidraw.git"

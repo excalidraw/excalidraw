@@ -2412,7 +2412,11 @@ export class App extends React.Component<ComponentProps, AppState> {
   private saveDebounced = debounce(() => {
     if (this.props.onChange) {
       const elements = globalSceneState.getAllElements() as ExcalidrawElement[];
-      this.props.onChange({ appState: this.state, elements });
+      this.props.onChange({
+        appState: this.state,
+        elements,
+        commitToHistory: false,
+      });
     }
   }, 300);
 

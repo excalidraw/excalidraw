@@ -53,7 +53,7 @@ export type ComponentProps = {
 export type InternalState = {
   elements: ExcalidrawElement[];
   appState: AppState;
-  commitToHistory?: boolean;
+  commitToHistory: boolean;
 };
 
 export type PointerCoords = Readonly<{
