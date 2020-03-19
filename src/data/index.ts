@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 
 import { getDefaultAppState } from "../appState";
 
-import { AppState } from "../types";
+import { AppState, InternalState } from "../types";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { fileSave } from "browser-nativefs";
 
@@ -341,7 +341,10 @@ export async function exportCanvas(
   }
 }
 
-export async function loadScene(id: string | null, privateKey?: string) {
+export async function loadScene(
+  id: string | null,
+  privateKey?: string,
+): Promise<InternalState> {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
