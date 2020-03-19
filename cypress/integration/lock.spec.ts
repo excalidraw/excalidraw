@@ -8,7 +8,7 @@ describe("Lock tool", () => {
     cy.get(
       'input[aria-label="Keep selected tool active after drawing"]',
     ).should("not.be.checked");
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     cy.contains("Architect").click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
@@ -27,7 +27,7 @@ describe("Lock tool", () => {
     cy.get(
       'input[aria-label="Keep selected tool active after drawing"]',
     ).click({ force: true });
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     cy.contains("Architect").click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },

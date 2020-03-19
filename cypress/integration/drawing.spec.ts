@@ -18,7 +18,7 @@ describe("Drawing", () => {
   });
   it("should draw a rectangle", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
@@ -37,15 +37,15 @@ describe("Drawing", () => {
       clip: region,
     });
   });
-  it("should write text using text tool", () => {
+  it.only("should write text using text tool", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Text"]').click();
-    cy.get("#canvas").trigger("mousedown", {
+    cy.get('[title^="Text"]').click();
+    cy.get("#canvas").trigger("pointerdown", {
       button: 0,
       x: region.x,
       y: region.y,
     });
-    cy.get('[contenteditable="true"]')
+    cy.get('[contenteditable="plaintext-only"]')
       .type("Hello world!")
       .blur();
     // shift screenshot region due to text being shifted while typing
@@ -63,7 +63,7 @@ describe("Drawing", () => {
   it("should write text by double clicking", () => {
     // just capture an empty square on the center of the viewport
     cy.get("#canvas").trigger("dblclick", region.x, region.y);
-    cy.get('[contenteditable="true"]')
+    cy.get('[contenteditable="plaintext-only"]')
       .type("Hello world!")
       .blur();
     // shift screenshot region due to text being shifted while typing
@@ -80,7 +80,7 @@ describe("Drawing", () => {
   });
   it("should draw a diamond", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Diamond"]').click();
+    cy.get('[title^="Diamond"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
@@ -93,7 +93,7 @@ describe("Drawing", () => {
   });
   it("should draw a arrow pointing south-east", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Arrow"]').click();
+    cy.get('[title^="Arrow"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
@@ -106,7 +106,7 @@ describe("Drawing", () => {
   });
   it("should draw a arrow pointing north-west", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Arrow"]').click();
+    cy.get('[title^="Arrow"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 50, y: region.y + 50 },
       { x: region.x + 10, y: region.y + 10 },
@@ -119,7 +119,7 @@ describe("Drawing", () => {
   });
   it("should draw a arrow pointing north-east", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Arrow"]').click();
+    cy.get('[title^="Arrow"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 50 },
       { x: region.x + 50, y: region.y + 10 },
@@ -132,7 +132,7 @@ describe("Drawing", () => {
   });
   it("should draw a arrow pointing south-west", () => {
     // just capture an empty square on the center of the viewport
-    cy.get('input[aria-label="Arrow"]').click();
+    cy.get('[title^="Arrow"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 50, y: region.y + 10 },
       { x: region.x + 10, y: region.y + 50 },

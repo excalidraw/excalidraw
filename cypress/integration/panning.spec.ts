@@ -20,13 +20,13 @@ describe("Panning", () => {
     // Holding the space key down
     cy.get("#canvas").trigger("keydown", { key: " " });
     cy.get("#canvas").should("have.css", "cursor", "grabbing");
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     // Releasing the space key
     cy.get("#canvas").trigger("keyup", { key: " " });
     cy.get("#canvas").should("have.css", "cursor", "crosshair");
   });
   it("should pan away from rectangle using space + drag technique", () => {
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
@@ -50,7 +50,7 @@ describe("Panning", () => {
     });
   });
   it("should pan away from rectangle using wheel", () => {
-    cy.get('input[aria-label="Rectangle"]').click();
+    cy.get('[title^="Rectangle"]').click();
     cy.get("#canvas").drag(
       { x: region.x + 10, y: region.y + 10 },
       { x: region.x + 50, y: region.y + 50 },
