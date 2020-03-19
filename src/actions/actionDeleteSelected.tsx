@@ -20,12 +20,11 @@ export const actionDeleteSelected = register({
         elementType: "selection",
         multiElement: null,
       },
+      commitToHistory: isSomeElementSelected(elements, appState),
     };
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
-  commitToHistory: (appState, elements) =>
-    isSomeElementSelected(elements, appState),
   keyTest: event => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

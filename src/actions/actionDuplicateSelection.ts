@@ -23,6 +23,7 @@ export const actionDuplicateSelection = register({
         },
         [],
       ),
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.duplicateSelection",

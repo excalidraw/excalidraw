@@ -17,7 +17,9 @@ export const actionCopyStyles = register({
     if (element) {
       copiedStyles = JSON.stringify(element);
     }
-    return {};
+    return {
+      commitToHistory: false,
+    };
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: event =>
@@ -30,7 +32,7 @@ export const actionPasteStyles = register({
   perform: (elements, appState) => {
     const pastedElement = JSON.parse(copiedStyles);
     if (!isExcalidrawElement(pastedElement)) {
-      return { elements };
+      return { elements, commitToHistory: false };
     }
     return {
       elements: elements.map(element => {
@@ -53,9 +55,9 @@ export const actionPasteStyles = register({
         }
         return element;
       }),
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   contextItemLabel: "labels.pasteStyles",
   keyTest: event =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "V",

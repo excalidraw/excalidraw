@@ -52,6 +52,7 @@ export const actionFinalize = register({
         editingElement: null,
         selectedElementIds: {},
       },
+      commitToHistory: false,
     };
   },
   keyTest: (event, appState) =>
