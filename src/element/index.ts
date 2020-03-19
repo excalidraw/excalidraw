@@ -41,7 +41,7 @@ export function getSyncableElements(elements: readonly ExcalidrawElement[]) {
 }
 
 export function getElementMap(elements: readonly ExcalidrawElement[]) {
-  return getSyncableElements(elements).reduce(
+  return elements.reduce(
     (acc: { [key: string]: ExcalidrawElement }, element: ExcalidrawElement) => {
       acc[element.id] = element;
       return acc;
