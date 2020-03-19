@@ -29,6 +29,27 @@ Go to https://excalidraw.com to start sketching.
 
 ## Run the code
 
+### As a component
+
+```
+npm install excalidraw react react-dom
+```
+
+```ts
+import React from "react";
+import ReactDOM from "react-dom";
+import { Excalidraw } from "excalidraw";
+
+ReactDOM.render(
+  <Excalidraw
+    width={500}
+    height={500}
+    onChange={state => console.log(state)}
+  />,
+  document.querySelector("root"),
+);
+```
+
 ### Code Sandbox
 
 - Go to https://codesandbox.io/s/github/excalidraw/excalidraw
