@@ -25,17 +25,41 @@ export class SceneHistory {
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.map(element => {
-        if (isLinearElement(element)) {
-          return newElementWith(element, {
-            points:
-              appState.multiElement && appState.multiElement.id === element.id
-                ? element.points.slice(0, -1)
-                : element.points,
-          });
+      elements: elements.reduce((elements, element) => {
+        if (
+          isLinearElement(element) &&
+          appState.multiElement &&
+          appState.multiElement.id === element.id
+        ) {
+          // don't store multi-point arrow if still has only one point
+          if (
+            appState.multiElement &&
+            appState.multiElement.id === element.id &&
+            element.points.length < 2
+          ) {
+            return elements;
+          }
+
+          elements.push(
+            newElementWith(element, {
+              // don't store last point if not committed
+              points:
+                element.lastCommittedPoint !==
+                element.points[element.points.length - 1]
+                  ? element.points.slice(0, -1)
+                  : element.points,
+              // don't regenerate versionNonce else this will short-circuit our
+              //  bail-on-no-change logic in pushEntry()
+              versionNonce: element.versionNonce,
+            }),
+          );
+        } else {
+          elements.push(
+            newElementWith(element, { versionNonce: element.versionNonce }),
+          );
         }
-        return newElementWith(element, {});
-      }),
+        return elements;
+      }, [] as Mutable<typeof elements>),
     });
   }
 
