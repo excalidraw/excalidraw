@@ -53,8 +53,8 @@ export function newElementWith<TElement extends ExcalidrawElement>(
 ): TElement {
   return {
     ...element,
-    ...updates,
     version: element.version + 1,
     versionNonce: randomSeed(),
+    ...updates,
   };
 }
