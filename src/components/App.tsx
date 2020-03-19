@@ -636,7 +636,8 @@ export class App extends React.Component<any, AppState> {
       } else if (event.key === "q") {
         this.toggleLock();
       }
-    } else if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+    }
+    if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
