@@ -1,5 +1,3 @@
-import "./FixedSideContainer.css";
-
 import React from "react";
 
 type FixedSideContainerProps = {

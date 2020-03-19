@@ -804,7 +804,7 @@ export class App extends React.Component<ComponentProps, AppState> {
 
     return (
       <div
-        className="container"
+        className="excalidraw"
         style={{ width: this.props.width, height: this.props.height }}
         ref={ref => {
           if (this.containerDeltaInitialized) {

@@ -1,0 +1,11 @@
+@import "./theme.css";
+@import "./_variables";
+
+body {
+  background-color: #eee;
+  margin: 0;
+  -webkit-text-size-adjust: 100%;
+  user-select: none;
+  width: 100vw;
+  height: 100vh;
+}
