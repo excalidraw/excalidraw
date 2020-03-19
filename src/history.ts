@@ -32,9 +32,12 @@ export class SceneHistory {
               appState.multiElement && appState.multiElement.id === element.id
                 ? element.points.slice(0, -1)
                 : element.points,
+            // don't regenerate versionNonce else this will short-circuit our
+            //  bail-on-no-change logic in pushEntry()
+            versionNonce: element.versionNonce,
           });
         }
-        return newElementWith(element, {});
+        return newElementWith(element, { versionNonce: element.versionNonce });
       }),
     });
   }
