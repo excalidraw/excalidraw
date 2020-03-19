@@ -1,4 +1,4 @@
-import { Action } from "./types";
+import { Action, ActionResult } from "./types";
 import React from "react";
 import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
@@ -13,8 +13,12 @@ import { newElementWith } from "../element/mutateElement";
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
   appState: AppState,
-  updater: () => { elements: ExcalidrawElement[]; appState: AppState } | null,
-) => {
+  updater: () => {
+    elements: ExcalidrawElement[];
+    appState: AppState;
+  } | null,
+): ActionResult => {
+  const commitToHistory = false;
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
@@ -23,7 +27,7 @@ const writeData = (
   ) {
     const data = updater();
     if (data === null) {
-      return {};
+      return { commitToHistory };
     }
 
     const prevElementMap = getElementMap(prevElements);
@@ -47,9 +51,10 @@ const writeData = (
             ),
         ),
       appState: { ...appState, ...data.appState },
+      commitToHistory,
     };
   }
-  return {};
+  return { commitToHistory };
 };
 
 const testUndo = (shift: boolean) => (event: KeyboardEvent) =>

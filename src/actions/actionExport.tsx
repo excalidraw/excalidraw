@@ -10,7 +10,7 @@ import { register } from "./register";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
-    return { appState: { ...appState, name: value } };
+    return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
     <ProjectName
@@ -24,7 +24,10 @@ export const actionChangeProjectName = register({
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
   perform: (_elements, appState, value) => {
-    return { appState: { ...appState, exportBackground: value } };
+    return {
+      appState: { ...appState, exportBackground: value },
+      commitToHistory: false,
+    };
   },
   PanelComponent: ({ appState, updateData }) => (
     <label>
@@ -42,7 +45,7 @@ export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
     saveAsJSON(elements, appState).catch(error => console.error(error));
-    return {};
+    return { commitToHistory: false };
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
@@ -63,7 +66,11 @@ export const actionLoadScene = register({
     appState,
     { elements: loadedElements, appState: loadedAppState },
   ) => {
-    return { elements: loadedElements, appState: loadedAppState };
+    return {
+      elements: loadedElements,
+      appState: loadedAppState,
+      commitToHistory: false,
+    };
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
