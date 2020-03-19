@@ -66,7 +66,7 @@
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
-    "roomDialog": "Start live collaboration",
+    "roomDialog": "开始实时协作",
     "createNewRoom": "Create new room"
   },
   "alerts": {
@@ -80,10 +80,10 @@
   },
   "toolBar": {
     "selection": "Selection",
-    "rectangle": "Rectangle",
+    "rectangle": "矩形",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
-    "arrow": "Arrow",
+    "arrow": "箭头",
     "line": "Line",
     "text": "Text",
     "lock": "Keep selected tool active after drawing"
