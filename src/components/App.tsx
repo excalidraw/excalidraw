@@ -332,7 +332,7 @@ export class App extends React.Component<any, AppState> {
                       }
 
                       return elements;
-                    }, [] as any)
+                    }, [] as Mutable<typeof restoredState.elements>)
                     // add local elements that weren't deleted or on remote
                     .concat(...Object.values(localElementMap)),
                 );
