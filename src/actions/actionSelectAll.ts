@@ -12,6 +12,7 @@ export const actionSelectAll = register({
           return map;
         }, {} as any),
       },
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.selectAll",

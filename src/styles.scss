@@ -1,6 +1,13 @@
 @import "./theme.css";
 @import "./_variables";
 
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
 body {
   margin: 0;
   --ui-font: Arial, Helvetica, sans-serif;
@@ -119,6 +126,7 @@ button,
   cursor: pointer;
 
   &:focus {
+    outline: transparent;
     box-shadow: 0 0 0 2px #a5d8ff;
   }
 
@@ -146,24 +154,38 @@ button,
   }
 }
 
-.App-toolbar,
-.App-mobile-menu {
-  --spacing: 0.5rem;
-  --padding: calc(4 * var(--space-factor));
-  padding: var(--padding);
-  padding-left: #{"max(var(--padding), env(safe-area-inset-left))"};
-  padding-right: #{"max(var(--padding), env(safe-area-inset-right))"};
-  background: #fcfcfc;
-  border-top: 1px solid #ccc;
-  box-sizing: border-box;
-}
-.App-toolbar {
-  padding-bottom: #{"max(var(--padding), env(safe-area-inset-bottom))"};
-  width: 100%;
-  box-sizing: border-box;
-  overflow: auto;
+.App-bottom-bar {
   position: absolute;
+  top: 0;
   bottom: 0;
+  left: 0;
+  right: 0;
+  --bar-padding: calc(4 * var(--space-factor));
+  padding-top: #{"max(var(--bar-padding), var(--sat))"};
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+  padding-bottom: var(--sab);
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+
+  > .Island {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    pointer-events: initial;
+  }
+}
+
+.App-toolbar {
+  width: 100%;
+
+  box-sizing: border-box;
 }
 .App-toolbar-content {
   display: flex;
@@ -171,18 +193,11 @@ button,
   justify-content: space-between;
 }
 .App-mobile-menu {
-  --bottom: calc(3rem - 1px + max(var(--padding), env(safe-area-inset-bottom)));
-  display: grid;
-  position: fixed;
   width: 100%;
-  bottom: var(--bottom);
-  z-index: 4;
-  max-height: calc(100% - var(--bottom));
-  overflow-y: scroll;
-}
-.App-mobile-menu .App-mobile-menu-scroller {
-  background: #fcfcfc;
-  box-shadow: none;
+  overflow-x: visible;
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin-bottom: var(--bar-padding);
 }
 
 .App-menu {
@@ -358,6 +373,7 @@ button,
   bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
+  z-index: -1;
 }
 
 @media #{$media-query} {
@@ -366,6 +382,6 @@ button,
   }
   .scroll-back-to-content {
     bottom: 80px;
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    bottom: calc(80px + var(--sab));
   }
 }

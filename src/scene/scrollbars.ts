@@ -2,8 +2,9 @@ import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
 import { FlooredNumber } from "../types";
 import { ScrollBars } from "./types";
+import { getGlobalCSSVariable } from "../utils";
 
-const SCROLLBAR_MARGIN = 4;
+export const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
 export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 
@@ -36,11 +37,18 @@ export function getScrollBars(
   const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
   const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
 
+  const safeArea = {
+    top: parseInt(getGlobalCSSVariable("sat")),
+    bottom: parseInt(getGlobalCSSVariable("sab")),
+    left: parseInt(getGlobalCSSVariable("sal")),
+    right: parseInt(getGlobalCSSVariable("sar")),
+  };
+
   // The viewport is the rectangle currently visible for the user
-  const viewportMinX = -scrollX + viewportWidthDiff / 2;
-  const viewportMinY = -scrollY + viewportHeightDiff / 2;
-  const viewportMaxX = viewportMinX + viewportWidthWithZoom;
-  const viewportMaxY = viewportMinY + viewportHeightWithZoom;
+  const viewportMinX = -scrollX + viewportWidthDiff / 2 + safeArea.left;
+  const viewportMinY = -scrollY + viewportHeightDiff / 2 + safeArea.top;
+  const viewportMaxX = viewportMinX + viewportWidthWithZoom - safeArea.right;
+  const viewportMaxY = viewportMinY + viewportHeightWithZoom - safeArea.bottom;
 
   // The scene is the bounding box of both the elements and viewport
   const sceneMinX = Math.min(elementsMinX, viewportMinX);
@@ -56,30 +64,36 @@ export function getScrollBars(
         ? null
         : {
             x:
+              Math.max(safeArea.left, SCROLLBAR_MARGIN) +
               ((viewportMinX - sceneMinX) / (sceneMaxX - sceneMinX)) *
-                viewportWidth +
-              SCROLLBAR_MARGIN,
-            y: viewportHeight - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+                viewportWidth,
+            y:
+              viewportHeight -
+              SCROLLBAR_WIDTH -
+              Math.max(SCROLLBAR_MARGIN, safeArea.bottom),
             width:
               ((viewportMaxX - viewportMinX) / (sceneMaxX - sceneMinX)) *
                 viewportWidth -
-              SCROLLBAR_MARGIN * 2,
+              Math.max(SCROLLBAR_MARGIN * 2, safeArea.left + safeArea.right),
             height: SCROLLBAR_WIDTH,
           },
     vertical:
       viewportMinY === sceneMinY && viewportMaxY === sceneMaxY
         ? null
         : {
-            x: viewportWidth - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN,
+            x:
+              viewportWidth -
+              SCROLLBAR_WIDTH -
+              Math.max(safeArea.right, SCROLLBAR_MARGIN),
             y:
               ((viewportMinY - sceneMinY) / (sceneMaxY - sceneMinY)) *
                 viewportHeight +
-              SCROLLBAR_MARGIN,
+              Math.max(safeArea.top, SCROLLBAR_MARGIN),
             width: SCROLLBAR_WIDTH,
             height:
               ((viewportMaxY - viewportMinY) / (sceneMaxY - sceneMinY)) *
                 viewportHeight -
-              SCROLLBAR_MARGIN * 2,
+              Math.max(SCROLLBAR_MARGIN * 2, safeArea.top + safeArea.bottom),
           },
   };
 }

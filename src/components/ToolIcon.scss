@@ -39,6 +39,7 @@
 .ToolIcon__label {
   font-family: var(--ui-font);
   margin: 0 0.8em;
+  text-overflow: ellipsis;
 }
 
 .ToolIcon_size_s .ToolIcon__icon {

@@ -38,7 +38,6 @@ function RoomModal({
         <>
           <p>{t("roomDialog.desc_intro")}</p>
           <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
-          <p>{t("roomDialog.desc_start")}</p>
           <div className="RoomDialog-sessionStartButtonContainer">
             <ToolButton
               className="RoomDialog-startSession"

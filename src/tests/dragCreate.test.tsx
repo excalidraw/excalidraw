@@ -4,6 +4,7 @@ import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
+import { ExcalidrawLinearElement } from "../element/types";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -14,7 +15,7 @@ beforeEach(() => {
   renderScene.mockClear();
 });
 
-const { __TEST__: h } = window;
+const { h } = window;
 
 describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", () => {
@@ -35,7 +36,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("rectangle");
@@ -63,7 +64,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("ellipse");
@@ -91,7 +92,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
     expect(h.elements[0].type).toEqual("diamond");
@@ -119,15 +120,18 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].type).toEqual("arrow");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(20);
-    expect(h.elements[0].points.length).toEqual(2);
-    expect(h.elements[0].points[0]).toEqual([0, 0]);
-    expect(h.elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    expect(element.type).toEqual("arrow");
+    expect(element.x).toEqual(30);
+    expect(element.y).toEqual(20);
+    expect(element.points.length).toEqual(2);
+    expect(element.points[0]).toEqual([0, 0]);
+    expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
   });
 
   it("line", () => {
@@ -148,15 +152,18 @@ describe("add element to the scene when pointer dragging long enough", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].type).toEqual("line");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(20);
-    expect(h.elements[0].points.length).toEqual(2);
-    expect(h.elements[0].points[0]).toEqual([0, 0]);
-    expect(h.elements[0].points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    expect(element.type).toEqual("line");
+    expect(element.x).toEqual(30);
+    expect(element.y).toEqual(20);
+    expect(element.points.length).toEqual(2);
+    expect(element.points[0]).toEqual([0, 0]);
+    expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
   });
 });
 
@@ -176,7 +183,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -195,7 +202,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -214,7 +221,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderScene).toHaveBeenCalledTimes(3);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -236,7 +243,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
@@ -258,7 +265,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(4);
-    expect(h.appState.selectionElement).toBeNull();
+    expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 });

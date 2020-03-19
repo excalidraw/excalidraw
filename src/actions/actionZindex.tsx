@@ -26,11 +26,11 @@ export const actionSendBackward = register({
         getSelectedIndices(elements, appState),
       ),
       appState,
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
-  commitToHistory: () => true,
   keyTest: event =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketLeft",
   PanelComponent: ({ updateData }) => (
@@ -54,11 +54,11 @@ export const actionBringForward = register({
         getSelectedIndices(elements, appState),
       ),
       appState,
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
-  commitToHistory: () => true,
   keyTest: event =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketRight",
   PanelComponent: ({ updateData }) => (
@@ -82,10 +82,10 @@ export const actionSendToBack = register({
         getSelectedIndices(elements, appState),
       ),
       appState,
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.sendToBack",
-  commitToHistory: () => true,
   keyTest: event => {
     return isDarwin
       ? event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "BracketLeft"
@@ -118,9 +118,9 @@ export const actionBringToFront = register({
         getSelectedIndices(elements, appState),
       ),
       appState,
+      commitToHistory: true,
     };
   },
-  commitToHistory: () => true,
   contextItemLabel: "labels.bringToFront",
   keyTest: event => {
     return isDarwin
