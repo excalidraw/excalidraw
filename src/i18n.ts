@@ -2,16 +2,21 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 export const languages = [
   { lng: "en", label: "English", data: require("./locales/en.json") },
-  { lng: "de", label: "Deutsch", data: require("./locales/de.json") },
-  { lng: "es", label: "Español", data: require("./locales/es.json") },
-  { lng: "fr", label: "Français", data: require("./locales/fr.json") },
-  { lng: "id", label: "Bahasa Indonesia", data: require("./locales/id.json") },
-  { lng: "no", label: "Norsk", data: require("./locales/no.json") },
-  { lng: "pl", label: "Polski", data: require("./locales/pl.json") },
-  { lng: "pt", label: "Português", data: require("./locales/pt.json") },
-  { lng: "ru", label: "Русский", data: require("./locales/ru.json") },
-  { lng: "tr", label: "Türkçe", data: require("./locales/tr.json") },
-  { lng: "ko", label: "한국어", data: require("./locales/ko.json") },
+  { lng: "de-DE", label: "Deutsch", data: require("./locales/de-DE.json") },
+  { lng: "es-ES", label: "Español", data: require("./locales/es-ES.json") },
+  { lng: "fr-FR", label: "Français", data: require("./locales/fr-FR.json") },
+  {
+    lng: "id-ID",
+    label: "Bahasa Indonesia",
+    data: require("./locales/id-ID.json"),
+  },
+  { lng: "no-No", label: "Norsk", data: require("./locales/no-NO.json") },
+  { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
+  { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
+  { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
+  { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
+  { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
+  { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
 ];
 
 let currentLanguage = languages[0];
