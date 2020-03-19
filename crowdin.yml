@@ -3,5 +3,5 @@ files:
     translation: /src/locales/%two_letters_code%.json
     languages_mapping:
       two_letters_code:
-        zh-CN: zh-CN
-        zh-TW: zh-TW
+        zh-CN: zh-cn
+        zh-TW: zh-tw
