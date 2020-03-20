@@ -1626,7 +1626,7 @@ export class App extends React.Component<any, AppState> {
       if (element.type === "selection") {
         this.setState({
           selectionElement: element,
-          draggingElement: hitElement ? hitElement : element,
+          draggingElement: element,
         });
       } else {
         globalSceneState.replaceAllElements([
