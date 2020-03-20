@@ -61,8 +61,6 @@ Pull requests are welcome. For major changes, please [open an issue](https://git
 
 To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, open an issue so we can get things set up on our end first.
 
-You can also discuss the app on our [Gitter channel](https://gitter.im/excalidraw/community).
-
 ## Excalidraw is built using these awesome tools
 
 - [React](https://reactjs.org)
