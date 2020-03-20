@@ -123,16 +123,16 @@ export class SceneHistory {
     return null;
   }
 
-  isRecording() {
-    return this.recording;
-  }
-
-  skipRecording() {
-    this.recording = false;
-  }
-
+  // Suspicious that this is called so many places. Seems error-prone.
   resumeRecording() {
     this.recording = true;
+  }
+
+  record(state: AppState, elements: readonly ExcalidrawElement[]) {
+    if (this.recording) {
+      this.pushEntry(state, elements);
+      this.recording = false;
+    }
   }
 }
 
