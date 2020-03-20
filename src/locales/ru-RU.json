@@ -3,7 +3,7 @@
     "paste": "Вставить",
     "selectAll": "Выделить всё",
     "copy": "Копировать",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "Копировать в буфер обмена как PNG",
     "bringForward": "Переложить вперёд",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Рисование холста",
     "layers": "Слои",
     "language": "Язык",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Создать многопользовательскую сессию",
+    "duplicateSelection": "Дублировать выбранные элементы"
   },
   "buttons": {
     "clearReset": "Очистить холст & сбросить цвет фона",
@@ -64,10 +64,10 @@
     "menu": "Меню",
     "done": "Готово",
     "edit": "Изменить",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Шаг назад",
+    "redo": "Шаг вперед",
+    "roomDialog": "Начать совместную работу",
+    "createNewRoom": "Создать новую комнату"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Не удалось декодировать данные.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое."
   },
   "toolBar": {
@@ -95,30 +95,30 @@
   },
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Возникла ошибка. Попробуйте ",
+    "headingMain_button": "перезагрузить страницу.",
+    "clearCanvasMessage": "Если перезагрузка страницы не помогла, попробуйте ",
+    "clearCanvasMessage_button": "очистить холст.",
+    "clearCanvasCaveat": " Текущая работа будет утеряна ",
+    "openIssueMessage_pre": "Перед тем как вы продолжите, мы будем признательны если вы откроете тикет в нашем ",
+    "openIssueMessage_button": "баг трекере.",
+    "openIssueMessage_post": " Пожалуйста, приложите следующую трассировку стека (и контент сцены, если возможно):",
+    "errorStack": "Трассировка стека с ошибкой:",
+    "errorStack_loading": "Данные загружаются. Пожалуйста, подождите...",
+    "sceneContent": "Содержание сцены:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Вы можете пригласить людей в текущую сцену для совместной работы.",
+    "desc_privacy": "Не беспокойтесь, сессия использует сквозное шифрование, поэтому всё что вы нарисуете останется приватным. Ваша информация не будет доступна даже на наших серверах.",
+    "button_startSession": "Начать сессию",
+    "button_stopSession": "Закончить сессию",
+    "desc_inProgressIntro": "Совместная сессия теперь активна.",
+    "desc_persistenceWarning": "Контент сцены доступен участникам в режиме P2P, и не сохраняется на нашем сервере. Поэтому если все участники отключатся, то вы потеряете свои данные, если не экспортируете сцену в файл или не сгенерируете публичную ссылку.",
+    "desc_shareLink": "Поделитесь этой ссылкой со всеми участниками:",
+    "desc_exitSession": "Остановка сессии отсоединит вас от комнаты, но вы сможете продолжить работу локально. Это не повлияет на остальных участников, и они смогут продолжить работу над общей версией."
   }
 }
