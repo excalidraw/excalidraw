@@ -289,12 +289,14 @@ export function renderSceneToSvg(
   }
   // render elements
   elements.forEach(element => {
-    renderElementToSvg(
-      element,
-      rsvg,
-      svgRoot,
-      element.x + offsetX,
-      element.y + offsetY,
-    );
+    if (!element.isDeleted) {
+      renderElementToSvg(
+        element,
+        rsvg,
+        svgRoot,
+        element.x + offsetX,
+        element.y + offsetY,
+      );
+    }
   });
 }
