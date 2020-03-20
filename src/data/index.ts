@@ -292,9 +292,9 @@ export async function exportCanvas(
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   // calculate smallest area to fit the contents in
-
+  const elementsToExport = elements.filter(element => !element.isDeleted);
   if (type === "svg") {
-    const tempSvg = exportToSvg(elements, {
+    const tempSvg = exportToSvg(elementsToExport, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
