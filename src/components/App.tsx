@@ -810,7 +810,9 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={globalSceneState.getAllElements()}
+          elements={globalSceneState.getAllElements().filter(element => {
+            return !element.isDeleted;
+          })}
           setElements={this.setElements}
           language={getLanguage()}
           onRoomCreate={this.createRoom}
