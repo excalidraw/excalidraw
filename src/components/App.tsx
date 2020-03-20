@@ -2432,10 +2432,7 @@ export class App extends React.Component<any, AppState> {
       this.broadcastSceneUpdate();
     }
 
-    if (history.isRecording()) {
-      history.pushEntry(this.state, globalSceneState.getAllElements());
-      history.skipRecording();
-    }
+    history.record(this.state, globalSceneState.getAllElements());
   }
 }
 
