@@ -236,7 +236,11 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private initializeSocketClient = () => {
+  private initializeSocketClient = (scene?: {
+    elements: readonly ExcalidrawElement[];
+    appState: AppState | null;
+    commitToHistory: boolean;
+  }) => {
     if (this.socket) {
       return;
     }
@@ -367,6 +371,9 @@ export class App extends React.Component<any, AppState> {
       this.socket.on("first-in-room", () => {
         if (this.socket) {
           this.socket.off("first-in-room");
+        }
+        if (scene) {
+          this.syncActionResult(scene);
         }
         this.socketInitialized = true;
       });
