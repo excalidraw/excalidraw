@@ -3,7 +3,7 @@
     "paste": "Yapıştır",
     "selectAll": "Hepsini Seç",
     "copy": "Kopyala",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "PNG olarak kopyala",
     "bringForward": "Bir öne getir",
     "sendToBack": "En arkaya gönder",
     "bringToFront": "En öne getir",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
     "language": "Dil",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Ortak çalışma ortamını paylaş",
+    "duplicateSelection": "Seçili nesneleri yinele"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -64,10 +64,10 @@
     "menu": "Menü",
     "done": "Tamam",
     "edit": "Düzenle",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Geri Al",
+    "redo": "İleri Al",
+    "roomDialog": "Ortak Çalışma Ortamı Yarat",
+    "createNewRoom": "Yeni oda oluştur"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş canvas dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır."
   },
   "toolBar": {
@@ -95,14 +95,14 @@
   },
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "SHIFT'e basılı tutarak orantılı şekilde boyutlandırabilirsiniz"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain_pre": "Hata oluştu. Lütfen ",
+    "headingMain_button": "sayfayı yenilemeyi deneyin.",
+    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
+    "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " This will result in loss of work ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
