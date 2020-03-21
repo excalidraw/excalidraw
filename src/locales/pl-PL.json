@@ -3,7 +3,7 @@
     "paste": "Wklej",
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
-    "copyAsPng": "Skopiuj do schowka jako plik PNG",
+    "copyAsPng": "Kopiuj do schowka jako PNG",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -44,7 +44,7 @@
     "layers": "Warstwy",
     "language": "Język",
     "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Powiel wybrane elementy"
+    "duplicateSelection": "Duplikuj wybrane elementy"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -65,7 +65,7 @@
     "done": "Gotowe",
     "edit": "Edytuj",
     "undo": "Cofnij",
-    "redo": "Powtórz",
+    "redo": "Przywróć",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Utwórz nowy pokój"
   },
