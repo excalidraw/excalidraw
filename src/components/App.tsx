@@ -841,73 +841,7 @@ export class App extends React.Component<any, AppState> {
                 this.canvas?.removeEventListener("wheel", this.handleWheel);
               }
             }}
-            onContextMenu={event => {
-              event.preventDefault();
-
-              const { x, y } = viewportCoordsToSceneCoords(
-                event,
-                this.state,
-                this.canvas,
-                window.devicePixelRatio,
-              );
-
-              const element = getElementAtPosition(
-                globalSceneState.getAllElements(),
-                this.state,
-                x,
-                y,
-                this.state.zoom,
-              );
-              if (!element) {
-                ContextMenu.push({
-                  options: [
-                    navigator.clipboard && {
-                      label: t("labels.paste"),
-                      action: () => this.pasteFromClipboard(null),
-                    },
-                    probablySupportsClipboardBlob &&
-                      hasNonDeletedElements(
-                        globalSceneState.getAllElements(),
-                      ) && {
-                        label: t("labels.copyAsPng"),
-                        action: this.copyToClipboardAsPng,
-                      },
-                    ...this.actionManager.getContextMenuItems(action =>
-                      this.canvasOnlyActions.includes(action.name),
-                    ),
-                  ],
-                  top: event.clientY,
-                  left: event.clientX,
-                });
-                return;
-              }
-
-              if (!this.state.selectedElementIds[element.id]) {
-                this.setState({ selectedElementIds: { [element.id]: true } });
-              }
-
-              ContextMenu.push({
-                options: [
-                  navigator.clipboard && {
-                    label: t("labels.copy"),
-                    action: this.copyToAppClipboard,
-                  },
-                  navigator.clipboard && {
-                    label: t("labels.paste"),
-                    action: () => this.pasteFromClipboard(null),
-                  },
-                  probablySupportsClipboardBlob && {
-                    label: t("labels.copyAsPng"),
-                    action: this.copyToClipboardAsPng,
-                  },
-                  ...this.actionManager.getContextMenuItems(
-                    action => !this.canvasOnlyActions.includes(action.name),
-                  ),
-                ],
-                top: event.clientY,
-                left: event.clientX,
-              });
-            }}
+            onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
             onDoubleClick={this.handleCanvasDoubleClick}
             onPointerMove={this.handleCanvasPointerMove}
@@ -2258,6 +2192,74 @@ export class App extends React.Component<any, AppState> {
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
+  };
+
+  private handleCanvasContextMenu = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    event.preventDefault();
+
+    const { x, y } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
+    const element = getElementAtPosition(
+      globalSceneState.getAllElements(),
+      this.state,
+      x,
+      y,
+      this.state.zoom,
+    );
+    if (!element) {
+      ContextMenu.push({
+        options: [
+          navigator.clipboard && {
+            label: t("labels.paste"),
+            action: () => this.pasteFromClipboard(null),
+          },
+          probablySupportsClipboardBlob &&
+            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+              label: t("labels.copyAsPng"),
+              action: this.copyToClipboardAsPng,
+            },
+          ...this.actionManager.getContextMenuItems(action =>
+            this.canvasOnlyActions.includes(action.name),
+          ),
+        ],
+        top: event.clientY,
+        left: event.clientX,
+      });
+      return;
+    }
+
+    if (!this.state.selectedElementIds[element.id]) {
+      this.setState({ selectedElementIds: { [element.id]: true } });
+    }
+
+    ContextMenu.push({
+      options: [
+        navigator.clipboard && {
+          label: t("labels.copy"),
+          action: this.copyToAppClipboard,
+        },
+        navigator.clipboard && {
+          label: t("labels.paste"),
+          action: () => this.pasteFromClipboard(null),
+        },
+        probablySupportsClipboardBlob && {
+          label: t("labels.copyAsPng"),
+          action: this.copyToClipboardAsPng,
+        },
+        ...this.actionManager.getContextMenuItems(
+          action => !this.canvasOnlyActions.includes(action.name),
+        ),
+      ],
+      top: event.clientY,
+      left: event.clientX,
+    });
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
