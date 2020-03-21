@@ -3,7 +3,7 @@
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
     "copy": "Copiar",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "Copiar al portapapeles como PNG",
     "bringForward": "Adelantar",
     "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
     "language": "Lenguaje",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Compartir una sesión de colaboración en vivo",
+    "duplicateSelection": "Duplicar elementos seleccionados"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -64,10 +64,10 @@
     "menu": "Menú",
     "done": "Terminado",
     "edit": "Editar",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "roomDialog": "Iniciar colaboración en vivo",
+    "createNewRoom": "Crear nueva sala"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "No se pudieron descifrar los datos.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
@@ -95,14 +95,14 @@
   },
   "hints": {
     "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain_pre": "Se encontró un error. Intente ",
+    "headingMain_button": "recarcando la página.",
+    "clearCanvasMessage": "Si la recarga no funciona, intente ",
+    "clearCanvasMessage_button": "limpiando el lienzo.",
     "clearCanvasCaveat": " This will result in loss of work ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
