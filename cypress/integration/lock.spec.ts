@@ -1,7 +1,4 @@
-import {
-  baseDrawingRegion as region,
-  artistDrawingConfig,
-} from "../support/utils";
+import { baseDrawingRegion as region } from "../support/utils";
 
 describe("Lock tool", () => {
   it("shouldn't create more than one shape if the lock is not active", () => {
@@ -20,7 +17,6 @@ describe("Lock tool", () => {
     );
     cy.get("#canvas").matchImageSnapshot("rectangleUnlocked", {
       clip: region,
-      ...artistDrawingConfig,
     });
   });
   it("should create two shapes if the lock is active", () => {
@@ -39,7 +35,6 @@ describe("Lock tool", () => {
     );
     cy.get("#canvas").matchImageSnapshot("rectangleLocked", {
       clip: region,
-      ...artistDrawingConfig,
     });
   });
 });

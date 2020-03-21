@@ -1,7 +1,4 @@
-import {
-  baseDrawingRegion as region,
-  artistDrawingConfig,
-} from "../support/utils";
+import { baseDrawingRegion as region } from "../support/utils";
 
 describe("Panning", () => {
   it("should change cursor when pressing space key", () => {
@@ -32,10 +29,8 @@ describe("Panning", () => {
       { x: region.x + 50, y: region.y + 50 },
     );
     cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
-    // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangle", {
       clip: region,
-      ...artistDrawingConfig,
     });
     // pan
     cy.get("#canvas").trigger("keydown", { key: " " });
@@ -46,7 +41,6 @@ describe("Panning", () => {
     cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangle", {
       clip: region,
-      ...artistDrawingConfig,
     });
   });
   it("should pan away from rectangle using wheel", () => {
@@ -59,7 +53,6 @@ describe("Panning", () => {
     // we add some tolerance threshold due to rough.js randomness
     cy.get("#canvas").matchImageSnapshot("beforePanningRectangleWheel", {
       clip: region,
-      ...artistDrawingConfig,
     });
     // pan
     cy.get("#canvas").drag(
@@ -70,7 +63,6 @@ describe("Panning", () => {
     cy.get("#canvas").click(region.x - 50, region.y - 50); // deselect
     cy.get("#canvas").matchImageSnapshot("afterPanningRectangleWheel", {
       clip: region,
-      ...artistDrawingConfig,
     });
   });
 });
