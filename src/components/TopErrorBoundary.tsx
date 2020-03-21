@@ -20,6 +20,10 @@ export class TopErrorBoundary extends React.Component<
     localStorage: "",
   };
 
+  render() {
+    return this.state.hasError ? this.errorSplash() : this.props.children;
+  }
+
   componentDidCatch(error: Error) {
     resetCursor();
     const _localStorage: any = {};
@@ -88,74 +92,70 @@ export class TopErrorBoundary extends React.Component<
     );
   }
 
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="ErrorSplash">
-          <div className="ErrorSplash-messageContainer">
-            <div className="ErrorSplash-paragraph bigger align-center">
-              {t("errorSplash.headingMain_pre")}
-              <button onClick={() => window.location.reload()}>
-                {t("errorSplash.headingMain_button")}
-              </button>
+  private errorSplash() {
+    return (
+      <div className="ErrorSplash">
+        <div className="ErrorSplash-messageContainer">
+          <div className="ErrorSplash-paragraph bigger align-center">
+            {t("errorSplash.headingMain_pre")}
+            <button onClick={() => window.location.reload()}>
+              {t("errorSplash.headingMain_button")}
+            </button>
+          </div>
+          <div className="ErrorSplash-paragraph align-center">
+            {t("errorSplash.clearCanvasMessage")}
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+            >
+              {t("errorSplash.clearCanvasMessage_button")}
+            </button>
+            <br />
+            <div className="smaller">
+              <span role="img" aria-label="warning">
+                ⚠️
+              </span>
+              {t("errorSplash.clearCanvasCaveat")}
+              <span role="img" aria-hidden="true">
+                ⚠️
+              </span>
             </div>
-            <div className="ErrorSplash-paragraph align-center">
-              {t("errorSplash.clearCanvasMessage")}
-              <button
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.reload();
-                }}
-              >
-                {t("errorSplash.clearCanvasMessage_button")}
+          </div>
+          <div>
+            <div className="ErrorSplash-paragraph">
+              {t("errorSplash.openIssueMessage_pre")}
+              <button onClick={this.createGithubIssue}>
+                {t("errorSplash.openIssueMessage_button")}
               </button>
-              <br />
-              <div className="smaller">
-                <span role="img" aria-label="warning">
-                  ⚠️
-                </span>
-                {t("errorSplash.clearCanvasCaveat")}
-                <span role="img" aria-hidden="true">
-                  ⚠️
-                </span>
-              </div>
+              {t("errorSplash.openIssueMessage_post")}
             </div>
-            <div>
-              <div className="ErrorSplash-paragraph">
-                {t("errorSplash.openIssueMessage_pre")}
-                <button onClick={this.createGithubIssue}>
-                  {t("errorSplash.openIssueMessage_button")}
-                </button>
-                {t("errorSplash.openIssueMessage_post")}
-              </div>
-              <div className="ErrorSplash-paragraph">
-                <div className="ErrorSplash-details">
-                  <label>{t("errorSplash.errorStack")}</label>
-                  <textarea
-                    rows={10}
-                    onPointerDown={this.selectTextArea}
-                    readOnly={true}
-                    value={
-                      this.state.unresolvedError
-                        ? t("errorSplash.errorStack_loading")
-                        : this.state.stack
-                    }
-                  />
-                  <label>{t("errorSplash.sceneContent")}</label>
-                  <textarea
-                    rows={5}
-                    onPointerDown={this.selectTextArea}
-                    readOnly={true}
-                    value={this.state.localStorage}
-                  />
-                </div>
+            <div className="ErrorSplash-paragraph">
+              <div className="ErrorSplash-details">
+                <label>{t("errorSplash.errorStack")}</label>
+                <textarea
+                  rows={10}
+                  onPointerDown={this.selectTextArea}
+                  readOnly={true}
+                  value={
+                    this.state.unresolvedError
+                      ? t("errorSplash.errorStack_loading")
+                      : this.state.stack
+                  }
+                />
+                <label>{t("errorSplash.sceneContent")}</label>
+                <textarea
+                  rows={5}
+                  onPointerDown={this.selectTextArea}
+                  readOnly={true}
+                  value={this.state.localStorage}
+                />
               </div>
             </div>
           </div>
         </div>
-      );
-    }
-
-    return this.props.children;
+      </div>
+    );
   }
 }
