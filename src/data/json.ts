@@ -4,6 +4,8 @@ import { cleanAppStateForExport } from "../appState";
 
 import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
+import { hasNonDeletedElements } from "../element";
+import { t } from "../i18n";
 
 export function serializeAsJSON(
   elements: readonly ExcalidrawElement[],
@@ -26,6 +28,9 @@ export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) {
+  if (!hasNonDeletedElements(elements)) {
+    return window.alert(t("alerts.cannotExportEmptyCanvas"));
+  }
   const serialized = serializeAsJSON(elements, appState);
 
   const name = `${appState.name}.excalidraw`;
