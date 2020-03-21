@@ -3,7 +3,7 @@
     "paste": "Wklej",
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -44,7 +44,7 @@
     "layers": "Warstwy",
     "language": "Język",
     "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "duplicateSelection": "Powiel wybrane elementy"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -64,10 +64,10 @@
     "menu": "Menu",
     "done": "Gotowe",
     "edit": "Edytuj",
-    "undo": "Undo",
-    "redo": "Redo",
+    "undo": "Cofnij",
+    "redo": "Powtórz",
     "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "createNewRoom": "Utwórz nowy pokój"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz."
   },
   "toolBar": {
