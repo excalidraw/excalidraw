@@ -103,6 +103,22 @@ export function debounce<T extends any[]>(
   return ret;
 }
 
+export function throttle<T extends any[]>(
+  fn: (...args: T) => void,
+  timeout: number,
+) {
+  let lastCalledAt: number = 0;
+
+  return (...args: T) => {
+    const timeNow = Date.now();
+    if (timeNow - lastCalledAt < timeout) {
+      return;
+    }
+    lastCalledAt = timeNow;
+    fn(...args);
+  };
+}
+
 export function selectNode(node: Element) {
   const selection = window.getSelection();
   if (selection) {

@@ -62,6 +62,10 @@ To translate Excalidraw into other languages, please visit [our Crowdin page](ht
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 
+### Credits
+
+- “[high five](https://thenounproject.com/search/?q=high%20five&i=1154833)” icon by HeadsOfBirds from [the Noun Project](https://thenounproject.com/)
+
 ## Testimonials
 
 <a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>

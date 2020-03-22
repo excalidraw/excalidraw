@@ -45,6 +45,12 @@ export type SocketUpdateDataSource = {
       pointerCoords: { x: number; y: number };
     };
   };
+  SECRET_HIGH_FIVE_ZONE: {
+    type: "SECRET_HIGH_FIVE_ZONE";
+    payload: {
+      isVisible: boolean;
+    };
+  };
 };
 
 export type SocketUpdateDataIncoming =

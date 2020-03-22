@@ -35,6 +35,7 @@ export function getDefaultAppState(): AppState {
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     collaborators: new Map(),
+    isSecretHighFiveZoneVisible: false,
   };
 }
 
@@ -48,6 +49,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isResizing,
     collaborators,
     isCollaborating,
+    isSecretHighFiveZoneVisible,
     ...exportedState
   } = appState;
   return exportedState;

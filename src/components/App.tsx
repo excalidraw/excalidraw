@@ -95,6 +95,7 @@ import {
   ARROW_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
+import { SecretHighFiveZone } from "./SecretHighFiveZone";
 import { ScrollBars } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -241,6 +242,11 @@ export class App extends React.Component<any, AppState> {
             {t("labels.drawingCanvas")}
           </canvas>
         </main>
+        <SecretHighFiveZone
+          isVisible={this.state.isSecretHighFiveZoneVisible}
+          onClose={this.closeSecretHighFiveZone}
+          pointerViewportCoordList={this.getPointerViewportCoordList()}
+        />
       </div>
     );
   }
@@ -777,6 +783,10 @@ export class App extends React.Component<any, AppState> {
                 return state;
               });
               break;
+            case "SECRET_HIGH_FIVE_ZONE":
+              const { isVisible } = decryptedData.payload;
+              this.setState({ isSecretHighFiveZoneVisible: isVisible });
+              break;
           }
         },
       );
@@ -837,6 +847,18 @@ export class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getAllElements()),
     );
     return this._broadcastSocketData(
+      data as typeof data & { _brand: "socketUpdateData" },
+    );
+  };
+
+  private broadcastSecretHighFiveZone = (isVisible: boolean) => {
+    const data: SocketUpdateDataSource["SECRET_HIGH_FIVE_ZONE"] = {
+      type: "SECRET_HIGH_FIVE_ZONE",
+      payload: {
+        isVisible,
+      },
+    };
+    this._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
     );
   };
@@ -1567,6 +1589,10 @@ export class App extends React.Component<any, AppState> {
                 font: this.state.currentItemFont,
               }),
             ]);
+
+            if (text === "HIGHFIVE!") {
+              this.showSecretHighFiveZone();
+            }
           }
           this.setState(prevState => ({
             selectedElementIds: {
@@ -2445,6 +2471,52 @@ export class App extends React.Component<any, AppState> {
   private saveDebounced = debounce(() => {
     saveToLocalStorage(globalSceneState.getAllElements(), this.state);
   }, 300);
+
+  private showSecretHighFiveZone = () => {
+    if (this.state.isCollaborating) {
+      this.setState({ isSecretHighFiveZoneVisible: true });
+      this.broadcastSecretHighFiveZone(true);
+    }
+  };
+
+  private closeSecretHighFiveZone = () => {
+    this.setState({ isSecretHighFiveZoneVisible: false });
+    if (this.state.isCollaborating) {
+      this.broadcastSecretHighFiveZone(false);
+    }
+  };
+
+  private getPointerViewportCoordList = (): Array<{
+    x: number;
+    y: number;
+  }> => {
+    if (!this.state.isSecretHighFiveZoneVisible) {
+      // bail out if the zone is hidden
+      return [];
+    }
+
+    const result: Array<{ x: number; y: number }> = [];
+
+    this.state.collaborators.forEach(user => {
+      if (!user.pointer) {
+        return;
+      }
+
+      result.push(
+        sceneCoordsToViewportCoords(
+          {
+            sceneX: user.pointer.x,
+            sceneY: user.pointer.y,
+          },
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        ),
+      );
+    });
+
+    return result;
+  };
 }
 
 // -----------------------------------------------------------------------------
