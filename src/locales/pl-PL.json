@@ -108,17 +108,17 @@
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "errorStack_loading": "Wczytywanie danych. Proszę czekać...",
+    "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Możesz zaprosić ludzi do swojej obecnej sceny, aby współpracować.",
+    "desc_privacy": "Nie martw się, sesja wykorzystuje szyfrowanie end-to-end, więc cokolwiek narysujesz pozostanie to prywatne. Nawet nasz serwer nie będzie w stanie zobaczyć co wymyślisz.",
+    "button_startSession": "Start sesji",
+    "button_stopSession": "Stop sesji",
+    "desc_inProgressIntro": "Współpraca na żywo właśnie trwa.",
+    "desc_persistenceWarning": "Zauważ, że dane sceny są współdzielone pomiędzy współpracownikami w modelu P2P i nie są przechowywane na naszym serwerze. Aby nie stracić danych gdy wszyscy się rozłączą, wyeksportuj dane do pliku lub linku do udostępnienia.",
+    "desc_shareLink": "Udostępnij ten link osobie, z którą chcesz współpracować:",
+    "desc_exitSession": "Zatrzymanie sesji spowoduje odłączenie od pokoju, ale nadal będzie można lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
   }
 }
