@@ -4,7 +4,7 @@ import { calculateScrollCenter, getTargetElement } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
-import { ExcalidrawElement, Versioned } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -28,9 +28,8 @@ interface LayerUIProps {
   appState: AppState;
   canvas: HTMLCanvasElement | null;
   setAppState: any;
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
   language: string;
-  setElements: (elements: readonly Versioned<ExcalidrawElement>[]) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   onToggleLock: () => void;
@@ -44,7 +43,6 @@ export const LayerUI = React.memo(
     canvas,
     elements,
     language,
-    setElements,
     onRoomCreate,
     onRoomDestroy,
     onToggleLock,
@@ -95,7 +93,6 @@ export const LayerUI = React.memo(
       <MobileMenu
         appState={appState}
         elements={elements}
-        setElements={setElements}
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
@@ -152,8 +149,6 @@ export const LayerUI = React.memo(
                         <ShapesSwitcher
                           elementType={appState.elementType}
                           setAppState={setAppState}
-                          setElements={setElements}
-                          elements={elements}
                         />
                       </Stack.Row>
                     </Island>

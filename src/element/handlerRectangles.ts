@@ -1,4 +1,4 @@
-import { ExcalidrawElement, PointerType } from "./types";
+import { ExcalidrawElement, PointerType, NonDeleted } from "./types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 
@@ -11,7 +11,7 @@ const handleSizes: { [k in PointerType]: number } = {
 };
 
 export function handlerRectangles(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   zoom: number,
   pointerType: PointerType = "mouse",
 ) {

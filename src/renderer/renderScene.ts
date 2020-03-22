@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
 import { FlooredNumber, AppState } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getElementAbsoluteCoords, handlerRectangles } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -27,9 +27,9 @@ function colorsForClientId(clientId: string) {
 }
 
 export function renderScene(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
-  selectionElement: ExcalidrawElement | null,
+  selectionElement: NonDeleted<ExcalidrawElement> | null,
   scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
@@ -239,7 +239,7 @@ export function renderScene(
 }
 
 function isVisibleElement(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   viewportWidth: number,
   viewportHeight: number,
   {
@@ -271,7 +271,7 @@ function isVisibleElement(
 
 // This should be only called for exporting purposes
 export function renderSceneToSvg(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   {

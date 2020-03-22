@@ -3,7 +3,11 @@ import { Point } from "../types";
 import { ExcalidrawElement, Versioned } from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
-import { isInvisiblySmallElement, normalizeDimensions } from "../element";
+import {
+  isInvisiblySmallElement,
+  normalizeDimensions,
+  versionedToNonDeleted,
+} from "../element";
 import nanoid from "nanoid";
 import { calculateScrollCenter } from "../scene";
 
@@ -74,7 +78,10 @@ export function restore(
     });
 
   if (opts?.scrollToContent && savedState) {
-    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+    savedState = {
+      ...savedState,
+      ...calculateScrollCenter(versionedToNonDeleted(elements)),
+    };
   }
 
   return {

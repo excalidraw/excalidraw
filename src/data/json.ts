@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { AppState } from "../types";
 import { cleanAppStateForExport } from "../appState";
 
@@ -6,7 +6,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 
 export function serializeAsJSON(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
 ): string {
   return JSON.stringify(
@@ -23,7 +23,7 @@ export function serializeAsJSON(
 }
 
 export async function saveAsJSON(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
 ) {
   const serialized = serializeAsJSON(elements, appState);

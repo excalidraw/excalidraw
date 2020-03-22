@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 
 import { getElementAbsoluteCoords, hitTest } from "../element";
 import { AppState } from "../types";
@@ -16,7 +16,7 @@ export const hasStroke = (type: string) =>
 export const hasText = (type: string) => type === "text";
 
 export function getElementAtPosition(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
   x: number,
   y: number,
@@ -35,7 +35,7 @@ export function getElementAtPosition(
 }
 
 export function getElementContainingPosition(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   x: number,
   y: number,
 ) {

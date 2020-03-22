@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface } from "../actions/types";
@@ -22,7 +22,7 @@ const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
 export type ExportCB = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   scale?: number,
 ) => void;
 
@@ -38,7 +38,7 @@ function ExportModal({
   closeButton,
 }: {
   appState: AppState;
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -199,7 +199,7 @@ export function ExportDialog({
   onExportToBackend,
 }: {
   appState: AppState;
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;

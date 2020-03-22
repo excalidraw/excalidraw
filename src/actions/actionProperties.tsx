@@ -1,5 +1,5 @@
 import React from "react";
-import { ExcalidrawElement, Versioned } from "../element/types";
+import { ExcalidrawElement, Versioned, NonDeleted } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
@@ -29,7 +29,7 @@ const changeProperty = (
 };
 
 const getFormValue = function<T>(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
   defaultValue?: T,

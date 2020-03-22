@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, NonDeleted } from "./element/types";
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 
@@ -18,7 +18,7 @@ export const probablySupportsClipboardBlob =
   "toBlob" in HTMLCanvasElement.prototype;
 
 export async function copyToAppClipboard(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
 ) {
   CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
@@ -37,7 +37,7 @@ export async function copyToAppClipboard(
 }
 
 export function getAppClipboard(): {
-  elements?: readonly ExcalidrawElement[];
+  elements?: readonly NonDeleted<ExcalidrawElement>[];
 } {
   try {
     const clipboardElements = JSON.parse(CLIPBOARD);
@@ -60,7 +60,7 @@ export async function getClipboardContent(
   event: ClipboardEvent | null,
 ): Promise<{
   text?: string;
-  elements?: readonly ExcalidrawElement[];
+  elements?: readonly NonDeleted<ExcalidrawElement>[];
 }> {
   try {
     const text = event

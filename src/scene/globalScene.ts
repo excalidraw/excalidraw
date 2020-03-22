@@ -1,4 +1,5 @@
-import { ExcalidrawElement, Versioned } from "../element/types";
+import { ExcalidrawElement, Versioned, NonDeleted } from "../element/types";
+import { versionedToNonDeleted } from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -15,8 +16,8 @@ class SceneState {
     private _elements: readonly Versioned<ExcalidrawElement>[] = [],
   ) {}
 
-  getElements(): readonly ExcalidrawElement[] {
-    return this._elements.filter(element => !element.isDeleted);
+  getElements(): readonly NonDeleted<ExcalidrawElement>[] {
+    return versionedToNonDeleted(this._elements);
   }
 
   getElementsIncludingDeleted() {

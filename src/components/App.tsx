@@ -20,6 +20,8 @@ import {
   getElementMap,
   getDrawingVersion,
   newLinearElement,
+  isNonDeleted,
+  assertNonDeleted,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -50,6 +52,7 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   Versioned,
+  NonDeleted,
 } from "../element/types";
 
 import {
@@ -794,10 +797,6 @@ export class App extends React.Component<any, AppState> {
     }));
   };
 
-  private setElements = (elements: readonly Versioned<ExcalidrawElement>[]) => {
-    globalSceneState.replaceElementsIncludingDeleted(elements);
-  };
-
   public render() {
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
@@ -815,7 +814,6 @@ export class App extends React.Component<any, AppState> {
           setAppState={this.setAppState}
           actionManager={this.actionManager}
           elements={globalSceneState.getElements()}
-          setElements={this.setElements}
           language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
@@ -2020,6 +2018,7 @@ export class App extends React.Component<any, AppState> {
         ) {
           this.setState({ selectedElementIds: {} });
         }
+        assertNonDeleted(draggingElement);
         const elementsWithinSelection = getElementsWithinSelection(
           globalSceneState.getElements(),
           draggingElement,
@@ -2300,7 +2299,7 @@ export class App extends React.Component<any, AppState> {
   });
 
   private addElementsFromPaste = (
-    clipboardElements: readonly ExcalidrawElement[],
+    clipboardElements: readonly NonDeleted<ExcalidrawElement>[],
   ) => {
     const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
@@ -2404,7 +2403,9 @@ export class App extends React.Component<any, AppState> {
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       globalSceneState.getElements(),
       this.state,
-      this.state.selectionElement,
+      this.state.selectionElement && isNonDeleted(this.state.selectionElement)
+        ? this.state.selectionElement
+        : null,
       window.devicePixelRatio,
       this.rc!,
       this.canvas!,

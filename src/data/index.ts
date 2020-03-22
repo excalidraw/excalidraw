@@ -1,4 +1,4 @@
-import { ExcalidrawElement, Versioned } from "../element/types";
+import { ExcalidrawElement, Versioned, NonDeleted } from "../element/types";
 
 import { getDefaultAppState } from "../appState";
 
@@ -166,7 +166,7 @@ export async function decryptAESGEM(
 }
 
 export async function exportToBackend(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
 ) {
   const json = serializeAsJSON(elements, appState);
@@ -270,7 +270,7 @@ export async function importFromBackend(
 
 export async function exportCanvas(
   type: ExportType,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
   canvas: HTMLCanvasElement,
   {

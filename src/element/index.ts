@@ -1,4 +1,4 @@
-import { ExcalidrawElement, Versioned } from "./types";
+import { ExcalidrawElement, Versioned, NonDeleted } from "./types";
 
 export {
   newElement,
@@ -48,4 +48,26 @@ export function getDrawingVersion(
   elements: readonly Versioned<ExcalidrawElement>[],
 ) {
   return elements.reduce((acc, el) => acc + el.version, 0);
+}
+
+export function versionedToNonDeleted(
+  elements: readonly Versioned<ExcalidrawElement>[],
+): readonly NonDeleted<ExcalidrawElement>[] {
+  return elements.filter(element => !element.isDeleted) as NonDeleted<
+    ExcalidrawElement
+  >[];
+}
+
+export function isNonDeleted(
+  element: ExcalidrawElement,
+): element is NonDeleted<ExcalidrawElement> {
+  return !(element as Versioned<ExcalidrawElement>).isDeleted;
+}
+
+export function assertNonDeleted<TElement extends ExcalidrawElement>(
+  element: TElement,
+): asserts element is NonDeleted<TElement> {
+  if (!isNonDeleted(element)) {
+    throw new Error("Expected element not to be deleted");
+  }
 }

@@ -8,6 +8,7 @@ import {
 import { ExcalidrawElement, Versioned } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
+import { versionedToNonDeleted } from "../element";
 
 export class ActionManager implements ActionsManagerInterface {
   actions: { [keyProp: string]: Action } = {};
@@ -89,7 +90,7 @@ export class ActionManager implements ActionsManagerInterface {
 
       return (
         <PanelComponent
-          elements={this.getElements()}
+          elements={versionedToNonDeleted(this.getElements())}
           appState={this.getAppState()}
           updateData={updateData}
         />

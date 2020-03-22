@@ -1,5 +1,5 @@
 import React from "react";
-import { ExcalidrawElement, Versioned } from "../element/types";
+import { ExcalidrawElement, Versioned, NonDeleted } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
@@ -20,7 +20,7 @@ export type ActionFilterFn = (action: Action) => void;
 export interface Action {
   name: string;
   PanelComponent?: React.FC<{
-    elements: readonly ExcalidrawElement[];
+    elements: readonly NonDeleted<ExcalidrawElement>[];
     appState: AppState;
     updateData: (formData?: any) => void;
   }>;

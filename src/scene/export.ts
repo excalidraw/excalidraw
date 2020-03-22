@@ -1,5 +1,5 @@
 import rough from "roughjs/bin/rough";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
@@ -7,7 +7,7 @@ import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 
 export function exportToCanvas(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
   {
     exportBackground,
@@ -61,7 +61,7 @@ export function exportToCanvas(
 }
 
 export function exportToSvg(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   {
     exportBackground,
     exportPadding = 10,

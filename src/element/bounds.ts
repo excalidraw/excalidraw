@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "./types";
 import { rotate } from "../math";
 import { Drawable } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -7,7 +11,9 @@ import { isLinearElement } from "./typeChecks";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+export function getElementAbsoluteCoords(
+  element: NonDeleted<ExcalidrawElement>,
+) {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteBounds(element);
   }
@@ -35,7 +41,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 }
 
 export function getLinearElementAbsoluteBounds(
-  element: ExcalidrawLinearElement,
+  element: NonDeleted<ExcalidrawLinearElement>,
 ) {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
@@ -186,7 +192,9 @@ export function getArrowPoints(
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
+export function getCommonBounds(
+  elements: readonly NonDeleted<ExcalidrawElement>[],
+) {
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;

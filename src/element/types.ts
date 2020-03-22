@@ -21,6 +21,10 @@ export type Versioned<TElement extends _ExcalidrawElementBase> = TElement & {
   isDeleted: boolean;
 };
 
+export type NonDeleted<TElement extends _ExcalidrawElementBase> = TElement & {
+  isDeleted: false;
+};
+
 export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
   type: "selection" | "rectangle" | "diamond" | "ellipse";
 };

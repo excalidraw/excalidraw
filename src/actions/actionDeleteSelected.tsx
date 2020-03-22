@@ -5,6 +5,7 @@ import React from "react";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
+import { versionedToNonDeleted } from "../element";
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
@@ -20,7 +21,10 @@ export const actionDeleteSelected = register({
         elementType: "selection",
         multiElement: null,
       },
-      commitToHistory: isSomeElementSelected(elements, appState),
+      commitToHistory: isSomeElementSelected(
+        versionedToNonDeleted(elements),
+        appState,
+      ),
     };
   },
   contextItemLabel: "labels.delete",

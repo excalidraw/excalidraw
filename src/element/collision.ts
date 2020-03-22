@@ -1,6 +1,6 @@
 import { distanceBetweenPointAndSegment } from "../math";
 
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, NonDeleted } from "./types";
 
 import {
   getDiamondPoints,
@@ -24,7 +24,7 @@ function isElementDraggableFromInside(
 }
 
 export function hitTest(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   appState: AppState,
   x: number,
   y: number,

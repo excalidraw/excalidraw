@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getCommonBounds } from "../element";
 import { FlooredNumber } from "../types";
 import { ScrollBars } from "./types";
@@ -9,7 +9,7 @@ export const SCROLLBAR_WIDTH = 6;
 export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 
 export function getScrollBars(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   viewportWidth: number,
   viewportHeight: number,
   {

@@ -1,6 +1,6 @@
 import React from "react";
 import { t } from "../i18n";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
@@ -9,7 +9,7 @@ import { isLinearElement } from "../element/typeChecks";
 
 interface Hint {
   appState: AppState;
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
 }
 
 const getHints = ({ appState, elements }: Hint) => {

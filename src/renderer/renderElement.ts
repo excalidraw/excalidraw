@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
 import { isTextElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -24,7 +28,7 @@ export interface ExcalidrawElementWithCanvas {
 }
 
 function generateElementCanvas(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   zoom: number,
 ): ExcalidrawElementWithCanvas {
   const canvas = document.createElement("canvas");
@@ -72,7 +76,7 @@ function generateElementCanvas(
 }
 
 function drawElementOnCanvas(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
 ) {
@@ -124,7 +128,7 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
-export function getShapeForElement(element: ExcalidrawElement) {
+export function getShapeForElement(element: NonDeleted<ExcalidrawElement>) {
   return shapeCache.get(element);
 }
 
@@ -133,7 +137,7 @@ export function invalidateShapeForElement(element: ExcalidrawElement) {
 }
 
 function generateElement(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   generator: RoughGenerator,
   sceneState?: SceneState,
 ) {
@@ -287,7 +291,7 @@ function drawElementFromCanvas(
 }
 
 export function renderElement(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
@@ -337,7 +341,7 @@ export function renderElement(
 }
 
 export function renderElementToSvg(
-  element: ExcalidrawElement,
+  element: NonDeleted<ExcalidrawElement>,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   offsetX?: number,
