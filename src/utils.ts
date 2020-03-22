@@ -3,7 +3,17 @@ import { getZoomOrigin } from "./scene";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
+let mockDateTime: string | null = null;
+
+export function setDateTimeForTests(dateTime: string) {
+  mockDateTime = dateTime;
+}
+
 export function getDateTime() {
+  if (mockDateTime) {
+    return mockDateTime;
+  }
+
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth() + 1;

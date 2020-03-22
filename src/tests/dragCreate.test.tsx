@@ -5,6 +5,7 @@ import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
+import { reseed } from "../random";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -13,6 +14,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
+  reseed(7);
 });
 
 const { h } = window;
@@ -44,6 +46,9 @@ describe("add element to the scene when pointer dragging long enough", () => {
     expect(h.elements[0].y).toEqual(20);
     expect(h.elements[0].width).toEqual(30); // 60 - 30
     expect(h.elements[0].height).toEqual(50); // 70 - 20
+
+    expect(h.elements.length).toMatchSnapshot();
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("ellipse", () => {
@@ -72,6 +77,9 @@ describe("add element to the scene when pointer dragging long enough", () => {
     expect(h.elements[0].y).toEqual(20);
     expect(h.elements[0].width).toEqual(30); // 60 - 30
     expect(h.elements[0].height).toEqual(50); // 70 - 20
+
+    expect(h.elements.length).toMatchSnapshot();
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("diamond", () => {
@@ -100,6 +108,9 @@ describe("add element to the scene when pointer dragging long enough", () => {
     expect(h.elements[0].y).toEqual(20);
     expect(h.elements[0].width).toEqual(30); // 60 - 30
     expect(h.elements[0].height).toEqual(50); // 70 - 20
+
+    expect(h.elements.length).toMatchSnapshot();
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("arrow", () => {
@@ -132,6 +143,9 @@ describe("add element to the scene when pointer dragging long enough", () => {
     expect(element.points.length).toEqual(2);
     expect(element.points[0]).toEqual([0, 0]);
     expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+    expect(h.elements.length).toMatchSnapshot();
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("line", () => {
@@ -164,6 +178,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
     expect(element.points.length).toEqual(2);
     expect(element.points[0]).toEqual([0, 0]);
     expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
 

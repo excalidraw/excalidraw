@@ -4,8 +4,8 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, normalizeDimensions } from "../element";
-import nanoid from "nanoid";
 import { calculateScrollCenter } from "../scene";
+import { randomId } from "../random";
 
 export function restore(
   // we're making the elements mutable for this API because we want to
@@ -62,7 +62,7 @@ export function restore(
         ...element,
         // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
         version: element.version || 1,
-        id: element.id || nanoid(),
+        id: element.id || randomId(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
         roughness: element.roughness ?? 1,
