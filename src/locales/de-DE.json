@@ -3,7 +3,7 @@
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
     "copy": "Kopieren",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "In Zwischenablage als PNG kopieren",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Zeichenfläche",
     "layers": "Ebenen",
     "language": "Sprache",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Live-Kollaborationssitzung teilen",
+    "duplicateSelection": "Markierte Elemente duplizieren"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -64,10 +64,10 @@
     "menu": "Menü",
     "done": "Fertig",
     "edit": "Bearbeiten",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Rückgängig machen",
+    "redo": "Wiederholen",
+    "roomDialog": "Live-Kollaborationssitzung starten",
+    "createNewRoom": "Neuen Raum erstellen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert, sodass weder Excalidraw-Server noch Dritte den Inhalt einsehen können."
   },
   "toolBar": {

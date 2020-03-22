@@ -3,7 +3,7 @@
     "paste": "Yapıştır",
     "selectAll": "Hepsini Seç",
     "copy": "Kopyala",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "PNG olarak kopyala",
     "bringForward": "Bir öne getir",
     "sendToBack": "En arkaya gönder",
     "bringToFront": "En öne getir",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
     "language": "Dil",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Ortak çalışma ortamını paylaş",
+    "duplicateSelection": "Seçili nesneleri yinele"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -64,10 +64,10 @@
     "menu": "Menü",
     "done": "Tamam",
     "edit": "Düzenle",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Geri Al",
+    "redo": "İleri Al",
+    "roomDialog": "Ortak Çalışma Ortamı Yarat",
+    "createNewRoom": "Yeni Oda Oluştur"
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş canvas dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır."
   },
   "toolBar": {
@@ -95,30 +95,30 @@
   },
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "SHIFT'e basılı tutarak orantılı şekilde boyutlandırabilirsiniz"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Hata oluştu. Lütfen ",
+    "headingMain_button": "sayfayı yenilemeyi deneyin.",
+    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
+    "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
+    "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
+    "openIssueMessage_pre": "Bu işlemi yapmadan, sorunu inceleyebilmemiz için ",
+    "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
+    "openIssueMessage_post": " Yardım biletine, aşağıda çıktısı verilen hata mesajını da ekleyin (mümkünse çalışma alanıyla birlikte):",
+    "errorStack": "Hata mesajı:",
+    "errorStack_loading": "Veri yükleniyor. Lütfen bekleyin...",
+    "sceneContent": "Çalışma alanı:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Çalışma alanınıza, sizinle birlikte çalışabilmeleri için başkalarını da ekleyebilirsiniz.",
+    "desc_privacy": "Çalışma ortamında yaptıklarınız ve çizimleriniz uçtan uca şifrelemeyle saklanmaktadır. Sunucularımız dahi bu verileri şifrelenmemiş haliyle göremez.",
+    "button_startSession": "Çalışma Ortamı Oluştur",
+    "button_stopSession": "Çalışma Ortamını Sonlandır",
+    "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
+    "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız yalnızca ortama katılmış diğer kişilerle paylaşılmaktadır. Katılımcılar eş zamanlı olarak bağlantı sorunları yaşadığında kaybolacaktır. Bunu önlemek için çalışma ortamını bir dosyaya veya paylaşılabilir bir bağlantıya aktarın.",
+    "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
+    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
   }
 }
