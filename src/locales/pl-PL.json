@@ -3,7 +3,7 @@
     "paste": "Wklej",
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "Kopiuj do schowka jako PNG",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
     "language": "Język",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Udostępnij sesję współpracy na żywo",
+    "duplicateSelection": "Duplikuj wybrane elementy"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -64,10 +64,10 @@
     "menu": "Menu",
     "done": "Gotowe",
     "edit": "Edytuj",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Cofnij",
+    "redo": "Przywróć",
+    "roomDialog": "Start współpracy na żywo",
+    "createNewRoom": "Utwórz nowy pokój"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -75,7 +75,7 @@
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz."
   },
   "toolBar": {
@@ -95,30 +95,30 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Kliknij na ostatni punkt lub naciśnij Escape albo Enter, aby zakończyć",
     "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
+    "headingMain_button": "odświeżyć stronę.",
+    "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
+    "clearCanvasMessage_button": "wyczyścić dokument.",
+    "clearCanvasCaveat": " To spowoduje utratę pracy ",
+    "openIssueMessage_pre": "Zanim to zrobisz, będziemy wdzięczni, jeśli utworzysz raport w naszym ",
+    "openIssueMessage_button": "narzędziu do śledzenia błędów.",
+    "openIssueMessage_post": " Proszę dołączyć następujący stos wywołań błędu (oraz zawartość sceny jeżeli nie jest prywatna):",
+    "errorStack": "Stos wywołań błędu:",
+    "errorStack_loading": "Wczytywanie danych. Proszę czekać...",
+    "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Możesz zaprosić ludzi do swojej obecnej sceny, aby współpracować.",
+    "desc_privacy": "Nie martw się, sesja wykorzystuje szyfrowanie end-to-end, więc cokolwiek narysujesz pozostanie to prywatne. Nawet nasz serwer nie będzie w stanie zobaczyć co wymyślisz.",
+    "button_startSession": "Start sesji",
+    "button_stopSession": "Stop sesji",
+    "desc_inProgressIntro": "Współpraca na żywo właśnie trwa.",
+    "desc_persistenceWarning": "Zauważ, że dane sceny są współdzielone pomiędzy współpracownikami w modelu P2P i nie są przechowywane na naszym serwerze. Aby nie stracić danych gdy wszyscy się rozłączą, wyeksportuj dane do pliku lub linku do udostępnienia.",
+    "desc_shareLink": "Udostępnij ten link osobie, z którą chcesz współpracować:",
+    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
   }
 }
