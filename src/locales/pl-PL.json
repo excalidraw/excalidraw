@@ -43,7 +43,7 @@
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
     "language": "Język",
-    "createRoom": "Share a live-collaboration session",
+    "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Duplikuj wybrane elementy"
   },
   "buttons": {
@@ -66,7 +66,7 @@
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
-    "roomDialog": "Start live collaboration",
+    "roomDialog": "Start współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój"
   },
   "alerts": {
@@ -95,14 +95,14 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Kliknij na ostatni punkt lub naciśnij Escape albo Enter, aby zakończyć",
     "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
     "headingMain_button": "odświeżyć stronę.",
     "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
-    "clearCanvasMessage_button": "wyczyścić kanwę.",
+    "clearCanvasMessage_button": "wyczyścić dokument.",
     "clearCanvasCaveat": " To spowoduje utratę pracy ",
     "openIssueMessage_pre": "Zanim to zrobisz, będziemy wdzięczni, jeśli utworzysz raport w naszym ",
     "openIssueMessage_button": "narzędziu do śledzenia błędów.",
