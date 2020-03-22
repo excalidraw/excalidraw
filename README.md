@@ -17,16 +17,6 @@
 
 Go to https://excalidraw.com to start sketching.
 
-## Testimonials
-
-<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
-<a href="https://twitter.com/dan_abramov/status/1213762494428262400"><img width="398" src="https://user-images.githubusercontent.com/197597/71783990-4d395880-2fa3-11ea-9ad7-186138db5003.png"></a>
-
-<a href="https://twitter.com/kyehohenberger/status/1214288572037025792"><img width="423" src="https://user-images.githubusercontent.com/197597/71851802-34f13880-308c-11ea-9416-191099e6349c.png"></a>
-<a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
-
-<a href="https://twitter.com/jordwalke/status/1214858186789806080"><img width="434" src="https://user-images.githubusercontent.com/197597/72036874-07a1b780-3251-11ea-99e8-6bafd93483a0.png"></a>
-
 ## Run the code
 
 ### Code Sandbox
@@ -59,7 +49,9 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
 
-To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, open an issue so we can get things set up on our end first.
+## Translating
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
 
 ## Excalidraw is built using these awesome tools
 
@@ -69,6 +61,16 @@ To translate Excalidraw into other languages, please visit [our Crowdin page](ht
 - [ZEIT Now](https://zeit.co)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
+
+## Testimonials
+
+<a href="https://twitter.com/Lissy_Sykes/status/1213813117177729026"><img width="398" src="https://user-images.githubusercontent.com/197597/71783813-dbf8a600-2fa0-11ea-9c0d-bb3cc45969e6.png"></a>
+<a href="https://twitter.com/dan_abramov/status/1213762494428262400"><img width="398" src="https://user-images.githubusercontent.com/197597/71783990-4d395880-2fa3-11ea-9ad7-186138db5003.png"></a>
+
+<a href="https://twitter.com/kyehohenberger/status/1214288572037025792"><img width="423" src="https://user-images.githubusercontent.com/197597/71851802-34f13880-308c-11ea-9416-191099e6349c.png"></a>
+<a href="https://twitter.com/lucasazzola/status/1215126440330416128"><img width="429" src="https://user-images.githubusercontent.com/197597/72039003-48e99580-3258-11ea-8daa-85dd055f2a82.png">
+
+<a href="https://twitter.com/jordwalke/status/1214858186789806080"><img width="434" src="https://user-images.githubusercontent.com/197597/72036874-07a1b780-3251-11ea-99e8-6bafd93483a0.png"></a>
 
 ## Contributors
 
