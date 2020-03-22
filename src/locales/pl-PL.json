@@ -119,6 +119,6 @@
     "desc_inProgressIntro": "Współpraca na żywo właśnie trwa.",
     "desc_persistenceWarning": "Zauważ, że dane sceny są współdzielone pomiędzy współpracownikami w modelu P2P i nie są przechowywane na naszym serwerze. Aby nie stracić danych gdy wszyscy się rozłączą, wyeksportuj dane do pliku lub linku do udostępnienia.",
     "desc_shareLink": "Udostępnij ten link osobie, z którą chcesz współpracować:",
-    "desc_exitSession": "Zatrzymanie sesji spowoduje odłączenie od pokoju, ale nadal będzie można lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
+    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
   }
 }
