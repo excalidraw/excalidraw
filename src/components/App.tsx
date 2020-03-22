@@ -351,13 +351,14 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
+    const scene = await loadScene(null);
+    this.syncActionResult(scene);
+
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       this.initializeSocketClient();
       return;
     }
-    const scene = await loadScene(null);
-    this.syncActionResult(scene);
 
     window.addEventListener("beforeunload", this.beforeUnload);
   }
