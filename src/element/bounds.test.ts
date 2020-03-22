@@ -1,5 +1,5 @@
 import { getElementAbsoluteCoords } from "./bounds";
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, NonDeleted } from "./types";
 
 const _ce = ({ x, y, w, h }: { x: number; y: number; w: number; h: number }) =>
   ({
@@ -14,7 +14,8 @@ const _ce = ({ x, y, w, h }: { x: number; y: number; w: number; h: number }) =>
     y,
     width: w,
     height: h,
-  } as ExcalidrawElement);
+    isDeleted: false,
+  } as NonDeleted<ExcalidrawElement>);
 
 describe("getElementAbsoluteCoords", () => {
   it("test x1 coordinate", () => {
