@@ -66,7 +66,7 @@
     "edit": "수정",
     "undo": "실행 취소",
     "redo": "다시 실행",
-    "roomDialog": "Start live collaboration",
+    "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "Create new room"
   },
   "alerts": {
