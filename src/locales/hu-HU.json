@@ -94,31 +94,31 @@
     "shapes": "Formák"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
+    "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
+    "resize": "Az arányokat korlátozhatja a SHIFT billentyű lenyomásával átmérezetés közben"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "headingMain_pre": "Hiba történt. Próbálja ",
+    "headingMain_button": "újratölteni az oldalt.",
+    "clearCanvasMessage": "Ha az újratöltés nem működik, próbálja ",
+    "clearCanvasMessage_button": "törölni a vászont.",
+    "clearCanvasCaveat": " Ezzel elveszik minden eddigi munkája ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_button": "hibabejelentő.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "errorStack": "Hiba veremkövetés:",
+    "errorStack_loading": "Adatok betöltése. Kérlek várjon...",
+    "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Meghívhat embereket a jelenlegi jelenetbe, hogy együttműködjenek önnel.",
+    "desc_privacy": "Ne aggódjon, a munkamenet végpontok közötti titkosítást használ, tehát bármit rajzol, privát marad. Még a szerverünk sem fogja látni, hogy mit rajzolt.",
+    "button_startSession": "Munkamenet indítása",
+    "button_stopSession": "Munkamenet leállítása",
+    "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
+    "desc_persistenceWarning": "Vegye figyelembe, hogy a jelenet adatait P2P formátumban osztják meg az együttműködők között és nem maradnak meg a szerverünkön. Így ha mindketten bezárják az ablakot, akkor elveszítik az adatokat, hacsak nem exportálják fájlba vagy nem hoznak létre egy megosztható linket.",
+    "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
+    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
   }
 }
