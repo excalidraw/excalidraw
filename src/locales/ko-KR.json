@@ -94,8 +94,8 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "linearElement": "곡선을 그리려면 클릭 후 드래그, 직선을 그리려면 바로 드래그하세요.",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
+    "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
     "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다."
   },
   "errorSplash": {
