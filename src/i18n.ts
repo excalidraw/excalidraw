@@ -10,6 +10,7 @@ export const languages = [
     label: "Bahasa Indonesia",
     data: require("./locales/id-ID.json"),
   },
+  { lng: "hu-HU", label: "Magyar", data: require("./locales/hu-HU.json") },  
   { lng: "no-No", label: "Norsk", data: require("./locales/no-NO.json") },
   { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
   { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
