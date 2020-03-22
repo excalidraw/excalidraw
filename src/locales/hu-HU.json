@@ -76,7 +76,7 @@
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
     "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
     "decryptFailed": "Nem sikerült dekódolni az adatot.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát."
   },
   "toolBar": {
     "selection": "Kiválasztás",
@@ -104,10 +104,10 @@
     "clearCanvasMessage": "Ha az újratöltés nem működik, próbálja ",
     "clearCanvasMessage_button": "törölni a vászont.",
     "clearCanvasCaveat": " Ezzel elveszik minden eddigi munkája ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "openIssueMessage_pre": "Mielőtt ezt megtenné, nagyra értékelnénk, ha nyitna egy hibajegyet nekünk ",
     "openIssueMessage_button": "hibabejelentő.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Hiba veremkövetés:",
+    "openIssueMessage_post": " Kérjük, csatolja a következő hibát (és ha nem bizalmas, akkor a jelenet tartalmát is):",
+    "errorStack": "A hiba részletei:",
     "errorStack_loading": "Adatok betöltése. Kérlek várjon...",
     "sceneContent": "Jelenet tartalma:"
   },
