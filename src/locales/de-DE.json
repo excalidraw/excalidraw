@@ -95,7 +95,7 @@
   },
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
-    "linearElementMulti": "Klicke auf letzten Punkt oder drücke Escape oder Eingabe um zu beenden",
+    "linearElementMulti": "Auf den letzten Punkt klicken oder zum Beenden Escape oder Eingabe drücken",
     "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten"
   },
   "errorSplash": {
@@ -103,22 +103,22 @@
     "headingMain_button": "die Seite neu zu laden.",
     "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche ",
     "clearCanvasMessage_button": "die Zeichenfläche zu löschen.",
-    "clearCanvasCaveat": " Dieses wird zum Verlust von Arbeit führen ",
+    "clearCanvasCaveat": " Dieses wird zum Verlust von Daten führen ",
     "openIssueMessage_pre": "Bevor du dieses tust, würden wir uns freuen, wenn du ein Problem in unserem ",
     "openIssueMessage_button": "Bug-Tracker meldest.",
-    "openIssueMessage_post": " Bitte füge den folgenden Fehler-Stacktrace ein (und wenn es sich nicht um private Daten handelt auch den Szenen-Inhalt):",
+    "openIssueMessage_post": " Bitte füge den folgenden Fehler-Stacktrace ein (und wenn es sich nicht um private Daten handelt auch den Zeichnungsinhalt):",
     "errorStack": "Fehler-Stacktrace:",
     "errorStack_loading": "Lade Daten, bitte warten...",
-    "sceneContent": "Szenen-Inhalt:"
+    "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
     "desc_intro": "Du kannst Leute zur Zusammenarbeit an deiner aktuellen Zeichnung einladen.",
     "desc_privacy": "Keine Sorge, die Sitzung verwendet Ende-zu-Ende-Verschlüsselung, so dass alles, was du zeichnest, privat bleibt. Nicht einmal unser Server kann einsehen was du dir einfallen lässt.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
-    "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
-    "desc_persistenceWarning": "Beachte, dass die Zeichendaten bei der Zusammenarbeit über P2P geteilt und nicht auf unserem Server gespeichert werden. Wenn ihr alle die Verbindung trennt, gehen eure Daten verloren, es sei denn, du exportierst sie in eine Datei oder einen gemeinsam nutzbaren Link.",
+    "desc_inProgressIntro": "Die Live-Kollaborationssitzung wird nun ausgeführt.",
+    "desc_persistenceWarning": "Beachte, dass die Zeichnungsdaten bei der Zusammenarbeit über P2P geteilt und nicht auf unserem Server gespeichert werden. Wenn ihr alle die Verbindung trennt, gehen eure Daten verloren, es sei denn, ihr exportiert sie in eine Datei oder einen gemeinsam nutzbaren Link.",
     "desc_shareLink": "Teile diesen Link mit allen, mit denen du zusammenarbeiten möchtest:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt, du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dieses keine Auswirkungen auf andere Personen hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
   }
 }
