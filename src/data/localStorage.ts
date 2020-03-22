@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { AppState } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
@@ -7,7 +7,7 @@ const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
 export function saveToLocalStorage(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
   appState: AppState,
 ) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(elements));

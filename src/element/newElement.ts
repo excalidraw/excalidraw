@@ -36,10 +36,16 @@ function _newElementBase<T extends ExcalidrawElement>(
     opacity,
     width = 0,
     height = 0,
+    version = 1,
+    versionNonce = 0,
+    isDeleted = false,
     ...rest
   }: ElementConstructorOpts &
-    Partial<ExcalidrawGenericElement> &
-    Versioned<any>,
+    Partial<ExcalidrawGenericElement> & {
+      version?: number;
+      versionNonce?: number;
+      isDeleted?: boolean;
+    },
 ) {
   return {
     id: rest.id || nanoid(),
@@ -55,9 +61,9 @@ function _newElementBase<T extends ExcalidrawElement>(
     roughness,
     opacity,
     seed: rest.seed ?? randomSeed(),
-    version: rest.version || 1,
-    versionNonce: rest.versionNonce ?? 0,
-    isDeleted: rest.isDeleted ?? false,
+    version,
+    versionNonce,
+    isDeleted,
   };
 }
 
