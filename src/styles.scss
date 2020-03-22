@@ -10,7 +10,8 @@
 
 body {
   margin: 0;
-  --ui-font: Arial, Helvetica, sans-serif;
+  --ui-font: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
   font-family: var(--ui-font);
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;
