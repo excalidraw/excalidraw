@@ -99,11 +99,11 @@
     "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
+    "headingMain_button": "odświeżyć stronę.",
+    "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
+    "clearCanvasMessage_button": "wyczyścić kanwę.",
+    "clearCanvasCaveat": " To spowoduje utratę pracy ",
     "openIssueMessage_pre": "Zanim to zrobisz, będziemy wdzięczni, jeśli utworzysz raport w naszym ",
     "openIssueMessage_button": "narzędziu do śledzenia błędów.",
     "openIssueMessage_post": " Proszę dołączyć następujący stos wywołań błędu (oraz zawartość sceny jeżeli nie jest prywatna):",
