@@ -1,7 +1,7 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import { getElementAbsoluteCoords } from "../element";
 import { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
+import { newElementWithDeleted } from "../element/mutateElement";
 
 export function getElementsWithinSelection(
   elements: readonly ExcalidrawElement[],
@@ -38,9 +38,9 @@ export function deleteSelectedElements(
   return {
     elements: elements.map(el => {
       if (appState.selectedElementIds[el.id]) {
-        return newElementWith(el, { isDeleted: true });
+        return newElementWithDeleted(el, true);
       }
-      return el;
+      return el as Versioned<typeof el>;
     }),
     appState: {
       ...appState,

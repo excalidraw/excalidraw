@@ -1,5 +1,5 @@
 import { AppState } from "./types";
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, Versioned } from "./element/types";
 import { clearAppStatePropertiesForHistory } from "./appState";
 import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
@@ -21,7 +21,7 @@ export class SceneHistory {
 
   private generateEntry(
     appState: AppState,
-    elements: readonly ExcalidrawElement[],
+    elements: readonly Versioned<ExcalidrawElement>[],
   ) {
     return JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
@@ -63,7 +63,10 @@ export class SceneHistory {
     });
   }
 
-  pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
+  pushEntry(
+    appState: AppState,
+    elements: readonly Versioned<ExcalidrawElement>[],
+  ) {
     const newEntry = this.generateEntry(appState, elements);
     if (
       this.stateHistory.length > 0 &&
@@ -128,7 +131,7 @@ export class SceneHistory {
     this.recording = true;
   }
 
-  record(state: AppState, elements: readonly ExcalidrawElement[]) {
+  record(state: AppState, elements: readonly Versioned<ExcalidrawElement>[]) {
     if (this.recording) {
       this.pushEntry(state, elements);
       this.recording = false;

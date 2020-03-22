@@ -6,6 +6,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
+  Versioned,
 } from "../element/types";
 import { measureText } from "../utils";
 
@@ -36,7 +37,9 @@ function _newElementBase<T extends ExcalidrawElement>(
     width = 0,
     height = 0,
     ...rest
-  }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
+  }: ElementConstructorOpts &
+    Partial<ExcalidrawGenericElement> &
+    Versioned<any>,
 ) {
   return {
     id: rest.id || nanoid(),
@@ -62,7 +65,7 @@ export function newElement(
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): ExcalidrawGenericElement {
+): Versioned<ExcalidrawGenericElement> {
   return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 }
 
@@ -71,7 +74,7 @@ export function newTextElement(
     text: string;
     font: string;
   } & ElementConstructorOpts,
-): ExcalidrawTextElement {
+): Versioned<ExcalidrawTextElement> {
   const { text, font } = opts;
   const metrics = measureText(text, font);
   const textElement = {
@@ -94,7 +97,7 @@ export function newLinearElement(
     type: ExcalidrawLinearElement["type"];
     lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
-): ExcalidrawLinearElement {
+): Versioned<ExcalidrawLinearElement> {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
@@ -143,8 +146,8 @@ function _duplicateElement(val: any, depth: number = 0) {
 export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   overrides?: Partial<TElement>,
-): TElement {
-  let copy: TElement = _duplicateElement(element);
+): Versioned<TElement> {
+  let copy: Versioned<TElement> = _duplicateElement(element);
   copy.id = nanoid();
   copy.seed = randomSeed();
   if (overrides) {

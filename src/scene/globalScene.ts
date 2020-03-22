@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 
 export interface SceneStateCallback {
   (): void;
@@ -11,13 +11,21 @@ export interface SceneStateCallbackRemover {
 class SceneState {
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  constructor(private _elements: readonly ExcalidrawElement[] = []) {}
+  constructor(
+    private _elements: readonly Versioned<ExcalidrawElement>[] = [],
+  ) {}
 
-  getAllElements() {
+  getElements(): readonly ExcalidrawElement[] {
+    return this._elements.filter(element => !element.isDeleted);
+  }
+
+  getElementsIncludingDeleted() {
     return this._elements;
   }
 
-  replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
+  replaceElementsIncludingDeleted(
+    nextElements: readonly Versioned<ExcalidrawElement>[],
+  ) {
     this._elements = nextElements;
     this.informMutation();
   }

@@ -27,7 +27,7 @@ function colorsForClientId(clientId: string) {
 }
 
 export function renderScene(
-  allElements: readonly ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: AppState,
   selectionElement: ExcalidrawElement | null,
   scale: number,
@@ -51,8 +51,6 @@ export function renderScene(
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
   }
-
-  const elements = allElements.filter(element => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
   context.scale(scale, scale);
@@ -289,14 +287,12 @@ export function renderSceneToSvg(
   }
   // render elements
   elements.forEach(element => {
-    if (!element.isDeleted) {
-      renderElementToSvg(
-        element,
-        rsvg,
-        svgRoot,
-        element.x + offsetX,
-        element.y + offsetY,
-      );
-    }
+    renderElementToSvg(
+      element,
+      rsvg,
+      svgRoot,
+      element.x + offsetX,
+      element.y + offsetY,
+    );
   });
 }

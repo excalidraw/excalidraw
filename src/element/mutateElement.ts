@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, Versioned } from "./types";
 import { randomSeed } from "roughjs/bin/math";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { globalSceneState } from "../scene";
@@ -41,8 +41,9 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
     invalidateShapeForElement(element);
   }
 
-  element.version++;
-  element.versionNonce = randomSeed();
+  const versionedElement = element as Versioned<TElement>;
+  versionedElement.version++;
+  versionedElement.versionNonce = randomSeed();
 
   globalSceneState.informMutation();
 }
@@ -50,11 +51,25 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
 export function newElementWith<TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-): TElement {
+): Versioned<TElement> {
+  const versionedElement = element as Versioned<TElement>;
   return {
-    ...element,
-    version: element.version + 1,
+    ...versionedElement,
+    version: versionedElement.version + 1,
     versionNonce: randomSeed(),
     ...updates,
+  };
+}
+
+export function newElementWithDeleted<TElement extends ExcalidrawElement>(
+  element: TElement,
+  isDeleted: boolean,
+) {
+  const versionedElement = element as Versioned<TElement>;
+  return {
+    ...versionedElement,
+    version: versionedElement.version + 1,
+    versionNonce: randomSeed(),
+    isDeleted,
   };
 }

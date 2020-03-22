@@ -1,6 +1,6 @@
 import { Point } from "../types";
 
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, normalizeDimensions } from "../element";
@@ -10,7 +10,7 @@ import { calculateScrollCenter } from "../scene";
 export function restore(
   // we're making the elements mutable for this API because we want to
   //  efficiently remove/tweak properties on them (to migrate old scenes)
-  savedElements: readonly Mutable<ExcalidrawElement>[],
+  savedElements: readonly Mutable<Versioned<ExcalidrawElement>>[],
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
 ): DataState {

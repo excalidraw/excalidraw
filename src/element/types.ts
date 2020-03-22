@@ -13,10 +13,13 @@ type _ExcalidrawElementBase = Readonly<{
   width: number;
   height: number;
   seed: number;
+}>;
+
+export type Versioned<TElement extends _ExcalidrawElementBase> = TElement & {
   version: number;
   versionNonce: number;
   isDeleted: boolean;
-}>;
+};
 
 export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
   type: "selection" | "rectangle" | "diamond" | "ellipse";

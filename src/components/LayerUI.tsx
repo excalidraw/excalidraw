@@ -4,7 +4,7 @@ import { calculateScrollCenter, getTargetElement } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -30,7 +30,7 @@ interface LayerUIProps {
   setAppState: any;
   elements: readonly ExcalidrawElement[];
   language: string;
-  setElements: (elements: readonly ExcalidrawElement[]) => void;
+  setElements: (elements: readonly Versioned<ExcalidrawElement>[]) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   onToggleLock: () => void;

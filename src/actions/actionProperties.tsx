@@ -1,5 +1,5 @@
 import React from "react";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
@@ -14,9 +14,11 @@ import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 
 const changeProperty = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly Versioned<ExcalidrawElement>[],
   appState: AppState,
-  callback: (element: ExcalidrawElement) => ExcalidrawElement,
+  callback: (
+    element: Versioned<ExcalidrawElement>,
+  ) => Versioned<ExcalidrawElement>,
 ) => {
   return elements.map(element => {
     if (appState.selectedElementIds[element.id]) {
@@ -266,7 +268,7 @@ export const actionChangeFontSize = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
+          const element = newElementWith(el, {
             font: `${value}px ${el.font.split("px ")[1]}`,
           });
           redrawTextBoundingBox(element);
@@ -313,7 +315,7 @@ export const actionChangeFontFamily = register({
     return {
       elements: changeProperty(elements, appState, el => {
         if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
+          const element = newElementWith(el, {
             font: `${el.font.split("px ")[0]}px ${value}`,
           });
           redrawTextBoundingBox(element);

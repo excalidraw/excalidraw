@@ -8,7 +8,10 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
 import { getElementMap } from "../element";
-import { newElementWith } from "../element/mutateElement";
+import {
+  newElementWith,
+  newElementWithDeleted,
+} from "../element/mutateElement";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -46,9 +49,7 @@ const writeData = (
             .filter(
               prevElement => !nextElementMap.hasOwnProperty(prevElement.id),
             )
-            .map(prevElement =>
-              newElementWith(prevElement, { isDeleted: true }),
-            ),
+            .map(prevElement => newElementWithDeleted(prevElement, true)),
         ),
       appState: { ...appState, ...data.appState },
       commitToHistory,

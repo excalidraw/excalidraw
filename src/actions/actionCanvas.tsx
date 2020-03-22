@@ -9,7 +9,7 @@ import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
+import { newElementWithDeleted } from "../element/mutateElement";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -37,9 +37,7 @@ export const actionClearCanvas = register({
   name: "clearCanvas",
   perform: elements => {
     return {
-      elements: elements.map(element =>
-        newElementWith(element, { isDeleted: true }),
-      ),
+      elements: elements.map(element => newElementWithDeleted(element, true)),
       appState: getDefaultAppState(),
       commitToHistory: true,
     };

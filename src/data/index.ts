@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 
 import { getDefaultAppState } from "../appState";
 
@@ -13,7 +13,6 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
-import { hasNonDeletedElements } from "../element";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -35,7 +34,7 @@ export type SocketUpdateDataSource = {
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
     payload: {
-      elements: readonly ExcalidrawElement[];
+      elements: readonly Versioned<ExcalidrawElement>[];
     };
   };
   MOUSE_LOCATION: {
@@ -225,7 +224,7 @@ export async function importFromBackend(
   id: string | null,
   privateKey: string | undefined,
 ) {
-  let elements: readonly ExcalidrawElement[] = [];
+  let elements: readonly Versioned<ExcalidrawElement>[] = [];
   let appState: AppState = getDefaultAppState();
 
   try {
@@ -288,7 +287,7 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!hasNonDeletedElements(elements)) {
+  if (elements.length === 0) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg") {

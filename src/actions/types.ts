@@ -1,15 +1,15 @@
 import React from "react";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import { AppState } from "../types";
 
 export type ActionResult = {
-  elements?: readonly ExcalidrawElement[] | null;
+  elements?: readonly Versioned<ExcalidrawElement>[] | null;
   appState?: AppState | null;
   commitToHistory: boolean;
 };
 
 type ActionFn = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly Versioned<ExcalidrawElement>[],
   appState: AppState,
   formData: any,
 ) => ActionResult;

@@ -5,7 +5,7 @@ import {
   UpdaterFn,
   ActionFilterFn,
 } from "./types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
 
@@ -16,12 +16,12 @@ export class ActionManager implements ActionsManagerInterface {
 
   getAppState: () => AppState;
 
-  getElements: () => readonly ExcalidrawElement[];
+  getElements: () => readonly Versioned<ExcalidrawElement>[];
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElements: () => readonly ExcalidrawElement[],
+    getElements: () => readonly Versioned<ExcalidrawElement>[],
   ) {
     this.updater = updater;
     this.getAppState = getAppState;

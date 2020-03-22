@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, Versioned } from "../element/types";
 import { duplicateElement } from "../element";
 
 export const actionDuplicateSelection = register({
@@ -9,7 +9,10 @@ export const actionDuplicateSelection = register({
     return {
       appState,
       elements: elements.reduce(
-        (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
+        (
+          acc: Array<Versioned<ExcalidrawElement>>,
+          element: Versioned<ExcalidrawElement>,
+        ) => {
           if (appState.selectedElementIds[element.id]) {
             const newElement = duplicateElement(element, {
               x: element.x + 10,
