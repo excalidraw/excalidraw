@@ -1,6 +1,10 @@
-name: Node CI
+name: Lint
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   lint:
