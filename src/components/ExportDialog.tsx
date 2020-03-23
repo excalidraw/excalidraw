@@ -152,7 +152,7 @@ function ExportModal({
             {actionManager.renderAction("changeProjectName")}
           </div>
           <Stack.Row gap={2}>
-            {scales.map(s => (
+            {scales.map((s) => (
               <ToolButton
                 key={s}
                 size="s"
@@ -174,7 +174,7 @@ function ExportModal({
               <input
                 type="checkbox"
                 checked={exportSelected}
-                onChange={event =>
+                onChange={(event) =>
                   setExportSelected(event.currentTarget.checked)
                 }
                 ref={onlySelectedInput}
