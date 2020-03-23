@@ -52,6 +52,7 @@
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "저장",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
