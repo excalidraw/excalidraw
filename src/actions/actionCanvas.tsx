@@ -26,7 +26,7 @@ export const actionChangeViewBackgroundColor = register({
           label={t("labels.canvasBackground")}
           type="canvasBackground"
           color={appState.viewBackgroundColor}
-          onChange={color => updateData(color)}
+          onChange={(color) => updateData(color)}
         />
       </div>
     );
@@ -35,9 +35,9 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
-  perform: elements => {
+  perform: (elements) => {
     return {
-      elements: elements.map(element =>
+      elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
       ),
       appState: getDefaultAppState(),
@@ -97,7 +97,7 @@ export const actionZoomIn = register({
       }}
     />
   ),
-  keyTest: event =>
+  keyTest: (event) =>
     (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
@@ -124,7 +124,7 @@ export const actionZoomOut = register({
       }}
     />
   ),
-  keyTest: event =>
+  keyTest: (event) =>
     (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
@@ -151,7 +151,7 @@ export const actionResetZoom = register({
       }}
     />
   ),
-  keyTest: event =>
+  keyTest: (event) =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });

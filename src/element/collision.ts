@@ -45,7 +45,7 @@ export function hitTest(
     const a = Math.abs(element.width) / 2;
     const b = Math.abs(element.height) / 2;
 
-    [0, 1, 2, 3].forEach(x => {
+    [0, 1, 2, 3].forEach((x) => {
       const xx = a * tx;
       const yy = b * ty;
 
@@ -179,7 +179,7 @@ export function hitTest(
     const relY = y - element.y;
 
     // hit thest all "subshapes" of the linear element
-    return shape.some(subshape =>
+    return shape.some((subshape) =>
       hitTestRoughShape(subshape.sets, relX, relY, lineThreshold),
     );
   } else if (element.type === "text") {

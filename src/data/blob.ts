@@ -27,7 +27,7 @@ export async function loadFromBlob(blob: any) {
   if ("text" in Blob) {
     contents = await blob.text();
   } else {
-    contents = await new Promise(resolve => {
+    contents = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsText(blob, "utf8");
       reader.onloadend = () => {
@@ -41,7 +41,7 @@ export async function loadFromBlob(blob: any) {
   if (!elements.length) {
     return Promise.reject("Cannot load invalid json");
   }
-  return new Promise<DataState>(resolve => {
+  return new Promise<DataState>((resolve) => {
     resolve(restore(elements, appState, { scrollToContent: true }));
   });
 }

@@ -34,7 +34,7 @@ export class TopErrorBoundary extends React.Component<
         _localStorage[key] = value;
       }
     }
-    this.setState(state => ({
+    this.setState((state) => ({
       hasError: true,
       unresolvedError: state.unresolvedError
         ? state.unresolvedError.concat(error)
@@ -60,7 +60,7 @@ export class TopErrorBoundary extends React.Component<
         }
       }
 
-      this.setState(state => ({
+      this.setState((state) => ({
         unresolvedError: null,
         stack: `${
           state.stack ? `${state.stack}\n\n================\n\n${stack}` : stack

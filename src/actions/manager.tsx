@@ -33,14 +33,14 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   registerAll(actions: readonly Action[]) {
-    actions.forEach(action => this.registerAction(action));
+    actions.forEach((action) => this.registerAction(action));
   }
 
   handleKeyDown(event: KeyboardEvent) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action =>
+        (action) =>
           action.keyTest &&
           action.keyTest(event, this.getAppState(), this.getElements()),
       );
@@ -58,16 +58,16 @@ export class ActionManager implements ActionsManagerInterface {
     this.updater(action.perform(this.getElements(), this.getAppState(), null));
   }
 
-  getContextMenuItems(actionFilter: ActionFilterFn = action => action) {
+  getContextMenuItems(actionFilter: ActionFilterFn = (action) => action) {
     return Object.values(this.actions)
       .filter(actionFilter)
-      .filter(action => "contextItemLabel" in action)
+      .filter((action) => "contextItemLabel" in action)
       .sort(
         (a, b) =>
           (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -
           (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
       )
-      .map(action => ({
+      .map((action) => ({
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
           this.updater(

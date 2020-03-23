@@ -81,7 +81,7 @@ export async function getClipboardContent(
 export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
   return new Promise((resolve, reject) => {
     try {
-      canvas.toBlob(async function(blob: any) {
+      canvas.toBlob(async function (blob: any) {
         try {
           await navigator.clipboard.write([
             new window.ClipboardItem({ "image/png": blob }),

@@ -13,7 +13,7 @@ export function ButtonSelect<T>({
 }) {
   return (
     <div className="buttonList">
-      {options.map(option => (
+      {options.map((option) => (
         <label
           key={option.text}
           className={value === option.value ? "active" : ""}

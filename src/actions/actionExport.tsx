@@ -34,7 +34,7 @@ export const actionChangeExportBackground = register({
       <input
         type="checkbox"
         checked={appState.exportBackground}
-        onChange={event => updateData(event.target.checked)}
+        onChange={(event) => updateData(event.target.checked)}
       />{" "}
       {t("labels.withBackground")}
     </label>
@@ -44,7 +44,7 @@ export const actionChangeExportBackground = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState).catch(error => console.error(error));
+    saveAsJSON(elements, appState).catch((error) => console.error(error));
     return { commitToHistory: false };
   },
   PanelComponent: ({ updateData }) => (
@@ -84,7 +84,7 @@ export const actionLoadScene = register({
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch(error => console.error(error));
+          .catch((error) => console.error(error));
       }}
     />
   ),

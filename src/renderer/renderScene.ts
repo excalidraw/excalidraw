@@ -52,7 +52,7 @@ export function renderScene(
     return { atLeastOneVisibleElement: false };
   }
 
-  const elements = allElements.filter(element => !element.isDeleted);
+  const elements = allElements.filter((element) => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
   context.scale(scale, scale);
@@ -86,7 +86,7 @@ export function renderScene(
   context.scale(sceneState.zoom, sceneState.zoom);
 
   // Paint visible elements
-  const visibleElements = elements.filter(element =>
+  const visibleElements = elements.filter((element) =>
     isVisibleElement(
       element,
       normalizedCanvasWidth,
@@ -95,7 +95,7 @@ export function renderScene(
     ),
   );
 
-  visibleElements.forEach(element => {
+  visibleElements.forEach((element) => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
   });
 
@@ -116,7 +116,7 @@ export function renderScene(
     const dashledLinePadding = 4 / sceneState.zoom;
 
     context.translate(sceneState.scrollX, sceneState.scrollY);
-    selectedElements.forEach(element => {
+    selectedElements.forEach((element) => {
       const [
         elementX1,
         elementY1,
@@ -148,8 +148,8 @@ export function renderScene(
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
       Object.values(handlers)
-        .filter(handler => handler !== undefined)
-        .forEach(handler => {
+        .filter((handler) => handler !== undefined)
+        .forEach((handler) => {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
           context.fillRect(handler[0], handler[1], handler[2], handler[3]);
@@ -219,7 +219,7 @@ export function renderScene(
     const strokeStyle = context.strokeStyle;
     context.fillStyle = SCROLLBAR_COLOR;
     context.strokeStyle = "rgba(255,255,255,0.8)";
-    [scrollBars.horizontal, scrollBars.vertical].forEach(scrollBar => {
+    [scrollBars.horizontal, scrollBars.vertical].forEach((scrollBar) => {
       if (scrollBar) {
         roundRect(
           context,
@@ -288,7 +288,7 @@ export function renderSceneToSvg(
     return;
   }
   // render elements
-  elements.forEach(element => {
+  elements.forEach((element) => {
     if (!element.isDeleted) {
       renderElementToSvg(
         element,

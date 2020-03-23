@@ -18,7 +18,7 @@ const changeProperty = (
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
 ) => {
-  return elements.map(element => {
+  return elements.map((element) => {
     if (appState.selectedElementIds[element.id]) {
       return callback(element);
     }
@@ -26,7 +26,7 @@ const changeProperty = (
   });
 };
 
-const getFormValue = function<T>(
+const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
@@ -46,7 +46,7 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           strokeColor: value,
         }),
@@ -64,7 +64,7 @@ export const actionChangeStrokeColor = register({
         color={getFormValue(
           elements,
           appState,
-          element => element.strokeColor,
+          (element) => element.strokeColor,
           appState.currentItemStrokeColor,
         )}
         onChange={updateData}
@@ -77,7 +77,7 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           backgroundColor: value,
         }),
@@ -95,7 +95,7 @@ export const actionChangeBackgroundColor = register({
         color={getFormValue(
           elements,
           appState,
-          element => element.backgroundColor,
+          (element) => element.backgroundColor,
           appState.currentItemBackgroundColor,
         )}
         onChange={updateData}
@@ -108,7 +108,7 @@ export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           fillStyle: value,
         }),
@@ -130,10 +130,10 @@ export const actionChangeFillStyle = register({
         value={getFormValue(
           elements,
           appState,
-          element => element.fillStyle,
+          (element) => element.fillStyle,
           appState.currentItemFillStyle,
         )}
-        onChange={value => {
+        onChange={(value) => {
           updateData(value);
         }}
       />
@@ -145,7 +145,7 @@ export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           strokeWidth: value,
         }),
@@ -167,10 +167,10 @@ export const actionChangeStrokeWidth = register({
         value={getFormValue(
           elements,
           appState,
-          element => element.strokeWidth,
+          (element) => element.strokeWidth,
           appState.currentItemStrokeWidth,
         )}
-        onChange={value => updateData(value)}
+        onChange={(value) => updateData(value)}
       />
     </fieldset>
   ),
@@ -180,7 +180,7 @@ export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           roughness: value,
         }),
@@ -202,10 +202,10 @@ export const actionChangeSloppiness = register({
         value={getFormValue(
           elements,
           appState,
-          element => element.roughness,
+          (element) => element.roughness,
           appState.currentItemRoughness,
         )}
-        onChange={value => updateData(value)}
+        onChange={(value) => updateData(value)}
       />
     </fieldset>
   ),
@@ -215,7 +215,7 @@ export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el =>
+      elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           opacity: value,
         }),
@@ -232,8 +232,8 @@ export const actionChangeOpacity = register({
         min="0"
         max="100"
         step="10"
-        onChange={event => updateData(+event.target.value)}
-        onWheel={event => {
+        onChange={(event) => updateData(+event.target.value)}
+        onWheel={(event) => {
           event.stopPropagation();
           const target = event.target as HTMLInputElement;
           const STEP = 10;
@@ -251,7 +251,7 @@ export const actionChangeOpacity = register({
           getFormValue(
             elements,
             appState,
-            element => element.opacity,
+            (element) => element.opacity,
             appState.currentItemOpacity,
           ) ?? undefined
         }
@@ -264,7 +264,7 @@ export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => {
+      elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = newElementWith(el, {
             font: `${value}px ${el.font.split("px ")[1]}`,
@@ -298,10 +298,10 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          element => isTextElement(element) && +element.font.split("px ")[0],
+          (element) => isTextElement(element) && +element.font.split("px ")[0],
           +(appState.currentItemFont || DEFAULT_FONT).split("px ")[0],
         )}
-        onChange={value => updateData(value)}
+        onChange={(value) => updateData(value)}
       />
     </fieldset>
   ),
@@ -311,7 +311,7 @@ export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, el => {
+      elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = newElementWith(el, {
             font: `${el.font.split("px ")[0]}px ${value}`,
@@ -344,10 +344,10 @@ export const actionChangeFontFamily = register({
         value={getFormValue(
           elements,
           appState,
-          element => isTextElement(element) && element.font.split("px ")[1],
+          (element) => isTextElement(element) && element.font.split("px ")[1],
           (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
         )}
-        onChange={value => updateData(value)}
+        onChange={(value) => updateData(value)}
       />
     </fieldset>
   ),

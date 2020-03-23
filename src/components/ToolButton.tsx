@@ -35,7 +35,7 @@ type ToolButtonProps =
 
 const DEFAULT_SIZE: ToolIconSize = "m";
 
-export const ToolButton = React.forwardRef(function(
+export const ToolButton = React.forwardRef(function (
   props: ToolButtonProps,
   ref,
 ) {
