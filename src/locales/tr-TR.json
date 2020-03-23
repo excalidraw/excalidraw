@@ -52,6 +52,7 @@
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
