@@ -102,7 +102,7 @@ export function isOverScrollBars(scrollBars: ScrollBars, x: number, y: number) {
   const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
     scrollBars.horizontal,
     scrollBars.vertical,
-  ].map(scrollBar => {
+  ].map((scrollBar) => {
     return (
       scrollBar &&
       scrollBar.x <= x &&

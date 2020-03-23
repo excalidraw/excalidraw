@@ -1,8 +1,8 @@
 import { Point } from "./types";
 
 export function getSizeFromPoints(points: readonly Point[]) {
-  const xs = points.map(point => point[0]);
-  const ys = points.map(point => point[1]);
+  const xs = points.map((point) => point[0]);
+  const ys = points.map((point) => point[1]);
   return {
     width: Math.max(...xs) - Math.min(...xs),
     height: Math.max(...ys) - Math.min(...ys),
@@ -13,7 +13,7 @@ export function rescalePoints(
   nextDimensionSize: number,
   prevPoints: readonly Point[],
 ): Point[] {
-  const prevDimValues = prevPoints.map(point => point[dimension]);
+  const prevDimValues = prevPoints.map((point) => point[dimension]);
   const prevMaxDimension = Math.max(...prevDimValues);
   const prevMinDimension = Math.min(...prevDimValues);
   const prevDimensionSize = prevMaxDimension - prevMinDimension;
@@ -22,7 +22,7 @@ export function rescalePoints(
 
   let nextMinDimension = Infinity;
 
-  const scaledPoints = prevPoints.map(prevPoint =>
+  const scaledPoints = prevPoints.map((prevPoint) =>
     prevPoint.map((value, currentDimension) => {
       if (currentDimension !== dimension) {
         return value;
@@ -36,7 +36,7 @@ export function rescalePoints(
   const translation = prevMinDimension - nextMinDimension;
 
   const nextPoints = scaledPoints.map(
-    scaledPoint =>
+    (scaledPoint) =>
       scaledPoint.map((value, currentDimension) => {
         return currentDimension === dimension ? value + translation : value;
       }) as [number, number],

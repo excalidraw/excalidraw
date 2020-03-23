@@ -40,7 +40,7 @@ export function MobileMenu({
     <>
       <FixedSideContainer side="top">
         <Section heading="shapes">
-          {heading => (
+          {(heading) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1}>
                 <Island padding={1}>
@@ -87,7 +87,7 @@ export function MobileMenu({
                   <fieldset>
                     <legend>{t("labels.language")}</legend>
                     <LanguageList
-                      onChange={lng => {
+                      onChange={(lng) => {
                         setLanguage(lng);
                         setAppState({});
                       }}

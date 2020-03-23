@@ -26,7 +26,7 @@ function ContextMenu({ options, onCloseRequest, top, left }: Props) {
     >
       <ul
         className="context-menu"
-        onContextMenu={event => event.preventDefault()}
+        onContextMenu={(event) => event.preventDefault()}
       >
         {options.map((option, idx) => (
           <li key={idx} onClick={onCloseRequest}>
@@ -69,7 +69,7 @@ function handleClose() {
 export default {
   push(params: ContextMenuParams) {
     const options = Array.of<ContextMenuOption>();
-    params.options.forEach(option => {
+    params.options.forEach((option) => {
       if (option) {
         options.push(option);
       }

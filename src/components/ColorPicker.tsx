@@ -18,7 +18,7 @@ const keyBindings = [
   ["a", "s", "d", "f", "g"],
 ].flat();
 
-const Picker = function({
+const Picker = function ({
   colors,
   color,
   onChange,
@@ -114,7 +114,7 @@ const Picker = function({
       <div className="color-picker-triangle"></div>
       <div
         className="color-picker-content"
-        ref={el => {
+        ref={(el) => {
           if (el) {
             gallery.current = el;
           }
@@ -131,7 +131,7 @@ const Picker = function({
             aria-keyshortcuts={keyBindings[i]}
             style={{ backgroundColor: _color }}
             key={_color}
-            ref={el => {
+            ref={(el) => {
               if (el && i === 0) {
                 firstItem.current = el;
               }
@@ -145,9 +145,7 @@ const Picker = function({
           >
             {_color === "transparent" ? (
               <div className="color-picker-transparent"></div>
-            ) : (
-              undefined
-            )}
+            ) : undefined}
             <span className="color-picker-keybinding">{keyBindings[i]}</span>
           </button>
         ))}
@@ -155,7 +153,7 @@ const Picker = function({
           <ColorInput
             color={color}
             label={label}
-            onChange={color => {
+            onChange={(color) => {
               onChange(color);
             }}
             ref={colorInput}
@@ -196,7 +194,7 @@ const ColorInput = React.forwardRef(
           spellCheck={false}
           className="color-picker-input"
           aria-label={label}
-          onChange={event => {
+          onChange={(event) => {
             const value = event.target.value.toLowerCase();
             if (value.match(colorRegex)) {
               onChange(value === "transparent" ? "transparent" : `#${value}`);
@@ -204,7 +202,7 @@ const ColorInput = React.forwardRef(
             setInnerValue(value);
           }}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={event => onChange(event.clipboardData.getData("text"))}
+          onPaste={(event) => onChange(event.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
@@ -244,7 +242,7 @@ export function ColorPicker({
         <ColorInput
           color={color}
           label={label}
-          onChange={color => {
+          onChange={(color) => {
             onChange(color);
           }}
         />
@@ -255,7 +253,7 @@ export function ColorPicker({
             <Picker
               colors={colors[type]}
               color={color || null}
-              onChange={changedColor => {
+              onChange={(changedColor) => {
                 onChange(changedColor);
               }}
               onClose={() => {

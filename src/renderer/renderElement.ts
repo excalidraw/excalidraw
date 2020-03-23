@@ -86,7 +86,7 @@ function drawElementOnCanvas(
     }
     case "arrow":
     case "line": {
-      (getShapeForElement(element) as Drawable[]).forEach(shape =>
+      (getShapeForElement(element) as Drawable[]).forEach((shape) =>
         rc.draw(shape),
       );
       break;
@@ -372,7 +372,7 @@ export function renderElementToSvg(
       generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
-      (getShapeForElement(element) as Drawable[]).forEach(shape => {
+      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
@@ -402,7 +402,7 @@ export function renderElementToSvg(
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
         const offset = element.height - element.baseline;
-        const fontSplit = element.font.split(" ").filter(d => !!d.trim());
+        const fontSplit = element.font.split(" ").filter((d) => !!d.trim());
         let fontFamily = fontSplit[0];
         let fontSize = "20px";
         if (fontSplit.length > 1) {

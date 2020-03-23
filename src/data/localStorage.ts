@@ -12,7 +12,7 @@ export function saveToLocalStorage(
 ) {
   localStorage.setItem(
     LOCAL_STORAGE_KEY,
-    JSON.stringify(elements.filter(element => !element.isDeleted)),
+    JSON.stringify(elements.filter((element) => !element.isDeleted)),
   );
   localStorage.setItem(
     LOCAL_STORAGE_KEY_STATE,

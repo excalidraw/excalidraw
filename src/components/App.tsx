@@ -111,7 +111,7 @@ import { actionFinalize } from "../actions";
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
 >(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
-  return (event => {
+  return ((event) => {
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
 }
@@ -183,7 +183,7 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={globalSceneState.getAllElements().filter(element => {
+          elements={globalSceneState.getAllElements().filter((element) => {
             return !element.isDeleted;
           })}
           setElements={this.setElements}
@@ -201,7 +201,7 @@ export class App extends React.Component<any, AppState> {
             }}
             width={canvasWidth}
             height={canvasHeight}
-            ref={canvas => {
+            ref={(canvas) => {
               // canvas is null when unmounting
               if (canvas !== null) {
                 this.canvas = canvas;
@@ -220,7 +220,7 @@ export class App extends React.Component<any, AppState> {
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
-            onDrop={event => {
+            onDrop={(event) => {
               const file = event.dataTransfer.files[0];
               if (
                 file?.type === "application/json" ||
@@ -234,7 +234,7 @@ export class App extends React.Component<any, AppState> {
                       commitToHistory: false,
                     }),
                   )
-                  .catch(error => console.error(error));
+                  .catch((error) => console.error(error));
               }
             }}
           >
@@ -260,7 +260,7 @@ export class App extends React.Component<any, AppState> {
       if (res.commitToHistory) {
         history.resumeRecording();
       }
-      this.setState(state => ({
+      this.setState((state) => ({
         ...res.appState,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
@@ -276,7 +276,7 @@ export class App extends React.Component<any, AppState> {
     this.saveDebounced.flush();
   });
 
-  private disableEvent: EventHandlerNonNull = event => {
+  private disableEvent: EventHandlerNonNull = (event) => {
     event.preventDefault();
   };
   private unmounted = false;
@@ -400,7 +400,7 @@ export class App extends React.Component<any, AppState> {
   private onResize = withBatchedUpdates(() => {
     globalSceneState
       .getAllElements()
-      .forEach(element => invalidateShapeForElement(element));
+      .forEach((element) => invalidateShapeForElement(element));
     this.setState({});
   });
 
@@ -586,7 +586,7 @@ export class App extends React.Component<any, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    const newElements = clipboardElements.map(element =>
+    const newElements = clipboardElements.map((element) =>
       duplicateElement(element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
@@ -631,7 +631,7 @@ export class App extends React.Component<any, AppState> {
   };
 
   toggleLock = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       elementLocked: !prevState.elementLocked,
       elementType: prevState.elementLocked
         ? "selection"
@@ -767,7 +767,7 @@ export class App extends React.Component<any, AppState> {
               break;
             case "MOUSE_LOCATION":
               const { socketID, pointerCoords } = decryptedData.payload;
-              this.setState(state => {
+              this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
                 }
@@ -787,7 +787,7 @@ export class App extends React.Component<any, AppState> {
         this.socketInitialized = true;
       });
       this.socket.on("room-user-change", (clients: string[]) => {
-        this.setState(state => {
+        this.setState((state) => {
           const collaborators: typeof state.collaborators = new Map();
           for (const socketID of clients) {
             if (state.collaborators.has(socketID)) {
@@ -901,7 +901,7 @@ export class App extends React.Component<any, AppState> {
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
       globalSceneState.replaceAllElements(
-        globalSceneState.getAllElements().map(el => {
+        globalSceneState.getAllElements().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
             const update: { x?: number; y?: number } = {};
             if (event.key === KEYS.ARROW_LEFT) {
@@ -1039,7 +1039,7 @@ export class App extends React.Component<any, AppState> {
       globalSceneState.replaceAllElements(
         globalSceneState
           .getAllElements()
-          .filter(element => element.id !== elementAtPosition.id),
+          .filter((element) => element.id !== elementAtPosition.id),
       );
 
       const centerElementX = elementAtPosition.x + elementAtPosition.width / 2;
@@ -1097,7 +1097,7 @@ export class App extends React.Component<any, AppState> {
       font: element.font,
       opacity: this.state.currentItemOpacity,
       zoom: this.state.zoom,
-      onSubmit: text => {
+      onSubmit: (text) => {
         if (text) {
           globalSceneState.replaceAllElements([
             ...globalSceneState.getAllElements(),
@@ -1105,7 +1105,7 @@ export class App extends React.Component<any, AppState> {
             newTextElement({ ...element, text, font: element.font }),
           ]);
         }
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [element.id]: true,
@@ -1477,7 +1477,7 @@ export class App extends React.Component<any, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            this.setState(prevState => ({
+            this.setState((prevState) => ({
               selectedElementIds: {
                 ...prevState.selectedElementIds,
                 [hitElement!.id]: true,
@@ -1557,7 +1557,7 @@ export class App extends React.Component<any, AppState> {
         opacity: this.state.currentItemOpacity,
         font: this.state.currentItemFont,
         zoom: this.state.zoom,
-        onSubmit: text => {
+        onSubmit: (text) => {
           if (text) {
             globalSceneState.replaceAllElements([
               ...globalSceneState.getAllElements(),
@@ -1568,7 +1568,7 @@ export class App extends React.Component<any, AppState> {
               }),
             ]);
           }
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
               [element.id]: true,
@@ -1619,7 +1619,7 @@ export class App extends React.Component<any, AppState> {
           this.actionManager.executeAction(actionFinalize);
           return;
         }
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [multiElement.id]: true,
@@ -1644,7 +1644,7 @@ export class App extends React.Component<any, AppState> {
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
         });
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [element.id]: false,
@@ -2057,7 +2057,7 @@ export class App extends React.Component<any, AppState> {
             window.devicePixelRatio,
           );
 
-          selectedElements.forEach(element => {
+          selectedElements.forEach((element) => {
             mutateElement(element, {
               x: element.x + x - lastX,
               y: element.y + y - lastY,
@@ -2139,7 +2139,7 @@ export class App extends React.Component<any, AppState> {
           globalSceneState.getAllElements(),
           draggingElement,
         );
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             ...elementsWithinSelection.reduce((map, element) => {
@@ -2196,7 +2196,7 @@ export class App extends React.Component<any, AppState> {
         } else if (draggingOccurred && !multiElement) {
           if (!elementLocked) {
             resetCursor();
-            this.setState(prevState => ({
+            this.setState((prevState) => ({
               draggingElement: null,
               elementType: "selection",
               selectedElementIds: {
@@ -2205,7 +2205,7 @@ export class App extends React.Component<any, AppState> {
               },
             }));
           } else {
-            this.setState(prevState => ({
+            this.setState((prevState) => ({
               draggingElement: null,
               selectedElementIds: {
                 ...prevState.selectedElementIds,
@@ -2242,7 +2242,7 @@ export class App extends React.Component<any, AppState> {
         globalSceneState.replaceAllElements(
           globalSceneState
             .getAllElements()
-            .filter(el => el.id !== resizingElement.id),
+            .filter((el) => el.id !== resizingElement.id),
         );
       }
 
@@ -2256,14 +2256,14 @@ export class App extends React.Component<any, AppState> {
       // selection unchanged
       if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
         if (event.shiftKey) {
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
               [hitElement!.id]: false,
             },
           }));
         } else {
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             selectedElementIds: { [hitElement!.id]: true },
           }));
         }
@@ -2276,7 +2276,7 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (!elementLocked) {
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [draggingElement.id]: true,
@@ -2341,7 +2341,7 @@ export class App extends React.Component<any, AppState> {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
-          ...this.actionManager.getContextMenuItems(action =>
+          ...this.actionManager.getContextMenuItems((action) =>
             this.canvasOnlyActions.includes(action.name),
           ),
         ],
@@ -2370,7 +2370,7 @@ export class App extends React.Component<any, AppState> {
           action: this.copyToClipboardAsPng,
         },
         ...this.actionManager.getContextMenuItems(
-          action => !this.canvasOnlyActions.includes(action.name),
+          (action) => !this.canvasOnlyActions.includes(action.name),
         ),
       ],
       top: event.clientY,
