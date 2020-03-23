@@ -64,7 +64,7 @@ export function textWysiwyg({
     backfaceVisibility: "hidden",
   });
 
-  editable.onpaste = ev => {
+  editable.onpaste = (ev) => {
     try {
       const selection = window.getSelection();
       if (!selection?.rangeCount) {
@@ -91,7 +91,7 @@ export function textWysiwyg({
     }
   };
 
-  editable.onkeydown = ev => {
+  editable.onkeydown = (ev) => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
       handleSubmit();

@@ -73,7 +73,7 @@ export const LayerUI = React.memo(
           onExportToPng={createExporter("png")}
           onExportToSvg={createExporter("svg")}
           onExportToClipboard={createExporter("clipboard")}
-          onExportToBackend={exportedElements => {
+          onExportToBackend={(exportedElements) => {
             if (canvas) {
               exportCanvas(
                 "backend",
@@ -143,7 +143,7 @@ export const LayerUI = React.memo(
               )}
             </Stack.Col>
             <Section heading="shapes">
-              {heading => (
+              {(heading) => (
                 <Stack.Col gap={4} align="start">
                   <Stack.Row gap={1}>
                     <Island padding={1}>
@@ -184,7 +184,7 @@ export const LayerUI = React.memo(
         </FixedSideContainer>
         <footer role="contentinfo">
           <LanguageList
-            onChange={lng => {
+            onChange={(lng) => {
               setLanguage(lng);
               setAppState({});
             }}
@@ -228,7 +228,7 @@ export const LayerUI = React.memo(
     return (
       prev.language === next.language &&
       prev.elements === next.elements &&
-      keys.every(key => prevAppState[key] === nextAppState[key])
+      keys.every((key) => prevAppState[key] === nextAppState[key])
     );
   },
 );

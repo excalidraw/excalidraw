@@ -27,5 +27,5 @@ export const actionDuplicateSelection = register({
     };
   },
   contextItemLabel: "labels.duplicateSelection",
-  keyTest: event => event[KEYS.CTRL_OR_CMD] && event.key === "d",
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === "d",
 });

@@ -13,7 +13,7 @@ let copiedStyles: string = "{}";
 export const actionCopyStyles = register({
   name: "copyStyles",
   perform: (elements, appState) => {
-    const element = elements.find(el => appState.selectedElementIds[el.id]);
+    const element = elements.find((el) => appState.selectedElementIds[el.id]);
     if (element) {
       copiedStyles = JSON.stringify(element);
     }
@@ -22,7 +22,7 @@ export const actionCopyStyles = register({
     };
   },
   contextItemLabel: "labels.copyStyles",
-  keyTest: event =>
+  keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C",
   contextMenuOrder: 0,
 });
@@ -35,7 +35,7 @@ export const actionPasteStyles = register({
       return { elements, commitToHistory: false };
     }
     return {
-      elements: elements.map(element => {
+      elements: elements.map((element) => {
         if (appState.selectedElementIds[element.id]) {
           const newElement = newElementWith(element, {
             backgroundColor: pastedElement?.backgroundColor,
@@ -59,7 +59,7 @@ export const actionPasteStyles = register({
     };
   },
   contextItemLabel: "labels.pasteStyles",
-  keyTest: event =>
+  keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,
 });

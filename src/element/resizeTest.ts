@@ -20,7 +20,7 @@ export function resizeTest(
 
   const handlers = handlerRectangles(element, zoom, pointerType);
 
-  const filter = Object.keys(handlers).filter(key => {
+  const filter = Object.keys(handlers).filter((key) => {
     const handler = handlers[key as HandlerRectanglesRet]!;
     if (!handler) {
       return false;

@@ -26,7 +26,7 @@ const fallbackLanguage = languages[0];
 
 export function setLanguage(newLng: string | undefined) {
   currentLanguage =
-    languages.find(language => language.lng === newLng) || fallbackLanguage;
+    languages.find((language) => language.lng === newLng) || fallbackLanguage;
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 }
@@ -69,7 +69,7 @@ export function t(path: string, replacement?: { [key: string]: string }) {
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
-    formatLanguageCode: function(lng: string) {
+    formatLanguageCode: function (lng: string) {
       return lng;
     },
     isWhitelisted: () => true,

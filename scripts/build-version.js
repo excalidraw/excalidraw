@@ -4,9 +4,9 @@ const fs = require("fs");
 const path = require("path");
 const asar = require("asar");
 
-const zero = digit => `0${digit}`.slice(-2);
+const zero = (digit) => `0${digit}`.slice(-2);
 
-const versionDate = date => {
+const versionDate = (date) => {
   const date_ = `${date.getFullYear()}-${zero(date.getMonth() + 1)}-${zero(
     date.getDate(),
   )}`;

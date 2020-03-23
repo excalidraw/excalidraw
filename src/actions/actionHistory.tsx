@@ -35,7 +35,7 @@ const writeData = (
     const nextElementMap = getElementMap(nextElements);
     return {
       elements: nextElements
-        .map(nextElement =>
+        .map((nextElement) =>
           newElementWith(
             prevElementMap[nextElement.id] || nextElement,
             nextElement,
@@ -44,9 +44,9 @@ const writeData = (
         .concat(
           prevElements
             .filter(
-              prevElement => !nextElementMap.hasOwnProperty(prevElement.id),
+              (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
             )
-            .map(prevElement =>
+            .map((prevElement) =>
               newElementWith(prevElement, { isDeleted: true }),
             ),
         ),
@@ -62,7 +62,7 @@ const testUndo = (shift: boolean) => (event: KeyboardEvent) =>
 
 type ActionCreator = (history: SceneHistory) => Action;
 
-export const createUndoAction: ActionCreator = history => ({
+export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.undoOnce()),
@@ -78,7 +78,7 @@ export const createUndoAction: ActionCreator = history => ({
   commitToHistory: () => false,
 });
 
-export const createRedoAction: ActionCreator = history => ({
+export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.redoOnce()),

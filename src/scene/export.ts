@@ -20,7 +20,7 @@ export function exportToCanvas(
     scale?: number;
     viewBackgroundColor: string;
   },
-  createCanvas: (width: number, height: number) => any = function(
+  createCanvas: (width: number, height: number) => any = function (
     width,
     height,
   ) {

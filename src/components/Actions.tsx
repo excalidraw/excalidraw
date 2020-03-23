@@ -22,7 +22,7 @@ export function SelectedShapeActions({
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
       {(hasBackground(elementType) ||
-        targetElements.some(element => hasBackground(element.type))) && (
+        targetElements.some((element) => hasBackground(element.type))) && (
         <>
           {renderAction("changeBackgroundColor")}
 
@@ -31,7 +31,7 @@ export function SelectedShapeActions({
       )}
 
       {(hasStroke(elementType) ||
-        targetElements.some(element => hasStroke(element.type))) && (
+        targetElements.some((element) => hasStroke(element.type))) && (
         <>
           {renderAction("changeStrokeWidth")}
 
@@ -40,7 +40,7 @@ export function SelectedShapeActions({
       )}
 
       {(hasText(elementType) ||
-        targetElements.some(element => hasText(element.type))) && (
+        targetElements.some((element) => hasText(element.type))) && (
         <>
           {renderAction("changeFontSize")}
 

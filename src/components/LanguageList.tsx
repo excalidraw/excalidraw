@@ -22,7 +22,7 @@ export function LanguageList({
         value={currentLanguage}
         aria-label={i18n.t("buttons.selectLanguage")}
       >
-        {languages.map(language => (
+        {languages.map((language) => (
           <option key={language.lng} value={language.lng}>
             {language.label}
           </option>

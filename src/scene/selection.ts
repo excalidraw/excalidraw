@@ -13,7 +13,7 @@ export function getElementsWithinSelection(
     selectionX2,
     selectionY2,
   ] = getElementAbsoluteCoords(selection);
-  return elements.filter(element => {
+  return elements.filter((element) => {
     const [
       elementX1,
       elementY1,
@@ -36,7 +36,7 @@ export function deleteSelectedElements(
   appState: AppState,
 ) {
   return {
-    elements: elements.map(el => {
+    elements: elements.map((el) => {
       if (appState.selectedElementIds[el.id]) {
         return newElementWith(el, { isDeleted: true });
       }
@@ -66,7 +66,7 @@ export function isSomeElementSelected(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): boolean {
-  return elements.some(element => appState.selectedElementIds[element.id]);
+  return elements.some((element) => appState.selectedElementIds[element.id]);
 }
 
 /**
@@ -80,7 +80,7 @@ export function getCommonAttributeOfSelectedElements<T>(
 ): T | null {
   const attributes = Array.from(
     new Set(
-      getSelectedElements(elements, appState).map(element =>
+      getSelectedElements(elements, appState).map((element) =>
         getAttribute(element),
       ),
     ),
@@ -92,7 +92,7 @@ export function getSelectedElements(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): readonly ExcalidrawElement[] {
-  return elements.filter(element => appState.selectedElementIds[element.id]);
+  return elements.filter((element) => appState.selectedElementIds[element.id]);
 }
 
 export function getTargetElement(
