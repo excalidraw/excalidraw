@@ -101,6 +101,7 @@ export const LayerUI = React.memo(
         setAppState={setAppState}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
+        onToggleLock={onToggleLock}
       />
     ) : (
       <>
@@ -161,7 +162,6 @@ export const LayerUI = React.memo(
                       checked={appState.elementLocked}
                       onChange={onToggleLock}
                       title={t("toolBar.lock")}
-                      isButton={isMobile}
                     />
                   </Stack.Row>
                 </Stack.Col>
