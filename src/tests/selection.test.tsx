@@ -4,6 +4,7 @@ import { render, fireEvent } from "./test-utils";
 import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
+import { reseed } from "../random";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -12,6 +13,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
+  reseed(7);
 });
 
 const { h } = window;
@@ -98,6 +100,8 @@ describe("select single element on the scene", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("diamond", () => {
@@ -123,6 +127,8 @@ describe("select single element on the scene", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("ellipse", () => {
@@ -148,6 +154,8 @@ describe("select single element on the scene", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("arrow", () => {
@@ -186,6 +194,7 @@ describe("select single element on the scene", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("arrow escape", () => {
@@ -224,5 +233,7 @@ describe("select single element on the scene", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });

@@ -14,6 +14,8 @@ export const KEYS = {
   SPACE: " ",
 } as const;
 
+export type Key = keyof typeof KEYS;
+
 export function isArrowKey(keyCode: string) {
   return (
     keyCode === KEYS.ARROW_LEFT ||

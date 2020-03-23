@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
 import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
+import { reseed } from "../random";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -11,6 +12,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
+  reseed(7);
 });
 
 const { h } = window;
@@ -53,6 +55,8 @@ describe("resize element", () => {
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
     expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
 
@@ -94,5 +98,7 @@ describe("resize element with aspect ratio when SHIFT is clicked", () => {
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([29, 47]);
     expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });

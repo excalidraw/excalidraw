@@ -1,16 +1,18 @@
 import { queries, buildQueries } from "@testing-library/react";
 
-const _getAllByToolName = (container: HTMLElement, tool: string) => {
-  const toolMap: { [propKey: string]: string } = {
-    selection: "Selection — S, 1",
-    rectangle: "Rectangle — R, 2",
-    diamond: "Diamond — D, 3",
-    ellipse: "Ellipse — E, 4",
-    arrow: "Arrow — A, 5",
-    line: "Line — L, 6",
-  };
+const toolMap = {
+  selection: "Selection — S, 1",
+  rectangle: "Rectangle — R, 2",
+  diamond: "Diamond — D, 3",
+  ellipse: "Ellipse — E, 4",
+  arrow: "Arrow — A, 5",
+  line: "Line — L, 6",
+};
 
-  const toolTitle = toolMap[tool as string];
+export type ToolName = keyof typeof toolMap;
+
+const _getAllByToolName = (container: HTMLElement, tool: string) => {
+  const toolTitle = toolMap[tool as ToolName];
   return queries.getAllByTitle(container, toolTitle);
 };
 

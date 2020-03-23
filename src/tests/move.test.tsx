@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
 import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
+import { reseed } from "../random";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -11,6 +12,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
+  reseed(7);
 });
 
 const { h } = window;
@@ -45,6 +47,8 @@ describe("move element", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
 
@@ -81,5 +85,7 @@ describe("duplicate element on move when ALT is clicked", () => {
     // previous element should stay intact
     expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
     expect([h.elements[1].x, h.elements[1].y]).toEqual([0, 40]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
