@@ -44,7 +44,7 @@
     "layers": "Lag",
     "language": "Språk",
     "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "duplicateSelection": "Dupliser valgte elementer"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -64,8 +64,8 @@
     "menu": "Meny",
     "done": "Ferdig",
     "edit": "Rediger",
-    "undo": "Undo",
-    "redo": "Redo",
+    "undo": "Angre",
+    "redo": "Gjør om",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room"
   },
@@ -75,7 +75,7 @@
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
   },
   "toolBar": {
@@ -95,20 +95,20 @@
   },
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Klikk på siste punkt eller press Escape eller Enter for å fullføre",
     "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain_pre": "En feil oppsto. Prøv ",
+    "headingMain_button": "å laste siden på nytt.",
+    "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
+    "clearCanvasMessage_button": "å tømme lerretet.",
     "clearCanvasCaveat": " This will result in loss of work ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "Laster inn, vennligst vent...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
