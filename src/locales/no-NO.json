@@ -52,6 +52,7 @@
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Lagre",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
