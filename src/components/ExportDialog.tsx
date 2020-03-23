@@ -135,8 +135,8 @@ function ExportModal({
               <ToolButton
                 type="button"
                 icon={clipboard}
-                title={t("buttons.copyToClipboard")}
-                aria-label={t("buttons.copyToClipboard")}
+                title={t("buttons.copyPngToClipboard")}
+                aria-label={t("buttons.copyPngToClipboard")}
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
