@@ -9,7 +9,7 @@
     "browser-nativefs": "0.4.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
-    "react": "16.13.0",
+    "react": "16.13.1",
     "react-dom": "16.13.0",
     "react-scripts": "3.4.1",
     "roughjs": "4.0.4",
