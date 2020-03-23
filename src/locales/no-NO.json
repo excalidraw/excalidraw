@@ -103,7 +103,7 @@
     "headingMain_button": "å laste siden på nytt.",
     "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
     "clearCanvasMessage_button": "å tømme lerretet.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
