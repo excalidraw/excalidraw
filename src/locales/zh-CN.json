@@ -91,7 +91,7 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "形状"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
