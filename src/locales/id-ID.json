@@ -52,6 +52,7 @@
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Simpan",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
