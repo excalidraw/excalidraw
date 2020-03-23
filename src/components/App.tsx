@@ -190,7 +190,7 @@ export class App extends React.Component<any, AppState> {
           language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
-          onToggleLock={this.toggleLock}
+          onLockToggle={this.toggleLock}
         />
         <main>
           <canvas

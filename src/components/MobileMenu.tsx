@@ -25,7 +25,7 @@ type MobileMenuProps = {
   setElements: any;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
-  onToggleLock: () => void;
+  onLockToggle: () => void;
 };
 
 export function MobileMenu({
@@ -37,7 +37,7 @@ export function MobileMenu({
   setAppState,
   onRoomCreate,
   onRoomDestroy,
-  onToggleLock,
+  onLockToggle,
 }: MobileMenuProps) {
   return (
     <>
@@ -59,7 +59,7 @@ export function MobileMenu({
                 </Island>
                 <LockIcon
                   checked={appState.elementLocked}
-                  onChange={onToggleLock}
+                  onChange={onLockToggle}
                   title={t("toolBar.lock")}
                 />
               </Stack.Row>
