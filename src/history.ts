@@ -14,6 +14,14 @@ export class SceneHistory {
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
 
+  getSnapshotForTest() {
+    return {
+      recording: this.recording,
+      stateHistory: this.stateHistory.map((s) => JSON.parse(s)),
+      redoStack: this.redoStack.map((s) => JSON.parse(s)),
+    };
+  }
+
   clear() {
     this.stateHistory.length = 0;
     this.redoStack.length = 0;

@@ -1,8 +1,8 @@
 import { ExcalidrawElement } from "./types";
-import { randomSeed } from "roughjs/bin/math";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { globalSceneState } from "../scene";
 import { getSizeFromPoints } from "../points";
+import { randomInteger } from "../random";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -42,7 +42,7 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   }
 
   element.version++;
-  element.versionNonce = randomSeed();
+  element.versionNonce = randomInteger();
 
   globalSceneState.informMutation();
 }
@@ -54,7 +54,7 @@ export function newElementWith<TElement extends ExcalidrawElement>(
   return {
     ...element,
     version: element.version + 1,
-    versionNonce: randomSeed(),
+    versionNonce: randomInteger(),
     ...updates,
   };
 }

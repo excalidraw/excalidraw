@@ -1,6 +1,3 @@
-import { randomSeed } from "roughjs/bin/math";
-import nanoid from "nanoid";
-
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -8,6 +5,7 @@ import {
   ExcalidrawGenericElement,
 } from "../element/types";
 import { measureText } from "../utils";
+import { randomInteger, randomId } from "../random";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -39,7 +37,7 @@ function _newElementBase<T extends ExcalidrawElement>(
   }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
 ) {
   return {
-    id: rest.id || nanoid(),
+    id: rest.id || randomId(),
     type,
     x,
     y,
@@ -51,7 +49,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     strokeWidth,
     roughness,
     opacity,
-    seed: rest.seed ?? randomSeed(),
+    seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: rest.isDeleted ?? false,
@@ -145,8 +143,8 @@ export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement {
   let copy: TElement = _duplicateElement(element);
-  copy.id = nanoid();
-  copy.seed = randomSeed();
+  copy.id = randomId();
+  copy.seed = randomInteger();
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }

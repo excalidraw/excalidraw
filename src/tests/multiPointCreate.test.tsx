@@ -5,6 +5,7 @@ import { App } from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
+import { reseed } from "../random";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -13,6 +14,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
+  reseed(7);
 });
 
 const { h } = window;
@@ -99,6 +101,8 @@ describe("multi point mode in linear elements", () => {
       [20, 30],
       [70, 110],
     ]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
   it("line", () => {
@@ -138,5 +142,7 @@ describe("multi point mode in linear elements", () => {
       [20, 30],
       [70, 110],
     ]);
+
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
