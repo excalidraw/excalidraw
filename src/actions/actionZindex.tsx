@@ -5,7 +5,6 @@ import {
   moveAllLeft,
   moveAllRight,
 } from "../zindex";
-import { getSelectedIndices } from "../scene";
 import { KEYS, isDarwin } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
@@ -16,15 +15,60 @@ import {
   sendToBack,
   bringForward,
 } from "../components/icons";
+import { ExcalidrawElement } from "../element/types";
+import { AppState } from "../types";
+
+function getElementIndices(
+  direction: "left" | "right",
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) {
+  const selectedIndices: number[] = [];
+  let deletedIndicesCache: number[] = [];
+
+  function cb(element: ExcalidrawElement, index: number) {
+    if (element.isDeleted) {
+      deletedIndicesCache.push(index);
+    } else {
+      if (appState.selectedElementIds[element.id]) {
+        selectedIndices.push(...deletedIndicesCache, index);
+      }
+      deletedIndicesCache = [];
+    }
+  }
+
+  if (direction === "left") {
+    let i = -1;
+    const len = elements.length;
+    while (++i < len) {
+      cb(elements[i], i);
+    }
+  } else {
+    let i = elements.length;
+    while (--i > -1) {
+      cb(elements[i], i);
+    }
+  }
+  return selectedIndices.sort();
+}
+
+function moveElements(
+  func: typeof moveOneLeft,
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) {
+  const _elements = elements.slice();
+  const direction =
+    func === moveOneLeft || func === moveAllLeft ? "left" : "right";
+  const indices = getElementIndices(direction, _elements, appState);
+  return func(_elements, indices);
+}
 
 export const actionSendBackward = register({
   name: "sendBackward",
   perform: (elements, appState) => {
     return {
-      elements: moveOneLeft(
-        [...elements],
-        getSelectedIndices(elements, appState),
-      ),
+      elements: moveElements(moveOneLeft, elements, appState),
       appState,
       commitToHistory: true,
     };
@@ -49,10 +93,7 @@ export const actionBringForward = register({
   name: "bringForward",
   perform: (elements, appState) => {
     return {
-      elements: moveOneRight(
-        [...elements],
-        getSelectedIndices(elements, appState),
-      ),
+      elements: moveElements(moveOneRight, elements, appState),
       appState,
       commitToHistory: true,
     };
@@ -77,10 +118,7 @@ export const actionSendToBack = register({
   name: "sendToBack",
   perform: (elements, appState) => {
     return {
-      elements: moveAllLeft(
-        [...elements],
-        getSelectedIndices(elements, appState),
-      ),
+      elements: moveElements(moveAllLeft, elements, appState),
       appState,
       commitToHistory: true,
     };
@@ -113,10 +151,7 @@ export const actionBringToFront = register({
   name: "bringToFront",
   perform: (elements, appState) => {
     return {
-      elements: moveAllRight(
-        [...elements],
-        getSelectedIndices(elements, appState),
-      ),
+      elements: moveElements(moveAllRight, elements, appState),
       appState,
       commitToHistory: true,
     };

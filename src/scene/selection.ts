@@ -49,19 +49,6 @@ export function deleteSelectedElements(
   };
 }
 
-export function getSelectedIndices(
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) {
-  const selectedIndices: number[] = [];
-  elements.forEach((element, index) => {
-    if (appState.selectedElementIds[element.id]) {
-      selectedIndices.push(index);
-    }
-  });
-  return selectedIndices;
-}
-
 export function isSomeElementSelected(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
