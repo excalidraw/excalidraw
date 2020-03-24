@@ -1,4 +1,7 @@
-import { ExcalidrawElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 
@@ -18,7 +21,7 @@ export const probablySupportsClipboardBlob =
   "toBlob" in HTMLCanvasElement.prototype;
 
 export async function copyToAppClipboard(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) {
   CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));

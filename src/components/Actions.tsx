@@ -66,13 +66,9 @@ export function SelectedShapeActions({
 export function ShapesSwitcher({
   elementType,
   setAppState,
-  setElements,
-  elements,
 }: {
   elementType: ExcalidrawElement["type"];
   setAppState: any;
-  setElements: any;
-  elements: readonly ExcalidrawElement[];
 }) {
   return (
     <>

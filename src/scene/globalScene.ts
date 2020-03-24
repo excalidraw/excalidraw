@@ -1,4 +1,8 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { toNonDeletedElements } from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -13,8 +17,12 @@ class SceneState {
 
   constructor(private _elements: readonly ExcalidrawElement[] = []) {}
 
-  getAllElements() {
+  getElementsIncludingDeleted() {
     return this._elements;
+  }
+
+  getElements(): readonly NonDeletedExcalidrawElement[] {
+    return toNonDeletedElements(this._elements);
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {

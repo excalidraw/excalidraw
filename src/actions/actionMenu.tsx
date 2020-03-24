@@ -2,7 +2,7 @@ import React from "react";
 import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { showSelectedShapeActions } from "../element";
+import { showSelectedShapeActions, toNonDeletedElements } from "../element";
 import { register } from "./register";
 
 export const actionToggleCanvasMenu = register({
@@ -36,7 +36,10 @@ export const actionToggleEditMenu = register({
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      visible={showSelectedShapeActions(appState, elements)}
+      visible={showSelectedShapeActions(
+        appState,
+        toNonDeletedElements(elements),
+      )}
       type="button"
       icon={palette}
       aria-label={t("buttons.edit")}

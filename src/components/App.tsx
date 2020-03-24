@@ -20,7 +20,6 @@ import {
   getElementMap,
   getDrawingVersion,
   getSyncableElements,
-  hasNonDeletedElements,
   newLinearElement,
 } from "../element";
 import {
@@ -48,7 +47,13 @@ import { restore } from "../data/restore";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawTextElement,
+} from "../element/types";
 
 import {
   isWritableElement,
@@ -159,7 +164,7 @@ export class App extends React.Component<any, AppState> {
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
-      () => globalSceneState.getAllElements(),
+      () => globalSceneState.getElementsIncludingDeleted(),
     );
     this.actionManager.registerAll(actions);
 
@@ -183,10 +188,7 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={globalSceneState.getAllElements().filter((element) => {
-            return !element.isDeleted;
-          })}
-          setElements={this.setElements}
+          elements={globalSceneState.getElements()}
           language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
@@ -399,7 +401,7 @@ export class App extends React.Component<any, AppState> {
   }
   private onResize = withBatchedUpdates(() => {
     globalSceneState
-      .getAllElements()
+      .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
     this.setState({});
   });
@@ -407,7 +409,7 @@ export class App extends React.Component<any, AppState> {
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
       this.state.isCollaborating &&
-      hasNonDeletedElements(globalSceneState.getAllElements())
+      globalSceneState.getElements().length > 0
     ) {
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
@@ -437,7 +439,7 @@ export class App extends React.Component<any, AppState> {
       );
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
       this.state.selectionElement,
       window.devicePixelRatio,
@@ -458,21 +460,20 @@ export class App extends React.Component<any, AppState> {
       currentScrollBars = scrollBars;
     }
     const scrolledOutside =
-      !atLeastOneVisibleElement &&
-      hasNonDeletedElements(globalSceneState.getAllElements());
+      !atLeastOneVisibleElement && globalSceneState.getElements().length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
     this.saveDebounced();
 
     if (
-      getDrawingVersion(globalSceneState.getAllElements()) >
+      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastSceneUpdate();
     }
 
-    history.record(this.state, globalSceneState.getAllElements());
+    history.record(this.state, globalSceneState.getElementsIncludingDeleted());
   }
 
   // Copy/paste
@@ -481,9 +482,9 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    copyToAppClipboard(globalSceneState.getElements(), this.state);
     const { elements: nextElements, appState } = deleteSelectedElements(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElementsIncludingDeleted(),
       this.state,
     );
     globalSceneState.replaceAllElements(nextElements);
@@ -496,23 +497,20 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    copyToAppClipboard(globalSceneState.getElements(), this.state);
     event.preventDefault();
   });
   private copyToAppClipboard = () => {
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    copyToAppClipboard(globalSceneState.getElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
-    const selectedElements = getSelectedElements(
-      globalSceneState.getAllElements(),
-      this.state,
-    );
+    const elements = globalSceneState.getElements();
+
+    const selectedElements = getSelectedElements(elements, this.state);
     exportCanvas(
       "clipboard",
-      selectedElements.length
-        ? selectedElements
-        : globalSceneState.getAllElements(),
+      selectedElements.length ? selectedElements : elements,
       this.state,
       this.canvas!,
       this.state,
@@ -556,7 +554,7 @@ export class App extends React.Component<any, AppState> {
           });
 
           globalSceneState.replaceAllElements([
-            ...globalSceneState.getAllElements(),
+            ...globalSceneState.getElementsIncludingDeleted(),
             element,
           ]);
           this.setState({ selectedElementIds: { [element.id]: true } });
@@ -594,7 +592,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     globalSceneState.replaceAllElements([
-      ...globalSceneState.getAllElements(),
+      ...globalSceneState.getElementsIncludingDeleted(),
       ...newElements,
     ]);
     history.resumeRecording();
@@ -691,15 +689,15 @@ export class App extends React.Component<any, AppState> {
               // elements with more staler versions than ours, ignore them
               // and keep ours.
               if (
-                globalSceneState.getAllElements() == null ||
-                globalSceneState.getAllElements().length === 0
+                globalSceneState.getElementsIncludingDeleted() == null ||
+                globalSceneState.getElementsIncludingDeleted().length === 0
               ) {
                 globalSceneState.replaceAllElements(restoredState.elements);
               } else {
                 // create a map of ids so we don't have to iterate
                 // over the array more than once.
                 const localElementMap = getElementMap(
-                  globalSceneState.getAllElements(),
+                  globalSceneState.getElementsIncludingDeleted(),
                 );
 
                 // Reconcile
@@ -754,7 +752,7 @@ export class App extends React.Component<any, AppState> {
                 );
               }
               this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
-                globalSceneState.getAllElements(),
+                globalSceneState.getElementsIncludingDeleted(),
               );
               // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
               // when we receive any messages from another peer. This UX can be pretty rough -- if you
@@ -829,12 +827,14 @@ export class App extends React.Component<any, AppState> {
     const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
       type: "SCENE_UPDATE",
       payload: {
-        elements: getSyncableElements(globalSceneState.getAllElements()),
+        elements: getSyncableElements(
+          globalSceneState.getElementsIncludingDeleted(),
+        ),
       },
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(globalSceneState.getAllElements()),
+      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
     return this._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
@@ -901,7 +901,7 @@ export class App extends React.Component<any, AppState> {
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
       globalSceneState.replaceAllElements(
-        globalSceneState.getAllElements().map((el) => {
+        globalSceneState.getElementsIncludingDeleted().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
             const update: { x?: number; y?: number } = {};
             if (event.key === KEYS.ARROW_LEFT) {
@@ -984,10 +984,6 @@ export class App extends React.Component<any, AppState> {
     gesture.initialScale = null;
   });
 
-  private setElements = (elements: readonly ExcalidrawElement[]) => {
-    globalSceneState.replaceAllElements(elements);
-  };
-
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -1007,7 +1003,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     const elementAtPosition = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
       x,
       y,
@@ -1017,7 +1013,7 @@ export class App extends React.Component<any, AppState> {
     const element =
       elementAtPosition && isTextElement(elementAtPosition)
         ? elementAtPosition
-        : newTextElement({
+        : (newTextElement({
             x: x,
             y: y,
             strokeColor: this.state.currentItemStrokeColor,
@@ -1028,7 +1024,7 @@ export class App extends React.Component<any, AppState> {
             opacity: this.state.currentItemOpacity,
             text: "",
             font: this.state.currentItemFont,
-          });
+          }) as NonDeleted<ExcalidrawTextElement>);
 
     this.setState({ editingElement: element });
 
@@ -1038,7 +1034,7 @@ export class App extends React.Component<any, AppState> {
     if (elementAtPosition && isTextElement(elementAtPosition)) {
       globalSceneState.replaceAllElements(
         globalSceneState
-          .getAllElements()
+          .getElementsIncludingDeleted()
           .filter((element) => element.id !== elementAtPosition.id),
       );
 
@@ -1100,7 +1096,7 @@ export class App extends React.Component<any, AppState> {
       onSubmit: (text) => {
         if (text) {
           globalSceneState.replaceAllElements([
-            ...globalSceneState.getAllElements(),
+            ...globalSceneState.getElementsIncludingDeleted(),
             // we need to recreate the element to update dimensions & position
             newTextElement({ ...element, text, font: element.font }),
           ]);
@@ -1235,12 +1231,12 @@ export class App extends React.Component<any, AppState> {
     }
 
     const selectedElements = getSelectedElements(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
     );
     if (selectedElements.length === 1 && !isOverScrollBar) {
       const resizeElement = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
+        globalSceneState.getElements(),
         this.state,
         { x, y },
         this.state.zoom,
@@ -1254,7 +1250,7 @@ export class App extends React.Component<any, AppState> {
       }
     }
     const hitElement = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
       x,
       y,
@@ -1433,7 +1429,7 @@ export class App extends React.Component<any, AppState> {
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
       const resizeElement = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
+        globalSceneState.getElements(),
         this.state,
         { x, y },
         this.state.zoom,
@@ -1441,7 +1437,7 @@ export class App extends React.Component<any, AppState> {
       );
 
       const selectedElements = getSelectedElements(
-        globalSceneState.getAllElements(),
+        globalSceneState.getElements(),
         this.state,
       );
       if (selectedElements.length === 1 && resizeElement) {
@@ -1456,7 +1452,7 @@ export class App extends React.Component<any, AppState> {
         isResizingElements = true;
       } else {
         hitElement = getElementAtPosition(
-          globalSceneState.getAllElements(),
+          globalSceneState.getElements(),
           this.state,
           x,
           y,
@@ -1484,7 +1480,7 @@ export class App extends React.Component<any, AppState> {
               },
             }));
             globalSceneState.replaceAllElements(
-              globalSceneState.getAllElements(),
+              globalSceneState.getElementsIncludingDeleted(),
             );
             hitElementWasAddedToSelection = true;
           }
@@ -1495,7 +1491,7 @@ export class App extends React.Component<any, AppState> {
             // put the duplicates where the selected elements used to be.
             const nextElements = [];
             const elementsToAppend = [];
-            for (const element of globalSceneState.getAllElements()) {
+            for (const element of globalSceneState.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
                 (element.id === hitElement.id && hitElementWasAddedToSelection)
@@ -1540,7 +1536,7 @@ export class App extends React.Component<any, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         font: this.state.currentItemFont,
-      });
+      }) as NonDeleted<ExcalidrawTextElement>;
 
       const resetSelection = () => {
         this.setState({
@@ -1560,7 +1556,7 @@ export class App extends React.Component<any, AppState> {
         onSubmit: (text) => {
           if (text) {
             globalSceneState.replaceAllElements([
-              ...globalSceneState.getAllElements(),
+              ...globalSceneState.getElementsIncludingDeleted(),
               newTextElement({
                 ...element,
                 text,
@@ -1643,7 +1639,7 @@ export class App extends React.Component<any, AppState> {
           strokeWidth: this.state.currentItemStrokeWidth,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-        });
+        }) as NonDeleted<ExcalidrawLinearElement>;
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -1654,7 +1650,7 @@ export class App extends React.Component<any, AppState> {
           points: [...element.points, [0, 0]],
         });
         globalSceneState.replaceAllElements([
-          ...globalSceneState.getAllElements(),
+          ...globalSceneState.getElementsIncludingDeleted(),
           element,
         ]);
         this.setState({
@@ -1673,7 +1669,7 @@ export class App extends React.Component<any, AppState> {
         strokeWidth: this.state.currentItemStrokeWidth,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
-      });
+      }) as NonDeletedExcalidrawElement;
 
       if (element.type === "selection") {
         this.setState({
@@ -1682,7 +1678,7 @@ export class App extends React.Component<any, AppState> {
         });
       } else {
         globalSceneState.replaceAllElements([
-          ...globalSceneState.getAllElements(),
+          ...globalSceneState.getElementsIncludingDeleted(),
           element,
         ]);
         this.setState({
@@ -1831,7 +1827,7 @@ export class App extends React.Component<any, AppState> {
         this.setState({ isResizing: true });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
+          globalSceneState.getElements(),
           this.state,
         );
         if (selectedElements.length === 1) {
@@ -2046,7 +2042,7 @@ export class App extends React.Component<any, AppState> {
         // if elements should be deselected on pointerup
         draggingOccurred = true;
         const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
+          globalSceneState.getElements(),
           this.state,
         );
         if (selectedElements.length > 0) {
@@ -2131,12 +2127,12 @@ export class App extends React.Component<any, AppState> {
       if (this.state.elementType === "selection") {
         if (
           !event.shiftKey &&
-          isSomeElementSelected(globalSceneState.getAllElements(), this.state)
+          isSomeElementSelected(globalSceneState.getElements(), this.state)
         ) {
           this.setState({ selectedElementIds: {} });
         }
         const elementsWithinSelection = getElementsWithinSelection(
-          globalSceneState.getAllElements(),
+          globalSceneState.getElements(),
           draggingElement,
         );
         this.setState((prevState) => ({
@@ -2224,7 +2220,7 @@ export class App extends React.Component<any, AppState> {
       ) {
         // remove invisible element which was added in onPointerDown
         globalSceneState.replaceAllElements(
-          globalSceneState.getAllElements().slice(0, -1),
+          globalSceneState.getElementsIncludingDeleted().slice(0, -1),
         );
         this.setState({
           draggingElement: null,
@@ -2241,7 +2237,7 @@ export class App extends React.Component<any, AppState> {
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
         globalSceneState.replaceAllElements(
           globalSceneState
-            .getAllElements()
+            .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
         );
       }
@@ -2286,7 +2282,7 @@ export class App extends React.Component<any, AppState> {
 
       if (
         elementType !== "selection" ||
-        isSomeElementSelected(globalSceneState.getAllElements(), this.state)
+        isSomeElementSelected(globalSceneState.getElements(), this.state)
       ) {
         history.resumeRecording();
       }
@@ -2323,7 +2319,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     const element = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
       x,
       y,
@@ -2337,7 +2333,7 @@ export class App extends React.Component<any, AppState> {
             action: () => this.pasteFromClipboard(null),
           },
           probablySupportsClipboardBlob &&
-            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+            globalSceneState.getElements().length > 0 && {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
@@ -2405,7 +2401,7 @@ export class App extends React.Component<any, AppState> {
 
   private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
     const elementClickedInside = getElementContainingPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElementsIncludingDeleted(),
       x,
       y,
     );
@@ -2443,7 +2439,10 @@ export class App extends React.Component<any, AppState> {
   };
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(globalSceneState.getAllElements(), this.state);
+    saveToLocalStorage(
+      globalSceneState.getElementsIncludingDeleted(),
+      this.state,
+    );
   }, 300);
 }
 
@@ -2467,7 +2466,7 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
   Object.defineProperties(window.h, {
     elements: {
       get() {
-        return globalSceneState.getAllElements();
+        return globalSceneState.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
         return globalSceneState.replaceAllElements(elements);

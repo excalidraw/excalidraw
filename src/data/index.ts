@@ -1,4 +1,7 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 
 import { getDefaultAppState } from "../appState";
 
@@ -13,7 +16,6 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
-import { hasNonDeletedElements } from "../element";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -271,7 +273,7 @@ export async function importFromBackend(
 
 export async function exportCanvas(
   type: ExportType,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   canvas: HTMLCanvasElement,
   {
@@ -288,7 +290,7 @@ export async function exportCanvas(
     scale?: number;
   },
 ) {
-  if (!hasNonDeletedElements(elements)) {
+  if (elements.length === 0) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg") {

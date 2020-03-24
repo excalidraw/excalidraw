@@ -1,10 +1,10 @@
 import { AppState } from "../types";
-import { ExcalidrawElement } from "./types";
+import { NonDeletedExcalidrawElement } from "./types";
 import { getSelectedElements } from "../scene";
 
 export const showSelectedShapeActions = (
   appState: AppState,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
 ) =>
   Boolean(
     appState.editingElement ||

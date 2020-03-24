@@ -93,6 +93,7 @@
     "fix:other": "npm run prettier -- --write",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
+    "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",

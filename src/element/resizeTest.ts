@@ -1,4 +1,8 @@
-import { ExcalidrawElement, PointerType } from "./types";
+import {
+  ExcalidrawElement,
+  PointerType,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 import { handlerRectangles } from "./handlerRectangles";
 import { AppState } from "../types";
@@ -7,7 +11,7 @@ import { isLinearElement } from "./typeChecks";
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
 export function resizeTest(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,
@@ -42,7 +46,7 @@ export function resizeTest(
 }
 
 export function getElementWithResizeHandler(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   { x, y }: { x: number; y: number },
   zoom: number,
@@ -54,7 +58,7 @@ export function getElementWithResizeHandler(
     }
     const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
-  }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+  }, null as { element: NonDeletedExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
 }
 
 /*
