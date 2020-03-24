@@ -52,6 +52,7 @@
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製到剪貼板",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "儲存",
     "load": "載入",
     "getShareableLink": "取得共享連結",

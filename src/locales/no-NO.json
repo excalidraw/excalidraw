@@ -44,7 +44,7 @@
     "layers": "Lag",
     "language": "Språk",
     "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "duplicateSelection": "Dupliser valgte elementer"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -52,6 +52,7 @@
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
+    "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
@@ -64,10 +65,10 @@
     "menu": "Meny",
     "done": "Ferdig",
     "edit": "Rediger",
-    "undo": "Undo",
-    "redo": "Redo",
+    "undo": "Angre",
+    "redo": "Gjør om",
     "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "createNewRoom": "Opprett et nytt rom"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -75,7 +76,7 @@
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
   },
   "toolBar": {
@@ -95,30 +96,30 @@
   },
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "headingMain_pre": "En feil oppsto. Prøv ",
+    "headingMain_button": "å laste siden på nytt.",
+    "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
+    "clearCanvasMessage_button": "å tømme lerretet.",
+    "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "Laster inn, vennligst vent...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
+    "desc_intro": "Du kan invitere personer til scenen din for å samarbeide med deg.",
+    "desc_privacy": "Ta det med ro, sesjonen bruker ende-til-ende-kryptering, så alt du tegner forblir privat. Ikke en gang serveren vår kan se hva du lager.",
+    "button_startSession": "Start sesjon",
+    "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
+    "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
     "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   }
 }
