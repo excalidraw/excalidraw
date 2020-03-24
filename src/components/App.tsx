@@ -332,6 +332,7 @@ export class App extends React.Component<any, AppState> {
       false,
     );
     document.addEventListener("gestureend", this.onGestureEnd as any, false);
+    window.addEventListener("beforeunload", this.beforeUnload);
 
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -351,16 +352,14 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const scene = await loadScene(null);
-    this.syncActionResult(scene);
-
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       this.initializeSocketClient();
       return;
     }
 
-    window.addEventListener("beforeunload", this.beforeUnload);
+    const scene = await loadScene(null);
+    this.syncActionResult(scene);
   }
 
   public componentWillUnmount() {
