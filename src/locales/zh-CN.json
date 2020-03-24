@@ -28,7 +28,7 @@
     "medium": "中等",
     "large": "大号",
     "veryLarge": "极大",
-    "solid": "Solid",
+    "solid": "实心",
     "hachure": "Hachure",
     "crossHatch": "Cross-Hatch",
     "thin": "细",
@@ -52,6 +52,7 @@
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "保存",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
@@ -91,7 +92,7 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "形状"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",

@@ -52,6 +52,7 @@
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
+    "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Zapisz",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
