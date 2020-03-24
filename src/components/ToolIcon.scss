@@ -123,6 +123,7 @@
 
 @media (max-width: 360px) {
   .ToolIcon.ToolIcon__lock {
+    display: inline-block;
     position: absolute;
     top: 60px;
     right: -8px;
