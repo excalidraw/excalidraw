@@ -12,7 +12,6 @@ type LockIconProps = {
   checked: boolean;
   onChange?(): void;
   size?: LockIconSize;
-  isButton?: boolean;
 };
 
 const DEFAULT_SIZE: LockIconSize = "m";
@@ -46,9 +45,7 @@ export function LockIcon(props: LockIconProps) {
 
   return (
     <label
-      className={`ToolIcon ToolIcon__lock ${
-        props.isButton ? "ToolIcon_type_button" : "ToolIcon_type_floating"
-      } ${sizeCn}`}
+      className={`ToolIcon ToolIcon__lock ToolIcon_type_floating ${sizeCn}`}
       title={`${props.title} ${getShortcutKey("Q")}`}
     >
       <input

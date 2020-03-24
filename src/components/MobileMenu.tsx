@@ -14,6 +14,7 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+import { LockIcon } from "./LockIcon";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -24,6 +25,7 @@ type MobileMenuProps = {
   setElements: any;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
+  onLockToggle: () => void;
 };
 
 export function MobileMenu({
@@ -35,6 +37,7 @@ export function MobileMenu({
   setAppState,
   onRoomCreate,
   onRoomDestroy,
+  onLockToggle,
 }: MobileMenuProps) {
   return (
     <>
@@ -54,6 +57,11 @@ export function MobileMenu({
                     />
                   </Stack.Row>
                 </Island>
+                <LockIcon
+                  checked={appState.elementLocked}
+                  onChange={onLockToggle}
+                  title={t("toolBar.lock")}
+                />
               </Stack.Row>
             </Stack.Col>
           )}
