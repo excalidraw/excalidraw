@@ -918,6 +918,24 @@ export class App extends React.Component<any, AppState> {
         }),
       );
       event.preventDefault();
+    } else if (event.key === KEYS.ENTER) {
+      const selectedElements = getSelectedElements(
+        globalSceneState.getAllElements(),
+        this.state,
+      );
+
+      if (
+        selectedElements.length === 1 &&
+        !isLinearElement(selectedElements[0])
+      ) {
+        const selectedElement = selectedElements[0];
+        const x = selectedElement.x + selectedElement.width / 2;
+        const y = selectedElement.y + selectedElement.height / 2;
+
+        this.startTextEditing(event, x, y);
+        event.preventDefault();
+        return;
+      }
     } else if (
       !event.ctrlKey &&
       !event.altKey &&
@@ -987,24 +1005,11 @@ export class App extends React.Component<any, AppState> {
     globalSceneState.replaceAllElements(elements);
   };
 
-  private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+  private startTextEditing = (
+    event: KeyboardEvent | React.MouseEvent<HTMLCanvasElement>,
+    x: number,
+    y: number,
   ) => {
-    // case: double-clicking with arrow/line tool selected would both create
-    //  text and enter multiElement mode
-    if (this.state.multiElement) {
-      return;
-    }
-
-    resetCursor();
-
-    const { x, y } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-
     const elementAtPosition = getElementAtPosition(
       globalSceneState.getAllElements(),
       this.state,
@@ -1031,8 +1036,8 @@ export class App extends React.Component<any, AppState> {
 
     this.setState({ editingElement: element });
 
-    let textX = event.clientX;
-    let textY = event.clientY;
+    let textX = (event as React.MouseEvent<HTMLCanvasElement>).clientX || x;
+    let textY = (event as React.MouseEvent<HTMLCanvasElement>).clientY || y;
 
     if (elementAtPosition && isTextElement(elementAtPosition)) {
       globalSceneState.replaceAllElements(
@@ -1117,6 +1122,27 @@ export class App extends React.Component<any, AppState> {
         resetSelection();
       },
     });
+  };
+
+  private handleCanvasDoubleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
+    // case: double-clicking with arrow/line tool selected would both create
+    //  text and enter multiElement mode
+    if (this.state.multiElement) {
+      return;
+    }
+
+    resetCursor();
+
+    const { x, y } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
+    this.startTextEditing(event, x, y);
   };
 
   private handleCanvasPointerMove = (
