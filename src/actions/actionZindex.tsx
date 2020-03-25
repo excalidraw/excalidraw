@@ -28,27 +28,36 @@ function getElementIndices(
 
   function cb(element: ExcalidrawElement, index: number) {
     if (element.isDeleted) {
+      // we want to build an array of deleted elements that are preceeding
+      //  a selected element so that we move them together
       deletedIndicesCache.push(index);
     } else {
       if (appState.selectedElementIds[element.id]) {
         selectedIndices.push(...deletedIndicesCache, index);
       }
+      // always empty cache of deleted elements after either pushing a group
+      //  of selected/deleted elements, of after encountering non-deleted elem
       deletedIndicesCache = [];
     }
   }
 
+  // sending back → select contiguous deleted elements that are to the left of
+  //  selected element(s)
   if (direction === "left") {
     let i = -1;
     const len = elements.length;
     while (++i < len) {
       cb(elements[i], i);
     }
+    // moving to front → loop from right to left so that we don't need to
+    //  backtrack when gathering deleted elements
   } else {
     let i = elements.length;
     while (--i > -1) {
       cb(elements[i], i);
     }
   }
+  // sort in case we were gathering indexes from right to left
   return selectedIndices.sort();
 }
 
