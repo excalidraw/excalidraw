@@ -24,10 +24,10 @@
     "handDrawn": "手寫",
     "normal": "正常",
     "code": "程式碼",
-    "small": "Small",
-    "medium": "Medium",
-    "large": "Large",
-    "veryLarge": "Very Large",
+    "small": "小",
+    "medium": "中",
+    "large": "大",
+    "veryLarge": "極大",
     "solid": "Solid",
     "hachure": "Hachure",
     "crossHatch": "Cross-Hatch",
@@ -92,7 +92,7 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "形狀"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
@@ -109,7 +109,7 @@
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "資料讀取中，請稍候",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
