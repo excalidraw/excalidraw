@@ -19,16 +19,16 @@
     "opacity": "透明度",
     "fontSize": "字體大小",
     "fontFamily": "字體",
-    "onlySelected": "Only selected",
-    "withBackground": "With Background",
+    "onlySelected": "只針對選取的",
+    "withBackground": "包含背景",
     "handDrawn": "手寫",
     "normal": "正常",
     "code": "程式碼",
-    "small": "Small",
-    "medium": "Medium",
-    "large": "Large",
-    "veryLarge": "Very Large",
-    "solid": "Solid",
+    "small": "小",
+    "medium": "中",
+    "large": "大",
+    "veryLarge": "極大",
+    "solid": "實",
     "hachure": "Hachure",
     "crossHatch": "Cross-Hatch",
     "thin": "細",
@@ -92,7 +92,7 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "形狀"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
@@ -100,17 +100,17 @@
     "resize": "當你再調整大小時可以按住 SHIFT 來約束比例"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "headingMain_pre": "遭遇錯誤，嘗試 ",
+    "headingMain_button": "載入頁面中",
+    "clearCanvasMessage": "如果重載還是無法解決，嘗試 ",
+    "clearCanvasMessage_button": "清理畫布",
+    "clearCanvasCaveat": " 這會導致目前的進度遺失 ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "errorStack_loading": "資料讀取中，請稍候",
+    "sceneContent": "場景內容"
   },
   "roomDialog": {
     "desc_intro": "你可以邀請其他人到你的目前的畫面與你合作。",
