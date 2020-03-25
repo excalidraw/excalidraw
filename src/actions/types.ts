@@ -70,7 +70,7 @@ export interface Action {
 
 export interface ActionsManagerInterface {
   actions: {
-    [keyProp: string]: Action;
+    [actionName in ActionName]: Action;
   };
   registerAction: (action: Action) => void;
   handleKeyDown: (event: KeyboardEvent) => boolean;
