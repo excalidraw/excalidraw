@@ -17,8 +17,41 @@ type ActionFn = (
 export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
 export type ActionFilterFn = (action: Action) => void;
 
+export type ActionName =
+  | "sendBackward"
+  | "bringForward"
+  | "sendToBack"
+  | "bringToFront"
+  | "copyStyles"
+  | "selectAll"
+  | "pasteStyles"
+  | "changeStrokeColor"
+  | "changeBackgroundColor"
+  | "changeFillStyle"
+  | "changeStrokeWidth"
+  | "changeSloppiness"
+  | "changeOpacity"
+  | "changeFontSize"
+  | "toggleCanvasMenu"
+  | "toggleEditMenu"
+  | "undo"
+  | "redo"
+  | "finalize"
+  | "changeProjectName"
+  | "changeExportBackground"
+  | "saveScene"
+  | "loadScene"
+  | "duplicateSelection"
+  | "deleteSelectedElements"
+  | "changeViewBackgroundColor"
+  | "clearCanvas"
+  | "zoomIn"
+  | "zoomOut"
+  | "resetZoom"
+  | "changeFontFamily";
+
 export interface Action {
-  name: string;
+  name: ActionName;
   PanelComponent?: React.FC<{
     elements: readonly ExcalidrawElement[];
     appState: AppState;
@@ -37,12 +70,12 @@ export interface Action {
 
 export interface ActionsManagerInterface {
   actions: {
-    [keyProp: string]: Action;
+    [actionName in ActionName]: Action;
   };
   registerAction: (action: Action) => void;
   handleKeyDown: (event: KeyboardEvent) => boolean;
   getContextMenuItems: (
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
-  renderAction: (name: string) => React.ReactElement | null;
+  renderAction: (name: ActionName) => React.ReactElement | null;
 }
