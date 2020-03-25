@@ -932,7 +932,10 @@ export class App extends React.Component<any, AppState> {
         const x = selectedElement.x + selectedElement.width / 2;
         const y = selectedElement.y + selectedElement.height / 2;
 
-        this.startTextEditing(event, x, y);
+        this.startTextEditing({ 
+          x: x, 
+          y: y,
+        });
         event.preventDefault();
         return;
       }
@@ -1005,11 +1008,19 @@ export class App extends React.Component<any, AppState> {
     globalSceneState.replaceAllElements(elements);
   };
 
-  private startTextEditing = (
-    event: KeyboardEvent | React.MouseEvent<HTMLCanvasElement>,
-    x: number,
+  private startTextEditing = ({
+    x,
+    y,
+    clientX,
+    clientY,
+    centerIfPossible = true,
+  }: {
+    x: number, 
     y: number,
-  ) => {
+    clientX?: number,
+    clientY?: number,
+    centerIfPossible?: boolean,
+  }) => {
     const elementAtPosition = getElementAtPosition(
       globalSceneState.getAllElements(),
       this.state,
@@ -1036,8 +1047,8 @@ export class App extends React.Component<any, AppState> {
 
     this.setState({ editingElement: element });
 
-    let textX = (event as React.MouseEvent<HTMLCanvasElement>).clientX || x;
-    let textY = (event as React.MouseEvent<HTMLCanvasElement>).clientY || y;
+    let textX = clientX || x;
+    let textY = clientY || y;
 
     if (elementAtPosition && isTextElement(elementAtPosition)) {
       globalSceneState.replaceAllElements(
@@ -1067,7 +1078,7 @@ export class App extends React.Component<any, AppState> {
         x: centerElementX,
         y: centerElementY,
       });
-    } else if (!event.altKey) {
+    } else if (centerIfPossible) {
       const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
         x,
         y,
@@ -1142,7 +1153,13 @@ export class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
-    this.startTextEditing(event, x, y);
+    this.startTextEditing({
+      x: x, 
+      y: y,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      centerIfPossible: !event.altKey,
+    });
   };
 
   private handleCanvasPointerMove = (
