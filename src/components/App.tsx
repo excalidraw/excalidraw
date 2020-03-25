@@ -932,8 +932,8 @@ export class App extends React.Component<any, AppState> {
         const x = selectedElement.x + selectedElement.width / 2;
         const y = selectedElement.y + selectedElement.height / 2;
 
-        this.startTextEditing({ 
-          x: x, 
+        this.startTextEditing({
+          x: x,
           y: y,
         });
         event.preventDefault();
@@ -1015,11 +1015,11 @@ export class App extends React.Component<any, AppState> {
     clientY,
     centerIfPossible = true,
   }: {
-    x: number, 
-    y: number,
-    clientX?: number,
-    clientY?: number,
-    centerIfPossible?: boolean,
+    x: number;
+    y: number;
+    clientX?: number;
+    clientY?: number;
+    centerIfPossible?: boolean;
   }) => {
     const elementAtPosition = getElementAtPosition(
       globalSceneState.getAllElements(),
@@ -1154,7 +1154,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     this.startTextEditing({
-      x: x, 
+      x: x,
       y: y,
       clientX: event.clientX,
       clientY: event.clientY,
