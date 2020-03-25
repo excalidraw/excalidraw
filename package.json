@@ -50,10 +50,8 @@
     "rewire": "5.0.0",
     "typescript": "3.8.3"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|browser-nativefs)/)"
-    ]
+  "engines": {
+    "node": ">=12.0.0"
   },
   "eslintConfig": {
     "extends": [
@@ -87,19 +85,22 @@
       "prettier/prettier": "warn"
     }
   },
-  "homepage": ".",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
     }
   },
-  "main": "src/index.js",
-  "name": "excalidraw",
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|browser-nativefs)/)"
+    ]
+  },
+  "private": true,
   "scripts": {
-    "build:app": "react-scripts build",
-    "build:zip": "node ./scripts/build-version.js",
     "build": "npm run build:app && npm run build:zip",
     "build-node": "node ./scripts/build-node.js",
+    "build:app": "react-scripts build",
+    "build:zip": "node ./scripts/build-version.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
@@ -108,18 +109,9 @@
     "start": "react-scripts start",
     "test": "npm run test:app",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
-    "test:typecheck": "tsc",
-    "test:other": "npm run prettier -- --list-different"
-  },
-  "version": "1.0.0",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/excalidraw/excalidraw.git"
-  },
-  "engines": {
-    "node": ">=12.0.0"
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
+    "test:other": "npm run prettier -- --list-different",
+    "test:typecheck": "tsc"
   }
 }
