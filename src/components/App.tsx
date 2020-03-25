@@ -918,6 +918,27 @@ export class App extends React.Component<any, AppState> {
         }),
       );
       event.preventDefault();
+    } else if (event.key === KEYS.ENTER) {
+      const selectedElements = getSelectedElements(
+        globalSceneState.getAllElements(),
+        this.state,
+      );
+
+      if (
+        selectedElements.length === 1 &&
+        !isLinearElement(selectedElements[0])
+      ) {
+        const selectedElement = selectedElements[0];
+        const x = selectedElement.x + selectedElement.width / 2;
+        const y = selectedElement.y + selectedElement.height / 2;
+
+        this.startTextEditing({
+          x: x,
+          y: y,
+        });
+        event.preventDefault();
+        return;
+      }
     } else if (
       !event.ctrlKey &&
       !event.altKey &&
@@ -987,24 +1008,19 @@ export class App extends React.Component<any, AppState> {
     globalSceneState.replaceAllElements(elements);
   };
 
-  private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-  ) => {
-    // case: double-clicking with arrow/line tool selected would both create
-    //  text and enter multiElement mode
-    if (this.state.multiElement) {
-      return;
-    }
-
-    resetCursor();
-
-    const { x, y } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-
+  private startTextEditing = ({
+    x,
+    y,
+    clientX,
+    clientY,
+    centerIfPossible = true,
+  }: {
+    x: number;
+    y: number;
+    clientX?: number;
+    clientY?: number;
+    centerIfPossible?: boolean;
+  }) => {
     const elementAtPosition = getElementAtPosition(
       globalSceneState.getAllElements(),
       this.state,
@@ -1031,8 +1047,8 @@ export class App extends React.Component<any, AppState> {
 
     this.setState({ editingElement: element });
 
-    let textX = event.clientX;
-    let textY = event.clientY;
+    let textX = clientX || x;
+    let textY = clientY || y;
 
     if (elementAtPosition && isTextElement(elementAtPosition)) {
       globalSceneState.replaceAllElements(
@@ -1062,7 +1078,7 @@ export class App extends React.Component<any, AppState> {
         x: centerElementX,
         y: centerElementY,
       });
-    } else if (!event.altKey) {
+    } else if (centerIfPossible) {
       const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
         x,
         y,
@@ -1116,6 +1132,33 @@ export class App extends React.Component<any, AppState> {
       onCancel: () => {
         resetSelection();
       },
+    });
+  };
+
+  private handleCanvasDoubleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
+    // case: double-clicking with arrow/line tool selected would both create
+    //  text and enter multiElement mode
+    if (this.state.multiElement) {
+      return;
+    }
+
+    resetCursor();
+
+    const { x, y } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
+    this.startTextEditing({
+      x: x,
+      y: y,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      centerIfPossible: !event.altKey,
     });
   };
 
