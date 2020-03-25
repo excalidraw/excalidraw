@@ -52,7 +52,7 @@
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In die Zwischenablage kopieren",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "save": "Speichern",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
@@ -96,7 +96,7 @@
   },
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
-    "linearElementMulti": "Auf den letzten Punkt klicken oder zum Beenden Escape oder Eingabe drücken",
+    "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten"
   },
   "errorSplash": {
