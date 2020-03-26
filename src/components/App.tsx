@@ -300,6 +300,10 @@ export class App extends React.Component<any, AppState> {
             return this.setState(...args);
           },
         },
+        app: {
+          configurable: true,
+          value: this,
+        },
       });
     }
 
@@ -2498,7 +2502,9 @@ declare global {
     h: {
       elements: readonly ExcalidrawElement[];
       state: AppState;
+      setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
+      app: InstanceType<typeof App>;
     };
   }
 }
