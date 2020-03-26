@@ -154,6 +154,12 @@ export class App extends React.Component<any, AppState> {
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
+
+  public state: AppState = {
+    ...getDefaultAppState(),
+    isLoading: true,
+  };
+
   constructor(props: any) {
     super(props);
     this.actionManager = new ActionManager(
@@ -226,15 +232,22 @@ export class App extends React.Component<any, AppState> {
                 file?.type === "application/json" ||
                 file?.name.endsWith(".excalidraw")
               ) {
+                this.setState({ isLoading: true });
                 loadFromBlob(file)
                   .then(({ elements, appState }) =>
                     this.syncActionResult({
                       elements,
-                      appState,
+                      appState: {
+                        ...(appState || this.state),
+                        isLoading: false,
+                      },
                       commitToHistory: false,
                     }),
                   )
-                  .catch((error) => console.error(error));
+                  .catch((error) => {
+                    console.error(error);
+                    this.setState({ isLoading: false });
+                  });
               }
             }}
           >
@@ -270,15 +283,55 @@ export class App extends React.Component<any, AppState> {
 
   // Lifecycle
 
-  private onUnload = withBatchedUpdates(() => {
+  private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.saveDebounced();
     this.saveDebounced.flush();
   });
 
+  private onUnload = () => {
+    this.destroySocketClient();
+    this.onBlur();
+  };
+
   private disableEvent: EventHandlerNonNull = (event) => {
     event.preventDefault();
   };
+
+  private initializeScene = async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+    const jsonMatch = window.location.hash.match(
+      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+
+    const isCollaborationScene = getCollaborationLinkData(window.location.href);
+
+    if (!isCollaborationScene) {
+      let scene: ResolutionType<typeof loadScene> | undefined;
+      // Backwards compatibility with legacy url format
+      if (id) {
+        scene = await loadScene(id);
+      } else if (jsonMatch) {
+        scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+      } else {
+        scene = await loadScene(null);
+      }
+      if (scene) {
+        this.syncActionResult(scene);
+      }
+    }
+
+    if (this.state.isLoading) {
+      this.setState({ isLoading: false });
+    }
+
+    // run this last else the `isLoading` state
+    if (isCollaborationScene) {
+      this.initializeSocketClient({ showLoadingState: true });
+    }
+  };
+
   private unmounted = false;
 
   public async componentDidMount() {
@@ -320,7 +373,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("mousemove", this.updateCurrentCursorPosition);
     window.addEventListener("resize", this.onResize, false);
     window.addEventListener("unload", this.onUnload, false);
-    window.addEventListener("blur", this.onUnload, false);
+    window.addEventListener("blur", this.onBlur, false);
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
 
@@ -338,32 +391,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("gestureend", this.onGestureEnd as any, false);
     window.addEventListener("beforeunload", this.beforeUnload);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
-
-    if (id) {
-      // Backwards compatibility with legacy url format
-      const scene = await loadScene(id);
-      this.syncActionResult(scene);
-    }
-
-    const jsonMatch = window.location.hash.match(
-      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-    );
-    if (jsonMatch) {
-      const scene = await loadScene(jsonMatch[1], jsonMatch[2]);
-      this.syncActionResult(scene);
-      return;
-    }
-
-    const roomMatch = getCollaborationLinkData(window.location.href);
-    if (roomMatch) {
-      this.initializeSocketClient();
-      return;
-    }
-
-    const scene = await loadScene(null);
-    this.syncActionResult(scene);
+    this.initializeScene();
   }
 
   public componentWillUnmount() {
@@ -383,7 +411,7 @@ export class App extends React.Component<any, AppState> {
     document.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("resize", this.onResize, false);
     window.removeEventListener("unload", this.onUnload, false);
-    window.removeEventListener("blur", this.onUnload, false);
+    window.removeEventListener("blur", this.onBlur, false);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
 
@@ -420,7 +448,7 @@ export class App extends React.Component<any, AppState> {
 
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.socket) {
-      this.initializeSocketClient();
+      this.initializeSocketClient({ showLoadingState: true });
     }
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
@@ -625,7 +653,7 @@ export class App extends React.Component<any, AppState> {
       "Excalidraw",
       await generateCollaborationLink(),
     );
-    this.initializeSocketClient();
+    this.initializeSocketClient({ showLoadingState: false });
   };
 
   destroyRoom = () => {
@@ -655,15 +683,23 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private initializeSocketClient = () => {
+  private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
     if (this.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
-      this.setState({
-        isCollaborating: true,
-      });
+      const initialize = () => {
+        this.socketInitialized = true;
+        clearTimeout(initializationTimer);
+        if (this.state.isLoading && !this.unmounted) {
+          this.setState({ isLoading: false });
+        }
+      };
+      // fallback in case you're not alone in the room but still don't receive
+      //  initial SCENE_UPDATE message
+      const initializationTimer = setTimeout(initialize, 5000);
+
       this.socket = socketIOClient(SOCKET_SERVER);
       this.roomID = roomMatch[1];
       this.roomKey = roomMatch[2];
@@ -685,7 +721,7 @@ export class App extends React.Component<any, AppState> {
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
-            case "SCENE_UPDATE":
+            case "SCENE_UPDATE": {
               const { elements: remoteElements } = decryptedData.payload;
               const restoredState = restore(remoteElements || [], null, {
                 scrollToContent: true,
@@ -765,10 +801,11 @@ export class App extends React.Component<any, AppState> {
               // right now we think this is the right tradeoff.
               history.clear();
               if (this.socketInitialized === false) {
-                this.socketInitialized = true;
+                initialize();
               }
               break;
-            case "MOUSE_LOCATION":
+            }
+            case "MOUSE_LOCATION": {
               const { socketID, pointerCoords } = decryptedData.payload;
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
@@ -780,6 +817,7 @@ export class App extends React.Component<any, AppState> {
                 return state;
               });
               break;
+            }
           }
         },
       );
@@ -787,7 +825,7 @@ export class App extends React.Component<any, AppState> {
         if (this.socket) {
           this.socket.off("first-in-room");
         }
-        this.socketInitialized = true;
+        initialize();
       });
       this.socket.on("room-user-change", (clients: string[]) => {
         this.setState((state) => {
@@ -807,6 +845,11 @@ export class App extends React.Component<any, AppState> {
       });
       this.socket.on("new-user", async (socketID: string) => {
         this.broadcastSceneUpdate();
+      });
+
+      this.setState({
+        isCollaborating: true,
+        isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
     }
   };
@@ -866,8 +909,6 @@ export class App extends React.Component<any, AppState> {
   private onSceneUpdated = () => {
     this.setState({});
   };
-
-  public state: AppState = getDefaultAppState();
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {

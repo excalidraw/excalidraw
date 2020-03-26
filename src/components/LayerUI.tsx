@@ -22,6 +22,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
+import { LoadingMessage } from "./LoadingMessage";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -105,6 +106,7 @@ export const LayerUI = React.memo(
       />
     ) : (
       <>
+        {appState.isLoading && <LoadingMessage />}
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
