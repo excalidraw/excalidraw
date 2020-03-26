@@ -374,7 +374,6 @@ button,
   bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
-  z-index: -1;
 }
 
 @media #{$media-query} {
@@ -384,5 +383,6 @@ button,
   .scroll-back-to-content {
     bottom: 80px;
     bottom: calc(80px + var(--sab));
+    z-index: -1;
   }
 }
