@@ -15,7 +15,7 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore Tratto",
-    "sloppiness": "Sloppiness",
+    "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "fontSize": "Dimensione del Carattere",
     "fontFamily": "Carattere",
@@ -29,8 +29,8 @@
     "large": "Grande",
     "veryLarge": "Molto Grande",
     "solid": "Pieno",
-    "hachure": "Hachure",
-    "crossHatch": "Cross-Hatch",
+    "hachure": "Tratteggio obliquo",
+    "crossHatch": "Tratteggio incrociato",
     "thin": "Sottile",
     "bold": "Grassetto",
     "extraBold": "Extra Grassetto",
@@ -39,15 +39,15 @@
     "cartoonist": "Fumettista",
     "fileTitle": "Titolo file",
     "colorPicker": "Selettore colore",
-    "canvasBackground": "Canvas background",
-    "drawingCanvas": "Drawing Canvas",
+    "canvasBackground": "Sfondo tela",
+    "drawingCanvas": "Tela da disegno",
     "layers": "Livelli",
     "language": "Lingua",
-    "createRoom": "Share a live-collaboration session",
+    "createRoom": "Condividi una sessione di collaborazione in diretta",
     "duplicateSelection": "Duplica elementi selezionati"
   },
   "buttons": {
-    "clearReset": "Reset the canvas",
+    "clearReset": "Ripristina la tela",
     "export": "Esporta",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
@@ -58,7 +58,7 @@
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
     "selectLanguage": "Seleziona Lingua",
-    "scrollBackToContent": "Scroll back to content",
+    "scrollBackToContent": "Scorri indietro fino al contenuto",
     "zoomIn": "Aumenta ingrandimento",
     "zoomOut": "Riduci ingrandimento",
     "resetZoom": "Ripristina ingrandimento",
@@ -67,17 +67,17 @@
     "edit": "Modifica",
     "undo": "Annulla",
     "redo": "Ripeti",
-    "roomDialog": "Start live collaboration",
+    "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza"
   },
   "alerts": {
-    "clearReset": "This will clear the whole canvas. Are you sure?",
+    "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
     "importBackendFailed": "Importazione dal server fallita.",
-    "cannotExportEmptyCanvas": "Cannot export empty canvas.",
+    "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
     "decryptFailed": "Impossibile decriptare i dati.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto."
   },
   "toolBar": {
     "selection": "Selezione",
@@ -90,36 +90,36 @@
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
+    "canvasActions": "Azioni sulla Tela",
+    "selectedShapeActions": "Impostazioni della forma selezionata",
     "shapes": "Forme"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "You can constraint proportions by holding SHIFT while resizing"
+    "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
+    "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
+    "resize": "È possibile vincolare le proporzioni tenendo premuto MAIUSC durante il ridimensionamento"
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "headingMain_button": "ricaricando la pagina.",
+    "clearCanvasMessage": "Se ricaricare non funziona, prova ",
+    "clearCanvasMessage_button": "pulire la tela.",
+    "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
+    "openIssueMessage_pre": "Prima di farlo, ti saremmo grati se aprissi una segnalazione sul nostro ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
+    "openIssueMessage_post": " Per favore includi il seguente stack trace (e se non è privato, anche il contenuto della scena):",
+    "errorStack": "Stack trace dell'errore:",
     "errorStack_loading": "Caricamento in corso. Attendere...",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
+    "desc_intro": "Puoi invitare persone nella tua scena attuale per collaborare con te.",
+    "desc_privacy": "Non preoccuparti, la sessione utilizza la crittografia end-to-end, quindi qualsiasi cosa disegni rimarrà privata. Nemmeno il nostro server sarà in grado di vedere cosa hai creato.",
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
+    "desc_persistenceWarning": "Nota che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Quindi, se tutti vi disconnetterete, perderete i dati a meno che non li si esporti in un file o in un link condivisibile.",
+    "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
+    "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   }
 }
