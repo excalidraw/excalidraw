@@ -10,6 +10,7 @@ export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
+  isLoading: boolean;
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawLinearElement | null;

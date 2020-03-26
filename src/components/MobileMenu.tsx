@@ -15,6 +15,7 @@ import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
+import { LoadingMessage } from "./LoadingMessage";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -41,6 +42,7 @@ export function MobileMenu({
 }: MobileMenuProps) {
   return (
     <>
+      {appState.isLoading && <LoadingMessage />}
       <FixedSideContainer side="top">
         <Section heading="shapes">
           {(heading) => (
