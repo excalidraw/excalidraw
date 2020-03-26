@@ -110,7 +110,7 @@
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
     "errorStack_loading": "Caricamento in corso. Attendere...",
-    "sceneContent": "Scene content:"
+    "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
     "desc_intro": "You can invite people to your current scene to collaborate with you.",
