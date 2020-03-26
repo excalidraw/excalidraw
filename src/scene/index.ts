@@ -1,6 +1,5 @@
 export { isOverScrollBars } from "./scrollbars";
 export {
-  getSelectedIndices,
   deleteSelectedElements,
   isSomeElementSelected,
   getElementsWithinSelection,
