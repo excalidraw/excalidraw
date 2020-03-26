@@ -52,9 +52,9 @@
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
-    "copyPngToClipboard": "Copy PNG to clipboard",
-    "save": "Save",
-    "load": "Load",
+    "copyPngToClipboard": "Copia PNG negli appunti",
+    "save": "Salva",
+    "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
     "selectLanguage": "Seleziona Lingua",
@@ -65,34 +65,34 @@
     "menu": "Menù",
     "done": "Fatto",
     "edit": "Modifica",
-    "undo": "Annulla operazione",
-    "redo": "Redo",
+    "undo": "Annulla",
+    "redo": "Ripeti",
     "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "createNewRoom": "Crea nuova stanza"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
-    "couldNotCreateShareableLink": "Couldn't create shareable link.",
-    "importBackendFailed": "Importing from backend failed.",
+    "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
+    "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
-    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
+    "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
-    "selection": "Selection",
-    "rectangle": "Rectangle",
-    "diamond": "Diamond",
-    "ellipse": "Ellipse",
-    "arrow": "Arrow",
-    "line": "Line",
-    "text": "Text",
-    "lock": "Keep selected tool active after drawing"
+    "selection": "Selezione",
+    "rectangle": "Rettangolo",
+    "diamond": "Rombo",
+    "ellipse": "Ellisse",
+    "arrow": "Freccia",
+    "line": "Linea",
+    "text": "Testo",
+    "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "Forme"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
@@ -100,7 +100,7 @@
     "resize": "You can constraint proportions by holding SHIFT while resizing"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
+    "headingMain_pre": "Si è verificato un errore. Provare ",
     "headingMain_button": "reloading the page.",
     "clearCanvasMessage": "If reloading doesn't work, try ",
     "clearCanvasMessage_button": "clearing the canvas.",
@@ -109,14 +109,14 @@
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "Caricamento in corso. Attendere...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
     "desc_intro": "You can invite people to your current scene to collaborate with you.",
     "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
+    "button_startSession": "Avvia sessione",
+    "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
