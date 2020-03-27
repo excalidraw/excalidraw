@@ -168,6 +168,17 @@ export class App extends React.Component<any, AppState> {
       () => globalSceneState.getAllElements(),
     );
     this.actionManager.registerAll(actions);
+    const url = new URL(document.location.toString()).searchParams.get(
+      "excalidraw",
+    );
+    if (url) {
+      fetch(url, {
+        method: "GET",
+        redirect: "follow",
+      })
+        .then((response) => response.text())
+        .then((result) => this.syncActionResult(JSON.parse(result)));
+    }
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
