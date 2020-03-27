@@ -32,6 +32,12 @@ export type EncryptedData = {
 };
 
 export type SocketUpdateDataSource = {
+  SCENE_INIT: {
+    type: "SCENE_INIT";
+    payload: {
+      elements: readonly ExcalidrawElement[];
+    };
+  };
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
     payload: {
