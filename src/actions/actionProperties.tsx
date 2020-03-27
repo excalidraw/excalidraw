@@ -122,9 +122,9 @@ export const actionChangeFillStyle = register({
       <legend>{t("labels.fill")}</legend>
       <ButtonSelect
         options={[
-          { value: "solid", text: t("labels.solid") },
           { value: "hachure", text: t("labels.hachure") },
           { value: "cross-hatch", text: t("labels.crossHatch") },
+          { value: "solid", text: t("labels.solid") },
         ]}
         group="fill"
         value={getFormValue(
