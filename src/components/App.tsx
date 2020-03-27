@@ -481,7 +481,7 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    this.copyAll();
     const { elements: nextElements, appState } = deleteSelectedElements(
       globalSceneState.getAllElements(),
       this.state,
@@ -496,10 +496,11 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    this.copyAll();
     event.preventDefault();
   });
-  private copyToAppClipboard = () => {
+
+  private copyAll = () => {
     copyToAppClipboard(globalSceneState.getAllElements(), this.state);
   };
 
@@ -2359,7 +2360,7 @@ export class App extends React.Component<any, AppState> {
       options: [
         navigator.clipboard && {
           label: t("labels.copy"),
-          action: this.copyToAppClipboard,
+          action: this.copyAll,
         },
         navigator.clipboard && {
           label: t("labels.paste"),
