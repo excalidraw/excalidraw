@@ -245,7 +245,11 @@ function generateElement(
   }
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
-  if (!prevElementWithCanvas || prevElementWithCanvas.canvasZoom !== zoom) {
+  const shouldRegenerateBecauseZoom =
+    prevElementWithCanvas &&
+    prevElementWithCanvas.canvasZoom !== zoom &&
+    !sceneState?.shouldCacheIgnoreZoom;
+  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
     elementWithCanvasCache.set(element, elementWithCanvas);
     return elementWithCanvas;
@@ -261,8 +265,8 @@ function drawElementFromCanvas(
 ) {
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(
-    -CANVAS_PADDING / sceneState.zoom,
-    -CANVAS_PADDING / sceneState.zoom,
+    -CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    -CANVAS_PADDING / elementWithCanvas.canvasZoom,
   );
   context.drawImage(
     elementWithCanvas.canvas!,
@@ -276,12 +280,12 @@ function drawElementFromCanvas(
         (Math.floor(elementWithCanvas.element.y) + sceneState.scrollY) *
           window.devicePixelRatio,
     ),
-    elementWithCanvas.canvas!.width / sceneState.zoom,
-    elementWithCanvas.canvas!.height / sceneState.zoom,
+    elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
+    elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
   context.translate(
-    CANVAS_PADDING / sceneState.zoom,
-    CANVAS_PADDING / sceneState.zoom,
+    CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    CANVAS_PADDING / elementWithCanvas.canvasZoom,
   );
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }

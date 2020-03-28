@@ -481,6 +481,7 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
+        shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
         renderOptimizations: true,
@@ -1242,7 +1243,9 @@ export class App extends React.Component<any, AppState> {
         scrollX: normalizeScroll(this.state.scrollX + deltaX / this.state.zoom),
         scrollY: normalizeScroll(this.state.scrollY + deltaY / this.state.zoom),
         zoom: getNormalizedZoom(gesture.initialScale! * scaleFactor),
+        shouldCacheIgnoreZoom: true,
       });
+      this.resetShouldCacheIgnoreZoomDebounced();
     } else {
       gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
     }
@@ -2547,6 +2550,10 @@ export class App extends React.Component<any, AppState> {
     }
     this.socket && this.broadcastMouseLocation({ pointerCoords });
   };
+
+  private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
+    this.setState({ shouldCacheIgnoreZoom: false });
+  }, 1000);
 
   private saveDebounced = debounce(() => {
     saveToLocalStorage(globalSceneState.getAllElements(), this.state);
