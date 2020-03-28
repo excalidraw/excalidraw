@@ -53,10 +53,17 @@ function generateElementCanvas(
         : 0;
     context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   } else {
-    canvas.width =
-      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    const angle = Math.PI / 4;
+    const width =
+      element.width * Math.cos(angle) + element.height * Math.sign(angle);
+    const height =
+      element.height * Math.sin(angle) + element.width * Math.cos(angle);
+    canvas.width = width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    canvasOffsetX = ((width - element.width) / 2) * window.devicePixelRatio;
+    canvasOffsetY = ((height - element.height) / 2) * window.devicePixelRatio;
+    context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
