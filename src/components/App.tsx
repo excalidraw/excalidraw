@@ -3,6 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { FlooredNumber } from "../types";
 
 import {
   newElement,
@@ -1128,6 +1129,9 @@ export class App extends React.Component<any, AppState> {
       const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
         x,
         y,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
       );
 
       if (snappedToCenterPosition) {
@@ -1615,7 +1619,13 @@ export class App extends React.Component<any, AppState> {
 
       const snappedToCenterPosition = event.altKey
         ? null
-        : this.getTextWysiwygSnappedToCenterPosition(x, y);
+        : this.getTextWysiwygSnappedToCenterPosition(
+            x,
+            y,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
 
       const element = newTextElement({
         x: snappedToCenterPosition?.elementCenterX ?? x,
@@ -2491,7 +2501,17 @@ export class App extends React.Component<any, AppState> {
     }));
   });
 
-  private getTextWysiwygSnappedToCenterPosition(x: number, y: number) {
+  private getTextWysiwygSnappedToCenterPosition(
+    x: number,
+    y: number,
+    state: {
+      scrollX: FlooredNumber;
+      scrollY: FlooredNumber;
+      zoom: number;
+    },
+    canvas: HTMLCanvasElement | null,
+    scale: number,
+  ) {
     const elementClickedInside = getElementContainingPosition(
       globalSceneState.getAllElements(),
       x,
@@ -2509,14 +2529,12 @@ export class App extends React.Component<any, AppState> {
       const isSnappedToCenter =
         distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
       if (isSnappedToCenter) {
-        const wysiwygX =
-          this.state.scrollX +
-          elementClickedInside.x +
-          elementClickedInside.width / 2;
-        const wysiwygY =
-          this.state.scrollY +
-          elementClickedInside.y +
-          elementClickedInside.height / 2;
+        const { x: wysiwygX, y: wysiwygY } = sceneCoordsToViewportCoords(
+          { sceneX: elementCenterX, sceneY: elementCenterY },
+          state,
+          canvas,
+          scale,
+        );
         return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
       }
     }
