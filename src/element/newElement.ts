@@ -18,6 +18,7 @@ type ElementConstructorOpts = {
   opacity: ExcalidrawGenericElement["opacity"];
   width?: ExcalidrawGenericElement["width"];
   height?: ExcalidrawGenericElement["height"];
+  angle?: ExcalidrawGenericElement["angle"];
 };
 
 function _newElementBase<T extends ExcalidrawElement>(
@@ -33,6 +34,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     opacity,
     width = 0,
     height = 0,
+    angle = 0,
     ...rest
   }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
 ) {
@@ -43,6 +45,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     y,
     width,
     height,
+    angle,
     strokeColor,
     backgroundColor,
     fillStyle,
@@ -148,5 +151,6 @@ export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }
+  copy.angle += Math.PI / 16; // just for rotation trial
   return copy;
 }

@@ -53,7 +53,7 @@ function generateElementCanvas(
         : 0;
     context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   } else {
-    const angle = Math.PI / 4;
+    const angle = element.angle;
     const width =
       element.width * Math.cos(angle) + element.height * Math.sign(angle);
     const height =
@@ -150,7 +150,7 @@ function generateElement(
     elementWithCanvasCache.delete(element);
     switch (element.type) {
       case "rectangle": {
-        const angle = Math.PI / 4;
+        const angle = element.angle;
         const x = element.width;
         const y = element.height;
         const cx = x / 2;

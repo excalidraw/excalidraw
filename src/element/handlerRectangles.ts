@@ -41,7 +41,7 @@ export function handlerRectangles(
   const elementHeight = elementY2 - elementY1;
   const cx = (elementX1 + elementX2) / 2;
   const cy = (elementY1 + elementY2) / 2;
-  const angle = Math.PI / 4;
+  const angle = element.angle;
 
   const dashedLineMargin = 4 / zoom;
 

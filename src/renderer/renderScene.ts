@@ -160,7 +160,7 @@ export function renderScene(
         elementHeight + dashledLinePadding * 2,
         elementX1 + elementWidth / 2,
         elementY1 + elementHeight / 2,
-        Math.PI / 4,
+        element.angle,
       );
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
@@ -185,7 +185,7 @@ export function renderScene(
             handler[3],
             handler[0] + handler[2] / 2,
             handler[1] + handler[3] / 2,
-            Math.PI / 4,
+            selectedElements[0].angle,
             true, // fill before stroke
           );
           context.lineWidth = lineWidth;
