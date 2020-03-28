@@ -26,6 +26,27 @@ function colorsForClientId(clientId: string) {
   };
 }
 
+function strokeRectWithAngle(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+  fill?: boolean,
+) {
+  context.translate(cx, cy);
+  context.rotate(angle);
+  if (fill) {
+    context.fillRect(x - cx, y - cy, width, height);
+  }
+  context.strokeRect(x - cx, y - cy, width, height);
+  context.rotate(-angle);
+  context.translate(-cx, -cy);
+}
+
 export function renderScene(
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -131,11 +152,15 @@ export function renderScene(
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / sceneState.zoom;
-      context.strokeRect(
+      strokeRectWithAngle(
+        context,
         elementX1 - dashledLinePadding,
         elementY1 - dashledLinePadding,
         elementWidth + dashledLinePadding * 2,
         elementHeight + dashledLinePadding * 2,
+        elementX1 + elementWidth / 2,
+        elementY1 + elementHeight / 2,
+        Math.PI / 4,
       );
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
@@ -144,6 +169,12 @@ export function renderScene(
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
+      const [
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2,
+      ] = getElementAbsoluteCoords(selectedElements[0]);
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
@@ -152,8 +183,17 @@ export function renderScene(
         .forEach((handler) => {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          context.fillRect(handler[0], handler[1], handler[2], handler[3]);
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          strokeRectWithAngle(
+            context,
+            handler[0],
+            handler[1],
+            handler[2],
+            handler[3],
+            (elementX1 + elementX2) / 2,
+            (elementY1 + elementY2) / 2,
+            Math.PI / 4,
+            true, // fill before stroke
+          );
           context.lineWidth = lineWidth;
         });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
