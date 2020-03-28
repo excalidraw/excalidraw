@@ -42,6 +42,7 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  shouldCacheIgnoreZoom: boolean;
 };
 
 export type PointerCoords = Readonly<{
