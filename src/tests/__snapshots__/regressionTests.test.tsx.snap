@@ -33,6 +33,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -211,6 +212,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -316,6 +318,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -558,6 +561,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -699,6 +703,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -873,6 +878,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1053,6 +1059,7 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1320,6 +1327,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1895,6 +1903,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2000,6 +2009,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2105,6 +2115,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2210,6 +2221,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2337,6 +2349,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2464,6 +2477,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2591,6 +2605,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2696,6 +2711,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2801,6 +2817,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2928,6 +2945,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3033,6 +3051,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": true,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3098,6 +3117,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3754,6 +3774,7 @@ Object {
     "id7": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4102,6 +4123,7 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4380,6 +4402,7 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4588,6 +4611,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4742,6 +4766,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5370,6 +5395,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5928,6 +5954,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6416,6 +6443,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6835,6 +6863,7 @@ Object {
     "id8": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7218,6 +7247,7 @@ Object {
     "id6": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7531,6 +7561,7 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7774,6 +7805,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7963,6 +7995,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8626,6 +8659,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9219,6 +9253,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9742,6 +9777,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10191,6 +10227,7 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10419,6 +10456,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10468,6 +10506,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": true,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10517,6 +10556,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10785,6 +10825,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
