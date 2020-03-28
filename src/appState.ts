@@ -35,6 +35,7 @@ export function getDefaultAppState(): AppState {
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     collaborators: new Map(),
+    shouldCacheIgnoreZoom: false,
   };
 }
 
