@@ -12,6 +12,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
 import rough from "roughjs/bin/rough";
+import { rotate } from "../math";
 
 const CANVAS_PADDING = 20;
 
@@ -141,20 +142,34 @@ function generateElement(
   if (!shape) {
     elementWithCanvasCache.delete(element);
     switch (element.type) {
-      case "rectangle":
-        shape = generator.rectangle(0, 0, element.width, element.height, {
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        });
+      case "rectangle": {
+        const angle = Math.PI / 4;
+        const x = element.width;
+        const y = element.height;
+        const cx = x / 2;
+        const cy = y / 2;
+        shape = generator.polygon(
+          [
+            rotate(0, 0, cx, cy, angle) as [number, number],
+            rotate(x, 0, cx, cy, angle) as [number, number],
+            rotate(x, y, cx, cy, angle) as [number, number],
+            rotate(0, y, cx, cy, angle) as [number, number],
+          ],
+          {
+            stroke: element.strokeColor,
+            fill:
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor,
+            fillStyle: element.fillStyle,
+            strokeWidth: element.strokeWidth,
+            roughness: element.roughness,
+            seed: element.seed,
+          },
+        );
 
         break;
+      }
       case "diamond": {
         const [
           topX,
