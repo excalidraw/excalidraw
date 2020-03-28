@@ -169,12 +169,6 @@ export function renderScene(
 
     // Paint resize handlers
     if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
-      const [
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-      ] = getElementAbsoluteCoords(selectedElements[0]);
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
@@ -189,8 +183,8 @@ export function renderScene(
             handler[1],
             handler[2],
             handler[3],
-            (elementX1 + elementX2) / 2,
-            (elementY1 + elementY2) / 2,
+            handler[0] + handler[2] / 2,
+            handler[1] + handler[3] / 2,
             Math.PI / 4,
             true, // fill before stroke
           );

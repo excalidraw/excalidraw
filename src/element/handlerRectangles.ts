@@ -1,6 +1,7 @@
 import { ExcalidrawElement, PointerType } from "./types";
 
 import { getElementAbsoluteCoords } from "./bounds";
+import { rotate } from "../math";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se";
 
@@ -9,6 +10,16 @@ const handleSizes: { [k in PointerType]: number } = {
   pen: 16,
   touch: 28,
 };
+
+function rotateHandlerCoords(
+  [x, y, w, h]: [number, number, number, number],
+  cx: number,
+  cy: number,
+  angle: number,
+) {
+  const [xx, yy] = rotate(x + w / 2, y + h / 2, cx, cy, angle);
+  return [xx - w / 2, yy - h / 2, w, h];
+}
 
 export function handlerRectangles(
   element: ExcalidrawElement,
@@ -28,67 +39,110 @@ export function handlerRectangles(
 
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
+  const cx = (elementX1 + elementX2) / 2;
+  const cy = (elementY1 + elementY2) / 2;
+  const angle = Math.PI / 4;
 
   const dashedLineMargin = 4 / zoom;
 
   const centeringOffset = (size - 8) / (2 * zoom);
 
   const handlers = {
-    nw: [
-      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ],
-    ne: [
-      elementX2 + dashedLineMargin - centeringOffset,
-      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ],
-    sw: [
-      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY2 + dashedLineMargin - centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ],
-    se: [
-      elementX2 + dashedLineMargin - centeringOffset,
-      elementY2 + dashedLineMargin - centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ],
+    nw: rotateHandlerCoords(
+      [
+        elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+        elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    ),
+    ne: rotateHandlerCoords(
+      [
+        elementX2 + dashedLineMargin - centeringOffset,
+        elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    ),
+    sw: rotateHandlerCoords(
+      [
+        elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+        elementY2 + dashedLineMargin - centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    ),
+    se: rotateHandlerCoords(
+      [
+        elementX2 + dashedLineMargin - centeringOffset,
+        elementY2 + dashedLineMargin - centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    ),
   } as { [T in Sides]: number[] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
   const minimumSizeForEightHandlers = (5 * size) / zoom;
   if (Math.abs(elementWidth) > minimumSizeForEightHandlers) {
-    handlers["n"] = [
-      elementX1 + elementWidth / 2 - handlerWidth / 2,
-      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ];
-    handlers["s"] = [
-      elementX1 + elementWidth / 2 - handlerWidth / 2,
-      elementY2 + dashedLineMargin - centeringOffset,
-      handlerWidth,
-      handlerHeight,
-    ];
+    handlers["n"] = rotateHandlerCoords(
+      [
+        elementX1 + elementWidth / 2 - handlerWidth / 2,
+        elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    );
+    handlers["s"] = rotateHandlerCoords(
+      [
+        elementX1 + elementWidth / 2 - handlerWidth / 2,
+        elementY2 + dashedLineMargin - centeringOffset,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    );
   }
   if (Math.abs(elementHeight) > minimumSizeForEightHandlers) {
-    handlers["w"] = [
-      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY1 + elementHeight / 2 - handlerHeight / 2,
-      handlerWidth,
-      handlerHeight,
-    ];
-    handlers["e"] = [
-      elementX2 + dashedLineMargin - centeringOffset,
-      elementY1 + elementHeight / 2 - handlerHeight / 2,
-      handlerWidth,
-      handlerHeight,
-    ];
+    handlers["w"] = rotateHandlerCoords(
+      [
+        elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+        elementY1 + elementHeight / 2 - handlerHeight / 2,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    );
+    handlers["e"] = rotateHandlerCoords(
+      [
+        elementX2 + dashedLineMargin - centeringOffset,
+        elementY1 + elementHeight / 2 - handlerHeight / 2,
+        handlerWidth,
+        handlerHeight,
+      ],
+      cx,
+      cy,
+      angle,
+    );
   }
 
   if (element.type === "arrow" || element.type === "line") {
