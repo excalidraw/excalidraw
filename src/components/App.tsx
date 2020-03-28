@@ -560,44 +560,20 @@ export class App extends React.Component<any, AppState> {
       if (
         // if no ClipboardEvent supplied, assume we're pasting via contextMenu
         //  thus these checks don't make sense
-        !event ||
-        (elementUnderCursor instanceof HTMLCanvasElement &&
-          !isWritableElement(target))
+        event &&
+        (!(elementUnderCursor instanceof HTMLCanvasElement) ||
+          isWritableElement(target))
       ) {
-        const data = await getClipboardContent(event);
-        if (data.elements) {
-          this.addElementsFromPaste(data.elements);
-        } else if (data.text) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            { clientX: cursorX, clientY: cursorY },
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-
-          const element = newTextElement({
-            x: x,
-            y: y,
-            strokeColor: this.state.currentItemStrokeColor,
-            backgroundColor: this.state.currentItemBackgroundColor,
-            fillStyle: this.state.currentItemFillStyle,
-            strokeWidth: this.state.currentItemStrokeWidth,
-            roughness: this.state.currentItemRoughness,
-            opacity: this.state.currentItemOpacity,
-            text: data.text,
-            font: this.state.currentItemFont,
-          });
-
-          globalSceneState.replaceAllElements([
-            ...globalSceneState.getAllElements(),
-            element,
-          ]);
-          this.setState({ selectedElementIds: { [element.id]: true } });
-          history.resumeRecording();
-        }
-        this.selectShapeTool("selection");
-        event?.preventDefault();
+        return;
       }
+      const data = await getClipboardContent(event);
+      if (data.elements) {
+        this.addElementsFromPaste(data.elements);
+      } else if (data.text) {
+        this.addTextFromPaste(data.text);
+      }
+      this.selectShapeTool("selection");
+      event?.preventDefault();
     },
   );
 
@@ -638,6 +614,35 @@ export class App extends React.Component<any, AppState> {
       }, {} as any),
     });
   };
+
+  private addTextFromPaste(text: any) {
+    const { x, y } = viewportCoordsToSceneCoords(
+      { clientX: cursorX, clientY: cursorY },
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
+    const element = newTextElement({
+      x: x,
+      y: y,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      text: text,
+      font: this.state.currentItemFont,
+    });
+
+    globalSceneState.replaceAllElements([
+      ...globalSceneState.getAllElements(),
+      element,
+    ]);
+    this.setState({ selectedElementIds: { [element.id]: true } });
+    history.resumeRecording();
+  }
 
   // Collaboration
 
