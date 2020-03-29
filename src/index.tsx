@@ -1,9 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import * as Sentry from "@sentry/browser";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
 import "./styles.scss";
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+});
 
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(
