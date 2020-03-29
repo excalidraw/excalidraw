@@ -7,6 +7,7 @@
   position: absolute;
   top: 56px;
   transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
+
   @media #{$media-query} {
     position: static;
     transform: none;
@@ -15,7 +16,7 @@
   }
 
   > span {
-    background-color: #ffd43b; /* OC YELLOW 4 */
+    background-color: #fff3bf; /* OC YELLOW 1 */
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
   }
