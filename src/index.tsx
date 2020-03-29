@@ -6,8 +6,19 @@ import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
 import "./styles.scss";
 
+const SentyProjectsHostnameMap: { [key: string]: string } = {
+  "excalidraw.com":
+    "https://a678efd811e84fa8811c61efecabbab8@sentry.io/5179065",
+  "excalidraw-team.now.sh":
+    "https://99a6ce3552444f7094f306de0eeb8c1d@sentry.io/5179196",
+};
+
+const onlineEnv = Object.keys(SentyProjectsHostnameMap).find(
+  (item) => window.location.hostname.indexOf(item) >= 0,
+);
+
 Sentry.init({
-  dsn: "https://a678efd811e84fa8811c61efecabbab8@sentry.io/5179065",
+  dsn: onlineEnv ? SentyProjectsHostnameMap[onlineEnv] : undefined,
 });
 
 // Block pinch-zooming on iOS outside of the content area
