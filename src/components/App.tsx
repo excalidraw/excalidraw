@@ -502,7 +502,7 @@ export class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getAllElements()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastSceneUpdate();
+      this.broadcastScene("SCENE_UPDATE");
     }
 
     history.record(this.state, globalSceneState.getAllElements());
@@ -708,6 +708,92 @@ export class App extends React.Component<any, AppState> {
       //  initial SCENE_UPDATE message
       const initializationTimer = setTimeout(initialize, 5000);
 
+      const updateScene = (
+        decryptedData: SocketUpdateDataSource["SCENE_INIT" | "SCENE_UPDATE"],
+      ) => {
+        const { elements: remoteElements } = decryptedData.payload;
+        const restoredState = restore(remoteElements || [], null, {
+          scrollToContent: true,
+        });
+        // Perform reconciliation - in collaboration, if we encounter
+        // elements with more staler versions than ours, ignore them
+        // and keep ours.
+        if (
+          globalSceneState.getAllElements() == null ||
+          globalSceneState.getAllElements().length === 0
+        ) {
+          globalSceneState.replaceAllElements(restoredState.elements);
+        } else {
+          // create a map of ids so we don't have to iterate
+          // over the array more than once.
+          const localElementMap = getElementMap(
+            globalSceneState.getAllElements(),
+          );
+
+          // Reconcile
+          globalSceneState.replaceAllElements(
+            restoredState.elements
+              .reduce((elements, element) => {
+                // if the remote element references one that's currently
+                //  edited on local, skip it (it'll be added in the next
+                //  step)
+                if (
+                  element.id === this.state.editingElement?.id ||
+                  element.id === this.state.resizingElement?.id ||
+                  element.id === this.state.draggingElement?.id
+                ) {
+                  return elements;
+                }
+
+                if (
+                  localElementMap.hasOwnProperty(element.id) &&
+                  localElementMap[element.id].version > element.version
+                ) {
+                  elements.push(localElementMap[element.id]);
+                  delete localElementMap[element.id];
+                } else if (
+                  localElementMap.hasOwnProperty(element.id) &&
+                  localElementMap[element.id].version === element.version &&
+                  localElementMap[element.id].versionNonce !==
+                    element.versionNonce
+                ) {
+                  // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+                  if (
+                    localElementMap[element.id].versionNonce <
+                    element.versionNonce
+                  ) {
+                    elements.push(localElementMap[element.id]);
+                  } else {
+                    // it should be highly unlikely that the two versionNonces are the same. if we are
+                    // really worried about this, we can replace the versionNonce with the socket id.
+                    elements.push(element);
+                  }
+                  delete localElementMap[element.id];
+                } else {
+                  elements.push(element);
+                  delete localElementMap[element.id];
+                }
+
+                return elements;
+              }, [] as Mutable<typeof restoredState.elements>)
+              // add local elements that weren't deleted or on remote
+              .concat(...Object.values(localElementMap)),
+          );
+        }
+        this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
+          globalSceneState.getAllElements(),
+        );
+
+        // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+        // when we receive any messages from another peer. This UX can be pretty rough -- if you
+        // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+        // right now we think this is the right tradeoff.
+        history.clear();
+        if (this.socketInitialized === false) {
+          initialize();
+        }
+      };
+
       this.socket = socketIOClient(SOCKET_SERVER);
       this.roomID = roomMatch[1];
       this.roomKey = roomMatch[2];
@@ -729,90 +815,15 @@ export class App extends React.Component<any, AppState> {
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
-            case "SCENE_UPDATE": {
-              const { elements: remoteElements } = decryptedData.payload;
-              const restoredState = restore(remoteElements || [], null, {
-                scrollToContent: true,
-              });
-              // Perform reconciliation - in collaboration, if we encounter
-              // elements with more staler versions than ours, ignore them
-              // and keep ours.
-              if (
-                globalSceneState.getAllElements() == null ||
-                globalSceneState.getAllElements().length === 0
-              ) {
-                globalSceneState.replaceAllElements(restoredState.elements);
-              } else {
-                // create a map of ids so we don't have to iterate
-                // over the array more than once.
-                const localElementMap = getElementMap(
-                  globalSceneState.getAllElements(),
-                );
-
-                // Reconcile
-                globalSceneState.replaceAllElements(
-                  restoredState.elements
-                    .reduce((elements, element) => {
-                      // if the remote element references one that's currently
-                      //  edited on local, skip it (it'll be added in the next
-                      //  step)
-                      if (
-                        element.id === this.state.editingElement?.id ||
-                        element.id === this.state.resizingElement?.id ||
-                        element.id === this.state.draggingElement?.id
-                      ) {
-                        return elements;
-                      }
-
-                      if (
-                        localElementMap.hasOwnProperty(element.id) &&
-                        localElementMap[element.id].version > element.version
-                      ) {
-                        elements.push(localElementMap[element.id]);
-                        delete localElementMap[element.id];
-                      } else if (
-                        localElementMap.hasOwnProperty(element.id) &&
-                        localElementMap[element.id].version ===
-                          element.version &&
-                        localElementMap[element.id].versionNonce !==
-                          element.versionNonce
-                      ) {
-                        // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
-                        if (
-                          localElementMap[element.id].versionNonce <
-                          element.versionNonce
-                        ) {
-                          elements.push(localElementMap[element.id]);
-                        } else {
-                          // it should be highly unlikely that the two versionNonces are the same. if we are
-                          // really worried about this, we can replace the versionNonce with the socket id.
-                          elements.push(element);
-                        }
-                        delete localElementMap[element.id];
-                      } else {
-                        elements.push(element);
-                        delete localElementMap[element.id];
-                      }
-
-                      return elements;
-                    }, [] as Mutable<typeof restoredState.elements>)
-                    // add local elements that weren't deleted or on remote
-                    .concat(...Object.values(localElementMap)),
-                );
-              }
-              this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
-                globalSceneState.getAllElements(),
-              );
-              // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-              // when we receive any messages from another peer. This UX can be pretty rough -- if you
-              // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-              // right now we think this is the right tradeoff.
-              history.clear();
-              if (this.socketInitialized === false) {
-                initialize();
+            case "SCENE_INIT": {
+              if (!this.socketInitialized) {
+                updateScene(decryptedData);
               }
               break;
             }
+            case "SCENE_UPDATE":
+              updateScene(decryptedData);
+              break;
             case "MOUSE_LOCATION": {
               const { socketID, pointerCoords } = decryptedData.payload;
               this.setState((state) => {
@@ -852,7 +863,7 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.socket.on("new-user", async (socketID: string) => {
-        this.broadcastSceneUpdate();
+        this.broadcastScene("SCENE_INIT");
       });
 
       this.setState({
@@ -879,9 +890,9 @@ export class App extends React.Component<any, AppState> {
     }
   };
 
-  private broadcastSceneUpdate = () => {
-    const data: SocketUpdateDataSource["SCENE_UPDATE"] = {
-      type: "SCENE_UPDATE",
+  private broadcastScene = (sceneType: "SCENE_INIT" | "SCENE_UPDATE") => {
+    const data: SocketUpdateDataSource[typeof sceneType] = {
+      type: sceneType,
       payload: {
         elements: getSyncableElements(globalSceneState.getAllElements()),
       },
