@@ -10,6 +10,7 @@ export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
+  isLoading: boolean;
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawLinearElement | null;
@@ -41,6 +42,7 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  shouldCacheIgnoreZoom: boolean;
 };
 
 export type PointerCoords = Readonly<{

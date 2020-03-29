@@ -5,6 +5,7 @@ export const DEFAULT_FONT = "20px Virgil";
 
 export function getDefaultAppState(): AppState {
   return {
+    isLoading: false,
     draggingElement: null,
     resizingElement: null,
     multiElement: null,
@@ -34,6 +35,7 @@ export function getDefaultAppState(): AppState {
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     collaborators: new Map(),
+    shouldCacheIgnoreZoom: false,
   };
 }
 
@@ -47,6 +49,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isResizing,
     collaborators,
     isCollaborating,
+    isLoading,
     ...exportedState
   } = appState;
   return exportedState;

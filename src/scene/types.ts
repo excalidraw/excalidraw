@@ -7,6 +7,7 @@ export type SceneState = {
   // null indicates transparent bg
   viewBackgroundColor: string | null;
   zoom: number;
+  shouldCacheIgnoreZoom: boolean;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
 };
 
