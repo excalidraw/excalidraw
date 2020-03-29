@@ -41,10 +41,10 @@
     "colorPicker": "Επιλογή Χρώματος",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
-    "layers": "Layers",
+    "layers": "Στρώματα",
     "language": "Γλώσσα",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Έναρξη Ζωντανής Συνεδρίας",
+    "duplicateSelection": "Αντιγραφή Επιλεγμένων"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -53,16 +53,16 @@
     "exportToSvg": "Εξαγωγή σε SVG",
     "copyToClipboard": "Αντιγραφή στο Πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο Πρόχειρο",
-    "save": "Save",
-    "load": "Load",
-    "getShareableLink": "Get shareable link",
-    "close": "Close",
-    "selectLanguage": "Select Language",
+    "save": "Αποθήκευση",
+    "load": "Άνοιγμα",
+    "getShareableLink": "Δημόσιος Σύνδεσμος",
+    "close": "Κλείσιμο",
+    "selectLanguage": "Επιλογή Γλώσσας",
     "scrollBackToContent": "Scroll back to content",
     "zoomIn": "Μεγέθυνση",
     "zoomOut": "Σμίκρυνση",
     "resetZoom": "Reset zoom",
-    "menu": "Menu",
+    "menu": "Μενού",
     "done": "Τέλος",
     "edit": "Επεξεργασία",
     "undo": "Αναίρεση",
@@ -118,8 +118,8 @@
     "button_startSession": "Έναρξη Συνεδρίας",
     "button_stopSession": "Τερματισμός Συνεδρίας",
     "desc_inProgressIntro": "Η ζωντανή συνεργασία με άλλους είναι σε ενεργή.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
+    "desc_persistenceWarning": "Να γνωρίζετε ότι η δουλεία σας διαμοιράζετε με άλλους απευθείας, χωρίς να αποθηκεύετε τίποτα στις μηχανές μας. Άρα, εάν όλοι αποσυνδεθούν, η δουλειάς σας θα χαθεί εκτός και την εξάγετε σε αρχείο ή σε σύνδεσμο.",
     "desc_shareLink": "Μοιραστείτε τον σύνδεσμο με όποιον θέλετε να δουλέψετε μαζί:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_exitSession": "Εάν σταματήσετε την συνεδρία θα βγείτε από το κανάλι, αλλά θα συνεχίσετε την δουλειά σας τοπικά. Να γνωρίζετε ότι αυτό δεν θα επηρεάσει τους άλλους και αυτοί θα συνεχίσουν να δουλεύουν τοπικά την δική τους έκδοση."
   }
 }
