@@ -131,13 +131,6 @@ export function handlerRectangles(
         } as typeof handlers;
       }
     }
-
-    return {
-      n: handlers.n,
-      s: handlers.s,
-      w: handlers.w,
-      e: handlers.e,
-    } as typeof handlers;
   }
 
   return handlers;
