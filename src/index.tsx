@@ -7,7 +7,7 @@ import { App } from "./components/App";
 import "./styles.scss";
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: "https://a678efd811e84fa8811c61efecabbab8@sentry.io/5179065",
 });
 
 // Block pinch-zooming on iOS outside of the content area
