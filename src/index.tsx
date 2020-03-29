@@ -18,6 +18,7 @@ const onlineEnv = Object.keys(SentyProjectsHostnameMap).find(
 );
 
 Sentry.init({
+  // Disable Sentry locally to avoid noise
   dsn: onlineEnv ? SentyProjectsHostnameMap[onlineEnv] : undefined,
 });
 
