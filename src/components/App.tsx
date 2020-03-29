@@ -1964,15 +1964,26 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width - deltaX;
+                const height = event.shiftKey
+                  ? element.width
+                  : element.height - deltaY;
                 mutateElement(element, {
                   x: element.x + deltaX,
                   y: event.shiftKey
                     ? element.y + element.height - element.width
                     : element.y + deltaY,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height - deltaY,
+                  width,
+                  height,
+                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                    ? {
+                        points: rescalePoints(
+                          0,
+                          width,
+                          rescalePoints(1, height, element.points),
+                        ),
+                      }
+                    : {}),
                 });
               }
               break;
@@ -1988,13 +1999,23 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
-                const nextWidth = element.width + deltaX;
+                const width = element.width + deltaX;
+                const height = event.shiftKey ? width : element.height - deltaY;
                 mutateElement(element, {
                   y: event.shiftKey
-                    ? element.y + element.height - nextWidth
+                    ? element.y + element.height - width
                     : element.y + deltaY,
-                  width: nextWidth,
-                  height: event.shiftKey ? nextWidth : element.height - deltaY,
+                  width,
+                  height,
+                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                    ? {
+                        points: rescalePoints(
+                          0,
+                          width,
+                          rescalePoints(1, height, element.points),
+                        ),
+                      }
+                    : {}),
                 });
               }
               break;
@@ -2010,12 +2031,23 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width - deltaX;
+                const height = event.shiftKey
+                  ? element.width
+                  : element.height + deltaY;
                 mutateElement(element, {
                   x: element.x + deltaX,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
+                  width,
+                  height,
+                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                    ? {
+                        points: rescalePoints(
+                          0,
+                          width,
+                          rescalePoints(1, height, element.points),
+                        ),
+                      }
+                    : {}),
                 });
               }
               break;
@@ -2031,11 +2063,22 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width + deltaX;
+                const height = event.shiftKey
+                  ? element.width
+                  : element.height + deltaY;
                 mutateElement(element, {
-                  width: element.width + deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
+                  width,
+                  height,
+                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                    ? {
+                        points: rescalePoints(
+                          0,
+                          width,
+                          rescalePoints(1, height, element.points),
+                        ),
+                      }
+                    : {}),
                 });
               }
               break;
