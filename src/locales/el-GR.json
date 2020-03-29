@@ -63,10 +63,10 @@
     "zoomOut": "Σμίκρυνση",
     "resetZoom": "Reset zoom",
     "menu": "Menu",
-    "done": "Done",
-    "edit": "Edit",
-    "undo": "Undo",
-    "redo": "Redo",
+    "done": "Τέλος",
+    "edit": "Επεξεργασία",
+    "undo": "Αναίρεση",
+    "redo": "Επαναφορά",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room"
   },
@@ -80,7 +80,7 @@
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
   },
   "toolBar": {
-    "selection": "Selection",
+    "selection": "Επιλογή",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
     "ellipse": "Έλλειψη",
@@ -92,7 +92,7 @@
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "shapes": "Σχήματα"
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
@@ -104,22 +104,22 @@
     "headingMain_button": "φορτώσετε ξανά την σελίδα.",
     "clearCanvasMessage": "Εάν το παραπάνω δεν δουλέψει, προσπαθήστε ",
     "clearCanvasMessage_button": "καθαρίσετε τον κανβά.",
-    "clearCanvasCaveat": " This will result in loss of work ",
+    "clearCanvasCaveat": " Αυτό θα προκαλέσει απώλεια της δουλειάς σας ",
     "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
     "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "errorStack_loading": "Προετοιμάζουμε το περιβάλλον. Παρακαλώ περιμένετε...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
+    "desc_intro": "Μπορείτε να προσκαλέσετε άλλους να δουλέψουν μαζί σας.",
+    "desc_privacy": "Μην ανησυχείτε, η συνεδρία χρησιμοποιεί κρυπτογράφηση από σημείο σε σημείο, άρα οτιδήποτε κάνετε θα παραμείνει ανοιχτό μόνο σε εσάς. Ούτε οι μηχανές μας μπορούν να δουν τι κάνατε.",
+    "button_startSession": "Έναρξη Συνεδρίας",
+    "button_stopSession": "Τερματισμός Συνεδρίας",
+    "desc_inProgressIntro": "Η ζωντανή συνεργασία με άλλους είναι σε ενεργή.",
     "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
+    "desc_shareLink": "Μοιραστείτε τον σύνδεσμο με όποιον θέλετε να δουλέψετε μαζί:",
     "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   }
 }
