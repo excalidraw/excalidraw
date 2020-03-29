@@ -36,7 +36,8 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   if (
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
-    typeof points !== "undefined"
+    typeof points !== "undefined" ||
+    typeof updates.angle !== "undefined"
   ) {
     invalidateShapeForElement(element);
   }
