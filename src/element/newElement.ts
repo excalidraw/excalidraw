@@ -151,9 +151,5 @@ export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }
-  if (element.type === "rectangle") {
-    // just for rotation trial
-    copy.angle += Math.PI / 16;
-  }
   return copy;
 }
