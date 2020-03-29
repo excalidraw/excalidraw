@@ -12,6 +12,7 @@ import { Drawable, OpSet } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
+import { rotate } from "../math";
 
 function isElementDraggableFromInside(
   element: ExcalidrawElement,
@@ -76,13 +77,17 @@ export function hitTest(
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    // reverse rotate the pointer
+    const [xx, yy] = rotate(x, y, cx, cy, -element.angle);
 
     if (isElementDraggableFromInside(element, appState)) {
       return (
-        x > x1 - lineThreshold &&
-        x < x2 + lineThreshold &&
-        y > y1 - lineThreshold &&
-        y < y2 + lineThreshold
+        xx > x1 - lineThreshold &&
+        xx < x2 + lineThreshold &&
+        yy > y1 - lineThreshold &&
+        yy < y2 + lineThreshold
       );
     }
 
@@ -90,10 +95,10 @@ export function hitTest(
     //    |D             |B
     // (x1, y2) --C-- (x2, y2)
     return (
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
-      distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
-      distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
-      distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
+      distanceBetweenPointAndSegment(xx, yy, x1, y1, x2, y1) < lineThreshold || // A
+      distanceBetweenPointAndSegment(xx, yy, x2, y1, x2, y2) < lineThreshold || // B
+      distanceBetweenPointAndSegment(xx, yy, x2, y2, x1, y2) < lineThreshold || // C
+      distanceBetweenPointAndSegment(xx, yy, x1, y2, x1, y1) < lineThreshold // D
     );
   } else if (element.type === "diamond") {
     x -= element.x;
