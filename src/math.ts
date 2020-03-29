@@ -55,6 +55,46 @@ export function rotate(
   ];
 }
 
+export function adjustEastPositionWithRotation(
+  position: { x: number; y: number },
+  deltaX: number,
+  angle: number,
+) {
+  const x = position.x - (deltaX / 2) * (1 - Math.cos(angle));
+  const y = position.y - (deltaX / 2) * -Math.sin(angle);
+  return { x, y };
+}
+
+export function adjustSouthPositionWithRotation(
+  position: { x: number; y: number },
+  deltaY: number,
+  angle: number,
+) {
+  const x = position.x - (deltaY / 2) * Math.sin(angle);
+  const y = position.y - (deltaY / 2) * (1 - Math.cos(angle));
+  return { x, y };
+}
+
+export function adjustWestPositionWithRotation(
+  position: { x: number; y: number },
+  deltaX: number,
+  angle: number,
+) {
+  const x = position.x + deltaX * Math.cos(angle);
+  const y = position.y + deltaX * (Math.sin(angle) / 2);
+  return { x, y };
+}
+
+export function adjustNorthPositionWithRotation(
+  position: { x: number; y: number },
+  deltaY: number,
+  angle: number,
+) {
+  const x = position.x + deltaY * (-Math.sin(angle) / 2);
+  const y = position.y + deltaY * Math.cos(angle);
+  return { x, y };
+}
+
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;
   const [start, ...other] = path;

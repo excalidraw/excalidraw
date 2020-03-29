@@ -49,6 +49,13 @@ import { restore } from "../data/restore";
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
+import {
+  rotate,
+  adjustEastPositionWithRotation,
+  adjustSouthPositionWithRotation,
+  adjustWestPositionWithRotation,
+  adjustNorthPositionWithRotation,
+} from "../math";
 
 import {
   isWritableElement,
@@ -1887,9 +1894,10 @@ export class App extends React.Component<any, AppState> {
             this.canvas,
             window.devicePixelRatio,
           );
-          const deltaX = x - lastX;
-          const deltaY = y - lastY;
           const element = selectedElements[0];
+          const angle = element.angle;
+          // reverse rotate delta
+          const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
           switch (resizeHandle) {
             case "nw":
               if (isLinearElement(element) && element.points.length === 2) {
@@ -1904,15 +1912,16 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width - deltaX;
+                const height = event.shiftKey ? width : element.height - deltaY;
                 mutateElement(element, {
-                  x: element.x + deltaX,
-                  y: event.shiftKey
-                    ? element.y + element.height - element.width
-                    : element.y + deltaY,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height - deltaY,
+                  width,
+                  height,
+                  ...adjustNorthPositionWithRotation(
+                    adjustWestPositionWithRotation(element, deltaX, angle),
+                    element.height - height,
+                    angle,
+                  ),
                 });
               }
               break;
@@ -1928,13 +1937,16 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
-                const nextWidth = element.width + deltaX;
+                const width = element.width + deltaX;
+                const height = event.shiftKey ? width : element.height - deltaY;
                 mutateElement(element, {
-                  y: event.shiftKey
-                    ? element.y + element.height - nextWidth
-                    : element.y + deltaY,
-                  width: nextWidth,
-                  height: event.shiftKey ? nextWidth : element.height - deltaY,
+                  width,
+                  height,
+                  ...adjustNorthPositionWithRotation(
+                    adjustEastPositionWithRotation(element, deltaX, angle),
+                    element.height - height,
+                    angle,
+                  ),
                 });
               }
               break;
@@ -1950,12 +1962,16 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width - deltaX;
+                const height = event.shiftKey ? width : element.height + deltaY;
                 mutateElement(element, {
-                  x: element.x + deltaX,
-                  width: element.width - deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
+                  width,
+                  height,
+                  ...adjustSouthPositionWithRotation(
+                    adjustWestPositionWithRotation(element, deltaX, angle),
+                    height - element.height,
+                    angle,
+                  ),
                 });
               }
               break;
@@ -1971,11 +1987,16 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
+                const width = element.width + deltaX;
+                const height = event.shiftKey ? width : element.height + deltaY;
                 mutateElement(element, {
-                  width: element.width + deltaX,
-                  height: event.shiftKey
-                    ? element.width
-                    : element.height + deltaY,
+                  width,
+                  height,
+                  ...adjustSouthPositionWithRotation(
+                    adjustEastPositionWithRotation(element, deltaX, angle),
+                    height - element.height,
+                    angle,
+                  ),
                 });
               }
               break;
@@ -1996,7 +2017,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 mutateElement(element, {
                   height,
-                  y: element.y + deltaY,
+                  ...adjustNorthPositionWithRotation(element, deltaY, angle),
                 });
               }
 
@@ -2020,7 +2041,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 mutateElement(element, {
                   width,
-                  x: element.x + deltaX,
+                  ...adjustWestPositionWithRotation(element, deltaX, angle),
                 });
               }
               break;
@@ -2041,6 +2062,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 mutateElement(element, {
                   height,
+                  ...adjustSouthPositionWithRotation(element, deltaY, angle),
                 });
               }
               break;
@@ -2061,6 +2083,7 @@ export class App extends React.Component<any, AppState> {
               } else {
                 mutateElement(element, {
                   width,
+                  ...adjustEastPositionWithRotation(element, deltaX, angle),
                 });
               }
               break;
