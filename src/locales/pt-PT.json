@@ -52,7 +52,7 @@
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "",
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
@@ -67,7 +67,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Start live collaboration",
+    "roomDialog": "",
     "createNewRoom": "Criar nova sala"
   },
   "alerts": {
@@ -96,7 +96,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "",
     "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   },
   "errorSplash": {
