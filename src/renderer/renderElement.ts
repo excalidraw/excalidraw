@@ -55,9 +55,11 @@ function generateElementCanvas(
   } else {
     const angle = element.angle;
     const width =
-      element.width * Math.cos(angle) + element.height * Math.sin(angle);
+      element.width * Math.abs(Math.cos(angle)) +
+      element.height * Math.abs(Math.sin(angle));
     const height =
-      element.height * Math.cos(angle) + element.width * Math.sin(angle);
+      element.height * Math.abs(Math.cos(angle)) +
+      element.width * Math.abs(Math.sin(angle));
     canvas.width = width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
     canvas.height =
       height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
