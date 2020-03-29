@@ -22,6 +22,7 @@ Go to https://excalidraw.com to start sketching.
 ### Code Sandbox
 
 - Go to https://codesandbox.io/s/github/excalidraw/excalidraw
+  - You may need to sign in with Github and reload the page
 - You can start coding instantly, and even send PRs from there!
 
 ### Local Installation
