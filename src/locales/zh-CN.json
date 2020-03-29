@@ -105,11 +105,7 @@
     "clearCanvasMessage": "如果重新加载页面无效, 请尝试 ",
     "clearCanvasMessage_button": "清除画布。",
     "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "加载数据中，请等待...",
     "sceneContent": "画布 内容:"
   },
   "roomDialog": {

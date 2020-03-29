@@ -105,11 +105,7 @@
     "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
     "clearCanvasMessage_button": "wyczyścić dokument.",
     "clearCanvasCaveat": " To spowoduje utratę pracy ",
-    "openIssueMessage_pre": "Zanim to zrobisz, będziemy wdzięczni, jeśli utworzysz raport w naszym ",
     "openIssueMessage_button": "narzędziu do śledzenia błędów.",
-    "openIssueMessage_post": " Proszę dołączyć następujący stos wywołań błędu (oraz zawartość sceny jeżeli nie jest prywatna):",
-    "errorStack": "Stos wywołań błędu:",
-    "errorStack_loading": "Wczytywanie danych. Proszę czekać...",
     "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {

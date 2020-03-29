@@ -105,11 +105,7 @@
     "clearCanvasMessage": "Se ricaricare non funziona, prova ",
     "clearCanvasMessage_button": "pulire la tela.",
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
-    "openIssueMessage_pre": "Prima di farlo, ti saremmo grati se aprissi una segnalazione sul nostro ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Per favore includi il seguente stack trace (e se non è privato, anche il contenuto della scena):",
-    "errorStack": "Stack trace dell'errore:",
-    "errorStack_loading": "Caricamento in corso. Attendere...",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {

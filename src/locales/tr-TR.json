@@ -105,11 +105,7 @@
     "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
     "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "openIssueMessage_pre": "Bu işlemi yapmadan, sorunu inceleyebilmemiz için ",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": " Yardım biletine, aşağıda çıktısı verilen hata mesajını da ekleyin (mümkünse çalışma alanıyla birlikte):",
-    "errorStack": "Hata mesajı:",
-    "errorStack_loading": "Veri yükleniyor. Lütfen bekleyin...",
     "sceneContent": "Çalışma alanı:"
   },
   "roomDialog": {

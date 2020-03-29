@@ -105,11 +105,7 @@
     "clearCanvasMessage": "Si la recarga no funciona, intente ",
     "clearCanvasMessage_button": "limpiando el lienzo.",
     "clearCanvasCaveat": " Esto resultará en la pérdida del trabajo ",
-    "openIssueMessage_pre": "Antes de hacerlo, agradeceríamos que abrieras un problema en nuestro ",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": " Por favor incluya el siguiente error en el stack trace (y si no es privado, también incluya el contenido de la escena):",
-    "errorStack": "Traza de pila de errores:",
-    "errorStack_loading": "Cargando datos, por favor espere...",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {

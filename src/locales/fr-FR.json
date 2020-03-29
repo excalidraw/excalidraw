@@ -105,11 +105,7 @@
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
     "clearCanvasMessage_button": "d'effacer la scène.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "openIssueMessage_pre": "Avant de le faire, nous vous serions reconnaissants d'ouvrir un ticket sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
-    "openIssueMessage_post": " Veuillez inclure la trace de la pile d'erreur suivante (et si ce n'est pas privé, aussi le contenu de la scène) :",
-    "errorStack": "Trace de la pile d'erreur:",
-    "errorStack_loading": "Chargement des données. Veuillez patienter...",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
