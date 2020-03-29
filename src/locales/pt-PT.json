@@ -105,7 +105,11 @@
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
     "clearCanvasMessage_button": "limpar a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
+    "openIssueMessage_pre": "Antes de fazer isso, gostaríamos que você relatasse o problema em nosso ",
     "openIssueMessage_button": "rastreador de bugs.",
+    "openIssueMessage_post": " Inclua o seguinte rastreamento de pilha de erros (e, se não for confidencial, também o conteúdo da cena):",
+    "errorStack": "Rastreamento de pilha de erros:",
+    "errorStack_loading": "Carregando os dados. por favor aguarde...",
     "sceneContent": "Conteúdo da cena:"
   },
   "roomDialog": {

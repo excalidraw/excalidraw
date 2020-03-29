@@ -105,7 +105,11 @@
     "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
     "clearCanvasMessage_button": "å tømme lerretet.",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
+    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
     "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
+    "errorStack": "Error stack trace:",
+    "errorStack_loading": "Laster inn, vennligst vent...",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
