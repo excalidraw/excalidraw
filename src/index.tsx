@@ -8,9 +8,9 @@ import "./styles.scss";
 
 const SentyProjectsHostnameMap: { [key: string]: string } = {
   "excalidraw.com":
-    "https://a678efd811e84fa8811c61efecabbab8@sentry.io/5179065",
+    "https://a678efd811e84fa8811c61efecabbab8@sentry.io/5179065", // production
   "excalidraw-team.now.sh":
-    "https://99a6ce3552444f7094f306de0eeb8c1d@sentry.io/5179196",
+    "https://99a6ce3552444f7094f306de0eeb8c1d@sentry.io/5179196", // staging
 };
 
 const onlineEnv = Object.keys(SentyProjectsHostnameMap).find(
