@@ -8,7 +8,7 @@ import "./styles.scss";
 
 const SentyEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
-  "excalidraw-team.now.sh": "staging",
+  "now.sh": "staging",
 };
 
 const onlineEnv = Object.keys(SentyEnvHostnameMap).find(
@@ -20,7 +20,8 @@ Sentry.init({
   dsn: onlineEnv
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
-  environment: onlineEnv,
+  environment: onlineEnv ? SentyEnvHostnameMap[onlineEnv] : undefined,
+  release: process.env.REACT_APP_GIT_SHA,
 });
 
 // Block pinch-zooming on iOS outside of the content area

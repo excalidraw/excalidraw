@@ -32,13 +32,10 @@ jobs:
           export SENTRY_RELEASE=$(sentry-cli releases propose-version)
           sentry-cli releases new $SENTRY_RELEASE --project $SENTRY_PROJECT
           sentry-cli releases set-commits --auto $SENTRY_RELEASE
-          sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps ./build
+          sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps --no-rewrite ./build/static/js/ --url-prefix "~/static/js"
           sentry-cli releases finalize $SENTRY_RELEASE
+          sentry-cli releases deploys $SENTRY_RELEASE new -e staging
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-
-      - name: Create new Sentry deploy
-        run: |
-          sentry-cli releases deploys $SENTRY_RELEASE new -e staging
