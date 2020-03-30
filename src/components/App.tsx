@@ -1974,14 +1974,6 @@ export class App extends React.Component<any, AppState> {
           const angle = element.angle;
           // reverse rotate delta
           const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
-          // TODO define somewhere else without closure
-          const rotateElement = (baseAngle: number) => {
-            const cx = element.x + element.width / 2;
-            const cy = element.y + element.height / 2;
-            mutateElement(element, {
-              angle: baseAngle + Math.atan2(y - cy, x - cx),
-            });
-          };
           switch (resizeHandle) {
             case "nw":
               if (isLinearElement(element) && element.points.length === 2) {
@@ -2123,9 +2115,7 @@ export class App extends React.Component<any, AppState> {
             case "n": {
               const height = element.height - deltaY;
 
-              if (event.shiftKey) {
-                rotateElement(Math.PI / 2);
-              } else if (isLinearElement(element)) {
+              if (isLinearElement(element)) {
                 if (element.points.length > 2 && height <= 0) {
                   // Someday we should implement logic to flip the shape.
                   // But for now, just stop.
@@ -2148,9 +2138,7 @@ export class App extends React.Component<any, AppState> {
             case "w": {
               const width = element.width - deltaX;
 
-              if (event.shiftKey) {
-                rotateElement(Math.PI);
-              } else if (isLinearElement(element)) {
+              if (isLinearElement(element)) {
                 if (element.points.length > 2 && width <= 0) {
                   // Someday we should implement logic to flip the shape.
                   // But for now, just stop.
@@ -2173,9 +2161,7 @@ export class App extends React.Component<any, AppState> {
             case "s": {
               const height = element.height + deltaY;
 
-              if (event.shiftKey) {
-                rotateElement(-Math.PI / 2);
-              } else if (isLinearElement(element)) {
+              if (isLinearElement(element)) {
                 if (element.points.length > 2 && height <= 0) {
                   // Someday we should implement logic to flip the shape.
                   // But for now, just stop.
@@ -2196,9 +2182,7 @@ export class App extends React.Component<any, AppState> {
             case "e": {
               const width = element.width + deltaX;
 
-              if (event.shiftKey) {
-                rotateElement(0);
-              } else if (isLinearElement(element)) {
+              if (isLinearElement(element)) {
                 if (element.points.length > 2 && width <= 0) {
                   // Someday we should implement logic to flip the shape.
                   // But for now, just stop.
@@ -2214,6 +2198,15 @@ export class App extends React.Component<any, AppState> {
                   ...adjustEastPositionWithRotation(element, deltaX, angle),
                 });
               }
+              break;
+            }
+            case "r": {
+              // rotation
+              const cx = element.x + element.width / 2;
+              const cy = element.y + element.height / 2;
+              mutateElement(element, {
+                angle: Math.PI / 2 + Math.atan2(y - cy, x - cx),
+              });
               break;
             }
           }

@@ -47,6 +47,19 @@ function strokeRectWithAngle(
   context.translate(-cx, -cy);
 }
 
+function strokeCircle(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  context.beginPath();
+  context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+}
+
 export function renderScene(
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -172,24 +185,35 @@ export function renderScene(
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
-      Object.values(handlers)
-        .filter((handler) => handler !== undefined)
-        .forEach((handler) => {
+      Object.keys(handlers).forEach((side) => {
+        const handler = handlers[side as keyof typeof handlers];
+        if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          strokeRectWithAngle(
-            context,
-            handler[0],
-            handler[1],
-            handler[2],
-            handler[3],
-            handler[0] + handler[2] / 2,
-            handler[1] + handler[3] / 2,
-            selectedElements[0].angle,
-            true, // fill before stroke
-          );
+          if (side === "r") {
+            strokeCircle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+            );
+          } else {
+            strokeRectWithAngle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              selectedElements[0].angle,
+              true, // fill before stroke
+            );
+          }
           context.lineWidth = lineWidth;
-        });
+        }
+      });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
     }
   }

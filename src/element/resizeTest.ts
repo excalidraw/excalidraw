@@ -94,6 +94,9 @@ export function getCursorForResizingElement(resizingElement: {
         cursor = "nesw";
       }
       break;
+    case "r": // rotation
+      cursor = "ew";
+      break;
   }
 
   return cursor ? `${cursor}-resize` : "";
