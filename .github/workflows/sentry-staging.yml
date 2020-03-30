@@ -8,11 +8,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      SENTRY_DEPLOY_ENVIRONMENT: staging
     steps:
       - uses: actions/checkout@v1.0.0
 
@@ -39,7 +34,11 @@ jobs:
           sentry-cli releases set-commits --auto $SENTRY_RELEASE
           sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps ./build
           sentry-cli releases finalize $SENTRY_RELEASE
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
       - name: Create new Sentry deploy
         run: |
-          sentry-cli releases deploys $SENTRY_RELEASE new -e $SENTRY_DEPLOY_ENVIRONMENT
+          sentry-cli releases deploys $SENTRY_RELEASE new -e staging
