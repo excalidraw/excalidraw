@@ -109,6 +109,7 @@
     "trackedToSentry_post": " was tracked on our system.",
     "openIssueMessage_pre": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our ",
     "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_post": " Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {

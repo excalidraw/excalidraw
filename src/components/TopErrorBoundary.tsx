@@ -57,9 +57,7 @@ export class TopErrorBoundary extends React.Component<
     let body = "";
     try {
       const templateStrFn = (await import("../bug-issue-template")).default;
-      body = encodeURIComponent(
-        templateStrFn(this.state.sentryEventId, this.state.localStorage),
-      );
+      body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
     } catch (error) {
       console.error(error);
     }
@@ -111,6 +109,7 @@ export class TopErrorBoundary extends React.Component<
               <button onClick={() => this.createGithubIssue()}>
                 {t("errorSplash.openIssueMessage_button")}
               </button>
+              {t("errorSplash.openIssueMessage_post")}
             </div>
             <div className="ErrorSplash-paragraph">
               <div className="ErrorSplash-details">
