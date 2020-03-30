@@ -30,7 +30,7 @@
     "stacktrace-js": "2.0.2"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.1.1",
+    "@testing-library/jest-dom": "5.3.0",
     "@testing-library/react": "10.0.1",
     "@types/jest": "25.1.4",
     "@types/nanoid": "2.1.0",
