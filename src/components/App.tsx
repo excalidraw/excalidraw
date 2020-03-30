@@ -2204,9 +2204,11 @@ export class App extends React.Component<any, AppState> {
               // rotation
               const cx = element.x + element.width / 2;
               const cy = element.y + element.height / 2;
-              mutateElement(element, {
-                angle: Math.PI / 2 + Math.atan2(y - cy, x - cx),
-              });
+              let angle = Math.PI / 2 + Math.atan2(y - cy, x - cx);
+              if (event.shiftKey) {
+                angle -= angle % (Math.PI / 8);
+              }
+              mutateElement(element, { angle });
               break;
             }
           }
