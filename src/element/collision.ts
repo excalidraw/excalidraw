@@ -27,20 +27,20 @@ function isElementDraggableFromInside(
 export function hitTest(
   element: ExcalidrawElement,
   appState: AppState,
-  x0: number,
-  y0: number,
+  x: number,
+  y: number,
   zoom: number,
 ): boolean {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / zoom;
 
-  const cx = element.x + element.width / 2;
-  const cy = element.y + element.height / 2;
-  // reverse rotate the pointer
-  let [x, y] = rotate(x0, y0, cx, cy, -element.angle);
-
   if (element.type === "ellipse") {
+    const cx = element.x + element.width / 2;
+    const cy = element.y + element.height / 2;
+    // reverse rotate the pointer
+    [x, y] = rotate(x, y, cx, cy, -element.angle);
+
     // https://stackoverflow.com/a/46007540/232122
     const px = Math.abs(x - element.x - element.width / 2);
     const py = Math.abs(y - element.y - element.height / 2);
@@ -81,6 +81,11 @@ export function hitTest(
     }
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
+    const cx = element.x + element.width / 2;
+    const cy = element.y + element.height / 2;
+    // reverse rotate the pointer
+    [x, y] = rotate(x, y, cx, cy, -element.angle);
+
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     if (isElementDraggableFromInside(element, appState)) {
@@ -102,6 +107,11 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
     );
   } else if (element.type === "diamond") {
+    const cx = element.x + element.width / 2;
+    const cy = element.y + element.height / 2;
+    // reverse rotate the pointer
+    [x, y] = rotate(x, y, cx, cy, -element.angle);
+
     x -= element.x;
     y -= element.y;
     let [
@@ -172,6 +182,10 @@ export function hitTest(
     const shape = getShapeForElement(element) as Drawable[];
 
     const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    // reverse rotate the pointer
+    [x, y] = rotate(x, y, cx, cy, -element.angle);
     if (
       x < x1 - lineThreshold ||
       y < y1 - lineThreshold ||
