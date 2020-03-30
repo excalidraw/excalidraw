@@ -43,7 +43,7 @@
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.3",
     "jest-canvas-mock": "2.2.0",
-    "lint-staged": "10.0.8",
+    "lint-staged": "10.0.10",
     "node-sass": "4.13.1",
     "pepjs": "0.5.2",
     "prettier": "2.0.2",
