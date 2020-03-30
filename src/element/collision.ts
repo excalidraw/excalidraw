@@ -27,13 +27,18 @@ function isElementDraggableFromInside(
 export function hitTest(
   element: ExcalidrawElement,
   appState: AppState,
-  x: number,
-  y: number,
+  x0: number,
+  y0: number,
   zoom: number,
 ): boolean {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / zoom;
+
+  const cx = element.x + element.width / 2;
+  const cy = element.y + element.height / 2;
+  // reverse rotate the pointer
+  let [x, y] = rotate(x0, y0, cx, cy, -element.angle);
 
   if (element.type === "ellipse") {
     // https://stackoverflow.com/a/46007540/232122
@@ -77,17 +82,13 @@ export function hitTest(
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    // reverse rotate the pointer
-    const [xx, yy] = rotate(x, y, cx, cy, -element.angle);
 
     if (isElementDraggableFromInside(element, appState)) {
       return (
-        xx > x1 - lineThreshold &&
-        xx < x2 + lineThreshold &&
-        yy > y1 - lineThreshold &&
-        yy < y2 + lineThreshold
+        x > x1 - lineThreshold &&
+        x < x2 + lineThreshold &&
+        y > y1 - lineThreshold &&
+        y < y2 + lineThreshold
       );
     }
 
@@ -95,10 +96,10 @@ export function hitTest(
     //    |D             |B
     // (x1, y2) --C-- (x2, y2)
     return (
-      distanceBetweenPointAndSegment(xx, yy, x1, y1, x2, y1) < lineThreshold || // A
-      distanceBetweenPointAndSegment(xx, yy, x2, y1, x2, y2) < lineThreshold || // B
-      distanceBetweenPointAndSegment(xx, yy, x2, y2, x1, y2) < lineThreshold || // C
-      distanceBetweenPointAndSegment(xx, yy, x1, y2, x1, y1) < lineThreshold // D
+      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
+      distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
+      distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
+      distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
     );
   } else if (element.type === "diamond") {
     x -= element.x;
