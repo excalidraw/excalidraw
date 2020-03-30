@@ -1,8 +1,8 @@
-export default (sentryErrorId, sceneInfo) => `
+export default (sentryErrorId) => `
 ### Scene content
 
 \`\`\`
-${sceneInfo}
+Paste scene content here
 \`\`\`
 
 ### Sentry Error ID
