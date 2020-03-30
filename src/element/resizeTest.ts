@@ -14,7 +14,7 @@ export function resizeTest(
   zoom: number,
   pointerType: PointerType,
 ): HandlerRectanglesRet | false {
-  if (!appState.selectedElementIds[element.id] || element.type === "text") {
+  if (!appState.selectedElementIds[element.id]) {
     return false;
   }
 
@@ -23,6 +23,10 @@ export function resizeTest(
   const filter = Object.keys(handlers).filter((key) => {
     const handler = handlers[key as HandlerRectanglesRet]!;
     if (!handler) {
+      return false;
+    }
+    if (element.type === "text" && key !== "r") {
+      // can't resize text elements but "r"otate
       return false;
     }
 

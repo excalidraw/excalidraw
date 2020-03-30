@@ -17,6 +17,8 @@ import { getSelectedElements } from "../scene/selection";
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+
 function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
@@ -181,16 +183,16 @@ export function renderScene(
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
-    if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
+    if (selectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
-      Object.keys(handlers).forEach((side) => {
-        const handler = handlers[side as keyof typeof handlers];
+      Object.keys(handlers).forEach((key) => {
+        const handler = handlers[key as HandlerRectanglesRet];
         if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          if (side === "r") {
+          if (key === "r") {
             strokeCircle(
               context,
               handler[0],
@@ -198,7 +200,7 @@ export function renderScene(
               handler[2],
               handler[3],
             );
-          } else {
+          } else if (selectedElements[0].type !== "text") {
             strokeRectWithAngle(
               context,
               handler[0],
