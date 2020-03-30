@@ -43,7 +43,7 @@
     "drawingCanvas": "",
     "layers": "",
     "language": "भाषा",
-    "createRoom": "",
+    "createRoom": "अधिवेशन",
     "duplicateSelection": ""
   },
   "buttons": {
@@ -67,7 +67,7 @@
     "edit": "संशोधन करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
-    "roomDialog": "",
+    "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": ""
   },
   "alerts": {
