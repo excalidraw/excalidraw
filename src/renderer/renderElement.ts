@@ -12,7 +12,6 @@ import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
 import rough from "roughjs/bin/rough";
-import { rotate } from "../math";
 
 const CANVAS_PADDING = 20;
 
@@ -53,19 +52,10 @@ function generateElementCanvas(
         : 0;
     context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   } else {
-    const angle = element.angle;
-    const width =
-      element.width * Math.abs(Math.cos(angle)) +
-      element.height * Math.abs(Math.sin(angle));
-    const height =
-      element.height * Math.abs(Math.cos(angle)) +
-      element.width * Math.abs(Math.sin(angle));
-    canvas.width = width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    canvas.width =
+      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
-    canvasOffsetX = ((width - element.width) / 2) * window.devicePixelRatio;
-    canvasOffsetY = ((height - element.height) / 2) * window.devicePixelRatio;
-    context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
+      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
@@ -151,34 +141,20 @@ function generateElement(
   if (!shape) {
     elementWithCanvasCache.delete(element);
     switch (element.type) {
-      case "rectangle": {
-        const angle = element.angle;
-        const x = element.width;
-        const y = element.height;
-        const cx = x / 2;
-        const cy = y / 2;
-        shape = generator.polygon(
-          [
-            rotate(0, 0, cx, cy, angle) as [number, number],
-            rotate(x, 0, cx, cy, angle) as [number, number],
-            rotate(x, y, cx, cy, angle) as [number, number],
-            rotate(0, y, cx, cy, angle) as [number, number],
-          ],
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
-            seed: element.seed,
-          },
-        );
+      case "rectangle":
+        shape = generator.rectangle(0, 0, element.width, element.height, {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed,
+        });
 
         break;
-      }
       case "diamond": {
         const [
           topX,
@@ -287,30 +263,37 @@ function drawElementFromCanvas(
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
 ) {
+  const element = elementWithCanvas.element;
+  const cx =
+    -elementWithCanvas.canvasOffsetX +
+    Math.floor(
+      (Math.floor(element.x + element.width / 2) + sceneState.scrollX) *
+        window.devicePixelRatio,
+    );
+  const cy =
+    -elementWithCanvas.canvasOffsetY +
+    Math.floor(
+      (Math.floor(element.y + element.height / 2) + sceneState.scrollY) *
+        window.devicePixelRatio,
+    );
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(
-    -CANVAS_PADDING / elementWithCanvas.canvasZoom,
-    -CANVAS_PADDING / elementWithCanvas.canvasZoom,
-  );
+  context.translate(cx, cy);
+  context.rotate(element.angle);
   context.drawImage(
     elementWithCanvas.canvas!,
     Math.floor(
-      -elementWithCanvas.canvasOffsetX +
-        (Math.floor(elementWithCanvas.element.x) + sceneState.scrollX) *
-          window.devicePixelRatio,
+      (-element.width / 2) * window.devicePixelRatio -
+        CANVAS_PADDING / elementWithCanvas.canvasZoom,
     ),
     Math.floor(
-      -elementWithCanvas.canvasOffsetY +
-        (Math.floor(elementWithCanvas.element.y) + sceneState.scrollY) *
-          window.devicePixelRatio,
+      (-element.height / 2) * window.devicePixelRatio -
+        CANVAS_PADDING / elementWithCanvas.canvasZoom,
     ),
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
-  context.translate(
-    CANVAS_PADDING / elementWithCanvas.canvasZoom,
-    CANVAS_PADDING / elementWithCanvas.canvasZoom,
-  );
+  context.rotate(-element.angle);
+  context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 

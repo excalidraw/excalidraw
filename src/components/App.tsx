@@ -2123,7 +2123,7 @@ export class App extends React.Component<any, AppState> {
             case "n": {
               const height = element.height - deltaY;
 
-              if (event.shiftKey && element.type === "rectangle") {
+              if (event.shiftKey) {
                 rotateElement(Math.PI / 2);
               } else if (isLinearElement(element)) {
                 if (element.points.length > 2 && height <= 0) {
@@ -2148,7 +2148,7 @@ export class App extends React.Component<any, AppState> {
             case "w": {
               const width = element.width - deltaX;
 
-              if (event.shiftKey && element.type === "rectangle") {
+              if (event.shiftKey) {
                 rotateElement(Math.PI);
               } else if (isLinearElement(element)) {
                 if (element.points.length > 2 && width <= 0) {
@@ -2173,7 +2173,7 @@ export class App extends React.Component<any, AppState> {
             case "s": {
               const height = element.height + deltaY;
 
-              if (event.shiftKey && element.type === "rectangle") {
+              if (event.shiftKey) {
                 rotateElement(-Math.PI / 2);
               } else if (isLinearElement(element)) {
                 if (element.points.length > 2 && height <= 0) {
@@ -2196,7 +2196,7 @@ export class App extends React.Component<any, AppState> {
             case "e": {
               const width = element.width + deltaX;
 
-              if (event.shiftKey && element.type === "rectangle") {
+              if (event.shiftKey) {
                 rotateElement(0);
               } else if (isLinearElement(element)) {
                 if (element.points.length > 2 && width <= 0) {
