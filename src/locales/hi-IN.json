@@ -81,8 +81,8 @@
   },
   "toolBar": {
     "selection": "",
-    "rectangle": "",
-    "diamond": "",
+    "rectangle": "आयात",
+    "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
@@ -115,8 +115,8 @@
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
+    "button_startSession": "सत्र प्रारंभ करें",
+    "button_stopSession": "सत्र रुकें",
     "desc_inProgressIntro": "",
     "desc_persistenceWarning": "",
     "desc_shareLink": "",
