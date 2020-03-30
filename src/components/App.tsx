@@ -1957,7 +1957,10 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (isResizingElements && this.state.resizingElement) {
-        this.setState({ isResizing: true });
+        this.setState({
+          isResizing: resizeHandle !== "r", // not rotate
+          isRotating: resizeHandle === "r", // rotate
+        });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(
           globalSceneState.getAllElements(),
@@ -2354,6 +2357,7 @@ export class App extends React.Component<any, AppState> {
 
       this.setState({
         isResizing: false,
+        isRotating: false,
         resizingElement: null,
         selectionElement: null,
         editingElement: multiElement ? this.state.editingElement : null,

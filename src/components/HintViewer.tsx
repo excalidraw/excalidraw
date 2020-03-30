@@ -13,7 +13,7 @@ interface Hint {
 }
 
 const getHints = ({ appState, elements }: Hint) => {
-  const { elementType, isResizing } = appState;
+  const { elementType, isResizing, isRotating } = appState;
   const multiMode = appState.multiElement !== null;
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
@@ -29,6 +29,10 @@ const getHints = ({ appState, elements }: Hint) => {
       return null;
     }
     return t("hints.resize");
+  }
+
+  if (isRotating) {
+    return t("hints.rotate");
   }
 
   return null;
