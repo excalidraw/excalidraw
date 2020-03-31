@@ -379,7 +379,9 @@ export function renderElementToSvg(
       }
       node.setAttribute(
         "transform",
-        `translate(${offsetX || 0} ${offsetY || 0})`,
+        `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
+          (180 * element.angle) / Math.PI
+        } ${element.width / 2} ${element.height / 2})`,
       );
       svgRoot.appendChild(node);
       break;
@@ -397,7 +399,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0})`,
+          `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
+            (180 * element.angle) / Math.PI
+          } ${element.width / 2} ${element.height / 2})`,
         );
         group.appendChild(node);
       });
@@ -414,7 +418,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0})`,
+          `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
+            (180 * element.angle) / Math.PI
+          } ${element.width / 2} ${element.height / 2})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
