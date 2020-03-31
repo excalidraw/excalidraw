@@ -264,31 +264,18 @@ function drawElementFromCanvas(
   sceneState: SceneState,
 ) {
   const element = elementWithCanvas.element;
-  const cx =
-    -elementWithCanvas.canvasOffsetX +
-    Math.floor(
-      (Math.floor(element.x + element.width / 2) + sceneState.scrollX) *
-        window.devicePixelRatio,
-    );
-  const cy =
-    -elementWithCanvas.canvasOffsetY +
-    Math.floor(
-      (Math.floor(element.y + element.height / 2) + sceneState.scrollY) *
-        window.devicePixelRatio,
-    );
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
   context.drawImage(
     elementWithCanvas.canvas!,
-    Math.floor(
-      (-element.width / 2) * window.devicePixelRatio -
-        CANVAS_PADDING / elementWithCanvas.canvasZoom,
-    ),
-    Math.floor(
-      (-element.height / 2) * window.devicePixelRatio -
-        CANVAS_PADDING / elementWithCanvas.canvasZoom,
-    ),
+    (-(x2 - x1) / 2) * window.devicePixelRatio -
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    (-(y2 - y1) / 2) * window.devicePixelRatio -
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
