@@ -19,6 +19,7 @@
     ]
   },
   "dependencies": {
+    "@sentry/browser": "5.15.4",
     "browser-nativefs": "0.4.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
@@ -26,8 +27,7 @@
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
     "roughjs": "4.0.4",
-    "socket.io-client": "2.3.0",
-    "stacktrace-js": "2.0.2"
+    "socket.io-client": "2.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.3.0",
@@ -100,7 +100,7 @@
   "scripts": {
     "build": "npm run build:app && npm run build:zip",
     "build-node": "node ./scripts/build-node.js",
-    "build:app": "react-scripts build",
+    "build:app": "REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
     "build:zip": "node ./scripts/build-version.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",

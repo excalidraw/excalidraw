@@ -1,11 +1,11 @@
 import React from "react";
+import * as Sentry from "@sentry/browser";
 import { resetCursor } from "../utils";
 import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
-  unresolvedError: Error[] | null;
   hasError: boolean;
-  stack: string;
+  sentryEventId: string;
   localStorage: string;
 }
 
@@ -14,9 +14,8 @@ export class TopErrorBoundary extends React.Component<
   TopErrorBoundaryState
 > {
   state: TopErrorBoundaryState = {
-    unresolvedError: null,
     hasError: false,
-    stack: "",
+    sentryEventId: "",
     localStorage: "",
   };
 
@@ -24,7 +23,7 @@ export class TopErrorBoundary extends React.Component<
     return this.state.hasError ? this.errorSplash() : this.props.children;
   }
 
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error, errorInfo: any) {
     resetCursor();
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
@@ -34,39 +33,17 @@ export class TopErrorBoundary extends React.Component<
         _localStorage[key] = value;
       }
     }
-    this.setState((state) => ({
-      hasError: true,
-      unresolvedError: state.unresolvedError
-        ? state.unresolvedError.concat(error)
-        : [error],
-      localStorage: JSON.stringify(_localStorage),
-    }));
-  }
 
-  async componentDidUpdate() {
-    if (this.state.unresolvedError !== null) {
-      let stack = "";
-      for (const error of this.state.unresolvedError) {
-        if (stack) {
-          stack += `\n\n================\n\n`;
-        }
-        stack += `${error.message}:\n\n`;
-        try {
-          const StackTrace = await import("stacktrace-js");
-          stack += (await StackTrace.fromError(error)).join("\n");
-        } catch (error) {
-          console.error(error);
-          stack += error.stack || "";
-        }
-      }
+    Sentry.withScope((scope) => {
+      scope.setExtras(errorInfo);
+      const eventId = Sentry.captureException(error);
 
       this.setState((state) => ({
-        unresolvedError: null,
-        stack: `${
-          state.stack ? `${state.stack}\n\n================\n\n${stack}` : stack
-        }`,
+        hasError: true,
+        sentryEventId: eventId,
+        localStorage: JSON.stringify(_localStorage),
       }));
-    }
+    });
   }
 
   private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
@@ -79,10 +56,8 @@ export class TopErrorBoundary extends React.Component<
   private async createGithubIssue() {
     let body = "";
     try {
-      const templateStr = (await import("../bug-issue-template")).default;
-      if (typeof templateStr === "string") {
-        body = encodeURIComponent(templateStr);
-      }
+      const templateStrFn = (await import("../bug-issue-template")).default;
+      body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
     } catch (error) {
       console.error(error);
     }
@@ -125,25 +100,19 @@ export class TopErrorBoundary extends React.Component<
           </div>
           <div>
             <div className="ErrorSplash-paragraph">
+              {t("errorSplash.trackedToSentry_pre")}
+              {this.state.sentryEventId}
+              {t("errorSplash.trackedToSentry_post")}
+            </div>
+            <div className="ErrorSplash-paragraph">
               {t("errorSplash.openIssueMessage_pre")}
-              <button onClick={this.createGithubIssue}>
+              <button onClick={() => this.createGithubIssue()}>
                 {t("errorSplash.openIssueMessage_button")}
               </button>
               {t("errorSplash.openIssueMessage_post")}
             </div>
             <div className="ErrorSplash-paragraph">
               <div className="ErrorSplash-details">
-                <label>{t("errorSplash.errorStack")}</label>
-                <textarea
-                  rows={10}
-                  onPointerDown={this.selectTextArea}
-                  readOnly={true}
-                  value={
-                    this.state.unresolvedError
-                      ? t("errorSplash.errorStack_loading")
-                      : this.state.stack
-                  }
-                />
                 <label>{t("errorSplash.sceneContent")}</label>
                 <textarea
                   rows={5}
