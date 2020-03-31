@@ -52,7 +52,7 @@
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "PNG másolása a vágólapra",
     "save": "Mentés",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
