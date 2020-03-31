@@ -2,11 +2,7 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 
-import {
-  getDiamondPoints,
-  getElementAbsoluteCoords,
-  getLinearElementAbsoluteBounds,
-} from "./bounds";
+import { getDiamondPoints, getElementAbsoluteCoords } from "./bounds";
 import { Point } from "../types";
 import { Drawable, OpSet } from "roughjs/bin/core";
 import { AppState } from "../types";
@@ -35,12 +31,13 @@ export function hitTest(
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / zoom;
 
-  if (element.type === "ellipse") {
-    const cx = element.x + element.width / 2;
-    const cy = element.y + element.height / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // reverse rotate the pointer
+  [x, y] = rotate(x, y, cx, cy, -element.angle);
 
+  if (element.type === "ellipse") {
     // https://stackoverflow.com/a/46007540/232122
     const px = Math.abs(x - element.x - element.width / 2);
     const py = Math.abs(y - element.y - element.height / 2);
@@ -81,13 +78,6 @@ export function hitTest(
     }
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
-    const cx = element.x + element.width / 2;
-    const cy = element.y + element.height / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
-
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
     if (isElementDraggableFromInside(element, appState)) {
       return (
         x > x1 - lineThreshold &&
@@ -107,11 +97,6 @@ export function hitTest(
       distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
     );
   } else if (element.type === "diamond") {
-    const cx = element.x + element.width / 2;
-    const cy = element.y + element.height / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
-
     x -= element.x;
     y -= element.y;
     let [
@@ -181,11 +166,6 @@ export function hitTest(
     }
     const shape = getShapeForElement(element) as Drawable[];
 
-    const [x1, y1, x2, y2] = getLinearElementAbsoluteBounds(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
     if (
       x < x1 - lineThreshold ||
       y < y1 - lineThreshold ||
@@ -203,12 +183,6 @@ export function hitTest(
       hitTestRoughShape(subshape.sets, relX, relY, lineThreshold),
     );
   } else if (element.type === "text") {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
-
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
