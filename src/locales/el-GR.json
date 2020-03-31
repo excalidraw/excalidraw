@@ -73,11 +73,11 @@
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
     "couldNotCreateShareableLink": "Δεν ήταν δυνατή η δημιουργία συνδέσμου κοινής χρήσης.",
-    "importBackendFailed": "",
+    "importBackendFailed": "Η εισαγωγή από το backend απέτυχε.",
     "cannotExportEmptyCanvas": "Δεν είναι δυνατή η εξαγωγή κενού καμβά.",
-    "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
-    "uploadedSecurly": ""
+    "couldNotCopyToClipboard": "Δεν ήταν δυνατή η αντιγραφή στο πρόχειρο. Δοκιμάστε τη χρήση του προγράμματος περιήγησης Chrome.",
+    "decryptFailed": "Δεν ήταν δυνατή η αποκρυπτογράφηση δεδομένων.",
+    "uploadedSecurly": "Η μεταφόρτωση έχει εξασφαλιστεί με κρυπτογράφηση από άκρο σε άκρο, πράγμα που σημαίνει ότι ο διακομιστής Excalidraw και τρίτα μέρη δεν μπορούν να διαβάσουν το περιεχόμενο."
   },
   "toolBar": {
     "selection": "Επιλογή",
@@ -87,17 +87,17 @@
     "arrow": "Βέλος",
     "line": "Γραμμή",
     "text": "Κείμενο",
-    "lock": ""
+    "lock": "Κρατήστε ενεργό το εργαλείο μετά το σχέδιο"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
+    "canvasActions": "Ενέργειες καμβά",
+    "selectedShapeActions": "Επιλεγμένες ενέργειες σχήματος",
     "shapes": "Σχήματα"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
-    "resize": ""
+    "linearElement": "Κάντε κλικ για να ξεκινήσετε πολλαπλά σημεία, σύρετε για μια γραμμή",
+    "linearElementMulti": "Κάντε κλικ στο τελευταίο σημείο ή πατήστε Escape ή Enter για να τελειώσετε",
+    "resize": "Μπορείτε να περιορίσετε τις αναλογίες κρατόντας το πλήκτρο SHIFT κατά την αλλαγή μεγέθους"
   },
   "errorSplash": {
     "headingMain_pre": "Συνέβη κάποιο σφάλμα. Προσπαθήστε ",
@@ -105,12 +105,12 @@
     "clearCanvasMessage": "Εάν το παραπάνω δεν δουλέψει, προσπαθήστε ",
     "clearCanvasMessage_button": "καθαρίσετε τον κανβά.",
     "clearCanvasCaveat": " Αυτό θα προκαλέσει απώλεια της δουλειάς σας ",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
+    "openIssueMessage_pre": "Πριν να το κάνουμε, θα εκτιμούσαμε εάν ανοίξατε ένα θέμα στο ",
+    "openIssueMessage_button": "ανιχνευτής σφαλμάτων.",
     "openIssueMessage_post": " Παρακαλώ συμπεριλάβετε το ακόλουθο ίχνος ανίχνευσης σφαλμάτων (αν δεν είναι ιδιωτικό, επίσης το περιεχόμενο της σκηνής):",
     "errorStack": "Σφάλμα στοίβαξης στοιχείου:",
     "errorStack_loading": "Προετοιμάζουμε το περιβάλλον. Παρακαλώ περιμένετε...",
-    "sceneContent": ""
+    "sceneContent": "Περιεχόμενο σκηνής:"
   },
   "roomDialog": {
     "desc_intro": "Μπορείτε να προσκαλέσετε άλλους να δουλέψουν μαζί σας.",
