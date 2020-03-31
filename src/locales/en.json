@@ -105,11 +105,11 @@
     "clearCanvasMessage": "If reloading doesn't work, try ",
     "clearCanvasMessage_button": "clearing the canvas.",
     "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "trackedToSentry_pre": "The error with identifier ",
+    "trackedToSentry_post": " was tracked on our system.",
+    "openIssueMessage_pre": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
+    "openIssueMessage_post": " Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
