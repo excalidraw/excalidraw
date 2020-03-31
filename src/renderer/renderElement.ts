@@ -334,9 +334,15 @@ export function renderElement(
       } else {
         const offsetX = Math.floor(element.x + sceneState.scrollX);
         const offsetY = Math.floor(element.y + sceneState.scrollY);
-        context.translate(offsetX, offsetY);
+        const cx = element.width / 2;
+        const cy = element.height / 2;
+        context.translate(offsetX + cx, offsetY + cy);
+        context.rotate(element.angle);
+        context.translate(-cx, -cy);
         drawElementOnCanvas(element, rc, context);
-        context.translate(-offsetX, -offsetY);
+        context.translate(cx, cy);
+        context.rotate(-element.angle);
+        context.translate(-offsetX - cx, -offsetY - cy);
       }
       break;
     }
