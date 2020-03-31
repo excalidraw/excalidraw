@@ -59,6 +59,12 @@ export function SelectedShapeActions({
           {renderAction("bringForward")}
         </div>
       </fieldset>
+      <fieldset>
+        <legend>Layers Actions</legend>
+        <div className="buttonList">
+          {renderAction("deleteSelectedElements")}
+        </div>
+      </fieldset>
     </div>
   );
 }
