@@ -4,6 +4,7 @@ import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber } from "../types";
+import { getElementAbsoluteCoords } from "../element/bounds";
 
 import {
   newElement,
@@ -2205,8 +2206,9 @@ export class App extends React.Component<any, AppState> {
             }
             case "r": {
               // rotation
-              const cx = element.x + element.width / 2;
-              const cy = element.y + element.height / 2;
+              const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+              const cx = (x1 + x2) / 2;
+              const cy = (y1 + y2) / 2;
               let angle = Math.PI / 2 + Math.atan2(y - cy, x - cx);
               if (event.shiftKey) {
                 angle -= angle % (Math.PI / 8);
