@@ -3,7 +3,7 @@
     "paste": "Tempel",
     "selectAll": "Pilih Semua",
     "copy": "Salin",
-    "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsPng": "",
     "bringForward": "Memajukan",
     "sendToBack": "Bawa ke Belakang",
     "bringToFront": "Bawa ke Depan",
@@ -43,8 +43,8 @@
     "drawingCanvas": "Kanvas",
     "layers": "Lapisan",
     "language": "Bahasa",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "",
+    "duplicateSelection": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -52,7 +52,7 @@
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "",
     "save": "Simpan",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
@@ -67,8 +67,8 @@
     "edit": "Sunting",
     "undo": "Urungkan",
     "redo": "Mengulang",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "roomDialog": "",
+    "createNewRoom": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -76,7 +76,7 @@
     "importBackendFailed": "Gagal mengimpor dari backend",
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya"
   },
   "toolBar": {
@@ -96,30 +96,30 @@
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "linearElementMulti": "",
     "resize": "Anda dapat membatasi proporsi dengan menahan SHIFT sambil mengubah ukuran"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "",
+    "headingMain_button": "",
+    "clearCanvasMessage": "",
+    "clearCanvasMessage_button": "",
+    "clearCanvasCaveat": "",
+    "openIssueMessage_pre": "",
+    "openIssueMessage_button": "",
+    "openIssueMessage_post": "",
+    "errorStack": "",
+    "errorStack_loading": "",
+    "sceneContent": ""
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "",
+    "desc_privacy": "",
+    "button_startSession": "",
+    "button_stopSession": "",
+    "desc_inProgressIntro": "",
+    "desc_persistenceWarning": "",
+    "desc_shareLink": "",
+    "desc_exitSession": ""
   }
 }

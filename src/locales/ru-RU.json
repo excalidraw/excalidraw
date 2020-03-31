@@ -52,7 +52,7 @@
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "",
     "save": "Сохранить",
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",

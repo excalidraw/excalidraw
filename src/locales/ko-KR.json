@@ -34,9 +34,9 @@
     "thin": "얇게",
     "bold": "굵게",
     "extraBold": "매우 굵게",
-    "architect": "Architect",
-    "artist": "Artist",
-    "cartoonist": "Cartoonist",
+    "architect": "",
+    "artist": "",
+    "cartoonist": "",
     "fileTitle": "파일 제목",
     "colorPicker": "색상 선택기",
     "canvasBackground": "캔버스 배경",
@@ -52,7 +52,7 @@
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
-    "copyPngToClipboard": "Copy PNG to clipboard",
+    "copyPngToClipboard": "",
     "save": "저장",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
@@ -68,7 +68,7 @@
     "undo": "실행 취소",
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
-    "createNewRoom": "Create new room"
+    "createNewRoom": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -90,9 +90,9 @@
     "lock": "선택된 도구 유지하기"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "",
+    "selectedShapeActions": "",
+    "shapes": ""
   },
   "hints": {
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
@@ -100,17 +100,17 @@
     "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다."
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
+    "headingMain_pre": "",
+    "headingMain_button": "",
+    "clearCanvasMessage": "",
+    "clearCanvasMessage_button": "",
+    "clearCanvasCaveat": "",
+    "openIssueMessage_pre": "",
+    "openIssueMessage_button": "",
+    "openIssueMessage_post": "",
+    "errorStack": "",
     "errorStack_loading": "데이터를 불러오는 중입니다. 잠시만 기다려 주세요...",
-    "sceneContent": "Scene content:"
+    "sceneContent": ""
   },
   "roomDialog": {
     "desc_intro": "현재 화면에 공동 작업자를 초대해 협업할 수 있습니다.",
