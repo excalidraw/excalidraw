@@ -8,6 +8,7 @@ import { ToolButton } from "./ToolButton";
 import { capitalizeString, getShortcutKey } from "../utils";
 import { CURSOR_TYPE } from "../constants";
 import Stack from "./Stack";
+import useIsMobile from "../is-mobile";
 
 export function SelectedShapeActions({
   targetElements,
@@ -18,6 +19,8 @@ export function SelectedShapeActions({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) {
+  const isMobile = useIsMobile();
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -62,7 +65,8 @@ export function SelectedShapeActions({
       <fieldset>
         <legend>Layers Actions</legend>
         <div className="buttonList">
-          {renderAction("deleteSelectedElements")}
+          {renderAction("duplicateSelection")}
+          {!isMobile && renderAction("deleteSelectedElements")}
         </div>
       </fieldset>
     </div>
