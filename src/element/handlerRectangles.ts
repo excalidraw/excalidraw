@@ -21,11 +21,18 @@ function rotateHandlerCoords(
   return [xx - w / 2, yy - h / 2, w, h];
 }
 
+let lastPointerType: PointerType = "mouse";
+
 export function handlerRectangles(
   element: ExcalidrawElement,
   zoom: number,
-  pointerType: PointerType = "mouse",
+  pointerType?: PointerType,
 ) {
+  if (pointerType === undefined) {
+    pointerType = lastPointerType;
+  } else {
+    lastPointerType = pointerType;
+  }
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;
