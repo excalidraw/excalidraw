@@ -319,17 +319,18 @@ export function renderElement(
       if (renderOptimizations) {
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
-        const offsetX = Math.floor(element.x + sceneState.scrollX);
-        const offsetY = Math.floor(element.y + sceneState.scrollY);
-        const cx = element.width / 2;
-        const cy = element.height / 2;
-        context.translate(offsetX + cx, offsetY + cy);
-        context.rotate(element.angle);
-        context.translate(-cx, -cy);
-        drawElementOnCanvas(element, rc, context);
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const cx = (x1 + x2) / 2 + sceneState.scrollX;
+        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const shiftX = (x2 - x1) / 2 - (element.x - x1);
+        const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.translate(cx, cy);
+        context.rotate(element.angle);
+        context.translate(-shiftX, -shiftY);
+        drawElementOnCanvas(element, rc, context);
+        context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
-        context.translate(-offsetX - cx, -offsetY - cy);
+        context.translate(-cx, -cy);
       }
       break;
     }
@@ -347,6 +348,10 @@ export function renderElementToSvg(
   offsetX?: number,
   offsetY?: number,
 ) {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x2 - x1) / 2 - (element.x - x1);
+  const cy = (y2 - y1) / 2 - (element.y - y1);
+  const degree = (180 * element.angle) / Math.PI;
   const generator = rsvg.generator;
   switch (element.type) {
     case "selection": {
@@ -366,9 +371,9 @@ export function renderElementToSvg(
       }
       node.setAttribute(
         "transform",
-        `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
-          (180 * element.angle) / Math.PI
-        } ${element.width / 2} ${element.height / 2})`,
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
       );
       svgRoot.appendChild(node);
       break;
@@ -386,9 +391,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
-            (180 * element.angle) / Math.PI
-          } ${element.width / 2} ${element.height / 2})`,
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
         );
         group.appendChild(node);
       });
@@ -405,9 +410,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0}) rotate(${
-            (180 * element.angle) / Math.PI
-          } ${element.width / 2} ${element.height / 2})`,
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
