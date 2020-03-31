@@ -1959,8 +1959,8 @@ export class App extends React.Component<any, AppState> {
 
       if (isResizingElements && this.state.resizingElement) {
         this.setState({
-          isResizing: resizeHandle !== "r", // not rotate
-          isRotating: resizeHandle === "r", // rotate
+          isResizing: resizeHandle !== "r", // not rotation
+          isRotating: resizeHandle === "r", // rotation
         });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(

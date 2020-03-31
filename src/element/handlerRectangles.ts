@@ -11,6 +11,8 @@ const handleSizes: { [k in PointerType]: number } = {
   touch: 28,
 };
 
+const ROTATION_HANDLER_GAP = 16;
+
 function rotateHandlerCoords(
   [x, y, w, h]: [number, number, number, number],
   cx: number,
@@ -18,21 +20,14 @@ function rotateHandlerCoords(
   angle: number,
 ) {
   const [xx, yy] = rotate(x + w / 2, y + h / 2, cx, cy, angle);
-  return [xx - w / 2, yy - h / 2, w, h];
+  return [xx - w / 2, yy - h / 2, w, h] as [number, number, number, number];
 }
-
-let lastPointerType: PointerType = "mouse";
 
 export function handlerRectangles(
   element: ExcalidrawElement,
   zoom: number,
-  pointerType?: PointerType,
+  pointerType: PointerType = "mouse",
 ) {
-  if (pointerType === undefined) {
-    pointerType = lastPointerType;
-  } else {
-    lastPointerType = pointerType;
-  }
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;
@@ -107,7 +102,7 @@ export function handlerRectangles(
           dashedLineMargin -
           handlerMarginY +
           centeringOffset -
-          handlerHeight * 2,
+          ROTATION_HANDLER_GAP,
         handlerWidth,
         handlerHeight,
       ],
@@ -115,7 +110,7 @@ export function handlerRectangles(
       cy,
       angle,
     ),
-  } as { [T in Sides]: number[] };
+  } as { [T in Sides]: [number, number, number, number] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
   const minimumSizeForEightHandlers = (5 * size) / zoom;

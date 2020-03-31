@@ -6,6 +6,19 @@ import { isLinearElement } from "./typeChecks";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
+function isInHandlerRect(
+  handler: [number, number, number, number],
+  x: number,
+  y: number,
+) {
+  return (
+    x >= handler[0] &&
+    x <= handler[0] + handler[2] &&
+    y >= handler[1] &&
+    y <= handler[1] + handler[3]
+  );
+}
+
 export function resizeTest(
   element: ExcalidrawElement,
   appState: AppState,
@@ -18,24 +31,27 @@ export function resizeTest(
     return false;
   }
 
-  const handlers = handlerRectangles(element, zoom, pointerType);
+  const { r: rotationHandler, ...handlers } = handlerRectangles(
+    element,
+    zoom,
+    pointerType,
+  );
+
+  if (rotationHandler && isInHandlerRect(rotationHandler, x, y)) {
+    return "r" as HandlerRectanglesRet;
+  }
+
+  if (element.type === "text") {
+    // can't resize text elements
+    return false;
+  }
 
   const filter = Object.keys(handlers).filter((key) => {
-    const handler = handlers[key as HandlerRectanglesRet]!;
+    const handler = handlers[key as Exclude<HandlerRectanglesRet, "r">]!;
     if (!handler) {
       return false;
     }
-    if (element.type === "text" && key !== "r") {
-      // can't resize text elements but "r"otate
-      return false;
-    }
-
-    return (
-      x >= handler[0] &&
-      x <= handler[0] + handler[2] &&
-      y >= handler[1] &&
-      y <= handler[1] + handler[3]
-    );
+    return isInHandlerRect(handler, x, y);
   });
 
   if (filter.length > 0) {
