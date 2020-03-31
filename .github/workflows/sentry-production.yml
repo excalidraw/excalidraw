@@ -8,11 +8,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      SENTRY_DEPLOY_ENVIRONMENT: production
     steps:
       - uses: actions/checkout@v1.0.0
 
@@ -40,3 +35,7 @@ jobs:
           sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps --no-rewrite ./build/static/js/ --url-prefix "~/static/js"
           sentry-cli releases finalize $SENTRY_RELEASE
           sentry-cli releases deploys $SENTRY_RELEASE new -e production
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
