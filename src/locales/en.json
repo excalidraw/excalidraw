@@ -42,6 +42,7 @@
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing Canvas",
     "layers": "Layers",
+    "actions": "Actions",
     "language": "Language",
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate selected elements"
