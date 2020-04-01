@@ -42,7 +42,7 @@ export function setLanguage(newLng: string | undefined) {
 }
 
 export function getLanguage() {
-  return currentLanguage.lng;
+  return currentLanguage;
 }
 
 function findPartsForData(data: any, parts: string[]) {

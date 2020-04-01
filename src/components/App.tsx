@@ -76,7 +76,7 @@ import { actions } from "../actions/register";
 
 import { ActionResult } from "../actions/types";
 import { getDefaultAppState } from "../appState";
-import { t, getLanguage } from "../i18n";
+import { t } from "../i18n";
 
 import {
   copyToAppClipboard,
@@ -194,7 +194,6 @@ export class App extends React.Component<any, AppState> {
             return !element.isDeleted;
           })}
           setElements={this.setElements}
-          language={getLanguage()}
           onRoomCreate={this.createRoom}
           onRoomDestroy={this.destroyRoom}
           onLockToggle={this.toggleLock}
