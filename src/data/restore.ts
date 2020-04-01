@@ -70,6 +70,7 @@ export function restore(
           element.opacity === null || element.opacity === undefined
             ? 100
             : element.opacity,
+        angle: element.angle ?? 0,
       };
     });
 
