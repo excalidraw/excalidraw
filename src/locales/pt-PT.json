@@ -42,7 +42,7 @@
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
-    "actions": "",
+    "actions": "Ações",
     "language": "Idioma",
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
     "duplicateSelection": "Duplicar os elementos selecionados"
@@ -53,7 +53,7 @@
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "Copiar PNG para area de transferência",
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
@@ -68,7 +68,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "",
+    "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala"
   },
   "alerts": {
@@ -97,7 +97,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "linearElementMulti": "",
+    "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
   },
   "errorSplash": {
@@ -106,11 +106,11 @@
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
     "clearCanvasMessage_button": "limpar a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
+    "trackedToSentry_pre": "Erro com o identificador ",
+    "trackedToSentry_post": " foi rastreado no nosso sistema.",
+    "openIssueMessage_pre": "Fomos muito cautelosos para não incluir suas informações de cena no erro. Se sua cena não for privada, por favor, considere seguir nosso ",
     "openIssueMessage_button": "rastreador de bugs.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Por favor, inclua informações abaixo, copiando e colando para a issue do GitHub.",
     "sceneContent": "Conteúdo da cena:"
   },
   "roomDialog": {
