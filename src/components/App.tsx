@@ -2194,13 +2194,13 @@ export class App extends React.Component<any, AppState> {
               const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
               const cx = (x1 + x2) / 2;
               const cy = (y1 + y2) / 2;
-              let angle = Math.PI / 2 + Math.atan2(y - cy, x - cx);
-              if (angle < 0) {
-                angle += 2 * Math.PI;
-              }
+              let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
               if (event.shiftKey) {
                 angle += Math.PI / 16;
                 angle -= angle % (Math.PI / 8);
+              }
+              if (angle >= 2 * Math.PI) {
+                angle -= 2 * Math.PI;
               }
               mutateElement(element, { angle });
               break;
