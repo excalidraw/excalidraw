@@ -1,6 +1,6 @@
 import React from "react";
 import { showSelectedShapeActions } from "../element";
-import { calculateScrollCenter, getTargetElement } from "../scene";
+import { calculateScrollCenter } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
@@ -137,7 +137,8 @@ export const LayerUI = React.memo(
                 >
                   <Island padding={4}>
                     <SelectedShapeActions
-                      targetElements={getTargetElement(elements, appState)}
+                      appState={appState}
+                      elements={elements}
                       renderAction={actionManager.renderAction}
                       elementType={appState.elementType}
                     />
