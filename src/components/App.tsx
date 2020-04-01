@@ -2194,15 +2194,13 @@ export class App extends React.Component<any, AppState> {
               const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
               const cx = (x1 + x2) / 2;
               const cy = (y1 + y2) / 2;
-              const rad = Math.atan2(y - cy, x - cx);
-              let angle = Math.PI / 2 + rad;
+              let angle = Math.PI / 2 + Math.atan2(y - cy, x - cx);
+              if (angle < 0) {
+                angle += 2 * Math.PI;
+              }
               if (event.shiftKey) {
-                // the 270° where we switch signs must be set manually
-                if (Math.PI - Math.abs(rad) < Math.PI / 16) {
-                  angle = Math.PI / 2 + Math.PI;
-                } else {
-                  angle -= angle % (Math.PI / 8);
-                }
+                angle += Math.PI / 16;
+                angle -= angle % (Math.PI / 8);
               }
               mutateElement(element, { angle });
               break;
