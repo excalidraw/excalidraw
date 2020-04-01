@@ -42,6 +42,7 @@
     "canvasBackground": "",
     "drawingCanvas": "",
     "layers": "",
+    "actions": "",
     "language": "भाषा",
     "createRoom": "अधिवेशन",
     "duplicateSelection": ""
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "",
     "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "errorStack": "",
-    "errorStack_loading": "",
     "sceneContent": ""
   },
   "roomDialog": {
