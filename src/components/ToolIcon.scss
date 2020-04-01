@@ -149,3 +149,12 @@
     }
   }
 }
+
+.unlocked-icon {
+  :root[dir="ltr"] & {
+    left: 2px;
+  }
+  :root[dir="rtl"] & {
+    right: 2px;
+  }
+}

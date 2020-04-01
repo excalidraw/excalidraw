@@ -21,7 +21,12 @@ export const languages = [
   { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
   { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
   { lng: "zh-CN", label: "简体中文", data: require("./locales/zh-CN.json") },
-  { lng: "ar-SA", label: "عربي", data: require("./locales/ar-SA.json") },
+  {
+    lng: "ar-SA",
+    label: "عربي",
+    data: require("./locales/ar-SA.json"),
+    rtl: true,
+  },
 ];
 
 let currentLanguage = languages[0];
@@ -30,6 +35,8 @@ const fallbackLanguage = languages[0];
 export function setLanguage(newLng: string | undefined) {
   currentLanguage =
     languages.find((language) => language.lng === newLng) || fallbackLanguage;
+
+  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 }

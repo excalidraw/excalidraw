@@ -41,6 +41,7 @@ export function textWysiwyg({
   } catch {
     editable.contentEditable = "true";
   }
+  editable.dir = "auto";
   editable.tabIndex = 0;
   editable.innerText = initText;
   editable.dataset.type = "wysiwyg";
