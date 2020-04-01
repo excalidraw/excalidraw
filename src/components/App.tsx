@@ -51,7 +51,7 @@ import { restore } from "../data/restore";
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
-import { rotate, adjustPositionWithRotation } from "../math";
+import { rotate, adjustXYWithRotation } from "../math";
 
 import {
   isWritableElement,
@@ -1988,16 +1988,11 @@ export class App extends React.Component<any, AppState> {
               } else {
                 const width = element.width - deltaX;
                 const height = event.shiftKey ? width : element.height - deltaY;
+                const dY = element.height - height;
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustPositionWithRotation(
-                    "nw",
-                    element,
-                    deltaX,
-                    element.height - height,
-                    angle,
-                  ),
+                  ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2024,16 +2019,11 @@ export class App extends React.Component<any, AppState> {
               } else {
                 const width = element.width + deltaX;
                 const height = event.shiftKey ? width : element.height - deltaY;
+                const dY = element.height - height;
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustPositionWithRotation(
-                    "ne",
-                    element,
-                    deltaX,
-                    element.height - height,
-                    angle,
-                  ),
+                  ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2060,16 +2050,11 @@ export class App extends React.Component<any, AppState> {
               } else {
                 const width = element.width - deltaX;
                 const height = event.shiftKey ? width : element.height + deltaY;
+                const dY = height - element.height;
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustPositionWithRotation(
-                    "sw",
-                    element,
-                    deltaX,
-                    height - element.height,
-                    angle,
-                  ),
+                  ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2096,16 +2081,11 @@ export class App extends React.Component<any, AppState> {
               } else {
                 const width = element.width + deltaX;
                 const height = event.shiftKey ? width : element.height + deltaY;
+                const dY = height - element.height;
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustPositionWithRotation(
-                    "se",
-                    element,
-                    deltaX,
-                    height - element.height,
-                    angle,
-                  ),
+                  ...adjustXYWithRotation("se", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2129,13 +2109,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
-                  ...adjustPositionWithRotation("n", element, 0, deltaY, angle),
+                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
-                  ...adjustPositionWithRotation("n", element, 0, deltaY, angle),
+                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
                 });
               }
 
@@ -2153,13 +2133,13 @@ export class App extends React.Component<any, AppState> {
 
                 mutateElement(element, {
                   width,
-                  ...adjustPositionWithRotation("w", element, deltaX, 0, angle),
+                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
-                  ...adjustPositionWithRotation("w", element, deltaX, 0, angle),
+                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
                 });
               }
               break;
@@ -2175,13 +2155,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
-                  ...adjustPositionWithRotation("s", element, 0, deltaY, angle),
+                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
-                  ...adjustPositionWithRotation("s", element, 0, deltaY, angle),
+                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
                 });
               }
               break;
@@ -2197,13 +2177,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   width,
-                  ...adjustPositionWithRotation("e", element, deltaX, 0, angle),
+                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
-                  ...adjustPositionWithRotation("e", element, deltaX, 0, angle),
+                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
                 });
               }
               break;

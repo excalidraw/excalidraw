@@ -95,7 +95,7 @@ function adjustNorthPositionWithRotation(
   return { x, y };
 }
 
-export function adjustPositionWithRotation(
+export function adjustXYWithRotation(
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   position: { x: number; y: number },
   deltaX: number,
