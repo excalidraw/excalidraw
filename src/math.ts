@@ -80,8 +80,7 @@ export function adjustWestPositionWithRotation(
   deltaX: number,
   angle: number,
 ) {
-  // FIXME what is proper calcuation?
-  const x = position.x + deltaX * Math.max(Math.cos(angle), 0);
+  const x = position.x + deltaX * (1 - (1 - Math.cos(angle)) / 2);
   const y = position.y + deltaX * (Math.sin(angle) / 2);
   return { x, y };
 }
@@ -91,9 +90,8 @@ export function adjustNorthPositionWithRotation(
   deltaY: number,
   angle: number,
 ) {
-  // FIXME what is proper calcuation?
   const x = position.x + deltaY * (-Math.sin(angle) / 2);
-  const y = position.y + deltaY * Math.max(Math.cos(angle), 0);
+  const y = position.y + deltaY * (1 - (1 - Math.cos(angle)) / 2);
   return { x, y };
 }
 
