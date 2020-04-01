@@ -3,7 +3,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 
-type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "r";
+type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
 
 const handleSizes: { [k in PointerType]: number } = {
   mouse: 8,
@@ -94,8 +94,7 @@ export function handlerRectangles(
       cy,
       angle,
     ),
-    // for rotation
-    r: rotateHandlerCoords(
+    rotation: rotateHandlerCoords(
       [
         elementX1 + elementWidth / 2 - handlerWidth / 2,
         elementY1 -

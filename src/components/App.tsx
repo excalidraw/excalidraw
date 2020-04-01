@@ -1959,8 +1959,8 @@ export class App extends React.Component<any, AppState> {
 
       if (isResizingElements && this.state.resizingElement) {
         this.setState({
-          isResizing: resizeHandle !== "r", // not rotation
-          isRotating: resizeHandle === "r", // rotation
+          isResizing: resizeHandle !== "rotation",
+          isRotating: resizeHandle === "rotation",
         });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(
@@ -2206,8 +2206,7 @@ export class App extends React.Component<any, AppState> {
               }
               break;
             }
-            case "r": {
-              // rotation
+            case "rotation": {
               const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
               const cx = (x1 + x2) / 2;
               const cy = (y1 + y2) / 2;

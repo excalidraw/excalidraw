@@ -31,14 +31,14 @@ export function resizeTest(
     return false;
   }
 
-  const { r: rotationHandler, ...handlers } = handlerRectangles(
+  const { rotation: rotationHandler, ...handlers } = handlerRectangles(
     element,
     zoom,
     pointerType,
   );
 
   if (rotationHandler && isInHandlerRect(rotationHandler, x, y)) {
-    return "r" as HandlerRectanglesRet;
+    return "rotation" as HandlerRectanglesRet;
   }
 
   if (element.type === "text") {
@@ -47,7 +47,7 @@ export function resizeTest(
   }
 
   const filter = Object.keys(handlers).filter((key) => {
-    const handler = handlers[key as Exclude<HandlerRectanglesRet, "r">]!;
+    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
     if (!handler) {
       return false;
     }
@@ -114,7 +114,7 @@ export function getCursorForResizingElement(resizingElement: {
         cursor = "nesw";
       }
       break;
-    case "r": // rotation
+    case "rotation":
       cursor = "ew";
       break;
   }
