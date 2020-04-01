@@ -65,7 +65,7 @@ export function adjustEastPositionWithRotation(
   return { x, y };
 }
 
-export function adjustSouthPositionWithRotation(
+function adjustSouthPositionWithRotation(
   position: { x: number; y: number },
   deltaY: number,
   angle: number,
@@ -75,7 +75,7 @@ export function adjustSouthPositionWithRotation(
   return { x, y };
 }
 
-export function adjustWestPositionWithRotation(
+function adjustWestPositionWithRotation(
   position: { x: number; y: number },
   deltaX: number,
   angle: number,
@@ -85,7 +85,7 @@ export function adjustWestPositionWithRotation(
   return { x, y };
 }
 
-export function adjustNorthPositionWithRotation(
+function adjustNorthPositionWithRotation(
   position: { x: number; y: number },
   deltaY: number,
   angle: number,
@@ -93,6 +93,49 @@ export function adjustNorthPositionWithRotation(
   const x = position.x + (deltaY / 2) * -Math.sin(angle);
   const y = position.y + (deltaY / 2) * (1 + Math.cos(angle));
   return { x, y };
+}
+
+export function adjustPositionWithRotation(
+  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  position: { x: number; y: number },
+  deltaX: number,
+  deltaY: number,
+  angle: number,
+) {
+  switch (side) {
+    case "n":
+      return adjustNorthPositionWithRotation(position, deltaY, angle);
+    case "s":
+      return adjustSouthPositionWithRotation(position, deltaY, angle);
+    case "w":
+      return adjustWestPositionWithRotation(position, deltaX, angle);
+    case "e":
+      return adjustEastPositionWithRotation(position, deltaX, angle);
+    case "nw":
+      return adjustNorthPositionWithRotation(
+        adjustWestPositionWithRotation(position, deltaX, angle),
+        deltaY,
+        angle,
+      );
+    case "ne":
+      return adjustNorthPositionWithRotation(
+        adjustEastPositionWithRotation(position, deltaX, angle),
+        deltaY,
+        angle,
+      );
+    case "sw":
+      return adjustSouthPositionWithRotation(
+        adjustWestPositionWithRotation(position, deltaX, angle),
+        deltaY,
+        angle,
+      );
+    case "se":
+      return adjustSouthPositionWithRotation(
+        adjustEastPositionWithRotation(position, deltaX, angle),
+        deltaY,
+        angle,
+      );
+  }
 }
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {

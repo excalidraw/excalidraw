@@ -51,13 +51,7 @@ import { restore } from "../data/restore";
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
-import {
-  rotate,
-  adjustEastPositionWithRotation,
-  adjustSouthPositionWithRotation,
-  adjustWestPositionWithRotation,
-  adjustNorthPositionWithRotation,
-} from "../math";
+import { rotate, adjustPositionWithRotation } from "../math";
 
 import {
   isWritableElement,
@@ -1997,8 +1991,10 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustNorthPositionWithRotation(
-                    adjustWestPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation(
+                    "nw",
+                    element,
+                    deltaX,
                     element.height - height,
                     angle,
                   ),
@@ -2031,8 +2027,10 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustNorthPositionWithRotation(
-                    adjustEastPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation(
+                    "ne",
+                    element,
+                    deltaX,
                     element.height - height,
                     angle,
                   ),
@@ -2065,8 +2063,10 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustSouthPositionWithRotation(
-                    adjustWestPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation(
+                    "sw",
+                    element,
+                    deltaX,
                     height - element.height,
                     angle,
                   ),
@@ -2099,8 +2099,10 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustSouthPositionWithRotation(
-                    adjustEastPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation(
+                    "se",
+                    element,
+                    deltaX,
                     height - element.height,
                     angle,
                   ),
@@ -2127,13 +2129,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
-                  ...adjustNorthPositionWithRotation(element, deltaY, angle),
+                  ...adjustPositionWithRotation("n", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
-                  ...adjustNorthPositionWithRotation(element, deltaY, angle),
+                  ...adjustPositionWithRotation("n", element, 0, deltaY, angle),
                 });
               }
 
@@ -2151,13 +2153,13 @@ export class App extends React.Component<any, AppState> {
 
                 mutateElement(element, {
                   width,
-                  ...adjustWestPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation("w", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
-                  ...adjustWestPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation("w", element, deltaX, 0, angle),
                 });
               }
               break;
@@ -2173,13 +2175,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
-                  ...adjustSouthPositionWithRotation(element, deltaY, angle),
+                  ...adjustPositionWithRotation("s", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
-                  ...adjustSouthPositionWithRotation(element, deltaY, angle),
+                  ...adjustPositionWithRotation("s", element, 0, deltaY, angle),
                 });
               }
               break;
@@ -2195,13 +2197,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   width,
-                  ...adjustEastPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation("e", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
-                  ...adjustEastPositionWithRotation(element, deltaX, angle),
+                  ...adjustPositionWithRotation("e", element, deltaX, 0, angle),
                 });
               }
               break;
