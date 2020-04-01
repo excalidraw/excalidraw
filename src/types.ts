@@ -11,6 +11,7 @@ export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
   isLoading: boolean;
+  errorMessage: string | null;
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawLinearElement | null;
