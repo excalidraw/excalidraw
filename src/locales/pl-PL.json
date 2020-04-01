@@ -53,7 +53,7 @@
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "Skopiuj PNG do schowka",
     "save": "Zapisz",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
@@ -108,9 +108,9 @@
     "clearCanvasCaveat": " To spowoduje utratę pracy ",
     "trackedToSentry_pre": "Błąd o identyfikatorze ",
     "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Byliśmy bardzo ostrożni, aby nie zamieścić informacji o Twojej scenie w błędzie. Jeżeli Twoja scena nie jest prywatna, prosimy rozważ następujące kroki na naszym ",
     "openIssueMessage_button": "narzędziu do śledzenia błędów.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i wklejenie w zgłoszenie na GitHub.",
     "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {
