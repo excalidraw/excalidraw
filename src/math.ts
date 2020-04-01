@@ -80,8 +80,8 @@ export function adjustWestPositionWithRotation(
   deltaX: number,
   angle: number,
 ) {
-  const x = position.x + deltaX * (1 - (1 - Math.cos(angle)) / 2);
-  const y = position.y + deltaX * (Math.sin(angle) / 2);
+  const x = position.x + (deltaX / 2) * (1 + Math.cos(angle));
+  const y = position.y + (deltaX / 2) * Math.sin(angle);
   return { x, y };
 }
 
@@ -90,8 +90,8 @@ export function adjustNorthPositionWithRotation(
   deltaY: number,
   angle: number,
 ) {
-  const x = position.x + deltaY * (-Math.sin(angle) / 2);
-  const y = position.y + deltaY * (1 - (1 - Math.cos(angle)) / 2);
+  const x = position.x + (deltaY / 2) * -Math.sin(angle);
+  const y = position.y + (deltaY / 2) * (1 + Math.cos(angle));
   return { x, y };
 }
 
