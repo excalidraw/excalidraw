@@ -192,7 +192,7 @@ export function renderScene(
         if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          if (key === "r") {
+          if (key === "rotation") {
             strokeCircle(
               context,
               handler[0],
