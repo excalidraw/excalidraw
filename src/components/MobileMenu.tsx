@@ -122,7 +122,9 @@ export function MobileMenu({
               {actionManager.renderAction("toggleEditMenu")}
               {actionManager.renderAction("undo")}
               {actionManager.renderAction("redo")}
-              {actionManager.renderAction("finalize")}
+              {actionManager.renderAction(
+                appState.multiElement ? "finalize" : "duplicateSelection",
+              )}
               {actionManager.renderAction("deleteSelectedElements")}
             </div>
             {appState.scrolledOutside && (
