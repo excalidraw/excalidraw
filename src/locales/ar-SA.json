@@ -92,26 +92,26 @@
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "selectedShapeActions": "إجراءات الشكل المحدد",
+    "shapes": "الأشكال"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
-    "resize": ""
+    "linearElement": "انقر لعمل نقاط متعددة، اسحب لخط واحد",
+    "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
+    "resize": "يمكنك تقييد الحجم من خلال الضغط على SHIFT أثناء تغيير الحجم"
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "headingMain_pre": "تم مواجهة خطأ. حاول مرة أخرى ",
+    "headingMain_button": "إعادة تحميل الصفحة.",
+    "clearCanvasMessage": "إذا لم تعمل إعادة التحميل، حاول مرة أخرى ",
+    "clearCanvasMessage_button": "مسح اللوحة.",
+    "clearCanvasCaveat": " هذا سيؤدي إلى فقدان العمل ",
+    "trackedToSentry_pre": "الخطأ بعنوان ",
+    "trackedToSentry_post": " تم تعقبه على نظامنا.",
+    "openIssueMessage_pre": "كنا حذرين جدا لعدم تضمين معلومات المشهد الخاصة بك في الخطأ. إذا لم يكن المشهد خاصًا ، يرجى النظر في متابعة هذا الأمر ",
+    "openIssueMessage_button": "متعقّب الخلل.",
+    "openIssueMessage_post": " يرجى تضمين المعلومات أدناه عن طريق نسخ ولصق المشكلة في GitHub.",
+    "sceneContent": "محتوى المشهد:"
   },
   "roomDialog": {
     "desc_intro": "يمكنك دعوة الناس لمشاركتك نفس الجلسة الذي تعمل عليه.",
