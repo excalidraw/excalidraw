@@ -98,9 +98,6 @@ export function textWysiwyg({
     }
     if (ev.key === KEYS.ENTER && !ev.shiftKey) {
       ev.stopPropagation();
-      if (ev.isComposing || ev.keyCode === 229) {
-        return;
-      }
     }
   };
   editable.onblur = handleSubmit;
