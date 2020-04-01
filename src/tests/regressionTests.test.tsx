@@ -322,6 +322,7 @@ describe("regression tests", () => {
     pointerUp();
 
     const resizeHandles = getResizeHandles();
+    delete resizeHandles.rotation; // exclude rotation handle
     for (const handlePos in resizeHandles) {
       const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
