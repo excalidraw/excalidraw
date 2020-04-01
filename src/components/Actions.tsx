@@ -62,13 +62,15 @@ export function SelectedShapeActions({
           {renderAction("bringForward")}
         </div>
       </fieldset>
-      <fieldset>
-        <legend>Layers Actions</legend>
-        <div className="buttonList">
-          {renderAction("duplicateSelection")}
-          {!isMobile && renderAction("deleteSelectedElements")}
-        </div>
-      </fieldset>
+      {!isMobile && (
+        <fieldset>
+          <legend>{t("labels.actions")}</legend>
+          <div className="buttonList">
+            {renderAction("duplicateSelection")}
+            {renderAction("deleteSelectedElements")}
+          </div>
+        </fieldset>
+      )}
     </div>
   );
 }
