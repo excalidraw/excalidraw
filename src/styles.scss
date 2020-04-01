@@ -92,6 +92,15 @@ canvas {
       position: absolute;
       pointer-events: none;
     }
+
+    .ToolIcon {
+      margin: 0 5px;
+    }
+
+    .ToolIcon__icon {
+      width: 28px;
+      height: 28px;
+    }
   }
 
   fieldset {
