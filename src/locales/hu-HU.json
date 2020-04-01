@@ -42,6 +42,7 @@
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "Rajzvászon",
     "layers": "Rétegek",
+    "actions": "",
     "language": "Nyelv",
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "Kijelölt elem duplikálása"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Ha az újratöltés nem működik, próbálja ",
     "clearCanvasMessage_button": "törölni a vászont.",
     "clearCanvasCaveat": " Ezzel elveszik minden eddigi munkája ",
-    "openIssueMessage_pre": "Mielőtt ezt megtenné, nagyra értékelnénk, ha nyitna egy hibajegyet nekünk ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "hibabejelentő.",
-    "openIssueMessage_post": " Kérjük, csatolja a következő hibát (és ha nem bizalmas, akkor a jelenet tartalmát is):",
-    "errorStack": "A hiba részletei:",
-    "errorStack_loading": "Adatok betöltése. Kérlek várjon...",
+    "openIssueMessage_post": "",
     "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {

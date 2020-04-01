@@ -42,6 +42,7 @@
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Zeichenfläche",
     "layers": "Ebenen",
+    "actions": "Aktionen",
     "language": "Sprache",
     "createRoom": "Live-Kollaborationssitzung teilen",
     "duplicateSelection": "Markierte Elemente duplizieren"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche ",
     "clearCanvasMessage_button": "die Zeichenfläche zu löschen.",
     "clearCanvasCaveat": " Dieses wird zum Verlust von Daten führen ",
-    "openIssueMessage_pre": "Bevor du dieses tust, würden wir uns freuen, wenn du ein Problem in unserem ",
+    "trackedToSentry_pre": "Der Fehler mit der Kennung ",
+    "trackedToSentry_post": " wurde in unserem System registriert.",
+    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in den Fehler aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
     "openIssueMessage_button": "Bug-Tracker meldest.",
-    "openIssueMessage_post": " Bitte füge den folgenden Fehler-Stacktrace ein (und wenn es sich nicht um private Daten handelt auch den Zeichnungsinhalt):",
-    "errorStack": "Fehler-Stacktrace:",
-    "errorStack_loading": "Lade Daten, bitte warten...",
+    "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {

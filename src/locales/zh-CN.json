@@ -42,6 +42,7 @@
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
+    "actions": "",
     "language": "语言",
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "如果重新加载页面无效, 请尝试 ",
     "clearCanvasMessage_button": "清除画布。",
     "clearCanvasCaveat": "",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "errorStack": "",
-    "errorStack_loading": "加载数据中，请等待...",
     "sceneContent": "画布 内容:"
   },
   "roomDialog": {

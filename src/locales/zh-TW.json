@@ -42,6 +42,7 @@
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪製 Canvas",
     "layers": "圖層",
+    "actions": "",
     "language": "語系",
     "createRoom": "分享即時協作會議",
     "duplicateSelection": "複製所有已選擇的元素"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "如果重載還是無法解決，嘗試 ",
     "clearCanvasMessage_button": "清理畫布",
     "clearCanvasCaveat": " 這會導致目前的進度遺失 ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": "",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "資料讀取中，請稍候",
     "sceneContent": "場景內容"
   },
   "roomDialog": {

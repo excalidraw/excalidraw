@@ -42,6 +42,7 @@
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
+    "actions": "",
     "language": "Språk",
     "createRoom": "",
     "duplicateSelection": "Dupliser valgte elementer"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
     "clearCanvasMessage_button": "å tømme lerretet.",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "errorStack": "",
-    "errorStack_loading": "Laster inn, vennligst vent...",
     "sceneContent": ""
   },
   "roomDialog": {

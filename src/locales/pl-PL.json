@@ -42,6 +42,7 @@
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
+    "actions": "Akcje",
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Duplikuj wybrane elementy"
@@ -52,7 +53,7 @@
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "Skopiuj PNG do schowka",
     "save": "Zapisz",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
     "clearCanvasMessage_button": "wyczyścić dokument.",
     "clearCanvasCaveat": " To spowoduje utratę pracy ",
-    "openIssueMessage_pre": "Zanim to zrobisz, będziemy wdzięczni, jeśli utworzysz raport w naszym ",
+    "trackedToSentry_pre": "Błąd o identyfikatorze ",
+    "trackedToSentry_post": " został zaraportowany w naszym systemie.",
+    "openIssueMessage_pre": "Byliśmy bardzo ostrożni, aby nie zamieścić informacji o Twojej scenie w błędzie. Jeżeli Twoja scena nie jest prywatna, prosimy rozważ następujące kroki na naszym ",
     "openIssueMessage_button": "narzędziu do śledzenia błędów.",
-    "openIssueMessage_post": " Proszę dołączyć następujący stos wywołań błędu (oraz zawartość sceny jeżeli nie jest prywatna):",
-    "errorStack": "Stos wywołań błędu:",
-    "errorStack_loading": "Wczytywanie danych. Proszę czekać...",
+    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i wklejenie w zgłoszenie na GitHub.",
     "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {
