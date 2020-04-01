@@ -28,7 +28,7 @@ function colorsForClientId(clientId: string) {
   };
 }
 
-function strokeRectWithAngle(
+function strokeRectWithRotation(
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -167,7 +167,7 @@ export function renderScene(
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / sceneState.zoom;
-      strokeRectWithAngle(
+      strokeRectWithRotation(
         context,
         elementX1 - dashledLinePadding,
         elementY1 - dashledLinePadding,
@@ -201,7 +201,7 @@ export function renderScene(
               handler[3],
             );
           } else if (selectedElements[0].type !== "text") {
-            strokeRectWithAngle(
+            strokeRectWithRotation(
               context,
               handler[0],
               handler[1],
