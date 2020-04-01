@@ -42,6 +42,7 @@
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
     "layers": "Στρώματα",
+    "actions": "",
     "language": "Γλώσσα",
     "createRoom": "Έναρξη Ζωντανής Συνεδρίας",
     "duplicateSelection": "Αντιγραφή Επιλεγμένων"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Εάν το παραπάνω δεν δουλέψει, προσπαθήστε ",
     "clearCanvasMessage_button": "καθαρίσετε τον κανβά.",
     "clearCanvasCaveat": " Αυτό θα προκαλέσει απώλεια της δουλειάς σας ",
-    "openIssueMessage_pre": "Πριν να το κάνουμε, θα εκτιμούσαμε εάν ανοίξατε ένα θέμα στο ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "ανιχνευτής σφαλμάτων.",
-    "openIssueMessage_post": " Παρακαλώ συμπεριλάβετε το ακόλουθο ίχνος ανίχνευσης σφαλμάτων (αν δεν είναι ιδιωτικό, επίσης το περιεχόμενο της σκηνής):",
-    "errorStack": "Σφάλμα στοίβαξης στοιχείου:",
-    "errorStack_loading": "Προετοιμάζουμε το περιβάλλον. Παρακαλώ περιμένετε...",
+    "openIssueMessage_post": "",
     "sceneContent": "Περιεχόμενο σκηνής:"
   },
   "roomDialog": {

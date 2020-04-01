@@ -42,6 +42,7 @@
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Рисование холста",
     "layers": "Слои",
+    "actions": "",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "Дублировать выбранные элементы"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Если перезагрузка страницы не помогла, попробуйте ",
     "clearCanvasMessage_button": "очистить холст.",
     "clearCanvasCaveat": " Текущая работа будет утеряна ",
-    "openIssueMessage_pre": "Перед тем как вы продолжите, мы будем признательны если вы откроете тикет в нашем ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "баг трекере.",
-    "openIssueMessage_post": " Пожалуйста, приложите следующую трассировку стека (и контент сцены, если возможно):",
-    "errorStack": "Трассировка стека с ошибкой:",
-    "errorStack_loading": "Данные загружаются. Пожалуйста, подождите...",
+    "openIssueMessage_post": "",
     "sceneContent": "Содержание сцены:"
   },
   "roomDialog": {
