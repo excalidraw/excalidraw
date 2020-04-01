@@ -97,11 +97,10 @@ export function textWysiwyg({
       handleSubmit();
     }
     if (ev.key === KEYS.ENTER && !ev.shiftKey) {
-      ev.preventDefault();
+      ev.stopPropagation();
       if (ev.isComposing || ev.keyCode === 229) {
         return;
       }
-      handleSubmit();
     }
   };
   editable.onblur = handleSubmit;
