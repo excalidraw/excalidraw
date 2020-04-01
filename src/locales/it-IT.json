@@ -42,6 +42,7 @@
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Tela da disegno",
     "layers": "Livelli",
+    "actions": "",
     "language": "Lingua",
     "createRoom": "Condividi una sessione di collaborazione in diretta",
     "duplicateSelection": "Duplica elementi selezionati"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Se ricaricare non funziona, prova ",
     "clearCanvasMessage_button": "pulire la tela.",
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
-    "openIssueMessage_pre": "Prima di farlo, ti saremmo grati se aprissi una segnalazione sul nostro ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Per favore includi il seguente stack trace (e se non è privato, anche il contenuto della scena):",
-    "errorStack": "Stack trace dell'errore:",
-    "errorStack_loading": "Caricamento in corso. Attendere...",
+    "openIssueMessage_post": "",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
