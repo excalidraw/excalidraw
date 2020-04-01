@@ -119,6 +119,7 @@ function withBatchedUpdates<
 
 const { history } = createHistory();
 
+let didTapTwice: boolean = false;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -368,6 +369,7 @@ export class App extends React.Component<any, AppState> {
     document.addEventListener("copy", this.onCopy);
     document.addEventListener("paste", this.pasteFromClipboard);
     document.addEventListener("cut", this.onCut);
+    window.addEventListener("touchstart", this.onTapStart);
 
     document.addEventListener("keydown", this.onKeyDown, false);
     document.addEventListener("keyup", this.onKeyUp, { passive: true });
@@ -401,6 +403,7 @@ export class App extends React.Component<any, AppState> {
 
     document.removeEventListener("copy", this.onCopy);
     document.removeEventListener("paste", this.pasteFromClipboard);
+    window.removeEventListener("touchstart", this.onTapStart);
     document.removeEventListener("cut", this.onCut);
 
     document.removeEventListener("keydown", this.onKeyDown, false);
@@ -551,6 +554,27 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
+  };
+
+  private onTapStart = (event: TouchEvent) => {
+    let timeoutId;
+    if (!didTapTwice) {
+      didTapTwice = true;
+      timeoutId = setTimeout(function () {
+        didTapTwice = false;
+      }, 300);
+      return false;
+    }
+    if (didTapTwice) {
+      const [touch] = event.touches;
+      // @ts-ignore
+      this.handleCanvasDoubleClick({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      clearTimeout(timeoutId);
+    }
+    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
