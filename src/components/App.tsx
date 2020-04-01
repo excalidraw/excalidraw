@@ -1186,6 +1186,7 @@ export class App extends React.Component<any, AppState> {
       font: element.font,
       opacity: this.state.currentItemOpacity,
       zoom: this.state.zoom,
+      angle: element.angle,
       onSubmit: (text) => {
         if (text) {
           globalSceneState.replaceAllElements([
@@ -1681,6 +1682,7 @@ export class App extends React.Component<any, AppState> {
         opacity: this.state.currentItemOpacity,
         font: this.state.currentItemFont,
         zoom: this.state.zoom,
+        angle: 0,
         onSubmit: (text) => {
           if (text) {
             globalSceneState.replaceAllElements([
