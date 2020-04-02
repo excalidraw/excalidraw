@@ -12,6 +12,7 @@ type _ExcalidrawElementBase = Readonly<{
   opacity: number;
   width: number;
   height: number;
+  angle: number;
   seed: number;
   version: number;
   versionNonce: number;

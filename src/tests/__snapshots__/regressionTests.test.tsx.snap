@@ -20,6 +20,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -41,6 +42,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -62,6 +64,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -101,6 +104,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -135,6 +139,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -153,6 +158,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -200,6 +206,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -220,6 +227,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -259,6 +267,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -306,6 +315,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -326,6 +336,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "#fa5252",
   "fillStyle": "hachure",
   "height": 10,
@@ -365,6 +376,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -399,6 +411,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -433,6 +446,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -467,6 +481,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -501,6 +516,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -548,6 +564,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -569,6 +586,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -608,6 +626,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -642,6 +661,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -689,6 +709,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -711,6 +732,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -750,6 +772,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -784,6 +807,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -818,6 +842,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -865,6 +890,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -886,6 +912,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -907,6 +934,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -946,6 +974,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -980,6 +1009,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -998,6 +1028,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1045,6 +1076,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1067,6 +1099,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1088,6 +1121,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1109,6 +1143,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1148,6 +1183,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1182,6 +1218,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1200,6 +1237,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1234,6 +1272,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1252,6 +1291,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1270,6 +1310,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1317,6 +1358,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1335,6 +1377,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1356,6 +1399,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1377,6 +1421,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1398,6 +1443,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 3 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1430,6 +1476,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 4 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1495,6 +1542,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1529,6 +1577,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1547,6 +1596,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1581,6 +1631,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1599,6 +1650,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1617,6 +1669,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1651,6 +1704,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1669,6 +1723,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1687,6 +1742,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1705,6 +1761,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1750,6 +1807,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1768,6 +1826,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1786,6 +1845,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1804,6 +1864,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1833,6 +1894,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1891,6 +1953,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1911,6 +1974,7 @@ Object {
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1950,6 +2014,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1997,6 +2062,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2017,6 +2083,7 @@ Object {
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2056,6 +2123,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2103,6 +2171,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2123,6 +2192,7 @@ Object {
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2162,6 +2232,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2209,6 +2280,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2229,6 +2301,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2279,6 +2352,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2337,6 +2411,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2357,6 +2432,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2407,6 +2483,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2465,6 +2542,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2485,6 +2563,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2535,6 +2614,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2593,6 +2673,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2613,6 +2694,7 @@ Object {
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2652,6 +2734,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2699,6 +2782,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2719,6 +2803,7 @@ Object {
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2758,6 +2843,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2805,6 +2891,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2825,6 +2912,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2875,6 +2963,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2933,6 +3022,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2953,6 +3043,7 @@ Object {
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2992,6 +3083,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3039,6 +3131,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3089,6 +3182,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3125,6 +3219,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -3164,6 +3259,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3198,6 +3294,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3232,6 +3329,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3266,6 +3364,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3300,6 +3399,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3334,6 +3434,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3368,6 +3469,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3402,6 +3504,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3436,6 +3539,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3470,6 +3574,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3504,6 +3609,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3538,6 +3644,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3572,6 +3679,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3606,6 +3714,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3640,6 +3749,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3674,6 +3784,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3708,6 +3819,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3755,6 +3867,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3782,6 +3895,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -3821,6 +3935,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3855,6 +3970,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3889,6 +4005,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3923,6 +4040,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3957,6 +4075,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3991,6 +4110,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4025,6 +4145,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4059,6 +4180,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4106,6 +4228,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4131,6 +4254,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4170,6 +4294,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4204,6 +4329,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4238,6 +4364,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4272,6 +4399,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4306,6 +4434,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4340,6 +4469,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4387,6 +4517,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4410,6 +4541,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -4449,6 +4581,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4483,6 +4616,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4517,6 +4651,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4551,6 +4686,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4598,6 +4734,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4619,6 +4756,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4658,6 +4796,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4692,6 +4831,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4739,6 +4879,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4774,6 +4915,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4813,6 +4955,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4847,6 +4990,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4881,6 +5025,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4915,6 +5060,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4949,6 +5095,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4983,6 +5130,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5017,6 +5165,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5051,6 +5200,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5085,6 +5235,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5119,6 +5270,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5153,6 +5305,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5187,6 +5340,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5221,6 +5375,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5255,6 +5410,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5289,6 +5445,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5323,6 +5480,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5370,6 +5528,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -5403,6 +5562,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -5442,6 +5602,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5476,6 +5637,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5510,6 +5672,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5544,6 +5707,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5578,6 +5742,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5612,6 +5777,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5646,6 +5812,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5680,6 +5847,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5714,6 +5882,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5748,6 +5917,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5782,6 +5952,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5816,6 +5987,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5850,6 +6022,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5884,6 +6057,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5931,6 +6105,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -5962,6 +6137,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -6001,6 +6177,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6035,6 +6212,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6069,6 +6247,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6103,6 +6282,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6137,6 +6317,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6171,6 +6352,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6205,6 +6387,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6239,6 +6422,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6273,6 +6457,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6307,6 +6492,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6341,6 +6527,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6375,6 +6562,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6422,6 +6610,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -6451,6 +6640,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -6490,6 +6680,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6524,6 +6715,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6558,6 +6750,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6592,6 +6785,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6626,6 +6820,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6660,6 +6855,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6694,6 +6890,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6728,6 +6925,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6762,6 +6960,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6796,6 +6995,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6843,6 +7043,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -6871,6 +7072,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -6910,6 +7112,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6944,6 +7147,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6978,6 +7182,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7012,6 +7217,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7046,6 +7252,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7080,6 +7287,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7114,6 +7322,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7148,6 +7357,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7182,6 +7392,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7229,6 +7440,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7255,6 +7467,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7294,6 +7507,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7328,6 +7542,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7362,6 +7577,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7396,6 +7612,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7430,6 +7647,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7464,6 +7682,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7498,6 +7717,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7545,6 +7765,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7569,6 +7790,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7608,6 +7830,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7642,6 +7865,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7676,6 +7900,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7710,6 +7935,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7744,6 +7970,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7791,6 +8018,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7813,6 +8041,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7852,6 +8081,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7886,6 +8116,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7920,6 +8151,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7967,6 +8199,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -8003,6 +8236,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -8042,6 +8276,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8076,6 +8311,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8110,6 +8346,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8144,6 +8381,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8178,6 +8416,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8212,6 +8451,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8246,6 +8486,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8280,6 +8521,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8314,6 +8556,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8348,6 +8591,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8382,6 +8626,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8416,6 +8661,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8450,6 +8696,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8484,6 +8731,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8518,6 +8766,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8552,6 +8801,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8586,6 +8836,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8633,6 +8884,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -8667,6 +8919,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -8706,6 +8959,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8740,6 +8994,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8774,6 +9029,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8808,6 +9064,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8842,6 +9099,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8876,6 +9134,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8910,6 +9169,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8944,6 +9204,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8978,6 +9239,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9012,6 +9274,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9046,6 +9309,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9080,6 +9344,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9114,6 +9379,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9148,6 +9414,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9182,6 +9449,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9229,6 +9497,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -9261,6 +9530,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -9300,6 +9570,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9334,6 +9605,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9368,6 +9640,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9402,6 +9675,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9436,6 +9710,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9470,6 +9745,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9504,6 +9780,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9538,6 +9815,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9572,6 +9850,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9606,6 +9885,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9640,6 +9920,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9674,6 +9955,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9708,6 +9990,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9755,6 +10038,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -9785,6 +10069,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -9824,6 +10109,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9858,6 +10144,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9892,6 +10179,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9926,6 +10214,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9960,6 +10249,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9994,6 +10284,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -10028,6 +10319,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10062,6 +10354,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -10096,6 +10389,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10130,6 +10424,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -10164,6 +10459,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10211,6 +10507,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10235,6 +10532,7 @@ Object {
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10256,6 +10554,7 @@ Object {
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10295,6 +10594,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10329,6 +10629,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10347,6 +10648,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10381,6 +10683,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10399,6 +10702,7 @@ Object {
           "y": 20,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10446,6 +10750,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10494,6 +10799,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10544,6 +10850,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10564,6 +10871,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10585,6 +10893,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10606,6 +10915,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10644,6 +10954,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10662,6 +10973,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10680,6 +10992,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10716,6 +11029,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10750,6 +11064,7 @@ Object {
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10768,6 +11083,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10815,6 +11131,7 @@ Object {
   "isCollaborating": false,
   "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",

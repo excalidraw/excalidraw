@@ -6,6 +6,19 @@ import { isLinearElement } from "./typeChecks";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
+function isInHandlerRect(
+  handler: [number, number, number, number],
+  x: number,
+  y: number,
+) {
+  return (
+    x >= handler[0] &&
+    x <= handler[0] + handler[2] &&
+    y >= handler[1] &&
+    y <= handler[1] + handler[3]
+  );
+}
+
 export function resizeTest(
   element: ExcalidrawElement,
   appState: AppState,
@@ -14,24 +27,31 @@ export function resizeTest(
   zoom: number,
   pointerType: PointerType,
 ): HandlerRectanglesRet | false {
-  if (!appState.selectedElementIds[element.id] || element.type === "text") {
+  if (!appState.selectedElementIds[element.id]) {
     return false;
   }
 
-  const handlers = handlerRectangles(element, zoom, pointerType);
+  const { rotation: rotationHandler, ...handlers } = handlerRectangles(
+    element,
+    zoom,
+    pointerType,
+  );
+
+  if (rotationHandler && isInHandlerRect(rotationHandler, x, y)) {
+    return "rotation" as HandlerRectanglesRet;
+  }
+
+  if (element.type === "text") {
+    // can't resize text elements
+    return false;
+  }
 
   const filter = Object.keys(handlers).filter((key) => {
-    const handler = handlers[key as HandlerRectanglesRet]!;
+    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
     if (!handler) {
       return false;
     }
-
-    return (
-      x >= handler[0] &&
-      x <= handler[0] + handler[2] &&
-      y >= handler[1] &&
-      y <= handler[1] + handler[3]
-    );
+    return isInHandlerRect(handler, x, y);
   });
 
   if (filter.length > 0) {
@@ -93,6 +113,9 @@ export function getCursorForResizingElement(resizingElement: {
       } else {
         cursor = "nesw";
       }
+      break;
+    case "rotation":
+      cursor = "ew";
       break;
   }
 
