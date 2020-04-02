@@ -1,7 +1,13 @@
+import React from "react";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
 import { duplicateElement } from "../element";
+import { isSomeElementSelected } from "../scene";
+import { ToolButton } from "../components/ToolButton";
+import { clone } from "../components/icons";
+import { t } from "../i18n";
+import { getShortcutKey } from "../utils";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -28,4 +34,16 @@ export const actionDuplicateSelection = register({
   },
   contextItemLabel: "labels.duplicateSelection",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === "d",
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={clone}
+      title={`${t("labels.duplicateSelection")} ${getShortcutKey(
+        "CtrlOrCmd+D",
+      )}`}
+      aria-label={t("labels.duplicateSelection")}
+      onClick={() => updateData(null)}
+      visible={isSomeElementSelected(elements, appState)}
+    />
+  ),
 });

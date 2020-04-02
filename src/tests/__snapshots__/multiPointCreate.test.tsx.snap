@@ -2,6 +2,7 @@
 
 exports[`multi point mode in linear elements arrow 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 110,
@@ -41,6 +42,7 @@ Object {
 
 exports[`multi point mode in linear elements line 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 110,

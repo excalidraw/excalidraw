@@ -42,6 +42,7 @@
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
+    "actions": "",
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Seçili nesneleri yinele"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
     "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "openIssueMessage_pre": "Bu işlemi yapmadan, sorunu inceleyebilmemiz için ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": " Yardım biletine, aşağıda çıktısı verilen hata mesajını da ekleyin (mümkünse çalışma alanıyla birlikte):",
-    "errorStack": "Hata mesajı:",
-    "errorStack_loading": "Veri yükleniyor. Lütfen bekleyin...",
+    "openIssueMessage_post": "",
     "sceneContent": "Çalışma alanı:"
   },
   "roomDialog": {

@@ -42,6 +42,7 @@
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
+    "actions": "",
     "language": "언어",
     "createRoom": "실시간 협업 세션 공유",
     "duplicateSelection": "선택 영역 복제하기"
@@ -105,11 +106,11 @@
     "clearCanvasMessage": "",
     "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "errorStack": "",
-    "errorStack_loading": "데이터를 불러오는 중입니다. 잠시만 기다려 주세요...",
     "sceneContent": ""
   },
   "roomDialog": {

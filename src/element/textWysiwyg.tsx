@@ -20,6 +20,7 @@ type TextWysiwygParams = {
   font: string;
   opacity: number;
   zoom: number;
+  angle: number;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -32,6 +33,7 @@ export function textWysiwyg({
   font,
   opacity,
   zoom,
+  angle,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -45,13 +47,15 @@ export function textWysiwyg({
   editable.innerText = initText;
   editable.dataset.type = "wysiwyg";
 
+  const degree = (180 * angle) / Math.PI;
+
   Object.assign(editable.style, {
     color: strokeColor,
     position: "fixed",
     opacity: opacity / 100,
     top: `${y}px`,
     left: `${x}px`,
-    transform: `translate(-50%, -50%) scale(${zoom})`,
+    transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
     textAlign: "left",
     display: "inline-block",
     font: font,
@@ -97,11 +101,7 @@ export function textWysiwyg({
       handleSubmit();
     }
     if (ev.key === KEYS.ENTER && !ev.shiftKey) {
-      ev.preventDefault();
-      if (ev.isComposing || ev.keyCode === 229) {
-        return;
-      }
-      handleSubmit();
+      ev.stopPropagation();
     }
   };
   editable.onblur = handleSubmit;

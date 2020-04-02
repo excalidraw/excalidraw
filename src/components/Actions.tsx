@@ -1,23 +1,31 @@
 import React from "react";
+import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
-import { hasBackground, hasStroke, hasText } from "../scene";
+import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
 import { capitalizeString, getShortcutKey } from "../utils";
 import { CURSOR_TYPE } from "../constants";
 import Stack from "./Stack";
+import useIsMobile from "../is-mobile";
 
 export function SelectedShapeActions({
-  targetElements,
+  appState,
+  elements,
   renderAction,
   elementType,
 }: {
-  targetElements: readonly ExcalidrawElement[];
+  appState: AppState;
+  elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) {
+  const targetElements = getTargetElement(elements, appState);
+  const isEditing = Boolean(appState.editingElement);
+  const isMobile = useIsMobile();
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -59,12 +67,15 @@ export function SelectedShapeActions({
           {renderAction("bringForward")}
         </div>
       </fieldset>
-      <fieldset>
-        <legend>Layers Actions</legend>
-        <div className="buttonList">
-          {renderAction("deleteSelectedElements")}
-        </div>
-      </fieldset>
+      {!isMobile && !isEditing && targetElements.length > 0 && (
+        <fieldset>
+          <legend>{t("labels.actions")}</legend>
+          <div className="buttonList">
+            {renderAction("duplicateSelection")}
+            {renderAction("deleteSelectedElements")}
+          </div>
+        </fieldset>
+      )}
     </div>
   );
 }

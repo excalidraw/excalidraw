@@ -37,6 +37,7 @@ export type AppState = {
   name: string;
   isCollaborating: boolean;
   isResizing: boolean;
+  isRotating: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
