@@ -4,7 +4,12 @@
   box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
   border-radius: 4px;
   position: absolute;
-  left: -5.5px;
+  :root[dir="ltr"] & {
+    left: -5.5px;
+  }
+  :root[dir="rtl"] & {
+    right: -5.5px;
+  }
 }
 
 .color-picker-control-container {
@@ -21,7 +26,12 @@
   border-color: transparent transparent rgb(255, 255, 255);
   position: absolute;
   top: -10px;
-  left: 12px;
+  :root[dir="ltr"] & {
+    left: 12px;
+  }
+  :root[dir="rtl"] & {
+    right: 12px;
+  }
 }
 
 .color-picker-triangle-shadow {
@@ -30,7 +40,7 @@
 }
 
 .color-picker-content {
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
   display: grid;
   grid-template-columns: repeat(5, auto);
   grid-gap: 0.5rem;
@@ -76,7 +86,12 @@
   background: #dee2e6;
   height: 1.875rem;
   width: 1.875rem;
-  border-radius: 4px 0px 0px 4px;
+  :root[dir="ltr"] & {
+    border-radius: 4px 0px 0px 4px;
+  }
+  :root[dir="rtl"] & {
+    border-radius: 0px 4px 4px 0px;
+  }
   color: #495057;
   display: flex;
   align-items: center;
@@ -97,11 +112,21 @@
 }
 .color-input-container:focus-within .color-picker-hash::before {
   background: #dee2e6;
-  right: -1px;
+  :root[dir="ltr"] & {
+    right: -1px;
+  }
+  :root[dir="rtl"] & {
+    left: -1px;
+  }
 }
 .color-input-container:focus-within .color-picker-hash::after {
   background: #fff;
-  right: -2px;
+  :root[dir="ltr"] & {
+    right: -2px;
+  }
+  :root[dir="rtl"] & {
+    left: -2px;
+  }
 }
 
 .color-input-container {
@@ -117,17 +142,22 @@
   outline: none;
   height: 1.75em;
   box-shadow: #dee2e6 0px 0px 0px 1px inset;
-  border-radius: 0px 4px 4px 0px;
+  :root[dir="ltr"] & {
+    border-radius: 0px 4px 4px 0px;
+  }
+  :root[dir="rtl"] & {
+    border-radius: 4px 0px 0px 4px;
+  }
   float: left;
   padding: 1px;
-  padding-left: 0.5em;
+  padding-inline-start: 0.5em;
   appearance: none;
 }
 
 .color-picker-label-swatch {
   height: 1.875rem;
   width: 1.875rem;
-  margin-right: 0.25rem;
+  margin-inline-end: 0.25rem;
   border: 1px solid #dee2e6;
   position: relative;
   overflow: hidden;
@@ -147,7 +177,12 @@
 .color-picker-keybinding {
   position: absolute;
   bottom: 2px;
-  right: 2px;
+  :root[dir="ltr"] & {
+    right: 2px;
+  }
+  :root[dir="rtl"] & {
+    left: 2px;
+  }
   font-size: 0.7em;
   color: #ccc;
 }

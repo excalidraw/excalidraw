@@ -4,7 +4,7 @@ import * as i18n from "../i18n";
 export function LanguageList({
   onChange,
   languages = i18n.languages,
-  currentLanguage = i18n.getLanguage(),
+  currentLanguage = i18n.getLanguage().lng,
   floating,
 }: {
   languages?: { lng: string; label: string }[];

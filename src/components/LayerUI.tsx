@@ -30,7 +30,6 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: any;
   elements: readonly ExcalidrawElement[];
-  language: string;
   setElements: (elements: readonly ExcalidrawElement[]) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
@@ -44,7 +43,6 @@ export const LayerUI = React.memo(
     setAppState,
     canvas,
     elements,
-    language,
     setElements,
     onRoomCreate,
     onRoomDestroy,
@@ -192,7 +190,6 @@ export const LayerUI = React.memo(
               setAppState({});
             }}
             languages={languages}
-            currentLanguage={language}
             floating
           />
           {appState.scrolledOutside && (
@@ -229,7 +226,6 @@ export const LayerUI = React.memo(
     const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
     return (
-      prev.language === next.language &&
       prev.elements === next.elements &&
       keys.every((key) => prevAppState[key] === nextAppState[key])
     );

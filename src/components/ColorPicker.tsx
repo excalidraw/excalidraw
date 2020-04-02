@@ -1,9 +1,9 @@
 import React from "react";
 import { Popover } from "./Popover";
 
-import "./ColorPicker.css";
+import "./ColorPicker.scss";
 import { KEYS } from "../keys";
-import { t } from "../i18n";
+import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
@@ -69,6 +69,7 @@ const Picker = function ({
       event.key === KEYS.ARROW_DOWN
     ) {
       const { activeElement } = document;
+      const isRTL = getLanguage().rtl;
       const index = Array.prototype.indexOf.call(
         gallery!.current!.children,
         activeElement,
@@ -76,9 +77,9 @@ const Picker = function ({
       if (index !== -1) {
         const length = gallery!.current!.children.length - (showInput ? 1 : 0);
         const nextIndex =
-          event.key === KEYS.ARROW_RIGHT
+          event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
-            : event.key === KEYS.ARROW_LEFT
+            : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
             ? (length + index - 1) % length
             : event.key === KEYS.ARROW_DOWN
             ? (index + 5) % length

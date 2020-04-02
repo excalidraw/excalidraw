@@ -20,7 +20,7 @@
   .Dialog {
     --metric: calc(var(--space-factor) * 4);
     --inset-left: #{"max(var(--metric), var(--sal))"};
-    --inset-right: #{"max(var(--metric), env(safe-area-inset-right))"};
+    --inset-right: #{"max(var(--metric), var(--sar))"};
   }
   .Dialog__title {
     grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
