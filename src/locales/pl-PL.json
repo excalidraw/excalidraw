@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "linearElementMulti": "Kliknij na ostatni punkt lub naciśnij Escape albo Enter, aby zakończyć",
-    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
