@@ -21,6 +21,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -34,6 +35,7 @@ export function textWysiwyg({
   opacity,
   zoom,
   angle,
+  onChange,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -93,6 +95,12 @@ export function textWysiwyg({
       ev.preventDefault();
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  editable.oninput = () => {
+    if (onChange) {
+      onChange(trimText(editable.innerText));
     }
   };
 
