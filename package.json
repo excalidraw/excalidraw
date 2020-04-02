@@ -85,7 +85,7 @@
       "prettier/prettier": "warn"
     }
   },
-  "homepage": ".",
+  "homepage": "./",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
