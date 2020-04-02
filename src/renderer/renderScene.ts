@@ -149,7 +149,7 @@ export function renderScene(
   // Pain selected elements
   if (renderSelection) {
     const selectedElements = getSelectedElements(elements, appState);
-    const dashledLinePadding = 4 / sceneState.zoom;
+    const dashedLinePadding = 4 / sceneState.zoom;
 
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach((element) => {
@@ -169,10 +169,10 @@ export function renderScene(
       context.lineWidth = 1 / sceneState.zoom;
       strokeRectWithRotation(
         context,
-        elementX1 - dashledLinePadding,
-        elementY1 - dashledLinePadding,
-        elementWidth + dashledLinePadding * 2,
-        elementHeight + dashledLinePadding * 2,
+        elementX1 - dashedLinePadding,
+        elementY1 - dashedLinePadding,
+        elementWidth + dashedLinePadding * 2,
+        elementHeight + dashedLinePadding * 2,
         elementX1 + elementWidth / 2,
         elementY1 + elementHeight / 2,
         element.angle,
