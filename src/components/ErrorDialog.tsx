@@ -24,7 +24,7 @@ export function ErrorDialog({
     <>
       {modalIsShown && (
         <Dialog
-          maxWidth={800}
+          maxWidth={500}
           onCloseRequest={handleClose}
           title={t("errorDialog.title")}
         >
