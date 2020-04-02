@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
-    "resize": "Az arányokat korlátozhatja a SHIFT billentyű lenyomásával átmérezetés közben"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
