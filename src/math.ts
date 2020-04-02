@@ -55,6 +55,33 @@ export function rotate(
   ];
 }
 
+export function adjustXYWithRotation(
+  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  position: { x: number; y: number },
+  deltaX: number,
+  deltaY: number,
+  angle: number,
+) {
+  let { x, y } = position;
+  if (side === "e" || side === "ne" || side === "se") {
+    x -= (deltaX / 2) * (1 - Math.cos(angle));
+    y -= (deltaX / 2) * -Math.sin(angle);
+  }
+  if (side === "s" || side === "sw" || side === "se") {
+    x -= (deltaY / 2) * Math.sin(angle);
+    y -= (deltaY / 2) * (1 - Math.cos(angle));
+  }
+  if (side === "w" || side === "nw" || side === "sw") {
+    x += (deltaX / 2) * (1 + Math.cos(angle));
+    y += (deltaX / 2) * Math.sin(angle);
+  }
+  if (side === "n" || side === "nw" || side === "ne") {
+    x += (deltaY / 2) * -Math.sin(angle);
+    y += (deltaY / 2) * (1 + Math.cos(angle));
+  }
+  return { x, y };
+}
+
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;
   const [start, ...other] = path;

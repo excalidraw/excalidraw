@@ -13,7 +13,7 @@ interface Hint {
 }
 
 const getHints = ({ appState, elements }: Hint) => {
-  const { elementType, isResizing } = appState;
+  const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
@@ -22,13 +22,17 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
-  if (isResizing) {
+  if (isResizing && lastPointerDownWith === "mouse") {
     const selectedElements = getSelectedElements(elements, appState);
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length > 2) {
       return null;
     }
     return t("hints.resize");
+  }
+
+  if (isRotating && lastPointerDownWith === "mouse") {
+    return t("hints.rotate");
   }
 
   return null;
