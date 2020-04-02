@@ -26,9 +26,9 @@ export function ErrorDialog({
         <Dialog
           maxWidth={800}
           onCloseRequest={handleClose}
-          title={t("buttons.export")}
+          title={t("errorDialog.title")}
         >
-          <div className="ExportDialog">{message}</div>
+          <div>{message}</div>
         </Dialog>
       )}
     </>
