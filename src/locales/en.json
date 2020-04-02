@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
     "couldNotCreateShareableLink": "Couldn't create shareable link.",
-    "couldNotLoadInvalidJSON": "Couldn't load invalid json",
+    "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
