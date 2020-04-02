@@ -3,7 +3,7 @@
     "paste": "Вставить",
     "selectAll": "Выделить всё",
     "copy": "Копировать",
-    "copyAsPng": "Копировать в буфер обмена как PNG",
+    "copyAsPng": "Скопировать в буфер обмена как PNG",
     "bringForward": "Переложить вперёд",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -20,7 +20,7 @@
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифта",
     "onlySelected": "Только выбранные",
-    "withBackground": "с фоном",
+    "withBackground": "С фоном",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
     "code": "Код",
@@ -42,18 +42,18 @@
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Рисование холста",
     "layers": "Слои",
-    "actions": "",
+    "actions": "Действия",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "Дублировать выбранные элементы"
   },
   "buttons": {
-    "clearReset": "Очистить холст & сбросить цвет фона",
+    "clearReset": "Очистить холст и сбросить цвет фона",
     "export": "Экспортировать",
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "Скопировать PNG в буфер обмена",
     "save": "Сохранить",
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
@@ -98,7 +98,7 @@
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
-    "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размера"
+    "resize": "Вы можете сохранить пропорции, удерживая SHIFT во время изменения размера"
   },
   "errorSplash": {
     "headingMain_pre": "Возникла ошибка. Попробуйте ",
@@ -106,11 +106,11 @@
     "clearCanvasMessage": "Если перезагрузка страницы не помогла, попробуйте ",
     "clearCanvasMessage_button": "очистить холст.",
     "clearCanvasCaveat": " Текущая работа будет утеряна ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
+    "trackedToSentry_pre": "Ошибка с идентификатором ",
+    "trackedToSentry_post": " отслеживается в нашей системе.",
+    "openIssueMessage_pre": "Для безопасности информация о вашей сцене не включена в ошибку. Если в сцене нет ничего конфиденциального, пожалуйста следуйте нашим ",
     "openIssueMessage_button": "баг трекере.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Пожалуйста, приложите информацию ниже, скопировав и вставив её, в issue GitHub.",
     "sceneContent": "Содержание сцены:"
   },
   "roomDialog": {
