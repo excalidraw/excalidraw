@@ -362,6 +362,10 @@ export class App extends React.Component<any, AppState> {
       });
     }
 
+    if (window.location.pathname !== "/") {
+      window.history.pushState({}, "Excalidraw", window.location.origin);
+    }
+
     this.removeSceneCallback = globalSceneState.addCallback(
       this.onSceneUpdated,
     );
