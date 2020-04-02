@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "È possibile vincolare le proporzioni tenendo premuto MAIUSC durante il ridimensionamento"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
