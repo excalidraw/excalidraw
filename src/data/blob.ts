@@ -40,7 +40,7 @@ export async function loadFromBlob(blob: any) {
   }
   const { elements, appState } = updateAppState(contents);
   if (!elements.length) {
-    return Promise.reject(t("alerts.couldNotLoadInvalidJSON"));
+    return Promise.reject(t("alerts.couldNotLoadInvalidFile"));
   }
   return new Promise<DataState>((resolve) => {
     resolve(restore(elements, appState, { scrollToContent: true }));
