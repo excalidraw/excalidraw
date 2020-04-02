@@ -97,16 +97,16 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "linearElementMulti": "Kliknij na ostatni punkt lub naciśnij Escape albo Enter, aby zakończyć",
+    "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
     "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
-    "clearCanvasMessage_button": "wyczyścić dokument.",
-    "clearCanvasCaveat": " To spowoduje utratę pracy ",
+    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
+    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
     "trackedToSentry_pre": "Błąd o identyfikatorze ",
     "trackedToSentry_post": " został zaraportowany w naszym systemie.",
     "openIssueMessage_pre": "Byliśmy bardzo ostrożni, aby nie zamieścić informacji o Twojej scenie w błędzie. Jeżeli Twoja scena nie jest prywatna, prosimy rozważ następujące kroki na naszym ",
