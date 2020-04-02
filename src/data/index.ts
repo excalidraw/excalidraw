@@ -51,6 +51,13 @@ export type SocketUpdateDataSource = {
       pointerCoords: { x: number; y: number };
     };
   };
+  MOUSE_ACTIVITY: {
+    type: "MOUSE_ACTIVITY";
+    payload: {
+      socketID: string;
+      activity: "keydown" | "keyup";
+    };
+  };
 };
 
 export type SocketUpdateDataIncoming =

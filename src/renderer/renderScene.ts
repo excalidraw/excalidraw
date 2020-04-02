@@ -252,6 +252,19 @@ export function renderScene(
     if (isOutOfBounds) {
       context.globalAlpha = 0.2;
     }
+
+    if (
+      sceneState.remotePointerActivity &&
+      sceneState.remotePointerActivity[clientId] === "keydown"
+    ) {
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 1;
+      context.stroke();
+      context.strokeStyle = strokeStyle;
+      context.closePath();
+    }
+
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + 1, y + 14);
@@ -263,6 +276,7 @@ export function renderScene(
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
     context.globalAlpha = globalAlpha;
+    context.closePath();
   }
 
   // Paint scrollbars

@@ -458,6 +458,9 @@ export class App extends React.Component<any, AppState> {
     const pointerViewportCoords: {
       [id: string]: { x: number; y: number };
     } = {};
+    const pointerActivity: {
+      [id: string]: string | undefined;
+    } = {};
     this.state.collaborators.forEach((user, socketID) => {
       if (!user.pointer) {
         return;
@@ -471,6 +474,7 @@ export class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+      pointerActivity[socketID] = user.activity;
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       globalSceneState.getAllElements(),
@@ -485,6 +489,7 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
+        remotePointerActivity: pointerActivity,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -867,6 +872,19 @@ export class App extends React.Component<any, AppState> {
               });
               break;
             }
+            case "MOUSE_ACTIVITY": {
+              const { socketID, activity } = decryptedData.payload;
+              this.setState((state) => {
+                if (!state.collaborators.has(socketID)) {
+                  state.collaborators.set(socketID, {});
+                }
+                const user = state.collaborators.get(socketID)!;
+                user.activity = activity;
+                state.collaborators.set(socketID, user);
+                return state;
+              });
+              break;
+            }
           }
         },
       );
@@ -912,6 +930,23 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
+        },
+      };
+      return this._broadcastSocketData(
+        data as typeof data & { _brand: "socketUpdateData" },
+      );
+    }
+  };
+
+  private broadcastMouseActivity = (payload: {
+    activity: SocketUpdateDataSource["MOUSE_ACTIVITY"]["payload"]["activity"];
+  }) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["MOUSE_ACTIVITY"] = {
+        type: "MOUSE_ACTIVITY",
+        payload: {
+          socketID: this.socket.id,
+          activity: payload.activity,
         },
       };
       return this._broadcastSocketData(
@@ -1422,6 +1457,8 @@ export class App extends React.Component<any, AppState> {
 
     this.setState({ lastPointerDownWith: event.pointerType });
 
+    this.broadcastMouseActivity({ activity: "keydown" });
+
     // pan canvas on wheel button drag or space+drag
     if (
       gesture.pointers.size === 0 &&
@@ -1453,6 +1490,7 @@ export class App extends React.Component<any, AppState> {
           if (!isHoldingSpace) {
             setCursorForShape(this.state.elementType);
           }
+          this.broadcastMouseActivity({ activity: "keyup" });
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("pointerup", teardown);
           window.removeEventListener("blur", teardown);
@@ -1552,6 +1590,7 @@ export class App extends React.Component<any, AppState> {
       const onPointerUp = withBatchedUpdates(() => {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
+        this.broadcastMouseActivity({ activity: "keyup" });
         lastPointerUp = null;
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
@@ -2369,6 +2408,9 @@ export class App extends React.Component<any, AppState> {
 
       resizeArrowFn = null;
       lastPointerUp = null;
+
+      this.broadcastMouseActivity({ activity: "keyup" });
+
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
 
