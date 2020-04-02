@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/me", "destination": "/" }
+  ]
+}
