@@ -9,7 +9,7 @@ import { ExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter, getTargetElement } from "../scene";
+import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
@@ -110,7 +110,8 @@ export function MobileMenu({
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
-                targetElements={getTargetElement(elements, appState)}
+                appState={appState}
+                elements={elements}
                 renderAction={actionManager.renderAction}
                 elementType={appState.elementType}
               />

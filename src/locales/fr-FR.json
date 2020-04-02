@@ -104,13 +104,13 @@
     "headingMain_pre": "Une erreur est survenue. Essayez ",
     "headingMain_button": "de recharger la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "d'effacer la scène.",
+    "clearCanvasMessage_button": "d'effacer le canevas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
+    "trackedToSentry_pre": "L'erreur ",
+    "trackedToSentry_post": " a été enregistrée dans notre système.",
+    "openIssueMessage_pre": "Nous avons été très prudents de ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {

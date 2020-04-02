@@ -17,6 +17,8 @@ import { getSelectedElements } from "../scene/selection";
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+
 function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
@@ -24,6 +26,40 @@ function colorsForClientId(clientId: string) {
     background: colors.elementBackground[sum % colors.elementBackground.length],
     stroke: colors.elementStroke[sum % colors.elementBackground.length],
   };
+}
+
+function strokeRectWithRotation(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+  fill?: boolean,
+) {
+  context.translate(cx, cy);
+  context.rotate(angle);
+  if (fill) {
+    context.fillRect(x - cx, y - cy, width, height);
+  }
+  context.strokeRect(x - cx, y - cy, width, height);
+  context.rotate(-angle);
+  context.translate(-cx, -cy);
+}
+
+function strokeCircle(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  context.beginPath();
+  context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
 }
 
 export function renderScene(
@@ -113,7 +149,7 @@ export function renderScene(
   // Pain selected elements
   if (renderSelection) {
     const selectedElements = getSelectedElements(elements, appState);
-    const dashledLinePadding = 4 / sceneState.zoom;
+    const dashedLinePadding = 4 / sceneState.zoom;
 
     context.translate(sceneState.scrollX, sceneState.scrollY);
     selectedElements.forEach((element) => {
@@ -131,11 +167,15 @@ export function renderScene(
       context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / sceneState.zoom;
-      context.strokeRect(
-        elementX1 - dashledLinePadding,
-        elementY1 - dashledLinePadding,
-        elementWidth + dashledLinePadding * 2,
-        elementHeight + dashledLinePadding * 2,
+      strokeRectWithRotation(
+        context,
+        elementX1 - dashedLinePadding,
+        elementY1 - dashedLinePadding,
+        elementWidth + dashedLinePadding * 2,
+        elementHeight + dashedLinePadding * 2,
+        elementX1 + elementWidth / 2,
+        elementY1 + elementHeight / 2,
+        element.angle,
       );
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
@@ -143,19 +183,39 @@ export function renderScene(
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
-    if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
+    if (selectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
-      Object.values(handlers)
-        .filter((handler) => handler !== undefined)
-        .forEach((handler) => {
+      Object.keys(handlers).forEach((key) => {
+        const handler = handlers[key as HandlerRectanglesRet];
+        if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          context.fillRect(handler[0], handler[1], handler[2], handler[3]);
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          if (key === "rotation") {
+            strokeCircle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+            );
+          } else if (selectedElements[0].type !== "text") {
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              selectedElements[0].angle,
+              true, // fill before stroke
+            );
+          }
           context.lineWidth = lineWidth;
-        });
+        }
+      });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
     }
   }

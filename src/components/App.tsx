@@ -4,6 +4,7 @@ import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber } from "../types";
+import { getElementAbsoluteCoords } from "../element/bounds";
 
 import {
   newElement,
@@ -50,6 +51,7 @@ import { restore } from "../data/restore";
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
+import { rotate, adjustXYWithRotation } from "../math";
 
 import {
   isWritableElement,
@@ -1212,6 +1214,7 @@ export class App extends React.Component<any, AppState> {
       font: element.font,
       opacity: this.state.currentItemOpacity,
       zoom: this.state.zoom,
+      angle: element.angle,
       onSubmit: (text) => {
         if (text) {
           globalSceneState.replaceAllElements([
@@ -1707,6 +1710,7 @@ export class App extends React.Component<any, AppState> {
         opacity: this.state.currentItemOpacity,
         font: this.state.currentItemFont,
         zoom: this.state.zoom,
+        angle: 0,
         onSubmit: (text) => {
           if (text) {
             globalSceneState.replaceAllElements([
@@ -1864,39 +1868,31 @@ export class App extends React.Component<any, AppState> {
       pointerY: number,
       perfect: boolean,
     ) => {
-      const p1 = element.points[pointIndex];
-      if (perfect) {
-        const absPx = p1[0] + element.x;
-        const absPy = p1[1] + element.y;
+      const [px, py] = element.points[pointIndex];
+      let x = element.x + deltaX;
+      let y = element.y + deltaY;
+      let pointX = px - deltaX;
+      let pointY = py - deltaY;
 
+      if (perfect) {
         const { width, height } = getPerfectElementSize(
           element.type,
-          pointerX - element.x - p1[0],
-          pointerY - element.y - p1[1],
+          px + element.x - pointerX,
+          py + element.y - pointerY,
         );
-
-        const dx = element.x + width + p1[0];
-        const dy = element.y + height + p1[1];
-        mutateElement(element, {
-          x: dx,
-          y: dy,
-          points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([absPx - element.x, absPy - element.y] as const)
-              : point,
-          ),
-        });
-      } else {
-        mutateElement(element, {
-          x: element.x + deltaX,
-          y: element.y + deltaY,
-          points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([p1[0] - deltaX, p1[1] - deltaY] as const)
-              : point,
-          ),
-        });
+        x = px + element.x - width;
+        y = py + element.y - height;
+        pointX = width;
+        pointY = height;
       }
+
+      mutateElement(element, {
+        x,
+        y,
+        points: element.points.map((point, i) =>
+          i === pointIndex ? ([pointX, pointY] as const) : point,
+        ),
+      });
     };
 
     const arrowResizeEnd = (
@@ -1908,7 +1904,7 @@ export class App extends React.Component<any, AppState> {
       pointerY: number,
       perfect: boolean,
     ) => {
-      const p1 = element.points[pointIndex];
+      const [px, py] = element.points[pointIndex];
       if (perfect) {
         const { width, height } = getPerfectElementSize(
           element.type,
@@ -1923,9 +1919,7 @@ export class App extends React.Component<any, AppState> {
       } else {
         mutateElement(element, {
           points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([p1[0] + deltaX, p1[1] + deltaY] as const)
-              : point,
+            i === pointIndex ? ([px + deltaX, py + deltaY] as const) : point,
           ),
         });
       }
@@ -1978,7 +1972,10 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (isResizingElements && this.state.resizingElement) {
-        this.setState({ isResizing: true });
+        this.setState({
+          isResizing: resizeHandle !== "rotation",
+          isRotating: resizeHandle === "rotation",
+        });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(
           globalSceneState.getAllElements(),
@@ -1991,9 +1988,10 @@ export class App extends React.Component<any, AppState> {
             this.canvas,
             window.devicePixelRatio,
           );
-          const deltaX = x - lastX;
-          const deltaY = y - lastY;
           const element = selectedElements[0];
+          const angle = element.angle;
+          // reverse rotate delta
+          const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
           switch (resizeHandle) {
             case "nw":
               if (isLinearElement(element) && element.points.length === 2) {
@@ -2009,16 +2007,12 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width - deltaX;
-                const height = event.shiftKey
-                  ? element.width
-                  : element.height - deltaY;
+                const height = event.shiftKey ? width : element.height - deltaY;
+                const dY = element.height - height;
                 mutateElement(element, {
-                  x: element.x + deltaX,
-                  y: event.shiftKey
-                    ? element.y + element.height - element.width
-                    : element.y + deltaY,
                   width,
                   height,
+                  ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2045,12 +2039,11 @@ export class App extends React.Component<any, AppState> {
               } else {
                 const width = element.width + deltaX;
                 const height = event.shiftKey ? width : element.height - deltaY;
+                const dY = element.height - height;
                 mutateElement(element, {
-                  y: event.shiftKey
-                    ? element.y + element.height - width
-                    : element.y + deltaY,
                   width,
                   height,
+                  ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2076,13 +2069,12 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width - deltaX;
-                const height = event.shiftKey
-                  ? element.width
-                  : element.height + deltaY;
+                const height = event.shiftKey ? width : element.height + deltaY;
+                const dY = height - element.height;
                 mutateElement(element, {
-                  x: element.x + deltaX,
                   width,
                   height,
+                  ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2108,12 +2100,12 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width + deltaX;
-                const height = event.shiftKey
-                  ? element.width
-                  : element.height + deltaY;
+                const height = event.shiftKey ? width : element.height + deltaY;
+                const dY = height - element.height;
                 mutateElement(element, {
                   width,
                   height,
+                  ...adjustXYWithRotation("se", element, deltaX, dY, angle),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2137,13 +2129,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
-                  y: element.y + deltaY,
+                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
-                  y: element.y + deltaY,
+                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
                 });
               }
 
@@ -2161,13 +2153,13 @@ export class App extends React.Component<any, AppState> {
 
                 mutateElement(element, {
                   width,
-                  x: element.x + deltaX,
+                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
-                  x: element.x + deltaX,
+                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
                 });
               }
               break;
@@ -2183,11 +2175,13 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   height,
+                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
                   points: rescalePoints(1, height, element.points),
                 });
               } else {
                 mutateElement(element, {
                   height,
+                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
                 });
               }
               break;
@@ -2203,13 +2197,30 @@ export class App extends React.Component<any, AppState> {
                 }
                 mutateElement(element, {
                   width,
+                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
                   points: rescalePoints(0, width, element.points),
                 });
               } else {
                 mutateElement(element, {
                   width,
+                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
                 });
               }
+              break;
+            }
+            case "rotation": {
+              const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+              const cx = (x1 + x2) / 2;
+              const cy = (y1 + y2) / 2;
+              let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
+              if (event.shiftKey) {
+                angle += Math.PI / 16;
+                angle -= angle % (Math.PI / 8);
+              }
+              if (angle >= 2 * Math.PI) {
+                angle -= 2 * Math.PI;
+              }
+              mutateElement(element, { angle });
               break;
             }
           }
@@ -2355,6 +2366,7 @@ export class App extends React.Component<any, AppState> {
 
       this.setState({
         isResizing: false,
+        isRotating: false,
         resizingElement: null,
         selectionElement: null,
         editingElement: multiElement ? this.state.editingElement : null,
