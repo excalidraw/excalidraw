@@ -319,7 +319,9 @@ button,
 
 .dropdown-select {
   height: 1.5rem;
-  padding: 0 1.5rem 0 0.5rem;
+  padding: 0;
+  padding-inline-start: 0.5rem;
+  padding-inline-end: 1.5rem;
   background-color: #e9ecef;
   border-radius: var(--space-factor);
   border: 1px solid #ced4da;
@@ -329,6 +331,9 @@ button,
   background-image: url("https://free-use.s3-us-west-2.amazonaws.com/up-sort.svg");
   background-repeat: no-repeat;
   background-position: right 0.7rem top 50%, 0 0;
+  :root[dir="rtl"] & {
+    background-position: left 0.7rem top 50%, 0 0;
+  }
   background-size: 0.65em auto, 100%;
 
   &:focus {
@@ -344,14 +349,18 @@ button,
   }
   &.dropdown-select--floating {
     position: absolute;
-    margin-bottom: 0.5em;
-    margin-right: 0.5em;
+    margin: 0.5em;
   }
 }
 
 .dropdown-select__language.dropdown-select--floating {
-  right: 0;
   bottom: 0;
+  :root[dir="ltr"] & {
+    right: 0;
+  }
+  :root[dir="rtl"] & {
+    left: 0;
+  }
 }
 
 .visually-hidden {
@@ -393,5 +402,22 @@ button,
     bottom: 80px;
     bottom: calc(80px + var(--sab));
     z-index: -1;
+  }
+}
+
+.rtl-mirror {
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+}
+
+.github-corner {
+  position: absolute;
+  top: 0;
+  :root[dir="ltr"] & {
+    right: 0;
+  }
+  :root[dir="rtl"] & {
+    left: 0;
   }
 }
