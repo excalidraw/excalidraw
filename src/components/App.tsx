@@ -1864,39 +1864,31 @@ export class App extends React.Component<any, AppState> {
       pointerY: number,
       perfect: boolean,
     ) => {
-      const p1 = element.points[pointIndex];
-      if (perfect) {
-        const absPx = p1[0] + element.x;
-        const absPy = p1[1] + element.y;
+      const [px, py] = element.points[pointIndex];
+      let x = element.x + deltaX;
+      let y = element.y + deltaY;
+      let pointX = px - deltaX;
+      let pointY = py - deltaY;
 
+      if (perfect) {
         const { width, height } = getPerfectElementSize(
           element.type,
-          pointerX - element.x - p1[0],
-          pointerY - element.y - p1[1],
+          px + element.x - pointerX,
+          py + element.y - pointerY,
         );
-
-        const dx = element.x + width + p1[0];
-        const dy = element.y + height + p1[1];
-        mutateElement(element, {
-          x: dx,
-          y: dy,
-          points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([absPx - element.x, absPy - element.y] as const)
-              : point,
-          ),
-        });
-      } else {
-        mutateElement(element, {
-          x: element.x + deltaX,
-          y: element.y + deltaY,
-          points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([p1[0] - deltaX, p1[1] - deltaY] as const)
-              : point,
-          ),
-        });
+        x = px + element.x - width;
+        y = py + element.y - height;
+        pointX = width;
+        pointY = height;
       }
+
+      mutateElement(element, {
+        x,
+        y,
+        points: element.points.map((point, i) =>
+          i === pointIndex ? ([pointX, pointY] as const) : point,
+        ),
+      });
     };
 
     const arrowResizeEnd = (
@@ -1908,7 +1900,7 @@ export class App extends React.Component<any, AppState> {
       pointerY: number,
       perfect: boolean,
     ) => {
-      const p1 = element.points[pointIndex];
+      const [px, py] = element.points[pointIndex];
       if (perfect) {
         const { width, height } = getPerfectElementSize(
           element.type,
@@ -1923,9 +1915,7 @@ export class App extends React.Component<any, AppState> {
       } else {
         mutateElement(element, {
           points: element.points.map((point, i) =>
-            i === pointIndex
-              ? ([p1[0] + deltaX, p1[1] + deltaY] as const)
-              : point,
+            i === pointIndex ? ([px + deltaX, py + deltaY] as const) : point,
           ),
         });
       }
