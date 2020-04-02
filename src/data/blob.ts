@@ -11,7 +11,7 @@ export async function loadFromBlob(blob: any) {
     try {
       const data = JSON.parse(contents);
       if (data.type !== "excalidraw") {
-        throw new Error(t("alerts.couldNotLoadInvalidJSON"));
+        throw new Error(t("alerts.couldNotLoadInvalidFile"));
       }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
