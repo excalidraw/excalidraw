@@ -112,16 +112,16 @@
     "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
     "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
     "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
-    "sceneContent": "Zawartość sceny:"
+    "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
-    "desc_intro": "Możesz zaprosić ludzi do swojej obecnej sceny, aby współpracować.",
-    "desc_privacy": "Nie martw się, sesja wykorzystuje szyfrowanie end-to-end, więc cokolwiek narysujesz pozostanie to prywatne. Nawet nasz serwer nie będzie w stanie zobaczyć co wymyślisz.",
-    "button_startSession": "Start sesji",
-    "button_stopSession": "Stop sesji",
-    "desc_inProgressIntro": "Super! Właśnie utworzyłeś sesję w której możesz zaprosić innych do współpracy.",
-    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu) wasze dane zostaną utracone.",
-    "desc_shareLink": "Udostępnij ten link osobie, z którą chcesz współpracować:",
-    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
+    "desc_intro": "Będziesz w stanie pracować wraz z osobami które zaprosisz do współpracy.",
+    "desc_privacy": "By zapewnić Ci prywatność, sesja współpracy na żywo jest zabezpieczona szyfrowaniem end-to-end, co oznacza, że poza tobą i osobami z którymi podzielisz się linkiem, nikt nie ma dostępu do tego co będziecie tworzyć.",
+    "button_startSession": "Rozpocznij sesję",
+    "button_stopSession": "Zakończ sesję",
+    "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
+    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
+    "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
+    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   }
 }
