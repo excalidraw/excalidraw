@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "انقر لعمل نقاط متعددة، اسحب لخط واحد",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
-    "resize": "يمكنك تقييد الحجم من خلال الضغط على SHIFT أثناء تغيير الحجم"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "تم مواجهة خطأ. حاول مرة أخرى ",
