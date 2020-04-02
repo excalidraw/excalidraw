@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
