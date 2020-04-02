@@ -109,9 +109,9 @@
     "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
     "trackedToSentry_pre": "Błąd o identyfikatorze ",
     "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Byliśmy bardzo ostrożni, aby nie zamieścić informacji o Twojej scenie w błędzie. Jeżeli Twoja scena nie jest prywatna, prosimy rozważ następujące kroki na naszym ",
-    "openIssueMessage_button": "narzędziu do śledzenia błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i wklejenie w zgłoszenie na GitHub.",
+    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
+    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
+    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
     "sceneContent": "Zawartość sceny:"
   },
   "roomDialog": {
