@@ -2628,7 +2628,7 @@ export class App extends React.Component<any, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     this.setState({ shouldCacheIgnoreZoom: false });
-  }, 1000);
+  }, 300);
 
   private saveDebounced = debounce(() => {
     saveToLocalStorage(globalSceneState.getAllElements(), this.state);
