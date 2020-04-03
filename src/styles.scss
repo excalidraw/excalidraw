@@ -266,6 +266,11 @@ button,
   height: 100%;
 }
 
+.App-menu__left {
+  overflow-y: auto;
+  max-height: calc(100vh - 236px);
+}
+
 .ErrorSplash {
   min-height: 100vh;
   padding: 20px 0;
