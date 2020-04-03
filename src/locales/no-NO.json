@@ -42,7 +42,7 @@
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
-    "actions": "",
+    "actions": "Handlinger",
     "language": "Språk",
     "createRoom": "",
     "duplicateSelection": "Dupliser valgte elementer"
@@ -107,11 +107,11 @@
     "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
     "clearCanvasMessage_button": "å tømme lerretet.",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry_pre": "Feilen med identifikator ",
+    "trackedToSentry_post": " ble logget i vårt system.",
+    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp på vår ",
+    "openIssueMessage_button": "feilrapporteringssystem.",
+    "openIssueMessage_post": " Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
     "sceneContent": ""
   },
   "roomDialog": {
