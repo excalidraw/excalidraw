@@ -51,6 +51,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     collaborators,
     isCollaborating,
     isLoading,
+    errorMessage,
     ...exportedState
   } = appState;
   return exportedState;
