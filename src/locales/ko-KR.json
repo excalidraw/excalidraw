@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
     "couldNotCreateShareableLink": "공유 가능한 링크를 생성할 수 없습니다.",
+    "couldNotLoadInvalidFile": "유효하지 않은 파일입니다.",
     "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
     "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "모든 데이터는 P2P 방식으로 공동 작업자 간에 공유되며 서버에는 저장되지 않습니다. 따라서 모든 작업자의 연결이 끊어지면 파일 또는 공유 가능한 링크로 보관하지 않는 한 데이터가 유실됩니다.",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
     "desc_exitSession": "세션을 중단하면 연결은 끊어지나 로컬에서 작업을 이어갈 수 있습니다. 로컬 작업은 다른 작업자에게 영향을 미치지 않으며 그들의 공동 작업은 계속 유지됩니다."
+  },
+  "errorDialog": {
+    "title": "에러"
   }
 }

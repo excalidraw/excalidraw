@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
     "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }

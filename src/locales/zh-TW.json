@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
     "couldNotCreateShareableLink": "無法建立共享連結",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "從後端導入失敗。",
     "cannotExportEmptyCanvas": "無法輸出空白的 canvas。",
     "couldNotCopyToClipboard": "無法複製到剪貼簿。嘗試使用 Chrome 瀏覽器。",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "注意，畫面的資料是透過 P2P 方式與協作者之間共享，不會保留在我們的伺服器。因此，如果所有人中斷連線時，將會遺失資料，除非將資料導出成檔案或是一個可共享的連結。",
     "desc_shareLink": "與要協作的任何人分享此連結：",
     "desc_exitSession": "停止會議將會中斷你與會議室的連線，但你可以繼續在本機端繼續處理工作。注意，這不會影響到其他人，他們仍然可以在他們自己的版本上繼續協作。"
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
