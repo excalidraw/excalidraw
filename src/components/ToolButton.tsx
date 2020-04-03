@@ -2,8 +2,6 @@ import "./ToolIcon.scss";
 
 import React from "react";
 
-import { getLanguage } from "../i18n";
-
 type ToolIconSize = "s" | "m";
 
 type ToolButtonBaseProps = {
@@ -36,7 +34,6 @@ type ToolButtonProps =
     });
 
 const DEFAULT_SIZE: ToolIconSize = "m";
-const isRTL = getLanguage().rtl;
 
 export const ToolButton = React.forwardRef(function (
   props: ToolButtonProps,
@@ -45,6 +42,7 @@ export const ToolButton = React.forwardRef(function (
   const innerRef = React.useRef(null);
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
+
   if (props.type === "button") {
     return (
       <button
@@ -65,9 +63,7 @@ export const ToolButton = React.forwardRef(function (
           {props.icon || props.label}
         </div>
         {props.showAriaLabel && (
-          <div className={`ToolIcon__label${isRTL ? " rtl" : ""}`}>
-            {props["aria-label"]}
-          </div>
+          <div className="ToolIcon__label">{props["aria-label"]}</div>
         )}
         {props.children}
       </button>
