@@ -23,7 +23,7 @@ export const languages = [
   { lng: "zh-CN", label: "简体中文", data: require("./locales/zh-CN.json") },
   {
     lng: "ar-SA",
-    label: "عربي",
+    label: "العربية",
     data: require("./locales/ar-SA.json"),
     rtl: true,
   },
