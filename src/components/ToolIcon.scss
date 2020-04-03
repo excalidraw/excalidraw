@@ -33,6 +33,10 @@
 
   & + .ToolIcon__label {
     margin-left: 0;
+    &.rtl {
+      margin-right: 0;
+      margin-left: 0.8em;
+    }
   }
 }
 
