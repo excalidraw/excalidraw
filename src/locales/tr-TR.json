@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
-    "resize": "SHIFT'e basılı tutarak orantılı şekilde boyutlandırabilirsiniz"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",

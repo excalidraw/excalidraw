@@ -216,6 +216,7 @@ button,
 
 .App-menu_top {
   grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
@@ -236,8 +237,8 @@ button,
 .App-menu_bottom {
   position: fixed;
   bottom: 0;
-
   grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
@@ -354,12 +355,12 @@ button,
 }
 
 .dropdown-select__language.dropdown-select--floating {
-  bottom: 0;
+  bottom: 10px;
   :root[dir="ltr"] & {
-    right: 0;
+    right: 10px;
   }
   :root[dir="rtl"] & {
-    left: 0;
+    left: 10px;
   }
 }
 

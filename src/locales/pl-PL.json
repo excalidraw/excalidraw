@@ -3,7 +3,7 @@
     "paste": "Wklej",
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
-    "copyAsPng": "Kopiuj do schowka jako PNG",
+    "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -45,7 +45,7 @@
     "actions": "Akcje",
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
-    "duplicateSelection": "Duplikuj wybrane elementy"
+    "duplicateSelection": "Powiel wybrane elementy"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -53,7 +53,7 @@
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
-    "copyPngToClipboard": "Skopiuj PNG do schowka",
+    "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "save": "Zapisz",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
@@ -68,7 +68,7 @@
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
-    "roomDialog": "Start współpracy na żywo",
+    "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój"
   },
   "alerts": {
@@ -97,30 +97,31 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "linearElementMulti": "Kliknij na ostatni punkt lub naciśnij Escape albo Enter, aby zakończyć",
-    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT"
+    "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
+    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT",
+    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
     "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli przeładowanie nie działa, spróbuj ",
-    "clearCanvasMessage_button": "wyczyścić dokument.",
-    "clearCanvasCaveat": " To spowoduje utratę pracy ",
+    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
+    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
     "trackedToSentry_pre": "Błąd o identyfikatorze ",
     "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Byliśmy bardzo ostrożni, aby nie zamieścić informacji o Twojej scenie w błędzie. Jeżeli Twoja scena nie jest prywatna, prosimy rozważ następujące kroki na naszym ",
-    "openIssueMessage_button": "narzędziu do śledzenia błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i wklejenie w zgłoszenie na GitHub.",
-    "sceneContent": "Zawartość sceny:"
+    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
+    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
+    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
+    "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
-    "desc_intro": "Możesz zaprosić ludzi do swojej obecnej sceny, aby współpracować.",
-    "desc_privacy": "Nie martw się, sesja wykorzystuje szyfrowanie end-to-end, więc cokolwiek narysujesz pozostanie to prywatne. Nawet nasz serwer nie będzie w stanie zobaczyć co wymyślisz.",
-    "button_startSession": "Start sesji",
-    "button_stopSession": "Stop sesji",
-    "desc_inProgressIntro": "Współpraca na żywo właśnie trwa.",
-    "desc_persistenceWarning": "Zauważ, że dane sceny są współdzielone pomiędzy współpracownikami w modelu P2P i nie są przechowywane na naszym serwerze. Aby nie stracić danych gdy wszyscy się rozłączą, wyeksportuj dane do pliku lub linku do udostępnienia.",
-    "desc_shareLink": "Udostępnij ten link osobie, z którą chcesz współpracować:",
-    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę nad sceną. Zauważ, że nie będzie to miało wpływu na inne osoby i nadal będą mogli kontynuować współpracę nad swoją wersją."
+    "desc_intro": "Będziesz w stanie pracować wraz z osobami które zaprosisz do współpracy.",
+    "desc_privacy": "By zapewnić Ci prywatność, sesja współpracy na żywo jest zabezpieczona szyfrowaniem end-to-end, co oznacza, że poza tobą i osobami z którymi podzielisz się linkiem, nikt nie ma dostępu do tego co będziecie tworzyć.",
+    "button_startSession": "Rozpocznij sesję",
+    "button_stopSession": "Zakończ sesję",
+    "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
+    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
+    "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
+    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   }
 }

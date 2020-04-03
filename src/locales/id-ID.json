@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "linearElementMulti": "",
-    "resize": "Anda dapat membatasi proporsi dengan menahan SHIFT sambil mengubah ukuran"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
