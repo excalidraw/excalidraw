@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
@@ -126,6 +126,6 @@
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Erreur"
   }
 }
