@@ -1195,6 +1195,10 @@ export class App extends React.Component<any, AppState> {
         resetSelection();
       },
     });
+
+    // do an initial update to re-initialize element position since we were
+    //  modifying element's x/y for sake of editor (case: syncing to remote)
+    updateElement(element.text);
   }
 
   private startTextEditing = ({
