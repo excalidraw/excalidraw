@@ -259,9 +259,16 @@ export function renderScene(
     ) {
       context.beginPath();
       context.arc(x, y, 15, 0, 2 * Math.PI, false);
-      context.lineWidth = 1;
+      context.lineWidth = 3;
+      context.strokeStyle = "#ffffff88";
       context.stroke();
-      context.strokeStyle = strokeStyle;
+      context.closePath();
+
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 1;
+      context.strokeStyle = stroke;
+      context.stroke();
       context.closePath();
     }
 
