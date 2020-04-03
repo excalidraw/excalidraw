@@ -35,6 +35,7 @@ import {
   getSelectedElements,
   globalSceneState,
   isSomeElementSelected,
+  calculateScrollCenter,
 } from "../scene";
 import {
   decryptAESGEM,
@@ -726,8 +727,20 @@ export class App extends React.Component<any, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource["SCENE_INIT" | "SCENE_UPDATE"],
+        { scrollToContent = false }: { scrollToContent?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
+
+        if (scrollToContent) {
+          this.setState({
+            ...this.state,
+            ...calculateScrollCenter(
+              remoteElements.filter((element) => {
+                return !element.isDeleted;
+              }),
+            ),
+          });
+        }
 
         // Perform reconciliation - in collaboration, if we encounter
         // elements with more staler versions than ours, ignore them
@@ -836,7 +849,7 @@ export class App extends React.Component<any, AppState> {
               return;
             case "SCENE_INIT": {
               if (!this.socketInitialized) {
-                updateScene(decryptedData);
+                updateScene(decryptedData, { scrollToContent: true });
               }
               break;
             }
