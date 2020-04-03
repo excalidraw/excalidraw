@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
     "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
     "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
