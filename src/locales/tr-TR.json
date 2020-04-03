@@ -42,7 +42,7 @@
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
-    "actions": "",
+    "actions": "İşlemler",
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Seçili nesneleri yinele"
@@ -53,7 +53,7 @@
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "PNG'yi panoya kopyala",
     "save": "Kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
@@ -112,7 +112,7 @@
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununu kopyalayarak ve yapıştırarak bilgi veriniz.",
     "sceneContent": "Çalışma alanı:"
   },
   "roomDialog": {
@@ -126,6 +126,6 @@
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Hata"
   }
 }
