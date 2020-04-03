@@ -247,9 +247,13 @@ export class App extends React.Component<any, AppState> {
                     }),
                   )
                   .catch((error) => {
-                    console.error(error);
-                    this.setState({ isLoading: false });
+                    this.setState({ isLoading: false, errorMessage: error });
                   });
+              } else {
+                this.setState({
+                  isLoading: false,
+                  errorMessage: t("alerts.couldNotLoadInvalidFile"),
+                });
               }
             }}
           >
