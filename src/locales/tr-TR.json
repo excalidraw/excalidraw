@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
     "couldNotCreateShareableLink": "Paylaşılabilir bağlantı oluşturulamadı.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş canvas dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız yalnızca ortama katılmış diğer kişilerle paylaşılmaktadır. Katılımcılar eş zamanlı olarak bağlantı sorunları yaşadığında kaybolacaktır. Bunu önlemek için çalışma ortamını bir dosyaya veya paylaşılabilir bir bağlantıya aktarın.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
