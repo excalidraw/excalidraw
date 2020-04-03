@@ -21,6 +21,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -34,6 +35,7 @@ export function textWysiwyg({
   opacity,
   zoom,
   angle,
+  onChange,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -96,6 +98,12 @@ export function textWysiwyg({
     }
   };
 
+  if (onChange) {
+    editable.oninput = () => {
+      onChange(trimText(editable.innerText));
+    };
+  }
+
   editable.onkeydown = (ev) => {
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
@@ -121,9 +129,6 @@ export function textWysiwyg({
   }
 
   function cleanup() {
-    editable.onblur = null;
-    editable.onkeydown = null;
-    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }

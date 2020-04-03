@@ -46,11 +46,14 @@ import {
   SocketUpdateDataSource,
   exportCanvas,
 } from "../data";
-import { restore } from "../data/restore";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawLinearElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "../element/types";
 import { rotate, adjustXYWithRotation } from "../math";
 
 import {
@@ -474,7 +477,15 @@ export class App extends React.Component<any, AppState> {
       );
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      globalSceneState.getAllElements(),
+      globalSceneState.getAllElements().filter((element) => {
+        // don't render text element that's being currently edited (it's
+        //  rendered on remote only)
+        return (
+          !this.state.editingElement ||
+          this.state.editingElement.type !== "text" ||
+          element.id !== this.state.editingElement.id
+        );
+      }),
       this.state,
       this.state.selectionElement,
       window.devicePixelRatio,
@@ -717,9 +728,7 @@ export class App extends React.Component<any, AppState> {
         decryptedData: SocketUpdateDataSource["SCENE_INIT" | "SCENE_UPDATE"],
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
-        const restoredState = restore(remoteElements || [], null, {
-          scrollToContent: true,
-        });
+
         // Perform reconciliation - in collaboration, if we encounter
         // elements with more staler versions than ours, ignore them
         // and keep ours.
@@ -727,7 +736,7 @@ export class App extends React.Component<any, AppState> {
           globalSceneState.getAllElements() == null ||
           globalSceneState.getAllElements().length === 0
         ) {
-          globalSceneState.replaceAllElements(restoredState.elements);
+          globalSceneState.replaceAllElements(remoteElements);
         } else {
           // create a map of ids so we don't have to iterate
           // over the array more than once.
@@ -736,7 +745,7 @@ export class App extends React.Component<any, AppState> {
           );
 
           // Reconcile
-          const newElements = restoredState.elements
+          const newElements = remoteElements
             .reduce((elements, element) => {
               // if the remote element references one that's currently
               //  edited on local, skip it (it'll be added in the next
@@ -779,7 +788,7 @@ export class App extends React.Component<any, AppState> {
               }
 
               return elements;
-            }, [] as Mutable<typeof restoredState.elements>)
+            }, [] as Mutable<typeof remoteElements>)
             // add local elements that weren't deleted or on remote
             .concat(...Object.values(localElementMap));
 
@@ -1082,6 +1091,96 @@ export class App extends React.Component<any, AppState> {
     globalSceneState.replaceAllElements(elements);
   };
 
+  private handleTextWysiwyg(
+    element: ExcalidrawTextElement,
+    {
+      x,
+      y,
+      isExistingElement = false,
+    }: { x: number; y: number; isExistingElement?: boolean },
+  ) {
+    const resetSelection = () => {
+      this.setState({
+        draggingElement: null,
+        editingElement: null,
+      });
+    };
+
+    // deselect all other elements when inserting text
+    this.setState({ selectedElementIds: {} });
+
+    const deleteElement = () => {
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getAllElements().map((_element) => {
+          if (_element.id === element.id) {
+            return newElementWith(_element, { isDeleted: true });
+          }
+          return _element;
+        }),
+      ]);
+    };
+
+    const updateElement = (text: string) => {
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getAllElements().map((_element) => {
+          if (_element.id === element.id) {
+            return newTextElement({
+              ..._element,
+              x: element.x,
+              y: element.y,
+              text,
+              font: this.state.currentItemFont,
+            });
+          }
+          return _element;
+        }),
+      ]);
+    };
+
+    textWysiwyg({
+      x,
+      y,
+      initText: element.text,
+      strokeColor: element.strokeColor,
+      opacity: element.opacity,
+      font: element.font,
+      angle: element.angle,
+      zoom: this.state.zoom,
+      onChange: withBatchedUpdates((text) => {
+        if (text) {
+          updateElement(text);
+        } else {
+          deleteElement();
+        }
+      }),
+      onSubmit: withBatchedUpdates((text) => {
+        updateElement(text);
+        this.setState((prevState) => ({
+          selectedElementIds: {
+            ...prevState.selectedElementIds,
+            [element.id]: true,
+          },
+        }));
+        if (this.state.elementLocked) {
+          setCursorForShape(this.state.elementType);
+        }
+        history.resumeRecording();
+        resetSelection();
+      }),
+      onCancel: withBatchedUpdates(() => {
+        deleteElement();
+        if (isExistingElement) {
+          history.resumeRecording();
+        }
+        resetSelection();
+      }),
+    });
+
+    // do an initial update to re-initialize element position since we were
+    //  modifying element's x/y for sake of editor (case: syncing to remote)
+    updateElement(element.text);
+  }
+
   private startTextEditing = ({
     x,
     y,
@@ -1124,13 +1223,10 @@ export class App extends React.Component<any, AppState> {
     let textX = clientX || x;
     let textY = clientY || y;
 
-    if (elementAtPosition && isTextElement(elementAtPosition)) {
-      globalSceneState.replaceAllElements(
-        globalSceneState
-          .getAllElements()
-          .filter((element) => element.id !== elementAtPosition.id),
-      );
+    let isExistingTextElement = false;
 
+    if (elementAtPosition && isTextElement(elementAtPosition)) {
+      isExistingTextElement = true;
       const centerElementX = elementAtPosition.x + elementAtPosition.width / 2;
       const centerElementY = elementAtPosition.y + elementAtPosition.height / 2;
 
@@ -1152,64 +1248,40 @@ export class App extends React.Component<any, AppState> {
         x: centerElementX,
         y: centerElementY,
       });
-    } else if (centerIfPossible) {
-      const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
-        x,
-        y,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
+    } else {
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getAllElements(),
+        element,
+      ]);
 
-      if (snappedToCenterPosition) {
-        mutateElement(element, {
-          x: snappedToCenterPosition.elementCenterX,
-          y: snappedToCenterPosition.elementCenterY,
-        });
-        textX = snappedToCenterPosition.wysiwygX;
-        textY = snappedToCenterPosition.wysiwygY;
+      if (centerIfPossible) {
+        const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+          x,
+          y,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+
+        if (snappedToCenterPosition) {
+          mutateElement(element, {
+            x: snappedToCenterPosition.elementCenterX,
+            y: snappedToCenterPosition.elementCenterY,
+          });
+          textX = snappedToCenterPosition.wysiwygX;
+          textY = snappedToCenterPosition.wysiwygY;
+        }
       }
     }
 
-    const resetSelection = () => {
-      this.setState({
-        draggingElement: null,
-        editingElement: null,
-      });
-    };
+    this.setState({
+      editingElement: element,
+    });
 
-    // deselect all other elements when inserting text
-    this.setState({ selectedElementIds: {} });
-
-    textWysiwyg({
-      initText: element.text,
+    this.handleTextWysiwyg(element, {
       x: textX,
       y: textY,
-      strokeColor: element.strokeColor,
-      font: element.font,
-      opacity: this.state.currentItemOpacity,
-      zoom: this.state.zoom,
-      angle: element.angle,
-      onSubmit: (text) => {
-        if (text) {
-          globalSceneState.replaceAllElements([
-            ...globalSceneState.getAllElements(),
-            // we need to recreate the element to update dimensions & position
-            newTextElement({ ...element, text, font: element.font }),
-          ]);
-        }
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [element.id]: true,
-          },
-        }));
-        history.resumeRecording();
-        resetSelection();
-      },
-      onCancel: () => {
-        resetSelection();
-      },
+      isExistingElement: isExistingTextElement,
     });
   };
 
@@ -1670,48 +1742,14 @@ export class App extends React.Component<any, AppState> {
         font: this.state.currentItemFont,
       });
 
-      const resetSelection = () => {
-        this.setState({
-          draggingElement: null,
-          editingElement: null,
-        });
-      };
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getAllElements(),
+        element,
+      ]);
 
-      textWysiwyg({
-        initText: "",
+      this.handleTextWysiwyg(element, {
         x: snappedToCenterPosition?.wysiwygX ?? event.clientX,
         y: snappedToCenterPosition?.wysiwygY ?? event.clientY,
-        strokeColor: this.state.currentItemStrokeColor,
-        opacity: this.state.currentItemOpacity,
-        font: this.state.currentItemFont,
-        zoom: this.state.zoom,
-        angle: 0,
-        onSubmit: (text) => {
-          if (text) {
-            globalSceneState.replaceAllElements([
-              ...globalSceneState.getAllElements(),
-              newTextElement({
-                ...element,
-                text,
-                font: this.state.currentItemFont,
-              }),
-            ]);
-          }
-          this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [element.id]: true,
-            },
-          }));
-          if (this.state.elementLocked) {
-            setCursorForShape(this.state.elementType);
-          }
-          history.resumeRecording();
-          resetSelection();
-        },
-        onCancel: () => {
-          resetSelection();
-        },
       });
       resetCursor();
       if (!this.state.elementLocked) {
