@@ -6,6 +6,10 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        },
+        {
+          "key": "Feature-Policy",
+          "value": "*"
         }
       ]
     }
