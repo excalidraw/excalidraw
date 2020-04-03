@@ -65,7 +65,7 @@ export const ToolButton = React.forwardRef(function (
           {props.icon || props.label}
         </div>
         {props.showAriaLabel && (
-          <div className={`ToolIcon__label ${isRTL && "rtl"}`}>
+          <div className={`ToolIcon__label${isRTL ? " rtl" : ""}`}>
             {props["aria-label"]}
           </div>
         )}
