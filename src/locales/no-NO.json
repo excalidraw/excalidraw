@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
     "couldNotCreateShareableLink": "Kunne ikke lage delbar lenke.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
     "desc_exitSession": ""
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
