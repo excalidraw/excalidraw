@@ -146,13 +146,32 @@ export function renderScene(
     );
   }
 
-  // Pain selected elements
+  // Paint selected elements
   if (renderSelection) {
-    const selectedElements = getSelectedElements(elements, appState);
-    const dashedLinePadding = 4 / sceneState.zoom;
-
     context.translate(sceneState.scrollX, sceneState.scrollY);
-    selectedElements.forEach((element) => {
+
+    const selections = elements.reduce((acc, element) => {
+      const selectionColors = [];
+      // local user
+      if (appState.selectedElementIds[element.id]) {
+        selectionColors.push("#000000");
+      }
+      // remote users
+      if (sceneState.remoteSelectedElementIds[element.id]) {
+        selectionColors.push(
+          ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
+            const { background } = colorsForClientId(socketId);
+            return background;
+          }),
+        );
+      }
+      if (selectionColors.length) {
+        acc.push({ element, selectionColors });
+      }
+      return acc;
+    }, [] as { element: ExcalidrawElement; selectionColors: string[] }[]);
+
+    selections.forEach(({ element, selectionColors }) => {
       const [
         elementX1,
         elementY1,
@@ -164,23 +183,43 @@ export function renderScene(
       const elementHeight = elementY2 - elementY1;
 
       const initialLineDash = context.getLineDash();
-      context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
+      const lineDashOffset = context.lineDashOffset;
+      const strokeStyle = context.strokeStyle;
+
+      const dashedLinePadding = 4 / sceneState.zoom;
+      const dashWidth = 8 / sceneState.zoom;
+      const spaceWidth = 4 / sceneState.zoom;
+
       context.lineWidth = 1 / sceneState.zoom;
-      strokeRectWithRotation(
-        context,
-        elementX1 - dashedLinePadding,
-        elementY1 - dashedLinePadding,
-        elementWidth + dashedLinePadding * 2,
-        elementHeight + dashedLinePadding * 2,
-        elementX1 + elementWidth / 2,
-        elementY1 + elementHeight / 2,
-        element.angle,
-      );
+
+      const count = selectionColors.length;
+      for (var i = 0; i < count; ++i) {
+        context.strokeStyle = selectionColors[i];
+        context.setLineDash([
+          dashWidth,
+          spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+        ]);
+        context.lineDashOffset = (dashWidth + spaceWidth) * i;
+        strokeRectWithRotation(
+          context,
+          elementX1 - dashedLinePadding,
+          elementY1 - dashedLinePadding,
+          elementWidth + dashedLinePadding * 2,
+          elementHeight + dashedLinePadding * 2,
+          elementX1 + elementWidth / 2,
+          elementY1 + elementHeight / 2,
+          element.angle,
+        );
+      }
+      context.lineDashOffset = lineDashOffset;
+      context.strokeStyle = strokeStyle;
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
+
+    const selectedElements = getSelectedElements(elements, appState);
 
     // Paint resize handlers
     if (selectedElements.length === 1) {

@@ -102,7 +102,7 @@ import {
   ARROW_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
-import { ScrollBars } from "../scene/types";
+import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
@@ -477,10 +477,17 @@ export class App extends React.Component<any, AppState> {
     if (this.state.isCollaborating && !this.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
-    const pointerViewportCoords: {
-      [id: string]: { x: number; y: number };
-    } = {};
+    const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
+    const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     this.state.collaborators.forEach((user, socketID) => {
+      if (user.selectedElementIds) {
+        for (const id of Object.keys(user.selectedElementIds)) {
+          if (!(id in remoteSelectedElementIds)) {
+            remoteSelectedElementIds[id] = [];
+          }
+          remoteSelectedElementIds[id].push(socketID);
+        }
+      }
       if (!user.pointer) {
         return;
       }
@@ -515,6 +522,7 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
+        remoteSelectedElementIds: remoteSelectedElementIds,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -874,13 +882,18 @@ export class App extends React.Component<any, AppState> {
               updateScene(decryptedData);
               break;
             case "MOUSE_LOCATION": {
-              const { socketID, pointerCoords } = decryptedData.payload;
+              const {
+                socketID,
+                pointerCoords,
+                selectedElementIds,
+              } = decryptedData.payload;
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
                 }
                 const user = state.collaborators.get(socketID)!;
                 user.pointer = pointerCoords;
+                user.selectedElementIds = selectedElementIds;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -931,6 +944,7 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
+          selectedElementIds: this.state.selectedElementIds,
         },
       };
       return this._broadcastSocketData(
