@@ -1432,7 +1432,7 @@ export class App extends React.Component<any, AppState> {
       globalSceneState.getAllElements(),
       this.state,
     );
-    if (selectedElements.length === 1 && !isOverScrollBar) {
+    if (selectedElements.length >= 1 && !isOverScrollBar) {
       const resizeElement = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
         this.state,
@@ -1638,7 +1638,7 @@ export class App extends React.Component<any, AppState> {
         globalSceneState.getAllElements(),
         this.state,
       );
-      if (selectedElements.length === 1 && resizeElement) {
+      if (selectedElements.length >= 1 && resizeElement) {
         this.setState({
           resizingElement: resizeElement ? resizeElement.element : null,
         });
@@ -2254,6 +2254,26 @@ export class App extends React.Component<any, AppState> {
 
           lastX = x;
           lastY = y;
+          return;
+        } else if (selectedElements.length > 1) {
+          // EXPERIMENT
+          const [minX, minY] = getCommonBounds(selectedElements);
+          const { x } = viewportCoordsToSceneCoords(
+            event,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
+          // just using x for now
+          const scale = 1 + (x - lastX) / minX; // roughly
+          selectedElements.forEach((element) => {
+            const width = element.width * scale;
+            const height = element.height * scale;
+            const x = element.x + (element.x - minX) * (scale - 1);
+            const y = element.y + (element.y - minY) * (scale - 1);
+            mutateElement(element, { width, height, x, y });
+          });
+          lastX = x;
           return;
         }
       }

@@ -183,7 +183,7 @@ export function renderScene(
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
-    if (selectedElements.length === 1) {
+    if (selectedElements.length >= 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
