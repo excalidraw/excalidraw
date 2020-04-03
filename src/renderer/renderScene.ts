@@ -24,8 +24,8 @@ function colorsForClientId(clientId: string) {
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
 
   // Skip transparent background.
-  const backgrounds = colors.elementBackground.splice(1);
-  const strokes = colors.elementStroke.splice(1);
+  const backgrounds = colors.elementBackground.slice(1);
+  const strokes = colors.elementStroke.slice(1);
   return {
     background: backgrounds[sum % backgrounds.length],
     stroke: strokes[sum % strokes.length],
