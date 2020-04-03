@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
     "couldNotCreateShareableLink": "Tidak bisa membuat tautan yang bisa dibagikan",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Gagal mengimpor dari backend",
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "",
     "desc_shareLink": "",
     "desc_exitSession": ""
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
