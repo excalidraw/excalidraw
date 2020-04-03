@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "",
     "linearElementMulti": "",
-    "resize": "当你调整大小时可以按住 SHIFT 来固定比例"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试 ",

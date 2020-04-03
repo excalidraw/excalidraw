@@ -42,7 +42,7 @@
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "Rajzvászon",
     "layers": "Rétegek",
-    "actions": "",
+    "actions": "Műveletek",
     "language": "Nyelv",
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "Kijelölt elem duplikálása"
@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
-    "resize": "Az arányokat korlátozhatja a SHIFT billentyű lenyomásával átmérezetés közben"
+    "resize": "A SHIFT billentyű lenyomva tartásával megőrizheti az arányokat",
+    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
@@ -106,11 +107,11 @@
     "clearCanvasMessage": "Ha az újratöltés nem működik, próbálja ",
     "clearCanvasMessage_button": "törölni a vászont.",
     "clearCanvasCaveat": " Ezzel elveszik minden eddigi munkája ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
+    "trackedToSentry_pre": "A hibakód azonosítóval ",
+    "trackedToSentry_post": " nyomon van követve a rendszerünkben.",
+    "openIssueMessage_pre": "Nagyon vigyáztunk, hogy ne adjunk meg a jelenetre vonatkozó információkat a hibában. Ha a jeleneted nem bizalmas, kérjük fontolja meg a jelenet hozzáadását a hibakövető rendszerünkben ",
     "openIssueMessage_button": "hibabejelentő.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Kérjük, másolja be az alábbi információkat a GitHub problémába.",
     "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {
