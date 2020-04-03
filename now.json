@@ -2,7 +2,8 @@
   "redirects": [
     {
       "source": "/([^.]+)",
-      "destination": "/"
+      "destination": "/",
+      "statusCode": 301
     }
   ]
 }
