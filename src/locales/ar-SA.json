@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",
     "couldNotCreateShareableLink": "تعذر إنشاء رابطة المشاركة.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الإستيراد من السيرفر.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
     "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة. حاول استخدام متصفح Chrome.",
@@ -99,8 +99,8 @@
   "hints": {
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
-    "resize": "",
-    "rotate": ""
+    "resize": "يمكنك تقييد الحجم من خلال الضغط على SHIFT أثناء تغيير الحجم",
+    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
@@ -126,6 +126,6 @@
     "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم."
   },
   "errorDialog": {
-    "title": ""
+    "title": "خطأ"
   }
 }
