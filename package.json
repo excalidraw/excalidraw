@@ -75,6 +75,7 @@
       ],
       "no-else-return": "warn",
       "no-useless-return": "warn",
+      "prefer-arrow-callback": "warn",
       "prefer-const": [
         "warn",
         {
