@@ -42,7 +42,7 @@
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
-    "actions": "",
+    "actions": "Handlinger",
     "language": "Språk",
     "createRoom": "",
     "duplicateSelection": "Dupliser valgte elementer"
@@ -98,8 +98,8 @@
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
-    "resize": "",
-    "rotate": ""
+    "resize": "Du kan låse forholdet ved å holde SHIFT mens du endrer størrelsen",
+    "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer"
   },
   "errorSplash": {
     "headingMain_pre": "En feil oppsto. Prøv ",
@@ -107,11 +107,11 @@
     "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
     "clearCanvasMessage_button": "å tømme lerretet.",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry_pre": "Feilen med identifikator ",
+    "trackedToSentry_post": " ble logget i vårt system.",
+    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp på vår ",
+    "openIssueMessage_button": "feilrapporteringssystem.",
+    "openIssueMessage_post": " Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
     "sceneContent": ""
   },
   "roomDialog": {
