@@ -1,0 +1,12 @@
+# http://EditorConfig.org
+
+# top-level EditorConfig file
+root = true
+
+[*]
+indent_style = space
+charset = utf-8
+
+[*.{ts,tsx,js,json}]
+indent_size = 2
+end_of_line = lf
