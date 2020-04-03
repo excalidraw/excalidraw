@@ -22,9 +22,13 @@ type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+
+  // Skip transparent background.
+  const backgrounds = colors.elementBackground.slice(1);
+  const strokes = colors.elementStroke.slice(1);
   return {
-    background: colors.elementBackground[sum % colors.elementBackground.length],
-    stroke: colors.elementStroke[sum % colors.elementBackground.length],
+    background: backgrounds[sum % backgrounds.length],
+    stroke: strokes[sum % strokes.length],
   };
 }
 
