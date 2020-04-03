@@ -267,7 +267,7 @@ button,
 }
 
 .App-menu__left--scrollable {
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: calc(100vh - 204px);
   box-shadow: var(--shadow-island);
 }
