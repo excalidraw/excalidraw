@@ -1275,13 +1275,8 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    const pointerCoords = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-    this.savePointer(pointerCoords, this.state.cursorActivity);
+    this.savePointer(event.clientX, event.clientY, this.state.cursorActivity);
+
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -1432,17 +1427,11 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const pointerCoords = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorActivity: "down",
     });
-    this.savePointer(pointerCoords, "down");
+    this.savePointer(event.clientX, event.clientY, "down");
 
     // pan canvas on wheel button drag or space+drag
     if (
@@ -1475,16 +1464,10 @@ export class App extends React.Component<any, AppState> {
           if (!isHoldingSpace) {
             setCursorForShape(this.state.elementType);
           }
-          const pointerCoords = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
           this.setState({
             cursorActivity: "up",
           });
-          this.savePointer(pointerCoords, "up");
+          this.savePointer(event.clientX, event.clientY, "up");
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("pointerup", teardown);
           window.removeEventListener("blur", teardown);
@@ -1585,16 +1568,10 @@ export class App extends React.Component<any, AppState> {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
         lastPointerUp = null;
-        const pointerCoords = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-          this.canvas,
-          window.devicePixelRatio,
-        );
         this.setState({
           cursorActivity: "up",
         });
-        this.savePointer(pointerCoords, "up");
+        this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
       });
@@ -2392,7 +2369,7 @@ export class App extends React.Component<any, AppState> {
       }
     });
 
-    const onPointerUp = withBatchedUpdates((event: PointerEvent) => {
+    const onPointerUp = withBatchedUpdates((childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -2410,13 +2387,7 @@ export class App extends React.Component<any, AppState> {
         editingElement: multiElement ? this.state.editingElement : null,
       });
 
-      const pointerCoords = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
-      this.savePointer(pointerCoords, "up");
+      this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
       resizeArrowFn = null;
       lastPointerUp = null;
@@ -2430,7 +2401,7 @@ export class App extends React.Component<any, AppState> {
         }
         if (!draggingOccurred && draggingElement && !multiElement) {
           const { x, y } = viewportCoordsToSceneCoords(
-            event,
+            childEvent,
             this.state,
             this.canvas,
             window.devicePixelRatio,
@@ -2507,7 +2478,7 @@ export class App extends React.Component<any, AppState> {
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
       if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
-        if (event.shiftKey) {
+        if (childEvent.shiftKey) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2694,15 +2665,26 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private savePointer = (
-    pointerCoords: { x: number; y: number },
-    activity: "down" | "up",
-  ) => {
+  private savePointer = (x: number, y: number, activity: "up" | "down") => {
+    if (!x || !y) {
+      return;
+    }
+    const pointerCoords = viewportCoordsToSceneCoords(
+      { clientX: x, clientY: y },
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket && this.broadcastMouseLocation({ pointerCoords, activity });
+    this.socket &&
+      this.broadcastMouseLocation({
+        pointerCoords,
+        activity,
+      });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
