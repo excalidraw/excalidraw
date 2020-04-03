@@ -151,6 +151,9 @@ export function renderScene(
     context.translate(sceneState.scrollX, sceneState.scrollY);
 
     const selections = elements.reduce((acc, element) => {
+      if (element.isDeleted) {
+        return acc;
+      }
       const selectionColors = [];
       // local user
       if (appState.selectedElementIds[element.id]) {
