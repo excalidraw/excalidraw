@@ -98,11 +98,11 @@ export function textWysiwyg({
     }
   };
 
-  editable.oninput = () => {
-    if (onChange) {
+  if (onChange) {
+    editable.oninput = () => {
       onChange(trimText(editable.innerText));
-    }
-  };
+    };
+  }
 
   editable.onkeydown = (ev) => {
     if (ev.key === KEYS.ESCAPE) {
@@ -129,9 +129,6 @@ export function textWysiwyg({
   }
 
   function cleanup() {
-    editable.onblur = null;
-    editable.onkeydown = null;
-    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }
