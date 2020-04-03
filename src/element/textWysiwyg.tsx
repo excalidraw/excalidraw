@@ -108,16 +108,38 @@ export function textWysiwyg({
     if (ev.key === KEYS.ESCAPE) {
       ev.preventDefault();
       handleSubmit();
-    }
-    if (ev.key === KEYS.ENTER && (ev.shiftKey || ev[KEYS.CTRL_OR_CMD])) {
+    } else if (ev.key === KEYS.ENTER && (ev.shiftKey || ev[KEYS.CTRL_OR_CMD])) {
       ev.preventDefault();
       if (ev.isComposing || ev.keyCode === 229) {
         return;
       }
       handleSubmit();
-    }
-    if (ev.key === KEYS.ENTER && !ev.shiftKey) {
+    } else if (ev.key === KEYS.ENTER) {
+      const selection = window.getSelection();
+      if (!selection?.rangeCount) {
+        return;
+      }
+
+      ev.preventDefault();
       ev.stopPropagation();
+
+      const range = selection.getRangeAt(0);
+      selection.deleteFromDocument();
+      selection.removeAllRanges();
+
+      const br = document.createElement("br");
+      range.insertNode(br);
+
+      range.setStartAfter(br);
+      range.setEndAfter(br);
+      selection.addRange(range);
+
+      // if next sibling is an empty text node, assume we've inserted a <br>
+      //  at the end of the editor, in which case we need to insert a 2nd <br>
+      //  for the end empty line to be rendered
+      if (br.nextSibling?.nodeName === "#text" && !br.nextSibling.textContent) {
+        br.nextSibling.replaceWith(document.createElement("br"));
+      }
     }
   };
   editable.onblur = handleSubmit;
