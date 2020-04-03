@@ -228,6 +228,9 @@ button,
 
 .App-menu_top > *:first-child {
   justify-self: flex-start;
+  overflow-y: scroll;
+  max-height: calc(100vh - 60px);
+  padding: 5px;
 }
 
 .App-menu_top > *:last-child {
@@ -236,12 +239,13 @@ button,
 
 .App-menu_bottom {
   position: fixed;
-  bottom: 0;
+  bottom: var(--margin);
   grid-template-columns: 1fr auto 1fr;
   grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
+  padding: 5px;
 }
 
 .App-menu_bottom > * {
