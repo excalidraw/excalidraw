@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
+    "resize": "Vous pouvez contraindre les proportions en maintenant la touche MAJ enfoncée tout en redimensionnant",
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",

@@ -98,7 +98,8 @@
   "hints": {
     "linearElement": "",
     "linearElementMulti": "",
-    "resize": ""
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
