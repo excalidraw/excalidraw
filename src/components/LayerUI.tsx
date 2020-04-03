@@ -137,7 +137,7 @@ export const LayerUI = React.memo(
               </Section>
               {showSelectedShapeActions(appState, elements) && (
                 <Section
-                  className="App-menu__left--scrollable"
+                  className="App-menu__left"
                   heading="selectedShapeActions"
                 >
                   <Island padding={4}>
