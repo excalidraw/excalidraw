@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
     "couldNotCreateShareableLink": "Konnte keinen teilbaren Link erstellen.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Beachte, dass die Zeichnungsdaten bei der Zusammenarbeit über P2P geteilt und nicht auf unserem Server gespeichert werden. Wenn ihr alle die Verbindung trennt, gehen eure Daten verloren, es sei denn, ihr exportiert sie in eine Datei oder einen gemeinsam nutzbaren Link.",
     "desc_shareLink": "Teile diesen Link mit allen, mit denen du zusammenarbeiten möchtest:",
     "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt, du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dieses keine Auswirkungen auf andere Personen hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
