@@ -64,9 +64,7 @@ export type SocketUpdateDataIncoming =
 // part of `AppState`.
 (window as any).handle = null;
 
-function byteToHex(byte: number): string {
-  return `0${byte.toString(16)}`.slice(-2);
-}
+const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 async function generateRandomID() {
   const arr = new Uint8Array(10);
@@ -105,8 +103,8 @@ export async function generateCollaborationLink() {
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
 }
 
-async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
-  return await window.crypto.subtle.importKey(
+const getImportedKey = async (key: string, usage: string): Promise<CryptoKey> =>
+  await window.crypto.subtle.importKey(
     "jwk",
     {
       alg: "A128GCM",
@@ -122,7 +120,6 @@ async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
     false, // extractable
     [usage],
   );
-}
 
 export async function encryptAESGEM(
   data: Uint8Array,

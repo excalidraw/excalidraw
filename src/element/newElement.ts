@@ -22,7 +22,7 @@ type ElementConstructorOpts = {
   angle?: ExcalidrawGenericElement["angle"];
 };
 
-function _newElementBase<T extends ExcalidrawElement>(
+const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
   {
     x,
@@ -38,35 +38,32 @@ function _newElementBase<T extends ExcalidrawElement>(
     angle = 0,
     ...rest
   }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
-) {
-  return {
-    id: rest.id || randomId(),
-    type,
-    x,
-    y,
-    width,
-    height,
-    angle,
-    strokeColor,
-    backgroundColor,
-    fillStyle,
-    strokeWidth,
-    roughness,
-    opacity,
-    seed: rest.seed ?? randomInteger(),
-    version: rest.version || 1,
-    versionNonce: rest.versionNonce ?? 0,
-    isDeleted: rest.isDeleted ?? false,
-  };
-}
+) => ({
+  id: rest.id || randomId(),
+  type,
+  x,
+  y,
+  width,
+  height,
+  angle,
+  strokeColor,
+  backgroundColor,
+  fillStyle,
+  strokeWidth,
+  roughness,
+  opacity,
+  seed: rest.seed ?? randomInteger(),
+  version: rest.version || 1,
+  versionNonce: rest.versionNonce ?? 0,
+  isDeleted: rest.isDeleted ?? false,
+});
 
-export function newElement(
+export const newElement = (
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): ExcalidrawGenericElement {
-  return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
-}
+): ExcalidrawGenericElement =>
+  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
 export function newTextElement(
   opts: {
@@ -95,18 +92,16 @@ export function newTextElement(
   return textElement;
 }
 
-export function newLinearElement(
+export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
     lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
-): ExcalidrawLinearElement {
-  return {
-    ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
-    points: [],
-    lastCommittedPoint: opts.lastCommittedPoint || null,
-  };
-}
+): ExcalidrawLinearElement => ({
+  ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
+  points: [],
+  lastCommittedPoint: opts.lastCommittedPoint || null,
+});
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 //  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)

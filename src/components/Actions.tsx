@@ -80,7 +80,7 @@ export function SelectedShapeActions({
   );
 }
 
-export function ShapesSwitcher({
+export const ShapesSwitcher = ({
   elementType,
   setAppState,
   setElements,
@@ -90,57 +90,53 @@ export function ShapesSwitcher({
   setAppState: any;
   setElements: any;
   elements: readonly ExcalidrawElement[];
-}) {
-  return (
-    <>
-      {SHAPES.map(({ value, icon }, index) => {
-        const label = t(`toolBar.${value}`);
-        const shortcut = getShortcutKey(
-          `${capitalizeString(value)[0]}, ${index + 1}`,
-        );
-        return (
-          <ToolButton
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={elementType === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} ${shortcut}`}
-            keyBindingLabel={`${index + 1}`}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={`${label[0]} ${index + 1}`}
-            onChange={() => {
-              setAppState({
-                elementType: value,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              document.documentElement.style.cursor =
-                value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-              setAppState({});
-            }}
-          ></ToolButton>
-        );
-      })}
-    </>
-  );
-}
+}) => (
+  <>
+    {SHAPES.map(({ value, icon }, index) => {
+      const label = t(`toolBar.${value}`);
+      const shortcut = getShortcutKey(
+        `${capitalizeString(value)[0]}, ${index + 1}`,
+      );
+      return (
+        <ToolButton
+          key={value}
+          type="radio"
+          icon={icon}
+          checked={elementType === value}
+          name="editor-current-shape"
+          title={`${capitalizeString(label)} ${shortcut}`}
+          keyBindingLabel={`${index + 1}`}
+          aria-label={capitalizeString(label)}
+          aria-keyshortcuts={`${label[0]} ${index + 1}`}
+          onChange={() => {
+            setAppState({
+              elementType: value,
+              multiElement: null,
+              selectedElementIds: {},
+            });
+            document.documentElement.style.cursor =
+              value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+            setAppState({});
+          }}
+        ></ToolButton>
+      );
+    })}
+  </>
+);
 
-export function ZoomActions({
+export const ZoomActions = ({
   renderAction,
   zoom,
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: number;
-}) {
-  return (
-    <Stack.Col gap={1}>
-      <Stack.Row gap={1} align="center">
-        {renderAction("zoomIn")}
-        {renderAction("zoomOut")}
-        {renderAction("resetZoom")}
-        <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
-      </Stack.Row>
-    </Stack.Col>
-  );
-}
+}) => (
+  <Stack.Col gap={1}>
+    <Stack.Row gap={1} align="center">
+      {renderAction("zoomIn")}
+      {renderAction("zoomOut")}
+      {renderAction("resetZoom")}
+      <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
+    </Stack.Row>
+  </Stack.Col>
+);

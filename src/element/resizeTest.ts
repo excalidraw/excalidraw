@@ -6,18 +6,15 @@ import { isLinearElement } from "./typeChecks";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
-function isInHandlerRect(
+const isInHandlerRect = (
   handler: [number, number, number, number],
   x: number,
   y: number,
-) {
-  return (
-    x >= handler[0] &&
-    x <= handler[0] + handler[2] &&
-    y >= handler[1] &&
-    y <= handler[1] + handler[3]
-  );
-}
+) =>
+  x >= handler[0] &&
+  x <= handler[0] + handler[2] &&
+  y >= handler[1] &&
+  y <= handler[1] + handler[3];
 
 export function resizeTest(
   element: ExcalidrawElement,
@@ -61,21 +58,20 @@ export function resizeTest(
   return false;
 }
 
-export function getElementWithResizeHandler(
+export const getElementWithResizeHandler = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   { x, y }: { x: number; y: number },
   zoom: number,
   pointerType: PointerType,
-) {
-  return elements.reduce((result, element) => {
+) =>
+  elements.reduce((result, element) => {
     if (result) {
       return result;
     }
     const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
-}
 
 /*
  * Returns bi-directional cursor for the element being resized

@@ -42,9 +42,7 @@ export function setLanguage(newLng: string | undefined) {
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 }
 
-export function getLanguage() {
-  return currentLanguage;
-}
+export const getLanguage = () => currentLanguage;
 
 function findPartsForData(data: any, parts: string[]) {
   for (var i = 0; i < parts.length; ++i) {
@@ -80,9 +78,7 @@ export function t(path: string, replacement?: { [key: string]: string }) {
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
-    formatLanguageCode: function (lng: string) {
-      return lng;
-    },
+    formatLanguageCode: (lng: string) => lng,
     isWhitelisted: () => true,
   },
   checkWhitelist: false,

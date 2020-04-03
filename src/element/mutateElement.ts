@@ -47,14 +47,12 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   globalSceneState.informMutation();
 }
 
-export function newElementWith<TElement extends ExcalidrawElement>(
+export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-): TElement {
-  return {
-    ...element,
-    version: element.version + 1,
-    versionNonce: randomInteger(),
-    ...updates,
-  };
-}
+): TElement => ({
+  ...element,
+  version: element.version + 1,
+  versionNonce: randomInteger(),
+  ...updates,
+});

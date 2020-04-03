@@ -5,11 +5,11 @@ import { cleanAppStateForExport } from "../appState";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 
-export function serializeAsJSON(
+export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-): string {
-  return JSON.stringify(
+): string =>
+  JSON.stringify(
     {
       type: "excalidraw",
       version: 1,
@@ -20,7 +20,6 @@ export function serializeAsJSON(
     null,
     2,
   );
-}
 
 export async function saveAsJSON(
   elements: readonly ExcalidrawElement[],

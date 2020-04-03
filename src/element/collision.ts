@@ -10,15 +10,12 @@ import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rotate } from "../math";
 
-function isElementDraggableFromInside(
+const isElementDraggableFromInside = (
   element: ExcalidrawElement,
   appState: AppState,
-): boolean {
-  return (
-    element.backgroundColor !== "transparent" ||
-    appState.selectedElementIds[element.id]
-  );
-}
+): boolean =>
+  element.backgroundColor !== "transparent" ||
+  appState.selectedElementIds[element.id];
 
 export function hitTest(
   element: ExcalidrawElement,

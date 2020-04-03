@@ -72,10 +72,7 @@ export const shapesShortcutKeys = SHAPES.map((shape, index) => [
   (index + 1).toString(),
 ]).flat(1);
 
-export function findShapeByKey(key: string) {
-  return (
-    SHAPES.find((shape, index) => {
-      return shape.value[0] === key || key === (index + 1).toString();
-    })?.value || "selection"
-  );
-}
+export const findShapeByKey = (key: string) =>
+  SHAPES.find((shape, index) => {
+    return shape.value[0] === key || key === (index + 1).toString();
+  })?.value || "selection";

@@ -124,9 +124,8 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
-export function getShapeForElement(element: ExcalidrawElement) {
-  return shapeCache.get(element);
-}
+export const getShapeForElement = (element: ExcalidrawElement) =>
+  shapeCache.get(element);
 
 export function invalidateShapeForElement(element: ExcalidrawElement) {
   shapeCache.delete(element);

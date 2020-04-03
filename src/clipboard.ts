@@ -78,8 +78,8 @@ export async function getClipboardContent(
   return getAppClipboard();
 }
 
-export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
-  return new Promise((resolve, reject) => {
+export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
+  new Promise((resolve, reject) => {
     try {
       canvas.toBlob(async (blob: any) => {
         try {
@@ -95,7 +95,6 @@ export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
       reject(error);
     }
   });
-}
 
 export async function copyTextToSystemClipboard(text: string | null) {
   let copied = false;

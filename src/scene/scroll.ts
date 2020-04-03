@@ -2,9 +2,8 @@ import { FlooredNumber } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
 
-export function normalizeScroll(pos: number) {
-  return Math.floor(pos) as FlooredNumber;
-}
+export const normalizeScroll = (pos: number) =>
+  Math.floor(pos) as FlooredNumber;
 
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],

@@ -16,35 +16,31 @@ type Props = {
   left: number;
 };
 
-function ContextMenu({ options, onCloseRequest, top, left }: Props) {
-  return (
-    <Popover
-      onCloseRequest={onCloseRequest}
-      top={top}
-      left={left}
-      fitInViewport={true}
+const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => (
+  <Popover
+    onCloseRequest={onCloseRequest}
+    top={top}
+    left={left}
+    fitInViewport={true}
+  >
+    <ul
+      className="context-menu"
+      onContextMenu={(event) => event.preventDefault()}
     >
-      <ul
-        className="context-menu"
-        onContextMenu={(event) => event.preventDefault()}
-      >
-        {options.map((option, idx) => (
-          <li key={idx} onClick={onCloseRequest}>
-            <ContextMenuOption {...option} />
-          </li>
-        ))}
-      </ul>
-    </Popover>
-  );
-}
+      {options.map((option, idx) => (
+        <li key={idx} onClick={onCloseRequest}>
+          <ContextMenuOption {...option} />
+        </li>
+      ))}
+    </ul>
+  </Popover>
+);
 
-function ContextMenuOption({ label, action }: ContextMenuOption) {
-  return (
-    <button className="context-menu-option" onClick={action}>
-      {label}
-    </button>
-  );
-}
+const ContextMenuOption = ({ label, action }: ContextMenuOption) => (
+  <button className="context-menu-option" onClick={action}>
+    {label}
+  </button>
+);
 
 let contextMenuNode: HTMLDivElement;
 function getContextMenuNode(): HTMLDivElement {

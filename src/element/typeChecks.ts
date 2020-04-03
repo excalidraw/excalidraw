@@ -4,27 +4,19 @@ import {
   ExcalidrawLinearElement,
 } from "./types";
 
-export function isTextElement(
+export const isTextElement = (
   element: ExcalidrawElement,
-): element is ExcalidrawTextElement {
-  return element.type === "text";
-}
+): element is ExcalidrawTextElement => element.type === "text";
 
-export function isLinearElement(
+export const isLinearElement = (
   element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement {
-  return (
-    element != null && (element.type === "arrow" || element.type === "line")
-  );
-}
+): element is ExcalidrawLinearElement =>
+  element != null && (element.type === "arrow" || element.type === "line");
 
-export function isExcalidrawElement(element: any): boolean {
-  return (
-    element?.type === "text" ||
-    element?.type === "diamond" ||
-    element?.type === "rectangle" ||
-    element?.type === "ellipse" ||
-    element?.type === "arrow" ||
-    element?.type === "line"
-  );
-}
+export const isExcalidrawElement = (element: any): boolean =>
+  element?.type === "text" ||
+  element?.type === "diamond" ||
+  element?.type === "rectangle" ||
+  element?.type === "ellipse" ||
+  element?.type === "arrow" ||
+  element?.type === "line";

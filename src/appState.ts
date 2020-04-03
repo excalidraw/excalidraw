@@ -3,7 +3,7 @@ import { getDateTime } from "./utils";
 
 export const DEFAULT_FONT = "20px Virgil";
 
-export function getDefaultAppState(): AppState {
+export const getDefaultAppState = (): AppState => {
   return {
     isLoading: false,
     errorMessage: null,
@@ -39,9 +39,9 @@ export function getDefaultAppState(): AppState {
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
   };
-}
+};
 
-export function clearAppStateForLocalStorage(appState: AppState) {
+export const clearAppStateForLocalStorage = (appState: AppState) => {
   const {
     draggingElement,
     resizingElement,
@@ -57,11 +57,11 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     ...exportedState
   } = appState;
   return exportedState;
-}
+};
 
-export function clearAppStatePropertiesForHistory(
+export const clearAppStatePropertiesForHistory = (
   appState: AppState,
-): Partial<AppState> {
+): Partial<AppState> => {
   return {
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
@@ -74,10 +74,10 @@ export function clearAppStatePropertiesForHistory(
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };
-}
+};
 
-export function cleanAppStateForExport(appState: AppState) {
+export const cleanAppStateForExport = (appState: AppState) => {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
   };
-}
+};

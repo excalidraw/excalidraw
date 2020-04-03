@@ -115,13 +115,15 @@ import { actionFinalize } from "../actions";
 /**
  * @param func handler taking at most single parameter (event).
  */
-function withBatchedUpdates<
+const withBatchedUpdates = <
   TFunction extends ((event: any) => void) | (() => void)
->(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) => {
   return ((event) => {
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
-}
+};
 
 const { history } = createHistory();
 
@@ -2728,17 +2730,12 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
 
   Object.defineProperties(window.h, {
     elements: {
-      get() {
-        return globalSceneState.getAllElements();
-      },
-      set(elements: ExcalidrawElement[]) {
-        return globalSceneState.replaceAllElements(elements);
-      },
+      get: () => globalSceneState.getAllElements(),
+      set: (elements: ExcalidrawElement[]) =>
+        globalSceneState.replaceAllElements(elements),
     },
     history: {
-      get() {
-        return history;
-      },
+      get: () => history,
     },
   });
 }

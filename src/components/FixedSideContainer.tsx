@@ -7,13 +7,11 @@ type FixedSideContainerProps = {
   side: "top" | "left" | "right";
 };
 
-export function FixedSideContainer({
+export const FixedSideContainer = ({
   children,
   side,
-}: FixedSideContainerProps) {
-  return (
-    <div className={`FixedSideContainer FixedSideContainer_side_${side}`}>
-      {children}
-    </div>
-  );
-}
+}: FixedSideContainerProps) => (
+  <div className={`FixedSideContainer FixedSideContainer_side_${side}`}>
+    {children}
+  </div>
+);

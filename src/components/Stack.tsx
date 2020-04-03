@@ -9,39 +9,35 @@ type StackProps = {
   justifyContent?: "center" | "space-around" | "space-between";
 };
 
-function RowStack({ children, gap, align, justifyContent }: StackProps) {
-  return (
-    <div
-      className="Stack Stack_horizontal"
-      style={
-        {
-          "--gap": gap,
-          alignItems: align,
-          justifyContent,
-        } as React.CSSProperties
-      }
-    >
-      {children}
-    </div>
-  );
-}
+const RowStack = ({ children, gap, align, justifyContent }: StackProps) => (
+  <div
+    className="Stack Stack_horizontal"
+    style={
+      {
+        "--gap": gap,
+        alignItems: align,
+        justifyContent,
+      } as React.CSSProperties
+    }
+  >
+    {children}
+  </div>
+);
 
-function ColStack({ children, gap, align, justifyContent }: StackProps) {
-  return (
-    <div
-      className="Stack Stack_vertical"
-      style={
-        {
-          "--gap": gap,
-          justifyItems: align,
-          justifyContent,
-        } as React.CSSProperties
-      }
-    >
-      {children}
-    </div>
-  );
-}
+const ColStack = ({ children, gap, align, justifyContent }: StackProps) => (
+  <div
+    className="Stack Stack_vertical"
+    style={
+      {
+        "--gap": gap,
+        justifyItems: align,
+        justifyContent,
+      } as React.CSSProperties
+    }
+  >
+    {children}
+  </div>
+);
 
 export default {
   Row: RowStack,

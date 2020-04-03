@@ -25,48 +25,40 @@ export function getDateTime() {
   return `${year}${month}${day}${hr}${min}${secs}`;
 }
 
-export function capitalizeString(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+export const capitalizeString = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
 
-export function isToolIcon(
+export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement {
-  return target instanceof HTMLElement && target.className.includes("ToolIcon");
-}
+): target is HTMLElement =>
+  target instanceof HTMLElement && target.className.includes("ToolIcon");
 
-export function isInputLike(
+export const isInputLike = (
   target: Element | EventTarget | null,
 ): target is
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement {
-  return (
-    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLBRElement || // newline in wysiwyg
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  );
-}
+  | HTMLDivElement =>
+  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  target instanceof HTMLBRElement || // newline in wysiwyg
+  target instanceof HTMLInputElement ||
+  target instanceof HTMLTextAreaElement ||
+  target instanceof HTMLSelectElement;
 
-export function isWritableElement(
+export const isWritableElement = (
   target: Element | EventTarget | null,
 ): target is
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement {
-  return (
-    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLBRElement || // newline in wysiwyg
-    target instanceof HTMLTextAreaElement ||
-    (target instanceof HTMLInputElement &&
-      (target.type === "text" || target.type === "number"))
-  );
-}
+  | HTMLDivElement =>
+  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  target instanceof HTMLBRElement || // newline in wysiwyg
+  target instanceof HTMLTextAreaElement ||
+  (target instanceof HTMLInputElement &&
+    (target.type === "text" || target.type === "number"));
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export function measureText(text: string, font: string) {
@@ -130,9 +122,7 @@ export function removeSelection() {
   }
 }
 
-export function distance(x: number, y: number) {
-  return Math.abs(x - y);
-}
+export const distance = (x: number, y: number) => Math.abs(x - y);
 
 export function distance2d(x1: number, y1: number, x2: number, y2: number) {
   const xd = x2 - x1;
@@ -205,8 +195,5 @@ export function sceneCoordsToViewportCoords(
   return { x, y };
 }
 
-export function getGlobalCSSVariable(name: string) {
-  return getComputedStyle(document.documentElement).getPropertyValue(
-    `--${name}`,
-  );
-}
+export const getGlobalCSSVariable = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
