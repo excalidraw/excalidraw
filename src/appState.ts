@@ -6,6 +6,7 @@ export const DEFAULT_FONT = "20px Virgil";
 export function getDefaultAppState(): AppState {
   return {
     isLoading: false,
+    errorMessage: null,
     draggingElement: null,
     resizingElement: null,
     multiElement: null,
@@ -52,6 +53,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     collaborators,
     isCollaborating,
     isLoading,
+    errorMessage,
     ...exportedState
   } = appState;
   return exportedState;
