@@ -1166,14 +1166,14 @@ export class App extends React.Component<any, AppState> {
       font: element.font,
       angle: element.angle,
       zoom: this.state.zoom,
-      onChange: (text) => {
+      onChange: withBatchedUpdates((text) => {
         if (text) {
           updateElement(text);
         } else {
           deleteElement();
         }
-      },
-      onSubmit: (text) => {
+      }),
+      onSubmit: withBatchedUpdates((text) => {
         updateElement(text);
         this.setState((prevState) => ({
           selectedElementIds: {
@@ -1186,14 +1186,14 @@ export class App extends React.Component<any, AppState> {
         }
         history.resumeRecording();
         resetSelection();
-      },
-      onCancel: () => {
+      }),
+      onCancel: withBatchedUpdates(() => {
         deleteElement();
         if (isExistingElement) {
           history.resumeRecording();
         }
         resetSelection();
-      },
+      }),
     });
 
     // do an initial update to re-initialize element position since we were
