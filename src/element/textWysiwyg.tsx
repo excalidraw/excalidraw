@@ -109,7 +109,7 @@ export function textWysiwyg({
       ev.preventDefault();
       handleSubmit();
     }
-    if (ev.key === KEYS.ENTER && (ev.shiftKey || ev.metaKey)) {
+    if (ev.key === KEYS.ENTER && (ev.shiftKey || ev[KEYS.CTRL_OR_CMD])) {
       ev.preventDefault();
       if (ev.isComposing || ev.keyCode === 229) {
         return;
