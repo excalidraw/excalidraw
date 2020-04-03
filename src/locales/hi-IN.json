@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "",
     "couldNotCreateShareableLink": "",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",
     "couldNotCopyToClipboard": "",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "",
     "desc_shareLink": "",
     "desc_exitSession": ""
+  },
+  "errorDialog": {
+    "title": ""
   }
 }

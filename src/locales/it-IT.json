@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Nota che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Quindi, se tutti vi disconnetterete, perderete i dati a meno che non li si esporti in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
     "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }

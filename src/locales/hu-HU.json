@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
     "couldNotCreateShareableLink": "Nem sikerült megosztható linket létrehozni.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
     "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
@@ -123,5 +124,8 @@
     "desc_persistenceWarning": "Vegye figyelembe, hogy a jelenet adatait P2P formátumban osztják meg az együttműködők között és nem maradnak meg a szerverünkön. Így ha mindketten bezárják az ablakot, akkor elveszítik az adatokat, hacsak nem exportálják fájlba vagy nem hoznak létre egy megosztható linket.",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
     "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+  },
+  "errorDialog": {
+    "title": ""
   }
 }
