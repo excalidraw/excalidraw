@@ -25,6 +25,7 @@ export function getDefaultAppState(): AppState {
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
+    cursorActivity: "up",
     scrolledOutside: false,
     name: `excalidraw-${getDateTime()}`,
     isCollaborating: false,

@@ -860,25 +860,17 @@ export class App extends React.Component<any, AppState> {
               updateScene(decryptedData);
               break;
             case "MOUSE_LOCATION": {
-              const { socketID, pointerCoords } = decryptedData.payload;
+              const {
+                socketID,
+                pointerCoords,
+                activity,
+              } = decryptedData.payload;
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
                 }
                 const user = state.collaborators.get(socketID)!;
                 user.pointer = pointerCoords;
-                state.collaborators.set(socketID, user);
-                return state;
-              });
-              break;
-            }
-            case "MOUSE_ACTIVITY": {
-              const { socketID, activity } = decryptedData.payload;
-              this.setState((state) => {
-                if (!state.collaborators.has(socketID)) {
-                  state.collaborators.set(socketID, {});
-                }
-                const user = state.collaborators.get(socketID)!;
                 user.activity = activity;
                 state.collaborators.set(socketID, user);
                 return state;
@@ -923,6 +915,7 @@ export class App extends React.Component<any, AppState> {
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+    activity?: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["activity"];
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
@@ -930,23 +923,7 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
-        },
-      };
-      return this._broadcastSocketData(
-        data as typeof data & { _brand: "socketUpdateData" },
-      );
-    }
-  };
-
-  private broadcastMouseActivity = (payload: {
-    activity: SocketUpdateDataSource["MOUSE_ACTIVITY"]["payload"]["activity"];
-  }) => {
-    if (this.socket?.id) {
-      const data: SocketUpdateDataSource["MOUSE_ACTIVITY"] = {
-        type: "MOUSE_ACTIVITY",
-        payload: {
-          socketID: this.socket.id,
-          activity: payload.activity,
+          activity: payload.activity || "up",
         },
       };
       return this._broadcastSocketData(
@@ -1087,6 +1064,10 @@ export class App extends React.Component<any, AppState> {
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    this.setState({
+      cursorActivity: "up",
+    });
+
     if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor();
@@ -1304,7 +1285,7 @@ export class App extends React.Component<any, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
-    this.savePointer(pointerCoords);
+    this.savePointer(pointerCoords, this.state.cursorActivity);
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -1455,9 +1436,17 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    this.setState({ lastPointerDownWith: event.pointerType });
-
-    this.broadcastMouseActivity({ activity: "keydown" });
+    const pointerCoords = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+    this.setState({
+      lastPointerDownWith: event.pointerType,
+      cursorActivity: "down",
+    });
+    this.savePointer(pointerCoords, "down");
 
     // pan canvas on wheel button drag or space+drag
     if (
@@ -1490,7 +1479,16 @@ export class App extends React.Component<any, AppState> {
           if (!isHoldingSpace) {
             setCursorForShape(this.state.elementType);
           }
-          this.broadcastMouseActivity({ activity: "keyup" });
+          const pointerCoords = viewportCoordsToSceneCoords(
+            event,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
+          this.setState({
+            cursorActivity: "up",
+          });
+          this.savePointer(pointerCoords, "up");
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("pointerup", teardown);
           window.removeEventListener("blur", teardown);
@@ -1590,8 +1588,17 @@ export class App extends React.Component<any, AppState> {
       const onPointerUp = withBatchedUpdates(() => {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
-        this.broadcastMouseActivity({ activity: "keyup" });
         lastPointerUp = null;
+        const pointerCoords = viewportCoordsToSceneCoords(
+          event,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+        this.setState({
+          cursorActivity: "up",
+        });
+        this.savePointer(pointerCoords, "up");
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
       });
@@ -2403,13 +2410,20 @@ export class App extends React.Component<any, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
+        cursorActivity: "up",
         editingElement: multiElement ? this.state.editingElement : null,
       });
 
+      const pointerCoords = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
+      this.savePointer(pointerCoords, "up");
+
       resizeArrowFn = null;
       lastPointerUp = null;
-
-      this.broadcastMouseActivity({ activity: "keyup" });
 
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
@@ -2684,12 +2698,15 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private savePointer = (pointerCoords: { x: number; y: number }) => {
+  private savePointer = (
+    pointerCoords: { x: number; y: number },
+    activity: "down" | "up",
+  ) => {
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket && this.broadcastMouseLocation({ pointerCoords });
+    this.socket && this.broadcastMouseLocation({ pointerCoords, activity });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
