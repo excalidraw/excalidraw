@@ -116,7 +116,7 @@ export const LayerUI = React.memo(
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4}>
-              <Section className="App-right-menu" heading="canvasActions">
+              <Section heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
                     <Stack.Row gap={1} justifyContent={"space-between"}>
