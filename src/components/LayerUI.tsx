@@ -136,11 +136,8 @@ export const LayerUI = React.memo(
                 </Island>
               </Section>
               {showSelectedShapeActions(appState, elements) && (
-                <Section
-                  className="App-menu__left"
-                  heading="selectedShapeActions"
-                >
-                  <Island padding={4}>
+                <Section heading="selectedShapeActions">
+                  <Island className="App-menu__left" padding={4}>
                     <SelectedShapeActions
                       appState={appState}
                       elements={elements}
