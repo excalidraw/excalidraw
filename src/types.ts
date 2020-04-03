@@ -33,7 +33,7 @@ export type AppState = {
   scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
-  cursorActivity: "up" | "down";
+  cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
   isCollaborating: boolean;
@@ -45,7 +45,7 @@ export type AppState = {
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<
     string,
-    { pointer?: { x: number; y: number }; activity?: "up" | "down" }
+    { pointer?: { x: number; y: number }; button?: "up" | "down" }
   >;
   shouldCacheIgnoreZoom: boolean;
 };

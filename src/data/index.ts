@@ -49,7 +49,7 @@ export type SocketUpdateDataSource = {
     payload: {
       socketID: string;
       pointerCoords: { x: number; y: number };
-      activity: "down" | "up";
+      button: "down" | "up";
     };
   };
 };

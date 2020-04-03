@@ -9,7 +9,7 @@ export type SceneState = {
   zoom: number;
   shouldCacheIgnoreZoom: boolean;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
-  remotePointerActivity?: { [id: string]: string | undefined };
+  remotePointerButton?: { [id: string]: string | undefined };
 };
 
 export type SceneScroll = {

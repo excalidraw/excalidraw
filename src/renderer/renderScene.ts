@@ -254,8 +254,8 @@ export function renderScene(
     }
 
     if (
-      sceneState.remotePointerActivity &&
-      sceneState.remotePointerActivity[clientId] === "down"
+      sceneState.remotePointerButton &&
+      sceneState.remotePointerButton[clientId] === "down"
     ) {
       context.beginPath();
       context.arc(x, y, 15, 0, 2 * Math.PI, false);
