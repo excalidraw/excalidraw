@@ -1064,10 +1064,6 @@ export class App extends React.Component<any, AppState> {
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    this.setState({
-      cursorActivity: "up",
-    });
-
     if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor();
