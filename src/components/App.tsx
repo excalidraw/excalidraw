@@ -2056,7 +2056,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...(isLinearElement(element) && (width < 0 || height < 0)
-                    ? element
+                    ? { x: element.x, y: element.y }
                     : adjustXYWithRotation("nw", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
@@ -2089,7 +2089,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...(isLinearElement(element) && (width < 0 || height < 0)
-                    ? element
+                    ? { x: element.x, y: element.y }
                     : adjustXYWithRotation("ne", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
@@ -2122,7 +2122,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...(isLinearElement(element) && (width < 0 || height < 0)
-                    ? element
+                    ? { x: element.x, y: element.y }
                     : adjustXYWithRotation("sw", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
@@ -2155,7 +2155,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...(isLinearElement(element) && (width < 0 || height < 0)
-                    ? element
+                    ? { x: element.x, y: element.y }
                     : adjustXYWithRotation("se", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
