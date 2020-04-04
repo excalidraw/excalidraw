@@ -37,7 +37,7 @@ export type AppState = {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
-  username: string | null;
+  username: string;
   isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;

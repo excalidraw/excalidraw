@@ -17,7 +17,7 @@ function RoomModal({
   onRoomDestroy,
 }: {
   activeRoomLink: string;
-  username: string | null;
+  username: string;
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
@@ -122,7 +122,7 @@ export function RoomDialog({
 }: {
   isCollaborating: AppState["isCollaborating"];
   collaboratorCount: number;
-  username: string | null;
+  username: string;
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
