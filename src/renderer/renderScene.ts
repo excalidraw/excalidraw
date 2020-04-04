@@ -151,9 +151,6 @@ export function renderScene(
     context.translate(sceneState.scrollX, sceneState.scrollY);
 
     const selections = elements.reduce((acc, element) => {
-      if (element.isDeleted) {
-        return acc;
-      }
       const selectionColors = [];
       // local user
       if (appState.selectedElementIds[element.id]) {
@@ -222,13 +219,16 @@ export function renderScene(
     });
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
-    const selectedElements = getSelectedElements(elements, appState);
+    const locallySelectedElements = getSelectedElements(elements, appState);
 
     // Paint resize handlers
-    if (selectedElements.length === 1) {
+    if (locallySelectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
-      const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
+      const handlers = handlerRectangles(
+        locallySelectedElements[0],
+        sceneState.zoom,
+      );
       Object.keys(handlers).forEach((key) => {
         const handler = handlers[key as HandlerRectanglesRet];
         if (handler !== undefined) {
@@ -242,7 +242,7 @@ export function renderScene(
               handler[2],
               handler[3],
             );
-          } else if (selectedElements[0].type !== "text") {
+          } else if (locallySelectedElements[0].type !== "text") {
             strokeRectWithRotation(
               context,
               handler[0],
@@ -251,7 +251,7 @@ export function renderScene(
               handler[3],
               handler[0] + handler[2] / 2,
               handler[1] + handler[3] / 2,
-              selectedElements[0].angle,
+              locallySelectedElements[0].angle,
               true, // fill before stroke
             );
           }
