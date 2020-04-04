@@ -112,7 +112,7 @@
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
