@@ -3,7 +3,11 @@ import { RoughSVG } from "roughjs/bin/svg";
 
 import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords, handlerRectangles } from "../element";
+import {
+  getElementAbsoluteCoords,
+  handlerRectangles,
+  getCommonBounds,
+} from "../element";
 
 import { roundRect } from "./roundRect";
 import { SceneState } from "../scene/types";
@@ -183,7 +187,7 @@ export function renderScene(
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     // Paint resize handlers
-    if (selectedElements.length >= 1) {
+    if (selectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
       const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
@@ -217,6 +221,65 @@ export function renderScene(
         }
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
+    } else if (selectedElements.length > 1) {
+      if (
+        selectedElements.every((element) =>
+          ["rectangle", "diamond", "ellipse"].includes(element.type),
+        )
+      ) {
+        context.translate(sceneState.scrollX, sceneState.scrollY);
+        context.fillStyle = "#fff";
+        const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+        const initialLineDash = context.getLineDash();
+        context.setLineDash([4 / sceneState.zoom, 2 / sceneState.zoom]);
+        const lineWidth = context.lineWidth;
+        context.lineWidth = 1 / sceneState.zoom;
+        strokeRectWithRotation(
+          context,
+          x1 - dashedLinePadding,
+          y1 - dashedLinePadding,
+          x2 - x1 + dashedLinePadding * 2,
+          y2 - y1 + dashedLinePadding * 2,
+          (x1 + x2) / 2,
+          (y1 + y2) / 2,
+          0,
+        );
+        context.lineWidth = lineWidth;
+        context.setLineDash(initialLineDash);
+        const hackedCommonElement = {
+          x: x1,
+          y: y1,
+          width: x2 - x1,
+          height: y2 - y1,
+          angle: 0,
+        } as ExcalidrawElement;
+        const handlers = handlerRectangles(
+          hackedCommonElement,
+          sceneState.zoom,
+        );
+        Object.keys(handlers).forEach((key) => {
+          const handler = handlers[key as HandlerRectanglesRet];
+          if (handler !== undefined) {
+            const lineWidth = context.lineWidth;
+            context.lineWidth = 1 / sceneState.zoom;
+            if (["ne", "se", "sw", "nw"].includes(key)) {
+              strokeRectWithRotation(
+                context,
+                handler[0],
+                handler[1],
+                handler[2],
+                handler[3],
+                handler[0] + handler[2] / 2,
+                handler[1] + handler[3] / 2,
+                0,
+                true, // fill before stroke
+              );
+            }
+            context.lineWidth = lineWidth;
+          }
+        });
+        context.translate(-sceneState.scrollX, -sceneState.scrollY);
+      }
     }
   }
 

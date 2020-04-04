@@ -1432,7 +1432,7 @@ export class App extends React.Component<any, AppState> {
       globalSceneState.getAllElements(),
       this.state,
     );
-    if (selectedElements.length >= 1 && !isOverScrollBar) {
+    if (selectedElements.length === 1 && !isOverScrollBar) {
       const resizeElement = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
         this.state,
@@ -1445,6 +1445,37 @@ export class App extends React.Component<any, AppState> {
           resizeElement,
         );
         return;
+      }
+    } else if (selectedElements.length > 1 && !isOverScrollBar) {
+      if (
+        selectedElements.every((element) =>
+          ["rectangle", "diamond", "ellipse"].includes(element.type),
+        )
+      ) {
+        const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+        const hackedCommonElement = {
+          id: "hackedCommonElement",
+          x: x1,
+          y: y1,
+          width: x2 - x1,
+          height: y2 - y1,
+          angle: 0,
+        } as ExcalidrawElement;
+        const resizeHandle = resizeTest(
+          hackedCommonElement,
+          { selectedElementIds: { hackedCommonElement: true } } as any,
+          x,
+          y,
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+          document.documentElement.style.cursor = getCursorForResizingElement({
+            element: hackedCommonElement,
+            resizeHandle,
+          });
+          return;
+        }
       }
     }
     const hitElement = getElementAtPosition(
@@ -1626,7 +1657,7 @@ export class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      const resizeElement = getElementWithResizeHandler(
+      let resizeElement = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
         this.state,
         { x, y },
@@ -1638,6 +1669,38 @@ export class App extends React.Component<any, AppState> {
         globalSceneState.getAllElements(),
         this.state,
       );
+      if (selectedElements.length > 1 && !resizeElement) {
+        if (
+          selectedElements.every((element) =>
+            ["rectangle", "diamond", "ellipse"].includes(element.type),
+          )
+        ) {
+          const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+          const hackedCommonElement = {
+            id: "hackedCommonElement",
+            x: x1,
+            y: y1,
+            width: x2 - x1,
+            height: y2 - y1,
+            angle: 0,
+          } as ExcalidrawElement;
+          resizeHandle = resizeTest(
+            hackedCommonElement,
+            { selectedElementIds: { hackedCommonElement: true } } as any,
+            x,
+            y,
+            this.state.zoom,
+            event.pointerType,
+          );
+          this.setState({ resizingElement: hackedCommonElement });
+          if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+            resizeElement = {
+              element: hackedCommonElement,
+              resizeHandle,
+            };
+          }
+        }
+      }
       if (selectedElements.length >= 1 && resizeElement) {
         this.setState({
           resizingElement: resizeElement ? resizeElement.element : null,
@@ -2256,25 +2319,27 @@ export class App extends React.Component<any, AppState> {
           lastY = y;
           return;
         } else if (selectedElements.length > 1) {
-          // EXPERIMENT
-          const [minX, minY] = getCommonBounds(selectedElements);
-          const { x } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-          // just using x for now
-          const scale = 1 + (x - lastX) / minX; // roughly
-          selectedElements.forEach((element) => {
-            const width = element.width * scale;
-            const height = element.height * scale;
-            const x = element.x + (element.x - minX) * (scale - 1);
-            const y = element.y + (element.y - minY) * (scale - 1);
-            mutateElement(element, { width, height, x, y });
-          });
-          lastX = x;
-          return;
+          // EXPERIMENT: se only
+          if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+            const [minX, minY] = getCommonBounds(selectedElements);
+            const { x } = viewportCoordsToSceneCoords(
+              event,
+              this.state,
+              this.canvas,
+              window.devicePixelRatio,
+            );
+            // just using x for now
+            const scale = 1 + (x - lastX) / minX; // roughly
+            selectedElements.forEach((element) => {
+              const width = element.width * scale;
+              const height = element.height * scale;
+              const x = element.x + (element.x - minX) * (scale - 1);
+              const y = element.y + (element.y - minY) * (scale - 1);
+              mutateElement(element, { width, height, x, y });
+            });
+            lastX = x;
+            return;
+          }
         }
       }
 
