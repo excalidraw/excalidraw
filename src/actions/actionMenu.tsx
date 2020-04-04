@@ -1,9 +1,15 @@
 import React from "react";
-import { menu, palette } from "../components/icons";
+import {
+  menu,
+  palette,
+  fullScreenOn,
+  fullScreenOff,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
 import { register } from "./register";
+import { allowFullScreen, exitFullScreen } from "../utils";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -42,6 +48,34 @@ export const actionToggleEditMenu = register({
       aria-label={t("buttons.edit")}
       onClick={updateData}
       selected={appState.openMenu === "shape"}
+    />
+  ),
+});
+
+export const actionFullScreen = register({
+  name: "fullScreen",
+  perform: (elements, appState) => {
+    if (!appState.fullScreenEnabled) {
+      allowFullScreen();
+    }
+    if (appState.fullScreenEnabled) {
+      exitFullScreen();
+    }
+    return {
+      appState: {
+        ...appState,
+        fullScreenEnabled: !appState.fullScreenEnabled,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={appState.fullScreenEnabled ? fullScreenOff : fullScreenOn}
+      aria-label={t("buttons.fullScreen")}
+      title={t("buttons.fullScreen")}
+      onClick={updateData}
     />
   ),
 });

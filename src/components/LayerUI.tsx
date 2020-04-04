@@ -182,6 +182,7 @@ export const LayerUI = React.memo(
                     renderAction={actionManager.renderAction}
                     zoom={appState.zoom}
                   />
+                  {actionManager.renderAction("fullScreen")}
                 </Island>
               </Section>
             </Stack.Col>
