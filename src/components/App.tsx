@@ -223,34 +223,7 @@ export class App extends React.Component<any, AppState> {
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
-            onDrop={(event) => {
-              const file = event.dataTransfer.files[0];
-              if (
-                file?.type === "application/json" ||
-                file?.name.endsWith(".excalidraw")
-              ) {
-                this.setState({ isLoading: true });
-                loadFromBlob(file)
-                  .then(({ elements, appState }) =>
-                    this.syncActionResult({
-                      elements,
-                      appState: {
-                        ...(appState || this.state),
-                        isLoading: false,
-                      },
-                      commitToHistory: false,
-                    }),
-                  )
-                  .catch((error) => {
-                    this.setState({ isLoading: false, errorMessage: error });
-                  });
-              } else {
-                this.setState({
-                  isLoading: false,
-                  errorMessage: t("alerts.couldNotLoadInvalidFile"),
-                });
-              }
-            }}
+            onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
           </canvas>
@@ -2584,6 +2557,35 @@ export class App extends React.Component<any, AppState> {
     } else {
       this.canvas?.removeEventListener("wheel", this.handleWheel);
       this.canvas?.removeEventListener("touchstart", this.onTapStart);
+    }
+  };
+
+  private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+    const file = event.dataTransfer?.files[0];
+    if (
+      file?.type === "application/json" ||
+      file?.name.endsWith(".excalidraw")
+    ) {
+      this.setState({ isLoading: true });
+      loadFromBlob(file)
+        .then(({ elements, appState }) =>
+          this.syncActionResult({
+            elements,
+            appState: {
+              ...(appState || this.state),
+              isLoading: false,
+            },
+            commitToHistory: false,
+          }),
+        )
+        .catch((error) => {
+          this.setState({ isLoading: false, errorMessage: error });
+        });
+    } else {
+      this.setState({
+        isLoading: false,
+        errorMessage: t("alerts.couldNotLoadInvalidFile"),
+      });
     }
   };
 
