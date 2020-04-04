@@ -150,13 +150,32 @@ export function renderScene(
     );
   }
 
-  // Pain selected elements
+  // Paint selected elements
   if (renderSelection) {
-    const selectedElements = getSelectedElements(elements, appState);
-    const dashedLinePadding = 4 / sceneState.zoom;
-
     context.translate(sceneState.scrollX, sceneState.scrollY);
-    selectedElements.forEach((element) => {
+
+    const selections = elements.reduce((acc, element) => {
+      const selectionColors = [];
+      // local user
+      if (appState.selectedElementIds[element.id]) {
+        selectionColors.push("#000000");
+      }
+      // remote users
+      if (sceneState.remoteSelectedElementIds[element.id]) {
+        selectionColors.push(
+          ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
+            const { background } = colorsForClientId(socketId);
+            return background;
+          }),
+        );
+      }
+      if (selectionColors.length) {
+        acc.push({ element, selectionColors });
+      }
+      return acc;
+    }, [] as { element: ExcalidrawElement; selectionColors: string[] }[]);
+
+    selections.forEach(({ element, selectionColors }) => {
       const [
         elementX1,
         elementY1,
@@ -168,29 +187,52 @@ export function renderScene(
       const elementHeight = elementY2 - elementY1;
 
       const initialLineDash = context.getLineDash();
-      context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
+      const lineDashOffset = context.lineDashOffset;
+      const strokeStyle = context.strokeStyle;
+
+      const dashedLinePadding = 4 / sceneState.zoom;
+      const dashWidth = 8 / sceneState.zoom;
+      const spaceWidth = 4 / sceneState.zoom;
+
       context.lineWidth = 1 / sceneState.zoom;
-      strokeRectWithRotation(
-        context,
-        elementX1 - dashedLinePadding,
-        elementY1 - dashedLinePadding,
-        elementWidth + dashedLinePadding * 2,
-        elementHeight + dashedLinePadding * 2,
-        elementX1 + elementWidth / 2,
-        elementY1 + elementHeight / 2,
-        element.angle,
-      );
+
+      const count = selectionColors.length;
+      for (var i = 0; i < count; ++i) {
+        context.strokeStyle = selectionColors[i];
+        context.setLineDash([
+          dashWidth,
+          spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+        ]);
+        context.lineDashOffset = (dashWidth + spaceWidth) * i;
+        strokeRectWithRotation(
+          context,
+          elementX1 - dashedLinePadding,
+          elementY1 - dashedLinePadding,
+          elementWidth + dashedLinePadding * 2,
+          elementHeight + dashedLinePadding * 2,
+          elementX1 + elementWidth / 2,
+          elementY1 + elementHeight / 2,
+          element.angle,
+        );
+      }
+      context.lineDashOffset = lineDashOffset;
+      context.strokeStyle = strokeStyle;
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
+    const locallySelectedElements = getSelectedElements(elements, appState);
+
     // Paint resize handlers
-    if (selectedElements.length === 1) {
+    if (locallySelectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
-      const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
+      const handlers = handlerRectangles(
+        locallySelectedElements[0],
+        sceneState.zoom,
+      );
       Object.keys(handlers).forEach((key) => {
         const handler = handlers[key as HandlerRectanglesRet];
         if (handler !== undefined) {
@@ -204,7 +246,7 @@ export function renderScene(
               handler[2],
               handler[3],
             );
-          } else if (selectedElements[0].type !== "text") {
+          } else if (locallySelectedElements[0].type !== "text") {
             strokeRectWithRotation(
               context,
               handler[0],
@@ -213,7 +255,7 @@ export function renderScene(
               handler[3],
               handler[0] + handler[2] / 2,
               handler[1] + handler[3] / 2,
-              selectedElements[0].angle,
+              locallySelectedElements[0].angle,
               true, // fill before stroke
             );
           }

@@ -43,7 +43,16 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  collaborators: Map<
+    string,
+    {
+      pointer?: {
+        x: number;
+        y: number;
+      };
+      selectedElementIds?: AppState["selectedElementIds"];
+    }
+  >;
   shouldCacheIgnoreZoom: boolean;
 };
 
