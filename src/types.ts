@@ -11,6 +11,7 @@ export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
   isLoading: boolean;
+  errorMessage: string | null;
   draggingElement: ExcalidrawElement | null;
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawLinearElement | null;
@@ -45,7 +46,14 @@ export type AppState = {
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<
     string,
-    { pointer?: { x: number; y: number }; button?: "up" | "down" }
+    {
+      pointer?: {
+        x: number;
+        y: number;
+      };
+      button?: "up" | "down";
+      selectedElementIds?: AppState["selectedElementIds"];
+    }
   >;
   shouldCacheIgnoreZoom: boolean;
 };

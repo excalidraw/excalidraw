@@ -8,7 +8,9 @@ export const actionSelectAll = register({
       appState: {
         ...appState,
         selectedElementIds: elements.reduce((map, element) => {
-          map[element.id] = true;
+          if (!element.isDeleted) {
+            map[element.id] = true;
+          }
           return map;
         }, {} as any),
       },

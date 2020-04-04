@@ -21,6 +21,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
@@ -34,6 +35,7 @@ export function textWysiwyg({
   opacity,
   zoom,
   angle,
+  onChange,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -69,7 +71,7 @@ export function textWysiwyg({
     backfaceVisibility: "hidden",
   });
 
-  editable.onpaste = (ev) => {
+  editable.onpaste = (event) => {
     try {
       const selection = window.getSelection();
       if (!selection?.rangeCount) {
@@ -77,7 +79,7 @@ export function textWysiwyg({
       }
       selection.deleteFromDocument();
 
-      const text = ev.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
+      const text = event.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
 
       const span = document.createElement("span");
       span.innerText = text;
@@ -90,25 +92,41 @@ export function textWysiwyg({
       range.setEnd(span, span.childNodes.length);
       selection.addRange(range);
 
-      ev.preventDefault();
+      event.preventDefault();
     } catch (error) {
       console.error(error);
     }
   };
 
-  editable.onkeydown = (ev) => {
-    if (ev.key === KEYS.ESCAPE) {
-      ev.preventDefault();
+  if (onChange) {
+    editable.oninput = () => {
+      onChange(trimText(editable.innerText));
+    };
+  }
+
+  editable.onkeydown = (event) => {
+    if (event.key === KEYS.ESCAPE) {
+      event.preventDefault();
       handleSubmit();
     }
-    if (ev.key === KEYS.ENTER && !ev.shiftKey) {
-      ev.stopPropagation();
+    if (
+      event.key === KEYS.ENTER &&
+      (event.shiftKey || event[KEYS.CTRL_OR_CMD])
+    ) {
+      event.preventDefault();
+      if (event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      handleSubmit();
+    }
+    if (event.key === KEYS.ENTER && !event.shiftKey) {
+      event.stopPropagation();
     }
   };
   editable.onblur = handleSubmit;
 
-  function stopEvent(ev: Event) {
-    ev.stopPropagation();
+  function stopEvent(event: Event) {
+    event.stopPropagation();
   }
 
   function handleSubmit() {
@@ -121,9 +139,6 @@ export function textWysiwyg({
   }
 
   function cleanup() {
-    editable.onblur = null;
-    editable.onkeydown = null;
-    editable.onpaste = null;
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }

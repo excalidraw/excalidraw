@@ -74,6 +74,7 @@
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
+    "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
@@ -98,7 +99,8 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
+    "resize": "Vous pouvez contraindre les proportions en maintenant la touche MAJ enfoncée tout en redimensionnant",
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
@@ -122,5 +124,8 @@
     "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
+  },
+  "errorDialog": {
+    "title": "Erreur"
   }
 }

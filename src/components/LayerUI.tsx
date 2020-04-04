@@ -22,6 +22,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
+import { ErrorDialog } from "./ErrorDialog";
 import { LoadingMessage } from "./LoadingMessage";
 
 interface LayerUIProps {
@@ -105,11 +106,17 @@ export const LayerUI = React.memo(
     ) : (
       <>
         {appState.isLoading && <LoadingMessage />}
+        {appState.errorMessage && (
+          <ErrorDialog
+            message={appState.errorMessage}
+            onClose={() => setAppState({ errorMessage: null })}
+          />
+        )}
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4}>
-              <Section className="App-right-menu" heading="canvasActions">
+              <Section heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
                     <Stack.Row gap={1} justifyContent={"space-between"}>
@@ -129,11 +136,8 @@ export const LayerUI = React.memo(
                 </Island>
               </Section>
               {showSelectedShapeActions(appState, elements) && (
-                <Section
-                  className="App-right-menu"
-                  heading="selectedShapeActions"
-                >
-                  <Island padding={4}>
+                <Section heading="selectedShapeActions">
+                  <Island className="App-menu__left" padding={4}>
                     <SelectedShapeActions
                       appState={appState}
                       elements={elements}

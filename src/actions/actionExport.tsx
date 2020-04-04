@@ -64,11 +64,14 @@ export const actionLoadScene = register({
   perform: (
     elements,
     appState,
-    { elements: loadedElements, appState: loadedAppState },
+    { elements: loadedElements, appState: loadedAppState, error },
   ) => {
     return {
       elements: loadedElements,
-      appState: loadedAppState,
+      appState: {
+        ...loadedAppState,
+        errorMessage: error,
+      },
       commitToHistory: false,
     };
   },
@@ -84,7 +87,9 @@ export const actionLoadScene = register({
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch((error) => console.error(error));
+          .catch((error) => {
+            updateData({ error: error });
+          });
       }}
     />
   ),

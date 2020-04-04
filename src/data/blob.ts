@@ -1,6 +1,7 @@
 import { getDefaultAppState } from "../appState";
 import { DataState } from "./types";
 import { restore } from "./restore";
+import { t } from "../i18n";
 
 export async function loadFromBlob(blob: any) {
   const updateAppState = (contents: string) => {
@@ -10,7 +11,7 @@ export async function loadFromBlob(blob: any) {
     try {
       const data = JSON.parse(contents);
       if (data.type !== "excalidraw") {
-        throw new Error("Cannot load invalid json");
+        throw new Error(t("alerts.couldNotLoadInvalidFile"));
       }
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
@@ -39,7 +40,7 @@ export async function loadFromBlob(blob: any) {
   }
   const { elements, appState } = updateAppState(contents);
   if (!elements.length) {
-    return Promise.reject("Cannot load invalid json");
+    return Promise.reject(t("alerts.couldNotLoadInvalidFile"));
   }
   return new Promise<DataState>((resolve) => {
     resolve(restore(elements, appState, { scrollToContent: true }));
