@@ -38,7 +38,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -234,7 +234,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -350,7 +350,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -619,7 +619,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -776,7 +776,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -972,7 +972,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1227,7 +1227,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1596,7 +1596,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2213,7 +2213,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2329,7 +2329,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2445,7 +2445,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2561,7 +2561,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2699,7 +2699,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2837,7 +2837,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2975,7 +2975,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3091,7 +3091,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3207,7 +3207,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3345,7 +3345,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3461,7 +3461,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3532,7 +3532,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4399,7 +4399,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4814,7 +4814,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5138,7 +5138,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5375,7 +5375,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5545,7 +5545,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6364,7 +6364,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7076,7 +7076,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7685,7 +7685,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8196,7 +8196,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8658,7 +8658,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9027,7 +9027,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9307,7 +9307,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9518,7 +9518,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10392,7 +10392,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -11157,7 +11157,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -11817,7 +11817,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -12372,7 +12372,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -12744,7 +12744,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -12799,7 +12799,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -12854,7 +12854,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -13146,7 +13146,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "username": null,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
