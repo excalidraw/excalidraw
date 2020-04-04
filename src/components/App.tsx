@@ -2321,7 +2321,9 @@ export class App extends React.Component<any, AppState> {
           // EXPERIMENT: se only
           if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
             const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-            const minSize = 12 / this.state.zoom; // dashedLinePadding * 3
+            const handleOffset = 4 / this.state.zoom; // XXX import constant
+            const dashedLinePadding = 4 / this.state.zoom; // XXX import constant
+            const minSize = handleOffset * 4;
             const minScale = Math.max(minSize / (x2 - x1), minSize / (y2 - y1));
             const { x, y } = viewportCoordsToSceneCoords(
               event,
@@ -2329,7 +2331,10 @@ export class App extends React.Component<any, AppState> {
               this.canvas,
               window.devicePixelRatio,
             );
-            const scale = Math.max((x - x1) / (x2 - x1), (y - y1) / (y2 - y1));
+            const scale = Math.max(
+              (x - handleOffset - dashedLinePadding - x1) / (x2 - x1),
+              (y - handleOffset - dashedLinePadding - y1) / (y2 - y1),
+            );
             if (scale > minScale) {
               selectedElements.forEach((element) => {
                 const width = element.width * scale;
