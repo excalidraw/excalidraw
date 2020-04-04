@@ -5,11 +5,11 @@ export const SVG_NS = "http://www.w3.org/2000/svg";
 
 let mockDateTime: string | null = null;
 
-export function setDateTimeForTests(dateTime: string) {
+export const setDateTimeForTests = (dateTime: string) => {
   mockDateTime = dateTime;
-}
+};
 
-export function getDateTime() {
+export const getDateTime = () => {
   if (mockDateTime) {
     return mockDateTime;
   }
@@ -23,7 +23,7 @@ export function getDateTime() {
   const secs = date.getSeconds();
 
   return `${year}${month}${day}${hr}${min}${secs}`;
-}
+};
 
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -61,7 +61,7 @@ export const isWritableElement = (
     (target.type === "text" || target.type === "number"));
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export function measureText(text: string, font: string) {
+export const measureText = (text: string, font: string) => {
   const line = document.createElement("div");
   const body = document.body;
   line.style.position = "absolute";
@@ -85,12 +85,12 @@ export function measureText(text: string, font: string) {
   document.body.removeChild(line);
 
   return { width, height, baseline };
-}
+};
 
-export function debounce<T extends any[]>(
+export const debounce = <T extends any[]>(
   fn: (...args: T) => void,
   timeout: number,
-) {
+) => {
   let handle = 0;
   let lastArgs: T;
   const ret = (...args: T) => {
@@ -103,9 +103,9 @@ export function debounce<T extends any[]>(
     fn(...lastArgs);
   };
   return ret;
-}
+};
 
-export function selectNode(node: Element) {
+export const selectNode = (node: Element) => {
   const selection = window.getSelection();
   if (selection) {
     const range = document.createRange();
@@ -113,26 +113,26 @@ export function selectNode(node: Element) {
     selection.removeAllRanges();
     selection.addRange(range);
   }
-}
+};
 
-export function removeSelection() {
+export const removeSelection = () => {
   const selection = window.getSelection();
   if (selection) {
     selection.removeAllRanges();
   }
-}
+};
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
-export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   const xd = x2 - x1;
   const yd = y2 - y1;
   return Math.hypot(xd, yd);
-}
+};
 
-export function resetCursor() {
+export const resetCursor = () => {
   document.documentElement.style.cursor = "";
-}
+};
 
 export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
@@ -145,7 +145,7 @@ export const getShortcutKey = (shortcut: string): string => {
   }
   return ` — ${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
-export function viewportCoordsToSceneCoords(
+export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
   {
     scrollX,
@@ -158,7 +158,7 @@ export function viewportCoordsToSceneCoords(
   },
   canvas: HTMLCanvasElement | null,
   scale: number,
-) {
+) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
   const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
   const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
@@ -167,9 +167,9 @@ export function viewportCoordsToSceneCoords(
   const y = clientYWithZoom - scrollY;
 
   return { x, y };
-}
+};
 
-export function sceneCoordsToViewportCoords(
+export const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
   {
     scrollX,
@@ -182,7 +182,7 @@ export function sceneCoordsToViewportCoords(
   },
   canvas: HTMLCanvasElement | null,
   scale: number,
-) {
+) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
   const sceneXWithZoomAndScroll =
     zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
@@ -193,7 +193,7 @@ export function sceneCoordsToViewportCoords(
   const y = sceneYWithZoomAndScroll;
 
   return { x, y };
-}
+};
 
 export const getGlobalCSSVariable = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
