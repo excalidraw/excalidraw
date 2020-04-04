@@ -125,6 +125,8 @@ function withBatchedUpdates<
 
 const { history } = createHistory();
 
+let didTapTwice: boolean = false;
+let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -403,6 +405,7 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("blur", this.onBlur, false);
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
+    this.getCanvasElement()?.addEventListener("touchstart", this.onTapStart);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
@@ -441,6 +444,7 @@ export class App extends React.Component<any, AppState> {
     window.removeEventListener("blur", this.onBlur, false);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
+    this.getCanvasElement()?.removeEventListener("touchstart", this.onTapStart);
 
     document.removeEventListener(
       "gesturestart",
@@ -585,6 +589,33 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
+  };
+
+  private getCanvasElement = () => {
+    const canvas = document.getElementById("canvas");
+    return canvas;
+  };
+
+  private onTapStart = (event: TouchEvent) => {
+    if (!didTapTwice) {
+      didTapTwice = true;
+      clearTimeout(tappedTwiceTimer);
+      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      return;
+    }
+    // insert text only if we tapped twice with a single finger
+    // event.touches.length === 1 will also prevent inserting text when user's zooming
+    if (didTapTwice && event.touches.length === 1) {
+      const [touch] = event.touches;
+      // @ts-ignore
+      this.handleCanvasDoubleClick({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      didTapTwice = false;
+      clearTimeout(tappedTwiceTimer);
+    }
+    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
