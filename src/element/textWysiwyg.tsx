@@ -61,7 +61,7 @@ export function textWysiwyg({
     top: `${y}px`,
     left: `${x}px`,
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
-    textAlign,
+    textAlign: textAlign,
     display: "inline-block",
     font: font,
     padding: "4px",
