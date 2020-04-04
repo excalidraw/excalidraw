@@ -187,6 +187,10 @@ export function getArrowPoints(
 }
 
 export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
+  if (!elements.length) {
+    return [0, 0, 0, 0];
+  }
+
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
