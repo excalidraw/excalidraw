@@ -144,6 +144,16 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+export function isFullScreen() {
+  if (
+    document.fullscreenElement &&
+    document.fullscreenElement.nodeName === "HTML"
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function allowFullScreen() {
   document.documentElement.requestFullscreen();
 }

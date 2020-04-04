@@ -45,7 +45,6 @@ export type AppState = {
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<string, { pointer?: { x: number; y: number } }>;
   shouldCacheIgnoreZoom: boolean;
-  fullScreenEnabled: boolean;
 };
 
 export type PointerCoords = Readonly<{
