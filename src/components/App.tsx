@@ -1669,7 +1669,7 @@ export class App extends React.Component<any, AppState> {
         globalSceneState.getAllElements(),
         this.state,
       );
-      if (selectedElements.length > 1 && !resizeElement) {
+      if (selectedElements.length > 1) {
         if (
           selectedElements.every((element) =>
             ["rectangle", "diamond", "ellipse"].includes(element.type),
@@ -1692,7 +1692,6 @@ export class App extends React.Component<any, AppState> {
             this.state.zoom,
             event.pointerType,
           );
-          this.setState({ resizingElement: hackedCommonElement });
           if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
             resizeElement = {
               element: hackedCommonElement,
