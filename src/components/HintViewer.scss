@@ -8,11 +8,12 @@
   position: absolute;
   top: 54px;
   transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
+  white-space: pre;
+  text-align: center;
   @media #{$media-query} {
     position: static;
     transform: none;
     margin-top: 0.5rem;
-    text-align: center;
   }
 
   > span {
