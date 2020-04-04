@@ -11,3 +11,5 @@ yarn-error.log*
 yarn.lock
 .envrc
 firebase/
+
+.now

@@ -74,4 +74,5 @@ export const actionFullScreen = register({
       onClick={updateData}
     />
   ),
+  keyTest: (event) => event.keyCode === 70,
 });
