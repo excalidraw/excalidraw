@@ -91,7 +91,7 @@ export function MobileMenu({
                     isCollaborating={appState.isCollaborating}
                     collaboratorCount={appState.collaborators.size}
                     username={appState.username}
-                    onUsernameChange={() => {}}
+                    onUsernameChange={(username) => setAppState({ username })}
                     onRoomCreate={onRoomCreate}
                     onRoomDestroy={onRoomDestroy}
                   />
