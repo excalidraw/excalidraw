@@ -100,6 +100,7 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   ARROW_CONFIRM_THRESHOLD,
+  SHIFT_LOCKING_ANGLE,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
@@ -2257,8 +2258,8 @@ export class App extends React.Component<any, AppState> {
               const cy = (y1 + y2) / 2;
               let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
               if (event.shiftKey) {
-                angle += Math.PI / 16;
-                angle -= angle % (Math.PI / 8);
+                angle += SHIFT_LOCKING_ANGLE / 2;
+                angle -= angle % SHIFT_LOCKING_ANGLE;
               }
               if (angle >= 2 * Math.PI) {
                 angle -= 2 * Math.PI;
