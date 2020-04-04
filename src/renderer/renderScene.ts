@@ -267,15 +267,16 @@ export function renderScene(
         }
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
-    } else if (selectedElements.length > 1) {
+    } else if (locallySelectedElements.length > 1) {
       if (
-        selectedElements.every((element) =>
+        locallySelectedElements.every((element) =>
           ["rectangle", "diamond", "ellipse"].includes(element.type),
         )
       ) {
+        const dashedLinePadding = 4 / sceneState.zoom;
         context.translate(sceneState.scrollX, sceneState.scrollY);
         context.fillStyle = "#fff";
-        const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+        const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
         context.setLineDash([4 / sceneState.zoom, 2 / sceneState.zoom]);
         const lineWidth = context.lineWidth;
