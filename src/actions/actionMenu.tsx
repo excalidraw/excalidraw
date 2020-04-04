@@ -54,7 +54,7 @@ export const actionToggleEditMenu = register({
 
 export const actionFullScreen = register({
   name: "fullScreen",
-  perform: (_elements, appState) => {
+  perform: () => {
     if (!isFullScreen()) {
       allowFullScreen();
     }
@@ -62,13 +62,10 @@ export const actionFullScreen = register({
       exitFullScreen();
     }
     return {
-      appState: {
-        ...appState,
-      },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={isFullScreen() ? fullScreenOff : fullScreenOn}

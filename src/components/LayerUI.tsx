@@ -177,12 +177,14 @@ export const LayerUI = React.memo(
           <div className="App-menu App-menu_bottom">
             <Stack.Col gap={2}>
               <Section heading="canvasActions">
-                <Island padding={1}>
-                  <ZoomActions
-                    renderAction={actionManager.renderAction}
-                    zoom={appState.zoom}
-                  />
-                  {actionManager.renderAction("fullScreen")}
+                <Island padding={2}>
+                  <Stack.Row gap={1}>
+                    {actionManager.renderAction("fullScreen")}
+                    <ZoomActions
+                      renderAction={actionManager.renderAction}
+                      zoom={appState.zoom}
+                    />
+                  </Stack.Row>
                 </Island>
               </Section>
             </Stack.Col>
