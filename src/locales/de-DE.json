@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
     "couldNotCreateShareableLink": "Konnte keinen teilbaren Link erstellen.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Ungültige Datei konnte nicht geladen werden",
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
@@ -107,11 +107,11 @@
     "headingMain_button": "die Seite neu zu laden.",
     "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche ",
     "clearCanvasMessage_button": "die Zeichenfläche zu löschen.",
-    "clearCanvasCaveat": " Dieses wird zum Verlust von Daten führen ",
+    "clearCanvasCaveat": " Dies wird zum Verlust von Daten führen ",
     "trackedToSentry_pre": "Der Fehler mit der Kennung ",
     "trackedToSentry_post": " wurde in unserem System registriert.",
     "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in den Fehler aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
-    "openIssueMessage_button": "Bug-Tracker meldest.",
+    "openIssueMessage_button": "Bug-Tracker.",
     "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
     "sceneContent": "Zeichnungsinhalt:"
   },
@@ -126,6 +126,6 @@
     "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt, du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dieses keine Auswirkungen auf andere Personen hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Fehler"
   }
 }
