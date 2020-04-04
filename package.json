@@ -77,14 +77,7 @@
       ],
       "no-else-return": "warn",
       "no-useless-return": "warn",
-      "prefer-arrow/prefer-arrow-functions": [
-        "warn",
-        {
-          "disallowPrototype": true,
-          "singleReturnOnly": true,
-          "classPropertiesAllowed": false
-        }
-      ],
+      "prefer-arrow/prefer-arrow-functions": "warn",
       "prefer-arrow-callback": "warn",
       "prefer-const": [
         "warn",
