@@ -2055,7 +2055,9 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
+                  ...(isLinearElement(element) && (width < 0 || height < 0)
+                    ? element
+                    : adjustXYWithRotation("nw", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2086,7 +2088,9 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
+                  ...(isLinearElement(element) && (width < 0 || height < 0)
+                    ? element
+                    : adjustXYWithRotation("ne", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2117,7 +2121,9 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
+                  ...(isLinearElement(element) && (width < 0 || height < 0)
+                    ? element
+                    : adjustXYWithRotation("sw", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
@@ -2148,7 +2154,9 @@ export class App extends React.Component<any, AppState> {
                 mutateElement(element, {
                   width,
                   height,
-                  ...adjustXYWithRotation("se", element, deltaX, dY, angle),
+                  ...(isLinearElement(element) && (width < 0 || height < 0)
+                    ? element
+                    : adjustXYWithRotation("se", element, deltaX, dY, angle)),
                   ...(isLinearElement(element) && width >= 0 && height >= 0
                     ? {
                         points: rescalePoints(
