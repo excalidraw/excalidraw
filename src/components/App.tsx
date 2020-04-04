@@ -972,9 +972,7 @@ export class App extends React.Component<any, AppState> {
     },
   ) {
     if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
-      const json = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey);
+      const encrypted = await encryptAESGEM(data, this.roomKey);
       this.socket.emit(
         "server-broadcast",
         this.roomID,

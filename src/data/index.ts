@@ -1,3 +1,5 @@
+import pako from "pako";
+
 import { ExcalidrawElement } from "../element/types";
 
 import { getDefaultAppState } from "../appState";
@@ -127,11 +129,15 @@ async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
 }
 
 export async function encryptAESGEM(
-  data: Uint8Array,
+  data: object,
   key: string,
 ): Promise<EncryptedData> {
   const importedKey = await getImportedKey(key, "encrypt");
   const iv = createIV();
+
+  const binaryString = pako.deflate(JSON.stringify(data), { to: "string" });
+  const encoded = new TextEncoder().encode(binaryString);
+
   return {
     data: await window.crypto.subtle.encrypt(
       {
@@ -139,7 +145,7 @@ export async function encryptAESGEM(
         iv,
       },
       importedKey,
-      data,
+      encoded,
     ),
     iv,
   };
@@ -164,7 +170,7 @@ export async function decryptAESGEM(
     const decodedData = new TextDecoder("utf-8").decode(
       new Uint8Array(decrypted) as any,
     );
-    return JSON.parse(decodedData);
+    return JSON.parse(pako.inflate(decodedData, { to: "string" }));
   } catch (error) {
     window.alert(t("alerts.decryptFailed"));
     console.error(error);
