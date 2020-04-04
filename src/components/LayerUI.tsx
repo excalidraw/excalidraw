@@ -133,6 +133,8 @@ export const LayerUI = React.memo(
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
+                        username={appState.username}
+                        onUsernameChange={() => {}}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />

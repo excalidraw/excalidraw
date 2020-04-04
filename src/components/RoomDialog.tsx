@@ -11,10 +11,14 @@ import { AppState } from "../types";
 
 function RoomModal({
   activeRoomLink,
+  username,
+  onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
 }: {
   activeRoomLink: string;
+  username: string | null;
+  onUsernameChange: () => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -71,6 +75,16 @@ function RoomModal({
               onPointerDown={selectInput}
             />
           </div>
+          <div className="RoomDialog-linkContainer">
+            <label htmlFor="username">Set your username</label>
+            <input
+              id="username"
+              value={username || ""}
+              className="RoomDialog-username"
+              // ref={roomLinkInput}
+              onPointerDown={onUsernameChange}
+            />
+          </div>
           <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
           <p>
             <span role="img" aria-hidden="true">
@@ -99,11 +113,15 @@ function RoomModal({
 export function RoomDialog({
   isCollaborating,
   collaboratorCount,
+  username,
+  onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
 }: {
   isCollaborating: AppState["isCollaborating"];
   collaboratorCount: number;
+  username: string | null;
+  onUsernameChange: () => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -149,6 +167,8 @@ export function RoomDialog({
         >
           <RoomModal
             activeRoomLink={activeRoomLink}
+            username={username}
+            onUsernameChange={onUsernameChange}
             onRoomCreate={onRoomCreate}
             onRoomDestroy={onRoomDestroy}
           />
