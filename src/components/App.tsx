@@ -2321,23 +2321,27 @@ export class App extends React.Component<any, AppState> {
         } else if (selectedElements.length > 1) {
           // EXPERIMENT: se only
           if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
-            const [minX, minY] = getCommonBounds(selectedElements);
-            const { x } = viewportCoordsToSceneCoords(
+            const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+            const minSize = 12 / this.state.zoom; // dashedLinePadding * 3
+            const minScale = Math.max(minSize / (x2 - x1), minSize / (y2 - y1));
+            const { x, y } = viewportCoordsToSceneCoords(
               event,
               this.state,
               this.canvas,
               window.devicePixelRatio,
             );
-            // just using x for now
-            const scale = 1 + (x - lastX) / minX; // roughly
-            selectedElements.forEach((element) => {
-              const width = element.width * scale;
-              const height = element.height * scale;
-              const x = element.x + (element.x - minX) * (scale - 1);
-              const y = element.y + (element.y - minY) * (scale - 1);
-              mutateElement(element, { width, height, x, y });
-            });
+            const scale = Math.max((x - x1) / (x2 - x1), (y - y1) / (y2 - y1));
+            if (scale > minScale) {
+              selectedElements.forEach((element) => {
+                const width = element.width * scale;
+                const height = element.height * scale;
+                const x = element.x + (element.x - x1) * (scale - 1);
+                const y = element.y + (element.y - y1) * (scale - 1);
+                mutateElement(element, { width, height, x, y });
+              });
+            }
             lastX = x;
+            lastY = y;
             return;
           }
         }
