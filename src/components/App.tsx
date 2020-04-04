@@ -126,6 +126,8 @@ function withBatchedUpdates<
 
 const { history } = createHistory();
 
+let didTapTwice: boolean = false;
+let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -214,19 +216,7 @@ export class App extends React.Component<any, AppState> {
             }}
             width={canvasWidth}
             height={canvasHeight}
-            ref={(canvas) => {
-              // canvas is null when unmounting
-              if (canvas !== null) {
-                this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas);
-
-                this.canvas.addEventListener("wheel", this.handleWheel, {
-                  passive: false,
-                });
-              } else {
-                this.canvas?.removeEventListener("wheel", this.handleWheel);
-              }
-            }}
+            ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
             onDoubleClick={this.handleCanvasDoubleClick}
@@ -586,6 +576,28 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
+  };
+
+  private onTapStart = (event: TouchEvent) => {
+    if (!didTapTwice) {
+      didTapTwice = true;
+      clearTimeout(tappedTwiceTimer);
+      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      return;
+    }
+    // insert text only if we tapped twice with a single finger
+    // event.touches.length === 1 will also prevent inserting text when user's zooming
+    if (didTapTwice && event.touches.length === 1) {
+      const [touch] = event.touches;
+      // @ts-ignore
+      this.handleCanvasDoubleClick({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      didTapTwice = false;
+      clearTimeout(tappedTwiceTimer);
+    }
+    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -2557,6 +2569,22 @@ export class App extends React.Component<any, AppState> {
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
+  };
+
+  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+    // canvas is null when unmounting
+    if (canvas !== null) {
+      this.canvas = canvas;
+      this.rc = rough.canvas(this.canvas);
+
+      this.canvas.addEventListener("wheel", this.handleWheel, {
+        passive: false,
+      });
+      this.canvas.addEventListener("touchstart", this.onTapStart);
+    } else {
+      this.canvas?.removeEventListener("wheel", this.handleWheel);
+      this.canvas?.removeEventListener("touchstart", this.onTapStart);
+    }
   };
 
   private handleCanvasContextMenu = (
