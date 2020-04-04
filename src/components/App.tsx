@@ -215,19 +215,7 @@ export class App extends React.Component<any, AppState> {
             }}
             width={canvasWidth}
             height={canvasHeight}
-            ref={(canvas) => {
-              // canvas is null when unmounting
-              if (canvas !== null) {
-                this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas);
-
-                this.canvas.addEventListener("wheel", this.handleWheel, {
-                  passive: false,
-                });
-              } else {
-                this.canvas?.removeEventListener("wheel", this.handleWheel);
-              }
-            }}
+            ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
             onDoubleClick={this.handleCanvasDoubleClick}
@@ -405,7 +393,6 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("blur", this.onBlur, false);
     window.addEventListener("dragover", this.disableEvent, false);
     window.addEventListener("drop", this.disableEvent, false);
-    this.getCanvasElement()?.addEventListener("touchstart", this.onTapStart);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
@@ -444,7 +431,6 @@ export class App extends React.Component<any, AppState> {
     window.removeEventListener("blur", this.onBlur, false);
     window.removeEventListener("dragover", this.disableEvent, false);
     window.removeEventListener("drop", this.disableEvent, false);
-    this.getCanvasElement()?.removeEventListener("touchstart", this.onTapStart);
 
     document.removeEventListener(
       "gesturestart",
@@ -589,11 +575,6 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
-  };
-
-  private getCanvasElement = () => {
-    const canvas = document.getElementById("canvas");
-    return canvas;
   };
 
   private onTapStart = (event: TouchEvent) => {
@@ -2587,6 +2568,22 @@ export class App extends React.Component<any, AppState> {
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
+  };
+
+  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+    // canvas is null when unmounting
+    if (canvas !== null) {
+      this.canvas = canvas;
+      this.rc = rough.canvas(this.canvas);
+
+      this.canvas.addEventListener("wheel", this.handleWheel, {
+        passive: false,
+      });
+      this.canvas.addEventListener("touchstart", this.onTapStart);
+    } else {
+      this.canvas?.removeEventListener("wheel", this.handleWheel);
+      this.canvas?.removeEventListener("touchstart", this.onTapStart);
+    }
   };
 
   private handleCanvasContextMenu = (
