@@ -49,6 +49,7 @@ export type SocketUpdateDataSource = {
     payload: {
       socketID: string;
       pointerCoords: { x: number; y: number };
+      button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
     };
   };

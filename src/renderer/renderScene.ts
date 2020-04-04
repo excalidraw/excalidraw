@@ -298,6 +298,26 @@ export function renderScene(
     if (isOutOfBounds) {
       context.globalAlpha = 0.2;
     }
+
+    if (
+      sceneState.remotePointerButton &&
+      sceneState.remotePointerButton[clientId] === "down"
+    ) {
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 3;
+      context.strokeStyle = "#ffffff88";
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 1;
+      context.strokeStyle = stroke;
+      context.stroke();
+      context.closePath();
+    }
+
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + 1, y + 14);
@@ -309,6 +329,7 @@ export function renderScene(
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
     context.globalAlpha = globalAlpha;
+    context.closePath();
   }
 
   // Paint scrollbars
