@@ -9,7 +9,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
 import { register } from "./register";
-import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
+import { allowFullScreen, exitFullScreen, isFullScreen, getShortcutKey } from "../utils";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
