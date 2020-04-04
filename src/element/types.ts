@@ -39,6 +39,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     font: string;
     text: string;
     baseline: number;
+    textAlign: string;
   }>;
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &

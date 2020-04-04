@@ -669,6 +669,7 @@ export class App extends React.Component<any, AppState> {
       opacity: this.state.currentItemOpacity,
       text: text,
       font: this.state.currentItemFont,
+      textAlign: this.state.currentItemTextAlign,
     });
 
     globalSceneState.replaceAllElements([
@@ -1160,6 +1161,7 @@ export class App extends React.Component<any, AppState> {
               y: element.y,
               text,
               font: this.state.currentItemFont,
+              textAlign: this.state.currentItemTextAlign,
             });
           }
           return _element;
@@ -1175,6 +1177,7 @@ export class App extends React.Component<any, AppState> {
       opacity: element.opacity,
       font: element.font,
       angle: element.angle,
+      textAlign: element.textAlign,
       zoom: this.state.zoom,
       onChange: withBatchedUpdates((text) => {
         if (text) {
@@ -1246,6 +1249,7 @@ export class App extends React.Component<any, AppState> {
             opacity: this.state.currentItemOpacity,
             text: "",
             font: this.state.currentItemFont,
+            textAlign: this.state.currentItemTextAlign,
           });
 
     this.setState({ editingElement: element });
@@ -1770,6 +1774,7 @@ export class App extends React.Component<any, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         font: this.state.currentItemFont,
+        textAlign: this.state.currentItemTextAlign,
       });
 
       globalSceneState.replaceAllElements([

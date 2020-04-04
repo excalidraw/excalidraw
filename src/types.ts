@@ -29,6 +29,7 @@ export type AppState = {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemFont: string;
+  currentItemTextAlign: string;
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;

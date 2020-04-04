@@ -72,9 +72,10 @@ export function newTextElement(
   opts: {
     text: string;
     font: string;
+    textAlign: string;
   } & ElementConstructorOpts,
 ): ExcalidrawTextElement {
-  const { text, font } = opts;
+  const { text, font, textAlign } = opts;
   const metrics = measureText(text, font);
   const textElement = newElementWith(
     {
@@ -82,6 +83,7 @@ export function newTextElement(
       isDeleted: false,
       text: text,
       font: font,
+      textAlign: textAlign,
       // Center the text
       x: opts.x - metrics.width / 2,
       y: opts.y - metrics.height / 2,

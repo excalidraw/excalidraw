@@ -53,6 +53,8 @@ export function SelectedShapeActions({
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
+
+          {renderAction("changeTextAlign")}
         </>
       )}
 

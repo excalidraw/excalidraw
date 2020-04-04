@@ -352,3 +352,47 @@ export const actionChangeFontFamily = register({
     </fieldset>
   ),
 });
+
+export const actionChangeTextAlgin = register({
+  name: "changeTextAlign",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isTextElement(el)) {
+          const element: ExcalidrawTextElement = newElementWith(el, {
+            textAlign: value,
+          });
+          redrawTextBoundingBox(element);
+          return element;
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        currentItemTextAlign: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.textAlign")}</legend>
+      <ButtonSelect
+        group="text-align"
+        options={[
+          { value: "left", text: t("labels.left") },
+          { value: "center", text: t("labels.center") },
+          { value: "right", text: t("labels.right") },
+        ]}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => isTextElement(element) && element.textAlign,
+          appState.currentItemTextAlign,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
