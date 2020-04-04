@@ -127,5 +127,8 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "shortcutsDialog": {
+    "title": "Keyboard shortcuts"
   }
 }
