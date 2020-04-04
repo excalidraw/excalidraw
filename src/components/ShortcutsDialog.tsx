@@ -106,7 +106,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             justifyContent: "space-between",
           }}
         >
-          <ShortcutIsland title={"Shapes"}>
+          <ShortcutIsland title={t("shortcutsDialog.shapes")}>
             <Shortcut title={t("toolBar.selection")} shortcuts={["S", "1"]} />
             <Shortcut title={t("toolBar.rectangle")} shortcuts={["R", "2"]} />
             <Shortcut title={t("toolBar.diamond")} shortcuts={["D", "3"]} />
@@ -116,68 +116,64 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut title={t("toolBar.text")} shortcuts={["T", "7"]} />
             <Shortcut title={t("toolBar.lock")} shortcuts={["Q"]} />
           </ShortcutIsland>
-          <ShortcutIsland title={"Editor"}>
+          <ShortcutIsland title={t("shortcutsDialog.editor")}>
             <Shortcut
-              title={"Copy"}
+              title={t("labels.copy")}
               shortcuts={[getShortcutKey("CtrlOrCmd+C", "")]}
             />
             <Shortcut
-              title={"Paste"}
+              title={t("labels.paste")}
               shortcuts={[getShortcutKey("CtrlOrCmd+V", "")]}
             />
             <Shortcut
-              title={"Copy to clipboard as PNG"}
+              title={t("labels.copyAsPng")}
               shortcuts={[getShortcutKey("Shift+Alt+C", "")]}
             />
             <Shortcut
-              title={"Copy styles"}
+              title={t("labels.copyStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+C", "")]}
             />
             <Shortcut
-              title={"Paste styles"}
+              title={t("labels.pasteStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V", "")]}
             />
             <Shortcut
-              title={"Delete"}
+              title={t("labels.delete")}
               shortcuts={[getShortcutKey("Del", "")]}
             />
             <Shortcut
-              title={"Send to back"}
+              title={t("labels.sendToBack")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+[", "")]}
             />
             <Shortcut
-              title={"Bring to front"}
+              title={t("labels.bringToFront")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+]", "")]}
             />
             <Shortcut
-              title={"Send backwards"}
+              title={t("labels.sendBackward")}
               shortcuts={[getShortcutKey("CtrlOrCmd+[", "")]}
             />
             <Shortcut
-              title={"Bring forward"}
+              title={t("labels.bringForward")}
               shortcuts={[getShortcutKey("CtrlOrCmd+]", "")]}
             />
             <Shortcut
-              title={"Duplicate selected element(s)"}
+              title={t("labels.duplicateSelection")}
               shortcuts={[getShortcutKey("CtrlOrCmd+D", "")]}
             />
           </ShortcutIsland>
-          <ShortcutIsland title={"View"}>
+          <ShortcutIsland title={t("shortcutsDialog.view")}>
             <Shortcut
-              title={"Zoom in"}
+              title={t("buttons.zoomIn")}
               shortcuts={[getShortcutKey("CtrlOrCmd++", "")]}
             />
             <Shortcut
-              title={"Zoom out"}
+              title={t("buttons.zoomOut")}
               shortcuts={[getShortcutKey("CtrlOrCmd+-", "")]}
             />
             <Shortcut
-              title={"Zoom reset"}
+              title={t("buttons.resetZoom")}
               shortcuts={[getShortcutKey("CtrlOrCmd+0", "")]}
-            />
-            <Shortcut
-              title={"Toggle full screen"}
-              shortcuts={[getShortcutKey("F", "")]}
             />
           </ShortcutIsland>
         </div>

@@ -129,6 +129,9 @@
     "title": "Error"
   },
   "shortcutsDialog": {
-    "title": "Keyboard shortcuts"
+    "title": "Keyboard shortcuts",
+    "shapes": "Shapes",
+    "editor": "Editor",
+    "view": "View"
   }
 }
