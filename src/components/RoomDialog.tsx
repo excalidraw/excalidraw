@@ -18,7 +18,7 @@ function RoomModal({
 }: {
   activeRoomLink: string;
   username: string | null;
-  onUsernameChange: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -75,14 +75,16 @@ function RoomModal({
               onPointerDown={selectInput}
             />
           </div>
-          <div className="RoomDialog-linkContainer">
-            <label htmlFor="username">Set your username</label>
+          <div className="RoomDialog-usernameContainer">
+            <label className="RoomDialog-usernameLabel" htmlFor="username">
+              Username:
+            </label>
             <input
               id="username"
               value={username || ""}
               className="RoomDialog-username"
               // ref={roomLinkInput}
-              onPointerDown={onUsernameChange}
+              onChange={(event) => onUsernameChange(event.target.value)}
             />
           </div>
           <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
@@ -121,7 +123,7 @@ export function RoomDialog({
   isCollaborating: AppState["isCollaborating"];
   collaboratorCount: number;
   username: string | null;
-  onUsernameChange: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
