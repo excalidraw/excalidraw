@@ -29,6 +29,7 @@ export function getDefaultAppState(): AppState {
     cursorButton: "up",
     scrolledOutside: false,
     name: `excalidraw-${getDateTime()}`,
+    username: null,
     isCollaborating: false,
     isResizing: false,
     isRotating: false,
