@@ -34,6 +34,7 @@ export type AppState = {
   scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
+  cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
   isCollaborating: boolean;
@@ -50,6 +51,7 @@ export type AppState = {
         x: number;
         y: number;
       };
+      button?: "up" | "down";
       selectedElementIds?: AppState["selectedElementIds"];
     }
   >;
