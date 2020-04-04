@@ -1,0 +1,36 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Feature-Policy",
+          "value": "*"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src https: data: 'unsafe-inline'; connect-src https://*.excalidraw.com wss://excalidraw-socket.herokuapp.com https://excalidraw-socket.herokuapp.com"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/([^.]+)",
+      "destination": "/",
+      "statusCode": 301
+    }
+  ]
+}

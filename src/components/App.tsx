@@ -35,6 +35,7 @@ import {
   getSelectedElements,
   globalSceneState,
   isSomeElementSelected,
+  calculateScrollCenter,
 } from "../scene";
 import {
   decryptAESGEM,
@@ -99,6 +100,7 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   ARROW_CONFIRM_THRESHOLD,
+  SHIFT_LOCKING_ANGLE,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars } from "../scene/types";
@@ -329,6 +331,23 @@ export class App extends React.Component<any, AppState> {
       if (scene) {
         this.syncActionResult(scene);
       }
+    }
+
+    // rerender text elements on font load to fix #637
+    try {
+      await Promise.race([
+        document.fonts?.ready?.then(() => {
+          globalSceneState.getAllElements().forEach((element) => {
+            if (isTextElement(element)) {
+              invalidateShapeForElement(element);
+            }
+          });
+        }),
+        // if fonts don't load in 1s for whatever reason, don't block the UI
+        new Promise((resolve) => setTimeout(resolve, 1000)),
+      ]);
+    } catch (error) {
+      console.error(error);
     }
 
     if (this.state.isLoading) {
@@ -726,8 +745,20 @@ export class App extends React.Component<any, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource["SCENE_INIT" | "SCENE_UPDATE"],
+        { scrollToContent = false }: { scrollToContent?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
+
+        if (scrollToContent) {
+          this.setState({
+            ...this.state,
+            ...calculateScrollCenter(
+              remoteElements.filter((element) => {
+                return !element.isDeleted;
+              }),
+            ),
+          });
+        }
 
         // Perform reconciliation - in collaboration, if we encounter
         // elements with more staler versions than ours, ignore them
@@ -836,7 +867,7 @@ export class App extends React.Component<any, AppState> {
               return;
             case "SCENE_INIT": {
               if (!this.socketInitialized) {
-                updateScene(decryptedData);
+                updateScene(decryptedData, { scrollToContent: true });
               }
               break;
             }
@@ -2289,8 +2320,8 @@ export class App extends React.Component<any, AppState> {
               const cy = (y1 + y2) / 2;
               let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
               if (event.shiftKey) {
-                angle += Math.PI / 16;
-                angle -= angle % (Math.PI / 8);
+                angle += SHIFT_LOCKING_ANGLE / 2;
+                angle -= angle % SHIFT_LOCKING_ANGLE;
               }
               if (angle >= 2 * Math.PI) {
                 angle -= 2 * Math.PI;

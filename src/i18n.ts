@@ -13,6 +13,7 @@ export const languages = [
   },
   { lng: "it-IT", label: "Italiano", data: require("./locales/it-IT.json") },
   { lng: "hu-HU", label: "Magyar", data: require("./locales/hu-HU.json") },
+  { lng: "nl-NL", label: "Nederlands", data: require("./locales/nl-NL.json") },
   { lng: "no-No", label: "Norsk", data: require("./locales/no-NO.json") },
   { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
   { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
