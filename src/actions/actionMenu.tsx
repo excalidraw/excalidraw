@@ -70,7 +70,7 @@ export const actionFullScreen = register({
       type="button"
       icon={isFullScreen() ? fullScreenOff : fullScreenOn}
       aria-label={t("buttons.fullScreen")}
-      title={t("buttons.fullScreen")}
+      title={`${t("buttons.fullScreen")} ${getShortcutKey("F")}`}
       onClick={updateData}
     />
   ),
