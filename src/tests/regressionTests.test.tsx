@@ -16,20 +16,20 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 let getByToolName: (name: string) => HTMLElement = null!;
 let canvas: HTMLCanvasElement = null!;
 
-function clickTool(toolName: ToolName) {
+const clickTool = (toolName: ToolName) => {
   fireEvent.click(getByToolName(toolName));
-}
+};
 
 let lastClientX = 0;
 let lastClientY = 0;
 let pointerType: "mouse" | "pen" | "touch" = "mouse";
 
-function pointerDown(
+const pointerDown = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerDown(canvas, {
@@ -40,7 +40,7 @@ function pointerDown(
     pointerId: 1,
     pointerType,
   });
-}
+};
 
 function pointer2Down(clientX: number, clientY: number) {
   fireEvent.pointerDown(canvas, {
@@ -87,26 +87,26 @@ function pointerMove(
   });
 }
 
-function pointerUp(
+const pointerUp = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerUp(canvas, { pointerId: 1, pointerType, shiftKey, altKey });
-}
+};
 
-function hotkeyDown(key: Key) {
+const hotkeyDown = (key: Key) => {
   fireEvent.keyDown(document, { key: KEYS[key] });
-}
+};
 
-function hotkeyUp(key: Key) {
+const hotkeyUp = (key: Key) => {
   fireEvent.keyUp(document, {
     key: KEYS[key],
   });
-}
+};
 
 function keyDown(
   key: string,

@@ -79,7 +79,9 @@
       "no-useless-return": "warn",
       "prefer-arrow/prefer-arrow-functions": [
         "warn",
-        {}
+        {
+          "singleReturnOnly": true
+        }
       ],
       "prefer-arrow-callback": "warn",
       "prefer-const": [
