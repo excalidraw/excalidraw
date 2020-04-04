@@ -23,6 +23,7 @@ function RoomModal({
   onRoomDestroy: () => void;
 }) {
   const roomLinkInput = useRef<HTMLInputElement>(null);
+
   function copyRoomLink() {
     copyTextToSystemClipboard(activeRoomLink);
     if (roomLinkInput.current) {
@@ -83,7 +84,6 @@ function RoomModal({
               id="username"
               value={username || ""}
               className="RoomDialog-username"
-              // ref={roomLinkInput}
               onChange={(event) => onUsernameChange(event.target.value)}
             />
           </div>
