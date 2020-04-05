@@ -69,7 +69,8 @@
     "undo": "Annulla",
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
-    "createNewRoom": "Crea nuova stanza"
+    "createNewRoom": "Crea nuova stanza",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
