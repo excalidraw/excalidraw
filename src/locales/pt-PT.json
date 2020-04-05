@@ -99,8 +99,8 @@
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
-    "resize": "",
-    "rotate": ""
+    "resize": "Você pode restringir as proporções segurando SHIFT durante o redimensionamento",
+    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Experimente ",
@@ -126,6 +126,6 @@
     "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Erro"
   }
 }
