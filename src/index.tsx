@@ -22,6 +22,12 @@ Sentry.init({
     : undefined,
   environment: onlineEnv ? SentyEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
+  integrations: [
+    // https://github.com/getsentry/sentry-docs/issues/1015
+    new (Sentry.Integrations as any).CaptureConsole({
+      levels: ["error"],
+    }),
+  ],
 });
 
 // Block pinch-zooming on iOS outside of the content area
