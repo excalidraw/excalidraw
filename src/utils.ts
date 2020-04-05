@@ -145,13 +145,7 @@ export function resetCursor() {
 }
 
 export function isFullScreen() {
-  if (
-    document.fullscreenElement &&
-    document.fullscreenElement.nodeName === "HTML"
-  ) {
-    return true;
-  }
-  return false;
+  return document.fullscreenElement?.nodeName === "HTML";
 }
 
 export function allowFullScreen() {
