@@ -69,7 +69,8 @@
     "undo": "Шаг назад",
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
-    "createNewRoom": "Создать новую комнату"
+    "createNewRoom": "Создать новую комнату",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
