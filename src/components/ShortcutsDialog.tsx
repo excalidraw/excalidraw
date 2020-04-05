@@ -19,7 +19,7 @@ const ShortcutIsland = (props: {
     <h3
       style={{
         margin: "0",
-        padding: "8px 4px",
+        padding: "4px",
         backgroundColor: "#e9ecef",
         textAlign: "center",
       }}
@@ -42,7 +42,7 @@ const Shortcut = (props: { title: string; shortcuts: string[] }) => (
         display: "flex",
         justifyContent: "space-between",
         margin: "0",
-        padding: "2px 4px",
+        padding: "4px",
         alignItems: "center",
       }}
     >
@@ -79,7 +79,7 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
       margin: "0 8px",
       backgroundColor: "#e9ecef",
       borderRadius: "2px",
-      fontSize: "0.9em",
+      fontSize: "0.8em",
     }}
     {...props}
   />
