@@ -185,7 +185,6 @@ export const LayerUI = React.memo(
               <Section heading="canvasActions">
                 <Island padding={2}>
                   <Stack.Row gap={1}>
-                    {actionManager.renderAction("fullScreen")}
                     <ZoomActions
                       renderAction={actionManager.renderAction}
                       zoom={appState.zoom}
