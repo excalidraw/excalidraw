@@ -88,6 +88,7 @@ import {
   copyToAppClipboard,
   getClipboardContent,
   probablySupportsClipboardBlob,
+  probablySupportsClipboardWriteText,
 } from "../clipboard";
 import { normalizeScroll } from "../scene";
 import { getCenter, getDistance } from "../gesture";
@@ -556,6 +557,22 @@ export class App extends React.Component<any, AppState> {
     );
     exportCanvas(
       "clipboard",
+      selectedElements.length
+        ? selectedElements
+        : globalSceneState.getAllElements(),
+      this.state,
+      this.canvas!,
+      this.state,
+    );
+  };
+
+  private copyToClipboardAsSvg = () => {
+    const selectedElements = getSelectedElements(
+      globalSceneState.getAllElements(),
+      this.state,
+    );
+    exportCanvas(
+      "clipboard-svg",
       selectedElements.length
         ? selectedElements
         : globalSceneState.getAllElements(),
@@ -2661,6 +2678,11 @@ export class App extends React.Component<any, AppState> {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
+          probablySupportsClipboardWriteText &&
+            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+              label: t("labels.copyAsSvg"),
+              action: this.copyToClipboardAsSvg,
+            },
           ...this.actionManager.getContextMenuItems((action) =>
             this.canvasOnlyActions.includes(action.name),
           ),
@@ -2688,6 +2710,10 @@ export class App extends React.Component<any, AppState> {
         probablySupportsClipboardBlob && {
           label: t("labels.copyAsPng"),
           action: this.copyToClipboardAsPng,
+        },
+        probablySupportsClipboardWriteText && {
+          label: t("labels.copyAsSvg"),
+          action: this.copyToClipboardAsSvg,
         },
         ...this.actionManager.getContextMenuItems(
           (action) => !this.canvasOnlyActions.includes(action.name),
