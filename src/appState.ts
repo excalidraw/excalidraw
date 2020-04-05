@@ -66,6 +66,7 @@ export function clearAppStatePropertiesForHistory(
   appState: AppState,
 ): Partial<AppState> {
   return {
+    selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
