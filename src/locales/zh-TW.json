@@ -4,6 +4,7 @@
     "selectAll": "選擇全部",
     "copy": "複製",
     "copyAsPng": "複製為 PNG 到剪貼板",
+    "copyAsSvg": "",
     "bringForward": "往前移動一層",
     "sendToBack": "移動至最底層",
     "bringToFront": "移動至最上層",
