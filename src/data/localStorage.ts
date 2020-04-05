@@ -53,6 +53,6 @@ export function restoreFromLocalStorage() {
     return restore(elements, appState);
   } catch (err) {
     // Unable to access window.localStorage
-    return [];
+    return { elements: [], appState: null };
   }
 }
