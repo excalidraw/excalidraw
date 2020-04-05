@@ -1549,8 +1549,6 @@ export class App extends React.Component<any, AppState> {
         clearTimeout(tappedTwiceTimer);
         tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
       } else {
-        // leaving this for now
-
         // case: double-clicking with arrow/line tool selected would both create
         //  text and enter multiElement mode
         if (this.state.multiElement) {
@@ -1575,6 +1573,7 @@ export class App extends React.Component<any, AppState> {
         });
         didTapTwice = false;
         clearTimeout(tappedTwiceTimer);
+        return;
       }
     }
 
