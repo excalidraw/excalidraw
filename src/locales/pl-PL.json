@@ -69,7 +69,8 @@
     "undo": "Cofnij",
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
-    "createNewRoom": "Utwórz nowy pokój"
+    "createNewRoom": "Utwórz nowy pokój",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
