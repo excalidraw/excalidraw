@@ -129,12 +129,12 @@
     "title": "에러"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": ""
+    "title": "키보드 단축키",
+    "shapes": "그리기",
+    "editor": "편집",
+    "view": "보기",
+    "blog": "블로그 읽어보기",
+    "howto": "가이드 참고하기",
+    "github": "이슈 제보하기"
   }
 }
