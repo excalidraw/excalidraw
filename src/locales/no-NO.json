@@ -69,7 +69,8 @@
     "undo": "Angre",
     "redo": "Gjør om",
     "roomDialog": "",
-    "createNewRoom": "Opprett et nytt rom"
+    "createNewRoom": "Opprett et nytt rom",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
