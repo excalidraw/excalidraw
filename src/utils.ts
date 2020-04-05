@@ -144,9 +144,7 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-export function isFullScreen() {
-  return document.fullscreenElement?.nodeName === "HTML";
-}
+export const isFullScreen = () => document.fullscreenElement?.nodeName === "HTML";
 
 export function allowFullScreen() {
   document.documentElement.requestFullscreen();
