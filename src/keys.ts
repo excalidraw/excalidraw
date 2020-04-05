@@ -13,6 +13,7 @@ export const KEYS = {
   TAB: "Tab",
   SPACE: " ",
   QUESTION_MARK: "?",
+  F_KEY: "f",
 } as const;
 
 export type Key = keyof typeof KEYS;
