@@ -129,12 +129,12 @@
     "title": "Fehler"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": ""
+    "title": "Tastaturkürzel",
+    "shapes": "Formen",
+    "editor": "Editor",
+    "view": "Ansicht",
+    "blog": "Unseren Blog lesen",
+    "howto": "Folgen Sie unseren Anleitungen",
+    "github": "Ein Problem gefunden? Informieren Sie uns"
   }
 }
