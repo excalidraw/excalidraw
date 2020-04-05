@@ -3,7 +3,7 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 import { rotate, adjustXYWithRotation } from "../math";
-import { ExcalidrawLinearElement } from "./types";
+import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { getElementAbsoluteCoords, getCommonBounds } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -402,4 +402,8 @@ export function resizeElements(
     }
   }
   return false;
+}
+
+export function canResizeMutlipleElements(element: ExcalidrawElement) {
+  return ["rectangle", "diamond", "ellipse"].includes(element.type);
 }

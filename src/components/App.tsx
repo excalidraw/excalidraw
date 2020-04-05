@@ -24,6 +24,7 @@ import {
   newLinearElement,
   ResizeArrowFnType,
   resizeElements,
+  canResizeMutlipleElements,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -1475,11 +1476,7 @@ export class App extends React.Component<any, AppState> {
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      if (
-        selectedElements.every((element) =>
-          ["rectangle", "diamond", "ellipse"].includes(element.type),
-        )
-      ) {
+      if (selectedElements.every(canResizeMutlipleElements)) {
         const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
         const hackedCommonElement = {
           id: "hackedCommonElement",
@@ -1710,11 +1707,7 @@ export class App extends React.Component<any, AppState> {
         this.state,
       );
       if (selectedElements.length > 1) {
-        if (
-          selectedElements.every((element) =>
-            ["rectangle", "diamond", "ellipse"].includes(element.type),
-          )
-        ) {
+        if (selectedElements.every(canResizeMutlipleElements)) {
           const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
           const hackedCommonElement = {
             id: "hackedCommonElement",

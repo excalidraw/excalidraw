@@ -5,8 +5,10 @@ import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import {
   getElementAbsoluteCoords,
+  handlerRectanglesFromCoords,
   handlerRectangles,
   getCommonBounds,
+  canResizeMutlipleElements,
 } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -268,17 +270,13 @@ export function renderScene(
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
     } else if (locallySelectedElements.length > 1) {
-      if (
-        locallySelectedElements.every((element) =>
-          ["rectangle", "diamond", "ellipse"].includes(element.type),
-        )
-      ) {
+      if (locallySelectedElements.every(canResizeMutlipleElements)) {
         const dashedLinePadding = 4 / sceneState.zoom;
         context.translate(sceneState.scrollX, sceneState.scrollY);
         context.fillStyle = "#fff";
         const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
-        context.setLineDash([4 / sceneState.zoom, 2 / sceneState.zoom]);
+        context.setLineDash([2 / sceneState.zoom]);
         const lineWidth = context.lineWidth;
         context.lineWidth = 1 / sceneState.zoom;
         strokeRectWithRotation(
@@ -293,35 +291,32 @@ export function renderScene(
         );
         context.lineWidth = lineWidth;
         context.setLineDash(initialLineDash);
-        const hackedCommonElement = {
-          x: x1,
-          y: y1,
-          width: x2 - x1,
-          height: y2 - y1,
-          angle: 0,
-        } as ExcalidrawElement;
-        const handlers = handlerRectangles(
-          hackedCommonElement,
+        const handlers = handlerRectanglesFromCoords(
+          x1,
+          y1,
+          x2,
+          y2,
+          0,
           sceneState.zoom,
+          undefined,
+          { e: true, s: true, n: true, w: true, rotation: true },
         );
         Object.keys(handlers).forEach((key) => {
           const handler = handlers[key as HandlerRectanglesRet];
           if (handler !== undefined) {
             const lineWidth = context.lineWidth;
             context.lineWidth = 1 / sceneState.zoom;
-            if (["ne", "se", "sw", "nw"].includes(key)) {
-              strokeRectWithRotation(
-                context,
-                handler[0],
-                handler[1],
-                handler[2],
-                handler[3],
-                handler[0] + handler[2] / 2,
-                handler[1] + handler[3] / 2,
-                0,
-                true, // fill before stroke
-              );
-            }
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              0,
+              true, // fill before stroke
+            );
             context.lineWidth = lineWidth;
           }
         });
