@@ -69,7 +69,8 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
-    "createNewRoom": "Crear nueva sala"
+    "createNewRoom": "Crear nueva sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
