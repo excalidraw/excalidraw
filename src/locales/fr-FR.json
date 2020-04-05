@@ -129,9 +129,9 @@
     "title": "Erreur"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "editor": "",
+    "title": "Raccourcis clavier",
+    "shapes": "Formes",
+    "editor": "Éditeur",
     "view": "",
     "blog": "",
     "howto": "",
