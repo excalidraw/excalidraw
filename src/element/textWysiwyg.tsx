@@ -139,6 +139,12 @@ export function textWysiwyg({
   }
 
   function cleanup() {
+    // remove events to ensure they don't late-fire
+    editable.onblur = null;
+    editable.onpaste = null;
+    editable.oninput = null;
+    editable.onkeydown = null;
+
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
   }
