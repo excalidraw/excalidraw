@@ -127,5 +127,14 @@
   },
   "errorDialog": {
     "title": "Hata"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }
