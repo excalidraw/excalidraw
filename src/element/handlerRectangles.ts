@@ -19,9 +19,6 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   n: true,
   w: true,
   rotation: true,
-  // EXPERIMENT: se only
-  ne: true,
-  sw: true,
 };
 
 function generateHandler(

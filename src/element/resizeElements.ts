@@ -412,6 +412,38 @@ export function resizeElements(
         }
         return true;
       }
+      case "ne": {
+        const scale = Math.max(
+          (x - handleOffset - dashedLinePadding - x1) / (x2 - x1),
+          (y2 - handleOffset - dashedLinePadding - y) / (y2 - y1),
+        );
+        if (scale > minScale) {
+          selectedElements.forEach((element) => {
+            const width = element.width * scale;
+            const height = element.height * scale;
+            const x = element.x + (element.x - x1) * (scale - 1);
+            const y = element.y - (y2 - element.y) * (scale - 1);
+            mutateElement(element, { width, height, x, y });
+          });
+        }
+        return true;
+      }
+      case "sw": {
+        const scale = Math.max(
+          (x2 - handleOffset - dashedLinePadding - x) / (x2 - x1),
+          (y - handleOffset - dashedLinePadding - y1) / (y2 - y1),
+        );
+        if (scale > minScale) {
+          selectedElements.forEach((element) => {
+            const width = element.width * scale;
+            const height = element.height * scale;
+            const x = element.x - (x2 - element.x) * (scale - 1);
+            const y = element.y + (element.y - y1) * (scale - 1);
+            mutateElement(element, { width, height, x, y });
+          });
+        }
+        return true;
+      }
     }
   }
   return false;
