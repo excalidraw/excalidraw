@@ -2,7 +2,6 @@ import { ExcalidrawElement, PointerType } from "./types";
 
 import { handlerRectangles } from "./handlerRectangles";
 import { AppState } from "../types";
-import { isLinearElement } from "./typeChecks";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -126,7 +125,7 @@ export function normalizeResizeHandle(
   element: ExcalidrawElement,
   resizeHandle: HandlerRectanglesRet,
 ): HandlerRectanglesRet {
-  if ((element.width >= 0 && element.height >= 0) || isLinearElement(element)) {
+  if (element.width >= 0 && element.height >= 0) {
     return resizeHandle;
   }
 

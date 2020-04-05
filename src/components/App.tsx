@@ -2056,7 +2056,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                  ...(isLinearElement(element)
                     ? {
                         points: rescalePoints(
                           0,
@@ -2087,7 +2087,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                  ...(isLinearElement(element)
                     ? {
                         points: rescalePoints(
                           0,
@@ -2118,7 +2118,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                  ...(isLinearElement(element)
                     ? {
                         points: rescalePoints(
                           0,
@@ -2149,7 +2149,7 @@ export class App extends React.Component<any, AppState> {
                   width,
                   height,
                   ...adjustXYWithRotation("se", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
+                  ...(isLinearElement(element)
                     ? {
                         points: rescalePoints(
                           0,
@@ -2165,11 +2165,6 @@ export class App extends React.Component<any, AppState> {
               const height = element.height - deltaY;
 
               if (isLinearElement(element)) {
-                if (element.points.length > 2 && height <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
                 mutateElement(element, {
                   height,
                   ...adjustXYWithRotation("n", element, 0, deltaY, angle),
@@ -2188,12 +2183,6 @@ export class App extends React.Component<any, AppState> {
               const width = element.width - deltaX;
 
               if (isLinearElement(element)) {
-                if (element.points.length > 2 && width <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
-
                 mutateElement(element, {
                   width,
                   ...adjustXYWithRotation("w", element, deltaX, 0, angle),
@@ -2211,11 +2200,6 @@ export class App extends React.Component<any, AppState> {
               const height = element.height + deltaY;
 
               if (isLinearElement(element)) {
-                if (element.points.length > 2 && height <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
                 mutateElement(element, {
                   height,
                   ...adjustXYWithRotation("s", element, 0, deltaY, angle),
@@ -2233,11 +2217,6 @@ export class App extends React.Component<any, AppState> {
               const width = element.width + deltaX;
 
               if (isLinearElement(element)) {
-                if (element.points.length > 2 && width <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
                 mutateElement(element, {
                   width,
                   ...adjustXYWithRotation("e", element, deltaX, 0, angle),
