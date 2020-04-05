@@ -127,5 +127,14 @@
   },
   "errorDialog": {
     "title": "Erreur"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }
