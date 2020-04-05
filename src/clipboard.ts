@@ -97,6 +97,14 @@ export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
   });
 }
 
+export async function copyCanvasToClipboardAsSvg(svgroot: SVGSVGElement) {
+  try {
+    await navigator.clipboard.writeText(svgroot.outerHTML);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function copyTextToSystemClipboard(text: string | null) {
   let copied = false;
   if (probablySupportsClipboardWriteText) {

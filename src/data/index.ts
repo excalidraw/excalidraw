@@ -7,7 +7,10 @@ import { exportToCanvas, exportToSvg } from "../scene/export";
 import { fileSave } from "browser-nativefs";
 
 import { t } from "../i18n";
-import { copyCanvasToClipboardAsPng } from "../clipboard";
+import {
+  copyCanvasToClipboardAsPng,
+  copyCanvasToClipboardAsSvg,
+} from "../clipboard";
 import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
@@ -299,16 +302,21 @@ export async function exportCanvas(
   if (!hasNonDeletedElements(elements)) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
-  if (type === "svg") {
+  if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
     });
-    await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-      fileName: `${name}.svg`,
-    });
-    return;
+    if (type === "svg") {
+      await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
+        fileName: `${name}.svg`,
+      });
+      return;
+    } else if (type === "clipboard-svg") {
+      copyCanvasToClipboardAsSvg(tempSvg);
+      return;
+    }
   }
 
   const tempCanvas = exportToCanvas(elements, appState, {

@@ -4,6 +4,7 @@
     "selectAll": "Select All",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsSvg": "Copy to clipboard as SVG",
     "bringForward": "Bring Forward",
     "sendToBack": "Send To Back",
     "bringToFront": "Bring To Front",
