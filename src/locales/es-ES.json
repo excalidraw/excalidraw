@@ -42,7 +42,7 @@
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
-    "actions": "",
+    "actions": "Acciones",
     "language": "Lenguaje",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar elementos seleccionados"
@@ -53,7 +53,7 @@
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
@@ -108,11 +108,11 @@
     "clearCanvasMessage": "Si la recarga no funciona, intente ",
     "clearCanvasMessage_button": "limpiando el lienzo.",
     "clearCanvasCaveat": " Esto resultará en la pérdida del trabajo ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
+    "trackedToSentry_pre": "El error con el identificador ",
+    "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
@@ -126,6 +126,6 @@
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Error"
   }
 }

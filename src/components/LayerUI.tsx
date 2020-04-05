@@ -23,6 +23,7 @@ import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
+import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 
 interface LayerUIProps {
@@ -110,6 +111,11 @@ export const LayerUI = React.memo(
           <ErrorDialog
             message={appState.errorMessage}
             onClose={() => setAppState({ errorMessage: null })}
+          />
+        )}
+        {appState.showShortcutsDialog && (
+          <ShortcutsDialog
+            onClose={() => setAppState({ showShortcutsDialog: null })}
           />
         )}
         <FixedSideContainer side="top">

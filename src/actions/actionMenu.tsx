@@ -1,20 +1,10 @@
 import React from "react";
-import {
-  menu,
-  palette,
-  fullScreenOn,
-  fullScreenOff,
-} from "../components/icons";
+import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
 import { register } from "./register";
-import {
-  allowFullScreen,
-  exitFullScreen,
-  isFullScreen,
-  getShortcutKey,
-} from "../utils";
+import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -70,14 +60,5 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={isFullScreen() ? fullScreenOff : fullScreenOn}
-      aria-label={t("buttons.fullScreen")}
-      title={`${t("buttons.fullScreen")} ${getShortcutKey("F")}`}
-      onClick={updateData}
-    />
-  ),
   keyTest: (event) => event.keyCode === 70,
 });

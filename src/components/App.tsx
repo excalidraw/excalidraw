@@ -100,9 +100,10 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   ARROW_CONFIRM_THRESHOLD,
+  SHIFT_LOCKING_ANGLE,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
-import { ScrollBars } from "../scene/types";
+import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
@@ -125,6 +126,8 @@ function withBatchedUpdates<
 
 const { history } = createHistory();
 
+let didTapTwice: boolean = false;
+let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -213,53 +216,14 @@ export class App extends React.Component<any, AppState> {
             }}
             width={canvasWidth}
             height={canvasHeight}
-            ref={(canvas) => {
-              // canvas is null when unmounting
-              if (canvas !== null) {
-                this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas);
-
-                this.canvas.addEventListener("wheel", this.handleWheel, {
-                  passive: false,
-                });
-              } else {
-                this.canvas?.removeEventListener("wheel", this.handleWheel);
-              }
-            }}
+            ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
             onDoubleClick={this.handleCanvasDoubleClick}
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
-            onDrop={(event) => {
-              const file = event.dataTransfer.files[0];
-              if (
-                file?.type === "application/json" ||
-                file?.name.endsWith(".excalidraw")
-              ) {
-                this.setState({ isLoading: true });
-                loadFromBlob(file)
-                  .then(({ elements, appState }) =>
-                    this.syncActionResult({
-                      elements,
-                      appState: {
-                        ...(appState || this.state),
-                        isLoading: false,
-                      },
-                      commitToHistory: false,
-                    }),
-                  )
-                  .catch((error) => {
-                    this.setState({ isLoading: false, errorMessage: error });
-                  });
-              } else {
-                this.setState({
-                  isLoading: false,
-                  errorMessage: t("alerts.couldNotLoadInvalidFile"),
-                });
-              }
-            }}
+            onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
           </canvas>
@@ -477,10 +441,21 @@ export class App extends React.Component<any, AppState> {
     if (this.state.isCollaborating && !this.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
-    const pointerViewportCoords: {
-      [id: string]: { x: number; y: number };
+
+    const cursorButton: {
+      [id: string]: string | undefined;
     } = {};
+    const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
+    const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     this.state.collaborators.forEach((user, socketID) => {
+      if (user.selectedElementIds) {
+        for (const id of Object.keys(user.selectedElementIds)) {
+          if (!(id in remoteSelectedElementIds)) {
+            remoteSelectedElementIds[id] = [];
+          }
+          remoteSelectedElementIds[id].push(socketID);
+        }
+      }
       if (!user.pointer) {
         return;
       }
@@ -493,6 +468,7 @@ export class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+      cursorButton[socketID] = user.button;
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       globalSceneState.getAllElements().filter((element) => {
@@ -515,6 +491,8 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
+        remotePointerButton: cursorButton,
+        remoteSelectedElementIds: remoteSelectedElementIds,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -585,6 +563,28 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
+  };
+
+  private onTapStart = (event: TouchEvent) => {
+    if (!didTapTwice) {
+      didTapTwice = true;
+      clearTimeout(tappedTwiceTimer);
+      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      return;
+    }
+    // insert text only if we tapped twice with a single finger
+    // event.touches.length === 1 will also prevent inserting text when user's zooming
+    if (didTapTwice && event.touches.length === 1) {
+      const [touch] = event.touches;
+      // @ts-ignore
+      this.handleCanvasDoubleClick({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      didTapTwice = false;
+      clearTimeout(tappedTwiceTimer);
+    }
+    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -874,13 +874,20 @@ export class App extends React.Component<any, AppState> {
               updateScene(decryptedData);
               break;
             case "MOUSE_LOCATION": {
-              const { socketID, pointerCoords } = decryptedData.payload;
+              const {
+                socketID,
+                pointerCoords,
+                button,
+                selectedElementIds,
+              } = decryptedData.payload;
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
                 }
                 const user = state.collaborators.get(socketID)!;
                 user.pointer = pointerCoords;
+                user.button = button;
+                user.selectedElementIds = selectedElementIds;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -924,6 +931,7 @@ export class App extends React.Component<any, AppState> {
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
@@ -931,6 +939,8 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
+          button: payload.button || "up",
+          selectedElementIds: this.state.selectedElementIds,
         },
       };
       return this._broadcastSocketData(
@@ -994,6 +1004,12 @@ export class App extends React.Component<any, AppState> {
       (isArrowKey(event.key) && isInputLike(event.target))
     ) {
       return;
+    }
+
+    if (event.key === KEYS.QUESTION_MARK) {
+      this.setState({
+        showShortcutsDialog: true,
+      });
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
@@ -1345,13 +1361,8 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    const pointerCoords = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-    this.savePointer(pointerCoords);
+    this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -1502,7 +1513,11 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    this.setState({ lastPointerDownWith: event.pointerType });
+    this.setState({
+      lastPointerDownWith: event.pointerType,
+      cursorButton: "down",
+    });
+    this.savePointer(event.clientX, event.clientY, "down");
 
     // pan canvas on wheel button drag or space+drag
     if (
@@ -1535,6 +1550,10 @@ export class App extends React.Component<any, AppState> {
           if (!isHoldingSpace) {
             setCursorForShape(this.state.elementType);
           }
+          this.setState({
+            cursorButton: "up",
+          });
+          this.savePointer(event.clientX, event.clientY, "up");
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("pointerup", teardown);
           window.removeEventListener("blur", teardown);
@@ -1635,6 +1654,10 @@ export class App extends React.Component<any, AppState> {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
         lastPointerUp = null;
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
       });
@@ -2257,8 +2280,8 @@ export class App extends React.Component<any, AppState> {
               const cy = (y1 + y2) / 2;
               let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
               if (event.shiftKey) {
-                angle += Math.PI / 16;
-                angle -= angle % (Math.PI / 8);
+                angle += SHIFT_LOCKING_ANGLE / 2;
+                angle -= angle % SHIFT_LOCKING_ANGLE;
               }
               if (angle >= 2 * Math.PI) {
                 angle -= 2 * Math.PI;
@@ -2398,7 +2421,7 @@ export class App extends React.Component<any, AppState> {
       }
     });
 
-    const onPointerUp = withBatchedUpdates((event: PointerEvent) => {
+    const onPointerUp = withBatchedUpdates((childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -2412,11 +2435,15 @@ export class App extends React.Component<any, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
+        cursorButton: "up",
         editingElement: multiElement ? this.state.editingElement : null,
       });
 
+      this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
       resizeArrowFn = null;
       lastPointerUp = null;
+
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
 
@@ -2426,7 +2453,7 @@ export class App extends React.Component<any, AppState> {
         }
         if (!draggingOccurred && draggingElement && !multiElement) {
           const { x, y } = viewportCoordsToSceneCoords(
-            event,
+            childEvent,
             this.state,
             this.canvas,
             window.devicePixelRatio,
@@ -2503,7 +2530,7 @@ export class App extends React.Component<any, AppState> {
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
       if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
-        if (event.shiftKey) {
+        if (childEvent.shiftKey) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2556,6 +2583,51 @@ export class App extends React.Component<any, AppState> {
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
+  };
+
+  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+    // canvas is null when unmounting
+    if (canvas !== null) {
+      this.canvas = canvas;
+      this.rc = rough.canvas(this.canvas);
+
+      this.canvas.addEventListener("wheel", this.handleWheel, {
+        passive: false,
+      });
+      this.canvas.addEventListener("touchstart", this.onTapStart);
+    } else {
+      this.canvas?.removeEventListener("wheel", this.handleWheel);
+      this.canvas?.removeEventListener("touchstart", this.onTapStart);
+    }
+  };
+
+  private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+    const file = event.dataTransfer?.files[0];
+    if (
+      file?.type === "application/json" ||
+      file?.name.endsWith(".excalidraw")
+    ) {
+      this.setState({ isLoading: true });
+      loadFromBlob(file)
+        .then(({ elements, appState }) =>
+          this.syncActionResult({
+            elements,
+            appState: {
+              ...(appState || this.state),
+              isLoading: false,
+            },
+            commitToHistory: false,
+          }),
+        )
+        .catch((error) => {
+          this.setState({ isLoading: false, errorMessage: error });
+        });
+    } else {
+      this.setState({
+        isLoading: false,
+        errorMessage: t("alerts.couldNotLoadInvalidFile"),
+      });
+    }
   };
 
   private handleCanvasContextMenu = (
@@ -2690,12 +2762,26 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private savePointer = (pointerCoords: { x: number; y: number }) => {
+  private savePointer = (x: number, y: number, button: "up" | "down") => {
+    if (!x || !y) {
+      return;
+    }
+    const pointerCoords = viewportCoordsToSceneCoords(
+      { clientX: x, clientY: y },
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket && this.broadcastMouseLocation({ pointerCoords });
+    this.socket &&
+      this.broadcastMouseLocation({
+        pointerCoords,
+        button,
+      });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

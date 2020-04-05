@@ -22,6 +22,16 @@ body {
   cursor: text;
 }
 
+a {
+  font-weight: 500;
+  text-decoration: none;
+  color: #1c7ed6; /* OC Blue 7 */
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 canvas {
   touch-action: none;
   user-select: none;

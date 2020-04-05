@@ -28,7 +28,14 @@ export function Modal(props: {
       aria-labelledby={props.labelledBy}
     >
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
-      <div className="Modal__content" style={{ maxWidth: props.maxWidth }}>
+      <div
+        className="Modal__content"
+        style={{
+          maxWidth: props.maxWidth,
+          maxHeight: "100%",
+          overflowY: "scroll",
+        }}
+      >
         {props.children}
       </div>
     </div>,

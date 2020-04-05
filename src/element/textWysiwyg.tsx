@@ -71,7 +71,7 @@ export function textWysiwyg({
     backfaceVisibility: "hidden",
   });
 
-  editable.onpaste = (ev) => {
+  editable.onpaste = (event) => {
     try {
       const selection = window.getSelection();
       if (!selection?.rangeCount) {
@@ -79,7 +79,7 @@ export function textWysiwyg({
       }
       selection.deleteFromDocument();
 
-      const text = ev.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
+      const text = event.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
 
       const span = document.createElement("span");
       span.innerText = text;
@@ -92,7 +92,7 @@ export function textWysiwyg({
       range.setEnd(span, span.childNodes.length);
       selection.addRange(range);
 
-      ev.preventDefault();
+      event.preventDefault();
     } catch (error) {
       console.error(error);
     }
@@ -104,26 +104,29 @@ export function textWysiwyg({
     };
   }
 
-  editable.onkeydown = (ev) => {
-    if (ev.key === KEYS.ESCAPE) {
-      ev.preventDefault();
+  editable.onkeydown = (event) => {
+    if (event.key === KEYS.ESCAPE) {
+      event.preventDefault();
       handleSubmit();
     }
-    if (ev.key === KEYS.ENTER && (ev.shiftKey || ev[KEYS.CTRL_OR_CMD])) {
-      ev.preventDefault();
-      if (ev.isComposing || ev.keyCode === 229) {
+    if (
+      event.key === KEYS.ENTER &&
+      (event.shiftKey || event[KEYS.CTRL_OR_CMD])
+    ) {
+      event.preventDefault();
+      if (event.isComposing || event.keyCode === 229) {
         return;
       }
       handleSubmit();
     }
-    if (ev.key === KEYS.ENTER && !ev.shiftKey) {
-      ev.stopPropagation();
+    if (event.key === KEYS.ENTER && !event.shiftKey) {
+      event.stopPropagation();
     }
   };
   editable.onblur = handleSubmit;
 
-  function stopEvent(ev: Event) {
-    ev.stopPropagation();
+  function stopEvent(event: Event) {
+    event.stopPropagation();
   }
 
   function handleSubmit() {
