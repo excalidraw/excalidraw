@@ -1006,6 +1006,12 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
+    if (event.key === KEYS.QUESTION_MARK) {
+      this.setState({
+        showShortcutsDialog: true,
+      });
+    }
+
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
