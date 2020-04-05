@@ -4,6 +4,7 @@
     "selectAll": "전체 선택",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 이미지 복사",
+    "copyAsSvg": "",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
