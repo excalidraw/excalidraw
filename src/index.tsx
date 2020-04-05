@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
+import * as SentryIntegrations from "@sentry/integrations";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
@@ -23,8 +24,7 @@ Sentry.init({
   environment: onlineEnv ? SentyEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
   integrations: [
-    // https://github.com/getsentry/sentry-docs/issues/1015
-    new (Sentry.Integrations as any).CaptureConsole({
+    new SentryIntegrations.CaptureConsole({
       levels: ["error"],
     }),
   ],
