@@ -69,7 +69,8 @@
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
-    "createNewRoom": "Neuen Raum erstellen"
+    "createNewRoom": "Neuen Raum erstellen",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
