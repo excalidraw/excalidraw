@@ -144,6 +144,14 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+export const isFullScreen = () =>
+  document.fullscreenElement?.nodeName === "HTML";
+
+export const allowFullScreen = () =>
+  document.documentElement.requestFullscreen();
+
+export const exitFullScreen = () => document.exitFullscreen();
+
 export const getShortcutKey = (shortcut: string, prefix = " — "): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
