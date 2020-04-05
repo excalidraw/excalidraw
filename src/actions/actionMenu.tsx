@@ -49,7 +49,7 @@ export const actionToggleEditMenu = register({
 });
 
 export const actionFullScreen = register({
-  name: "fullScreen",
+  name: "toggleFullScreen",
   perform: () => {
     if (!isFullScreen()) {
       allowFullScreen();

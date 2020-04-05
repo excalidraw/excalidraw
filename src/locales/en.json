@@ -70,7 +70,7 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "fullScreen": "Full screen"
+    "toggleFullScreen": "Toggle Full screen"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
