@@ -69,7 +69,8 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
-    "createNewRoom": "Criar nova sala"
+    "createNewRoom": "Criar nova sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
