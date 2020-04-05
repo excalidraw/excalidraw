@@ -127,5 +127,14 @@
   },
   "errorDialog": {
     "title": "Ошибка"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }
