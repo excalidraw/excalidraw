@@ -16,6 +16,8 @@ export type AppState = {
   resizingElement: ExcalidrawElement | null;
   multiElement: ExcalidrawLinearElement | null;
   selectionElement: ExcalidrawElement | null;
+  aspectRatioElement: ExcalidrawElement | null;
+  rollbackShiftElement: ExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: ExcalidrawElement | null;

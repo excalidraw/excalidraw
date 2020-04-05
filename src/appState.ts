@@ -11,6 +11,8 @@ export function getDefaultAppState(): AppState {
     resizingElement: null,
     multiElement: null,
     editingElement: null,
+    aspectRatioElement: null,
+    rollbackShiftElement: null,
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
