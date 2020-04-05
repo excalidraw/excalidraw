@@ -299,7 +299,17 @@ export function renderScene(
           0,
           sceneState.zoom,
           undefined,
-          { e: true, s: true, n: true, w: true, rotation: true },
+          {
+            e: true,
+            s: true,
+            n: true,
+            w: true,
+            rotation: true,
+            // EXPERIMENT: se only
+            nw: true,
+            ne: true,
+            sw: true,
+          },
         );
         Object.keys(handlers).forEach((key) => {
           const handler = handlers[key as HandlerRectanglesRet];

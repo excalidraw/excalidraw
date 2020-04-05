@@ -1494,7 +1494,7 @@ export class App extends React.Component<any, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+        if (resizeHandle) {
           document.documentElement.style.cursor = getCursorForResizingElement({
             element: hackedCommonElement,
             resizeHandle,
@@ -1725,7 +1725,7 @@ export class App extends React.Component<any, AppState> {
             this.state.zoom,
             event.pointerType,
           );
-          if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+          if (resizeHandle) {
             elementWithResizeHandler = {
               element: hackedCommonElement,
               resizeHandle,

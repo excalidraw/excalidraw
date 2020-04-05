@@ -376,7 +376,7 @@ export function resizeElements(
       return true;
     } else if (selectedElements.length > 1) {
       // EXPERIMENT: se only
-      if (["ne", "se", "sw", "nw"].includes(resizeHandle as string)) {
+      if (resizeHandle === "se") {
         const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
         const handleOffset = 4 / appState.zoom; // XXX import constant
         const dashedLinePadding = 4 / appState.zoom; // XXX import constant
