@@ -186,7 +186,9 @@ export function getArrowPoints(
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
+export function getCommonBounds(
+  elements: readonly ExcalidrawElement[],
+): [number, number, number, number] {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }

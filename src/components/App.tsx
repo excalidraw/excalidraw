@@ -24,7 +24,9 @@ import {
   newLinearElement,
   ResizeArrowFnType,
   resizeElements,
+  getElementWithResizeHandler,
   canResizeMutlipleElements,
+  getResizeHandlerFromCoords,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -71,7 +73,6 @@ import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
 
-import { getElementWithResizeHandler } from "../element/resizeTest";
 import { ActionManager } from "../actions/manager";
 import "../actions";
 import { actions } from "../actions/register";
@@ -1476,21 +1477,10 @@ export class App extends React.Component<any, AppState> {
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      if (selectedElements.every(canResizeMutlipleElements)) {
-        const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-        const hackedCommonElement = {
-          id: "hackedCommonElement",
-          x: x1,
-          y: y1,
-          width: x2 - x1,
-          height: y2 - y1,
-          angle: 0,
-        } as ExcalidrawElement;
-        const resizeHandle = resizeTest(
-          hackedCommonElement,
-          { selectedElementIds: { hackedCommonElement: true } } as any,
-          x,
-          y,
+      if (canResizeMutlipleElements(selectedElements)) {
+        const resizeHandle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          { x, y },
           this.state.zoom,
           event.pointerType,
         );
@@ -1693,58 +1683,49 @@ export class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      let elementWithResizeHandler = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
-        this.state,
-        { x, y },
-        this.state.zoom,
-        event.pointerType,
-      );
-
       const selectedElements = getSelectedElements(
         globalSceneState.getAllElements(),
         this.state,
       );
-      if (selectedElements.length > 1) {
-        if (selectedElements.every(canResizeMutlipleElements)) {
-          const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-          const hackedCommonElement = {
-            id: "hackedCommonElement",
-            x: x1,
-            y: y1,
-            width: x2 - x1,
-            height: y2 - y1,
-            angle: 0,
-          } as ExcalidrawElement;
-          resizeHandle = resizeTest(
-            hackedCommonElement,
-            { selectedElementIds: { hackedCommonElement: true } } as any,
-            x,
-            y,
+      if (selectedElements.length === 1) {
+        const elementWithResizeHandler = getElementWithResizeHandler(
+          globalSceneState.getAllElements(),
+          this.state,
+          { x, y },
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (elementWithResizeHandler) {
+          this.setState({
+            resizingElement: elementWithResizeHandler
+              ? elementWithResizeHandler.element
+              : null,
+          });
+          resizeHandle = elementWithResizeHandler.resizeHandle;
+          document.documentElement.style.cursor = getCursorForResizingElement(
+            elementWithResizeHandler,
+          );
+          isResizingElements = true;
+        }
+      } else if (selectedElements.length > 1) {
+        if (canResizeMutlipleElements(selectedElements)) {
+          resizeHandle = getResizeHandlerFromCoords(
+            getCommonBounds(selectedElements),
+            { x, y },
             this.state.zoom,
             event.pointerType,
           );
           if (resizeHandle) {
-            elementWithResizeHandler = {
-              element: hackedCommonElement,
-              resizeHandle,
-            };
+            document.documentElement.style.cursor = getCursorForResizingElement(
+              {
+                resizeHandle,
+              },
+            );
+            isResizingElements = true;
           }
         }
       }
-      if (selectedElements.length >= 1 && elementWithResizeHandler) {
-        this.setState({
-          resizingElement: elementWithResizeHandler
-            ? elementWithResizeHandler.element
-            : null,
-        });
-
-        resizeHandle = elementWithResizeHandler.resizeHandle;
-        document.documentElement.style.cursor = getCursorForResizingElement(
-          elementWithResizeHandler,
-        );
-        isResizingElements = true;
-      } else {
+      if (!isResizingElements) {
         hitElement = getElementAtPosition(
           globalSceneState.getAllElements(),
           this.state,
@@ -2008,9 +1989,9 @@ export class App extends React.Component<any, AppState> {
         }
       }
 
-      if (
+      const resized =
+        isResizingElements &&
         resizeElements(
-          isResizingElements,
           resizeHandle,
           this.state,
           this.setAppState,
@@ -2021,8 +2002,8 @@ export class App extends React.Component<any, AppState> {
           y,
           lastX,
           lastY,
-        )
-      ) {
+        );
+      if (resized) {
         lastX = x;
         lastY = y;
         return;

@@ -1,6 +1,10 @@
 import { ExcalidrawElement, PointerType } from "./types";
 
-import { handlerRectangles } from "./handlerRectangles";
+import {
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+} from "./handlerRectangles";
 import { AppState } from "../types";
 import { isLinearElement } from "./typeChecks";
 
@@ -75,6 +79,30 @@ export function getElementWithResizeHandler(
     const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+}
+
+export function getResizeHandlerFromCoords(
+  [x1, y1, x2, y2]: readonly [number, number, number, number],
+  { x, y }: { x: number; y: number },
+  zoom: number,
+  pointerType: PointerType,
+) {
+  const handlers = handlerRectanglesFromCoords(
+    x1,
+    y1,
+    x2,
+    y2,
+    0,
+    zoom,
+    pointerType,
+    OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  );
+
+  const found = Object.keys(handlers).find((key) => {
+    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
+    return handler && isInHandlerRect(handler, x, y);
+  });
+  return (found || false) as HandlerRectanglesRet;
 }
 
 /*

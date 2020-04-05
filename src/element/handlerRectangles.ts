@@ -13,6 +13,18 @@ const handleSizes: { [k in PointerType]: number } = {
 
 const ROTATION_HANDLER_GAP = 16;
 
+export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  rotation: true,
+  // EXPERIMENT: se only
+  nw: true,
+  ne: true,
+  sw: true,
+};
+
 function generateHandler(
   x: number,
   y: number,

@@ -5,6 +5,7 @@ import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import {
   getElementAbsoluteCoords,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   handlerRectanglesFromCoords,
   handlerRectangles,
   getCommonBounds,
@@ -270,7 +271,7 @@ export function renderScene(
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
     } else if (locallySelectedElements.length > 1) {
-      if (locallySelectedElements.every(canResizeMutlipleElements)) {
+      if (canResizeMutlipleElements(locallySelectedElements)) {
         const dashedLinePadding = 4 / sceneState.zoom;
         context.translate(sceneState.scrollX, sceneState.scrollY);
         context.fillStyle = "#fff";
@@ -299,17 +300,7 @@ export function renderScene(
           0,
           sceneState.zoom,
           undefined,
-          {
-            e: true,
-            s: true,
-            n: true,
-            w: true,
-            rotation: true,
-            // EXPERIMENT: se only
-            nw: true,
-            ne: true,
-            sw: true,
-          },
+          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         Object.keys(handlers).forEach((key) => {
           const handler = handlers[key as HandlerRectanglesRet];
