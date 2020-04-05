@@ -69,7 +69,8 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
-    "createNewRoom": "Créer un nouveau salon"
+    "createNewRoom": "Créer un nouveau salon",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
