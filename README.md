@@ -45,6 +45,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm run test:code` | Test for formatting with Prettier |
 | `npm run test:app`  | Test the app                      |
 | `npm run test`      | Run all tests                     |
+| `npm run test -u`   | Update all snapshots              |
 
 ## Contributing
 
