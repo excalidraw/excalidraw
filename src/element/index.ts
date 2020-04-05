@@ -15,7 +15,6 @@ export {
   getLinearElementAbsoluteBounds,
 } from "./bounds";
 
-export type { Sides } from "./handlerRectangles";
 export {
   handlerRectanglesFromCoords,
   handlerRectangles,

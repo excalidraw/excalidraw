@@ -1496,7 +1496,6 @@ export class App extends React.Component<any, AppState> {
         );
         if (resizeHandle) {
           document.documentElement.style.cursor = getCursorForResizingElement({
-            element: hackedCommonElement,
             resizeHandle,
           });
           return;

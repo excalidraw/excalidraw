@@ -81,12 +81,12 @@ export function getElementWithResizeHandler(
  * Returns bi-directional cursor for the element being resized
  */
 export function getCursorForResizingElement(resizingElement: {
-  element: ExcalidrawElement;
+  element?: ExcalidrawElement;
   resizeHandle: ReturnType<typeof resizeTest>;
 }): string {
   const { element, resizeHandle } = resizingElement;
   const shouldSwapCursors =
-    Math.sign(element.height) * Math.sign(element.width) === -1;
+    element && Math.sign(element.height) * Math.sign(element.width) === -1;
   let cursor = null;
 
   switch (resizeHandle) {

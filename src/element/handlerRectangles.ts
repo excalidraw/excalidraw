@@ -3,16 +3,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 
-export type Sides =
-  | "n"
-  | "s"
-  | "w"
-  | "e"
-  | "nw"
-  | "ne"
-  | "sw"
-  | "se"
-  | "rotation";
+type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
 
 const handleSizes: { [k in PointerType]: number } = {
   mouse: 8,
