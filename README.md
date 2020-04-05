@@ -17,6 +17,8 @@
 
 Go to https://excalidraw.com to start sketching.
 
+Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://howto.excalidraw.com) to learn more about Excalidraw and how to use it effectively.
+
 ## Run the code
 
 ### Code Sandbox
