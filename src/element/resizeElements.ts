@@ -374,27 +374,44 @@ export function resizeElements(
 
     return true;
   } else if (selectedElements.length > 1) {
-    // EXPERIMENT: se only
-    if (resizeHandle === "se") {
-      const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-      const handleOffset = 4 / appState.zoom; // XXX import constant
-      const dashedLinePadding = 4 / appState.zoom; // XXX import constant
-      const minSize = handleOffset * 4;
-      const minScale = Math.max(minSize / (x2 - x1), minSize / (y2 - y1));
-      const scale = Math.max(
-        (x - handleOffset - dashedLinePadding - x1) / (x2 - x1),
-        (y - handleOffset - dashedLinePadding - y1) / (y2 - y1),
-      );
-      if (scale > minScale) {
-        selectedElements.forEach((element) => {
-          const width = element.width * scale;
-          const height = element.height * scale;
-          const x = element.x + (element.x - x1) * (scale - 1);
-          const y = element.y + (element.y - y1) * (scale - 1);
-          mutateElement(element, { width, height, x, y });
-        });
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+    const handleOffset = 4 / appState.zoom; // XXX import constant
+    const dashedLinePadding = 4 / appState.zoom; // XXX import constant
+    const minSize = handleOffset * 4;
+    const minScale = Math.max(minSize / (x2 - x1), minSize / (y2 - y1));
+    switch (resizeHandle) {
+      case "se": {
+        const scale = Math.max(
+          (x - handleOffset - dashedLinePadding - x1) / (x2 - x1),
+          (y - handleOffset - dashedLinePadding - y1) / (y2 - y1),
+        );
+        if (scale > minScale) {
+          selectedElements.forEach((element) => {
+            const width = element.width * scale;
+            const height = element.height * scale;
+            const x = element.x + (element.x - x1) * (scale - 1);
+            const y = element.y + (element.y - y1) * (scale - 1);
+            mutateElement(element, { width, height, x, y });
+          });
+        }
+        return true;
       }
-      return true;
+      case "nw": {
+        const scale = Math.max(
+          (x2 - handleOffset - dashedLinePadding - x) / (x2 - x1),
+          (y2 - handleOffset - dashedLinePadding - y) / (y2 - y1),
+        );
+        if (scale > minScale) {
+          selectedElements.forEach((element) => {
+            const width = element.width * scale;
+            const height = element.height * scale;
+            const x = element.x - (x2 - element.x) * (scale - 1);
+            const y = element.y - (y2 - element.y) * (scale - 1);
+            mutateElement(element, { width, height, x, y });
+          });
+        }
+        return true;
+      }
     }
   }
   return false;

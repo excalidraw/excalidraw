@@ -20,7 +20,6 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   w: true,
   rotation: true,
   // EXPERIMENT: se only
-  nw: true,
   ne: true,
   sw: true,
 };
