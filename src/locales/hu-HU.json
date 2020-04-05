@@ -69,7 +69,8 @@
     "undo": "Visszavonás",
     "redo": "Újra végrehajtás",
     "roomDialog": "Élő együttműködés indítása",
-    "createNewRoom": "Új szoba létrehozása"
+    "createNewRoom": "Új szoba létrehozása",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
