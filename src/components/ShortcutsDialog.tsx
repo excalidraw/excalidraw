@@ -96,9 +96,25 @@ const Footer = () => (
       paddingTop: 16,
     }}
   >
-    <a href="https://blog.excalidraw.com">{t("shortcutsDialog.blog")}</a>
-    <a href="https://howto.excalidraw.com">{t("shortcutsDialog.howto")}</a>
-    <a href="https://github.com/excalidraw/excalidraw/issues">
+    <a
+      href="https://blog.excalidraw.com"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {t("shortcutsDialog.blog")}
+    </a>
+    <a
+      href="https://howto.excalidraw.com"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {t("shortcutsDialog.howto")}
+    </a>
+    <a
+      href="https://github.com/excalidraw/excalidraw/issues"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       {t("shortcutsDialog.github")}
     </a>
   </div>
