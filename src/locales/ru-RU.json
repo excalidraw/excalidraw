@@ -4,6 +4,7 @@
     "selectAll": "Выделить всё",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
+    "copyAsSvg": "",
     "bringForward": "Переложить вперёд",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
