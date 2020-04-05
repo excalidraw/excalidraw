@@ -39,10 +39,7 @@ function generateHandler(
 }
 
 export function handlerRectanglesFromCoords(
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
+  [x1, y1, x2, y2]: [number, number, number, number],
   angle: number,
   zoom: number,
   pointerType: PointerType = "mouse",
@@ -187,15 +184,8 @@ export function handlerRectangles(
   zoom: number,
   pointerType: PointerType = "mouse",
 ) {
-  const [elementX1, elementY1, elementX2, elementY2] = getElementAbsoluteCoords(
-    element,
-  );
-
   const handlers = handlerRectanglesFromCoords(
-    elementX1,
-    elementY1,
-    elementX2,
-    elementY2,
+    getElementAbsoluteCoords(element),
     element.angle,
     zoom,
     pointerType,

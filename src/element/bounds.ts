@@ -7,7 +7,9 @@ import { isLinearElement } from "./typeChecks";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+export function getElementAbsoluteCoords(
+  element: ExcalidrawElement,
+): [number, number, number, number] {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteBounds(element);
   }
@@ -36,7 +38,7 @@ export function getDiamondPoints(element: ExcalidrawElement) {
 
 export function getLinearElementAbsoluteBounds(
   element: ExcalidrawLinearElement,
-) {
+): [number, number, number, number] {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
