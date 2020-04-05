@@ -69,7 +69,8 @@
     "undo": "Urungkan",
     "redo": "Mengulang",
     "roomDialog": "",
-    "createNewRoom": ""
+    "createNewRoom": "",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
