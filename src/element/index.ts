@@ -22,6 +22,8 @@ export {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
+export type { ResizeArrowFnType } from "./resizeElements";
+export { resizeElements } from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
