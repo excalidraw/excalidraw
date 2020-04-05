@@ -144,9 +144,11 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-export const isFullScreen = () => document.fullscreenElement?.nodeName === "HTML";
+export const isFullScreen = () =>
+  document.fullscreenElement?.nodeName === "HTML";
 
-export const allowFullScreen = () => document.documentElement.requestFullscreen();
+export const allowFullScreen = () =>
+  document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
 
