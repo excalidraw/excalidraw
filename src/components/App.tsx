@@ -1068,6 +1068,39 @@ export class App extends React.Component<any, AppState> {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
+    if (
+      event.shiftKey &&
+      this.state.isResizing &&
+      this.state.resizingElement &&
+      this.state.aspectRatioElement
+    ) {
+      const deltaWidth =
+        this.state.resizingElement.width - this.state.aspectRatioElement.width;
+      const deltaHeight =
+        this.state.resizingElement.height -
+        this.state.aspectRatioElement.height;
+
+      const aspectRatioX =
+        this.state.aspectRatioElement.height /
+        this.state.aspectRatioElement.width;
+      const aspectRatioY =
+        this.state.aspectRatioElement.width /
+        this.state.aspectRatioElement.height;
+
+      this.setState({
+        rollbackShiftElement: duplicateElement(this.state.resizingElement),
+      });
+
+      if (deltaWidth >= deltaHeight) {
+        mutateElement(this.state.resizingElement, {
+          height: this.state.resizingElement.width * aspectRatioX,
+        });
+      } else {
+        mutateElement(this.state.resizingElement, {
+          width: this.state.resizingElement.height * aspectRatioY,
+        });
+      }
+    }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
@@ -1082,6 +1115,21 @@ export class App extends React.Component<any, AppState> {
         this.setState({ selectedElementIds: {} });
       }
       isHoldingSpace = false;
+    }
+    // Rollback to original element when releasing the shiftKey
+    if (
+      !event.shiftKey &&
+      this.state.isResizing &&
+      this.state.rollbackShiftElement !== null &&
+      this.state.resizingElement !== null
+    ) {
+      this.setState({ rollbackShiftElement: null });
+      mutateElement(this.state.resizingElement, {
+        x: this.state.rollbackShiftElement.x,
+        y: this.state.rollbackShiftElement.y,
+        width: this.state.rollbackShiftElement.width,
+        height: this.state.rollbackShiftElement.height,
+      });
     }
   });
 
@@ -2018,6 +2066,10 @@ export class App extends React.Component<any, AppState> {
         this.setState({
           isResizing: resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
+          aspectRatioElement:
+            this.state.aspectRatioElement !== null
+              ? this.state.aspectRatioElement
+              : duplicateElement(this.state.resizingElement),
         });
         const el = this.state.resizingElement;
         const selectedElements = getSelectedElements(
@@ -2050,7 +2102,9 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
+                const height = event.shiftKey
+                  ? element.height - deltaX
+                  : element.height - deltaY;
                 const dY = element.height - height;
                 mutateElement(element, {
                   width,
@@ -2081,7 +2135,9 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
+                const height = event.shiftKey
+                  ? element.height + deltaX
+                  : element.height - deltaY;
                 const dY = element.height - height;
                 mutateElement(element, {
                   width,
@@ -2112,7 +2168,9 @@ export class App extends React.Component<any, AppState> {
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
                 const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
+                const height = event.shiftKey
+                  ? element.height - deltaX
+                  : element.height + deltaY;
                 const dY = height - element.height;
                 mutateElement(element, {
                   width,
@@ -2142,9 +2200,63 @@ export class App extends React.Component<any, AppState> {
                 }
                 resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
               } else {
-                const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
+                const aspectRatioElement = this.state.aspectRatioElement;
+
+                if (aspectRatioElement === null) {
+                  break;
+                }
+
+                const aspectRatioX =
+                  aspectRatioElement.height / aspectRatioElement.width;
+                const aspectRatioY =
+                  aspectRatioElement.width / aspectRatioElement.height;
+
+                let width = element.width;
+                let height = element.height;
+
+                if (event.shiftKey) {
+                  const isBoth =
+                    (deltaX > 0 &&
+                      deltaY > 0 &&
+                      x > element.x + element.width &&
+                      y > element.y + element.height) ||
+                    (deltaX < 0 &&
+                      deltaY < 0 &&
+                      x < element.x + element.width &&
+                      y < element.y + element.height);
+
+                  const isHorizontal =
+                    ((x > element.x + element.width && deltaX > 0) ||
+                      (x < element.x + element.width && deltaX < 0)) &&
+                    y <= element.y + element.height;
+
+                  const isVertical =
+                    ((y > element.y + element.height && deltaY > 0) ||
+                      (y < element.y + element.height && deltaY < 0)) &&
+                    x <= element.x + element.width;
+
+                  if (isBoth || isHorizontal) {
+                    width = element.width + deltaX;
+                    height = width * aspectRatioX;
+                  } else if (isVertical) {
+                    height = element.height + deltaY;
+                    width = height * aspectRatioY;
+                  }
+
+                  // Flip element
+                  if (aspectRatioElement && x < aspectRatioElement.x) {
+                    width *= -1;
+                  } else if (aspectRatioElement && y < aspectRatioElement.y) {
+                    height *= -1;
+                  }
+                } else {
+                  // Non aspect ratio resize
+                  width = element.width + deltaX;
+                  height = element.height + deltaY;
+                }
+
                 const dY = height - element.height;
+
                 mutateElement(element, {
                   width,
                   height,
@@ -2413,6 +2525,7 @@ export class App extends React.Component<any, AppState> {
         resizingElement: null,
         selectionElement: null,
         editingElement: multiElement ? this.state.editingElement : null,
+        aspectRatioElement: null,
       });
 
       resizeArrowFn = null;
