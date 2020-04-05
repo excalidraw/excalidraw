@@ -69,7 +69,8 @@
     "undo": "撤销",
     "redo": "重做",
     "roomDialog": "开始实时协作",
-    "createNewRoom": "新建会议室"
+    "createNewRoom": "新建会议室",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
