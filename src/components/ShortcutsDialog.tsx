@@ -1,6 +1,6 @@
 import React from "react";
 import { t } from "../i18n";
-
+import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 
@@ -179,11 +179,19 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               title={t("labels.sendToBack")}
-              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+[", "")]}
+              shortcuts={[
+                isDarwin
+                  ? getShortcutKey("CtrlOrCmd+Alt+[", "")
+                  : getShortcutKey("CtrlOrCmd+Shift+[", ""),
+              ]}
             />
             <Shortcut
               title={t("labels.bringToFront")}
-              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+]", "")]}
+              shortcuts={[
+                isDarwin
+                  ? getShortcutKey("CtrlOrCmd+Alt+]", "")
+                  : getShortcutKey("CtrlOrCmd+Shift+]", ""),
+              ]}
             />
             <Shortcut
               title={t("labels.sendBackward")}
