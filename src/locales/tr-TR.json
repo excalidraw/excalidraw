@@ -69,7 +69,8 @@
     "undo": "Geri Al",
     "redo": "İleri Al",
     "roomDialog": "Ortak Çalışma Ortamı Yarat",
-    "createNewRoom": "Yeni Oda Oluştur"
+    "createNewRoom": "Yeni Oda Oluştur",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
