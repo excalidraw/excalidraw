@@ -34,15 +34,15 @@
     "thin": "细",
     "bold": "加粗",
     "extraBold": "特粗",
-    "architect": "",
-    "artist": "",
-    "cartoonist": "",
+    "architect": "朴素",
+    "artist": "艺术",
+    "cartoonist": "漫画",
     "fileTitle": "文件名",
     "colorPicker": "调色盘",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
-    "actions": "",
+    "actions": "操作",
     "language": "语言",
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素"
@@ -53,7 +53,7 @@
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
@@ -74,7 +74,7 @@
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
     "couldNotCreateShareableLink": "无法创建共享链接",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "无法加载无效文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白的 canvas。",
     "couldNotCopyToClipboard": "无法复制到剪贴板。 请使用 Chrome 浏览器。",
@@ -92,14 +92,14 @@
     "lock": "绘制后保持所选的工具栏状态"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
+    "canvasActions": "画布动作",
+    "selectedShapeActions": "选定形状操作",
     "shapes": "形状"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
-    "resize": "",
+    "linearElement": "点击创建多个点 拖动创建直线",
+    "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
+    "resize": "调整大小时可以按住 Shift 来调整比例",
     "rotate": ""
   },
   "errorSplash": {
