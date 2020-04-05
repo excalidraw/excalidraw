@@ -129,12 +129,12 @@
     "title": "Fout"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": ""
+    "title": "Sneltoetsen",
+    "shapes": "Vormen",
+    "editor": "Editor",
+    "view": "Weergave",
+    "blog": "Lees onze blog",
+    "howto": "Volg onze handleidingen",
+    "github": "Probleem gevonden? Stuur een nieuwe issue"
   }
 }
