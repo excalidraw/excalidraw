@@ -219,7 +219,6 @@ export class App extends React.Component<any, AppState> {
             ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
-            onDoubleClick={this.handleCanvasDoubleClick}
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
@@ -563,28 +562,6 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
-  };
-
-  private onTapStart = (event: TouchEvent) => {
-    if (!didTapTwice) {
-      didTapTwice = true;
-      clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
-      return;
-    }
-    // insert text only if we tapped twice with a single finger
-    // event.touches.length === 1 will also prevent inserting text when user's zooming
-    if (didTapTwice && event.touches.length === 1) {
-      const [touch] = event.touches;
-      // @ts-ignore
-      this.handleCanvasDoubleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
-      didTapTwice = false;
-      clearTimeout(tappedTwiceTimer);
-    }
-    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -1325,33 +1302,6 @@ export class App extends React.Component<any, AppState> {
     });
   };
 
-  private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-  ) => {
-    // case: double-clicking with arrow/line tool selected would both create
-    //  text and enter multiElement mode
-    if (this.state.multiElement) {
-      return;
-    }
-
-    resetCursor();
-
-    const { x, y } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-
-    this.startTextEditing({
-      x: x,
-      y: y,
-      clientX: event.clientX,
-      clientY: event.clientY,
-      centerIfPossible: !event.altKey,
-    });
-  };
-
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -1589,6 +1539,43 @@ export class App extends React.Component<any, AppState> {
     //  want when clicking inside the canvas.
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
+    }
+
+    // insert text on double tap/click
+    if (gesture.pointers.size === 1) {
+      event.preventDefault();
+      if (!didTapTwice) {
+        didTapTwice = true;
+        clearTimeout(tappedTwiceTimer);
+        tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      } else {
+        // leaving this for now
+
+        // case: double-clicking with arrow/line tool selected would both create
+        //  text and enter multiElement mode
+        if (this.state.multiElement) {
+          return;
+        }
+
+        resetCursor();
+        const center = getCenter(gesture.pointers);
+        const { x, y } = viewportCoordsToSceneCoords(
+          { clientX: center.x, clientY: center.y },
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+
+        this.startTextEditing({
+          x: x,
+          y: y,
+          clientX: center.x,
+          clientY: center.y,
+          centerIfPossible: !event.altKey,
+        });
+        didTapTwice = false;
+        clearTimeout(tappedTwiceTimer);
+      }
     }
 
     // don't select while panning
@@ -2588,10 +2575,8 @@ export class App extends React.Component<any, AppState> {
       this.canvas.addEventListener("wheel", this.handleWheel, {
         passive: false,
       });
-      this.canvas.addEventListener("touchstart", this.onTapStart);
     } else {
       this.canvas?.removeEventListener("wheel", this.handleWheel);
-      this.canvas?.removeEventListener("touchstart", this.onTapStart);
     }
   };
 
