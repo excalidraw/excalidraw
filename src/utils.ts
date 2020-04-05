@@ -146,9 +146,7 @@ export function resetCursor() {
 
 export const isFullScreen = () => document.fullscreenElement?.nodeName === "HTML";
 
-export function allowFullScreen() {
-  document.documentElement.requestFullscreen();
-}
+export const allowFullScreen = () => document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
 
