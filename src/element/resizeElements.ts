@@ -371,8 +371,6 @@ export function resizeElements(
         y: element.y,
       });
 
-      lastX = x;
-      lastY = y;
       return true;
     } else if (selectedElements.length > 1) {
       // EXPERIMENT: se only
@@ -395,8 +393,6 @@ export function resizeElements(
             mutateElement(element, { width, height, x, y });
           });
         }
-        lastX = x;
-        lastY = y;
         return true;
       }
     }
