@@ -12,6 +12,7 @@ export const KEYS = {
   CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
   TAB: "Tab",
   SPACE: " ",
+  QUESTION_MARK: "?",
 } as const;
 
 export type Key = keyof typeof KEYS;

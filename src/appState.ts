@@ -39,6 +39,7 @@ export function getDefaultAppState(): AppState {
     selectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
+    showShortcutsDialog: false,
   };
 }
 
@@ -55,6 +56,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isCollaborating,
     isLoading,
     errorMessage,
+    showShortcutsDialog,
     ...exportedState
   } = appState;
   return exportedState;

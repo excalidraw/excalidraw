@@ -37,6 +37,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -224,6 +225,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -335,6 +337,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -587,6 +590,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -735,6 +739,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -917,6 +922,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1106,6 +1112,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1386,6 +1393,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1985,6 +1993,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2096,6 +2105,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2207,6 +2217,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2318,6 +2329,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2451,6 +2463,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2584,6 +2597,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2717,6 +2731,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2828,6 +2843,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2939,6 +2955,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3072,6 +3089,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3183,6 +3201,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3252,6 +3271,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3930,6 +3950,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4291,6 +4312,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4580,6 +4602,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4797,6 +4820,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4958,6 +4982,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5607,6 +5632,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6184,6 +6210,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6689,6 +6716,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7123,6 +7151,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7520,6 +7549,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7845,6 +7875,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8098,6 +8129,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8295,6 +8327,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8980,6 +9013,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9593,6 +9627,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10134,6 +10169,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10599,6 +10635,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10838,6 +10875,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10891,6 +10929,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10944,6 +10983,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -11225,6 +11265,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }

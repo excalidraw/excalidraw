@@ -127,5 +127,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "shortcutsDialog": {
+    "title": "Keyboard shortcuts",
+    "shapes": "Shapes",
+    "editor": "Editor",
+    "view": "View",
+    "blog": "Read our blog",
+    "howto": "Follow our guides",
+    "github": "Found an issue? Submit"
   }
 }
