@@ -183,7 +183,7 @@ export const LayerUI = React.memo(
           <div className="App-menu App-menu_bottom">
             <Stack.Col gap={2}>
               <Section heading="canvasActions">
-                <Island padding={2}>
+                <Island padding={1}>
                   <ZoomActions
                     renderAction={actionManager.renderAction}
                     zoom={appState.zoom}
