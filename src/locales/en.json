@@ -132,6 +132,9 @@
     "title": "Keyboard shortcuts",
     "shapes": "Shapes",
     "editor": "Editor",
-    "view": "View"
+    "view": "View",
+    "blog": "Read the Blog",
+    "howto": "Check out the How To",
+    "github": "Found an issue? Submit"
   }
 }

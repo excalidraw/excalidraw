@@ -42,7 +42,7 @@ const Shortcut = (props: { title: string; shortcuts: string[] }) => (
         display: "flex",
         justifyContent: "space-between",
         margin: "0",
-        padding: "4px",
+        padding: "2px 4px",
         alignItems: "center",
       }}
     >
@@ -50,6 +50,7 @@ const Shortcut = (props: { title: string; shortcuts: string[] }) => (
         style={{
           flexBasis: 0,
           flexGrow: 2,
+          lineHeight: 1.4,
         }}
       >
         {props.title}
@@ -82,6 +83,25 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
     }}
     {...props}
   />
+);
+
+const Footer = () => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      borderTop: "1px solid #ced4da",
+      marginTop: 8,
+      paddingTop: 16,
+    }}
+  >
+    <a href="https://blog.excalidraw.com">{t("shortcutsDialog.blog")}</a>
+    <a href="https://howto.excalidraw.com">{t("shortcutsDialog.howto")}</a>
+    <a href="https://github.com/excalidraw/excalidraw/issues">
+      {t("shortcutsDialog.github")}
+    </a>
+  </div>
 );
 
 export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
@@ -177,6 +197,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             />
           </ShortcutIsland>
         </div>
+        <Footer />
       </Dialog>
     </>
   );
