@@ -913,7 +913,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.socket.on("new-user", async (/* socketID: string */) => {
+      this.socket.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -1678,6 +1678,9 @@ export class App extends React.Component<any, AppState> {
 
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
+    const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
+      resizeHandle = nextResizeHandle;
+    };
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1993,6 +1996,7 @@ export class App extends React.Component<any, AppState> {
         isResizingElements &&
         resizeElements(
           resizeHandle,
+          setResizeHandle,
           this.state,
           this.setAppState,
           resizeArrowFn,
@@ -2229,7 +2233,7 @@ export class App extends React.Component<any, AppState> {
             },
           }));
         } else {
-          this.setState((/* prevState */) => ({
+          this.setState((_prevState) => ({
             selectedElementIds: { [hitElement!.id]: true },
           }));
         }

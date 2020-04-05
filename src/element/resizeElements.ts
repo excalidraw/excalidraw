@@ -94,6 +94,7 @@ const arrowResizeEnd: ResizeArrowFnType = (
 
 export function resizeElements(
   resizeHandle: ResizeTestType,
+  setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   appState: AppState,
   setAppState: (obj: any) => void,
   resizeArrowFn: ResizeArrowFnType | null,
@@ -355,7 +356,7 @@ export function resizeElements(
     }
 
     if (resizeHandle) {
-      resizeHandle = normalizeResizeHandle(element, resizeHandle);
+      setResizeHandle(normalizeResizeHandle(element, resizeHandle));
     }
     normalizeDimensions(element);
 
