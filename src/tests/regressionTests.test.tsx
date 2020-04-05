@@ -8,7 +8,7 @@ import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
-import { handlerRectangles } from "../element";
+import { Sides, handlerRectangles } from "../element";
 
 const { h } = window;
 
@@ -167,7 +167,9 @@ function getResizeHandles() {
     getSelectedElement(),
     h.state.zoom,
     pointerType,
-  );
+  ) as {
+    [T in Sides]: [number, number, number, number];
+  };
 
   const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
 
