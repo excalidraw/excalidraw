@@ -48,7 +48,8 @@ export type ActionName =
   | "zoomIn"
   | "zoomOut"
   | "resetZoom"
-  | "changeFontFamily";
+  | "changeFontFamily"
+  | "toggleFullScreen";
 
 export interface Action {
   name: ActionName;
