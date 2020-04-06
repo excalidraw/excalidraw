@@ -4,7 +4,7 @@
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
-    "copyAsSvg": "",
+    "copyAsSvg": "Skopiuj do schowka jako plik SVG",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -71,7 +71,7 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -133,8 +133,8 @@
   "shortcutsDialog": {
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Zakrzywiona strzałka",
+    "curvedLine": "Zakrzywiona linia",
     "editor": "Edytor",
     "view": "Widok",
     "blog": "Przeczytaj naszego bloga",
