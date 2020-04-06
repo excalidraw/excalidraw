@@ -133,6 +133,8 @@
   "shortcutsDialog": {
     "title": "Συντομεύσεις πληκτρολογίου",
     "shapes": "Σχήματα",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "Επεξεργαστής",
     "view": "Προβολή",
     "blog": "Διαβάστε το ιστολόγιο μας",
