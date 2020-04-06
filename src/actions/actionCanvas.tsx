@@ -10,6 +10,7 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
+import { AppState } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -35,12 +36,15 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
-  perform: (elements) => {
+  perform: (elements, appState: AppState) => {
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
       ),
-      appState: getDefaultAppState(),
+      appState: {
+        ...getDefaultAppState(),
+        username: appState.username,
+      },
       commitToHistory: true,
     };
   },
