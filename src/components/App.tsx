@@ -1190,11 +1190,10 @@ export class App extends React.Component<any, AppState> {
         ...globalSceneState.getAllElements().map((_element) => {
           if (_element.id === element.id) {
             return newTextElement({
-              ..._element,
+              ...(_element as ExcalidrawTextElement),
               x: element.x,
               y: element.y,
               text,
-              font: this.state.currentItemFont,
             });
           }
           return _element;
