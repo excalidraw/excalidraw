@@ -1,7 +1,7 @@
 import React from "react";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
+import { trash, zoomIn, zoomOut, zoomReset } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
@@ -130,7 +130,7 @@ export const actionZoomOut = register({
 });
 
 export const actionResetZoom = register({
-  name: "resetZoom",
+  name: "zoomReset",
   perform: (_elements, appState) => {
     return {
       appState: {
@@ -143,9 +143,9 @@ export const actionResetZoom = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      icon={resetZoom}
-      title={t("buttons.resetZoom")}
-      aria-label={t("buttons.resetZoom")}
+      icon={zoomReset}
+      title={t("buttons.zoomReset")}
+      aria-label={t("buttons.zoomReset")}
       onClick={() => {
         updateData(null);
       }}

@@ -92,7 +92,7 @@ export const redo = createIcon(
 
 // Icon imported form Storybook
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
-export const resetZoom = createIcon(
+export const zoomReset = createIcon(
   <path
     stroke="currentColor"
     strokeWidth="40"

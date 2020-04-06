@@ -216,7 +216,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+-", "")]}
             />
             <Shortcut
-              title={t("buttons.resetZoom")}
+              title={t("buttons.zoomReset")}
               shortcuts={[getShortcutKey("CtrlOrCmd+0", "")]}
             />
             <Shortcut title={t("buttons.toggleFullScreen")} shortcuts={["F"]} />

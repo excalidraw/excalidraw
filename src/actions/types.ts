@@ -47,7 +47,7 @@ export type ActionName =
   | "clearCanvas"
   | "zoomIn"
   | "zoomOut"
-  | "resetZoom"
+  | "zoomReset"
   | "changeFontFamily"
   | "toggleFullScreen";
 
