@@ -4,6 +4,7 @@
     "selectAll": "تحديد الكل",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة كـ PNG",
+    "copyAsSvg": "",
     "bringForward": "ارقع للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -69,7 +70,8 @@
     "undo": "تراجع عن",
     "redo": "إعادة تنفيذ",
     "roomDialog": "بدء المشاركة الحية",
-    "createNewRoom": "إنشاء غرفة جديدة"
+    "createNewRoom": "إنشاء غرفة جديدة",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "خطأ"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

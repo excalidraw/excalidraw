@@ -1,6 +1,7 @@
 import { ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isLinearElement } from "./typeChecks";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
@@ -23,17 +24,21 @@ export const getPerfectElementSize = (
   const absHeight = Math.abs(height);
 
   if (elementType === "line" || elementType === "arrow") {
-    if (absHeight < absWidth / 2) {
+    const lockedAngle =
+      Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *
+      SHIFT_LOCKING_ANGLE;
+    if (lockedAngle === 0) {
       height = 0;
-    } else if (absWidth < absHeight / 2) {
+    } else if (lockedAngle === Math.PI / 2) {
       width = 0;
     } else {
-      height = absWidth * Math.sign(height);
+      height =
+        Math.round(absWidth * Math.tan(lockedAngle)) * Math.sign(height) ||
+        height;
     }
   } else if (elementType !== "selection") {
     height = absWidth * Math.sign(height);
   }
-
   return { width, height };
 };
 

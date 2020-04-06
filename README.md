@@ -17,6 +17,8 @@
 
 Go to https://excalidraw.com to start sketching.
 
+Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://howto.excalidraw.com) to learn more about Excalidraw and how to use it effectively.
+
 ## Run the code
 
 ### Code Sandbox
@@ -45,6 +47,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm run test:code` | Test for formatting with Prettier |
 | `npm run test:app`  | Test the app                      |
 | `npm run test`      | Run all tests                     |
+| `npm run test -u`   | Update all snapshots              |
 
 ## Contributing
 

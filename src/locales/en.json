@@ -4,6 +4,7 @@
     "selectAll": "Select All",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
+    "copyAsSvg": "Copy to clipboard as SVG",
     "bringForward": "Bring Forward",
     "sendToBack": "Send To Back",
     "bringToFront": "Bring To Front",
@@ -69,7 +70,8 @@
     "undo": "Undo",
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "createNewRoom": "Create new room",
+    "toggleFullScreen": "Toggle full screen"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "shortcutsDialog": {
+    "title": "Keyboard shortcuts",
+    "shapes": "Shapes",
+    "editor": "Editor",
+    "view": "View",
+    "blog": "Read our blog",
+    "howto": "Follow our guides",
+    "github": "Found an issue? Submit"
   }
 }
