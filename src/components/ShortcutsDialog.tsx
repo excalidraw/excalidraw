@@ -154,6 +154,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
           </ShortcutIsland>
           <ShortcutIsland title={t("shortcutsDialog.editor")}>
             <Shortcut
+              title={t("labels.selectAll")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+A", "")]}
+            />
+            <Shortcut
               title={t("labels.copy")}
               shortcuts={[getShortcutKey("CtrlOrCmd+C", "")]}
             />
