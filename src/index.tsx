@@ -5,6 +5,7 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
 import "./styles.scss";
+import { register as registerServiceWorker } from "./serviceWorker";
 
 const SentyEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
@@ -46,3 +47,5 @@ ReactDOM.render(
   </TopErrorBoundary>,
   rootElement,
 );
+
+registerServiceWorker();
