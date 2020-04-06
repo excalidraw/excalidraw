@@ -1,5 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 
@@ -14,12 +14,9 @@ export function getElementsWithinSelection(
     selectionY2,
   ] = getElementAbsoluteCoords(selection);
   return elements.filter((element) => {
-    const [
-      elementX1,
-      elementY1,
-      elementX2,
-      elementY2,
-    ] = getElementAbsoluteCoords(element);
+    const [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+      element,
+    );
 
     return (
       element.type !== "selection" &&

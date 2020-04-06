@@ -9,6 +9,7 @@ export {
 } from "./newElement";
 export {
   getElementAbsoluteCoords,
+  getElementBounds,
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
