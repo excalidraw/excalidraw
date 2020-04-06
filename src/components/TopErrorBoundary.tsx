@@ -34,11 +34,11 @@ export class TopErrorBoundary extends React.Component<
       }
     }
 
-    Sentry.withScope((scope) => {
+    Sentry.withScope(scope => {
       scope.setExtras(errorInfo);
       const eventId = Sentry.captureException(error);
 
-      this.setState((state) => ({
+      this.setState(state => ({
         hasError: true,
         sentryEventId: eventId,
         localStorage: JSON.stringify(_localStorage),
@@ -81,8 +81,13 @@ export class TopErrorBoundary extends React.Component<
             {t("errorSplash.clearCanvasMessage")}
             <button
               onClick={() => {
-                localStorage.clear();
-                window.location.reload();
+                try {
+                  localStorage.clear();
+                } catch (err) {
+                  console.error(err);
+                } finally {
+                  window.location.reload();
+                }
               }}
             >
               {t("errorSplash.clearCanvasMessage_button")}

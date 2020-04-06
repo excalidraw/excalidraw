@@ -21,38 +21,42 @@ export function saveToLocalStorage(
     );
   } catch (err) {
     // Unable to access window.localStorage
+    console.error(err);
   }
 }
 
 export function restoreFromLocalStorage() {
+  let savedElements = null;
+  let savedState = null;
+
   try {
-    const savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
-
-    let elements = [];
-    if (savedElements) {
-      try {
-        elements = JSON.parse(savedElements);
-      } catch {
-        // Do nothing because elements array is already empty
-      }
-    }
-
-    let appState = null;
-    if (savedState) {
-      try {
-        appState = JSON.parse(savedState) as AppState;
-        // If we're retrieving from local storage, we should not be collaborating
-        appState.isCollaborating = false;
-        appState.collaborators = new Map();
-      } catch {
-        // Do nothing because appState is already null
-      }
-    }
-
-    return restore(elements, appState);
+    savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
+    savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
   } catch (err) {
-    // Unable to access window.localStorage
-    return { elements: [], appState: null };
+    // Unable to access localStorage
+    console.error(err);
   }
+
+  let elements = [];
+  if (savedElements) {
+    try {
+      elements = JSON.parse(savedElements);
+    } catch {
+      // Do nothing because elements array is already empty
+    }
+  }
+
+  let appState = null;
+  if (savedState) {
+    try {
+      appState = JSON.parse(savedState) as AppState;
+      // If we're retrieving from local storage, we should not be collaborating
+      appState.isCollaborating = false;
+      appState.collaborators = new Map();
+    } catch {
+      // Do nothing because appState is already null
+    }
+  }
+
+  return restore(elements, appState);
 }
