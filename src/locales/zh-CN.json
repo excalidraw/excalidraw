@@ -4,7 +4,7 @@
     "selectAll": "全选",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
-    "copyAsSvg": "",
+    "copyAsSvg": "复制为 SVG 到剪贴板",
     "bringForward": "上移一层",
     "sendToBack": "移至最后",
     "bringToFront": "移至最前",
@@ -71,7 +71,7 @@
     "redo": "重做",
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "切换全屏显示"
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -131,12 +131,12 @@
     "title": "错误"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": ""
+    "title": "快捷键列表",
+    "shapes": "形状",
+    "editor": "编辑者",
+    "view": "视图",
+    "blog": "浏览我们的博客",
+    "howto": "按照我们的指南",
+    "github": "发现问题吗？请提交"
   }
 }
