@@ -133,8 +133,8 @@
   "shortcutsDialog": {
     "title": "Tastatursnarveier",
     "shapes": "Figurer",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Buet pil",
+    "curvedLine": "Buet linje",
     "editor": "Redigering",
     "view": "Visning",
     "blog": "Les bloggen vår",
