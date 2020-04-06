@@ -4,6 +4,7 @@
     "selectAll": "Выделить всё",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
+    "copyAsSvg": "",
     "bringForward": "Переложить вперёд",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -69,7 +70,8 @@
     "undo": "Шаг назад",
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
-    "createNewRoom": "Создать новую комнату"
+    "createNewRoom": "Создать новую комнату",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Ошибка"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

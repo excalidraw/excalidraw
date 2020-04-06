@@ -4,6 +4,7 @@
     "selectAll": "Összes kijelölése",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
+    "copyAsSvg": "",
     "bringForward": "Előrébb hozás",
     "sendToBack": "Hátraküldés",
     "bringToFront": "Elõtérbe hozás",
@@ -69,7 +70,8 @@
     "undo": "Visszavonás",
     "redo": "Újra végrehajtás",
     "roomDialog": "Élő együttműködés indítása",
-    "createNewRoom": "Új szoba létrehozása"
+    "createNewRoom": "Új szoba létrehozása",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }
