@@ -133,8 +133,8 @@
   "shortcutsDialog": {
     "title": "Sneltoetsen",
     "shapes": "Vormen",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Gebogen pijl",
+    "curvedLine": "Gebogen lijn",
     "editor": "Editor",
     "view": "Weergave",
     "blog": "Lees onze blog",
