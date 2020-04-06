@@ -337,13 +337,22 @@ export function renderScene(
       const measureHeight =
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
+      // Border
+      context.fillRect(
+        offsetX - 1,
+        offsetY - 1,
+        measure.width + 2 * paddingHorizontal + 2,
+        measureHeight + 2 * paddingVertical + 2,
+      );
+      context.fillStyle = "#ffffff88";
+      // Background
       context.fillRect(
         offsetX,
         offsetY,
         measure.width + 2 * paddingHorizontal,
         measureHeight + 2 * paddingVertical,
       );
-      context.fillStyle = "white";
+      context.fillStyle = "#ffffff";
       context.fillText(
         username,
         offsetX + paddingHorizontal,
