@@ -1,5 +1,6 @@
 import { FlooredNumber } from "./types";
 import { getZoomOrigin } from "./scene";
+import { CURSOR_TYPE } from "./constants";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -142,6 +143,14 @@ export function distance2d(x1: number, y1: number, x2: number, y2: number) {
 
 export function resetCursor() {
   document.documentElement.style.cursor = "";
+}
+
+export function setCursorForShape(shape: string) {
+  if (shape === "selection") {
+    resetCursor();
+  } else {
+    document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+  }
 }
 
 export const isFullScreen = () =>
