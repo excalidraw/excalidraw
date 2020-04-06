@@ -133,6 +133,8 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "编辑者",
     "view": "视图",
     "blog": "浏览我们的博客",
