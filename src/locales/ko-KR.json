@@ -133,6 +133,8 @@
   "shortcutsDialog": {
     "title": "키보드 단축키",
     "shapes": "그리기",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "편집",
     "view": "보기",
     "blog": "블로그 읽어보기",
