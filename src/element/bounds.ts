@@ -190,13 +190,12 @@ export const getElementBounds = (
   element: ExcalidrawElement,
 ): [number, number, number, number] => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const angle = element.angle;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  const [x11, y11] = rotate(x1, y1, cx, cy, angle);
-  const [x12, y12] = rotate(x1, y2, cx, cy, angle);
-  const [x22, y22] = rotate(x2, y2, cx, cy, angle);
-  const [x21, y21] = rotate(x2, y1, cx, cy, angle);
+  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
   const minX = Math.min(x11, x12, x22, x21);
   const minY = Math.min(y11, y12, y22, y21);
   const maxX = Math.max(x11, x12, x22, x21);
