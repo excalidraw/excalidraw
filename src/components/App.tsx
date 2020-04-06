@@ -67,6 +67,7 @@ import {
   resetCursor,
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
+  setCursorForShape,
 } from "../utils";
 import { KEYS, isArrowKey } from "../keys";
 
@@ -145,15 +146,6 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-
-function setCursorForShape(shape: string) {
-  if (shape === "selection") {
-    resetCursor();
-  } else {
-    document.documentElement.style.cursor =
-      shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-  }
-}
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -1110,10 +1102,7 @@ export class App extends React.Component<any, AppState> {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
-        document.documentElement.style.cursor =
-          this.state.elementType === "text"
-            ? CURSOR_TYPE.TEXT
-            : CURSOR_TYPE.CROSSHAIR;
+        setCursorForShape(this.state.elementType);
         this.setState({ selectedElementIds: {} });
       }
       isHoldingSpace = false;
@@ -1483,7 +1472,11 @@ export class App extends React.Component<any, AppState> {
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
-    if (hasDeselectedButton || this.state.elementType !== "selection") {
+    if (
+      hasDeselectedButton ||
+      (this.state.elementType !== "selection" &&
+        this.state.elementType !== "text")
+    ) {
       return;
     }
 
@@ -1513,8 +1506,14 @@ export class App extends React.Component<any, AppState> {
       y,
       this.state.zoom,
     );
-    document.documentElement.style.cursor =
-      hitElement && !isOverScrollBar ? "move" : "";
+    if (this.state.elementType === "text") {
+      document.documentElement.style.cursor = isTextElement(hitElement)
+        ? CURSOR_TYPE.TEXT
+        : CURSOR_TYPE.CROSSHAIR;
+    } else {
+      document.documentElement.style.cursor =
+        hitElement && !isOverScrollBar ? "move" : "";
+    }
   };
 
   private handleCanvasPointerDown = (
@@ -1790,47 +1789,25 @@ export class App extends React.Component<any, AppState> {
         return;
       }
 
-      const snappedToCenterPosition = event.altKey
-        ? null
-        : this.getTextWysiwygSnappedToCenterPosition(
-            x,
-            y,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
+      const { x, y } = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
 
-      const element = newTextElement({
-        x: snappedToCenterPosition?.elementCenterX ?? x,
-        y: snappedToCenterPosition?.elementCenterY ?? y,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-        text: "",
-        font: this.state.currentItemFont,
+      this.startTextEditing({
+        x: x,
+        y: y,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        centerIfPossible: !event.altKey,
       });
 
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements(),
-        element,
-      ]);
-
-      this.handleTextWysiwyg(element, {
-        x: snappedToCenterPosition?.wysiwygX ?? event.clientX,
-        y: snappedToCenterPosition?.wysiwygY ?? event.clientY,
-      });
       resetCursor();
       if (!this.state.elementLocked) {
         this.setState({
-          editingElement: element,
           elementType: "selection",
-        });
-      } else {
-        this.setState({
-          editingElement: element,
         });
       }
       return;
