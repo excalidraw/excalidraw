@@ -133,6 +133,8 @@
   "shortcutsDialog": {
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "Edytor",
     "view": "Widok",
     "blog": "Przeczytaj naszego bloga",
