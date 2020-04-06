@@ -186,9 +186,9 @@ export function getArrowPoints(
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getElementBounds(
+export const getElementBounds = (
   element: ExcalidrawElement,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const angle = element.angle;
   const cx = (x1 + x2) / 2;
@@ -202,11 +202,11 @@ export function getElementBounds(
   const maxX = Math.max(x11, x12, x22, x21);
   const maxY = Math.max(y11, y12, y22, y21);
   return [minX, minY, maxX, maxY];
-}
+};
 
-export function getCommonBounds(
+export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
@@ -225,4 +225,4 @@ export function getCommonBounds(
   });
 
   return [minX, minY, maxX, maxY];
-}
+};
