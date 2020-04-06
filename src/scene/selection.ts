@@ -3,10 +3,10 @@ import { getElementAbsoluteCoords } from "../element";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 
-export function getElementsWithinSelection(
+export const getElementsWithinSelection = (
   elements: readonly ExcalidrawElement[],
   selection: ExcalidrawElement,
-) {
+) => {
   const [
     selectionX1,
     selectionY1,
@@ -29,7 +29,7 @@ export function getElementsWithinSelection(
       selectionY2 >= elementY2
     );
   });
-}
+};
 
 export const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -57,11 +57,11 @@ export const isSomeElementSelected = (
  * Returns common attribute (picked by `getAttribute` callback) of selected
  *  elements. If elements don't share the same value, returns `null`.
  */
-export function getCommonAttributeOfSelectedElements<T>(
+export const getCommonAttributeOfSelectedElements = <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-): T | null {
+): T | null => {
   const attributes = Array.from(
     new Set(
       getSelectedElements(elements, appState).map((element) =>
@@ -70,7 +70,7 @@ export function getCommonAttributeOfSelectedElements<T>(
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;
-}
+};
 
 export const getSelectedElements = (
   elements: readonly ExcalidrawElement[],
