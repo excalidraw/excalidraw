@@ -343,7 +343,7 @@ export function renderScene(
         measure.width + 2 * paddingHorizontal,
         measureHeight + 2 * paddingVertical,
       );
-      context.fillStyle = "white";
+      context.fillStyle = "#fff";
       context.fillText(
         username,
         offsetX + paddingHorizontal,
