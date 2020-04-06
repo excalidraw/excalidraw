@@ -65,16 +65,18 @@ class ToastManager {
     const id = getToastId();
     this.toasts.set(id, message);
     if (isFinite(shiftAfterMs)) {
-      this.timers.set(
-        id,
-        window.setTimeout(() => this.pop(id), shiftAfterMs),
-      );
+      const handle = window.setTimeout(() => this.pop(id), shiftAfterMs);
+      this.timers.set(id, handle);
     }
     this.render();
   }
 
   private pop = (id: number) => {
-    this.timers.delete(id);
+    const handle = this.timers.get(id);
+    if (handle) {
+      window.clearTimeout(handle);
+      this.timers.delete(id);
+    }
     this.toasts.delete(id);
     this.render();
   };
