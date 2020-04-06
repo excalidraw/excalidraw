@@ -34,11 +34,11 @@ export class TopErrorBoundary extends React.Component<
       }
     }
 
-    Sentry.withScope(scope => {
+    Sentry.withScope((scope) => {
       scope.setExtras(errorInfo);
       const eventId = Sentry.captureException(error);
 
-      this.setState(state => ({
+      this.setState((state) => ({
         hasError: true,
         sentryEventId: eventId,
         localStorage: JSON.stringify(_localStorage),
