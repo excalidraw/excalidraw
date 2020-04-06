@@ -133,6 +133,8 @@
   "shortcutsDialog": {
     "title": "Tastaturkürzel",
     "shapes": "Formen",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "Editor",
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
