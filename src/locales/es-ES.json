@@ -4,6 +4,7 @@
     "selectAll": "Seleccionar todo",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
+    "copyAsSvg": "",
     "bringForward": "Adelantar",
     "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
@@ -69,7 +70,8 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
-    "createNewRoom": "Crear nueva sala"
+    "createNewRoom": "Crear nueva sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

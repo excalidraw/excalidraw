@@ -4,6 +4,7 @@
     "selectAll": "Selecionar tudo",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
+    "copyAsSvg": "",
     "bringForward": "Passar para o primeiro plano",
     "sendToBack": "Passar para trás",
     "bringToFront": "Passar para frente",
@@ -69,7 +70,8 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
-    "createNewRoom": "Criar nova sala"
+    "createNewRoom": "Criar nova sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
@@ -99,8 +101,8 @@
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
-    "resize": "",
-    "rotate": ""
+    "resize": "Você pode restringir as proporções segurando SHIFT durante o redimensionamento",
+    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Experimente ",
@@ -126,6 +128,15 @@
     "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Erro"
+  },
+  "shortcutsDialog": {
+    "title": "Atalhos de teclado",
+    "shapes": "Formas",
+    "editor": "Editor",
+    "view": "",
+    "blog": "Leia o nosso blog",
+    "howto": "Siga nossos guias",
+    "github": ""
   }
 }

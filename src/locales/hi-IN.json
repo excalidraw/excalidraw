@@ -4,6 +4,7 @@
     "selectAll": "सभी चुनें",
     "copy": "प्रतिलिपि",
     "copyAsPng": "",
+    "copyAsSvg": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -69,7 +70,8 @@
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
     "roomDialog": "लाइव सहयोग शुरू करें",
-    "createNewRoom": ""
+    "createNewRoom": "",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

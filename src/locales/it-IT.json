@@ -4,6 +4,7 @@
     "selectAll": "Seleziona tutto",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti in formato PNG",
+    "copyAsSvg": "",
     "bringForward": "Porta Avanti",
     "sendToBack": "Sposta in secondo piano",
     "bringToFront": "Porta in primo piano",
@@ -69,7 +70,8 @@
     "undo": "Annulla",
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
-    "createNewRoom": "Crea nuova stanza"
+    "createNewRoom": "Crea nuova stanza",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

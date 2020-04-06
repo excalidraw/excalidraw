@@ -4,6 +4,7 @@
     "selectAll": "Selecteer alles",
     "copy": "Kopieer",
     "copyAsPng": "Kopieer als PNG",
+    "copyAsSvg": "Kopieer als SVG",
     "bringForward": "Breng naar voren",
     "sendToBack": "Breng naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -69,7 +70,8 @@
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
-    "createNewRoom": "Creëer live-samenwerkingssessie"
+    "createNewRoom": "Creëer live-samenwerkingssessie",
+    "toggleFullScreen": "Schermvullende weergave"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Fout"
+  },
+  "shortcutsDialog": {
+    "title": "Sneltoetsen",
+    "shapes": "Vormen",
+    "editor": "Editor",
+    "view": "Weergave",
+    "blog": "Lees onze blog",
+    "howto": "Volg onze handleidingen",
+    "github": "Probleem gevonden? Stuur een nieuwe issue"
   }
 }
