@@ -49,7 +49,7 @@ export const actionSaveScene = register({
     return { commitToHistory: false };
   },
   keyTest: (event) => {
-    return event.key === KEYS.ES && event[KEYS.CTRL_OR_CMD];
+    return event.key === "s" && event[KEYS.CTRL_OR_CMD];
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
