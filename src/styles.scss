@@ -372,7 +372,7 @@ button,
 .dropdown-select__language.dropdown-select--floating {
   bottom: 10px;
   :root[dir="ltr"] & {
-    right: 10px;
+    right: 55px;
   }
   :root[dir="rtl"] & {
     left: 10px;
@@ -408,6 +408,12 @@ button,
   bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
+}
+
+.toggle-shortcut-key {
+  position: fixed;
+  bottom: 4px;
+  right: 15px;
 }
 
 @media #{$media-query} {

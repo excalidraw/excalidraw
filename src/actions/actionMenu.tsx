@@ -1,5 +1,5 @@
 import React from "react";
-import { menu, palette } from "../components/icons";
+import { menu, palette, questionMark } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
@@ -62,4 +62,27 @@ export const actionFullScreen = register({
     };
   },
   keyTest: (event) => event.keyCode === KEYS.F_KEY_CODE,
+});
+
+export const actionShortcuts = register({
+  name: "toggleShortcuts",
+  perform: (_elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        showShortcutsDialog: true,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={questionMark}
+      aria-label={t("buttons.showShortcuts")}
+      onClick={updateData}
+      className="toggle-shortcut-key"
+    />
+  ),
+  keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });
