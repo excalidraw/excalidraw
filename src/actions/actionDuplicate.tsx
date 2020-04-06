@@ -9,8 +9,8 @@ import { clone } from "../components/icons";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 
-export const actionDuplicateSelection = register({
-  name: "duplicateSelection",
+export const actionDuplicate = register({
+  name: "duplicate",
   perform: (elements, appState) => {
     return {
       appState,
@@ -32,16 +32,14 @@ export const actionDuplicateSelection = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.duplicateSelection",
+  contextItemLabel: "labels.duplicate",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === "d",
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
       icon={clone}
-      title={`${t("labels.duplicateSelection")} ${getShortcutKey(
-        "CtrlOrCmd+D",
-      )}`}
-      aria-label={t("labels.duplicateSelection")}
+      title={`${t("labels.duplicate")} ${getShortcutKey("CtrlOrCmd+D")}`}
+      aria-label={t("labels.duplicate")}
       onClick={() => updateData(null)}
       visible={isSomeElementSelected(elements, appState)}
     />

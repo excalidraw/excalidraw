@@ -6,7 +6,7 @@ export {
   actionSendToBack,
 } from "./actionZindex";
 export { actionSelectAll } from "./actionSelectAll";
-export { actionDuplicateSelection } from "./actionDuplicateSelection";
+export { actionDuplicate } from "./actionDuplicate";
 export {
   actionChangeStrokeColor,
   actionChangeBackgroundColor,

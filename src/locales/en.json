@@ -46,7 +46,7 @@
     "actions": "Actions",
     "language": "Language",
     "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "duplicate": "Duplicate"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

@@ -44,6 +44,7 @@ const Shortcut = (props: { title: string; shortcuts: string[] }) => (
         margin: "0",
         padding: "4px",
         alignItems: "center",
+        whiteSpace: "nowrap",
       }}
     >
       <div
@@ -75,7 +76,7 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
   <span
     style={{
       border: "1px solid #ced4da",
-      padding: "2px 8px",
+      padding: "2px 6px",
       margin: "0 4px",
       backgroundColor: "#e9ecef",
       borderRadius: "2px",
@@ -92,8 +93,8 @@ const Footer = () => (
       flexDirection: "row",
       justifyContent: "space-between",
       borderTop: "1px solid #ced4da",
-      marginTop: 8,
-      paddingTop: 16,
+      marginTop: 4,
+      paddingTop: 12,
     }}
   >
     <a
@@ -214,7 +215,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+]", "")]}
             />
             <Shortcut
-              title={t("labels.duplicateSelection")}
+              title={t("labels.duplicate")}
               shortcuts={[getShortcutKey("CtrlOrCmd+D", "")]}
             />
           </ShortcutIsland>
