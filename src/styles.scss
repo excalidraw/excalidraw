@@ -372,7 +372,7 @@ button,
 .dropdown-select__language.dropdown-select--floating {
   bottom: 10px;
   :root[dir="ltr"] & {
-    right: 55px;
+    right: 45px;
   }
   :root[dir="rtl"] & {
     left: 10px;
@@ -410,9 +410,9 @@ button,
   padding: 10px 20px;
 }
 
-.toggle-shortcut-key {
+.help-icon {
   position: fixed;
-  bottom: 4px;
+  bottom: 14px;
   right: 15px;
 }
 

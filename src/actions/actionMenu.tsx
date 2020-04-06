@@ -1,11 +1,12 @@
 import React from "react";
-import { menu, palette, questionMark } from "../components/icons";
+import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
+import { HelpIcon } from "../components/HelpIcon";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -76,13 +77,7 @@ export const actionShortcuts = register({
     };
   },
   PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={questionMark}
-      aria-label={t("buttons.showShortcuts")}
-      onClick={updateData}
-      className="toggle-shortcut-key"
-    />
+    <HelpIcon title={t("buttons.showShortcuts")} onClick={updateData} />
   ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });
