@@ -71,7 +71,7 @@
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "Mode plein-écran"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -137,8 +137,8 @@
     "curvedLine": "",
     "editor": "Éditeur",
     "view": "",
-    "blog": "",
-    "howto": "",
+    "blog": "Lisez notre blog",
+    "howto": "Suivez notre guides",
     "github": ""
   }
 }
