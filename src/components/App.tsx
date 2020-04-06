@@ -120,9 +120,11 @@ import { actionFinalize } from "../actions";
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
 >(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
-  return ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
+  return (
+    ((event) => {
+      unstable_batchedUpdates(func as TFunction, event);
+    }) as TFunction
+  );
 }
 
 const { history } = createHistory();
