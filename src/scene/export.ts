@@ -6,6 +6,8 @@ import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 
+export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+
 export function exportToCanvas(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -86,6 +88,7 @@ export function exportToSvg(
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
   svgRoot.innerHTML = `
+  ${SVG_EXPORT_TAG}
   <defs>
     <style>
       @font-face {
