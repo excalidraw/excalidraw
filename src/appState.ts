@@ -39,6 +39,7 @@ export function getDefaultAppState(): AppState {
     selectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
+    showShortcutsDialog: false,
   };
 }
 
@@ -55,6 +56,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isCollaborating,
     isLoading,
     errorMessage,
+    showShortcutsDialog,
     ...exportedState
   } = appState;
   return exportedState;
@@ -64,6 +66,7 @@ export function clearAppStatePropertiesForHistory(
   appState: AppState,
 ): Partial<AppState> {
   return {
+    selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,

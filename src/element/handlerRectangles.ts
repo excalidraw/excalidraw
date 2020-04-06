@@ -112,7 +112,7 @@ export function handlerRectanglesFromCoords(
             dashedLineMargin -
             handlerMarginY +
             centeringOffset -
-            ROTATION_HANDLER_GAP,
+            ROTATION_HANDLER_GAP / zoom,
           handlerWidth,
           handlerHeight,
           cx,

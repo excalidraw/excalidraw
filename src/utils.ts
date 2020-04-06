@@ -144,16 +144,25 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
-export const getShortcutKey = (shortcut: string): string => {
+export const isFullScreen = () =>
+  document.fullscreenElement?.nodeName === "HTML";
+
+export const allowFullScreen = () =>
+  document.documentElement.requestFullscreen();
+
+export const exitFullScreen = () => document.exitFullscreen();
+
+export const getShortcutKey = (shortcut: string, prefix = " — "): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
-    return ` — ${shortcut
+    return `${prefix}${shortcut
       .replace("CtrlOrCmd+", "⌘")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
-      .replace("Shift+", "⇧")}`;
+      .replace("Shift+", "⇧")
+      .replace("Del", "⌫")}`;
   }
-  return ` — ${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${prefix}${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },

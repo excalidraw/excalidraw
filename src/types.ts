@@ -56,6 +56,7 @@ export type AppState = {
     }
   >;
   shouldCacheIgnoreZoom: boolean;
+  showShortcutsDialog: boolean;
 };
 
 export type PointerCoords = Readonly<{

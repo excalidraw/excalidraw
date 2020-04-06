@@ -37,6 +37,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -102,6 +103,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -137,6 +141,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -224,6 +232,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -267,6 +276,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -335,6 +347,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -378,6 +391,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -413,6 +429,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -448,6 +467,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -483,6 +505,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -518,6 +543,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -587,6 +615,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -630,6 +659,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -665,6 +697,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -735,6 +771,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -778,6 +815,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -813,6 +853,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -848,6 +892,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -917,6 +966,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -982,6 +1032,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1017,6 +1070,67 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1106,6 +1220,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1193,6 +1308,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1228,6 +1346,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1282,6 +1403,87 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 1116226695,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1386,6 +1588,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1539,6 +1742,7 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -1554,6 +1758,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1589,6 +1796,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1643,6 +1853,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1716,6 +1929,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1819,6 +2035,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1985,6 +2204,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2028,6 +2248,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2096,6 +2319,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2139,6 +2363,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2207,6 +2434,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2250,6 +2478,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2318,6 +2549,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2372,6 +2604,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2451,6 +2686,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2505,6 +2741,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2584,6 +2823,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2638,6 +2878,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2717,6 +2960,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2760,6 +3004,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2828,6 +3075,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2871,6 +3119,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2939,6 +3190,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2993,6 +3245,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3072,6 +3327,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3115,6 +3371,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3183,6 +3442,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3252,6 +3512,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3295,6 +3556,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3330,6 +3594,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3365,6 +3633,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3400,6 +3673,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3435,6 +3714,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3470,6 +3756,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3505,6 +3799,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3540,6 +3843,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3575,6 +3888,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3610,6 +3934,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3645,6 +3981,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3680,6 +4029,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3715,6 +4078,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3750,6 +4128,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3785,6 +4179,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3820,6 +4231,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3855,6 +4284,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id16": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3930,6 +4378,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3973,6 +4422,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4008,6 +4460,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4043,6 +4499,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4078,6 +4539,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4113,6 +4580,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4148,6 +4622,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4183,6 +4665,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4218,6 +4709,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4291,6 +4792,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4334,6 +4836,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4369,6 +4874,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4404,6 +4913,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4439,6 +4953,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4474,6 +4994,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4509,6 +5036,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4580,6 +5115,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4623,6 +5159,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4658,6 +5197,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4693,6 +5236,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4728,6 +5276,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4797,6 +5351,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4840,6 +5395,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4875,6 +5433,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4958,6 +5520,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5001,6 +5564,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5036,6 +5602,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5071,6 +5641,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5106,6 +5681,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5141,6 +5722,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5176,6 +5764,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5211,6 +5807,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5246,6 +5851,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5281,6 +5896,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5316,6 +5942,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5351,6 +5989,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5386,6 +6037,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5421,6 +6086,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5456,6 +6136,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5491,6 +6187,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5526,6 +6239,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5607,6 +6338,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5650,6 +6382,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5685,6 +6420,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5720,6 +6459,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5755,6 +6499,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5790,6 +6540,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5825,6 +6582,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5860,6 +6625,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5895,6 +6669,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5930,6 +6714,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5965,6 +6760,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6000,6 +6807,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6035,6 +6855,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6070,6 +6904,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6105,6 +6954,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6184,6 +7049,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6227,6 +7093,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6262,6 +7131,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6297,6 +7170,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6332,6 +7210,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6367,6 +7251,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6402,6 +7293,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6437,6 +7336,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6472,6 +7380,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6507,6 +7425,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6542,6 +7471,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6577,6 +7518,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6612,6 +7566,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6689,6 +7657,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6732,6 +7701,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6767,6 +7739,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6802,6 +7778,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6837,6 +7818,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6872,6 +7859,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6907,6 +7901,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6942,6 +7944,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6977,6 +7988,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7012,6 +8033,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7047,6 +8079,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7123,6 +8167,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7166,6 +8211,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7201,6 +8249,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7236,6 +8288,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7271,6 +8328,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7306,6 +8369,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7341,6 +8411,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7376,6 +8454,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7411,6 +8498,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7446,6 +8543,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7520,6 +8628,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7563,6 +8672,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7598,6 +8710,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7633,6 +8749,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7668,6 +8789,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7703,6 +8830,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7738,6 +8872,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7773,6 +8915,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7845,6 +8996,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7888,6 +9040,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7923,6 +9078,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7958,6 +9117,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7993,6 +9157,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8028,6 +9198,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8098,6 +9275,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8141,6 +9319,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8176,6 +9357,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8211,6 +9396,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8295,6 +9485,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8338,6 +9529,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8373,6 +9567,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8408,6 +9606,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8443,6 +9646,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8478,6 +9687,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8513,6 +9729,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8548,6 +9772,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8583,6 +9816,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8618,6 +9861,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8653,6 +9907,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8688,6 +9954,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8723,6 +10002,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8758,6 +10051,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8793,6 +10101,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8828,6 +10152,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8863,6 +10204,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8898,6 +10257,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id16": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8980,6 +10358,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9023,6 +10402,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9058,6 +10440,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9093,6 +10479,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9128,6 +10519,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9163,6 +10560,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9198,6 +10602,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9233,6 +10645,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9268,6 +10689,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9303,6 +10734,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9338,6 +10780,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9373,6 +10827,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9408,6 +10875,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9443,6 +10924,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9478,6 +10974,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9513,6 +11025,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9593,6 +11122,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9636,6 +11166,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9671,6 +11204,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9706,6 +11243,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9741,6 +11283,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9776,6 +11324,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9811,6 +11366,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9846,6 +11409,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9881,6 +11453,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9916,6 +11498,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9951,6 +11544,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9986,6 +11591,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10021,6 +11639,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10056,6 +11688,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10134,6 +11781,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10177,6 +11825,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10212,6 +11863,10 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10247,6 +11902,11 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10282,6 +11942,12 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10317,6 +11983,13 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10352,6 +12025,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10387,6 +12068,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10422,6 +12112,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10457,6 +12157,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10492,6 +12203,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10527,6 +12250,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10599,6 +12335,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10664,6 +12401,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10699,6 +12439,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10753,6 +12496,131 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10838,6 +12706,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10891,6 +12760,7 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10940,10 +12810,11 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id2": true,
+    "id1": true,
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -11030,6 +12901,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11105,6 +12979,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11140,6 +13017,9 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11225,6 +13105,7 @@ Object {
   "selectedElementIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
