@@ -6,8 +6,7 @@ import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString, getShortcutKey } from "../utils";
-import { CURSOR_TYPE } from "../constants";
+import { capitalizeString, getShortcutKey, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 
@@ -115,8 +114,7 @@ export function ShapesSwitcher({
                 multiElement: null,
                 selectedElementIds: {},
               });
-              document.documentElement.style.cursor =
-                value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
+              setCursorForShape(value);
               setAppState({});
             }}
           ></ToolButton>
