@@ -52,57 +52,58 @@ export function handlerRectangles(
 
   const centeringOffset = (size - 8) / (2 * zoom);
 
-  const handlers = {
-    nw: generateHandler(
-      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
-      handlerWidth,
-      handlerHeight,
-      cx,
-      cy,
-      angle,
-    ),
-    ne: generateHandler(
-      elementX2 + dashedLineMargin - centeringOffset,
-      elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
-      handlerWidth,
-      handlerHeight,
-      cx,
-      cy,
-      angle,
-    ),
-    sw: generateHandler(
-      elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
-      elementY2 + dashedLineMargin - centeringOffset,
-      handlerWidth,
-      handlerHeight,
-      cx,
-      cy,
-      angle,
-    ),
-    se: generateHandler(
-      elementX2 + dashedLineMargin - centeringOffset,
-      elementY2 + dashedLineMargin - centeringOffset,
-      handlerWidth,
-      handlerHeight,
-      cx,
-      cy,
-      angle,
-    ),
-    rotation: generateHandler(
-      elementX1 + elementWidth / 2 - handlerWidth / 2,
-      elementY1 -
-        dashedLineMargin -
-        handlerMarginY +
-        centeringOffset -
-        ROTATION_HANDLER_GAP / zoom,
-      handlerWidth,
-      handlerHeight,
-      cx,
-      cy,
-      angle,
-    ),
-  } as { [T in Sides]: [number, number, number, number] };
+  const handlers =
+    {
+      nw: generateHandler(
+        elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+        elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
+        handlerWidth,
+        handlerHeight,
+        cx,
+        cy,
+        angle,
+      ),
+      ne: generateHandler(
+        elementX2 + dashedLineMargin - centeringOffset,
+        elementY1 - dashedLineMargin - handlerMarginY + centeringOffset,
+        handlerWidth,
+        handlerHeight,
+        cx,
+        cy,
+        angle,
+      ),
+      sw: generateHandler(
+        elementX1 - dashedLineMargin - handlerMarginX + centeringOffset,
+        elementY2 + dashedLineMargin - centeringOffset,
+        handlerWidth,
+        handlerHeight,
+        cx,
+        cy,
+        angle,
+      ),
+      se: generateHandler(
+        elementX2 + dashedLineMargin - centeringOffset,
+        elementY2 + dashedLineMargin - centeringOffset,
+        handlerWidth,
+        handlerHeight,
+        cx,
+        cy,
+        angle,
+      ),
+      rotation: generateHandler(
+        elementX1 + elementWidth / 2 - handlerWidth / 2,
+        elementY1 -
+          dashedLineMargin -
+          handlerMarginY +
+          centeringOffset -
+          ROTATION_HANDLER_GAP / zoom,
+        handlerWidth,
+        handlerHeight,
+        cx,
+        cy,
+        angle,
+      ),
+    } as { [T in Sides]: [number, number, number, number] };
 
   // We only want to show height handlers (all cardinal directions)  above a certain size
   const minimumSizeForEightHandlers = (5 * size) / zoom;
@@ -153,38 +154,48 @@ export function handlerRectangles(
       const [, p1] = element.points;
 
       if (p1[0] === 0 || p1[1] === 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
+        return (
+          {
+            nw: handlers.nw,
+            se: handlers.se,
+          } as typeof handlers
+        );
       }
 
       if (p1[0] > 0 && p1[1] < 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
+        return (
+          {
+            ne: handlers.ne,
+            sw: handlers.sw,
+          } as typeof handlers
+        );
       }
 
       if (p1[0] > 0 && p1[1] > 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
+        return (
+          {
+            nw: handlers.nw,
+            se: handlers.se,
+          } as typeof handlers
+        );
       }
 
       if (p1[0] < 0 && p1[1] > 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
+        return (
+          {
+            ne: handlers.ne,
+            sw: handlers.sw,
+          } as typeof handlers
+        );
       }
 
       if (p1[0] < 0 && p1[1] < 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
+        return (
+          {
+            nw: handlers.nw,
+            se: handlers.se,
+          } as typeof handlers
+        );
       }
     }
   }
