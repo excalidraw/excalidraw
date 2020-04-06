@@ -76,7 +76,7 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
     style={{
       border: "1px solid #ced4da",
       padding: "2px 8px",
-      margin: "0 8px",
+      margin: "0 4px",
       backgroundColor: "#e9ecef",
       borderRadius: "2px",
       fontSize: "0.8em",
@@ -150,6 +150,14 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut title={t("toolBar.arrow")} shortcuts={["A", "5"]} />
             <Shortcut title={t("toolBar.line")} shortcuts={["L", "6"]} />
             <Shortcut title={t("toolBar.text")} shortcuts={["T", "7"]} />
+            <Shortcut
+              title={t("shortcutsDialog.curvedArrow")}
+              shortcuts={["A", "click", "click", "click"]}
+            />
+            <Shortcut
+              title={t("shortcutsDialog.curvedLine")}
+              shortcuts={["L", "click", "click", "click"]}
+            />
             <Shortcut title={t("toolBar.lock")} shortcuts={["Q"]} />
           </ShortcutIsland>
           <ShortcutIsland title={t("shortcutsDialog.editor")}>
