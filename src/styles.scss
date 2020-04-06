@@ -413,7 +413,8 @@ button,
 .help-icon {
   position: fixed;
   bottom: 14px;
-  right: 15px;
+  right: 10px;
+  fill: #868e96;
 }
 
 @media #{$media-query} {
