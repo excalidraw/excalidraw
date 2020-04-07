@@ -71,7 +71,8 @@
     "redo": "إعادة تنفيذ",
     "roomDialog": "بدء المشاركة الحية",
     "createNewRoom": "إنشاء غرفة جديدة",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",
