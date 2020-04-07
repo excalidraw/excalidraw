@@ -5,12 +5,12 @@ import {
 } from "./newElement";
 import { mutateElement } from "./mutateElement";
 
-function isPrimitive(val: any) {
+const isPrimitive = (val: any) => {
   const type = typeof val;
   return val == null || (type !== "object" && type !== "function");
-}
+};
 
-function assertCloneObjects(source: any, clone: any) {
+const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {
     if (clone.hasOwnProperty(key) && !isPrimitive(clone[key])) {
       expect(clone[key]).not.toBe(source[key]);
@@ -19,7 +19,7 @@ function assertCloneObjects(source: any, clone: any) {
       }
     }
   }
-}
+};
 
 it("clones arrow element", () => {
   const element = newLinearElement({
