@@ -46,7 +46,8 @@
     "actions": "الإجراءات",
     "language": "اللغة",
     "createRoom": "مشاركة الجلسة مباشرة",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
