@@ -71,7 +71,8 @@
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
-    "toggleFullScreen": "Attiva/Disattiva schermo intero"
+    "toggleFullScreen": "Attiva/Disattiva schermo intero",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
