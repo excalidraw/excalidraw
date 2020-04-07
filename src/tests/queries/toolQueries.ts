@@ -1,19 +1,19 @@
 import { queries, buildQueries } from "@testing-library/react";
 
 const toolMap = {
-  selection: "Selection — S, 1",
-  rectangle: "Rectangle — R, 2",
-  diamond: "Diamond — D, 3",
-  ellipse: "Ellipse — E, 4",
-  arrow: "Arrow — A, 5",
-  line: "Line — L, 6",
+  selection: "selection",
+  rectangle: "rectangle",
+  diamond: "diamond",
+  ellipse: "ellipse",
+  arrow: "arrow",
+  line: "line",
 };
 
 export type ToolName = keyof typeof toolMap;
 
 const _getAllByToolName = (container: HTMLElement, tool: string) => {
   const toolTitle = toolMap[tool as ToolName];
-  return queries.getAllByTitle(container, toolTitle);
+  return queries.getAllByTestId(container, toolTitle);
 };
 
 const getMultipleError = (_container: any, tool: any) =>

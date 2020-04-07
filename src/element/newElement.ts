@@ -6,6 +6,7 @@ import {
 } from "../element/types";
 import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
+import { newElementWith } from "./mutateElement";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -18,6 +19,7 @@ type ElementConstructorOpts = {
   opacity: ExcalidrawGenericElement["opacity"];
   width?: ExcalidrawGenericElement["width"];
   height?: ExcalidrawGenericElement["height"];
+  angle?: ExcalidrawGenericElement["angle"];
 };
 
 function _newElementBase<T extends ExcalidrawElement>(
@@ -33,6 +35,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     opacity,
     width = 0,
     height = 0,
+    angle = 0,
     ...rest
   }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
 ) {
@@ -43,6 +46,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     y,
     width,
     height,
+    angle,
     strokeColor,
     backgroundColor,
     fillStyle,
@@ -72,17 +76,21 @@ export function newTextElement(
 ): ExcalidrawTextElement {
   const { text, font } = opts;
   const metrics = measureText(text, font);
-  const textElement = {
-    ..._newElementBase<ExcalidrawTextElement>("text", opts),
-    text: text,
-    font: font,
-    // Center the text
-    x: opts.x - metrics.width / 2,
-    y: opts.y - metrics.height / 2,
-    width: metrics.width,
-    height: metrics.height,
-    baseline: metrics.baseline,
-  };
+  const textElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawTextElement>("text", opts),
+      isDeleted: false,
+      text: text,
+      font: font,
+      // Center the text
+      x: opts.x - metrics.width / 2,
+      y: opts.y - metrics.height / 2,
+      width: metrics.width,
+      height: metrics.height,
+      baseline: metrics.baseline,
+    },
+    {},
+  );
 
   return textElement;
 }

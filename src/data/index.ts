@@ -10,7 +10,10 @@ import { exportToCanvas, exportToSvg } from "../scene/export";
 import { fileSave } from "browser-nativefs";
 
 import { t } from "../i18n";
-import { copyCanvasToClipboardAsPng } from "../clipboard";
+import {
+  copyCanvasToClipboardAsPng,
+  copyCanvasToClipboardAsSvg,
+} from "../clipboard";
 import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
@@ -34,6 +37,12 @@ export type EncryptedData = {
 };
 
 export type SocketUpdateDataSource = {
+  SCENE_INIT: {
+    type: "SCENE_INIT";
+    payload: {
+      elements: readonly ExcalidrawElement[];
+    };
+  };
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
     payload: {
@@ -45,6 +54,9 @@ export type SocketUpdateDataSource = {
     payload: {
       socketID: string;
       pointerCoords: { x: number; y: number };
+      button: "down" | "up";
+      selectedElementIds: AppState["selectedElementIds"];
+      username: string;
     };
   };
 };
@@ -98,7 +110,7 @@ export function getCollaborationLinkData(link: string) {
 export async function generateCollaborationLink() {
   const id = await generateRandomID();
   const key = await generateEncryptionKey();
-  return `${window.location.origin}#room=${id},${key}`;
+  return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
 }
 
 async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
@@ -293,16 +305,21 @@ export async function exportCanvas(
   if (elements.length === 0) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
-  if (type === "svg") {
+  if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
     });
-    await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-      fileName: `${name}.svg`,
-    });
-    return;
+    if (type === "svg") {
+      await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
+        fileName: `${name}.svg`,
+      });
+      return;
+    } else if (type === "clipboard-svg") {
+      copyCanvasToClipboardAsSvg(tempSvg);
+      return;
+    }
   }
 
   const tempCanvas = exportToCanvas(elements, appState, {

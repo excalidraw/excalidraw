@@ -162,12 +162,13 @@ function getSelectedElement(): ExcalidrawElement {
   return selectedElements[0];
 }
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 function getResizeHandles() {
-  const rects = handlerRectangles(
-    getSelectedElement(),
-    h.state.zoom,
-    pointerType,
-  );
+  const rects =
+    handlerRectangles(getSelectedElement(), h.state.zoom, pointerType) as
+    {
+      [T in HandlerRectanglesRet]: [number, number, number, number];
+    };
 
   const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
 
@@ -322,6 +323,7 @@ describe("regression tests", () => {
     pointerUp();
 
     const resizeHandles = getResizeHandles();
+    delete resizeHandles.rotation; // exclude rotation handle
     for (const handlePos in resizeHandles) {
       const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();

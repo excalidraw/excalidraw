@@ -4,6 +4,7 @@
     "selectAll": "Seleccionar todo",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
+    "copyAsSvg": "",
     "bringForward": "Adelantar",
     "sendToBack": "Enviar Al Fondo",
     "bringToFront": "Traer al frente",
@@ -42,6 +43,7 @@
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
+    "actions": "Acciones",
     "language": "Lenguaje",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar elementos seleccionados"
@@ -52,6 +54,7 @@
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
+    "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
@@ -67,11 +70,13 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
-    "createNewRoom": "Crear nueva sala"
+    "createNewRoom": "Crear nueva sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
+    "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
@@ -96,7 +101,8 @@
   "hints": {
     "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
@@ -104,11 +110,11 @@
     "clearCanvasMessage": "Si la recarga no funciona, intente ",
     "clearCanvasMessage_button": "limpiando el lienzo.",
     "clearCanvasCaveat": " Esto resultará en la pérdida del trabajo ",
-    "openIssueMessage_pre": "Antes de hacerlo, agradeceríamos que abrieras un problema en nuestro ",
+    "trackedToSentry_pre": "El error con el identificador ",
+    "trackedToSentry_post": " fue rastreado en nuestro sistema.",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": " Por favor incluya el siguiente error en el stack trace (y si no es privado, también incluya el contenido de la escena):",
-    "errorStack": "Traza de pila de errores:",
-    "errorStack_loading": "Cargando datos, por favor espere...",
+    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
     "desc_shareLink": "Comparte este enlace con cualquier persona con quien quieras colaborar:",
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
+  },
+  "errorDialog": {
+    "title": "Error"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

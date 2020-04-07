@@ -3,6 +3,7 @@ import { getCommonBounds } from "../element";
 import { FlooredNumber } from "../types";
 import { ScrollBars } from "./types";
 import { getGlobalCSSVariable } from "../utils";
+import { getLanguage } from "../i18n";
 
 export const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
@@ -44,6 +45,8 @@ export function getScrollBars(
     right: parseInt(getGlobalCSSVariable("sar")),
   };
 
+  const isRTL = getLanguage().rtl;
+
   // The viewport is the rectangle currently visible for the user
   const viewportMinX = -scrollX + viewportWidthDiff / 2 + safeArea.left;
   const viewportMinY = -scrollY + viewportHeightDiff / 2 + safeArea.top;
@@ -81,10 +84,11 @@ export function getScrollBars(
       viewportMinY === sceneMinY && viewportMaxY === sceneMaxY
         ? null
         : {
-            x:
-              viewportWidth -
-              SCROLLBAR_WIDTH -
-              Math.max(safeArea.right, SCROLLBAR_MARGIN),
+            x: isRTL
+              ? Math.max(safeArea.left, SCROLLBAR_MARGIN)
+              : viewportWidth -
+                SCROLLBAR_WIDTH -
+                Math.max(safeArea.right, SCROLLBAR_MARGIN),
             y:
               ((viewportMinY - sceneMinY) / (sceneMaxY - sceneMinY)) *
                 viewportHeight +

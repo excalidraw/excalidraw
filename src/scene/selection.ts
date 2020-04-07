@@ -2,7 +2,7 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 
@@ -17,12 +17,9 @@ export function getElementsWithinSelection(
     selectionY2,
   ] = getElementAbsoluteCoords(selection);
   return elements.filter((element) => {
-    const [
-      elementX1,
-      elementY1,
-      elementX2,
-      elementY2,
-    ] = getElementAbsoluteCoords(element);
+    const [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+      element,
+    );
 
     return (
       element.type !== "selection" &&
@@ -50,19 +47,6 @@ export function deleteSelectedElements(
       selectedElementIds: {},
     },
   };
-}
-
-export function getSelectedIndices(
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) {
-  const selectedIndices: number[] = [];
-  elements.forEach((element, index) => {
-    if (appState.selectedElementIds[element.id]) {
-      selectedIndices.push(index);
-    }
-  });
-  return selectedIndices;
 }
 
 export function isSomeElementSelected(
@@ -94,7 +78,7 @@ export function getCommonAttributeOfSelectedElements<T>(
 export function getSelectedElements(
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-): readonly NonDeletedExcalidrawElement[] {
+) {
   return elements.filter((element) => appState.selectedElementIds[element.id]);
 }
 

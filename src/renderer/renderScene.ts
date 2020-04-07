@@ -6,7 +6,14 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { getElementAbsoluteCoords, handlerRectangles } from "../element";
+import {
+  getElementAbsoluteCoords,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+  getCommonBounds,
+  canResizeMutlipleElements,
+} from "../element";
 
 import { roundRect } from "./roundRect";
 import { SceneState } from "../scene/types";
@@ -20,13 +27,53 @@ import { getSelectedElements } from "../scene/selection";
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+
 function colorsForClientId(clientId: string) {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+
+  // Skip transparent background.
+  const backgrounds = colors.elementBackground.slice(1);
+  const strokes = colors.elementStroke.slice(1);
   return {
-    background: colors.elementBackground[sum % colors.elementBackground.length],
-    stroke: colors.elementStroke[sum % colors.elementBackground.length],
+    background: backgrounds[sum % backgrounds.length],
+    stroke: strokes[sum % strokes.length],
   };
+}
+
+function strokeRectWithRotation(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+  fill?: boolean,
+) {
+  context.translate(cx, cy);
+  context.rotate(angle);
+  if (fill) {
+    context.fillRect(x - cx, y - cy, width, height);
+  }
+  context.strokeRect(x - cx, y - cy, width, height);
+  context.rotate(-angle);
+  context.translate(-cx, -cy);
+}
+
+function strokeCircle(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  context.beginPath();
+  context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
 }
 
 export function renderScene(
@@ -111,13 +158,32 @@ export function renderScene(
     );
   }
 
-  // Pain selected elements
+  // Paint selected elements
   if (renderSelection) {
-    const selectedElements = getSelectedElements(elements, appState);
-    const dashledLinePadding = 4 / sceneState.zoom;
-
     context.translate(sceneState.scrollX, sceneState.scrollY);
-    selectedElements.forEach((element) => {
+
+    const selections = elements.reduce((acc, element) => {
+      const selectionColors = [];
+      // local user
+      if (appState.selectedElementIds[element.id]) {
+        selectionColors.push("#000000");
+      }
+      // remote users
+      if (sceneState.remoteSelectedElementIds[element.id]) {
+        selectionColors.push(
+          ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
+            const { background } = colorsForClientId(socketId);
+            return background;
+          }),
+        );
+      }
+      if (selectionColors.length) {
+        acc.push({ element, selectionColors });
+      }
+      return acc;
+    }, [] as { element: ExcalidrawElement; selectionColors: string[] }[]);
+
+    selections.forEach(({ element, selectionColors }) => {
       const [
         elementX1,
         elementY1,
@@ -129,35 +195,132 @@ export function renderScene(
       const elementHeight = elementY2 - elementY1;
 
       const initialLineDash = context.getLineDash();
-      context.setLineDash([8 / sceneState.zoom, 4 / sceneState.zoom]);
       const lineWidth = context.lineWidth;
+      const lineDashOffset = context.lineDashOffset;
+      const strokeStyle = context.strokeStyle;
+
+      const dashedLinePadding = 4 / sceneState.zoom;
+      const dashWidth = 8 / sceneState.zoom;
+      const spaceWidth = 4 / sceneState.zoom;
+
       context.lineWidth = 1 / sceneState.zoom;
-      context.strokeRect(
-        elementX1 - dashledLinePadding,
-        elementY1 - dashledLinePadding,
-        elementWidth + dashledLinePadding * 2,
-        elementHeight + dashledLinePadding * 2,
-      );
+
+      const count = selectionColors.length;
+      for (var i = 0; i < count; ++i) {
+        context.strokeStyle = selectionColors[i];
+        context.setLineDash([
+          dashWidth,
+          spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+        ]);
+        context.lineDashOffset = (dashWidth + spaceWidth) * i;
+        strokeRectWithRotation(
+          context,
+          elementX1 - dashedLinePadding,
+          elementY1 - dashedLinePadding,
+          elementWidth + dashedLinePadding * 2,
+          elementHeight + dashedLinePadding * 2,
+          elementX1 + elementWidth / 2,
+          elementY1 + elementHeight / 2,
+          element.angle,
+        );
+      }
+      context.lineDashOffset = lineDashOffset;
+      context.strokeStyle = strokeStyle;
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
     });
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
+    const locallySelectedElements = getSelectedElements(elements, appState);
+
     // Paint resize handlers
-    if (selectedElements.length === 1 && selectedElements[0].type !== "text") {
+    if (locallySelectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = "#fff";
-      const handlers = handlerRectangles(selectedElements[0], sceneState.zoom);
-      Object.values(handlers)
-        .filter((handler) => handler !== undefined)
-        .forEach((handler) => {
+      const handlers = handlerRectangles(
+        locallySelectedElements[0],
+        sceneState.zoom,
+      );
+      Object.keys(handlers).forEach((key) => {
+        const handler = handlers[key as HandlerRectanglesRet];
+        if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          context.fillRect(handler[0], handler[1], handler[2], handler[3]);
-          context.strokeRect(handler[0], handler[1], handler[2], handler[3]);
+          if (key === "rotation") {
+            strokeCircle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+            );
+          } else if (locallySelectedElements[0].type !== "text") {
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              locallySelectedElements[0].angle,
+              true, // fill before stroke
+            );
+          }
           context.lineWidth = lineWidth;
-        });
+        }
+      });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
+    } else if (locallySelectedElements.length > 1) {
+      if (canResizeMutlipleElements(locallySelectedElements)) {
+        const dashedLinePadding = 4 / sceneState.zoom;
+        context.translate(sceneState.scrollX, sceneState.scrollY);
+        context.fillStyle = "#fff";
+        const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
+        const initialLineDash = context.getLineDash();
+        context.setLineDash([2 / sceneState.zoom]);
+        const lineWidth = context.lineWidth;
+        context.lineWidth = 1 / sceneState.zoom;
+        strokeRectWithRotation(
+          context,
+          x1 - dashedLinePadding,
+          y1 - dashedLinePadding,
+          x2 - x1 + dashedLinePadding * 2,
+          y2 - y1 + dashedLinePadding * 2,
+          (x1 + x2) / 2,
+          (y1 + y2) / 2,
+          0,
+        );
+        context.lineWidth = lineWidth;
+        context.setLineDash(initialLineDash);
+        const handlers = handlerRectanglesFromCoords(
+          [x1, y1, x2, y2],
+          0,
+          sceneState.zoom,
+          undefined,
+          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+        );
+        Object.keys(handlers).forEach((key) => {
+          const handler = handlers[key as HandlerRectanglesRet];
+          if (handler !== undefined) {
+            const lineWidth = context.lineWidth;
+            context.lineWidth = 1 / sceneState.zoom;
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              0,
+              true, // fill before stroke
+            );
+            context.lineWidth = lineWidth;
+          }
+        });
+        context.translate(-sceneState.scrollX, -sceneState.scrollY);
+      }
     }
   }
 
@@ -168,6 +331,7 @@ export function renderScene(
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
     let { x, y } = sceneState.remotePointerViewportCoords[clientId];
+    const username = sceneState.remotePointerUsernames[clientId];
 
     const width = 9;
     const height = 14;
@@ -193,6 +357,26 @@ export function renderScene(
     if (isOutOfBounds) {
       context.globalAlpha = 0.2;
     }
+
+    if (
+      sceneState.remotePointerButton &&
+      sceneState.remotePointerButton[clientId] === "down"
+    ) {
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 3;
+      context.strokeStyle = "#ffffff88";
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.arc(x, y, 15, 0, 2 * Math.PI, false);
+      context.lineWidth = 1;
+      context.strokeStyle = stroke;
+      context.stroke();
+      context.closePath();
+    }
+
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + 1, y + 14);
@@ -201,9 +385,45 @@ export function renderScene(
     context.lineTo(x, y);
     context.fill();
     context.stroke();
+
+    if (!isOutOfBounds && username) {
+      const offsetX = x + width;
+      const offsetY = y + height;
+      const paddingHorizontal = 4;
+      const paddingVertical = 4;
+      const measure = context.measureText(username);
+      const measureHeight =
+        measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
+
+      // Border
+      context.fillStyle = stroke;
+      context.globalAlpha = globalAlpha;
+      context.fillRect(
+        offsetX - 1,
+        offsetY - 1,
+        measure.width + 2 * paddingHorizontal + 2,
+        measureHeight + 2 * paddingVertical + 2,
+      );
+      // Background
+      context.fillStyle = background;
+      context.fillRect(
+        offsetX,
+        offsetY,
+        measure.width + 2 * paddingHorizontal,
+        measureHeight + 2 * paddingVertical,
+      );
+      context.fillStyle = "#ffffff";
+      context.fillText(
+        username,
+        offsetX + paddingHorizontal,
+        offsetY + paddingVertical + measure.actualBoundingBoxAscent,
+      );
+    }
+
     context.strokeStyle = strokeStyle;
     context.fillStyle = fillStyle;
     context.globalAlpha = globalAlpha;
+    context.closePath();
   }
 
   // Paint scrollbars

@@ -10,15 +10,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -32,6 +36,9 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -39,6 +46,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -60,6 +68,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -95,10 +104,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -129,10 +142,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -151,6 +169,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -176,7 +195,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `8`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -188,15 +207,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -209,6 +232,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -216,6 +242,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -251,10 +278,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -280,7 +311,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `11`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -292,15 +323,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#5f3dc4",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -313,6 +348,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -320,6 +358,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "#fa5252",
   "fillStyle": "hachure",
   "height": 10,
@@ -355,10 +394,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -389,10 +432,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -423,10 +470,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -457,10 +508,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -491,10 +546,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "#fa5252",
           "fillStyle": "hachure",
           "height": 10,
@@ -520,7 +579,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `9`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -532,15 +591,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -554,6 +617,9 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -561,6 +627,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -596,10 +663,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -630,10 +701,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -659,7 +735,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `8`;
+exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `9`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -671,15 +747,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -694,6 +774,9 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -701,6 +784,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -736,10 +820,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -770,10 +858,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -804,10 +897,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -833,7 +932,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `11`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -845,15 +944,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -867,6 +970,9 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -874,6 +980,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -895,6 +1002,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -930,10 +1038,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -964,10 +1076,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -986,6 +1102,65 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1011,7 +1186,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `11`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -1023,15 +1198,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1046,6 +1225,9 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1053,6 +1235,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1074,6 +1257,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1095,6 +1279,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1130,10 +1315,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1164,10 +1353,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1186,6 +1379,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1216,10 +1410,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1238,6 +1436,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1256,6 +1455,85 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 1116226695,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id3": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1281,7 +1559,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `16`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -1293,15 +1571,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1312,6 +1594,9 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1319,6 +1604,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1340,6 +1626,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1361,6 +1648,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1382,6 +1670,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 3 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1414,6 +1703,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] element 4 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1460,6 +1750,7 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -1475,10 +1766,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1509,10 +1804,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1531,6 +1830,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1561,10 +1861,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1583,6 +1887,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1601,6 +1906,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1631,10 +1937,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1653,6 +1963,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1671,6 +1982,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1689,6 +2001,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1730,10 +2043,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1752,6 +2069,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1770,6 +2088,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1788,6 +2107,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1817,6 +2137,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1853,7 +2174,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `5`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `33`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `34`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -1865,15 +2186,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1886,6 +2211,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1893,6 +2221,7 @@ Object {
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -1928,10 +2257,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -1957,7 +2290,7 @@ Object {
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -1969,15 +2302,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -1990,6 +2327,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -1997,6 +2337,7 @@ Object {
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2032,10 +2373,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2061,7 +2406,7 @@ Object {
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -2073,15 +2418,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2094,6 +2443,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2101,6 +2453,7 @@ Object {
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2136,10 +2489,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2165,7 +2522,7 @@ Object {
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -2177,15 +2534,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2198,6 +2559,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2205,6 +2569,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2251,10 +2616,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2291,7 +2660,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -2303,15 +2672,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2324,6 +2697,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2331,6 +2707,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2377,10 +2754,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2417,7 +2798,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -2429,15 +2810,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2450,6 +2835,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2457,6 +2845,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2503,10 +2892,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2543,7 +2936,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -2555,15 +2948,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2576,6 +2973,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2583,6 +2983,7 @@ Object {
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2618,10 +3019,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2647,7 +3052,7 @@ Object {
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -2659,15 +3064,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2680,6 +3089,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2687,6 +3099,7 @@ Object {
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2722,10 +3135,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2751,7 +3168,7 @@ Object {
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -2763,15 +3180,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2784,6 +3205,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2791,6 +3215,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2837,10 +3262,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2877,7 +3306,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -2889,15 +3318,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -2910,6 +3343,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -2917,6 +3353,7 @@ Object {
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -2952,10 +3389,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -2981,7 +3422,7 @@ Object {
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -2993,15 +3434,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3014,6 +3459,9 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3029,7 +3477,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `7`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
@@ -3041,15 +3489,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3078,6 +3530,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3085,6 +3540,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -3120,10 +3576,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3154,10 +3614,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3188,10 +3653,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3222,10 +3693,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3256,10 +3734,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3290,10 +3776,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3324,10 +3819,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3358,10 +3863,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3392,10 +3908,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3426,10 +3954,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3460,10 +4001,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3494,10 +4049,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3528,10 +4098,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3562,10 +4148,27 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3596,10 +4199,28 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3630,10 +4251,29 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3664,10 +4304,30 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id16": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3693,7 +4353,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `53`;
+exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `54`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -3705,15 +4365,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -3733,6 +4397,9 @@ Object {
     "id7": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -3740,6 +4407,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -3775,10 +4443,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3809,10 +4481,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3843,10 +4520,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3877,10 +4560,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -3911,10 +4601,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -3945,10 +4643,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -3979,10 +4686,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4013,10 +4730,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4042,7 +4770,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `26`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `27`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -4054,15 +4782,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4080,6 +4812,9 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4087,6 +4822,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4122,10 +4858,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4156,10 +4896,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4190,10 +4935,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4224,10 +4975,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4258,10 +5016,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4292,10 +5058,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4321,7 +5096,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `20`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `21`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -4333,15 +5108,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4357,6 +5136,9 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4364,6 +5146,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -4399,10 +5182,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4433,10 +5220,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4467,10 +5259,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4501,10 +5299,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4530,7 +5335,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `14`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `15`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -4542,15 +5347,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4564,6 +5373,9 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4571,6 +5383,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4606,10 +5419,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4640,10 +5457,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4669,7 +5491,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `8`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `9`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -4681,15 +5503,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -4717,6 +5543,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -4724,6 +5553,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -4759,10 +5589,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4793,10 +5627,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4827,10 +5666,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4861,10 +5706,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -4895,10 +5747,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4929,10 +5789,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -4963,10 +5832,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -4997,10 +5876,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5031,10 +5921,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5065,10 +5967,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5099,10 +6014,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5133,10 +6062,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5167,10 +6111,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5201,10 +6161,27 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5235,10 +6212,28 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5269,10 +6264,29 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5298,7 +6312,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `50`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `51`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -5310,15 +6324,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -5344,6 +6362,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5351,6 +6372,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -5386,10 +6408,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5420,10 +6446,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5454,10 +6485,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5488,10 +6525,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5522,10 +6566,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5556,10 +6608,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5590,10 +6651,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5624,10 +6695,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5658,10 +6740,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5692,10 +6786,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5726,10 +6833,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5760,10 +6881,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -5794,10 +6930,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5828,10 +6980,27 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -5857,7 +7026,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `44`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `45`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -5869,15 +7038,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -5901,6 +7074,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -5908,6 +7084,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 15,
@@ -5943,10 +7120,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -5977,10 +7158,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6011,10 +7197,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6045,10 +7237,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6079,10 +7278,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6113,10 +7320,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6147,10 +7363,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6181,10 +7407,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6215,10 +7452,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6249,10 +7498,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6283,10 +7545,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6317,10 +7593,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6346,7 +7637,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `38`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `39`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -6358,15 +7649,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -6388,6 +7683,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6395,6 +7693,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 5,
@@ -6430,10 +7729,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6464,10 +7767,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6498,10 +7806,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6532,10 +7846,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6566,10 +7887,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6600,10 +7929,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6634,10 +7972,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6668,10 +8016,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6702,10 +8061,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6736,10 +8107,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6765,7 +8149,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `32`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `33`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -6777,15 +8161,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -6806,6 +8194,9 @@ Object {
     "id8": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -6813,6 +8204,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -6848,10 +8240,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6882,10 +8278,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -6916,10 +8317,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -6950,10 +8357,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -6984,10 +8398,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7018,10 +8440,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7052,10 +8483,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7086,10 +8527,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7120,10 +8572,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7149,7 +8613,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `29`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `30`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -7161,15 +8625,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7188,6 +8656,9 @@ Object {
     "id6": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7195,6 +8666,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7230,10 +8702,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7264,10 +8740,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7298,10 +8779,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7332,10 +8819,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7366,10 +8860,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7400,10 +8902,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7434,10 +8945,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7463,7 +8984,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `23`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `24`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -7475,15 +8996,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7500,6 +9025,9 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7507,6 +9035,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7542,10 +9071,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7576,10 +9109,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7610,10 +9148,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7644,10 +9188,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -7678,10 +9229,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7707,7 +9266,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `17`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `18`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -7719,15 +9278,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7742,6 +9305,9 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7749,6 +9315,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7784,10 +9351,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7818,10 +9389,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -7852,10 +9428,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -7881,7 +9463,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `11`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `12`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -7893,15 +9475,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -7930,6 +9516,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -7937,6 +9526,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -7972,10 +9562,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8006,10 +9600,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8040,10 +9639,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8074,10 +9679,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8108,10 +9720,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8142,10 +9762,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8176,10 +9805,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8210,10 +9849,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8244,10 +9894,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8278,10 +9940,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8312,10 +9987,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8346,10 +10035,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8380,10 +10084,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8414,10 +10134,27 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8448,10 +10185,28 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8482,10 +10237,29 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8516,10 +10290,30 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id15": true,
+          "id16": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8545,7 +10339,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `53`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `54`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -8557,15 +10351,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -8592,6 +10390,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -8599,6 +10400,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -8634,10 +10436,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8668,10 +10474,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8702,10 +10513,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8736,10 +10553,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8770,10 +10594,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8804,10 +10636,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -8838,10 +10679,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8872,10 +10723,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8906,10 +10768,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -8940,10 +10814,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -8974,10 +10861,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9008,10 +10909,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9042,10 +10958,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9076,10 +11008,27 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9110,10 +11059,28 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id13": true,
+          "id14": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9139,7 +11106,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `47`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `48`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -9151,15 +11118,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -9184,6 +11155,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9191,6 +11165,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -9226,10 +11201,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9260,10 +11239,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9294,10 +11278,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9328,10 +11318,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9362,10 +11359,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9396,10 +11401,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9430,10 +11444,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9464,10 +11488,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9498,10 +11533,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9532,10 +11579,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9566,10 +11626,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9600,10 +11674,25 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9634,10 +11723,26 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id11": true,
+          "id12": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9663,7 +11768,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `41`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `42`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -9675,15 +11780,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -9706,6 +11815,9 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -9713,6 +11825,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -9748,10 +11861,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9782,10 +11899,15 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9816,10 +11938,16 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9850,10 +11978,17 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -9884,10 +12019,18 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9918,10 +12061,19 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 15,
@@ -9952,10 +12104,20 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -9986,10 +12148,21 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -10020,10 +12193,22 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10054,10 +12239,23 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 5,
@@ -10088,10 +12286,24 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id10": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+          "id5": true,
+          "id6": true,
+          "id7": true,
+          "id8": true,
+          "id9": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10117,7 +12329,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `35`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `36`;
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] appState 1`] = `
 Object {
@@ -10129,15 +12341,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10154,6 +12370,9 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10161,6 +12380,7 @@ Object {
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10182,6 +12402,7 @@ Object {
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10217,10 +12438,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10251,10 +12476,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10273,6 +12502,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10303,10 +12533,136 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "exportBackground": true,
+        "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id4": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10325,6 +12681,7 @@ Object {
           "y": 20,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10350,7 +12707,7 @@ Object {
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shift-click to select a group, then drag: [end of test] number of renders 1`] = `16`;
+exports[`regression tests shift-click to select a group, then drag: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
@@ -10362,15 +12719,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10381,6 +12742,9 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10396,7 +12760,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `3`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -10408,15 +12772,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10429,6 +12797,9 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": true,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10444,7 +12815,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `9`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -10456,15 +12827,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10474,9 +12849,12 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id2": true,
+    "id1": true,
   },
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10484,6 +12862,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 0 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10505,6 +12884,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 1 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10526,6 +12906,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] element 2 1`] = `
 Object {
+  "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
   "height": 10,
@@ -10560,10 +12941,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10582,6 +12967,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10600,6 +12986,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10632,10 +13019,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10666,10 +13057,14 @@ Object {
         "currentItemStrokeWidth": 1,
         "exportBackground": true,
         "name": "excalidraw-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10688,6 +13083,7 @@ Object {
           "y": 10,
         },
         Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
           "height": 10,
@@ -10713,7 +13109,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `16`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -10725,15 +13121,19 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
   "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
+  "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
+  "isLoading": false,
   "isResizing": false,
+  "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "excalidraw-201933152653",
@@ -10744,6 +13144,9 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
   "viewBackgroundColor": "#ffffff",
   "zoom": 1,
 }
@@ -10759,4 +13162,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `3`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `4`;

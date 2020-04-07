@@ -7,7 +7,11 @@ export type SceneState = {
   // null indicates transparent bg
   viewBackgroundColor: string | null;
   zoom: number;
+  shouldCacheIgnoreZoom: boolean;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
+  remotePointerButton?: { [id: string]: string | undefined };
+  remoteSelectedElementIds: { [elementId: string]: string[] };
+  remotePointerUsernames: { [id: string]: string };
 };
 
 export type SceneScroll = {
@@ -19,7 +23,12 @@ export interface Scene {
   elements: ExcalidrawTextElement[];
 }
 
-export type ExportType = "png" | "clipboard" | "backend" | "svg";
+export type ExportType =
+  | "png"
+  | "clipboard"
+  | "clipboard-svg"
+  | "backend"
+  | "svg";
 
 export type ScrollBars = {
   horizontal: {

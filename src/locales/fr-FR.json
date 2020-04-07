@@ -4,6 +4,7 @@
     "selectAll": "Tout sélectionner",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
+    "copyAsSvg": "Copier dans le presse-papier en SVG",
     "bringForward": "Mettre en avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -42,6 +43,7 @@
     "canvasBackground": "Fond du canevas",
     "drawingCanvas": "Canevas de dessin",
     "layers": "Calques",
+    "actions": "Actions",
     "language": "Langue",
     "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer les éléments sélectionnés"
@@ -52,6 +54,7 @@
     "exportToPng": "Exporter en PNG",
     "exportToSvg": "Exporter en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
+    "copyPngToClipboard": "Copier le PNG dans le presse-papier",
     "save": "Sauvegarder",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
@@ -67,11 +70,13 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
-    "createNewRoom": "Créer un nouveau salon"
+    "createNewRoom": "Créer un nouveau salon",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
+    "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
@@ -96,19 +101,20 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "Pour maintenir les proportions, appuyez sur MAJ pendant le redimensionnement"
+    "resize": "Vous pouvez contraindre les proportions en maintenant la touche MAJ enfoncée tout en redimensionnant",
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
     "headingMain_button": "de recharger la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "d'effacer la scène.",
+    "clearCanvasMessage_button": "d'effacer le canevas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "openIssueMessage_pre": "Avant de le faire, nous vous serions reconnaissants d'ouvrir un ticket sur notre ",
+    "trackedToSentry_pre": "L'erreur ",
+    "trackedToSentry_post": " a été enregistrée dans notre système.",
+    "openIssueMessage_pre": "Nous avons été très prudents de ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
-    "openIssueMessage_post": " Veuillez inclure la trace de la pile d'erreur suivante (et si ce n'est pas privé, aussi le contenu de la scène) :",
-    "errorStack": "Trace de la pile d'erreur:",
-    "errorStack_loading": "Chargement des données. Veuillez patienter...",
+    "openIssueMessage_post": " Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
+  },
+  "errorDialog": {
+    "title": "Erreur"
+  },
+  "shortcutsDialog": {
+    "title": "Raccourcis clavier",
+    "shapes": "Formes",
+    "editor": "Éditeur",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

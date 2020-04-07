@@ -1,7 +1,10 @@
-.DS_Store
-.vscode
 *.log
+.DS_Store
+.envrc
+.now
+.vscode
 build
+firebase/
 logs
 node_modules
 npm-debug.log*
@@ -9,5 +12,3 @@ static
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
-.envrc
-firebase/

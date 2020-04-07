@@ -6,6 +6,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
+import { KEYS } from "../keys";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -47,6 +48,9 @@ export const actionSaveScene = register({
     saveAsJSON(elements, appState).catch((error) => console.error(error));
     return { commitToHistory: false };
   },
+  keyTest: (event) => {
+    return event.key === "s" && event[KEYS.CTRL_OR_CMD];
+  },
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
@@ -64,11 +68,14 @@ export const actionLoadScene = register({
   perform: (
     elements,
     appState,
-    { elements: loadedElements, appState: loadedAppState },
+    { elements: loadedElements, appState: loadedAppState, error },
   ) => {
     return {
       elements: loadedElements,
-      appState: loadedAppState,
+      appState: {
+        ...loadedAppState,
+        errorMessage: error,
+      },
       commitToHistory: false,
     };
   },
@@ -84,7 +91,9 @@ export const actionLoadScene = register({
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch((error) => console.error(error));
+          .catch((error) => {
+            updateData({ error: error });
+          });
       }}
     />
   ),

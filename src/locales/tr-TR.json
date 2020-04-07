@@ -4,6 +4,7 @@
     "selectAll": "Hepsini Seç",
     "copy": "Kopyala",
     "copyAsPng": "PNG olarak kopyala",
+    "copyAsSvg": "",
     "bringForward": "Bir öne getir",
     "sendToBack": "En arkaya gönder",
     "bringToFront": "En öne getir",
@@ -42,6 +43,7 @@
     "canvasBackground": "Canvas arka planı",
     "drawingCanvas": "Canvas Çizim",
     "layers": "Katmanlar",
+    "actions": "İşlemler",
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Seçili nesneleri yinele"
@@ -52,6 +54,7 @@
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
+    "copyPngToClipboard": "PNG'yi panoya kopyala",
     "save": "Kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
@@ -67,11 +70,13 @@
     "undo": "Geri Al",
     "redo": "İleri Al",
     "roomDialog": "Ortak Çalışma Ortamı Yarat",
-    "createNewRoom": "Yeni Oda Oluştur"
+    "createNewRoom": "Yeni Oda Oluştur",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
     "couldNotCreateShareableLink": "Paylaşılabilir bağlantı oluşturulamadı.",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş canvas dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
@@ -96,7 +101,8 @@
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
-    "resize": "SHIFT'e basılı tutarak orantılı şekilde boyutlandırabilirsiniz"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",
@@ -104,11 +110,11 @@
     "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
     "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "openIssueMessage_pre": "Bu işlemi yapmadan, sorunu inceleyebilmemiz için ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": " Yardım biletine, aşağıda çıktısı verilen hata mesajını da ekleyin (mümkünse çalışma alanıyla birlikte):",
-    "errorStack": "Hata mesajı:",
-    "errorStack_loading": "Veri yükleniyor. Lütfen bekleyin...",
+    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununu kopyalayarak ve yapıştırarak bilgi veriniz.",
     "sceneContent": "Çalışma alanı:"
   },
   "roomDialog": {
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız yalnızca ortama katılmış diğer kişilerle paylaşılmaktadır. Katılımcılar eş zamanlı olarak bağlantı sorunları yaşadığında kaybolacaktır. Bunu önlemek için çalışma ortamını bir dosyaya veya paylaşılabilir bir bağlantıya aktarın.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
+  },
+  "errorDialog": {
+    "title": "Hata"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

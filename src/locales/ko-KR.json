@@ -4,6 +4,7 @@
     "selectAll": "전체 선택",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 이미지 복사",
+    "copyAsSvg": "",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -34,14 +35,15 @@
     "thin": "얇게",
     "bold": "굵게",
     "extraBold": "매우 굵게",
-    "architect": "Architect",
-    "artist": "Artist",
-    "cartoonist": "Cartoonist",
+    "architect": "",
+    "artist": "",
+    "cartoonist": "",
     "fileTitle": "파일 제목",
     "colorPicker": "색상 선택기",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
+    "actions": "",
     "language": "언어",
     "createRoom": "실시간 협업 세션 공유",
     "duplicateSelection": "선택 영역 복제하기"
@@ -52,6 +54,7 @@
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
+    "copyPngToClipboard": "클립보드로 이미지 복사",
     "save": "저장",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
@@ -67,11 +70,13 @@
     "undo": "실행 취소",
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
-    "createNewRoom": "Create new room"
+    "createNewRoom": "",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
     "couldNotCreateShareableLink": "공유 가능한 링크를 생성할 수 없습니다.",
+    "couldNotLoadInvalidFile": "유효하지 않은 파일입니다.",
     "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
     "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
@@ -89,27 +94,28 @@
     "lock": "선택된 도구 유지하기"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "",
+    "selectedShapeActions": "",
+    "shapes": ""
   },
   "hints": {
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
-    "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다."
+    "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다.",
+    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다."
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "데이터를 불러오는 중입니다. 잠시만 기다려 주세요...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "",
+    "headingMain_button": "페이지 새로고침",
+    "clearCanvasMessage": "",
+    "clearCanvasMessage_button": "캔버스를 초기화 중입니다.",
+    "clearCanvasCaveat": "",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
+    "openIssueMessage_button": "",
+    "openIssueMessage_post": " 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
+    "sceneContent": ""
   },
   "roomDialog": {
     "desc_intro": "현재 화면에 공동 작업자를 초대해 협업할 수 있습니다.",
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "모든 데이터는 P2P 방식으로 공동 작업자 간에 공유되며 서버에는 저장되지 않습니다. 따라서 모든 작업자의 연결이 끊어지면 파일 또는 공유 가능한 링크로 보관하지 않는 한 데이터가 유실됩니다.",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
     "desc_exitSession": "세션을 중단하면 연결은 끊어지나 로컬에서 작업을 이어갈 수 있습니다. 로컬 작업은 다른 작업자에게 영향을 미치지 않으며 그들의 공동 작업은 계속 유지됩니다."
+  },
+  "errorDialog": {
+    "title": "에러"
+  },
+  "shortcutsDialog": {
+    "title": "키보드 단축키",
+    "shapes": "그리기",
+    "editor": "편집",
+    "view": "보기",
+    "blog": "블로그 읽어보기",
+    "howto": "가이드 참고하기",
+    "github": "이슈 제보하기"
   }
 }

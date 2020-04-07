@@ -1,46 +1,58 @@
 {
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
+    "@sentry/browser": "5.15.4",
+    "@sentry/integrations": "5.15.4",
     "browser-nativefs": "0.4.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
     "react": "16.13.1",
-    "react-dom": "16.13.0",
+    "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
     "roughjs": "4.0.4",
-    "socket.io-client": "2.3.0",
-    "stacktrace-js": "2.0.2"
+    "socket.io-client": "2.3.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.1.1",
-    "@testing-library/react": "10.0.1",
-    "@types/jest": "25.1.4",
+    "@testing-library/jest-dom": "5.3.0",
+    "@testing-library/react": "10.0.2",
+    "@types/jest": "25.2.1",
     "@types/nanoid": "2.1.0",
-    "@types/react": "16.9.25",
-    "@types/react-dom": "16.9.5",
+    "@types/react": "16.9.32",
+    "@types/react-dom": "16.9.6",
     "@types/socket.io-client": "1.4.32",
-    "asar": "3.0.1",
+    "asar": "3.0.3",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.3",
     "jest-canvas-mock": "2.2.0",
-    "lint-staged": "10.0.8",
+    "lint-staged": "10.1.2",
     "node-sass": "4.13.1",
     "pepjs": "0.5.2",
-    "prettier": "2.0.1",
+    "prettier": "2.0.3",
     "rewire": "5.0.0",
     "typescript": "3.8.3"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|browser-nativefs)/)"
-    ]
+  "engines": {
+    "node": ">=12.0.0"
   },
   "eslintConfig": {
     "extends": [
@@ -80,13 +92,17 @@
       "pre-commit": "lint-staged"
     }
   },
-  "main": "src/index.js",
-  "name": "excalidraw",
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(roughjs|browser-nativefs)/)"
+    ]
+  },
+  "private": true,
   "scripts": {
-    "build:app": "react-scripts build",
-    "build:zip": "node ./scripts/build-version.js",
     "build": "npm run build:app && npm run build:zip",
     "build-node": "node ./scripts/build-node.js",
+    "build:app": "REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
+    "build:zip": "node ./scripts/build-version.js",
     "eject": "react-scripts eject",
     "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
@@ -95,19 +111,11 @@
     "start": "react-scripts start",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app",
     "test": "npm run test:app",
+    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
-    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
-    "test:typecheck": "tsc",
-    "test:other": "npm run prettier -- --list-different"
-  },
-  "version": "1.0.0",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/excalidraw/excalidraw.git"
-  },
-  "engines": {
-    "node": ">=12.0.0"
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
+    "test:other": "npm run prettier -- --list-different",
+    "test:typecheck": "tsc"
   }
 }

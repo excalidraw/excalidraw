@@ -5,6 +5,8 @@ export const DEFAULT_FONT = "20px Virgil";
 
 export function getDefaultAppState(): AppState {
   return {
+    isLoading: false,
+    errorMessage: null,
     draggingElement: null,
     resizingElement: null,
     multiElement: null,
@@ -24,16 +26,21 @@ export function getDefaultAppState(): AppState {
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
+    cursorButton: "up",
     scrolledOutside: false,
     name: `excalidraw-${getDateTime()}`,
+    username: "",
     isCollaborating: false,
     isResizing: false,
+    isRotating: false,
     selectionElement: null,
     zoom: 1,
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     collaborators: new Map(),
+    shouldCacheIgnoreZoom: false,
+    showShortcutsDialog: false,
   };
 }
 
@@ -45,8 +52,12 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     editingElement,
     selectionElement,
     isResizing,
+    isRotating,
     collaborators,
     isCollaborating,
+    isLoading,
+    errorMessage,
+    showShortcutsDialog,
     ...exportedState
   } = appState;
   return exportedState;
@@ -56,6 +67,7 @@ export function clearAppStatePropertiesForHistory(
   appState: AppState,
 ): Partial<AppState> {
   return {
+    selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,

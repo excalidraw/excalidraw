@@ -1,6 +1,6 @@
 import React from "react";
 import { showSelectedShapeActions } from "../element";
-import { calculateScrollCenter, getTargetElement } from "../scene";
+import { calculateScrollCenter } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
@@ -22,6 +22,9 @@ import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
+import { ErrorDialog } from "./ErrorDialog";
+import { ShortcutsDialog } from "./ShortcutsDialog";
+import { LoadingMessage } from "./LoadingMessage";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -29,10 +32,9 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
-  language: string;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
-  onToggleLock: () => void;
+  onLockToggle: () => void;
 }
 
 export const LayerUI = React.memo(
@@ -42,10 +44,9 @@ export const LayerUI = React.memo(
     setAppState,
     canvas,
     elements,
-    language,
     onRoomCreate,
     onRoomDestroy,
-    onToggleLock,
+    onLockToggle,
   }: LayerUIProps) => {
     const isMobile = useIsMobile();
 
@@ -98,14 +99,27 @@ export const LayerUI = React.memo(
         setAppState={setAppState}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
+        onLockToggle={onLockToggle}
       />
     ) : (
       <>
+        {appState.isLoading && <LoadingMessage />}
+        {appState.errorMessage && (
+          <ErrorDialog
+            message={appState.errorMessage}
+            onClose={() => setAppState({ errorMessage: null })}
+          />
+        )}
+        {appState.showShortcutsDialog && (
+          <ShortcutsDialog
+            onClose={() => setAppState({ showShortcutsDialog: null })}
+          />
+        )}
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4}>
-              <Section className="App-right-menu" heading="canvasActions">
+              <Section heading="canvasActions">
                 <Island padding={4}>
                   <Stack.Col gap={4}>
                     <Stack.Row gap={1} justifyContent={"space-between"}>
@@ -116,6 +130,12 @@ export const LayerUI = React.memo(
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
+                        username={appState.username}
+                        onUsernameChange={(username) => {
+                          setAppState({
+                            username,
+                          });
+                        }}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
@@ -125,13 +145,11 @@ export const LayerUI = React.memo(
                 </Island>
               </Section>
               {showSelectedShapeActions(appState, elements) && (
-                <Section
-                  className="App-right-menu"
-                  heading="selectedShapeActions"
-                >
-                  <Island padding={4}>
+                <Section heading="selectedShapeActions">
+                  <Island className="App-menu__left" padding={4}>
                     <SelectedShapeActions
-                      targetElements={getTargetElement(elements, appState)}
+                      appState={appState}
+                      elements={elements}
                       renderAction={actionManager.renderAction}
                       elementType={appState.elementType}
                     />
@@ -154,9 +172,8 @@ export const LayerUI = React.memo(
                     </Island>
                     <LockIcon
                       checked={appState.elementLocked}
-                      onChange={onToggleLock}
+                      onChange={onLockToggle}
                       title={t("toolBar.lock")}
-                      isButton={isMobile}
                     />
                   </Stack.Row>
                 </Stack.Col>
@@ -184,9 +201,9 @@ export const LayerUI = React.memo(
               setAppState({});
             }}
             languages={languages}
-            currentLanguage={language}
             floating
           />
+          {actionManager.renderAction("toggleShortcuts")}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
@@ -221,7 +238,6 @@ export const LayerUI = React.memo(
     const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
     return (
-      prev.language === next.language &&
       prev.elements === next.elements &&
       keys.every((key) => prevAppState[key] === nextAppState[key])
     );

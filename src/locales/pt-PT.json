@@ -4,6 +4,7 @@
     "selectAll": "Selecionar tudo",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
+    "copyAsSvg": "",
     "bringForward": "Passar para o primeiro plano",
     "sendToBack": "Passar para trás",
     "bringToFront": "Passar para frente",
@@ -42,6 +43,7 @@
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
+    "actions": "Ações",
     "language": "Idioma",
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
     "duplicateSelection": "Duplicar os elementos selecionados"
@@ -52,6 +54,7 @@
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
+    "copyPngToClipboard": "Copiar PNG para area de transferência",
     "save": "Guardar",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
@@ -66,12 +69,14 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Criar nova sala"
+    "roomDialog": "Iniciar colaboração ao vivo",
+    "createNewRoom": "Criar nova sala",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
+    "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo",
     "importBackendFailed": "O carregamento no servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
@@ -95,8 +100,9 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "Você pode restringir proporções segurando SHIFT durante o redimensionamento"
+    "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
+    "resize": "Você pode restringir as proporções segurando SHIFT durante o redimensionamento",
+    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Experimente ",
@@ -104,11 +110,11 @@
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
     "clearCanvasMessage_button": "limpar a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
-    "openIssueMessage_pre": "Antes de fazer isso, gostaríamos que você relatasse o problema em nosso ",
+    "trackedToSentry_pre": "Erro com o identificador ",
+    "trackedToSentry_post": " foi rastreado no nosso sistema.",
+    "openIssueMessage_pre": "Fomos muito cautelosos para não incluir suas informações de cena no erro. Se sua cena não for privada, por favor, considere seguir nosso ",
     "openIssueMessage_button": "rastreador de bugs.",
-    "openIssueMessage_post": " Inclua o seguinte rastreamento de pilha de erros (e, se não for confidencial, também o conteúdo da cena):",
-    "errorStack": "Rastreamento de pilha de erros:",
-    "errorStack_loading": "Carregando os dados. por favor aguarde...",
+    "openIssueMessage_post": " Por favor, inclua informações abaixo, copiando e colando para a issue do GitHub.",
     "sceneContent": "Conteúdo da cena:"
   },
   "roomDialog": {
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
     "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
+  },
+  "errorDialog": {
+    "title": "Erro"
+  },
+  "shortcutsDialog": {
+    "title": "Atalhos de teclado",
+    "shapes": "Formas",
+    "editor": "Editor",
+    "view": "",
+    "blog": "Leia o nosso blog",
+    "howto": "Siga nossos guias",
+    "github": ""
   }
 }

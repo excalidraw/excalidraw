@@ -9,11 +9,13 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter, getTargetElement } from "../scene";
+import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+import { LockIcon } from "./LockIcon";
+import { LoadingMessage } from "./LoadingMessage";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -23,6 +25,7 @@ type MobileMenuProps = {
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
+  onLockToggle: () => void;
 };
 
 export function MobileMenu({
@@ -33,9 +36,11 @@ export function MobileMenu({
   setAppState,
   onRoomCreate,
   onRoomDestroy,
+  onLockToggle,
 }: MobileMenuProps) {
   return (
     <>
+      {appState.isLoading && <LoadingMessage />}
       <FixedSideContainer side="top">
         <Section heading="shapes">
           {(heading) => (
@@ -50,6 +55,11 @@ export function MobileMenu({
                     />
                   </Stack.Row>
                 </Island>
+                <LockIcon
+                  checked={appState.elementLocked}
+                  onChange={onLockToggle}
+                  title={t("toolBar.lock")}
+                />
               </Stack.Row>
             </Stack.Col>
           )}
@@ -76,6 +86,8 @@ export function MobileMenu({
                   <RoomDialog
                     isCollaborating={appState.isCollaborating}
                     collaboratorCount={appState.collaborators.size}
+                    username={appState.username}
+                    onUsernameChange={(username) => setAppState({ username })}
                     onRoomCreate={onRoomCreate}
                     onRoomDestroy={onRoomDestroy}
                   />
@@ -96,7 +108,8 @@ export function MobileMenu({
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
-                targetElements={getTargetElement(elements, appState)}
+                appState={appState}
+                elements={elements}
                 renderAction={actionManager.renderAction}
                 elementType={appState.elementType}
               />
@@ -108,7 +121,9 @@ export function MobileMenu({
               {actionManager.renderAction("toggleEditMenu")}
               {actionManager.renderAction("undo")}
               {actionManager.renderAction("redo")}
-              {actionManager.renderAction("finalize")}
+              {actionManager.renderAction(
+                appState.multiElement ? "finalize" : "duplicateSelection",
+              )}
               {actionManager.renderAction("deleteSelectedElements")}
             </div>
             {appState.scrolledOutside && (

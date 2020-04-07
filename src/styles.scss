@@ -22,6 +22,16 @@ body {
   cursor: text;
 }
 
+a {
+  font-weight: 500;
+  text-decoration: none;
+  color: #1c7ed6; /* OC Blue 7 */
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 canvas {
   touch-action: none;
   user-select: none;
@@ -91,6 +101,15 @@ canvas {
       opacity: 0;
       position: absolute;
       pointer-events: none;
+    }
+
+    .ToolIcon {
+      margin: 0 5px;
+    }
+
+    .ToolIcon__icon {
+      width: 28px;
+      height: 28px;
     }
   }
 
@@ -207,6 +226,7 @@ button,
 
 .App-menu_top {
   grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
@@ -227,8 +247,8 @@ button,
 .App-menu_bottom {
   position: fixed;
   bottom: 0;
-
   grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
@@ -254,6 +274,11 @@ button,
 .App-menu_right {
   grid-template-rows: 1fr;
   height: 100%;
+}
+
+.App-menu__left {
+  overflow-y: auto;
+  max-height: calc(100vh - 236px);
 }
 
 .ErrorSplash {
@@ -310,7 +335,9 @@ button,
 
 .dropdown-select {
   height: 1.5rem;
-  padding: 0 1.5rem 0 0.5rem;
+  padding: 0;
+  padding-inline-start: 0.5rem;
+  padding-inline-end: 1.5rem;
   background-color: #e9ecef;
   border-radius: var(--space-factor);
   border: 1px solid #ced4da;
@@ -320,6 +347,9 @@ button,
   background-image: url("https://free-use.s3-us-west-2.amazonaws.com/up-sort.svg");
   background-repeat: no-repeat;
   background-position: right 0.7rem top 50%, 0 0;
+  :root[dir="rtl"] & {
+    background-position: left 0.7rem top 50%, 0 0;
+  }
   background-size: 0.65em auto, 100%;
 
   &:focus {
@@ -335,14 +365,18 @@ button,
   }
   &.dropdown-select--floating {
     position: absolute;
-    margin-bottom: 0.5em;
-    margin-right: 0.5em;
+    margin: 0.5em;
   }
 }
 
 .dropdown-select__language.dropdown-select--floating {
-  right: 0;
-  bottom: 0;
+  bottom: 10px;
+  :root[dir="ltr"] & {
+    right: 44px;
+  }
+  :root[dir="rtl"] & {
+    left: 44px;
+  }
 }
 
 .visually-hidden {
@@ -374,7 +408,19 @@ button,
   bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
-  z-index: -1;
+}
+
+.help-icon {
+  position: fixed;
+  cursor: pointer;
+  fill: #868e96;
+  bottom: 14px;
+  :root[dir="ltr"] & {
+    right: 14px;
+  }
+  :root[dir="rtl"] & {
+    left: 14px;
+  }
 }
 
 @media #{$media-query} {
@@ -384,5 +430,23 @@ button,
   .scroll-back-to-content {
     bottom: 80px;
     bottom: calc(80px + var(--sab));
+    z-index: -1;
+  }
+}
+
+.rtl-mirror {
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+}
+
+.github-corner {
+  position: absolute;
+  top: 0;
+  :root[dir="ltr"] & {
+    right: 0;
+  }
+  :root[dir="rtl"] & {
+    left: 0;
   }
 }

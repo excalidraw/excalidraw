@@ -11,6 +11,8 @@ export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
+  isLoading: boolean;
+  errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -33,15 +35,31 @@ export type AppState = {
   scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
+  cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
+  username: string;
   isCollaborating: boolean;
   isResizing: boolean;
+  isRotating: boolean;
   zoom: number;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  collaborators: Map<
+    string,
+    {
+      pointer?: {
+        x: number;
+        y: number;
+      };
+      button?: "up" | "down";
+      selectedElementIds?: AppState["selectedElementIds"];
+      username?: string | null;
+    }
+  >;
+  shouldCacheIgnoreZoom: boolean;
+  showShortcutsDialog: boolean;
 };
 
 export type PointerCoords = Readonly<{

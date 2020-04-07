@@ -249,7 +249,11 @@ function generateElement(
   }
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
-  if (!prevElementWithCanvas || prevElementWithCanvas.canvasZoom !== zoom) {
+  const shouldRegenerateBecauseZoom =
+    prevElementWithCanvas &&
+    prevElementWithCanvas.canvasZoom !== zoom &&
+    !sceneState?.shouldCacheIgnoreZoom;
+  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
     elementWithCanvasCache.set(element, elementWithCanvas);
     return elementWithCanvas;
@@ -263,30 +267,24 @@ function drawElementFromCanvas(
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
 ) {
+  const element = elementWithCanvas.element;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(
-    -CANVAS_PADDING / sceneState.zoom,
-    -CANVAS_PADDING / sceneState.zoom,
-  );
+  context.translate(cx, cy);
+  context.rotate(element.angle);
   context.drawImage(
     elementWithCanvas.canvas!,
-    Math.floor(
-      -elementWithCanvas.canvasOffsetX +
-        (Math.floor(elementWithCanvas.element.x) + sceneState.scrollX) *
-          window.devicePixelRatio,
-    ),
-    Math.floor(
-      -elementWithCanvas.canvasOffsetY +
-        (Math.floor(elementWithCanvas.element.y) + sceneState.scrollY) *
-          window.devicePixelRatio,
-    ),
-    elementWithCanvas.canvas!.width / sceneState.zoom,
-    elementWithCanvas.canvas!.height / sceneState.zoom,
+    (-(x2 - x1) / 2) * window.devicePixelRatio -
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    (-(y2 - y1) / 2) * window.devicePixelRatio -
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
+    elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
-  context.translate(
-    CANVAS_PADDING / sceneState.zoom,
-    CANVAS_PADDING / sceneState.zoom,
-  );
+  context.rotate(-element.angle);
+  context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
@@ -325,11 +323,18 @@ export function renderElement(
       if (renderOptimizations) {
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
-        const offsetX = Math.floor(element.x + sceneState.scrollX);
-        const offsetY = Math.floor(element.y + sceneState.scrollY);
-        context.translate(offsetX, offsetY);
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const cx = (x1 + x2) / 2 + sceneState.scrollX;
+        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const shiftX = (x2 - x1) / 2 - (element.x - x1);
+        const shiftY = (y2 - y1) / 2 - (element.y - y1);
+        context.translate(cx, cy);
+        context.rotate(element.angle);
+        context.translate(-shiftX, -shiftY);
         drawElementOnCanvas(element, rc, context);
-        context.translate(-offsetX, -offsetY);
+        context.translate(shiftX, shiftY);
+        context.rotate(-element.angle);
+        context.translate(-cx, -cy);
       }
       break;
     }
@@ -347,6 +352,10 @@ export function renderElementToSvg(
   offsetX?: number,
   offsetY?: number,
 ) {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x2 - x1) / 2 - (element.x - x1);
+  const cy = (y2 - y1) / 2 - (element.y - y1);
+  const degree = (180 * element.angle) / Math.PI;
   const generator = rsvg.generator;
   switch (element.type) {
     case "selection": {
@@ -366,7 +375,9 @@ export function renderElementToSvg(
       }
       node.setAttribute(
         "transform",
-        `translate(${offsetX || 0} ${offsetY || 0})`,
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
       );
       svgRoot.appendChild(node);
       break;
@@ -384,7 +395,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0})`,
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
         );
         group.appendChild(node);
       });
@@ -401,7 +414,9 @@ export function renderElementToSvg(
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY || 0})`,
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;

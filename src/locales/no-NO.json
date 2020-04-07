@@ -4,6 +4,7 @@
     "selectAll": "Velg alt",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
+    "copyAsSvg": "Kopier til utklippstavlen som SVG",
     "bringForward": "Flytt framover",
     "sendToBack": "Flytt bakover",
     "bringToFront": "Flytt forrest",
@@ -42,9 +43,10 @@
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
+    "actions": "Handlinger",
     "language": "Språk",
-    "createRoom": "Share a live-collaboration session",
-    "duplicateSelection": "Duplicate selected elements"
+    "createRoom": "Del en sanntids-samarbeidsøkt",
+    "duplicateSelection": "Dupliser valgte elementer"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -52,6 +54,7 @@
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
+    "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
@@ -64,18 +67,20 @@
     "menu": "Meny",
     "done": "Ferdig",
     "edit": "Rediger",
-    "undo": "Undo",
-    "redo": "Redo",
-    "roomDialog": "Start live collaboration",
-    "createNewRoom": "Create new room"
+    "undo": "Angre",
+    "redo": "Gjør om",
+    "roomDialog": "Start sanntids-samarbeid",
+    "createNewRoom": "Opprett et nytt rom",
+    "toggleFullScreen": "Skru fullskjerm av/på"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
     "couldNotCreateShareableLink": "Kunne ikke lage delbar lenke.",
+    "couldNotLoadInvalidFile": "Kunne ikke laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
-    "decryptFailed": "Couldn't decrypt data.",
+    "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
   },
   "toolBar": {
@@ -95,30 +100,43 @@
   },
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "Du kan låse proporsjonene ved å holde nede Shift mens du endrer størrelsen"
+    "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
+    "resize": "Du kan låse forholdet ved å holde SHIFT mens du endrer størrelsen",
+    "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer"
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "headingMain_pre": "En feil oppsto. Prøv ",
+    "headingMain_button": "å laste siden på nytt.",
+    "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
+    "clearCanvasMessage_button": "å tømme lerretet.",
+    "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
+    "trackedToSentry_pre": "Feilen med identifikator ",
+    "trackedToSentry_post": " ble logget i vårt system.",
+    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp i vårt ",
+    "openIssueMessage_button": "feilrapporteringssystem.",
+    "openIssueMessage_post": " Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
+    "sceneContent": "Scene-innhold:"
   },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_intro": "Du kan invitere personer til scenen din for å samarbeide med deg.",
+    "desc_privacy": "Ta det med ro, sesjonen bruker ende-til-ende-kryptering, så alt du tegner forblir privat. Ikke en gang serveren vår kan se hva du lager.",
+    "button_startSession": "Start økt",
+    "button_stopSession": "Stopp sesjon",
+    "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
+    "desc_persistenceWarning": "Vær oppmerksom på at scene-data deles på tvers av samarbeidspartnere på en P2P-måte, og ikke vedvarende på serveren vår. Dette betyr at hvis alle kobler fra, mister du dataene med mindre du eksporterer dem til en fil eller en delbar link.",
+    "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
+    "desc_exitSession": "Når du avslutter økten, frakobles du fra rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt være i stand til å samarbeide på deres versjon."
+  },
+  "errorDialog": {
+    "title": "Feil"
+  },
+  "shortcutsDialog": {
+    "title": "Tastatursnarveier",
+    "shapes": "Figurer",
+    "editor": "Redigering",
+    "view": "Visning",
+    "blog": "Les bloggen vår",
+    "howto": "Følg våre veiledninger",
+    "github": "Funnet et problem? Send inn"
   }
 }

@@ -4,6 +4,7 @@
     "selectAll": "選擇全部",
     "copy": "複製",
     "copyAsPng": "複製為 PNG 到剪貼板",
+    "copyAsSvg": "",
     "bringForward": "往前移動一層",
     "sendToBack": "移動至最底層",
     "bringToFront": "移動至最上層",
@@ -15,33 +16,34 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "邊框寬度",
-    "sloppiness": "Sloppiness",
+    "sloppiness": "",
     "opacity": "透明度",
     "fontSize": "字體大小",
     "fontFamily": "字體",
-    "onlySelected": "Only selected",
-    "withBackground": "With Background",
+    "onlySelected": "只針對選取的",
+    "withBackground": "包含背景",
     "handDrawn": "手寫",
     "normal": "正常",
     "code": "程式碼",
-    "small": "Small",
-    "medium": "Medium",
-    "large": "Large",
-    "veryLarge": "Very Large",
-    "solid": "Solid",
-    "hachure": "Hachure",
-    "crossHatch": "Cross-Hatch",
+    "small": "小",
+    "medium": "中",
+    "large": "大",
+    "veryLarge": "極大",
+    "solid": "實",
+    "hachure": "",
+    "crossHatch": "",
     "thin": "細",
     "bold": "粗",
     "extraBold": "特粗",
-    "architect": "Architect",
-    "artist": "Artist",
-    "cartoonist": "Cartoonist",
+    "architect": "",
+    "artist": "",
+    "cartoonist": "",
     "fileTitle": "檔案名稱",
     "colorPicker": "色彩選擇工具",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪製 Canvas",
     "layers": "圖層",
+    "actions": "",
     "language": "語系",
     "createRoom": "分享即時協作會議",
     "duplicateSelection": "複製所有已選擇的元素"
@@ -52,6 +54,7 @@
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製到剪貼板",
+    "copyPngToClipboard": "複製 PNG 到剪貼板",
     "save": "儲存",
     "load": "載入",
     "getShareableLink": "取得共享連結",
@@ -67,11 +70,13 @@
     "undo": "復原",
     "redo": "重做",
     "roomDialog": "分享即時協作會議",
-    "createNewRoom": "建立新的會議室"
+    "createNewRoom": "建立新的會議室",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
     "couldNotCreateShareableLink": "無法建立共享連結",
+    "couldNotLoadInvalidFile": "",
     "importBackendFailed": "從後端導入失敗。",
     "cannotExportEmptyCanvas": "無法輸出空白的 canvas。",
     "couldNotCopyToClipboard": "無法複製到剪貼簿。嘗試使用 Chrome 瀏覽器。",
@@ -89,27 +94,28 @@
     "lock": "繪圖後使所選工具保持活動狀態"
   },
   "headings": {
-    "canvasActions": "Canvas actions",
-    "selectedShapeActions": "Selected shape actions",
-    "shapes": "Shapes"
+    "canvasActions": "",
+    "selectedShapeActions": "",
+    "shapes": "形狀"
   },
   "hints": {
-    "linearElement": "Click to start multiple points, drag for single line",
+    "linearElement": "",
     "linearElementMulti": "按下 Escape 或 Enter 來完成",
-    "resize": "當你再調整大小時可以按住 SHIFT 來約束比例"
+    "resize": "",
+    "rotate": ""
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
-    "clearCanvasCaveat": " This will result in loss of work ",
-    "openIssueMessage_pre": "Before doing so, we'd appreciate if you opened an issue on our ",
+    "headingMain_pre": "遭遇錯誤，嘗試 ",
+    "headingMain_button": "載入頁面中",
+    "clearCanvasMessage": "如果重載還是無法解決，嘗試 ",
+    "clearCanvasMessage_button": "清理畫布",
+    "clearCanvasCaveat": " 這會導致目前的進度遺失 ",
+    "trackedToSentry_pre": "",
+    "trackedToSentry_post": "",
+    "openIssueMessage_pre": "",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include the following error stack trace (and if it's not private, also the scene content):",
-    "errorStack": "Error stack trace:",
-    "errorStack_loading": "Loading data. please wait...",
-    "sceneContent": "Scene content:"
+    "openIssueMessage_post": "",
+    "sceneContent": "場景內容"
   },
   "roomDialog": {
     "desc_intro": "你可以邀請其他人到你的目前的畫面與你合作。",
@@ -120,5 +126,17 @@
     "desc_persistenceWarning": "注意，畫面的資料是透過 P2P 方式與協作者之間共享，不會保留在我們的伺服器。因此，如果所有人中斷連線時，將會遺失資料，除非將資料導出成檔案或是一個可共享的連結。",
     "desc_shareLink": "與要協作的任何人分享此連結：",
     "desc_exitSession": "停止會議將會中斷你與會議室的連線，但你可以繼續在本機端繼續處理工作。注意，這不會影響到其他人，他們仍然可以在他們自己的版本上繼續協作。"
+  },
+  "errorDialog": {
+    "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

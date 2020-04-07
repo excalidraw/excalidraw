@@ -17,11 +17,14 @@
 
 Go to https://excalidraw.com to start sketching.
 
+Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://howto.excalidraw.com) to learn more about Excalidraw and how to use it effectively.
+
 ## Run the code
 
 ### Code Sandbox
 
 - Go to https://codesandbox.io/s/github/excalidraw/excalidraw
+  - You may need to sign in with Github and reload the page
 - You can start coding instantly, and even send PRs from there!
 
 ### Local Installation
@@ -36,14 +39,14 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 #### Commands
 
-| Command             | Description                       |
-| ------------------- | --------------------------------- |
-| `npm install`       | Install the dependencies          |
-| `npm start`         | Run the project                   |
-| `npm run fix`       | Reformat all files with Prettier  |
-| `npm run test:code` | Test for formatting with Prettier |
-| `npm run test:app`  | Test the app                      |
-| `npm run test`      | Run all tests                     |
+| Command               | Description                       |
+| --------------------- | --------------------------------- |
+| `npm install`         | Install the dependencies          |
+| `npm start`           | Run the project                   |
+| `npm run fix`         | Reformat all files with Prettier  |
+| `npm test`            | Run tests                         |
+| `npm run test:update` | Update test snapshots             |
+| `npm run test:code`   | Test for formatting with Prettier |
 
 ## Contributing
 
