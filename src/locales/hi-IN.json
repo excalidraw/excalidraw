@@ -71,7 +71,8 @@
     "redo": "फिर से करें",
     "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "",
