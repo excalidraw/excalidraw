@@ -46,7 +46,8 @@
     "actions": "",
     "language": "भाषा",
     "createRoom": "अधिवेशन",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "",
