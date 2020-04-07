@@ -85,10 +85,6 @@ function ExportModal({
     scale,
   ]);
 
-  useEffect(() => {
-    pngButton.current?.focus();
-  }, []);
-
   function handleKeyDown(event: React.KeyboardEvent) {
     if (event.key === KEYS.TAB) {
       const { activeElement } = document;
