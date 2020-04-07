@@ -83,10 +83,9 @@ export class TopErrorBoundary extends React.Component<
               onClick={() => {
                 try {
                   localStorage.clear();
-                } catch (err) {
-                  console.error(err);
-                } finally {
                   window.location.reload();
+                } catch (error) {
+                  console.error(error);
                 }
               }}
             >
