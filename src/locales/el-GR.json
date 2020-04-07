@@ -71,7 +71,7 @@
     "redo": "Επαναφορά",
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "Εναλλαγή πλήρους οθόνης"
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
@@ -133,8 +133,8 @@
   "shortcutsDialog": {
     "title": "Συντομεύσεις πληκτρολογίου",
     "shapes": "Σχήματα",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Κυρτό βέλος",
+    "curvedLine": "Κυρτή γραμμή",
     "editor": "Επεξεργαστής",
     "view": "Προβολή",
     "blog": "Διαβάστε το ιστολόγιο μας",
