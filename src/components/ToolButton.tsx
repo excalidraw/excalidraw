@@ -8,6 +8,7 @@ type ToolButtonBaseProps = {
   icon?: React.ReactNode;
   "aria-label": string;
   "aria-keyshortcuts"?: string;
+  "data-testid"?: string;
   label?: string;
   title?: string;
   name?: string;
@@ -78,6 +79,7 @@ export const ToolButton = React.forwardRef(function (
         name={props.name}
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
+        data-testid={props["data-testid"]}
         id={props.id}
         onChange={props.onChange}
         checked={props.checked}

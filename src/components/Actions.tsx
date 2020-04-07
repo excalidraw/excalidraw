@@ -108,6 +108,7 @@ export function ShapesSwitcher({
             keyBindingLabel={`${index + 1}`}
             aria-label={capitalizeString(label)}
             aria-keyshortcuts={`${label[0]} ${index + 1}`}
+            data-testid={value}
             onChange={() => {
               setAppState({
                 elementType: value,
