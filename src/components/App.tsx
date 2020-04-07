@@ -142,13 +142,33 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-export class App extends React.Component<any, AppState> {
-  canvas: HTMLCanvasElement | null = null;
-  rc: RoughCanvas | null = null;
+class Portal {
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
   roomID: string | null = null;
   roomKey: string | null = null;
+
+  open(socket: SocketIOClient.Socket, id: string, key: string) {
+    this.socket = socket;
+    this.roomID = id;
+    this.roomKey = key;
+  }
+
+  close() {
+    if (!this.socket) {
+      return;
+    }
+    this.socket.close();
+    this.socket = null;
+    this.roomID = null;
+    this.roomKey = null;
+  }
+}
+
+export class App extends React.Component<any, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+  room: Portal = new Portal();
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -193,8 +213,8 @@ export class App extends React.Component<any, AppState> {
             return !element.isDeleted;
           })}
           setElements={this.setElements}
-          onRoomCreate={this.createRoom}
-          onRoomDestroy={this.destroyRoom}
+          onRoomCreate={this.openPortal}
+          onRoomDestroy={this.closePortal}
           onLockToggle={this.toggleLock}
         />
         <main>
@@ -428,7 +448,7 @@ export class App extends React.Component<any, AppState> {
   });
 
   componentDidUpdate() {
-    if (this.state.isCollaborating && !this.socket) {
+    if (this.state.isCollaborating && !this.room.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
 
@@ -700,7 +720,7 @@ export class App extends React.Component<any, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
-  createRoom = async () => {
+  openPortal = async () => {
     window.history.pushState(
       {},
       "Excalidraw",
@@ -709,7 +729,7 @@ export class App extends React.Component<any, AppState> {
     this.initializeSocketClient({ showLoadingState: false });
   };
 
-  destroyRoom = () => {
+  closePortal = () => {
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -728,22 +748,17 @@ export class App extends React.Component<any, AppState> {
       isCollaborating: false,
       collaborators: new Map(),
     });
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-      this.roomID = null;
-      this.roomKey = null;
-    }
+    this.room.close();
   };
 
   private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
-    if (this.socket) {
+    if (this.room.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const initialize = () => {
-        this.socketInitialized = true;
+        this.room.socketInitialized = true;
         clearTimeout(initializationTimer);
         if (this.state.isLoading && !this.unmounted) {
           this.setState({ isLoading: false });
@@ -849,26 +864,26 @@ export class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.socketInitialized === false) {
+        if (this.room.socketInitialized === false) {
           initialize();
         }
       };
 
-      this.socket = socketIOClient(SOCKET_SERVER);
-      this.roomID = roomMatch[1];
-      this.roomKey = roomMatch[2];
-      this.socket.on("init-room", () => {
-        this.socket && this.socket.emit("join-room", this.roomID);
+      this.room.open(socketIOClient(SOCKET_SERVER), roomMatch[1], roomMatch[2]);
+
+      this.room.socket!.on("init-room", () => {
+        this.room.socket &&
+          this.room.socket.emit("join-room", this.room.roomID);
       });
-      this.socket.on(
+      this.room.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-          if (!this.roomKey) {
+          if (!this.room.roomKey) {
             return;
           }
           const decryptedData = await decryptAESGEM(
             encryptedData,
-            this.roomKey,
+            this.room.roomKey,
             iv,
           );
 
@@ -876,7 +891,7 @@ export class App extends React.Component<any, AppState> {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_INIT": {
-              if (!this.socketInitialized) {
+              if (!this.room.socketInitialized) {
                 updateScene(decryptedData, { scrollToContent: true });
               }
               break;
@@ -909,13 +924,13 @@ export class App extends React.Component<any, AppState> {
           }
         },
       );
-      this.socket.on("first-in-room", () => {
-        if (this.socket) {
-          this.socket.off("first-in-room");
+      this.room.socket!.on("first-in-room", () => {
+        if (this.room.socket) {
+          this.room.socket.off("first-in-room");
         }
         initialize();
       });
-      this.socket.on("room-user-change", (clients: string[]) => {
+      this.room.socket!.on("room-user-change", (clients: string[]) => {
         this.setState((state) => {
           const collaborators: typeof state.collaborators = new Map();
           for (const socketID of clients) {
@@ -931,7 +946,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.socket.on("new-user", async (_socketID: string) => {
+      this.room.socket!.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -946,11 +961,11 @@ export class App extends React.Component<any, AppState> {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.socket?.id) {
+    if (this.room.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketID: this.socket.id,
+          socketID: this.room.socket.id,
           pointerCoords: payload.pointerCoords,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
@@ -985,13 +1000,18 @@ export class App extends React.Component<any, AppState> {
       _brand: "socketUpdateData";
     },
   ) {
-    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+    if (
+      this.room.socketInitialized &&
+      this.room.socket &&
+      this.room.roomID &&
+      this.room.roomKey
+    ) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey);
-      this.socket.emit(
+      const encrypted = await encryptAESGEM(encoded, this.room.roomKey);
+      this.room.socket.emit(
         "server-broadcast",
-        this.roomID,
+        this.room.roomID,
         encrypted.data,
         encrypted.iv,
       );
@@ -2490,7 +2510,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket &&
+    this.room.socket &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,
