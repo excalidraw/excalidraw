@@ -6,10 +6,10 @@ let testIdBase = 0;
 
 export const randomInteger = () => Math.floor(random.next() * 2 ** 31);
 
-export function reseed(seed: number) {
+export const reseed = (seed: number) => {
   random = new Random(seed);
   testIdBase = 0;
-}
+};
 
 export const randomId = () =>
   process.env.NODE_ENV === "test" ? `id${testIdBase++}` : nanoid();

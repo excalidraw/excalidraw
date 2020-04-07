@@ -1,14 +1,14 @@
 import { Point } from "./types";
 
 // https://stackoverflow.com/a/6853926/232122
-export function distanceBetweenPointAndSegment(
+export const distanceBetweenPointAndSegment = (
   x: number,
   y: number,
   x1: number,
   y1: number,
   x2: number,
   y2: number,
-) {
+) => {
   const A = x - x1;
   const B = y - y1;
   const C = x2 - x1;
@@ -37,7 +37,7 @@ export function distanceBetweenPointAndSegment(
   const dx = x - xx;
   const dy = y - yy;
   return Math.hypot(dx, dy);
-}
+};
 
 export const rotate = (
   x1: number,

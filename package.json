@@ -41,7 +41,6 @@
     "asar": "3.0.3",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
-    "eslint-plugin-prefer-arrow": "1.1.7",
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.3",
     "jest-canvas-mock": "2.2.0",
@@ -61,8 +60,7 @@
       "react-app"
     ],
     "plugins": [
-      "prettier",
-      "prefer-arrow"
+      "prettier"
     ],
     "rules": {
       "curly": "warn",
@@ -78,13 +76,6 @@
       ],
       "no-else-return": "warn",
       "no-useless-return": "warn",
-      "prefer-arrow/prefer-arrow-functions": [
-        "warn",
-        {
-          "singleReturnOnly": true
-        }
-      ],
-      "prefer-arrow-callback": "warn",
       "prefer-const": [
         "warn",
         {
