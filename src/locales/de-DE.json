@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Tastaturkürzel",
     "shapes": "Formen",
+    "or": "",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "editor": "Editor",
