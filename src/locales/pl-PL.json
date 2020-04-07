@@ -46,7 +46,8 @@
     "actions": "Akcje",
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
