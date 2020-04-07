@@ -94,7 +94,9 @@ export function ShapesSwitcher({
     <>
       {SHAPES.map(({ value, icon }, index) => {
         const label = t(`toolBar.${value}`);
-        const shortcut = `${capitalizeString(value)[0]}, ${index + 1}`;
+        const shortcut = `${capitalizeString(value)[0]} ${t(
+          "shortcutsDialog.or",
+        )} ${index + 1}`;
         return (
           <ToolButton
             key={value}
