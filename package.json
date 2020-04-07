@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@sentry/browser": "5.15.4",
+    "@sentry/integrations": "5.15.4",
     "browser-nativefs": "0.4.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
