@@ -161,17 +161,17 @@ export const allowFullScreen = () =>
 
 export const exitFullScreen = () => document.exitFullscreen();
 
-export const getShortcutKey = (shortcut: string, prefix = " — "): string => {
+export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
-    return `${prefix}${shortcut
+    return `${shortcut
       .replace("CtrlOrCmd+", "⌘")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
       .replace("Shift+", "⇧")
       .replace("Del", "⌫")}`;
   }
-  return `${prefix}${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },

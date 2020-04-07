@@ -1,5 +1,4 @@
 import React from "react";
-import { getShortcutKey } from "../utils";
 
 type HelpIconProps = {
   title?: string;
@@ -21,10 +20,7 @@ const ICON = (
 
 export function HelpIcon(props: HelpIconProps) {
   return (
-    <label
-      title={`${props.title} ${getShortcutKey("?")}`}
-      className="help-icon"
-    >
+    <label title={`${props.title} — ?`} className="help-icon">
       <div onClick={props.onClick}>{ICON}</div>
     </label>
   );
