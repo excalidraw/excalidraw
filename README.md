@@ -44,10 +44,9 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm install`         | Install the dependencies          |
 | `npm start`           | Run the project                   |
 | `npm run fix`         | Reformat all files with Prettier  |
-| `npm run test:code`   | Test for formatting with Prettier |
-| `npm run test:app`    | Test the app                      |
 | `npm test`            | Run tests                         |
-| `npm run test:update` | Update all snapshots              |
+| `npm run test:update` | Update test snapshots             |
+| `npm run test:code`   | Test for formatting with Prettier |
 
 ## Contributing
 
