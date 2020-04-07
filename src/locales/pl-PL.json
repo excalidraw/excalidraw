@@ -71,7 +71,8 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy"
+    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
