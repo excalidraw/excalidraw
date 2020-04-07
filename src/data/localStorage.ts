@@ -19,9 +19,9 @@ export function saveToLocalStorage(
       LOCAL_STORAGE_KEY_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
-  } catch (err) {
+  } catch (error) {
     // Unable to access window.localStorage
-    console.error(err);
+    console.error(error);
   }
 }
 
@@ -32,9 +32,9 @@ export function restoreFromLocalStorage() {
   try {
     savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
     savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
-  } catch (err) {
+  } catch (error) {
     // Unable to access localStorage
-    console.error(err);
+    console.error(error);
   }
 
   let elements = [];
