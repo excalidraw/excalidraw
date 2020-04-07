@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "키보드 단축키",
     "shapes": "그리기",
+    "or": "",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "editor": "편집",
