@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Modal } from "./Modal";
 import { Island } from "./Island";
 import { t } from "../i18n";
@@ -15,6 +15,21 @@ export function Dialog(props: {
   closeButtonRef?: React.Ref<HTMLButtonElement>;
   title: React.ReactNode;
 }) {
+  const islandRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!islandRef.current) {
+      return;
+    }
+
+    const buttons = islandRef.current.querySelectorAll("button");
+
+    if (buttons.length > 0) {
+      // If there's a button other than close, focus it.
+      (buttons[1] || buttons[0]).focus();
+    }
+  }, []);
+
   return (
     <Modal
       className={`${props.className ?? ""} Dialog`}
@@ -22,7 +37,7 @@ export function Dialog(props: {
       maxWidth={props.maxWidth}
       onCloseRequest={props.onCloseRequest}
     >
-      <Island padding={4}>
+      <Island padding={4} ref={islandRef}>
         <h2 id="dialog-title" className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
           <button
