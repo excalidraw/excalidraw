@@ -338,14 +338,16 @@ export function renderScene(
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
       // Border
+      context.fillStyle = stroke;
+      context.globalAlpha = globalAlpha;
       context.fillRect(
         offsetX - 1,
         offsetY - 1,
         measure.width + 2 * paddingHorizontal + 2,
         measureHeight + 2 * paddingVertical + 2,
       );
-      context.fillStyle = "#ffffff88";
       // Background
+      context.fillStyle = background;
       context.fillRect(
         offsetX,
         offsetY,
