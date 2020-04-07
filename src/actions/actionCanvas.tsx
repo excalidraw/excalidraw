@@ -90,7 +90,7 @@ export const actionZoomIn = register({
     <ToolButton
       type="button"
       icon={zoomIn}
-      title={`${t("buttons.zoomIn")} ${getShortcutKey("CtrlOrCmd++")}`}
+      title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
@@ -117,7 +117,7 @@ export const actionZoomOut = register({
     <ToolButton
       type="button"
       icon={zoomOut}
-      title={`${t("buttons.zoomOut")} ${getShortcutKey("CtrlOrCmd+-")}`}
+      title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);

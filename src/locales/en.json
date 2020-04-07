@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Keyboard shortcuts",
     "shapes": "Shapes",
+    "or": "or",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "editor": "Editor",

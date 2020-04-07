@@ -38,7 +38,7 @@ export const actionDuplicateSelection = register({
     <ToolButton
       type="button"
       icon={clone}
-      title={`${t("labels.duplicateSelection")} ${getShortcutKey(
+      title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
         "CtrlOrCmd+D",
       )}`}
       aria-label={t("labels.duplicateSelection")}
