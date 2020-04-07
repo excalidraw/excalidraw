@@ -41,12 +41,12 @@
     "fileTitle": "Filnavn",
     "colorPicker": "Fargevelger",
     "canvasBackground": "Lerretsbakgrunn",
-    "drawingCanvas": "",
+    "drawingCanvas": "Lerret",
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
     "createRoom": "Del en sanntids-samarbeidsøkt",
-    "duplicateSelection": ""
+    "duplicateSelection": "Dupliser"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -59,7 +59,7 @@
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
-    "selectLanguage": "",
+    "selectLanguage": "Velg språk",
     "scrollBackToContent": "Skroll tilbake til innhold",
     "zoomIn": "Zoom inn",
     "zoomOut": "Zoom ut",
@@ -134,7 +134,7 @@
     "title": "Tastatursnarveier",
     "shapes": "Figurer",
     "or": "eller",
-    "click": "",
+    "click": "klikk",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "editor": "Redigering",
