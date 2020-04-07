@@ -46,7 +46,8 @@
     "actions": "操作",
     "language": "语言",
     "createRoom": "分享实时协作会议",
-    "duplicateSelection": "复制所有已选择的元素"
+    "duplicateSelection": "复制所有已选择的元素",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "重置画布",
