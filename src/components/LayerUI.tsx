@@ -133,6 +133,12 @@ export const LayerUI = React.memo(
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
+                        username={appState.username}
+                        onUsernameChange={(username) => {
+                          setAppState({
+                            username,
+                          });
+                        }}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
@@ -202,6 +208,7 @@ export const LayerUI = React.memo(
             languages={languages}
             floating
           />
+          {actionManager.renderAction("toggleShortcuts")}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"

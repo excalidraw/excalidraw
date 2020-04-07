@@ -81,8 +81,12 @@ export class TopErrorBoundary extends React.Component<
             {t("errorSplash.clearCanvasMessage")}
             <button
               onClick={() => {
-                localStorage.clear();
-                window.location.reload();
+                try {
+                  localStorage.clear();
+                  window.location.reload();
+                } catch (error) {
+                  console.error(error);
+                }
               }}
             >
               {t("errorSplash.clearCanvasMessage_button")}

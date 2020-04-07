@@ -37,6 +37,7 @@ export type AppState = {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
+  username: string;
   isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
@@ -53,6 +54,7 @@ export type AppState = {
       };
       button?: "up" | "down";
       selectedElementIds?: AppState["selectedElementIds"];
+      username?: string | null;
     }
   >;
   shouldCacheIgnoreZoom: boolean;

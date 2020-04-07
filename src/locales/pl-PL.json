@@ -4,6 +4,7 @@
     "selectAll": "Wybierz wszystkie",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
+    "copyAsSvg": "",
     "bringForward": "Przenieś do góry",
     "sendToBack": "Przenieś na dół",
     "bringToFront": "Przenieś na wierzch",
@@ -69,12 +70,13 @@
     "undo": "Cofnij",
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
-    "createNewRoom": "Utwórz nowy pokój"
+    "createNewRoom": "Utwórz nowy pokój",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
-    "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku, nieprawidłowy plik",
+    "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
@@ -126,6 +128,15 @@
     "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   },
   "errorDialog": {
-    "title": "Błąd"
+    "title": "Wystąpił błąd"
+  },
+  "shortcutsDialog": {
+    "title": "Skróty klawiszowe",
+    "shapes": "Kształty",
+    "editor": "Edytor",
+    "view": "Widok",
+    "blog": "Przeczytaj naszego bloga",
+    "howto": "Skorzystaj z instrukcji",
+    "github": "Znalazłeś problem? Zgłoś go"
   }
 }

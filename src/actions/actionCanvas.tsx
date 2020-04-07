@@ -10,6 +10,7 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
+import { AppState } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -35,12 +36,15 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
-  perform: (elements) => {
+  perform: (elements, appState: AppState) => {
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
       ),
-      appState: getDefaultAppState(),
+      appState: {
+        ...getDefaultAppState(),
+        username: appState.username,
+      },
       commitToHistory: true,
     };
   },
@@ -90,7 +94,7 @@ export const actionZoomIn = register({
     <ToolButton
       type="button"
       icon={zoomIn}
-      title={`${t("buttons.zoomIn")} ${getShortcutKey("CtrlOrCmd++")}`}
+      title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
@@ -117,7 +121,7 @@ export const actionZoomOut = register({
     <ToolButton
       type="button"
       icon={zoomOut}
-      title={`${t("buttons.zoomOut")} ${getShortcutKey("CtrlOrCmd+-")}`}
+      title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);

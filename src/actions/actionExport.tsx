@@ -6,6 +6,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
+import { KEYS } from "../keys";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -46,6 +47,9 @@ export const actionSaveScene = register({
   perform: (elements, appState, value) => {
     saveAsJSON(elements, appState).catch((error) => console.error(error));
     return { commitToHistory: false };
+  },
+  keyTest: (event) => {
+    return event.key === "s" && event[KEYS.CTRL_OR_CMD];
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
