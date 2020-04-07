@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Sneltoetsen",
     "shapes": "Vormen",
+    "or": "",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Gebogen lijn",
     "editor": "Editor",
