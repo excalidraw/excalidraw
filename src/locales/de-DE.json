@@ -72,7 +72,7 @@
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
     "toggleFullScreen": "Vollbildmodus umschalten",
-    "showShortcuts": ""
+    "showShortcuts": "Tastaturkürzel anzeigen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
