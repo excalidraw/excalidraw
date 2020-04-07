@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Atalhos de teclado",
     "shapes": "Formas",
+    "or": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "Editor",
