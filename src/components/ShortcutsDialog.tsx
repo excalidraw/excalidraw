@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
@@ -14,7 +14,6 @@ const ShortcutIsland = (props: {
       border: "1px solid #ced4da",
       marginBottom: "16px",
     }}
-    {...props}
   >
     <h3
       style={{
@@ -39,7 +38,6 @@ const Shortcut = (props: {
     style={{
       borderTop: "1px solid #ced4da",
     }}
-    {...props}
   >
     <div
       style={{
@@ -68,12 +66,12 @@ const Shortcut = (props: {
         }}
       >
         {props.shortcuts.map((shortcut, index) => (
-          <>
+          <React.Fragment key={index}>
             <ShortcutKey>{shortcut}</ShortcutKey>
             {props.isOr &&
               index !== props.shortcuts.length - 1 &&
               t("shortcutsDialog.or")}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>
@@ -134,6 +132,12 @@ const Footer = () => (
 );
 
 export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
+  const closeButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeButton.current?.focus();
+  }, []);
+
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -145,6 +149,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
       <Dialog
         maxWidth={800}
         onCloseRequest={handleClose}
+        closeButtonRef={closeButton}
         title={t("shortcutsDialog.title")}
       >
         <div
