@@ -140,7 +140,7 @@ export function resizeElements(
             width,
             height,
             ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
-            ...(isLinearElement(element)
+            ...(isLinearElement(element) && width !== 0 && height !== 0
               ? {
                   points: rescalePoints(
                     0,
@@ -172,7 +172,7 @@ export function resizeElements(
             width,
             height,
             ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
-            ...(isLinearElement(element)
+            ...(isLinearElement(element) && width !== 0 && height !== 0
               ? {
                   points: rescalePoints(
                     0,
@@ -204,7 +204,7 @@ export function resizeElements(
             width,
             height,
             ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
-            ...(isLinearElement(element)
+            ...(isLinearElement(element) && width !== 0 && height !== 0
               ? {
                   points: rescalePoints(
                     0,
@@ -236,7 +236,7 @@ export function resizeElements(
             width,
             height,
             ...adjustXYWithRotation("se", element, deltaX, dY, angle),
-            ...(isLinearElement(element)
+            ...(isLinearElement(element) && width !== 0 && height !== 0
               ? {
                   points: rescalePoints(
                     0,
@@ -251,7 +251,7 @@ export function resizeElements(
       case "n": {
         const height = element.height - deltaY;
 
-        if (isLinearElement(element)) {
+        if (isLinearElement(element) && height !== 0) {
           mutateElement(element, {
             height,
             ...adjustXYWithRotation("n", element, 0, deltaY, angle),
@@ -269,7 +269,7 @@ export function resizeElements(
       case "w": {
         const width = element.width - deltaX;
 
-        if (isLinearElement(element)) {
+        if (isLinearElement(element) && width !== 0) {
           mutateElement(element, {
             width,
             ...adjustXYWithRotation("w", element, deltaX, 0, angle),
@@ -286,7 +286,7 @@ export function resizeElements(
       case "s": {
         const height = element.height + deltaY;
 
-        if (isLinearElement(element)) {
+        if (isLinearElement(element) && height !== 0) {
           mutateElement(element, {
             height,
             ...adjustXYWithRotation("s", element, 0, deltaY, angle),
@@ -303,7 +303,7 @@ export function resizeElements(
       case "e": {
         const width = element.width + deltaX;
 
-        if (isLinearElement(element)) {
+        if (isLinearElement(element) && width !== 0) {
           mutateElement(element, {
             width,
             ...adjustXYWithRotation("e", element, deltaX, 0, angle),
