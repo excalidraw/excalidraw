@@ -2126,7 +2126,12 @@ export class App extends React.Component<any, AppState> {
         resizingElement: null,
         selectionElement: null,
         cursorButton: "up",
-        editingElement: multiElement ? this.state.editingElement : null,
+        // text elements are reset on finalize, and resetting on pointerup
+        //  may cause issues with double taps
+        editingElement:
+          multiElement || isTextElement(this.state.editingElement)
+            ? this.state.editingElement
+            : null,
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
