@@ -72,7 +72,7 @@
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
-    "showShortcuts": ""
+    "showShortcuts": "Afficher les raccourcis"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
