@@ -46,7 +46,8 @@
     "actions": "Acties",
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
-    "duplicateSelection": "Dupliceer"
+    "duplicateSelection": "Dupliceer",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
