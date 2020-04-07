@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
@@ -132,12 +132,6 @@ const Footer = () => (
 );
 
 export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
-  const closeButton = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    closeButton.current?.focus();
-  }, []);
-
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -149,7 +143,6 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
       <Dialog
         maxWidth={800}
         onCloseRequest={handleClose}
-        closeButtonRef={closeButton}
         title={t("shortcutsDialog.title")}
       >
         <div
