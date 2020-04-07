@@ -1,17 +1,17 @@
 {
   "labels": {
     "paste": "Вставить",
-    "selectAll": "",
+    "selectAll": "Выбрать все",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
-    "bringForward": "",
-    "sendToBack": "",
-    "bringToFront": "",
-    "sendBackward": "",
+    "bringForward": "Переместить вперед",
+    "sendToBack": "На задний план",
+    "bringToFront": "На передний план",
+    "sendBackward": "Переместить назад",
     "delete": "Удалить",
-    "copyStyles": "",
-    "pasteStyles": "",
+    "copyStyles": "Скопировать стили",
+    "pasteStyles": "Вставить стили",
     "stroke": "Обводка",
     "background": "Фон",
     "fill": "Заливка",
@@ -46,7 +46,8 @@
     "actions": "Действия",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
