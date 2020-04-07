@@ -46,7 +46,8 @@
     "actions": "Actions",
     "language": "Langue",
     "createRoom": "Partager une session de collaboration en direct",
-    "duplicateSelection": "Dupliquer"
+    "duplicateSelection": "Dupliquer",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
