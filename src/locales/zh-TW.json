@@ -46,7 +46,8 @@
     "actions": "",
     "language": "語系",
     "createRoom": "分享即時協作會議",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
