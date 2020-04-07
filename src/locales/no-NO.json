@@ -72,7 +72,7 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
     "toggleFullScreen": "Skru fullskjerm av/på",
-    "showShortcuts": ""
+    "showShortcuts": "Vis snarveier"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -134,7 +134,7 @@
   "shortcutsDialog": {
     "title": "Tastatursnarveier",
     "shapes": "Figurer",
-    "or": "",
+    "or": "eller",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "editor": "Redigering",
