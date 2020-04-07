@@ -71,8 +71,7 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen",
-    "showShortcuts": "Show shortcuts"
+    "toggleFullScreen": "Toggle full screen"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -135,6 +134,7 @@
     "title": "Keyboard shortcuts",
     "shapes": "Shapes",
     "or": "or",
+    "click": "click",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "editor": "Editor",

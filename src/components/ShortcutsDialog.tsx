@@ -165,12 +165,22 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut label={t("toolBar.text")} shortcuts={["T", "7"]} />
             <Shortcut
               label={t("shortcutsDialog.curvedArrow")}
-              shortcuts={["A", "click", "click", "click"]}
+              shortcuts={[
+                "A",
+                t("shortcutsDialog.click"),
+                t("shortcutsDialog.click"),
+                t("shortcutsDialog.click"),
+              ]}
               isOr={false}
             />
             <Shortcut
               label={t("shortcutsDialog.curvedLine")}
-              shortcuts={["L", "click", "click", "click"]}
+              shortcuts={[
+                "L",
+                t("shortcutsDialog.click"),
+                t("shortcutsDialog.click"),
+                t("shortcutsDialog.click"),
+              ]}
               isOr={false}
             />
             <Shortcut label={t("toolBar.lock")} shortcuts={["Q"]} />
