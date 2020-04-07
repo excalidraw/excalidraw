@@ -4,14 +4,12 @@ import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber } from "../types";
-import { getElementAbsoluteCoords } from "../element/bounds";
 
 import {
   newElement,
   newTextElement,
   duplicateElement,
   resizeTest,
-  normalizeResizeHandle,
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
@@ -24,6 +22,11 @@ import {
   getSyncableElements,
   hasNonDeletedElements,
   newLinearElement,
+  ResizeArrowFnType,
+  resizeElements,
+  getElementWithResizeHandler,
+  canResizeMutlipleElements,
+  getResizeHandlerFromCoords,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -50,12 +53,7 @@ import {
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../element/types";
-import { rotate, adjustXYWithRotation } from "../math";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import {
   isWritableElement,
@@ -67,6 +65,7 @@ import {
   resetCursor,
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
+  setCursorForShape,
 } from "../utils";
 import { KEYS, isArrowKey } from "../keys";
 
@@ -75,7 +74,6 @@ import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
 
-import { getElementWithResizeHandler } from "../element/resizeTest";
 import { ActionManager } from "../actions/manager";
 import "../actions";
 import { actions } from "../actions/register";
@@ -88,6 +86,7 @@ import {
   copyToAppClipboard,
   getClipboardContent,
   probablySupportsClipboardBlob,
+  probablySupportsClipboardWriteText,
 } from "../clipboard";
 import { normalizeScroll } from "../scene";
 import { getCenter, getDistance } from "../gesture";
@@ -102,14 +101,13 @@ import {
   ARROW_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
-import { ScrollBars } from "../scene/types";
+import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
-import { rescalePoints } from "../points";
 import { actionFinalize } from "../actions";
 
 /**
@@ -125,6 +123,8 @@ function withBatchedUpdates<
 
 const { history } = createHistory();
 
+let didTapTwice: boolean = false;
+let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -139,15 +139,6 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-
-function setCursorForShape(shape: string) {
-  if (shape === "selection") {
-    resetCursor();
-  } else {
-    document.documentElement.style.cursor =
-      shape === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-  }
-}
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -213,53 +204,14 @@ export class App extends React.Component<any, AppState> {
             }}
             width={canvasWidth}
             height={canvasHeight}
-            ref={(canvas) => {
-              // canvas is null when unmounting
-              if (canvas !== null) {
-                this.canvas = canvas;
-                this.rc = rough.canvas(this.canvas);
-
-                this.canvas.addEventListener("wheel", this.handleWheel, {
-                  passive: false,
-                });
-              } else {
-                this.canvas?.removeEventListener("wheel", this.handleWheel);
-              }
-            }}
+            ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
             onPointerDown={this.handleCanvasPointerDown}
             onDoubleClick={this.handleCanvasDoubleClick}
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
-            onDrop={(event) => {
-              const file = event.dataTransfer.files[0];
-              if (
-                file?.type === "application/json" ||
-                file?.name.endsWith(".excalidraw")
-              ) {
-                this.setState({ isLoading: true });
-                loadFromBlob(file)
-                  .then(({ elements, appState }) =>
-                    this.syncActionResult({
-                      elements,
-                      appState: {
-                        ...(appState || this.state),
-                        isLoading: false,
-                      },
-                      commitToHistory: false,
-                    }),
-                  )
-                  .catch((error) => {
-                    this.setState({ isLoading: false, errorMessage: error });
-                  });
-              } else {
-                this.setState({
-                  isLoading: false,
-                  errorMessage: t("alerts.couldNotLoadInvalidFile"),
-                });
-              }
-            }}
+            onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
           </canvas>
@@ -477,10 +429,21 @@ export class App extends React.Component<any, AppState> {
     if (this.state.isCollaborating && !this.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
-    const pointerViewportCoords: {
-      [id: string]: { x: number; y: number };
+
+    const cursorButton: {
+      [id: string]: string | undefined;
     } = {};
+    const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
+    const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     this.state.collaborators.forEach((user, socketID) => {
+      if (user.selectedElementIds) {
+        for (const id of Object.keys(user.selectedElementIds)) {
+          if (!(id in remoteSelectedElementIds)) {
+            remoteSelectedElementIds[id] = [];
+          }
+          remoteSelectedElementIds[id].push(socketID);
+        }
+      }
       if (!user.pointer) {
         return;
       }
@@ -493,6 +456,7 @@ export class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+      cursorButton[socketID] = user.button;
     });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       globalSceneState.getAllElements().filter((element) => {
@@ -515,6 +479,8 @@ export class App extends React.Component<any, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
+        remotePointerButton: cursorButton,
+        remoteSelectedElementIds: remoteSelectedElementIds,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -585,6 +551,44 @@ export class App extends React.Component<any, AppState> {
       this.canvas!,
       this.state,
     );
+  };
+
+  private copyToClipboardAsSvg = () => {
+    const selectedElements = getSelectedElements(
+      globalSceneState.getAllElements(),
+      this.state,
+    );
+    exportCanvas(
+      "clipboard-svg",
+      selectedElements.length
+        ? selectedElements
+        : globalSceneState.getAllElements(),
+      this.state,
+      this.canvas!,
+      this.state,
+    );
+  };
+
+  private onTapStart = (event: TouchEvent) => {
+    if (!didTapTwice) {
+      didTapTwice = true;
+      clearTimeout(tappedTwiceTimer);
+      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      return;
+    }
+    // insert text only if we tapped twice with a single finger
+    // event.touches.length === 1 will also prevent inserting text when user's zooming
+    if (didTapTwice && event.touches.length === 1) {
+      const [touch] = event.touches;
+      // @ts-ignore
+      this.handleCanvasDoubleClick({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      didTapTwice = false;
+      clearTimeout(tappedTwiceTimer);
+    }
+    event.preventDefault();
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -874,13 +878,20 @@ export class App extends React.Component<any, AppState> {
               updateScene(decryptedData);
               break;
             case "MOUSE_LOCATION": {
-              const { socketID, pointerCoords } = decryptedData.payload;
+              const {
+                socketID,
+                pointerCoords,
+                button,
+                selectedElementIds,
+              } = decryptedData.payload;
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
                 }
                 const user = state.collaborators.get(socketID)!;
                 user.pointer = pointerCoords;
+                user.button = button;
+                user.selectedElementIds = selectedElementIds;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -911,7 +922,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.socket.on("new-user", async (socketID: string) => {
+      this.socket.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -924,6 +935,7 @@ export class App extends React.Component<any, AppState> {
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
@@ -931,6 +943,8 @@ export class App extends React.Component<any, AppState> {
         payload: {
           socketID: this.socket.id,
           pointerCoords: payload.pointerCoords,
+          button: payload.button || "up",
+          selectedElementIds: this.state.selectedElementIds,
         },
       };
       return this._broadcastSocketData(
@@ -994,6 +1008,12 @@ export class App extends React.Component<any, AppState> {
       (isArrowKey(event.key) && isInputLike(event.target))
     ) {
       return;
+    }
+
+    if (event.key === KEYS.QUESTION_MARK) {
+      this.setState({
+        showShortcutsDialog: true,
+      });
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
@@ -1075,10 +1095,7 @@ export class App extends React.Component<any, AppState> {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
-        document.documentElement.style.cursor =
-          this.state.elementType === "text"
-            ? CURSOR_TYPE.TEXT
-            : CURSOR_TYPE.CROSSHAIR;
+        setCursorForShape(this.state.elementType);
         this.setState({ selectedElementIds: {} });
       }
       isHoldingSpace = false;
@@ -1155,11 +1172,10 @@ export class App extends React.Component<any, AppState> {
         ...globalSceneState.getAllElements().map((_element) => {
           if (_element.id === element.id) {
             return newTextElement({
-              ..._element,
+              ...(_element as ExcalidrawTextElement),
               x: element.x,
               y: element.y,
               text,
-              font: this.state.currentItemFont,
             });
           }
           return _element;
@@ -1345,13 +1361,8 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    const pointerCoords = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-    this.savePointer(pointerCoords);
+    this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -1454,7 +1465,11 @@ export class App extends React.Component<any, AppState> {
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
-    if (hasDeselectedButton || this.state.elementType !== "selection") {
+    if (
+      hasDeselectedButton ||
+      (this.state.elementType !== "selection" &&
+        this.state.elementType !== "text")
+    ) {
       return;
     }
 
@@ -1463,18 +1478,33 @@ export class App extends React.Component<any, AppState> {
       this.state,
     );
     if (selectedElements.length === 1 && !isOverScrollBar) {
-      const resizeElement = getElementWithResizeHandler(
+      const elementWithResizeHandler = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
         this.state,
         { x, y },
         this.state.zoom,
         event.pointerType,
       );
-      if (resizeElement && resizeElement.resizeHandle) {
+      if (elementWithResizeHandler && elementWithResizeHandler.resizeHandle) {
         document.documentElement.style.cursor = getCursorForResizingElement(
-          resizeElement,
+          elementWithResizeHandler,
         );
         return;
+      }
+    } else if (selectedElements.length > 1 && !isOverScrollBar) {
+      if (canResizeMutlipleElements(selectedElements)) {
+        const resizeHandle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          { x, y },
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (resizeHandle) {
+          document.documentElement.style.cursor = getCursorForResizingElement({
+            resizeHandle,
+          });
+          return;
+        }
       }
     }
     const hitElement = getElementAtPosition(
@@ -1484,8 +1514,14 @@ export class App extends React.Component<any, AppState> {
       y,
       this.state.zoom,
     );
-    document.documentElement.style.cursor =
-      hitElement && !isOverScrollBar ? "move" : "";
+    if (this.state.elementType === "text") {
+      document.documentElement.style.cursor = isTextElement(hitElement)
+        ? CURSOR_TYPE.TEXT
+        : CURSOR_TYPE.CROSSHAIR;
+    } else {
+      document.documentElement.style.cursor =
+        hitElement && !isOverScrollBar ? "move" : "";
+    }
   };
 
   private handleCanvasPointerDown = (
@@ -1502,7 +1538,11 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    this.setState({ lastPointerDownWith: event.pointerType });
+    this.setState({
+      lastPointerDownWith: event.pointerType,
+      cursorButton: "down",
+    });
+    this.savePointer(event.clientX, event.clientY, "down");
 
     // pan canvas on wheel button drag or space+drag
     if (
@@ -1535,6 +1575,10 @@ export class App extends React.Component<any, AppState> {
           if (!isHoldingSpace) {
             setCursorForShape(this.state.elementType);
           }
+          this.setState({
+            cursorButton: "up",
+          });
+          this.savePointer(event.clientX, event.clientY, "up");
           window.removeEventListener("pointermove", onPointerMove);
           window.removeEventListener("pointerup", teardown);
           window.removeEventListener("blur", teardown);
@@ -1635,6 +1679,10 @@ export class App extends React.Component<any, AppState> {
         isDraggingScrollBar = false;
         setCursorForShape(this.state.elementType);
         lastPointerUp = null;
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
       });
@@ -1651,34 +1699,57 @@ export class App extends React.Component<any, AppState> {
 
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
+    const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
+      resizeHandle = nextResizeHandle;
+    };
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      const resizeElement = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
-        this.state,
-        { x, y },
-        this.state.zoom,
-        event.pointerType,
-      );
-
       const selectedElements = getSelectedElements(
         globalSceneState.getAllElements(),
         this.state,
       );
-      if (selectedElements.length === 1 && resizeElement) {
-        this.setState({
-          resizingElement: resizeElement ? resizeElement.element : null,
-        });
-
-        resizeHandle = resizeElement.resizeHandle;
-        document.documentElement.style.cursor = getCursorForResizingElement(
-          resizeElement,
+      if (selectedElements.length === 1) {
+        const elementWithResizeHandler = getElementWithResizeHandler(
+          globalSceneState.getAllElements(),
+          this.state,
+          { x, y },
+          this.state.zoom,
+          event.pointerType,
         );
-        isResizingElements = true;
-      } else {
+        if (elementWithResizeHandler) {
+          this.setState({
+            resizingElement: elementWithResizeHandler
+              ? elementWithResizeHandler.element
+              : null,
+          });
+          resizeHandle = elementWithResizeHandler.resizeHandle;
+          document.documentElement.style.cursor = getCursorForResizingElement(
+            elementWithResizeHandler,
+          );
+          isResizingElements = true;
+        }
+      } else if (selectedElements.length > 1) {
+        if (canResizeMutlipleElements(selectedElements)) {
+          resizeHandle = getResizeHandlerFromCoords(
+            getCommonBounds(selectedElements),
+            { x, y },
+            this.state.zoom,
+            event.pointerType,
+          );
+          if (resizeHandle) {
+            document.documentElement.style.cursor = getCursorForResizingElement(
+              {
+                resizeHandle,
+              },
+            );
+            isResizingElements = true;
+          }
+        }
+      }
+      if (!isResizingElements) {
         hitElement = getElementAtPosition(
           globalSceneState.getAllElements(),
           this.state,
@@ -1749,47 +1820,25 @@ export class App extends React.Component<any, AppState> {
         return;
       }
 
-      const snappedToCenterPosition = event.altKey
-        ? null
-        : this.getTextWysiwygSnappedToCenterPosition(
-            x,
-            y,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
+      const { x, y } = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
 
-      const element = newTextElement({
-        x: snappedToCenterPosition?.elementCenterX ?? x,
-        y: snappedToCenterPosition?.elementCenterY ?? y,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-        text: "",
-        font: this.state.currentItemFont,
+      this.startTextEditing({
+        x: x,
+        y: y,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        centerIfPossible: !event.altKey,
       });
 
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements(),
-        element,
-      ]);
-
-      this.handleTextWysiwyg(element, {
-        x: snappedToCenterPosition?.wysiwygX ?? event.clientX,
-        y: snappedToCenterPosition?.wysiwygY ?? event.clientY,
-      });
       resetCursor();
       if (!this.state.elementLocked) {
         this.setState({
-          editingElement: element,
           elementType: "selection",
-        });
-      } else {
-        this.setState({
-          editingElement: element,
         });
       }
       return;
@@ -1890,82 +1939,9 @@ export class App extends React.Component<any, AppState> {
       }
     }
 
-    let resizeArrowFn:
-      | ((
-          element: ExcalidrawLinearElement,
-          pointIndex: number,
-          deltaX: number,
-          deltaY: number,
-          pointerX: number,
-          pointerY: number,
-          perfect: boolean,
-        ) => void)
-      | null = null;
-
-    const arrowResizeOrigin = (
-      element: ExcalidrawLinearElement,
-      pointIndex: number,
-      deltaX: number,
-      deltaY: number,
-      pointerX: number,
-      pointerY: number,
-      perfect: boolean,
-    ) => {
-      const [px, py] = element.points[pointIndex];
-      let x = element.x + deltaX;
-      let y = element.y + deltaY;
-      let pointX = px - deltaX;
-      let pointY = py - deltaY;
-
-      if (perfect) {
-        const { width, height } = getPerfectElementSize(
-          element.type,
-          px + element.x - pointerX,
-          py + element.y - pointerY,
-        );
-        x = px + element.x - width;
-        y = py + element.y - height;
-        pointX = width;
-        pointY = height;
-      }
-
-      mutateElement(element, {
-        x,
-        y,
-        points: element.points.map((point, i) =>
-          i === pointIndex ? ([pointX, pointY] as const) : point,
-        ),
-      });
-    };
-
-    const arrowResizeEnd = (
-      element: ExcalidrawLinearElement,
-      pointIndex: number,
-      deltaX: number,
-      deltaY: number,
-      pointerX: number,
-      pointerY: number,
-      perfect: boolean,
-    ) => {
-      const [px, py] = element.points[pointIndex];
-      if (perfect) {
-        const { width, height } = getPerfectElementSize(
-          element.type,
-          pointerX - element.x,
-          pointerY - element.y,
-        );
-        mutateElement(element, {
-          points: element.points.map((point, i) =>
-            i === pointIndex ? ([width, height] as const) : point,
-          ),
-        });
-      } else {
-        mutateElement(element, {
-          points: element.points.map((point, i) =>
-            i === pointIndex ? ([px + deltaX, py + deltaY] as const) : point,
-          ),
-        });
-      }
+    let resizeArrowFn: ResizeArrowFnType | null = null;
+    const setResizeArrrowFn = (fn: ResizeArrowFnType) => {
+      resizeArrowFn = fn;
     };
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
@@ -1994,6 +1970,13 @@ export class App extends React.Component<any, AppState> {
         return;
       }
 
+      const { x, y } = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
+
       // for arrows, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
@@ -2003,268 +1986,30 @@ export class App extends React.Component<any, AppState> {
         (this.state.elementType === "arrow" ||
           this.state.elementType === "line")
       ) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-          this.canvas,
-          window.devicePixelRatio,
-        );
         if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
           return;
         }
       }
 
-      if (isResizingElements && this.state.resizingElement) {
-        this.setState({
-          isResizing: resizeHandle !== "rotation",
-          isRotating: resizeHandle === "rotation",
-        });
-        const el = this.state.resizingElement;
-        const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
+      const resized =
+        isResizingElements &&
+        resizeElements(
+          resizeHandle,
+          setResizeHandle,
           this.state,
+          this.setAppState,
+          resizeArrowFn,
+          setResizeArrrowFn,
+          event,
+          x,
+          y,
+          lastX,
+          lastY,
         );
-        if (selectedElements.length === 1) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-          const element = selectedElements[0];
-          const angle = element.angle;
-          // reverse rotate delta
-          const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
-          switch (resizeHandle) {
-            case "nw":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-
-                if (!resizeArrowFn) {
-                  if (p1[0] < 0 || p1[1] < 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
-                const dY = element.height - height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element)
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "ne":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] >= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
-                const dY = element.height - height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
-                  ...(isLinearElement(element)
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "sw":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] <= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
-                const dY = height - element.height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element)
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "se":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] > 0 || p1[1] > 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
-                const dY = height - element.height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("se", element, deltaX, dY, angle),
-                  ...(isLinearElement(element)
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "n": {
-              const height = element.height - deltaY;
-
-              if (isLinearElement(element)) {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
-                  points: rescalePoints(1, height, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
-                });
-              }
-
-              break;
-            }
-            case "w": {
-              const width = element.width - deltaX;
-
-              if (isLinearElement(element)) {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
-                  points: rescalePoints(0, width, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
-                });
-              }
-              break;
-            }
-            case "s": {
-              const height = element.height + deltaY;
-
-              if (isLinearElement(element)) {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
-                  points: rescalePoints(1, height, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
-                });
-              }
-              break;
-            }
-            case "e": {
-              const width = element.width + deltaX;
-
-              if (isLinearElement(element)) {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
-                  points: rescalePoints(0, width, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
-                });
-              }
-              break;
-            }
-            case "rotation": {
-              const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-              const cx = (x1 + x2) / 2;
-              const cy = (y1 + y2) / 2;
-              let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
-              if (event.shiftKey) {
-                angle += Math.PI / 16;
-                angle -= angle % (Math.PI / 8);
-              }
-              if (angle >= 2 * Math.PI) {
-                angle -= 2 * Math.PI;
-              }
-              mutateElement(element, { angle });
-              break;
-            }
-          }
-
-          if (resizeHandle) {
-            resizeHandle = normalizeResizeHandle(element, resizeHandle);
-          }
-          normalizeDimensions(element);
-
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            element,
-            resizeHandle,
-          });
-          mutateElement(el, {
-            x: element.x,
-            y: element.y,
-          });
-
-          lastX = x;
-          lastY = y;
-          return;
-        }
+      if (resized) {
+        lastX = x;
+        lastY = y;
+        return;
       }
 
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
@@ -2301,13 +2046,6 @@ export class App extends React.Component<any, AppState> {
       if (!draggingElement) {
         return;
       }
-
-      const { x, y } = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
 
       let width = distance(originX, x);
       let height = distance(originY, y);
@@ -2377,7 +2115,7 @@ export class App extends React.Component<any, AppState> {
       }
     });
 
-    const onPointerUp = withBatchedUpdates((event: PointerEvent) => {
+    const onPointerUp = withBatchedUpdates((childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -2391,11 +2129,15 @@ export class App extends React.Component<any, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
+        cursorButton: "up",
         editingElement: multiElement ? this.state.editingElement : null,
       });
 
+      this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
       resizeArrowFn = null;
       lastPointerUp = null;
+
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
 
@@ -2405,7 +2147,7 @@ export class App extends React.Component<any, AppState> {
         }
         if (!draggingOccurred && draggingElement && !multiElement) {
           const { x, y } = viewportCoordsToSceneCoords(
-            event,
+            childEvent,
             this.state,
             this.canvas,
             window.devicePixelRatio,
@@ -2482,7 +2224,7 @@ export class App extends React.Component<any, AppState> {
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
       if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
-        if (event.shiftKey) {
+        if (childEvent.shiftKey) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2490,7 +2232,7 @@ export class App extends React.Component<any, AppState> {
             },
           }));
         } else {
-          this.setState((prevState) => ({
+          this.setState((_prevState) => ({
             selectedElementIds: { [hitElement!.id]: true },
           }));
         }
@@ -2537,6 +2279,51 @@ export class App extends React.Component<any, AppState> {
     window.addEventListener("pointerup", onPointerUp);
   };
 
+  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+    // canvas is null when unmounting
+    if (canvas !== null) {
+      this.canvas = canvas;
+      this.rc = rough.canvas(this.canvas);
+
+      this.canvas.addEventListener("wheel", this.handleWheel, {
+        passive: false,
+      });
+      this.canvas.addEventListener("touchstart", this.onTapStart);
+    } else {
+      this.canvas?.removeEventListener("wheel", this.handleWheel);
+      this.canvas?.removeEventListener("touchstart", this.onTapStart);
+    }
+  };
+
+  private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+    const file = event.dataTransfer?.files[0];
+    if (
+      file?.type === "application/json" ||
+      file?.name.endsWith(".excalidraw")
+    ) {
+      this.setState({ isLoading: true });
+      loadFromBlob(file)
+        .then(({ elements, appState }) =>
+          this.syncActionResult({
+            elements,
+            appState: {
+              ...(appState || this.state),
+              isLoading: false,
+            },
+            commitToHistory: false,
+          }),
+        )
+        .catch((error) => {
+          this.setState({ isLoading: false, errorMessage: error });
+        });
+    } else {
+      this.setState({
+        isLoading: false,
+        errorMessage: t("alerts.couldNotLoadInvalidFile"),
+      });
+    }
+  };
+
   private handleCanvasContextMenu = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -2568,6 +2355,11 @@ export class App extends React.Component<any, AppState> {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
+          probablySupportsClipboardWriteText &&
+            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+              label: t("labels.copyAsSvg"),
+              action: this.copyToClipboardAsSvg,
+            },
           ...this.actionManager.getContextMenuItems((action) =>
             this.canvasOnlyActions.includes(action.name),
           ),
@@ -2595,6 +2387,10 @@ export class App extends React.Component<any, AppState> {
         probablySupportsClipboardBlob && {
           label: t("labels.copyAsPng"),
           action: this.copyToClipboardAsPng,
+        },
+        probablySupportsClipboardWriteText && {
+          label: t("labels.copyAsSvg"),
+          action: this.copyToClipboardAsSvg,
         },
         ...this.actionManager.getContextMenuItems(
           (action) => !this.canvasOnlyActions.includes(action.name),
@@ -2669,12 +2465,26 @@ export class App extends React.Component<any, AppState> {
     }
   }
 
-  private savePointer = (pointerCoords: { x: number; y: number }) => {
+  private savePointer = (x: number, y: number, button: "up" | "down") => {
+    if (!x || !y) {
+      return;
+    }
+    const pointerCoords = viewportCoordsToSceneCoords(
+      { clientX: x, clientY: y },
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket && this.broadcastMouseLocation({ pointerCoords });
+    this.socket &&
+      this.broadcastMouseLocation({
+        pointerCoords,
+        button,
+      });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

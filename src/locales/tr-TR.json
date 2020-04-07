@@ -4,6 +4,7 @@
     "selectAll": "Hepsini Seç",
     "copy": "Kopyala",
     "copyAsPng": "PNG olarak kopyala",
+    "copyAsSvg": "",
     "bringForward": "Bir öne getir",
     "sendToBack": "En arkaya gönder",
     "bringToFront": "En öne getir",
@@ -69,7 +70,8 @@
     "undo": "Geri Al",
     "redo": "İleri Al",
     "roomDialog": "Ortak Çalışma Ortamı Yarat",
-    "createNewRoom": "Yeni Oda Oluştur"
+    "createNewRoom": "Yeni Oda Oluştur",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Hata"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

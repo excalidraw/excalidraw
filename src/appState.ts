@@ -26,6 +26,7 @@ export function getDefaultAppState(): AppState {
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
+    cursorButton: "up",
     scrolledOutside: false,
     name: `excalidraw-${getDateTime()}`,
     isCollaborating: false,
@@ -38,6 +39,7 @@ export function getDefaultAppState(): AppState {
     selectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
+    showShortcutsDialog: false,
   };
 }
 
@@ -54,6 +56,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isCollaborating,
     isLoading,
     errorMessage,
+    showShortcutsDialog,
     ...exportedState
   } = appState;
   return exportedState;
@@ -63,6 +66,7 @@ export function clearAppStatePropertiesForHistory(
   appState: AppState,
 ): Partial<AppState> {
   return {
+    selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,

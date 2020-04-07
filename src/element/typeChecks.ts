@@ -5,9 +5,9 @@ import {
 } from "./types";
 
 export function isTextElement(
-  element: ExcalidrawElement,
+  element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement {
-  return element.type === "text";
+  return element != null && element.type === "text";
 }
 
 export function isLinearElement(

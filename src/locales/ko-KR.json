@@ -4,6 +4,7 @@
     "selectAll": "전체 선택",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 이미지 복사",
+    "copyAsSvg": "",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -69,7 +70,8 @@
     "undo": "실행 취소",
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
-    "createNewRoom": ""
+    "createNewRoom": "",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "에러"
+  },
+  "shortcutsDialog": {
+    "title": "키보드 단축키",
+    "shapes": "그리기",
+    "editor": "편집",
+    "view": "보기",
+    "blog": "블로그 읽어보기",
+    "howto": "가이드 참고하기",
+    "github": "이슈 제보하기"
   }
 }
