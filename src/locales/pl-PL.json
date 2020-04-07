@@ -72,7 +72,7 @@
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
-    "showShortcuts": ""
+    "showShortcuts": "Pokaż skróty"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -134,7 +134,7 @@
   "shortcutsDialog": {
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
-    "or": "",
+    "or": "lub",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "editor": "Edytor",
