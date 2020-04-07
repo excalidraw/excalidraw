@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
+    "or": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "编辑者",
