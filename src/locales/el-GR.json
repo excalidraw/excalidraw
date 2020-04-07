@@ -71,7 +71,8 @@
     "redo": "Επαναφορά",
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
-    "toggleFullScreen": "Εναλλαγή πλήρους οθόνης"
+    "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
