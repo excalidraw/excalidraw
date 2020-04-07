@@ -3,13 +3,13 @@ import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 
-export function ErrorDialog({
+export const ErrorDialog = ({
   message,
   onClose,
 }: {
   message: string;
   onClose?: () => void;
-}) {
+}) => {
   const [modalIsShown, setModalIsShown] = useState(!!message);
 
   const handleClose = React.useCallback(() => {
@@ -33,4 +33,4 @@ export function ErrorDialog({
       )}
     </>
   );
-}
+};

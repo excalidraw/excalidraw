@@ -22,10 +22,7 @@ export const exportToCanvas = (
     scale?: number;
     viewBackgroundColor: string;
   },
-  createCanvas: (width: number, height: number) => any = function (
-    width,
-    height,
-  ) {
+  createCanvas: (width: number, height: number) => any = (width, height) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;

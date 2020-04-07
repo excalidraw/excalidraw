@@ -20,14 +20,14 @@ const isInHandlerRect = (
   y >= handler[1] &&
   y <= handler[1] + handler[3];
 
-export function resizeTest(
+export const resizeTest = (
   element: ExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,
   zoom: number,
   pointerType: PointerType,
-): HandlerRectanglesRet | false {
+): HandlerRectanglesRet | false => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
   }
@@ -60,7 +60,7 @@ export function resizeTest(
   }
 
   return false;
-}
+};
 
 export const getElementWithResizeHandler = (
   elements: readonly ExcalidrawElement[],
@@ -77,12 +77,12 @@ export const getElementWithResizeHandler = (
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
 
-export function getResizeHandlerFromCoords(
+export const getResizeHandlerFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   { x, y }: { x: number; y: number },
   zoom: number,
   pointerType: PointerType,
-) {
+) => {
   const handlers = handlerRectanglesFromCoords(
     [x1, y1, x2, y2],
     0,
@@ -96,15 +96,15 @@ export function getResizeHandlerFromCoords(
     return handler && isInHandlerRect(handler, x, y);
   });
   return (found || false) as HandlerRectanglesRet;
-}
+};
 
 /*
  * Returns bi-directional cursor for the element being resized
  */
-export function getCursorForResizingElement(resizingElement: {
+export const getCursorForResizingElement = (resizingElement: {
   element?: ExcalidrawElement;
   resizeHandle: ReturnType<typeof resizeTest>;
-}): string {
+}): string => {
   const { element, resizeHandle } = resizingElement;
   const shouldSwapCursors =
     element && Math.sign(element.height) * Math.sign(element.width) === -1;
@@ -141,12 +141,12 @@ export function getCursorForResizingElement(resizingElement: {
   }
 
   return cursor ? `${cursor}-resize` : "";
-}
+};
 
-export function normalizeResizeHandle(
+export const normalizeResizeHandle = (
   element: ExcalidrawElement,
   resizeHandle: HandlerRectanglesRet,
-): HandlerRectanglesRet {
+): HandlerRectanglesRet => {
   if ((element.width >= 0 && element.height >= 0) || isLinearElement(element)) {
     return resizeHandle;
   }
@@ -195,4 +195,4 @@ export function normalizeResizeHandle(
   }
 
   return resizeHandle;
-}
+};

@@ -52,7 +52,7 @@ export const LayerUI = React.memo(
   }: LayerUIProps) => {
     const isMobile = useIsMobile();
 
-    function renderExportDialog() {
+    const renderExportDialog = () => {
       const createExporter = (type: ExportType): ExportCB => (
         exportedElements,
         scale,
@@ -90,7 +90,7 @@ export const LayerUI = React.memo(
           }}
         />
       );
-    }
+    };
 
     return isMobile ? (
       <MobileMenu
