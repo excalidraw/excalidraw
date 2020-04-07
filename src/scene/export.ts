@@ -54,6 +54,7 @@ export const exportToCanvas = (
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
+      remotePointerUsernames: {},
     },
     {
       renderScrollbars: false,

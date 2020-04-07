@@ -54,6 +54,7 @@ export type SocketUpdateDataSource = {
       pointerCoords: { x: number; y: number };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
+      username: string;
     };
   };
 };
