@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Συντομεύσεις πληκτρολογίου",
     "shapes": "Σχήματα",
+    "or": "ή",
     "curvedArrow": "Κυρτό βέλος",
     "curvedLine": "Κυρτή γραμμή",
     "editor": "Επεξεργαστής",
