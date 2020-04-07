@@ -46,7 +46,8 @@
     "actions": "Aktionen",
     "language": "Sprache",
     "createRoom": "Live-Kollaborationssitzung teilen",
-    "duplicateSelection": "Duplizieren"
+    "duplicateSelection": "Duplizieren",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
