@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Tastatursnarveier",
     "shapes": "Figurer",
+    "or": "",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "editor": "Redigering",
