@@ -71,7 +71,8 @@
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
