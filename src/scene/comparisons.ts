@@ -15,13 +15,13 @@ export const hasStroke = (type: string) =>
 
 export const hasText = (type: string) => type === "text";
 
-export function getElementAtPosition(
+export const getElementAtPosition = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   x: number,
   y: number,
   zoom: number,
-) {
+) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
@@ -35,13 +35,13 @@ export function getElementAtPosition(
   }
 
   return hitElement;
-}
+};
 
-export function getElementContainingPosition(
+export const getElementContainingPosition = (
   elements: readonly ExcalidrawElement[],
   x: number,
   y: number,
-) {
+) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
@@ -55,4 +55,4 @@ export function getElementContainingPosition(
     }
   }
   return hitElement;
-}
+};

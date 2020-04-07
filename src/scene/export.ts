@@ -6,7 +6,9 @@ import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 
-export function exportToCanvas(
+export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+
+export const exportToCanvas = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   {
@@ -29,7 +31,7 @@ export function exportToCanvas(
     tempCanvas.height = height * scale;
     return tempCanvas;
   },
-) {
+) => {
   // calculate smallest area to fit the contents in
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX) + exportPadding * 2;
@@ -60,9 +62,9 @@ export function exportToCanvas(
     },
   );
   return tempCanvas;
-}
+};
 
-export function exportToSvg(
+export const exportToSvg = (
   elements: readonly ExcalidrawElement[],
   {
     exportBackground,
@@ -73,7 +75,7 @@ export function exportToSvg(
     exportPadding?: number;
     viewBackgroundColor: string;
   },
-): SVGSVGElement {
+): SVGSVGElement => {
   // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX) + exportPadding * 2;
@@ -86,6 +88,7 @@ export function exportToSvg(
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
   svgRoot.innerHTML = `
+  ${SVG_EXPORT_TAG}
   <defs>
     <style>
       @font-face {
@@ -117,4 +120,4 @@ export function exportToSvg(
     offsetY: -minY + exportPadding,
   });
   return svgRoot;
-}
+};

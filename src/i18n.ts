@@ -33,18 +33,18 @@ export const languages = [
 let currentLanguage = languages[0];
 const fallbackLanguage = languages[0];
 
-export function setLanguage(newLng: string | undefined) {
+export const setLanguage = (newLng: string | undefined) => {
   currentLanguage =
     languages.find((language) => language.lng === newLng) || fallbackLanguage;
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
-}
+};
 
 export const getLanguage = () => currentLanguage;
 
-function findPartsForData(data: any, parts: string[]) {
+const findPartsForData = (data: any, parts: string[]) => {
   for (var i = 0; i < parts.length; ++i) {
     const part = parts[i];
     if (data[part] === undefined) {
@@ -56,9 +56,9 @@ function findPartsForData(data: any, parts: string[]) {
     return undefined;
   }
   return data;
-}
+};
 
-export function t(path: string, replacement?: { [key: string]: string }) {
+export const t = (path: string, replacement?: { [key: string]: string }) => {
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLanguage.data, parts) ||
@@ -73,7 +73,7 @@ export function t(path: string, replacement?: { [key: string]: string }) {
     }
   }
   return translation;
-}
+};
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({

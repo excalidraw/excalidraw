@@ -1,5 +1,6 @@
 import { FlooredNumber } from "./types";
 import { getZoomOrigin } from "./scene";
+import { CURSOR_TYPE } from "./constants";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -134,6 +135,14 @@ export const resetCursor = () => {
   document.documentElement.style.cursor = "";
 };
 
+export function setCursorForShape(shape: string) {
+  if (shape === "selection") {
+    resetCursor();
+  } else {
+    document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+  }
+}
+
 export const isFullScreen = () =>
   document.fullscreenElement?.nodeName === "HTML";
 
@@ -142,17 +151,17 @@ export const allowFullScreen = () =>
 
 export const exitFullScreen = () => document.exitFullscreen();
 
-export const getShortcutKey = (shortcut: string, prefix = " — "): string => {
+export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
-    return `${prefix}${shortcut
+    return `${shortcut
       .replace("CtrlOrCmd+", "⌘")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
       .replace("Shift+", "⇧")
       .replace("Del", "⌫")}`;
   }
-  return `${prefix}${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },

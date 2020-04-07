@@ -3,7 +3,14 @@ import { RoughSVG } from "roughjs/bin/svg";
 
 import { FlooredNumber, AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords, handlerRectangles } from "../element";
+import {
+  getElementAbsoluteCoords,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+  getCommonBounds,
+  canResizeMutlipleElements,
+} from "../element";
 
 import { roundRect } from "./roundRect";
 import { SceneState } from "../scene/types";
@@ -263,6 +270,56 @@ export function renderScene(
         }
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
+    } else if (locallySelectedElements.length > 1) {
+      if (canResizeMutlipleElements(locallySelectedElements)) {
+        const dashedLinePadding = 4 / sceneState.zoom;
+        context.translate(sceneState.scrollX, sceneState.scrollY);
+        context.fillStyle = "#fff";
+        const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
+        const initialLineDash = context.getLineDash();
+        context.setLineDash([2 / sceneState.zoom]);
+        const lineWidth = context.lineWidth;
+        context.lineWidth = 1 / sceneState.zoom;
+        strokeRectWithRotation(
+          context,
+          x1 - dashedLinePadding,
+          y1 - dashedLinePadding,
+          x2 - x1 + dashedLinePadding * 2,
+          y2 - y1 + dashedLinePadding * 2,
+          (x1 + x2) / 2,
+          (y1 + y2) / 2,
+          0,
+        );
+        context.lineWidth = lineWidth;
+        context.setLineDash(initialLineDash);
+        const handlers = handlerRectanglesFromCoords(
+          [x1, y1, x2, y2],
+          0,
+          sceneState.zoom,
+          undefined,
+          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+        );
+        Object.keys(handlers).forEach((key) => {
+          const handler = handlers[key as HandlerRectanglesRet];
+          if (handler !== undefined) {
+            const lineWidth = context.lineWidth;
+            context.lineWidth = 1 / sceneState.zoom;
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              0,
+              true, // fill before stroke
+            );
+            context.lineWidth = lineWidth;
+          }
+        });
+        context.translate(-sceneState.scrollX, -sceneState.scrollY);
+      }
     }
   }
 

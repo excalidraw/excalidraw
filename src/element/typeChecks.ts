@@ -5,8 +5,10 @@ import {
 } from "./types";
 
 export const isTextElement = (
-  element: ExcalidrawElement,
-): element is ExcalidrawTextElement => element.type === "text";
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextElement => {
+  return element != null && element.type === "text";
+};
 
 export const isLinearElement = (
   element?: ExcalidrawElement | null,

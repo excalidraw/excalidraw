@@ -42,39 +42,39 @@ const pointerDown = (
   });
 };
 
-function pointer2Down(clientX: number, clientY: number) {
+const pointer2Down = (clientX: number, clientY: number) => {
   fireEvent.pointerDown(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointer2Move(clientX: number, clientY: number) {
+const pointer2Move = (clientX: number, clientY: number) => {
   fireEvent.pointerMove(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointer2Up(clientX: number, clientY: number) {
+const pointer2Up = (clientX: number, clientY: number) => {
   fireEvent.pointerUp(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointerMove(
+const pointerMove = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerMove(canvas, {
@@ -85,7 +85,7 @@ function pointerMove(
     pointerId: 1,
     pointerType,
   });
-}
+};
 
 const pointerUp = (
   clientX: number = lastClientX,
@@ -108,47 +108,47 @@ const hotkeyUp = (key: Key) => {
   });
 };
 
-function keyDown(
+const keyDown = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   fireEvent.keyDown(document, { key, ctrlKey, shiftKey });
-}
+};
 
-function keyUp(
+const keyUp = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   fireEvent.keyUp(document, {
     key,
     ctrlKey,
     shiftKey,
   });
-}
+};
 
-function hotkeyPress(key: Key) {
+const hotkeyPress = (key: Key) => {
   hotkeyDown(key);
   hotkeyUp(key);
-}
+};
 
-function keyPress(
+const keyPress = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   keyDown(key, ctrlKey, shiftKey);
   keyUp(key, ctrlKey, shiftKey);
-}
+};
 
-function clickLabeledElement(label: string) {
+const clickLabeledElement = (label: string) => {
   const element = document.querySelector(`[aria-label='${label}']`);
   if (!element) {
     throw new Error(`No labeled element found: ${label}`);
   }
   fireEvent.click(element);
-}
+};
 
 function getSelectedElement(): ExcalidrawElement {
   const selectedElements = h.elements.filter(
@@ -162,12 +162,13 @@ function getSelectedElement(): ExcalidrawElement {
   return selectedElements[0];
 }
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 function getResizeHandles() {
-  const rects = handlerRectangles(
-    getSelectedElement(),
-    h.state.zoom,
-    pointerType,
-  );
+  const rects =
+    handlerRectangles(getSelectedElement(), h.state.zoom, pointerType) as
+    {
+      [T in HandlerRectanglesRet]: [number, number, number, number];
+    };
 
   const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
 

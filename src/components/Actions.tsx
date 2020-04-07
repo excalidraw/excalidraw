@@ -6,8 +6,7 @@ import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString, getShortcutKey } from "../utils";
-import { CURSOR_TYPE } from "../constants";
+import { capitalizeString, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 
@@ -90,39 +89,41 @@ export const ShapesSwitcher = ({
   setAppState: any;
   setElements: any;
   elements: readonly ExcalidrawElement[];
-}) => (
-  <>
-    {SHAPES.map(({ value, icon }, index) => {
-      const label = t(`toolBar.${value}`);
-      const shortcut = getShortcutKey(
-        `${capitalizeString(value)[0]}, ${index + 1}`,
-      );
-      return (
-        <ToolButton
-          key={value}
-          type="radio"
-          icon={icon}
-          checked={elementType === value}
-          name="editor-current-shape"
-          title={`${capitalizeString(label)} ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={`${label[0]} ${index + 1}`}
-          onChange={() => {
-            setAppState({
-              elementType: value,
-              multiElement: null,
-              selectedElementIds: {},
-            });
-            document.documentElement.style.cursor =
-              value === "text" ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR;
-            setAppState({});
-          }}
-        ></ToolButton>
-      );
-    })}
-  </>
-);
+}) => {
+  return (
+    <>
+      {SHAPES.map(({ value, icon }, index) => {
+        const label = t(`toolBar.${value}`);
+        const shortcut = `${capitalizeString(value)[0]} ${t(
+          "shortcutsDialog.or",
+        )} ${index + 1}`;
+        return (
+          <ToolButton
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(label)} — ${shortcut}`}
+            keyBindingLabel={`${index + 1}`}
+            aria-label={capitalizeString(label)}
+            aria-keyshortcuts={`${label[0]} ${index + 1}`}
+            data-testid={value}
+            onChange={() => {
+              setAppState({
+                elementType: value,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+              setCursorForShape(value);
+              setAppState({});
+            }}
+          ></ToolButton>
+        );
+      })}
+    </>
+  );
+};
 
 export const ZoomActions = ({
   renderAction,

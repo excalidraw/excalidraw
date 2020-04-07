@@ -53,13 +53,13 @@ export const rotate = (
     (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2,
   ];
 
-export function adjustXYWithRotation(
+export const adjustXYWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   position: { x: number; y: number },
   deltaX: number,
   deltaY: number,
   angle: number,
-) {
+) => {
   let { x, y } = position;
   if (side === "e" || side === "ne" || side === "se") {
     x -= (deltaX / 2) * (1 - Math.cos(angle));
@@ -78,7 +78,7 @@ export function adjustXYWithRotation(
     y += (deltaY / 2) * (1 + Math.cos(angle));
   }
   return { x, y };
-}
+};
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;

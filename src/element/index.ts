@@ -15,13 +15,21 @@ export {
   getLinearElementAbsoluteBounds,
 } from "./bounds";
 
-export { handlerRectangles } from "./handlerRectangles";
+export {
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+} from "./handlerRectangles";
 export { hitTest } from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,
   normalizeResizeHandle,
+  getElementWithResizeHandler,
+  getResizeHandlerFromCoords,
 } from "./resizeTest";
+export type { ResizeArrowFnType } from "./resizeElements";
+export { resizeElements, canResizeMutlipleElements } from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
