@@ -205,9 +205,9 @@ export const getElementBounds = (
   return [minX, minY, maxX, maxY];
 };
 
-export function getCommonBounds(
+export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
