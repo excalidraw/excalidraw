@@ -72,7 +72,7 @@
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
-    "showShortcuts": ""
+    "showShortcuts": "显示快捷方式"
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -134,9 +134,9 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
-    "or": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "or": "或者",
+    "curvedArrow": "曲线（带有箭头）",
+    "curvedLine": "曲线（无箭头）",
     "editor": "编辑者",
     "view": "视图",
     "blog": "浏览我们的博客",
