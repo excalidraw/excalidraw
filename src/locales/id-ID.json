@@ -4,6 +4,7 @@
     "selectAll": "Pilih Semua",
     "copy": "Salin",
     "copyAsPng": "",
+    "copyAsSvg": "",
     "bringForward": "Memajukan",
     "sendToBack": "Bawa ke Belakang",
     "bringToFront": "Bawa ke Depan",
@@ -69,7 +70,8 @@
     "undo": "Urungkan",
     "redo": "Mengulang",
     "roomDialog": "",
-    "createNewRoom": ""
+    "createNewRoom": "",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

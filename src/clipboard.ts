@@ -1,6 +1,7 @@
 import { ExcalidrawElement } from "./element/types";
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
+import { SVG_EXPORT_TAG } from "./scene/export";
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -39,6 +40,10 @@ export async function copyToAppClipboard(
 export function getAppClipboard(): {
   elements?: readonly ExcalidrawElement[];
 } {
+  if (!CLIPBOARD) {
+    return {};
+  }
+
   try {
     const clipboardElements = JSON.parse(CLIPBOARD);
 
@@ -68,7 +73,7 @@ export async function getClipboardContent(
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    if (text && !PREFER_APP_CLIPBOARD) {
+    if (text && !PREFER_APP_CLIPBOARD && !text.includes(SVG_EXPORT_TAG)) {
       return { text };
     }
   } catch (error) {

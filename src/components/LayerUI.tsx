@@ -202,6 +202,7 @@ export const LayerUI = React.memo(
             languages={languages}
             floating
           />
+          {actionManager.renderAction("toggleShortcuts")}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
