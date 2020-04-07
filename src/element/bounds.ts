@@ -188,9 +188,26 @@ export function getArrowPoints(
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getCommonBounds(
+export const getElementBounds = (
+  element: ExcalidrawElement,
+): [number, number, number, number] => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+  const minX = Math.min(x11, x12, x22, x21);
+  const minY = Math.min(y11, y12, y22, y21);
+  const maxX = Math.max(x11, x12, x22, x21);
+  const maxY = Math.max(y11, y12, y22, y21);
+  return [minX, minY, maxX, maxY];
+};
+
+export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
@@ -201,19 +218,12 @@ export function getCommonBounds(
   let maxY = -Infinity;
 
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const angle = element.angle;
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    const [x11, y11] = rotate(x1, y1, cx, cy, angle);
-    const [x12, y12] = rotate(x1, y2, cx, cy, angle);
-    const [x22, y22] = rotate(x2, y2, cx, cy, angle);
-    const [x21, y21] = rotate(x2, y1, cx, cy, angle);
-    minX = Math.min(minX, x11, x12, x22, x21);
-    minY = Math.min(minY, y11, y12, y22, y21);
-    maxX = Math.max(maxX, x11, x12, x22, x21);
-    maxY = Math.max(maxY, y11, y12, y22, y21);
+    const [x1, y1, x2, y2] = getElementBounds(element);
+    minX = Math.min(minX, x1);
+    minY = Math.min(minY, y1);
+    maxX = Math.max(maxX, x2);
+    maxY = Math.max(maxY, y2);
   });
 
   return [minX, minY, maxX, maxY];
-}
+};

@@ -11,14 +11,19 @@ import { AppState } from "../types";
 
 function RoomModal({
   activeRoomLink,
+  username,
+  onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
 }: {
   activeRoomLink: string;
+  username: string;
+  onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
   const roomLinkInput = useRef<HTMLInputElement>(null);
+
   function copyRoomLink() {
     copyTextToSystemClipboard(activeRoomLink);
     if (roomLinkInput.current) {
@@ -71,6 +76,17 @@ function RoomModal({
               onPointerDown={selectInput}
             />
           </div>
+          <div className="RoomDialog-usernameContainer">
+            <label className="RoomDialog-usernameLabel" htmlFor="username">
+              Username:
+            </label>
+            <input
+              id="username"
+              value={username || ""}
+              className="RoomDialog-username"
+              onChange={(event) => onUsernameChange(event.target.value)}
+            />
+          </div>
           <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
           <p>
             <span role="img" aria-hidden="true">
@@ -99,11 +115,15 @@ function RoomModal({
 export function RoomDialog({
   isCollaborating,
   collaboratorCount,
+  username,
+  onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
 }: {
   isCollaborating: AppState["isCollaborating"];
   collaboratorCount: number;
+  username: string;
+  onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
 }) {
@@ -149,6 +169,8 @@ export function RoomDialog({
         >
           <RoomModal
             activeRoomLink={activeRoomLink}
+            username={username}
+            onUsernameChange={onUsernameChange}
             onRoomCreate={onRoomCreate}
             onRoomDestroy={onRoomDestroy}
           />
