@@ -134,6 +134,7 @@
   "shortcutsDialog": {
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
+    "or": "",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "editor": "Edytor",
