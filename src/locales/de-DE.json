@@ -71,7 +71,8 @@
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
-    "toggleFullScreen": "Vollbildmodus umschalten"
+    "toggleFullScreen": "Vollbildmodus umschalten",
+    "showShortcuts": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
