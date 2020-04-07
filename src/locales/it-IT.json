@@ -46,7 +46,8 @@
     "actions": "",
     "language": "Lingua",
     "createRoom": "Condividi una sessione di collaborazione in diretta",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
