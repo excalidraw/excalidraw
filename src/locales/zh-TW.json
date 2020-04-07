@@ -4,6 +4,7 @@
     "selectAll": "選擇全部",
     "copy": "複製",
     "copyAsPng": "複製為 PNG 到剪貼板",
+    "copyAsSvg": "",
     "bringForward": "往前移動一層",
     "sendToBack": "移動至最底層",
     "bringToFront": "移動至最上層",
@@ -69,7 +70,8 @@
     "undo": "復原",
     "redo": "重做",
     "roomDialog": "分享即時協作會議",
-    "createNewRoom": "建立新的會議室"
+    "createNewRoom": "建立新的會議室",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

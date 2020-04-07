@@ -23,6 +23,7 @@ import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
+import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 
 interface LayerUIProps {
@@ -112,6 +113,11 @@ export const LayerUI = React.memo(
             onClose={() => setAppState({ errorMessage: null })}
           />
         )}
+        {appState.showShortcutsDialog && (
+          <ShortcutsDialog
+            onClose={() => setAppState({ showShortcutsDialog: null })}
+          />
+        )}
         <FixedSideContainer side="top">
           <HintViewer appState={appState} elements={elements} />
           <div className="App-menu App-menu_top">
@@ -127,6 +133,12 @@ export const LayerUI = React.memo(
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
+                        username={appState.username}
+                        onUsernameChange={(username) => {
+                          setAppState({
+                            username,
+                          });
+                        }}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
@@ -196,6 +208,7 @@ export const LayerUI = React.memo(
             languages={languages}
             floating
           />
+          {actionManager.renderAction("toggleShortcuts")}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"

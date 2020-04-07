@@ -4,6 +4,7 @@
     "selectAll": "Alle auswählen",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage als PNG kopieren",
+    "copyAsSvg": "",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
@@ -69,7 +70,8 @@
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
-    "createNewRoom": "Neuen Raum erstellen"
+    "createNewRoom": "Neuen Raum erstellen",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Fehler"
+  },
+  "shortcutsDialog": {
+    "title": "Tastaturkürzel",
+    "shapes": "Formen",
+    "editor": "Editor",
+    "view": "Ansicht",
+    "blog": "Unseren Blog lesen",
+    "howto": "Folgen Sie unseren Anleitungen",
+    "github": "Ein Problem gefunden? Informieren Sie uns"
   }
 }

@@ -4,6 +4,7 @@
     "selectAll": "Velg alt",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
+    "copyAsSvg": "Kopier til utklippstavlen som SVG",
     "bringForward": "Flytt framover",
     "sendToBack": "Flytt bakover",
     "bringToFront": "Flytt forrest",
@@ -44,7 +45,7 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
-    "createRoom": "",
+    "createRoom": "Del en sanntids-samarbeidsøkt",
     "duplicateSelection": "Dupliser valgte elementer"
   },
   "buttons": {
@@ -68,8 +69,9 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
-    "roomDialog": "",
-    "createNewRoom": "Opprett et nytt rom"
+    "roomDialog": "Start sanntids-samarbeid",
+    "createNewRoom": "Opprett et nytt rom",
+    "toggleFullScreen": "Skru fullskjerm av/på"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -110,22 +112,31 @@
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
     "trackedToSentry_pre": "Feilen med identifikator ",
     "trackedToSentry_post": " ble logget i vårt system.",
-    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp på vår ",
+    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp i vårt ",
     "openIssueMessage_button": "feilrapporteringssystem.",
     "openIssueMessage_post": " Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
-    "sceneContent": ""
+    "sceneContent": "Scene-innhold:"
   },
   "roomDialog": {
     "desc_intro": "Du kan invitere personer til scenen din for å samarbeide med deg.",
     "desc_privacy": "Ta det med ro, sesjonen bruker ende-til-ende-kryptering, så alt du tegner forblir privat. Ikke en gang serveren vår kan se hva du lager.",
-    "button_startSession": "Start sesjon",
+    "button_startSession": "Start økt",
     "button_stopSession": "Stopp sesjon",
-    "desc_inProgressIntro": "",
-    "desc_persistenceWarning": "",
+    "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
+    "desc_persistenceWarning": "Vær oppmerksom på at scene-data deles på tvers av samarbeidspartnere på en P2P-måte, og ikke vedvarende på serveren vår. Dette betyr at hvis alle kobler fra, mister du dataene med mindre du eksporterer dem til en fil eller en delbar link.",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Når du avslutter økten, frakobles du fra rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt være i stand til å samarbeide på deres versjon."
   },
   "errorDialog": {
     "title": "Feil"
+  },
+  "shortcutsDialog": {
+    "title": "Tastatursnarveier",
+    "shapes": "Figurer",
+    "editor": "Redigering",
+    "view": "Visning",
+    "blog": "Les bloggen vår",
+    "howto": "Følg våre veiledninger",
+    "github": "Funnet et problem? Send inn"
   }
 }

@@ -90,6 +90,8 @@ export function MobileMenu({
                   <RoomDialog
                     isCollaborating={appState.isCollaborating}
                     collaboratorCount={appState.collaborators.size}
+                    username={appState.username}
+                    onUsernameChange={(username) => setAppState({ username })}
                     onRoomCreate={onRoomCreate}
                     onRoomDestroy={onRoomDestroy}
                   />

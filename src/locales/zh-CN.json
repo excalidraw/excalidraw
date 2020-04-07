@@ -4,6 +4,7 @@
     "selectAll": "全选",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
+    "copyAsSvg": "复制为 SVG 到剪贴板",
     "bringForward": "上移一层",
     "sendToBack": "移至最后",
     "bringToFront": "移至最前",
@@ -15,7 +16,7 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
-    "sloppiness": "倾斜",
+    "sloppiness": "边框",
     "opacity": "透明度",
     "fontSize": "字体大小",
     "fontFamily": "字体",
@@ -29,20 +30,20 @@
     "large": "大号",
     "veryLarge": "极大",
     "solid": "实心",
-    "hachure": "",
-    "crossHatch": "",
+    "hachure": "线条",
+    "crossHatch": "交叉线条",
     "thin": "细",
     "bold": "加粗",
     "extraBold": "特粗",
-    "architect": "",
-    "artist": "",
-    "cartoonist": "",
+    "architect": "朴素",
+    "artist": "艺术",
+    "cartoonist": "漫画",
     "fileTitle": "文件名",
     "colorPicker": "调色盘",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
-    "actions": "",
+    "actions": "操作",
     "language": "语言",
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素"
@@ -53,7 +54,7 @@
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
-    "copyPngToClipboard": "",
+    "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
@@ -69,12 +70,13 @@
     "undo": "撤销",
     "redo": "重做",
     "roomDialog": "开始实时协作",
-    "createNewRoom": "新建会议室"
+    "createNewRoom": "新建会议室",
+    "toggleFullScreen": "切换全屏显示"
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
     "couldNotCreateShareableLink": "无法创建共享链接",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "无法加载无效文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白的 canvas。",
     "couldNotCopyToClipboard": "无法复制到剪贴板。 请使用 Chrome 浏览器。",
@@ -92,27 +94,27 @@
     "lock": "绘制后保持所选的工具栏状态"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
+    "canvasActions": "画布动作",
+    "selectedShapeActions": "选定形状操作",
     "shapes": "形状"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
-    "resize": "",
-    "rotate": ""
+    "linearElement": "点击创建多个点 拖动创建直线",
+    "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
+    "resize": "调整大小时可以按住 Shift 来约束比例",
+    "rotate": "旋转时可以按住 Shift 来约束角度"
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试 ",
     "headingMain_button": "重新加载页面。",
     "clearCanvasMessage": "如果重新加载页面无效, 请尝试 ",
     "clearCanvasMessage_button": "清除画布。",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "clearCanvasCaveat": " 这会造成当前工作丢失 ",
+    "trackedToSentry_pre": "带有标识符的错误 ",
+    "trackedToSentry_post": " 已在我们的系统中跟踪",
+    "openIssueMessage_pre": "我们非常谨慎地不将您的场景信息包含在错误信息中。如果您的场景不是私密的，请考虑跟进我们的 ",
+    "openIssueMessage_button": "错误追踪器。",
+    "openIssueMessage_post": " 请复制并粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布 内容:"
   },
   "roomDialog": {
@@ -126,6 +128,15 @@
     "desc_exitSession": "停止会话将中断你在会议室的连接，但你依然可以在本地继续使用画布. 注意，这不会影响到其他用户, 他们仍可以在自己的版本上继续协作。"
   },
   "errorDialog": {
-    "title": ""
+    "title": "错误"
+  },
+  "shortcutsDialog": {
+    "title": "快捷键列表",
+    "shapes": "形状",
+    "editor": "编辑者",
+    "view": "视图",
+    "blog": "浏览我们的博客",
+    "howto": "跟随我们的指南",
+    "github": "发现问题？提交"
   }
 }

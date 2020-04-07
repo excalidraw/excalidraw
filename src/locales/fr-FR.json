@@ -4,6 +4,7 @@
     "selectAll": "Tout sélectionner",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
+    "copyAsSvg": "Copier dans le presse-papier en SVG",
     "bringForward": "Mettre en avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -69,7 +70,8 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
-    "createNewRoom": "Créer un nouveau salon"
+    "createNewRoom": "Créer un nouveau salon",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -127,5 +129,14 @@
   },
   "errorDialog": {
     "title": "Erreur"
+  },
+  "shortcutsDialog": {
+    "title": "Raccourcis clavier",
+    "shapes": "Formes",
+    "editor": "Éditeur",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }
