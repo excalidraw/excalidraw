@@ -372,10 +372,10 @@ button,
 .dropdown-select__language.dropdown-select--floating {
   bottom: 10px;
   :root[dir="ltr"] & {
-    right: 10px;
+    right: 44px;
   }
   :root[dir="rtl"] & {
-    left: 10px;
+    left: 44px;
   }
 }
 
@@ -408,6 +408,19 @@ button,
   bottom: 30px;
   transform: translateX(-50%);
   padding: 10px 20px;
+}
+
+.help-icon {
+  position: fixed;
+  cursor: pointer;
+  fill: #868e96;
+  bottom: 14px;
+  :root[dir="ltr"] & {
+    right: 14px;
+  }
+  :root[dir="rtl"] & {
+    left: 14px;
+  }
 }
 
 @media #{$media-query} {

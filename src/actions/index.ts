@@ -40,4 +40,5 @@ export {
   actionToggleCanvasMenu,
   actionToggleEditMenu,
   actionFullScreen,
+  actionShortcuts,
 } from "./actionMenu";
