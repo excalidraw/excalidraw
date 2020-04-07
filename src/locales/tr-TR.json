@@ -46,7 +46,8 @@
     "actions": "İşlemler",
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
