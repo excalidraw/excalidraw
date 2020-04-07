@@ -71,12 +71,12 @@
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "Attiva/Disattiva schermo intero"
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
@@ -101,8 +101,8 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "",
-    "rotate": ""
+    "resize": "Puoi mantenere le proporzioni tenendo premuto SHIFT durante il ridimensionamento",
+    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
@@ -111,7 +111,7 @@
     "clearCanvasMessage_button": "pulire la tela.",
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
     "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " è stato tracciato nel nostro sistema.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": "",
