@@ -10,21 +10,20 @@ export function setDateTimeForTests(dateTime: string) {
   mockDateTime = dateTime;
 }
 
-export function getDateTime() {
+export const getDateTime = () => {
   if (mockDateTime) {
     return mockDateTime;
   }
 
   const date = new Date();
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hr = date.getHours();
-  const min = date.getMinutes();
-  const secs = date.getSeconds();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const hr = `${date.getHours()}`.padStart(2, "0");
+  const min = `${date.getMinutes()}`.padStart(2, "0");
 
-  return `${year}${month}${day}${hr}${min}${secs}`;
-}
+  return `${year}-${month}-${day}-${hr}${min}`;
+};
 
 export function capitalizeString(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
