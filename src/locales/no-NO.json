@@ -46,7 +46,8 @@
     "actions": "Handlinger",
     "language": "Språk",
     "createRoom": "Del en sanntids-samarbeidsøkt",
-    "duplicateSelection": "Dupliser"
+    "duplicateSelection": "Dupliser",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
