@@ -3,6 +3,7 @@ import {
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  TextAlign,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -30,6 +31,7 @@ export type AppState = {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemFont: string;
+  currentItemTextAlign: TextAlign;
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
