@@ -3,7 +3,7 @@ import { DataState } from "./types";
 import { restore } from "./restore";
 import { t } from "../i18n";
 
-export async function loadFromBlob(blob: any) {
+export const loadFromBlob = async (blob: any) => {
   const updateAppState = (contents: string) => {
     const defaultAppState = getDefaultAppState();
     let elements = [];
@@ -45,4 +45,4 @@ export async function loadFromBlob(blob: any) {
   return new Promise<DataState>((resolve) => {
     resolve(restore(elements, appState, { scrollToContent: true }));
   });
-}
+};

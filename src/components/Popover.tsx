@@ -10,13 +10,13 @@ type Props = {
   fitInViewport?: boolean;
 };
 
-export function Popover({
+export const Popover = ({
   children,
   left,
   top,
   onCloseRequest,
   fitInViewport = false,
-}: Props) {
+}: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
 
   // ensure the popover doesn't overflow the viewport
@@ -53,4 +53,4 @@ export function Popover({
       {children}
     </div>
   );
-}
+};

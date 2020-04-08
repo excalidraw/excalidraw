@@ -90,24 +90,24 @@ async function generateEncryptionKey() {
   return (await window.crypto.subtle.exportKey("jwk", key)).k;
 }
 
-function createIV() {
+const createIV = () => {
   const arr = new Uint8Array(12);
   return window.crypto.getRandomValues(arr);
-}
+};
 
-export function getCollaborationLinkData(link: string) {
+export const getCollaborationLinkData = (link: string) => {
   if (link.length === 0) {
     return;
   }
   const hash = new URL(link).hash;
   return hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
-}
+};
 
-export async function generateCollaborationLink() {
+export const generateCollaborationLink = async () => {
   const id = await generateRandomID();
   const key = await generateEncryptionKey();
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
-}
+};
 
 const getImportedKey = async (key: string, usage: string): Promise<CryptoKey> =>
   await window.crypto.subtle.importKey(

@@ -6,10 +6,10 @@ import { restore } from "./restore";
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 
-export function saveToLocalStorage(
+export const saveToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   try {
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
@@ -23,9 +23,9 @@ export function saveToLocalStorage(
     // Unable to access window.localStorage
     console.error(error);
   }
-}
+};
 
-export function restoreFromLocalStorage() {
+export const restoreFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
 
@@ -59,4 +59,4 @@ export function restoreFromLocalStorage() {
   }
 
   return restore(elements, appState);
-}
+};

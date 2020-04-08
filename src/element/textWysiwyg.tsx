@@ -1,7 +1,7 @@
 import { KEYS } from "../keys";
 import { selectNode } from "../utils";
 
-function trimText(text: string) {
+const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
   if (!text.trim()) {
     return "";
@@ -10,7 +10,7 @@ function trimText(text: string) {
   //  box calculation (there's also a bug in FF which inserts trailing newline
   //  for multiline texts)
   return text.replace(/^\n+|\n+$/g, "");
-}
+};
 
 type TextWysiwygParams = {
   initText: string;
@@ -26,7 +26,7 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
-export function textWysiwyg({
+export const textWysiwyg = ({
   initText,
   x,
   y,
@@ -38,7 +38,7 @@ export function textWysiwyg({
   onChange,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams) => {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -104,6 +104,15 @@ export function textWysiwyg({
     };
   }
 
+  const handleSubmit = () => {
+    if (editable.innerText) {
+      onSubmit(trimText(editable.innerText));
+    } else {
+      onCancel();
+    }
+    cleanup();
+  };
+
   editable.onkeydown = (event) => {
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
@@ -125,20 +134,11 @@ export function textWysiwyg({
   };
   editable.onblur = handleSubmit;
 
-  function stopEvent(event: Event) {
+  const stopEvent = (event: Event) => {
     event.stopPropagation();
-  }
+  };
 
-  function handleSubmit() {
-    if (editable.innerText) {
-      onSubmit(trimText(editable.innerText));
-    } else {
-      onCancel();
-    }
-    cleanup();
-  }
-
-  function cleanup() {
+  const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.onpaste = null;
@@ -147,10 +147,10 @@ export function textWysiwyg({
 
     window.removeEventListener("wheel", stopEvent, true);
     document.body.removeChild(editable);
-  }
+  };
 
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
-}
+};

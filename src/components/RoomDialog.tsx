@@ -9,7 +9,7 @@ import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
 import { AppState } from "../types";
 
-function RoomModal({
+const RoomModal = ({
   activeRoomLink,
   username,
   onUsernameChange,
@@ -21,21 +21,21 @@ function RoomModal({
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
-}) {
+}) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
-  function copyRoomLink() {
+  const copyRoomLink = () => {
     copyTextToSystemClipboard(activeRoomLink);
     if (roomLinkInput.current) {
       roomLinkInput.current.select();
     }
-  }
-  function selectInput(event: React.MouseEvent<HTMLInputElement>) {
+  };
+  const selectInput = (event: React.MouseEvent<HTMLInputElement>) => {
     if (event.target !== document.activeElement) {
       event.preventDefault();
       (event.target as HTMLInputElement).select();
     }
-  }
+  };
 
   return (
     <div className="RoomDialog-modal">
@@ -110,9 +110,9 @@ function RoomModal({
       )}
     </div>
   );
-}
+};
 
-export function RoomDialog({
+export const RoomDialog = ({
   isCollaborating,
   collaboratorCount,
   username,
@@ -126,7 +126,7 @@ export function RoomDialog({
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
-}) {
+}) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const [activeRoomLink, setActiveRoomLink] = useState("");
 
@@ -178,4 +178,4 @@ export function RoomDialog({
       )}
     </>
   );
-}
+};

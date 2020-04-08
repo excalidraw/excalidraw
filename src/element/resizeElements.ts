@@ -92,7 +92,7 @@ const arrowResizeEnd: ResizeArrowFnType = (
   }
 };
 
-export function resizeElements(
+export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   appState: AppState,
@@ -104,7 +104,7 @@ export function resizeElements(
   y: number,
   lastX: number,
   lastY: number,
-) {
+) => {
   setAppState({
     isResizing: resizeHandle !== "rotation",
     isRotating: resizeHandle === "rotation",
@@ -448,7 +448,7 @@ export function resizeElements(
     }
   }
   return false;
-}
+};
 
 export const canResizeMutlipleElements = (
   elements: readonly ExcalidrawElement[],

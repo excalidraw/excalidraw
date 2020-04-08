@@ -65,12 +65,12 @@ export const newElement = (
 ): ExcalidrawGenericElement =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-export function newTextElement(
+export const newTextElement = (
   opts: {
     text: string;
     font: string;
   } & ElementConstructorOpts,
-): ExcalidrawTextElement {
+): ExcalidrawTextElement => {
   const { text, font } = opts;
   const metrics = measureText(text, font);
   const textElement = newElementWith(
@@ -90,7 +90,7 @@ export function newTextElement(
   );
 
   return textElement;
-}
+};
 
 export const newLinearElement = (
   opts: {
@@ -107,7 +107,7 @@ export const newLinearElement = (
 //  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
 // Adapted from https://github.com/lukeed/klona
-function _duplicateElement(val: any, depth: number = 0) {
+const _duplicateElement = (val: any, depth: number = 0) => {
   if (val == null || typeof val !== "object") {
     return val;
   }
@@ -139,12 +139,12 @@ function _duplicateElement(val: any, depth: number = 0) {
   }
 
   return val;
-}
+};
 
-export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
+export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   overrides?: Partial<TElement>,
-): TElement {
+): TElement => {
   let copy: TElement = _duplicateElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
@@ -152,4 +152,4 @@ export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
     copy = Object.assign(copy, overrides);
   }
   return copy;
-}
+};
