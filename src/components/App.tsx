@@ -1201,8 +1201,6 @@ export class App extends React.Component<any, AppState> {
               x: element.x,
               y: element.y,
               text,
-              font: this.state.currentItemFont,
-              textAlign: this.state.currentItemTextAlign,
             });
           }
           return _element;
