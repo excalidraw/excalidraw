@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Plak",
-    "selectAll": "Selecteer alles",
+    "selectAll": "Alles selecteren",
     "copy": "Kopieer",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
@@ -10,8 +10,8 @@
     "bringToFront": "Breng naar voorgrond",
     "sendBackward": "Breng naar achter",
     "delete": "Verwijderen",
-    "copyStyles": "Kopieer stijl",
-    "pasteStyles": "Plak stijl",
+    "copyStyles": "Stijl kopiëren",
+    "pasteStyles": "Stijl plakken",
     "stroke": "Lijn",
     "background": "Achtergrond",
     "fill": "Invulling",
@@ -28,7 +28,7 @@
     "small": "Klein",
     "medium": "Medium",
     "large": "Groot",
-    "veryLarge": "Zeer Groot",
+    "veryLarge": "Zeer groot",
     "solid": "Ingekleurd",
     "hachure": "Arcering",
     "crossHatch": "Tweemaal gearceerd",
@@ -46,7 +46,8 @@
     "actions": "Acties",
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
-    "duplicateSelection": "Dupliceer geselecteerde object"
+    "duplicateSelection": "Dupliceer",
+    "untitled": "Naamloos"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -133,6 +134,10 @@
   "shortcutsDialog": {
     "title": "Sneltoetsen",
     "shapes": "Vormen",
+    "or": "",
+    "click": "klik",
+    "curvedArrow": "Gebogen pijl",
+    "curvedLine": "Gebogen lijn",
     "editor": "Editor",
     "view": "Weergave",
     "blog": "Lees onze blog",
