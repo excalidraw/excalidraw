@@ -1,5 +1,6 @@
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
+import { t } from "./i18n";
 
 export const DEFAULT_FONT = "20px Virgil";
 
@@ -28,7 +29,7 @@ export function getDefaultAppState(): AppState {
     cursorY: 0,
     cursorButton: "up",
     scrolledOutside: false,
-    name: `excalidraw-${getDateTime()}`,
+    name: `${t("labels.untitled")}-${getDateTime()}`,
     username: "",
     isCollaborating: false,
     isResizing: false,
