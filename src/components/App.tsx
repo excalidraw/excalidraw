@@ -557,7 +557,7 @@ export class App extends React.Component<any, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    copyToAppClipboard(globalSceneState.getElements(), this.state);
+    this.copyAll();
     event.preventDefault();
   });
 
