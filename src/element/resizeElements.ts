@@ -3,7 +3,11 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 import { rotate, adjustXYWithRotation } from "../math";
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import {
+  ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+} from "./types";
 import { getElementAbsoluteCoords, getCommonBounds } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -17,7 +21,7 @@ import {
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
 export type ResizeArrowFnType = (
-  element: ExcalidrawLinearElement,
+  element: NonDeleted<ExcalidrawLinearElement>,
   pointIndex: number,
   deltaX: number,
   deltaY: number,
@@ -27,13 +31,13 @@ export type ResizeArrowFnType = (
 ) => void;
 
 const arrowResizeOrigin: ResizeArrowFnType = (
-  element: ExcalidrawLinearElement,
-  pointIndex: number,
-  deltaX: number,
-  deltaY: number,
-  pointerX: number,
-  pointerY: number,
-  perfect: boolean,
+  element,
+  pointIndex,
+  deltaX,
+  deltaY,
+  pointerX,
+  pointerY,
+  perfect,
 ) => {
   const [px, py] = element.points[pointIndex];
   let x = element.x + deltaX;
@@ -63,13 +67,13 @@ const arrowResizeOrigin: ResizeArrowFnType = (
 };
 
 const arrowResizeEnd: ResizeArrowFnType = (
-  element: ExcalidrawLinearElement,
-  pointIndex: number,
-  deltaX: number,
-  deltaY: number,
-  pointerX: number,
-  pointerY: number,
-  perfect: boolean,
+  element,
+  pointIndex,
+  deltaX,
+  deltaY,
+  pointerX,
+  pointerY,
+  perfect,
 ) => {
   const [px, py] = element.points[pointIndex];
   if (perfect) {
@@ -110,7 +114,7 @@ export function resizeElements(
     isRotating: resizeHandle === "rotation",
   });
   const selectedElements = getSelectedElements(
-    globalSceneState.getAllElements(),
+    globalSceneState.getElements(),
     appState,
   );
   if (selectedElements.length === 1) {
@@ -451,7 +455,7 @@ export function resizeElements(
 }
 
 export function canResizeMutlipleElements(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
 ) {
   return elements.every((element) =>
     ["rectangle", "diamond", "ellipse"].includes(element.type),

@@ -110,6 +110,7 @@
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
+    "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
     "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",

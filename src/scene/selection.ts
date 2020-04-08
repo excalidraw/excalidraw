@@ -1,11 +1,14 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 
 export function getElementsWithinSelection(
-  elements: readonly ExcalidrawElement[],
-  selection: ExcalidrawElement,
+  elements: readonly NonDeletedExcalidrawElement[],
+  selection: NonDeletedExcalidrawElement,
 ) {
   const [
     selectionX1,
@@ -47,7 +50,7 @@ export function deleteSelectedElements(
 }
 
 export function isSomeElementSelected(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ): boolean {
   return elements.some((element) => appState.selectedElementIds[element.id]);
@@ -58,7 +61,7 @@ export function isSomeElementSelected(
  *  elements. If elements don't share the same value, returns `null`.
  */
 export function getCommonAttributeOfSelectedElements<T>(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
 ): T | null {
@@ -73,14 +76,14 @@ export function getCommonAttributeOfSelectedElements<T>(
 }
 
 export function getSelectedElements(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-): readonly ExcalidrawElement[] {
+) {
   return elements.filter((element) => appState.selectedElementIds[element.id]);
 }
 
 export function getTargetElement(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) {
   return appState.editingElement

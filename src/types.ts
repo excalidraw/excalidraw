@@ -1,7 +1,8 @@
 import {
-  ExcalidrawElement,
   PointerType,
   ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -12,13 +13,13 @@ export type Point = Readonly<RoughPoint>;
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
-  draggingElement: ExcalidrawElement | null;
-  resizingElement: ExcalidrawElement | null;
-  multiElement: ExcalidrawLinearElement | null;
-  selectionElement: ExcalidrawElement | null;
+  draggingElement: NonDeletedExcalidrawElement | null;
+  resizingElement: NonDeletedExcalidrawElement | null;
+  multiElement: NonDeleted<ExcalidrawLinearElement> | null;
+  selectionElement: NonDeletedExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
-  editingElement: ExcalidrawElement | null;
+  editingElement: NonDeletedExcalidrawElement | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;

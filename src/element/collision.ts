@@ -6,7 +6,7 @@ import {
 } from "../math";
 import { getPointsOnBezierCurves } from "roughjs/bin/geometry";
 
-import { ExcalidrawElement } from "./types";
+import { NonDeletedExcalidrawElement } from "./types";
 
 import {
   getDiamondPoints,
@@ -20,7 +20,7 @@ import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 
 function isElementDraggableFromInside(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
 ): boolean {
   const dragFromInside =
@@ -33,7 +33,7 @@ function isElementDraggableFromInside(
 }
 
 export function hitTest(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,

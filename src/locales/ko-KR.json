@@ -3,8 +3,8 @@
     "paste": "붙여넣기",
     "selectAll": "전체 선택",
     "copy": "복사하기",
-    "copyAsPng": "클립보드로 이미지 복사",
-    "copyAsSvg": "",
+    "copyAsPng": "클립보드로 PNG 이미지 복사",
+    "copyAsSvg": "클립보드로 SVG 이미지 복사",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -46,7 +46,8 @@
     "actions": "",
     "language": "언어",
     "createRoom": "실시간 협업 세션 공유",
-    "duplicateSelection": "선택 영역 복제하기"
+    "duplicateSelection": "복제",
+    "untitled": "제목 없음"
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -54,7 +55,7 @@
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
-    "copyPngToClipboard": "클립보드로 이미지 복사",
+    "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "save": "저장",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
@@ -71,7 +72,7 @@
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "전체화면"
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -133,6 +134,10 @@
   "shortcutsDialog": {
     "title": "키보드 단축키",
     "shapes": "그리기",
+    "or": "또는",
+    "click": "클릭",
+    "curvedArrow": "곡선 화살표",
+    "curvedLine": "곡선",
     "editor": "편집",
     "view": "보기",
     "blog": "블로그 읽어보기",
