@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { isTextElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -24,7 +28,7 @@ export interface ExcalidrawElementWithCanvas {
 }
 
 function generateElementCanvas(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   zoom: number,
 ): ExcalidrawElementWithCanvas {
   const canvas = document.createElement("canvas");
@@ -72,7 +76,7 @@ function generateElementCanvas(
 }
 
 function drawElementOnCanvas(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
 ) {
@@ -133,7 +137,7 @@ export function invalidateShapeForElement(element: ExcalidrawElement) {
 }
 
 function generateElement(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
   sceneState?: SceneState,
 ) {
@@ -285,7 +289,7 @@ function drawElementFromCanvas(
 }
 
 export function renderElement(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
@@ -342,7 +346,7 @@ export function renderElement(
 }
 
 export function renderElementToSvg(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   offsetX?: number,

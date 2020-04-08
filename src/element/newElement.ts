@@ -3,6 +3,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
+  NonDeleted,
 } from "../element/types";
 import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -56,7 +57,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
-    isDeleted: rest.isDeleted ?? false,
+    isDeleted: false as false,
   };
 }
 
@@ -64,7 +65,7 @@ export function newElement(
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): ExcalidrawGenericElement {
+): NonDeleted<ExcalidrawGenericElement> {
   return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 }
 
@@ -73,13 +74,12 @@ export function newTextElement(
     text: string;
     font: string;
   } & ElementConstructorOpts,
-): ExcalidrawTextElement {
+): NonDeleted<ExcalidrawTextElement> {
   const { text, font } = opts;
   const metrics = measureText(text, font);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      isDeleted: false,
       text: text,
       font: font,
       // Center the text
@@ -100,7 +100,7 @@ export function newLinearElement(
     type: ExcalidrawLinearElement["type"];
     lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
-): ExcalidrawLinearElement {
+): NonDeleted<ExcalidrawLinearElement> {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],

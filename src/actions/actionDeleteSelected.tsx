@@ -5,6 +5,7 @@ import React from "react";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
+import { getNonDeletedElements } from "../element";
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
@@ -20,7 +21,10 @@ export const actionDeleteSelected = register({
         elementType: "selection",
         multiElement: null,
       },
-      commitToHistory: isSomeElementSelected(elements, appState),
+      commitToHistory: isSomeElementSelected(
+        getNonDeletedElements(elements),
+        appState,
+      ),
     };
   },
   contextItemLabel: "labels.delete",
@@ -33,7 +37,7 @@ export const actionDeleteSelected = register({
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(elements, appState)}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });

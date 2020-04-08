@@ -2,7 +2,7 @@ import React from "react";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
-import { duplicateElement } from "../element";
+import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { clone } from "../components/icons";
@@ -43,7 +43,7 @@ export const actionDuplicateSelection = register({
       )}`}
       aria-label={t("labels.duplicateSelection")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(elements, appState)}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
