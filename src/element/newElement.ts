@@ -4,6 +4,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
   NonDeleted,
+  TextAlign,
 } from "../element/types";
 import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -73,15 +74,16 @@ export function newTextElement(
   opts: {
     text: string;
     font: string;
+    textAlign: TextAlign;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> {
-  const { text, font } = opts;
-  const metrics = measureText(text, font);
+  const metrics = measureText(opts.text, opts.font);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text: text,
-      font: font,
+      text: opts.text,
+      font: opts.font,
+      textAlign: opts.textAlign,
       // Center the text
       x: opts.x - metrics.width / 2,
       y: opts.y - metrics.height / 2,
