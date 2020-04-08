@@ -150,7 +150,7 @@ const clickLabeledElement = (label: string) => {
   fireEvent.click(element);
 };
 
-function getSelectedElement(): ExcalidrawElement {
+const getSelectedElement = (): ExcalidrawElement => {
   const selectedElements = h.elements.filter(
     (element) => h.state.selectedElementIds[element.id],
   );
@@ -160,10 +160,10 @@ function getSelectedElement(): ExcalidrawElement {
     );
   }
   return selectedElements[0];
-}
+};
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-function getResizeHandles() {
+const getResizeHandles = () => {
   const rects =
     handlerRectangles(getSelectedElement(), h.state.zoom, pointerType) as
     {
@@ -179,14 +179,14 @@ function getResizeHandles() {
   }
 
   return rv;
-}
+};
 
 /**
  * This is always called at the end of your test, so usually you don't need to call it.
  * However, if you have a long test, you might want to call it during the test so it's easier
  * to debug where a test failure came from.
  */
-function checkpoint(name: string) {
+const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
@@ -196,7 +196,7 @@ function checkpoint(name: string) {
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
-}
+};
 
 beforeEach(() => {
   // Unmount ReactDOM from root

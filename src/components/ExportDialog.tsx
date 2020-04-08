@@ -24,7 +24,7 @@ export type ExportCB = (
   scale?: number,
 ) => void;
 
-function ExportModal({
+const ExportModal = ({
   elements,
   appState,
   exportPadding = 10,
@@ -43,7 +43,7 @@ function ExportModal({
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
-}) {
+}) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
@@ -153,9 +153,9 @@ function ExportModal({
       </Stack.Col>
     </div>
   );
-}
+};
 
-export function ExportDialog({
+export const ExportDialog = ({
   elements,
   appState,
   exportPadding = 10,
@@ -173,7 +173,7 @@ export function ExportDialog({
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
-}) {
+}) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
 
@@ -214,4 +214,4 @@ export function ExportDialog({
       )}
     </>
   );
-}
+};

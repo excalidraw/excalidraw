@@ -134,13 +134,13 @@ export const resetCursor = () => {
   document.documentElement.style.cursor = "";
 };
 
-export function setCursorForShape(shape: string) {
+export const setCursorForShape = (shape: string) => {
   if (shape === "selection") {
     resetCursor();
   } else {
     document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
-}
+};
 
 export const isFullScreen = () =>
   document.fullscreenElement?.nodeName === "HTML";

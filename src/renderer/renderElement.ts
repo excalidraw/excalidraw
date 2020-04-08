@@ -23,10 +23,10 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
 }
 
-function generateElementCanvas(
+const generateElementCanvas = (
   element: ExcalidrawElement,
   zoom: number,
-): ExcalidrawElementWithCanvas {
+): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
@@ -69,13 +69,13 @@ function generateElementCanvas(
     1 / (window.devicePixelRatio * zoom),
   );
   return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
-}
+};
 
-function drawElementOnCanvas(
+const drawElementOnCanvas = (
   element: ExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-) {
+) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
     case "rectangle":
@@ -112,7 +112,7 @@ function drawElementOnCanvas(
     }
   }
   context.globalAlpha = 1;
-}
+};
 
 const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
@@ -127,15 +127,14 @@ const shapeCache = new WeakMap<
 export const getShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.get(element);
 
-export function invalidateShapeForElement(element: ExcalidrawElement) {
+export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
-}
 
-function generateElement(
+const generateElement = (
   element: ExcalidrawElement,
   generator: RoughGenerator,
   sceneState?: SceneState,
-) {
+) => {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
     elementWithCanvasCache.delete(element);
@@ -254,14 +253,14 @@ function generateElement(
     return elementWithCanvas;
   }
   return prevElementWithCanvas;
-}
+};
 
-function drawElementFromCanvas(
+const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
-) {
+) => {
   const element = elementWithCanvas.element;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
@@ -281,15 +280,15 @@ function drawElementFromCanvas(
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
-}
+};
 
-export function renderElement(
+export const renderElement = (
   element: ExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
   sceneState: SceneState,
-) {
+) => {
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
@@ -338,15 +337,15 @@ export function renderElement(
       throw new Error(`Unimplemented type ${element.type}`);
     }
   }
-}
+};
 
-export function renderElementToSvg(
+export const renderElementToSvg = (
   element: ExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   offsetX?: number,
   offsetY?: number,
-) {
+) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
@@ -440,4 +439,4 @@ export function renderElementToSvg(
       }
     }
   }
-}
+};

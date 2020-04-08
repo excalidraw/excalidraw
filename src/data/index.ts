@@ -72,13 +72,13 @@ export type SocketUpdateDataIncoming =
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
-async function generateRandomID() {
+const generateRandomID = async () => {
   const arr = new Uint8Array(10);
   window.crypto.getRandomValues(arr);
   return Array.from(arr, byteToHex).join("");
-}
+};
 
-async function generateEncryptionKey() {
+const generateEncryptionKey = async () => {
   const key = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
@@ -88,7 +88,7 @@ async function generateEncryptionKey() {
     ["encrypt", "decrypt"],
   );
   return (await window.crypto.subtle.exportKey("jwk", key)).k;
-}
+};
 
 const createIV = () => {
   const arr = new Uint8Array(12);
@@ -127,10 +127,10 @@ const getImportedKey = async (key: string, usage: string): Promise<CryptoKey> =>
     [usage],
   );
 
-export async function encryptAESGEM(
+export const encryptAESGEM = async (
   data: Uint8Array,
   key: string,
-): Promise<EncryptedData> {
+): Promise<EncryptedData> => {
   const importedKey = await getImportedKey(key, "encrypt");
   const iv = createIV();
   return {
@@ -144,13 +144,13 @@ export async function encryptAESGEM(
     ),
     iv,
   };
-}
+};
 
-export async function decryptAESGEM(
+export const decryptAESGEM = async (
   data: ArrayBuffer,
   key: string,
   iv: Uint8Array,
-): Promise<SocketUpdateDataIncoming> {
+): Promise<SocketUpdateDataIncoming> => {
   try {
     const importedKey = await getImportedKey(key, "decrypt");
     const decrypted = await window.crypto.subtle.decrypt(
@@ -173,12 +173,12 @@ export async function decryptAESGEM(
   return {
     type: "INVALID_RESPONSE",
   };
-}
+};
 
-export async function exportToBackend(
+export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   const json = serializeAsJSON(elements, appState);
   const encoded = new TextEncoder().encode(json);
 
@@ -228,12 +228,12 @@ export async function exportToBackend(
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
-}
+};
 
-export async function importFromBackend(
+export const importFromBackend = async (
   id: string | null,
   privateKey: string | undefined,
-) {
+) => {
   let elements: readonly ExcalidrawElement[] = [];
   let appState: AppState = getDefaultAppState();
 
@@ -276,9 +276,9 @@ export async function importFromBackend(
   } finally {
     return restore(elements, appState, { scrollToContent: true });
   }
-}
+};
 
-export async function exportCanvas(
+export const exportCanvas = async (
   type: ExportType,
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -296,7 +296,7 @@ export async function exportCanvas(
     name: string;
     scale?: number;
   },
-) {
+) => {
   if (!hasNonDeletedElements(elements)) {
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
@@ -353,9 +353,9 @@ export async function exportCanvas(
   if (tempCanvas !== canvas) {
     tempCanvas.remove();
   }
-}
+};
 
-export async function loadScene(id: string | null, privateKey?: string) {
+export const loadScene = async (id: string | null, privateKey?: string) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
@@ -371,4 +371,4 @@ export async function loadScene(id: string | null, privateKey?: string) {
     appState: data.appState && { ...data.appState },
     commitToHistory: false,
   };
-}
+};

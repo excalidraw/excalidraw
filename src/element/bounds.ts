@@ -7,9 +7,9 @@ import { isLinearElement } from "./typeChecks";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-export function getElementAbsoluteCoords(
+export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteBounds(element);
   }
@@ -19,9 +19,9 @@ export function getElementAbsoluteCoords(
     element.x + element.width,
     element.y + element.height,
   ];
-}
+};
 
-export function getDiamondPoints(element: ExcalidrawElement) {
+export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
@@ -34,11 +34,11 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
-}
+};
 
-export function getLinearElementAbsoluteBounds(
+export const getLinearElementAbsoluteBounds = (
   element: ExcalidrawLinearElement,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
@@ -122,12 +122,12 @@ export function getLinearElementAbsoluteBounds(
     maxX + element.x,
     maxY + element.y,
   ];
-}
+};
 
-export function getArrowPoints(
+export const getArrowPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
-) {
+) => {
   const ops = shape[0].sets[0].ops;
 
   const data = ops[ops.length - 1].data;
@@ -186,7 +186,7 @@ export function getArrowPoints(
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
   return [x2, y2, x3, y3, x4, y4];
-}
+};
 
 export const getElementBounds = (
   element: ExcalidrawElement,
