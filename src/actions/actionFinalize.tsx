@@ -33,7 +33,7 @@ export const actionFinalize = register({
         newElements = newElements.slice(0, -1);
       }
 
-      // If the multi point array closes the loop,
+      // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
       if (appState.multiElement.type === "line") {
