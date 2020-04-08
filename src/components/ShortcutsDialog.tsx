@@ -14,7 +14,6 @@ const ShortcutIsland = (props: {
       border: "1px solid #ced4da",
       marginBottom: "16px",
     }}
-    {...props}
   >
     <h3
       style={{
@@ -39,7 +38,6 @@ const Shortcut = (props: {
     style={{
       borderTop: "1px solid #ced4da",
     }}
-    {...props}
   >
     <div
       style={{
@@ -68,12 +66,12 @@ const Shortcut = (props: {
         }}
       >
         {props.shortcuts.map((shortcut, index) => (
-          <>
+          <React.Fragment key={index}>
             <ShortcutKey>{shortcut}</ShortcutKey>
             {props.isOr &&
               index !== props.shortcuts.length - 1 &&
               t("shortcutsDialog.or")}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>

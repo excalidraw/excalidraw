@@ -11,8 +11,6 @@ import { ActionsManagerInterface } from "../actions/types";
 import Stack from "./Stack";
 import { t } from "../i18n";
 
-import { KEYS } from "../keys";
-
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import useIsMobile from "../is-mobile";
@@ -35,7 +33,6 @@ function ExportModal({
   onExportToSvg,
   onExportToClipboard,
   onExportToBackend,
-  closeButton,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
@@ -46,15 +43,12 @@ function ExportModal({
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
-  closeButton: React.RefObject<HTMLButtonElement>;
 }) {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
-  const pngButton = useRef<HTMLButtonElement>(null);
-  const onlySelectedInput = useRef<HTMLInputElement>(null);
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState)
@@ -85,33 +79,8 @@ function ExportModal({
     scale,
   ]);
 
-  useEffect(() => {
-    pngButton.current?.focus();
-  }, []);
-
-  function handleKeyDown(event: React.KeyboardEvent) {
-    if (event.key === KEYS.TAB) {
-      const { activeElement } = document;
-      if (event.shiftKey) {
-        if (activeElement === pngButton.current) {
-          closeButton.current?.focus();
-          event.preventDefault();
-        }
-      } else {
-        if (activeElement === closeButton.current) {
-          pngButton.current?.focus();
-          event.preventDefault();
-        }
-        if (activeElement === onlySelectedInput.current) {
-          closeButton.current?.focus();
-          event.preventDefault();
-        }
-      }
-    }
-  }
-
   return (
-    <div onKeyDown={handleKeyDown} className="ExportDialog">
+    <div className="ExportDialog">
       <div className="ExportDialog__preview" ref={previewRef}></div>
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
@@ -122,7 +91,6 @@ function ExportModal({
               title={t("buttons.exportToPng")}
               aria-label={t("buttons.exportToPng")}
               onClick={() => onExportToPng(exportedElements, scale)}
-              ref={pngButton}
             />
             <ToolButton
               type="button"
@@ -177,7 +145,6 @@ function ExportModal({
                 onChange={(event) =>
                   setExportSelected(event.currentTarget.checked)
                 }
-                ref={onlySelectedInput}
               />{" "}
               {t("labels.onlySelected")}
             </label>
@@ -209,7 +176,6 @@ export function ExportDialog({
 }) {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
-  const closeButton = useRef<HTMLButtonElement>(null);
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
@@ -232,7 +198,6 @@ export function ExportDialog({
           maxWidth={800}
           onCloseRequest={handleClose}
           title={t("buttons.export")}
-          closeButtonRef={closeButton}
         >
           <ExportModal
             elements={elements}
@@ -244,7 +209,6 @@ export function ExportDialog({
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
-            closeButton={closeButton}
           />
         </Dialog>
       )}
