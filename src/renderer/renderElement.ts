@@ -101,15 +101,28 @@ function drawElementOnCanvas(
         context.font = element.font;
         const fillStyle = context.fillStyle;
         context.fillStyle = element.strokeColor;
+        const textAlign = context.textAlign;
+        context.textAlign = element.textAlign as CanvasTextAlign;
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const offset = element.height - element.baseline;
+        const verticalOffset = element.height - element.baseline;
+        const horizontalOffset =
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
         for (let i = 0; i < lines.length; i++) {
-          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+          context.fillText(
+            lines[i],
+            0 + horizontalOffset,
+            (i + 1) * lineHeight - verticalOffset,
+          );
         }
         context.fillStyle = fillStyle;
         context.font = font;
+        context.textAlign = textAlign;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }

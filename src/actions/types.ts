@@ -49,6 +49,7 @@ export type ActionName =
   | "zoomOut"
   | "resetZoom"
   | "changeFontFamily"
+  | "changeTextAlign"
   | "toggleFullScreen"
   | "toggleShortcuts";
 

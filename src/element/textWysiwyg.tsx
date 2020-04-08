@@ -21,6 +21,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  textAlign: string;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
@@ -36,6 +37,7 @@ export function textWysiwyg({
   zoom,
   angle,
   onChange,
+  textAlign,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
@@ -59,7 +61,7 @@ export function textWysiwyg({
     top: `${y}px`,
     left: `${x}px`,
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
-    textAlign: "left",
+    textAlign: textAlign,
     display: "inline-block",
     font: font,
     padding: "4px",
