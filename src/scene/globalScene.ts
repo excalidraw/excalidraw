@@ -12,7 +12,7 @@ export interface SceneStateCallbackRemover {
   (): void;
 }
 
-class SceneState {
+class GlobalScene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   constructor(private _elements: readonly ExcalidrawElement[] = []) {}
@@ -52,4 +52,4 @@ class SceneState {
   }
 }
 
-export const globalSceneState = new SceneState();
+export const globalSceneState = new GlobalScene();
