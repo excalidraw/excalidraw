@@ -108,18 +108,13 @@ export function textWysiwyg({
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       handleSubmit();
-    }
-    if (
-      event.key === KEYS.ENTER &&
-      (event.shiftKey || event[KEYS.CTRL_OR_CMD])
-    ) {
+    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
       handleSubmit();
-    }
-    if (event.key === KEYS.ENTER && !event.shiftKey) {
+    } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
     }
   };
