@@ -52,12 +52,7 @@ import {
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  NonDeleted,
-  ExcalidrawTextElement,
-  ExcalidrawLinearElement,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import {
   isWritableElement,
@@ -1905,18 +1900,17 @@ export class App extends React.Component<any, AppState> {
         });
         document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
-        const element =
-          newLinearElement({
-            type: this.state.elementType,
-            x: x,
-            y: y,
-            strokeColor: this.state.currentItemStrokeColor,
-            backgroundColor: this.state.currentItemBackgroundColor,
-            fillStyle: this.state.currentItemFillStyle,
-            strokeWidth: this.state.currentItemStrokeWidth,
-            roughness: this.state.currentItemRoughness,
-            opacity: this.state.currentItemOpacity,
-          }) as NonDeleted<ExcalidrawLinearElement>;
+        const element = newLinearElement({
+          type: this.state.elementType,
+          x: x,
+          y: y,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+        });
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
