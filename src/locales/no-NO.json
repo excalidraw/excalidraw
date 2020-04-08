@@ -5,10 +5,10 @@
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
-    "bringForward": "Flytt fremover",
-    "sendToBack": "Flytt bakerst",
+    "bringForward": "Flytt framover",
+    "sendToBack": "Send bakerst",
     "bringToFront": "Flytt forrest",
-    "sendBackward": "Flytt bakover",
+    "sendBackward": "Send bakover",
     "delete": "Slett",
     "copyStyles": "Kopier stiler",
     "pasteStyles": "Lim inn stiler",
@@ -47,7 +47,7 @@
     "language": "Språk",
     "createRoom": "Del en sanntids-samarbeidsøkt",
     "duplicateSelection": "Dupliser",
-    "untitled": ""
+    "untitled": "Uten navn"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
