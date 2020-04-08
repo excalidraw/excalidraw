@@ -2,9 +2,13 @@ import { distanceBetweenPointAndSegment } from "../math";
 
 import { ExcalidrawElement } from "./types";
 
-import { getDiamondPoints, getElementAbsoluteCoords } from "./bounds";
+import {
+  getDiamondPoints,
+  getElementAbsoluteCoords,
+  getCurvePathOps,
+} from "./bounds";
 import { Point } from "../types";
-import { Drawable, OpSet } from "roughjs/bin/core";
+import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
@@ -180,7 +184,7 @@ export function hitTest(
 
     // hit thest all "subshapes" of the linear element
     return shape.some((subshape) =>
-      hitTestRoughShape(subshape.sets, relX, relY, lineThreshold),
+      hitTestRoughShape(subshape, relX, relY, lineThreshold),
     );
   } else if (element.type === "text") {
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
@@ -225,13 +229,13 @@ const pointInBezierEquation = (
 };
 
 const hitTestRoughShape = (
-  opSet: OpSet[],
+  drawable: Drawable,
   x: number,
   y: number,
   lineThreshold: number,
 ) => {
   // read operations from first opSet
-  const ops = opSet[0].ops;
+  const ops = getCurvePathOps(drawable);
 
   // set start position as (0,0) just in case
   // move operation does not exist (unlikely but it is worth safekeeping it)

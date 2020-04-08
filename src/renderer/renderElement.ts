@@ -6,14 +6,15 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance } from "../utils";
+import { SVG_NS, distance, distance2d } from "../utils";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
+const MAX_DISTANCE_TO_DETECT_LOOP = 8;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -209,15 +210,39 @@ function generateElement(
         break;
       case "line":
       case "arrow": {
-        const options = {
+        const options: Options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
+
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
         const points = element.points.length ? element.points : [[0, 0]];
+
+        // If shape is a line and is a closed shape,
+        // fill the shape if a color is set.
+        if (element.type === "line" && points.length >= 3) {
+          const [firstPoint, lastPoint] = [
+            points[0],
+            points[points.length - 1],
+          ];
+          if (
+            distance2d(
+              firstPoint[0],
+              firstPoint[1],
+              lastPoint[0],
+              lastPoint[1],
+            ) <= MAX_DISTANCE_TO_DETECT_LOOP
+          ) {
+            options.fillStyle = element.fillStyle;
+            options.fill =
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor;
+          }
+        }
 
         // curve is always the first element
         // this simplifies finding the curve for an element

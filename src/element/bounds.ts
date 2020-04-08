@@ -1,6 +1,6 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
@@ -61,7 +61,7 @@ export function getLinearElementAbsoluteBounds(
   const shape = getShapeForElement(element) as Drawable[];
 
   // first element is always the curve
-  const ops = shape[0].sets[0].ops;
+  const ops = getCurvePathOps(shape[0]);
 
   let currentP: Point = [0, 0];
 
@@ -126,7 +126,7 @@ export function getArrowPoints(
   element: ExcalidrawLinearElement,
   shape: Drawable[],
 ) {
-  const ops = shape[0].sets[0].ops;
+  const ops = getCurvePathOps(shape[0]);
 
   const data = ops[ops.length - 1].data;
   const p3 = [data[4], data[5]] as Point;
@@ -184,6 +184,15 @@ export function getArrowPoints(
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
   return [x2, y2, x3, y3, x4, y4];
+}
+
+export function getCurvePathOps(shape: Drawable): Op[] {
+  for (const set of shape.sets) {
+    if (set.type === "path") {
+      return set.ops;
+    }
+  }
+  return shape.sets[0].ops;
 }
 
 export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
