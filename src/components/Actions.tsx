@@ -10,7 +10,7 @@ import { capitalizeString, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 
-export function SelectedShapeActions({
+export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
@@ -20,7 +20,7 @@ export function SelectedShapeActions({
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
-}) {
+}) => {
   const targetElements = getTargetElement(elements, appState);
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
@@ -77,7 +77,7 @@ export function SelectedShapeActions({
       )}
     </div>
   );
-}
+};
 
 export const ShapesSwitcher = ({
   elementType,
