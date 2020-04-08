@@ -1,13 +1,13 @@
 {
   "labels": {
     "paste": "粘贴",
-    "selectAll": "全选",
+    "selectAll": "选择所有",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
     "bringForward": "上移一层",
-    "sendToBack": "移至最后",
-    "bringToFront": "移至最前",
+    "sendToBack": "置于底层",
+    "bringToFront": "置于顶层",
     "sendBackward": "下移一层",
     "delete": "删除",
     "copyStyles": "复制样式",
@@ -34,7 +34,7 @@
     "crossHatch": "交叉线条",
     "thin": "细",
     "bold": "加粗",
-    "extraBold": "特粗",
+    "extraBold": "超粗",
     "architect": "朴素",
     "artist": "艺术",
     "cartoonist": "漫画",
@@ -46,7 +46,8 @@
     "actions": "操作",
     "language": "语言",
     "createRoom": "分享实时协作会议",
-    "duplicateSelection": "复制所有已选择的元素"
+    "duplicateSelection": "复制所有已选择的元素",
+    "untitled": "无标题"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -133,6 +134,10 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
+    "or": "或者",
+    "click": "点击",
+    "curvedArrow": "曲线（带有箭头）",
+    "curvedLine": "曲线（无箭头）",
     "editor": "编辑者",
     "view": "视图",
     "blog": "浏览我们的博客",

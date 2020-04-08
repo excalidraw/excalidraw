@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
-    "selectAll": "सभी चुनें",
+    "selectAll": "",
     "copy": "प्रतिलिपि",
     "copyAsPng": "",
     "copyAsSvg": "",
@@ -18,8 +18,8 @@
     "strokeWidth": "",
     "sloppiness": "",
     "opacity": "",
-    "fontSize": "मुद्रलिपि आकार",
-    "fontFamily": "मुद्रलिपि परिवार",
+    "fontSize": "",
+    "fontFamily": "",
     "onlySelected": "",
     "withBackground": "",
     "handDrawn": "",
@@ -28,13 +28,13 @@
     "small": "छोटा",
     "medium": "मध्यम",
     "large": "बड़ा",
-    "veryLarge": "बहुत बड़ा",
+    "veryLarge": "",
     "solid": "दृढ़",
     "hachure": "",
     "crossHatch": "",
     "thin": "पतला",
     "bold": "मोटा",
-    "extraBold": "बहुत मोटा",
+    "extraBold": "",
     "architect": "वास्तुकार",
     "artist": "कलाकार",
     "cartoonist": "व्यंग्य चित्रकार",
@@ -46,7 +46,8 @@
     "actions": "",
     "language": "भाषा",
     "createRoom": "अधिवेशन",
-    "duplicateSelection": ""
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "",
@@ -133,6 +134,10 @@
   "shortcutsDialog": {
     "title": "",
     "shapes": "",
+    "or": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
     "editor": "",
     "view": "",
     "blog": "",
