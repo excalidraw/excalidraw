@@ -4,14 +4,12 @@ import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber } from "../types";
-import { getElementAbsoluteCoords } from "../element/bounds";
 
 import {
   newElement,
   newTextElement,
   duplicateElement,
   resizeTest,
-  normalizeResizeHandle,
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
@@ -24,6 +22,11 @@ import {
   getSyncableElements,
   hasNonDeletedElements,
   newLinearElement,
+  ResizeArrowFnType,
+  resizeElements,
+  getElementWithResizeHandler,
+  canResizeMutlipleElements,
+  getResizeHandlerFromCoords,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -50,12 +53,7 @@ import {
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../element/types";
-import { rotate, adjustXYWithRotation } from "../math";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import {
   isWritableElement,
@@ -76,7 +74,6 @@ import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
 
-import { getElementWithResizeHandler } from "../element/resizeTest";
 import { ActionManager } from "../actions/manager";
 import "../actions";
 import { actions } from "../actions/register";
@@ -102,7 +99,6 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   ARROW_CONFIRM_THRESHOLD,
-  SHIFT_LOCKING_ANGLE,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
@@ -112,7 +108,6 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
-import { rescalePoints } from "../points";
 import { actionFinalize } from "../actions";
 
 /**
@@ -147,13 +142,33 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-export class App extends React.Component<any, AppState> {
-  canvas: HTMLCanvasElement | null = null;
-  rc: RoughCanvas | null = null;
+class Portal {
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
   roomID: string | null = null;
   roomKey: string | null = null;
+
+  open(socket: SocketIOClient.Socket, id: string, key: string) {
+    this.socket = socket;
+    this.roomID = id;
+    this.roomKey = key;
+  }
+
+  close() {
+    if (!this.socket) {
+      return;
+    }
+    this.socket.close();
+    this.socket = null;
+    this.roomID = null;
+    this.roomKey = null;
+  }
+}
+
+export class App extends React.Component<any, AppState> {
+  canvas: HTMLCanvasElement | null = null;
+  rc: RoughCanvas | null = null;
+  room: Portal = new Portal();
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -198,8 +213,8 @@ export class App extends React.Component<any, AppState> {
             return !element.isDeleted;
           })}
           setElements={this.setElements}
-          onRoomCreate={this.createRoom}
-          onRoomDestroy={this.destroyRoom}
+          onRoomCreate={this.openPortal}
+          onRoomDestroy={this.closePortal}
           onLockToggle={this.toggleLock}
         />
         <main>
@@ -433,7 +448,7 @@ export class App extends React.Component<any, AppState> {
   });
 
   componentDidUpdate() {
-    if (this.state.isCollaborating && !this.socket) {
+    if (this.state.isCollaborating && !this.room.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
 
@@ -442,6 +457,7 @@ export class App extends React.Component<any, AppState> {
     } = {};
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
+    const pointerUsernames: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketID) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
@@ -453,6 +469,9 @@ export class App extends React.Component<any, AppState> {
       }
       if (!user.pointer) {
         return;
+      }
+      if (user.username) {
+        pointerUsernames[socketID] = user.username;
       }
       pointerViewportCoords[socketID] = sceneCoordsToViewportCoords(
         {
@@ -488,6 +507,7 @@ export class App extends React.Component<any, AppState> {
         remotePointerViewportCoords: pointerViewportCoords,
         remotePointerButton: cursorButton,
         remoteSelectedElementIds: remoteSelectedElementIds,
+        remotePointerUsernames: pointerUsernames,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -700,7 +720,7 @@ export class App extends React.Component<any, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
-  createRoom = async () => {
+  openPortal = async () => {
     window.history.pushState(
       {},
       "Excalidraw",
@@ -709,7 +729,7 @@ export class App extends React.Component<any, AppState> {
     this.initializeSocketClient({ showLoadingState: false });
   };
 
-  destroyRoom = () => {
+  closePortal = () => {
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -728,22 +748,17 @@ export class App extends React.Component<any, AppState> {
       isCollaborating: false,
       collaborators: new Map(),
     });
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-      this.roomID = null;
-      this.roomKey = null;
-    }
+    this.room.close();
   };
 
   private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
-    if (this.socket) {
+    if (this.room.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const initialize = () => {
-        this.socketInitialized = true;
+        this.room.socketInitialized = true;
         clearTimeout(initializationTimer);
         if (this.state.isLoading && !this.unmounted) {
           this.setState({ isLoading: false });
@@ -849,26 +864,26 @@ export class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.socketInitialized === false) {
+        if (this.room.socketInitialized === false) {
           initialize();
         }
       };
 
-      this.socket = socketIOClient(SOCKET_SERVER);
-      this.roomID = roomMatch[1];
-      this.roomKey = roomMatch[2];
-      this.socket.on("init-room", () => {
-        this.socket && this.socket.emit("join-room", this.roomID);
+      this.room.open(socketIOClient(SOCKET_SERVER), roomMatch[1], roomMatch[2]);
+
+      this.room.socket!.on("init-room", () => {
+        this.room.socket &&
+          this.room.socket.emit("join-room", this.room.roomID);
       });
-      this.socket.on(
+      this.room.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-          if (!this.roomKey) {
+          if (!this.room.roomKey) {
             return;
           }
           const decryptedData = await decryptAESGEM(
             encryptedData,
-            this.roomKey,
+            this.room.roomKey,
             iv,
           );
 
@@ -876,7 +891,7 @@ export class App extends React.Component<any, AppState> {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_INIT": {
-              if (!this.socketInitialized) {
+              if (!this.room.socketInitialized) {
                 updateScene(decryptedData, { scrollToContent: true });
               }
               break;
@@ -889,6 +904,7 @@ export class App extends React.Component<any, AppState> {
                 socketID,
                 pointerCoords,
                 button,
+                username,
                 selectedElementIds,
               } = decryptedData.payload;
               this.setState((state) => {
@@ -899,6 +915,7 @@ export class App extends React.Component<any, AppState> {
                 user.pointer = pointerCoords;
                 user.button = button;
                 user.selectedElementIds = selectedElementIds;
+                user.username = username;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -907,13 +924,13 @@ export class App extends React.Component<any, AppState> {
           }
         },
       );
-      this.socket.on("first-in-room", () => {
-        if (this.socket) {
-          this.socket.off("first-in-room");
+      this.room.socket!.on("first-in-room", () => {
+        if (this.room.socket) {
+          this.room.socket.off("first-in-room");
         }
         initialize();
       });
-      this.socket.on("room-user-change", (clients: string[]) => {
+      this.room.socket!.on("room-user-change", (clients: string[]) => {
         this.setState((state) => {
           const collaborators: typeof state.collaborators = new Map();
           for (const socketID of clients) {
@@ -929,7 +946,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.socket.on("new-user", async (socketID: string) => {
+      this.room.socket!.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -944,14 +961,15 @@ export class App extends React.Component<any, AppState> {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.socket?.id) {
+    if (this.room.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketID: this.socket.id,
+          socketID: this.room.socket.id,
           pointerCoords: payload.pointerCoords,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
+          username: this.state.username,
         },
       };
       return this._broadcastSocketData(
@@ -982,13 +1000,18 @@ export class App extends React.Component<any, AppState> {
       _brand: "socketUpdateData";
     },
   ) {
-    if (this.socketInitialized && this.socket && this.roomID && this.roomKey) {
+    if (
+      this.room.socketInitialized &&
+      this.room.socket &&
+      this.room.roomID &&
+      this.room.roomKey
+    ) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey);
-      this.socket.emit(
+      const encrypted = await encryptAESGEM(encoded, this.room.roomKey);
+      this.room.socket.emit(
         "server-broadcast",
-        this.roomID,
+        this.room.roomID,
         encrypted.data,
         encrypted.iv,
       );
@@ -1485,18 +1508,33 @@ export class App extends React.Component<any, AppState> {
       this.state,
     );
     if (selectedElements.length === 1 && !isOverScrollBar) {
-      const resizeElement = getElementWithResizeHandler(
+      const elementWithResizeHandler = getElementWithResizeHandler(
         globalSceneState.getAllElements(),
         this.state,
         { x, y },
         this.state.zoom,
         event.pointerType,
       );
-      if (resizeElement && resizeElement.resizeHandle) {
+      if (elementWithResizeHandler && elementWithResizeHandler.resizeHandle) {
         document.documentElement.style.cursor = getCursorForResizingElement(
-          resizeElement,
+          elementWithResizeHandler,
         );
         return;
+      }
+    } else if (selectedElements.length > 1 && !isOverScrollBar) {
+      if (canResizeMutlipleElements(selectedElements)) {
+        const resizeHandle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          { x, y },
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (resizeHandle) {
+          document.documentElement.style.cursor = getCursorForResizingElement({
+            resizeHandle,
+          });
+          return;
+        }
       }
     }
     const hitElement = getElementAtPosition(
@@ -1691,34 +1729,57 @@ export class App extends React.Component<any, AppState> {
 
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
+    const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
+      resizeHandle = nextResizeHandle;
+    };
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      const resizeElement = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
-        this.state,
-        { x, y },
-        this.state.zoom,
-        event.pointerType,
-      );
-
       const selectedElements = getSelectedElements(
         globalSceneState.getAllElements(),
         this.state,
       );
-      if (selectedElements.length === 1 && resizeElement) {
-        this.setState({
-          resizingElement: resizeElement ? resizeElement.element : null,
-        });
-
-        resizeHandle = resizeElement.resizeHandle;
-        document.documentElement.style.cursor = getCursorForResizingElement(
-          resizeElement,
+      if (selectedElements.length === 1) {
+        const elementWithResizeHandler = getElementWithResizeHandler(
+          globalSceneState.getAllElements(),
+          this.state,
+          { x, y },
+          this.state.zoom,
+          event.pointerType,
         );
-        isResizingElements = true;
-      } else {
+        if (elementWithResizeHandler) {
+          this.setState({
+            resizingElement: elementWithResizeHandler
+              ? elementWithResizeHandler.element
+              : null,
+          });
+          resizeHandle = elementWithResizeHandler.resizeHandle;
+          document.documentElement.style.cursor = getCursorForResizingElement(
+            elementWithResizeHandler,
+          );
+          isResizingElements = true;
+        }
+      } else if (selectedElements.length > 1) {
+        if (canResizeMutlipleElements(selectedElements)) {
+          resizeHandle = getResizeHandlerFromCoords(
+            getCommonBounds(selectedElements),
+            { x, y },
+            this.state.zoom,
+            event.pointerType,
+          );
+          if (resizeHandle) {
+            document.documentElement.style.cursor = getCursorForResizingElement(
+              {
+                resizeHandle,
+              },
+            );
+            isResizingElements = true;
+          }
+        }
+      }
+      if (!isResizingElements) {
         hitElement = getElementAtPosition(
           globalSceneState.getAllElements(),
           this.state,
@@ -1908,82 +1969,9 @@ export class App extends React.Component<any, AppState> {
       }
     }
 
-    let resizeArrowFn:
-      | ((
-          element: ExcalidrawLinearElement,
-          pointIndex: number,
-          deltaX: number,
-          deltaY: number,
-          pointerX: number,
-          pointerY: number,
-          perfect: boolean,
-        ) => void)
-      | null = null;
-
-    const arrowResizeOrigin = (
-      element: ExcalidrawLinearElement,
-      pointIndex: number,
-      deltaX: number,
-      deltaY: number,
-      pointerX: number,
-      pointerY: number,
-      perfect: boolean,
-    ) => {
-      const [px, py] = element.points[pointIndex];
-      let x = element.x + deltaX;
-      let y = element.y + deltaY;
-      let pointX = px - deltaX;
-      let pointY = py - deltaY;
-
-      if (perfect) {
-        const { width, height } = getPerfectElementSize(
-          element.type,
-          px + element.x - pointerX,
-          py + element.y - pointerY,
-        );
-        x = px + element.x - width;
-        y = py + element.y - height;
-        pointX = width;
-        pointY = height;
-      }
-
-      mutateElement(element, {
-        x,
-        y,
-        points: element.points.map((point, i) =>
-          i === pointIndex ? ([pointX, pointY] as const) : point,
-        ),
-      });
-    };
-
-    const arrowResizeEnd = (
-      element: ExcalidrawLinearElement,
-      pointIndex: number,
-      deltaX: number,
-      deltaY: number,
-      pointerX: number,
-      pointerY: number,
-      perfect: boolean,
-    ) => {
-      const [px, py] = element.points[pointIndex];
-      if (perfect) {
-        const { width, height } = getPerfectElementSize(
-          element.type,
-          pointerX - element.x,
-          pointerY - element.y,
-        );
-        mutateElement(element, {
-          points: element.points.map((point, i) =>
-            i === pointIndex ? ([width, height] as const) : point,
-          ),
-        });
-      } else {
-        mutateElement(element, {
-          points: element.points.map((point, i) =>
-            i === pointIndex ? ([px + deltaX, py + deltaY] as const) : point,
-          ),
-        });
-      }
+    let resizeArrowFn: ResizeArrowFnType | null = null;
+    const setResizeArrrowFn = (fn: ResizeArrowFnType) => {
+      resizeArrowFn = fn;
     };
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
@@ -2012,6 +2000,13 @@ export class App extends React.Component<any, AppState> {
         return;
       }
 
+      const { x, y } = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
+
       // for arrows, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
@@ -2021,289 +2016,30 @@ export class App extends React.Component<any, AppState> {
         (this.state.elementType === "arrow" ||
           this.state.elementType === "line")
       ) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-          this.canvas,
-          window.devicePixelRatio,
-        );
         if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
           return;
         }
       }
 
-      if (isResizingElements && this.state.resizingElement) {
-        this.setState({
-          isResizing: resizeHandle !== "rotation",
-          isRotating: resizeHandle === "rotation",
-        });
-        const el = this.state.resizingElement;
-        const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
+      const resized =
+        isResizingElements &&
+        resizeElements(
+          resizeHandle,
+          setResizeHandle,
           this.state,
+          this.setAppState,
+          resizeArrowFn,
+          setResizeArrrowFn,
+          event,
+          x,
+          y,
+          lastX,
+          lastY,
         );
-        if (selectedElements.length === 1) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-          const element = selectedElements[0];
-          const angle = element.angle;
-          // reverse rotate delta
-          const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
-          switch (resizeHandle) {
-            case "nw":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-
-                if (!resizeArrowFn) {
-                  if (p1[0] < 0 || p1[1] < 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
-                const dY = element.height - height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("nw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "ne":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] >= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height - deltaY;
-                const dY = element.height - height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("ne", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "sw":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] <= 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width - deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
-                const dY = height - element.height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "se":
-              if (isLinearElement(element) && element.points.length === 2) {
-                const [, p1] = element.points;
-                if (!resizeArrowFn) {
-                  if (p1[0] > 0 || p1[1] > 0) {
-                    resizeArrowFn = arrowResizeEnd;
-                  } else {
-                    resizeArrowFn = arrowResizeOrigin;
-                  }
-                }
-                resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-              } else {
-                const width = element.width + deltaX;
-                const height = event.shiftKey ? width : element.height + deltaY;
-                const dY = height - element.height;
-                mutateElement(element, {
-                  width,
-                  height,
-                  ...adjustXYWithRotation("se", element, deltaX, dY, angle),
-                  ...(isLinearElement(element) && width >= 0 && height >= 0
-                    ? {
-                        points: rescalePoints(
-                          0,
-                          width,
-                          rescalePoints(1, height, element.points),
-                        ),
-                      }
-                    : {}),
-                });
-              }
-              break;
-            case "n": {
-              const height = element.height - deltaY;
-
-              if (isLinearElement(element)) {
-                if (element.points.length > 2 && height <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
-                  points: rescalePoints(1, height, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("n", element, 0, deltaY, angle),
-                });
-              }
-
-              break;
-            }
-            case "w": {
-              const width = element.width - deltaX;
-
-              if (isLinearElement(element)) {
-                if (element.points.length > 2 && width <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
-
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
-                  points: rescalePoints(0, width, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("w", element, deltaX, 0, angle),
-                });
-              }
-              break;
-            }
-            case "s": {
-              const height = element.height + deltaY;
-
-              if (isLinearElement(element)) {
-                if (element.points.length > 2 && height <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
-                  points: rescalePoints(1, height, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  height,
-                  ...adjustXYWithRotation("s", element, 0, deltaY, angle),
-                });
-              }
-              break;
-            }
-            case "e": {
-              const width = element.width + deltaX;
-
-              if (isLinearElement(element)) {
-                if (element.points.length > 2 && width <= 0) {
-                  // Someday we should implement logic to flip the shape.
-                  // But for now, just stop.
-                  break;
-                }
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
-                  points: rescalePoints(0, width, element.points),
-                });
-              } else {
-                mutateElement(element, {
-                  width,
-                  ...adjustXYWithRotation("e", element, deltaX, 0, angle),
-                });
-              }
-              break;
-            }
-            case "rotation": {
-              const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-              const cx = (x1 + x2) / 2;
-              const cy = (y1 + y2) / 2;
-              let angle = (5 * Math.PI) / 2 + Math.atan2(y - cy, x - cx);
-              if (event.shiftKey) {
-                angle += SHIFT_LOCKING_ANGLE / 2;
-                angle -= angle % SHIFT_LOCKING_ANGLE;
-              }
-              if (angle >= 2 * Math.PI) {
-                angle -= 2 * Math.PI;
-              }
-              mutateElement(element, { angle });
-              break;
-            }
-          }
-
-          if (resizeHandle) {
-            resizeHandle = normalizeResizeHandle(element, resizeHandle);
-          }
-          normalizeDimensions(element);
-
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            element,
-            resizeHandle,
-          });
-          mutateElement(el, {
-            x: element.x,
-            y: element.y,
-          });
-
-          lastX = x;
-          lastY = y;
-          return;
-        }
+      if (resized) {
+        lastX = x;
+        lastY = y;
+        return;
       }
 
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
@@ -2340,13 +2076,6 @@ export class App extends React.Component<any, AppState> {
       if (!draggingElement) {
         return;
       }
-
-      const { x, y } = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
 
       let width = distance(originX, x);
       let height = distance(originY, y);
@@ -2533,7 +2262,7 @@ export class App extends React.Component<any, AppState> {
             },
           }));
         } else {
-          this.setState((prevState) => ({
+          this.setState((_prevState) => ({
             selectedElementIds: { [hitElement!.id]: true },
           }));
         }
@@ -2781,7 +2510,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.socket &&
+    this.room.socket &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,

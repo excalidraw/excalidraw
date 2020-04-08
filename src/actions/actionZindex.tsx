@@ -91,7 +91,7 @@ export const actionSendBackward = register({
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
-      title={`${t("labels.sendBackward")} ${getShortcutKey("CtrlOrCmd+[")}`}
+      title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
       {sendBackward}
     </button>
@@ -116,7 +116,7 @@ export const actionBringForward = register({
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
-      title={`${t("labels.bringForward")} ${getShortcutKey("CtrlOrCmd+]")}`}
+      title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
       {bringForward}
     </button>
@@ -145,7 +145,7 @@ export const actionSendToBack = register({
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
-      title={`${t("labels.sendToBack")} ${
+      title={`${t("labels.sendToBack")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+[")
           : getShortcutKey("CtrlOrCmd+Shift+[")
@@ -178,7 +178,7 @@ export const actionBringToFront = register({
       type="button"
       className="zIndexButton"
       onClick={(event) => updateData(null)}
-      title={`${t("labels.bringToFront")} ${
+      title={`${t("labels.bringToFront")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+]")
           : getShortcutKey("CtrlOrCmd+Shift+]")

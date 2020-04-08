@@ -22,8 +22,12 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
-  if (isResizing && lastPointerDownWith === "mouse") {
-    const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = getSelectedElements(elements, appState);
+  if (
+    isResizing &&
+    lastPointerDownWith === "mouse" &&
+    selectedElements.length === 1
+  ) {
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length > 2) {
       return null;

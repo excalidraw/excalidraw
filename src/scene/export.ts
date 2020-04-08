@@ -54,6 +54,7 @@ export function exportToCanvas(
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
+      remotePointerUsernames: {},
     },
     {
       renderScrollbars: false,
@@ -93,11 +94,11 @@ export function exportToSvg(
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/FG_Virgil.ttf");
+        src: url("https://excalidraw.com/FG_Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.ttf");
+        src: url("https://excalidraw.com/Cascadia.woff2");
       }
     </style>
   </defs>
