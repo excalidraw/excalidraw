@@ -54,7 +54,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d } from "../math";
+import { distance2d, isPathALoop } from "../math";
 
 import {
   isWritableElement,
@@ -1876,6 +1876,16 @@ export class App extends React.Component<any, AppState> {
       if (this.state.multiElement) {
         const { multiElement } = this.state;
 
+        // finalize if completing a loop
+        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+          mutateElement(multiElement, {
+            lastCommittedPoint:
+              multiElement.points[multiElement.points.length - 1],
+          });
+          this.actionManager.executeAction(actionFinalize);
+          return;
+        }
+
         const { x: rx, y: ry, lastCommittedPoint } = multiElement;
 
         // clicking inside commit zone → finalize arrow
@@ -1892,6 +1902,7 @@ export class App extends React.Component<any, AppState> {
           this.actionManager.executeAction(actionFinalize);
           return;
         }
+
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
