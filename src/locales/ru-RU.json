@@ -1,51 +1,53 @@
 {
   "labels": {
     "paste": "Вставить",
-    "selectAll": "Выделить всё",
+    "selectAll": "Выбрать все",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
-    "bringForward": "Переложить вперёд",
+    "copyAsSvg": "Скопировать в буфер обмена как SVG",
+    "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
-    "sendBackward": "Переложить назад",
+    "sendBackward": "Переместить назад",
     "delete": "Удалить",
     "copyStyles": "Скопировать стили",
     "pasteStyles": "Вставить стили",
     "stroke": "Обводка",
     "background": "Фон",
     "fill": "Заливка",
-    "strokeWidth": "Толщина обводки",
+    "strokeWidth": "",
     "sloppiness": "Стиль обводки",
     "opacity": "Непрозрачность",
-    "fontSize": "Размер шрифта",
-    "fontFamily": "Семейство шрифта",
+    "fontSize": "",
+    "fontFamily": "",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
-    "handDrawn": "Нарисованный от руки",
+    "handDrawn": "",
     "normal": "Обычный",
     "code": "Код",
     "small": "Малый",
     "medium": "Средний",
     "large": "Большой",
-    "veryLarge": "Очень Большой",
+    "veryLarge": "",
     "solid": "Однотонная",
     "hachure": "Штрихованная",
-    "crossHatch": "Перекрестная",
+    "crossHatch": "",
     "thin": "Тонкая",
     "bold": "Жирная",
-    "extraBold": "Очень Жирная",
+    "extraBold": "",
     "architect": "Архитектор",
     "artist": "Художник",
     "cartoonist": "Карикатурист",
     "fileTitle": "Название файла",
     "colorPicker": "Выбор цвета",
     "canvasBackground": "Фон холста",
-    "drawingCanvas": "Рисование холста",
+    "drawingCanvas": "",
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
-    "duplicateSelection": "Дублировать выбранные элементы"
+    "duplicateSelection": "",
+    "untitled": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -58,7 +60,7 @@
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
-    "selectLanguage": "Выбрать язык",
+    "selectLanguage": "",
     "scrollBackToContent": "Вернуться к содержимому",
     "zoomIn": "Увеличить",
     "zoomOut": "Уменьшить",
@@ -69,12 +71,13 @@
     "undo": "Шаг назад",
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
-    "createNewRoom": "Создать новую комнату"
+    "createNewRoom": "Создать новую комнату",
+    "toggleFullScreen": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
     "couldNotCreateShareableLink": "Не удалось создать общедоступную ссылку.",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Не удалось загрузить недопустимый файл",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
@@ -99,7 +102,7 @@
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
-    "resize": "",
+    "resize": "Вы можете сохранить пропорции, удерживая SHIFT во время изменения размера",
     "rotate": ""
   },
   "errorSplash": {
@@ -126,6 +129,19 @@
     "desc_exitSession": "Остановка сессии отсоединит вас от комнаты, но вы сможете продолжить работу локально. Это не повлияет на остальных участников, и они смогут продолжить работу над общей версией."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Ошибка"
+  },
+  "shortcutsDialog": {
+    "title": "",
+    "shapes": "Фигуры",
+    "or": "или",
+    "click": "",
+    "curvedArrow": "Изогнутая стрелка",
+    "curvedLine": "Изогнутая линия",
+    "editor": "",
+    "view": "",
+    "blog": "",
+    "howto": "",
+    "github": ""
   }
 }

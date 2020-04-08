@@ -1,6 +1,14 @@
-import { ExcalidrawElement, PointerType } from "./types";
+import {
+  ExcalidrawElement,
+  PointerType,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
-import { handlerRectangles } from "./handlerRectangles";
+import {
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+} from "./handlerRectangles";
 import { AppState } from "../types";
 import { isLinearElement } from "./typeChecks";
 
@@ -20,7 +28,7 @@ function isInHandlerRect(
 }
 
 export function resizeTest(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,
@@ -62,7 +70,7 @@ export function resizeTest(
 }
 
 export function getElementWithResizeHandler(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   { x, y }: { x: number; y: number },
   zoom: number,
@@ -74,19 +82,40 @@ export function getElementWithResizeHandler(
     }
     const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
-  }, null as { element: ExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+  }, null as { element: NonDeletedExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+}
+
+export function getResizeHandlerFromCoords(
+  [x1, y1, x2, y2]: readonly [number, number, number, number],
+  { x, y }: { x: number; y: number },
+  zoom: number,
+  pointerType: PointerType,
+) {
+  const handlers = handlerRectanglesFromCoords(
+    [x1, y1, x2, y2],
+    0,
+    zoom,
+    pointerType,
+    OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  );
+
+  const found = Object.keys(handlers).find((key) => {
+    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
+    return handler && isInHandlerRect(handler, x, y);
+  });
+  return (found || false) as HandlerRectanglesRet;
 }
 
 /*
  * Returns bi-directional cursor for the element being resized
  */
 export function getCursorForResizingElement(resizingElement: {
-  element: ExcalidrawElement;
+  element?: ExcalidrawElement;
   resizeHandle: ReturnType<typeof resizeTest>;
 }): string {
   const { element, resizeHandle } = resizingElement;
   const shouldSwapCursors =
-    Math.sign(element.height) * Math.sign(element.width) === -1;
+    element && Math.sign(element.height) * Math.sign(element.width) === -1;
   let cursor = null;
 
   switch (resizeHandle) {

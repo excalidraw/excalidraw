@@ -1,5 +1,6 @@
 import { FlooredNumber } from "./types";
 import { getZoomOrigin } from "./scene";
+import { CURSOR_TYPE } from "./constants";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -9,21 +10,20 @@ export function setDateTimeForTests(dateTime: string) {
   mockDateTime = dateTime;
 }
 
-export function getDateTime() {
+export const getDateTime = () => {
   if (mockDateTime) {
     return mockDateTime;
   }
 
   const date = new Date();
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hr = date.getHours();
-  const min = date.getMinutes();
-  const secs = date.getSeconds();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const hr = `${date.getHours()}`.padStart(2, "0");
+  const min = `${date.getMinutes()}`.padStart(2, "0");
 
-  return `${year}${month}${day}${hr}${min}${secs}`;
-}
+  return `${year}-${month}-${day}-${hr}${min}`;
+};
 
 export function capitalizeString(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -144,16 +144,33 @@ export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
 
+export function setCursorForShape(shape: string) {
+  if (shape === "selection") {
+    resetCursor();
+  } else {
+    document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+  }
+}
+
+export const isFullScreen = () =>
+  document.fullscreenElement?.nodeName === "HTML";
+
+export const allowFullScreen = () =>
+  document.documentElement.requestFullscreen();
+
+export const exitFullScreen = () => document.exitFullscreen();
+
 export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
-    return ` — ${shortcut
+    return `${shortcut
       .replace("CtrlOrCmd+", "⌘")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
-      .replace("Shift+", "⇧")}`;
+      .replace("Shift+", "⇧")
+      .replace("Del", "⌫")}`;
   }
-  return ` — ${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },

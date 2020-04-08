@@ -1,6 +1,6 @@
 import { distanceBetweenPointAndSegment } from "../math";
 
-import { ExcalidrawElement } from "./types";
+import { NonDeletedExcalidrawElement } from "./types";
 
 import { getDiamondPoints, getElementAbsoluteCoords } from "./bounds";
 import { Point } from "../types";
@@ -11,7 +11,7 @@ import { isLinearElement } from "./typeChecks";
 import { rotate } from "../math";
 
 function isElementDraggableFromInside(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
 ): boolean {
   return (
@@ -21,7 +21,7 @@ function isElementDraggableFromInside(
 }
 
 export function hitTest(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,

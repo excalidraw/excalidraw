@@ -33,6 +33,12 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement;
 
+export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
+  isDeleted: false;
+};
+
+export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";

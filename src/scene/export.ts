@@ -1,13 +1,15 @@
 import rough from "roughjs/bin/rough";
-import { ExcalidrawElement } from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 
+export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+
 export function exportToCanvas(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   {
     exportBackground,
@@ -50,7 +52,9 @@ export function exportToCanvas(
       scrollY: normalizeScroll(-minY + exportPadding),
       zoom: 1,
       remotePointerViewportCoords: {},
+      remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
+      remotePointerUsernames: {},
     },
     {
       renderScrollbars: false,
@@ -62,7 +66,7 @@ export function exportToCanvas(
 }
 
 export function exportToSvg(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
     exportPadding = 10,
@@ -85,15 +89,16 @@ export function exportToSvg(
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
   svgRoot.innerHTML = `
+  ${SVG_EXPORT_TAG}
   <defs>
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/FG_Virgil.ttf");
+        src: url("https://excalidraw.com/FG_Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.ttf");
+        src: url("https://excalidraw.com/Cascadia.woff2");
       }
     </style>
   </defs>

@@ -1,6 +1,6 @@
 import React from "react";
 import { t } from "../i18n";
-import { ExcalidrawElement } from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
@@ -9,7 +9,7 @@ import { isLinearElement } from "../element/typeChecks";
 
 interface Hint {
   appState: AppState;
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
 }
 
 const getHints = ({ appState, elements }: Hint) => {
@@ -22,8 +22,12 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
-  if (isResizing && lastPointerDownWith === "mouse") {
-    const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = getSelectedElements(elements, appState);
+  if (
+    isResizing &&
+    lastPointerDownWith === "mouse" &&
+    selectedElements.length === 1
+  ) {
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length > 2) {
       return null;

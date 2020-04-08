@@ -5,7 +5,11 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
-import { isTextElement, redrawTextBoundingBox } from "../element";
+import {
+  isTextElement,
+  redrawTextBoundingBox,
+  getNonDeletedElements,
+} from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
@@ -33,10 +37,15 @@ const getFormValue = function <T>(
   defaultValue?: T,
 ): T | null {
   const editingElement = appState.editingElement;
+  const nonDeletedElements = getNonDeletedElements(elements);
   return (
     (editingElement && getAttribute(editingElement)) ??
-    (isSomeElementSelected(elements, appState)
-      ? getCommonAttributeOfSelectedElements(elements, appState, getAttribute)
+    (isSomeElementSelected(nonDeletedElements, appState)
+      ? getCommonAttributeOfSelectedElements(
+          nonDeletedElements,
+          appState,
+          getAttribute,
+        )
       : defaultValue) ??
     null
   );
