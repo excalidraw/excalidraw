@@ -162,12 +162,34 @@ class Portal {
     this.roomID = null;
     this.roomKey = null;
   }
+
+  isOpen() {
+    return this.socketInitialized && this.socket && this.roomID && this.roomKey;
+  }
+
+  async _broadcastSocketData(
+    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+      _brand: "socketUpdateData";
+    },
+  ) {
+    if (this.isOpen()) {
+      const json = JSON.stringify(data);
+      const encoded = new TextEncoder().encode(json);
+      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
+      this.socket!.emit(
+        "server-broadcast",
+        this.roomID,
+        encrypted.data,
+        encrypted.iv,
+      );
+    }
+  }
 }
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  room: Portal = new Portal();
+  portal: Portal = new Portal();
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -444,7 +466,7 @@ export class App extends React.Component<any, AppState> {
   });
 
   componentDidUpdate() {
-    if (this.state.isCollaborating && !this.room.socket) {
+    if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
 
@@ -740,17 +762,17 @@ export class App extends React.Component<any, AppState> {
       isCollaborating: false,
       collaborators: new Map(),
     });
-    this.room.close();
+    this.portal.close();
   };
 
   private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
-    if (this.room.socket) {
+    if (this.portal.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const initialize = () => {
-        this.room.socketInitialized = true;
+        this.portal.socketInitialized = true;
         clearTimeout(initializationTimer);
         if (this.state.isLoading && !this.unmounted) {
           this.setState({ isLoading: false });
@@ -856,26 +878,30 @@ export class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.room.socketInitialized === false) {
+        if (this.portal.socketInitialized === false) {
           initialize();
         }
       };
 
-      this.room.open(socketIOClient(SOCKET_SERVER), roomMatch[1], roomMatch[2]);
+      this.portal.open(
+        socketIOClient(SOCKET_SERVER),
+        roomMatch[1],
+        roomMatch[2],
+      );
 
-      this.room.socket!.on("init-room", () => {
-        this.room.socket &&
-          this.room.socket.emit("join-room", this.room.roomID);
+      this.portal.socket!.on("init-room", () => {
+        this.portal.socket &&
+          this.portal.socket.emit("join-room", this.portal.roomID);
       });
-      this.room.socket!.on(
+      this.portal.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-          if (!this.room.roomKey) {
+          if (!this.portal.roomKey) {
             return;
           }
           const decryptedData = await decryptAESGEM(
             encryptedData,
-            this.room.roomKey,
+            this.portal.roomKey,
             iv,
           );
 
@@ -883,7 +909,7 @@ export class App extends React.Component<any, AppState> {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_INIT": {
-              if (!this.room.socketInitialized) {
+              if (!this.portal.socketInitialized) {
                 updateScene(decryptedData, { scrollToContent: true });
               }
               break;
@@ -916,13 +942,13 @@ export class App extends React.Component<any, AppState> {
           }
         },
       );
-      this.room.socket!.on("first-in-room", () => {
-        if (this.room.socket) {
-          this.room.socket.off("first-in-room");
+      this.portal.socket!.on("first-in-room", () => {
+        if (this.portal.socket) {
+          this.portal.socket.off("first-in-room");
         }
         initialize();
       });
-      this.room.socket!.on("room-user-change", (clients: string[]) => {
+      this.portal.socket!.on("room-user-change", (clients: string[]) => {
         this.setState((state) => {
           const collaborators: typeof state.collaborators = new Map();
           for (const socketID of clients) {
@@ -938,7 +964,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.room.socket!.on("new-user", async (_socketID: string) => {
+      this.portal.socket!.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -953,18 +979,18 @@ export class App extends React.Component<any, AppState> {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.room.socket?.id) {
+    if (this.portal.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketID: this.room.socket.id,
+          socketID: this.portal.socket.id,
           pointerCoords: payload.pointerCoords,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
           username: this.state.username,
         },
       };
-      return this._broadcastSocketData(
+      return this.portal._broadcastSocketData(
         data as typeof data & { _brand: "socketUpdateData" },
       );
     }
@@ -983,34 +1009,10 @@ export class App extends React.Component<any, AppState> {
       this.lastBroadcastedOrReceivedSceneVersion,
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
-    return this._broadcastSocketData(
+    return this.portal._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
     );
   };
-
-  // Low-level. Use type-specific broadcast* method.
-  private async _broadcastSocketData(
-    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-      _brand: "socketUpdateData";
-    },
-  ) {
-    if (
-      this.room.socketInitialized &&
-      this.room.socket &&
-      this.room.roomID &&
-      this.room.roomKey
-    ) {
-      const json = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.room.roomKey);
-      this.room.socket.emit(
-        "server-broadcast",
-        this.room.roomID,
-        encrypted.data,
-        encrypted.iv,
-      );
-    }
-  }
 
   private onSceneUpdated = () => {
     this.setState({});
@@ -2500,7 +2502,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.room.socket &&
+    this.portal.socket &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,
