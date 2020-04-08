@@ -1,5 +1,9 @@
 import React from "react";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  TextAlign,
+} from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
@@ -362,7 +366,7 @@ export const actionChangeFontFamily = register({
   ),
 });
 
-export const actionChangeTextAlgin = register({
+export const actionChangeTextAlign = register({
   name: "changeTextAlign",
   perform: (elements, appState, value) => {
     return {
@@ -387,7 +391,7 @@ export const actionChangeTextAlgin = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.textAlign")}</legend>
-      <ButtonSelect
+      <ButtonSelect<TextAlign | false>
         group="text-align"
         options={[
           { value: "left", text: t("labels.left") },

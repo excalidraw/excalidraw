@@ -37,7 +37,7 @@ export function textWysiwyg({
   zoom,
   angle,
   onChange,
-  textAlign = "left",
+  textAlign,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) {
