@@ -18,7 +18,7 @@
     "strokeWidth": "Πάχος μολυβιάς",
     "sloppiness": "Ακαταστασία",
     "opacity": "Διαφάνεια",
-    "textAlign": "",
+    "textAlign": "Στοίχιση κειμένου",
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
@@ -35,9 +35,9 @@
     "crossHatch": "Διασταυρούμενη εκκόλαψη",
     "thin": "Λεπτή",
     "bold": "Έντονη",
-    "left": "",
-    "center": "",
-    "right": "",
+    "left": "Αριστερά",
+    "center": "Κέντρο",
+    "right": "Δεξιά",
     "extraBold": "Πολύ έντονη",
     "architect": "Αρχιτέκτονας",
     "artist": "Καλλιτέχνης",
@@ -51,7 +51,7 @@
     "language": "Γλώσσα",
     "createRoom": "Έναρξη Ζωντανής Συνεδρίας",
     "duplicateSelection": "Δημιουργία αντιγράφου",
-    "untitled": ""
+    "untitled": "Χωρίς τίτλο"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
