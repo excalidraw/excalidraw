@@ -10,11 +10,11 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance, distance2d } from "../utils";
+import { SVG_NS, distance } from "../utils";
+import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
-const MAX_DISTANCE_TO_DETECT_LOOP = 8;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -223,19 +223,8 @@ function generateElement(
 
         // If shape is a line and is a closed shape,
         // fill the shape if a color is set.
-        if (element.type === "line" && points.length >= 3) {
-          const [firstPoint, lastPoint] = [
-            points[0],
-            points[points.length - 1],
-          ];
-          if (
-            distance2d(
-              firstPoint[0],
-              firstPoint[1],
-              lastPoint[0],
-              lastPoint[1],
-            ) <= MAX_DISTANCE_TO_DETECT_LOOP
-          ) {
+        if (element.type === "line") {
+          if (isPathALoop(element.points)) {
             options.fillStyle = element.fillStyle;
             options.fill =
               element.backgroundColor === "transparent"

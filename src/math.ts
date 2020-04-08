@@ -1,5 +1,7 @@
 import { Point } from "./types";
 
+const MAX_DISTANCE_TO_DETECT_LOOP = 8;
+
 // https://stackoverflow.com/a/6853926/232122
 export function distanceBetweenPointAndSegment(
   x: number,
@@ -144,3 +146,22 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
 
   return null;
 };
+
+export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+  const xd = x2 - x1;
+  const yd = y2 - y1;
+  return Math.hypot(xd, yd);
+}
+
+// Checks if the first and last point are close enough
+// to be considered a loop
+export function isPathALoop(points: Point[]): boolean {
+  if (points.length >= 3) {
+    const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
+    return (
+      distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
+      MAX_DISTANCE_TO_DETECT_LOOP
+    );
+  }
+  return false;
+}

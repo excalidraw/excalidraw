@@ -55,13 +55,14 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
+import { distance2d } from "../math";
+
 import {
   isWritableElement,
   isInputLike,
   isToolIcon,
   debounce,
   distance,
-  distance2d,
   resetCursor,
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
