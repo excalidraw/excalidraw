@@ -1,4 +1,8 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { getNonDeletedElements } from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -8,13 +12,17 @@ export interface SceneStateCallbackRemover {
   (): void;
 }
 
-class SceneState {
+class GlobalScene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   constructor(private _elements: readonly ExcalidrawElement[] = []) {}
 
-  getAllElements() {
+  getElementsIncludingDeleted() {
     return this._elements;
+  }
+
+  getElements(): readonly NonDeletedExcalidrawElement[] {
+    return getNonDeletedElements(this._elements);
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
@@ -44,4 +52,4 @@ class SceneState {
   }
 }
 
-export const globalSceneState = new SceneState();
+export const globalSceneState = new GlobalScene();

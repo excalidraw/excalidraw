@@ -9,6 +9,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
+import { globalSceneState } from "../scene";
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -17,16 +18,18 @@ export class ActionManager implements ActionsManagerInterface {
 
   getAppState: () => AppState;
 
-  getElements: () => readonly ExcalidrawElement[];
+  getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElements: () => readonly ExcalidrawElement[],
+    getElementsIncludingDeleted: () => ReturnType<
+      typeof globalSceneState["getElementsIncludingDeleted"]
+    >,
   ) {
     this.updater = updater;
     this.getAppState = getAppState;
-    this.getElements = getElements;
+    this.getElementsIncludingDeleted = getElementsIncludingDeleted;
   }
 
   registerAction(action: Action) {
@@ -43,7 +46,11 @@ export class ActionManager implements ActionsManagerInterface {
       .filter(
         (action) =>
           action.keyTest &&
-          action.keyTest(event, this.getAppState(), this.getElements()),
+          action.keyTest(
+            event,
+            this.getAppState(),
+            this.getElementsIncludingDeleted(),
+          ),
       );
 
     if (data.length === 0) {
@@ -51,12 +58,24 @@ export class ActionManager implements ActionsManagerInterface {
     }
 
     event.preventDefault();
-    this.updater(data[0].perform(this.getElements(), this.getAppState(), null));
+    this.updater(
+      data[0].perform(
+        this.getElementsIncludingDeleted(),
+        this.getAppState(),
+        null,
+      ),
+    );
     return true;
   }
 
   executeAction(action: Action) {
-    this.updater(action.perform(this.getElements(), this.getAppState(), null));
+    this.updater(
+      action.perform(
+        this.getElementsIncludingDeleted(),
+        this.getAppState(),
+        null,
+      ),
+    );
   }
 
   getContextMenuItems(actionFilter: ActionFilterFn = (action) => action) {
@@ -72,7 +91,11 @@ export class ActionManager implements ActionsManagerInterface {
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
           this.updater(
-            action.perform(this.getElements(), this.getAppState(), null),
+            action.perform(
+              this.getElementsIncludingDeleted(),
+              this.getAppState(),
+              null,
+            ),
           );
         },
       }));
@@ -84,13 +107,17 @@ export class ActionManager implements ActionsManagerInterface {
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState?: any) => {
         this.updater(
-          action.perform(this.getElements(), this.getAppState(), formState),
+          action.perform(
+            this.getElementsIncludingDeleted(),
+            this.getAppState(),
+            formState,
+          ),
         );
       };
 
       return (
         <PanelComponent
-          elements={this.getElements()}
+          elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}
         />
