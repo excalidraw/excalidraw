@@ -32,6 +32,6 @@ export const IsMobileProvider = ({
   return <context.Provider value={isMobile}>{children}</context.Provider>;
 };
 
-export const useIsMobile = () => {
+export default function useIsMobile() {
   return useContext(context);
-};
+}
