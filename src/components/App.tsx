@@ -54,7 +54,6 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
@@ -1281,7 +1280,7 @@ export class App extends React.Component<any, AppState> {
     const element =
       elementAtPosition && isTextElement(elementAtPosition)
         ? elementAtPosition
-        : (newTextElement({
+        : newTextElement({
             x: x,
             y: y,
             strokeColor: this.state.currentItemStrokeColor,
@@ -1292,7 +1291,7 @@ export class App extends React.Component<any, AppState> {
             opacity: this.state.currentItemOpacity,
             text: "",
             font: this.state.currentItemFont,
-          }) as NonDeleted<ExcalidrawTextElement>);
+          });
 
     this.setState({ editingElement: element });
 
@@ -1940,18 +1939,17 @@ export class App extends React.Component<any, AppState> {
         });
       }
     } else {
-      const element =
-        newElement({
-          type: this.state.elementType,
-          x: x,
-          y: y,
-          strokeColor: this.state.currentItemStrokeColor,
-          backgroundColor: this.state.currentItemBackgroundColor,
-          fillStyle: this.state.currentItemFillStyle,
-          strokeWidth: this.state.currentItemStrokeWidth,
-          roughness: this.state.currentItemRoughness,
-          opacity: this.state.currentItemOpacity,
-        }) as NonDeletedExcalidrawElement;
+      const element = newElement({
+        type: this.state.elementType,
+        x: x,
+        y: y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+      });
 
       if (element.type === "selection") {
         this.setState({
