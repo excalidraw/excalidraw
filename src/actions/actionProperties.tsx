@@ -8,7 +8,7 @@ import { ButtonSelect } from "../components/ButtonSelect";
 import {
   isTextElement,
   redrawTextBoundingBox,
-  toNonDeletedElements,
+  getNonDeletedElements,
 } from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
@@ -37,7 +37,7 @@ const getFormValue = function <T>(
   defaultValue?: T,
 ): T | null {
   const editingElement = appState.editingElement;
-  const nonDeletedElements = toNonDeletedElements(elements);
+  const nonDeletedElements = getNonDeletedElements(elements);
   return (
     (editingElement && getAttribute(editingElement)) ??
     (isSomeElementSelected(nonDeletedElements, appState)

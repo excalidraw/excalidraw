@@ -5,7 +5,7 @@ import React from "react";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
-import { toNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
@@ -22,7 +22,7 @@ export const actionDeleteSelected = register({
         multiElement: null,
       },
       commitToHistory: isSomeElementSelected(
-        toNonDeletedElements(elements),
+        getNonDeletedElements(elements),
         appState,
       ),
     };
@@ -37,7 +37,7 @@ export const actionDeleteSelected = register({
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(toNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });

@@ -2,7 +2,7 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { toNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -22,7 +22,7 @@ class SceneState {
   }
 
   getElements(): readonly NonDeletedExcalidrawElement[] {
-    return toNonDeletedElements(this._elements);
+    return getNonDeletedElements(this._elements);
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {

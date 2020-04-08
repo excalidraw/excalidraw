@@ -9,7 +9,7 @@ import { ToolButton } from "./ToolButton";
 import { capitalizeString, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
-import { toNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 
 export function SelectedShapeActions({
   appState,
@@ -23,7 +23,7 @@ export function SelectedShapeActions({
   elementType: ExcalidrawElement["type"];
 }) {
   const targetElements = getTargetElement(
-    toNonDeletedElements(elements),
+    getNonDeletedElements(elements),
     appState,
   );
   const isEditing = Boolean(appState.editingElement);
