@@ -485,8 +485,9 @@ export class App extends React.Component<any, AppState> {
       );
       cursorButton[socketID] = user.button;
     });
+    const elements = globalSceneState.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      globalSceneState.getElements().filter((element) => {
+      elements.filter((element) => {
         // don't render text element that's being currently edited (it's
         //  rendered on remote only)
         return (
@@ -518,8 +519,7 @@ export class App extends React.Component<any, AppState> {
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
-    const scrolledOutside =
-      !atLeastOneVisibleElement && globalSceneState.getElements().length > 0;
+    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
@@ -1502,13 +1502,12 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const selectedElements = getSelectedElements(
-      globalSceneState.getElements(),
-      this.state,
-    );
+    const elements = globalSceneState.getElements();
+
+    const selectedElements = getSelectedElements(elements, this.state);
     if (selectedElements.length === 1 && !isOverScrollBar) {
       const elementWithResizeHandler = getElementWithResizeHandler(
-        globalSceneState.getElements(),
+        elements,
         this.state,
         { x, y },
         this.state.zoom,
@@ -1537,7 +1536,7 @@ export class App extends React.Component<any, AppState> {
       }
     }
     const hitElement = getElementAtPosition(
-      globalSceneState.getElements(),
+      elements,
       this.state,
       x,
       y,
@@ -1736,13 +1735,11 @@ export class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      const selectedElements = getSelectedElements(
-        globalSceneState.getElements(),
-        this.state,
-      );
+      const elements = globalSceneState.getElements();
+      const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1) {
         const elementWithResizeHandler = getElementWithResizeHandler(
-          globalSceneState.getElements(),
+          elements,
           this.state,
           { x, y },
           this.state.zoom,
@@ -1780,7 +1777,7 @@ export class App extends React.Component<any, AppState> {
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
-          globalSceneState.getElements(),
+          elements,
           this.state,
           x,
           y,
@@ -2123,14 +2120,12 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (this.state.elementType === "selection") {
-        if (
-          !event.shiftKey &&
-          isSomeElementSelected(globalSceneState.getElements(), this.state)
-        ) {
+        const elements = globalSceneState.getElements();
+        if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
           this.setState({ selectedElementIds: {} });
         }
         const elementsWithinSelection = getElementsWithinSelection(
-          globalSceneState.getElements(),
+          elements,
           draggingElement,
         );
         this.setState((prevState) => ({
@@ -2366,8 +2361,9 @@ export class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
+    const elements = globalSceneState.getElements();
     const element = getElementAtPosition(
-      globalSceneState.getElements(),
+      elements,
       this.state,
       x,
       y,
@@ -2381,12 +2377,12 @@ export class App extends React.Component<any, AppState> {
             action: () => this.pasteFromClipboard(null),
           },
           probablySupportsClipboardBlob &&
-            globalSceneState.getElements().length > 0 && {
+            elements.length > 0 && {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
           probablySupportsClipboardWriteText &&
-            globalSceneState.getElements().length > 0 && {
+            elements.length > 0 && {
               label: t("labels.copyAsSvg"),
               action: this.copyToClipboardAsSvg,
             },
