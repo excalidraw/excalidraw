@@ -1,13 +1,13 @@
 {
   "labels": {
     "paste": "Επικόλληση",
-    "selectAll": "Επιλογή όλων",
+    "selectAll": "Επιλογή Όλων",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
     "bringForward": "Στο προσκήνιο",
-    "sendToBack": "",
-    "bringToFront": "",
+    "sendToBack": "Ένα επίπεδο πίσω",
+    "bringToFront": "Ένα επίπεδο μπροστά",
     "sendBackward": "Στο παρασκήνιο",
     "delete": "Διαγραφή",
     "copyStyles": "Αντιγραφή εμφάνισης",
@@ -46,7 +46,7 @@
     "actions": "Ενέργειες",
     "language": "Γλώσσα",
     "createRoom": "Έναρξη Ζωντανής Συνεδρίας",
-    "duplicateSelection": "",
+    "duplicateSelection": "Δημιουργία αντιγράφου",
     "untitled": ""
   },
   "buttons": {
