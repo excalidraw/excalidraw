@@ -26,6 +26,7 @@ export function Modal(props: {
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      tabIndex={-1}
     >
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div
