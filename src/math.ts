@@ -166,6 +166,9 @@ export function isPathALoop(points: Point[]): boolean {
   return false;
 }
 
+// Draw a line from the point to the right till infiinty
+// Check how many lines of the polygon does this infinite line intersects with
+// If the number of intersections is odd, point is in the polygon
 export function isPointInPolygon(
   points: Point[],
   x: number,
