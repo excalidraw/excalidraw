@@ -22,11 +22,13 @@ export function Dialog(props: {
       return;
     }
 
-    const buttons = islandRef.current.querySelectorAll("button");
+    const focusableElements = islandRef.current.querySelectorAll<HTMLElement>(
+      "button, a, input, select, textarea, [tabindex]",
+    );
 
-    if (buttons.length > 0) {
-      // If there's a button other than close, focus it.
-      (buttons[1] || buttons[0]).focus();
+    if (focusableElements.length > 0) {
+      // If there's an element other than close, focus it.
+      (focusableElements[1] || focusableElements[0]).focus();
     }
   }, []);
 
