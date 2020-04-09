@@ -139,11 +139,11 @@
     "title": "Atalhos de teclado",
     "shapes": "Formas",
     "or": "ou",
-    "click": "",
+    "click": "clicar",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "editor": "Editor",
-    "view": "",
+    "view": "Visualizar",
     "blog": "Leia o nosso blog",
     "howto": "Siga os nossos guias",
     "github": "Encontrou algum problema? Nos informe"
