@@ -18,6 +18,7 @@
     "strokeWidth": "Strichstärke",
     "sloppiness": "Sauberkeit",
     "opacity": "Sichtbarkeit",
+    "textAlign": "Textausrichtung",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -34,6 +35,9 @@
     "crossHatch": "Kreuzschraffiert",
     "thin": "Dünn",
     "bold": "Fett",
+    "left": "Links",
+    "center": "Zentriert",
+    "right": "Rechts",
     "extraBold": "Extra Fett",
     "architect": "Architekt",
     "artist": "Künstler",
@@ -82,7 +86,7 @@
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
-    "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert, sodass weder Excalidraw-Server noch Dritte den Inhalt einsehen können."
+    "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen."
   },
   "toolBar": {
     "selection": "Auswahl",
