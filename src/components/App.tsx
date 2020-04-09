@@ -172,13 +172,14 @@ class Portal {
     data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
       _brand: "socketUpdateData";
     },
+    volatile: boolean = false,
   ) {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey!);
       this.socket!.emit(
-        "server-broadcast",
+        volatile ? "server-volatile-broadcast" : "server-broadcast",
         this.roomID,
         encrypted.data,
         encrypted.iv,
@@ -994,6 +995,7 @@ export class App extends React.Component<any, AppState> {
       };
       return this.portal._broadcastSocketData(
         data as typeof data & { _brand: "socketUpdateData" },
+        true, // volatile
       );
     }
   };
