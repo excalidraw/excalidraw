@@ -146,6 +146,8 @@
     "view": "Widok",
     "blog": "Przeczytaj naszego bloga",
     "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go"
+    "github": "Znalazłeś problem? Zgłoś go",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
