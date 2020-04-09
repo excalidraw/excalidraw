@@ -96,7 +96,7 @@ const arrowResizeEnd: ResizeArrowFnType = (
   }
 };
 
-function applyResizeArrowFn(
+const applyResizeArrowFn = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowFn: ResizeArrowFnType | null,
   setResizeArrowFn: (fn: ResizeArrowFnType) => void,
@@ -106,7 +106,7 @@ function applyResizeArrowFn(
   y: number,
   lastX: number,
   lastY: number,
-) {
+) => {
   const angle = element.angle;
   const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
   if (!resizeArrowFn) {
@@ -118,9 +118,9 @@ function applyResizeArrowFn(
   }
   resizeArrowFn(element, 1, deltaX, deltaY, x, y, sidesWithSameLength);
   setResizeArrowFn(resizeArrowFn);
-}
+};
 
-export function resizeElements(
+export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   appState: AppState,
@@ -132,7 +132,7 @@ export function resizeElements(
   yPointer: number,
   lastX: number,
   lastY: number,
-) {
+) => {
   setAppState({
     isResizing: resizeHandle !== "rotation",
     isRotating: resizeHandle === "rotation",
@@ -307,12 +307,12 @@ export function resizeElements(
     }
   }
   return false;
-}
+};
 
-export function canResizeMutlipleElements(
+export const canResizeMutlipleElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-) {
+) => {
   return elements.every((element) =>
     ["rectangle", "diamond", "ellipse"].includes(element.type),
   );
-}
+};

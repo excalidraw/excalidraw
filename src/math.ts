@@ -56,14 +56,14 @@ export function rotate(
   ];
 }
 
-function adjustXYWithRotation(
+const adjustXYWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
   angle: number,
   deltaX: number,
   deltaY: number,
-) {
+) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   deltaX /= 2;
@@ -85,9 +85,9 @@ function adjustXYWithRotation(
     y += deltaY * (1 + cos);
   }
   return { x, y };
-}
+};
 
-export function resizeXYWidthHightWithRotation(
+export const resizeXYWidthHightWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
@@ -100,7 +100,7 @@ export function resizeXYWidthHightWithRotation(
   yPointer: number,
   offsetPointer: number,
   sidesWithSameLength: boolean,
-) {
+) => {
   // center point for rotation
   const cx = x + width / 2;
   const cy = y + height / 2;
@@ -141,7 +141,7 @@ export function resizeXYWidthHightWithRotation(
       height - nextHeight,
     ),
   };
-}
+};
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;
