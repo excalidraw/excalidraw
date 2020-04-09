@@ -56,7 +56,7 @@ export function rotate(
   ];
 }
 
-export function adjustXYWithRotation(
+function adjustXYWithRotation(
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
@@ -64,23 +64,89 @@ export function adjustXYWithRotation(
   deltaX: number,
   deltaY: number,
 ) {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  deltaX /= 2;
+  deltaY /= 2;
   if (side === "e" || side === "ne" || side === "se") {
-    x -= (deltaX / 2) * (1 - Math.cos(angle));
-    y -= (deltaX / 2) * -Math.sin(angle);
+    x += deltaX * (1 - cos);
+    y += deltaX * -sin;
   }
   if (side === "s" || side === "sw" || side === "se") {
-    x -= (deltaY / 2) * Math.sin(angle);
-    y -= (deltaY / 2) * (1 - Math.cos(angle));
+    x += deltaY * sin;
+    y += deltaY * (1 - cos);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    x += (deltaX / 2) * (1 + Math.cos(angle));
-    y += (deltaX / 2) * Math.sin(angle);
+    x += deltaX * (1 + cos);
+    y += deltaX * sin;
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    x += (deltaY / 2) * -Math.sin(angle);
-    y += (deltaY / 2) * (1 + Math.cos(angle));
+    x += deltaY * -sin;
+    y += deltaY * (1 + cos);
   }
   return { x, y };
+}
+
+export function resizeXYWidthHightWithRotation(
+  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  angle: number,
+  xPointer: number,
+  yPointer: number,
+  offset: number,
+  sidesWithSameLength: boolean,
+) {
+  // center point for rotation
+  const cx = x + width / 2;
+  const cy = y + height / 2;
+
+  // rotation with current angle
+  const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
+
+  let scaleX = 1;
+  let scaleY = 1;
+  let nextX = x;
+  let nextY = y;
+  if (side === "e" || side === "ne" || side === "se") {
+    scaleX = (rotatedX - offset - x) / width;
+    nextX += width * (scaleX - 1);
+  }
+  if (side === "s" || side === "sw" || side === "se") {
+    scaleY = (rotatedY - offset - y) / height;
+    nextY += height * (scaleY - 1);
+  }
+  if (side === "w" || side === "nw" || side === "sw") {
+    scaleX = (x + width - offset - rotatedX) / width;
+    nextX -= width * (scaleX - 1);
+  }
+  if (side === "n" || side === "nw" || side === "ne") {
+    scaleY = (y + height - offset - rotatedY) / height;
+    nextY -= height * (scaleY - 1);
+  }
+
+  let nextWidth = width * scaleX;
+  let nextHeight = height * scaleY;
+  if (sidesWithSameLength) {
+    nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
+  }
+
+  return {
+    x: nextX,
+    y: nextY,
+    width: nextWidth,
+    height: nextHeight,
+    ...adjustXYWithRotation(
+      side,
+      x,
+      y,
+      angle,
+      width - nextWidth,
+      height - nextHeight,
+    ),
+  };
 }
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
