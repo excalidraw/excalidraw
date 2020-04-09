@@ -1485,6 +1485,9 @@ export class App extends React.Component<any, AppState> {
             points: points.slice(0, -1),
           });
         } else {
+          if (isPathALoop(points)) {
+            document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          }
           // update last uncommitted point
           mutateElement(multiElement, {
             points: [...points.slice(0, -1), [x - rx, y - ry]],
