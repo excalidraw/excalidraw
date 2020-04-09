@@ -13,6 +13,7 @@ const ShortcutIsland = (props: {
       width: "49%",
       border: "1px solid #ced4da",
       marginBottom: "16px",
+      height: "-webkit-fill-available",
     }}
   >
     <h3

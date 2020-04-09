@@ -1,5 +1,6 @@
 .Island {
   --padding: 0;
+  word-break: keep-all;
   background-color: var(--bg-color-main);
   box-shadow: var(--shadow-island);
   border-radius: var(--border-radius-m);
