@@ -13,6 +13,7 @@ const ShortcutIsland = (props: {
       width: "49%",
       border: "1px solid #ced4da",
       marginBottom: "16px",
+      height: "-webkit-fill-available",
     }}
   >
     <h3
@@ -85,6 +86,7 @@ Shortcut.defaultProps = {
 const ShortcutKey = (props: { children: React.ReactNode }) => (
   <span
     style={{
+      wordBreak: "keep-all",
       border: "1px solid #ced4da",
       padding: "2px 8px",
       margin: "0 4px",
