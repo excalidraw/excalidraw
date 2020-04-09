@@ -280,7 +280,7 @@ export function resizeElements(
             ...adjustXYWithRotation(
               "sw",
               element,
-              width - element.width,
+              element.width - width,
               height - element.height,
               angle,
             ),
