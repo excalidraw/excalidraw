@@ -146,6 +146,8 @@
     "view": "View",
     "blog": "Read our blog",
     "howto": "Follow our guides",
-    "github": "Found an issue? Submit"
+    "github": "Found an issue? Submit",
+    "textNewLine": "Add new line (text)",
+    "textFinish": "Finish editing (text)"
   }
 }
