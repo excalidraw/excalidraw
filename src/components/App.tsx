@@ -2862,6 +2862,7 @@ class App extends React.Component<any, AppState> {
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
     const { deltaX, deltaY } = event;
+    const { selectedElementIds } = this.state;
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
@@ -2872,9 +2873,15 @@ class App extends React.Component<any, AppState> {
         delta = MAX_STEP;
       }
       delta *= sign;
+      const newElements = { ...selectedElementIds };
+      Object.keys(newElements).forEach((key) => {
+        newElements[key] = false;
+      });
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+        selectedElementIds: newElements,
       }));
+
       return;
     }
 
