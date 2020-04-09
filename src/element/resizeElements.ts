@@ -3,11 +3,7 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 import { rotate, adjustXYWithRotation } from "../math";
-import {
-  ExcalidrawLinearElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
-} from "./types";
+import { NonDeletedExcalidrawElement, ResizeArrowFnType } from "./types";
 import { getElementAbsoluteCoords, getCommonBounds } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -19,16 +15,6 @@ import {
 } from "./resizeTest";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
-
-export type ResizeArrowFnType = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  pointIndex: number,
-  deltaX: number,
-  deltaY: number,
-  pointerX: number,
-  pointerY: number,
-  perfect: boolean,
-) => void;
 
 const arrowResizeOrigin: ResizeArrowFnType = (
   element,
