@@ -97,7 +97,7 @@ const arrowResizeEnd: ResizeArrowFnType = (
 };
 
 function applyResizeArrowFn(
-  element: ExcalidrawLinearElement,
+  element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowFn: ResizeArrowFnType | null,
   setResizeArrowFn: (fn: ResizeArrowFnType) => void,
   isResizeEnd: boolean,
