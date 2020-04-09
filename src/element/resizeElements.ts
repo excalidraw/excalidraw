@@ -239,8 +239,8 @@ export function resizeElements(
     switch (resizeHandle) {
       case "se": {
         const scale = Math.max(
-          (xPointer - handleOffset - dashedLinePadding - x1) / (x2 - x1),
-          (yPointer - handleOffset - dashedLinePadding - y1) / (y2 - y1),
+          (xPointer - offset - x1) / (x2 - x1),
+          (yPointer - offset - y1) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -255,8 +255,8 @@ export function resizeElements(
       }
       case "nw": {
         const scale = Math.max(
-          (x2 - handleOffset - dashedLinePadding - xPointer) / (x2 - x1),
-          (y2 - handleOffset - dashedLinePadding - yPointer) / (y2 - y1),
+          (x2 - offset - xPointer) / (x2 - x1),
+          (y2 - offset - yPointer) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -271,8 +271,8 @@ export function resizeElements(
       }
       case "ne": {
         const scale = Math.max(
-          (xPointer - handleOffset - dashedLinePadding - x1) / (x2 - x1),
-          (y2 - handleOffset - dashedLinePadding - yPointer) / (y2 - y1),
+          (xPointer - offset - x1) / (x2 - x1),
+          (y2 - offset - yPointer) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -287,8 +287,8 @@ export function resizeElements(
       }
       case "sw": {
         const scale = Math.max(
-          (x2 - handleOffset - dashedLinePadding - xPointer) / (x2 - x1),
-          (yPointer - handleOffset - dashedLinePadding - y1) / (y2 - y1),
+          (x2 - offset - xPointer) / (x2 - x1),
+          (yPointer - offset - y1) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
