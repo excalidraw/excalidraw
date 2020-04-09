@@ -162,7 +162,8 @@ export const getShortcutKey = (shortcut: string): string => {
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
       .replace("Shift+", "⇧")
-      .replace("Del", "⌫")}`;
+      .replace("Del", "⌫")
+      .replace("Enter", "Return")}`;
   }
   return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
