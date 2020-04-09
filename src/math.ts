@@ -108,23 +108,17 @@ export function resizeXYWidthHightWithRotation(
 
   let scaleX = 1;
   let scaleY = 1;
-  let nextX = x;
-  let nextY = y;
   if (side === "e" || side === "ne" || side === "se") {
     scaleX = (rotatedX - offset - x) / width;
-    nextX += width * (scaleX - 1);
   }
   if (side === "s" || side === "sw" || side === "se") {
     scaleY = (rotatedY - offset - y) / height;
-    nextY += height * (scaleY - 1);
   }
   if (side === "w" || side === "nw" || side === "sw") {
     scaleX = (x + width - offset - rotatedX) / width;
-    nextX -= width * (scaleX - 1);
   }
   if (side === "n" || side === "nw" || side === "ne") {
     scaleY = (y + height - offset - rotatedY) / height;
-    nextY -= height * (scaleY - 1);
   }
 
   let nextWidth = width * scaleX;
@@ -134,8 +128,6 @@ export function resizeXYWidthHightWithRotation(
   }
 
   return {
-    x: nextX,
-    y: nextY,
     width: nextWidth,
     height: nextHeight,
     ...adjustXYWithRotation(
