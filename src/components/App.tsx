@@ -54,13 +54,14 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
+import { distance2d, isPathALoop } from "../math";
+
 import {
   isWritableElement,
   isInputLike,
   isToolIcon,
   debounce,
   distance,
-  distance2d,
   resetCursor,
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
@@ -97,7 +98,7 @@ import {
   POINTER_BUTTON,
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
-  ARROW_CONFIRM_THRESHOLD,
+  LINE_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
@@ -1456,7 +1457,7 @@ export class App extends React.Component<any, AppState> {
         //  threshold, add a point
         if (
           distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          ARROW_CONFIRM_THRESHOLD
+          LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
             points: [...points, [x - rx, y - ry]],
@@ -1477,13 +1478,16 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
           mutateElement(multiElement, {
             points: points.slice(0, -1),
           });
         } else {
+          if (isPathALoop(points)) {
+            document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          }
           // update last uncommitted point
           mutateElement(multiElement, {
             points: [...points.slice(0, -1), [x - rx, y - ry]],
@@ -1875,6 +1879,16 @@ export class App extends React.Component<any, AppState> {
       if (this.state.multiElement) {
         const { multiElement } = this.state;
 
+        // finalize if completing a loop
+        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+          mutateElement(multiElement, {
+            lastCommittedPoint:
+              multiElement.points[multiElement.points.length - 1],
+          });
+          this.actionManager.executeAction(actionFinalize);
+          return;
+        }
+
         const { x: rx, y: ry, lastCommittedPoint } = multiElement;
 
         // clicking inside commit zone → finalize arrow
@@ -1886,11 +1900,12 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           this.actionManager.executeAction(actionFinalize);
           return;
         }
+
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
