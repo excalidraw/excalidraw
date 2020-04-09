@@ -146,6 +146,8 @@
     "view": "Visning",
     "blog": "Les bloggen vår",
     "howto": "Følg våre veiledninger",
-    "github": "Funnet et problem? Send inn"
+    "github": "Funnet et problem? Send inn",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
