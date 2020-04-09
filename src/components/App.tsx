@@ -21,7 +21,6 @@ import {
   getDrawingVersion,
   getSyncableElements,
   newLinearElement,
-  ResizeArrowFnType,
   resizeElements,
   getElementWithResizeHandler,
   canResizeMutlipleElements,
@@ -52,7 +51,11 @@ import {
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ResizeArrowFnType,
+} from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
