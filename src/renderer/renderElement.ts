@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { isTextElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -6,11 +10,12 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
+import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
@@ -24,7 +29,7 @@ export interface ExcalidrawElementWithCanvas {
 }
 
 function generateElementCanvas(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   zoom: number,
 ): ExcalidrawElementWithCanvas {
   const canvas = document.createElement("canvas");
@@ -72,7 +77,7 @@ function generateElementCanvas(
 }
 
 function drawElementOnCanvas(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
 ) {
@@ -97,15 +102,28 @@ function drawElementOnCanvas(
         context.font = element.font;
         const fillStyle = context.fillStyle;
         context.fillStyle = element.strokeColor;
+        const textAlign = context.textAlign;
+        context.textAlign = element.textAlign as CanvasTextAlign;
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const offset = element.height - element.baseline;
+        const verticalOffset = element.height - element.baseline;
+        const horizontalOffset =
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
         for (let i = 0; i < lines.length; i++) {
-          context.fillText(lines[i], 0, (i + 1) * lineHeight - offset);
+          context.fillText(
+            lines[i],
+            0 + horizontalOffset,
+            (i + 1) * lineHeight - verticalOffset,
+          );
         }
         context.fillStyle = fillStyle;
         context.font = font;
+        context.textAlign = textAlign;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
@@ -133,7 +151,7 @@ export function invalidateShapeForElement(element: ExcalidrawElement) {
 }
 
 function generateElement(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
   sceneState?: SceneState,
 ) {
@@ -209,15 +227,28 @@ function generateElement(
         break;
       case "line":
       case "arrow": {
-        const options = {
+        const options: Options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
+
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
         const points = element.points.length ? element.points : [[0, 0]];
+
+        // If shape is a line and is a closed shape,
+        // fill the shape if a color is set.
+        if (element.type === "line") {
+          if (isPathALoop(element.points)) {
+            options.fillStyle = element.fillStyle;
+            options.fill =
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor;
+          }
+        }
 
         // curve is always the first element
         // this simplifies finding the curve for an element
@@ -285,7 +316,7 @@ function drawElementFromCanvas(
 }
 
 export function renderElement(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
@@ -342,7 +373,7 @@ export function renderElement(
 }
 
 export function renderElementToSvg(
-  element: ExcalidrawElement,
+  element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   offsetX?: number,

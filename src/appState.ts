@@ -1,7 +1,9 @@
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
+import { t } from "./i18n";
 
 export const DEFAULT_FONT = "20px Virgil";
+export const DEFAULT_TEXT_ALIGN = "left";
 
 export function getDefaultAppState(): AppState {
   return {
@@ -21,13 +23,16 @@ export function getDefaultAppState(): AppState {
     currentItemRoughness: 1,
     currentItemOpacity: 100,
     currentItemFont: DEFAULT_FONT,
+    currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     viewBackgroundColor: "#ffffff",
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
+    cursorButton: "up",
     scrolledOutside: false,
-    name: `excalidraw-${getDateTime()}`,
+    name: `${t("labels.untitled")}-${getDateTime()}`,
+    username: "",
     isCollaborating: false,
     isResizing: false,
     isRotating: false,
@@ -38,6 +43,7 @@ export function getDefaultAppState(): AppState {
     selectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
+    showShortcutsDialog: false,
   };
 }
 
@@ -54,6 +60,7 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isCollaborating,
     isLoading,
     errorMessage,
+    showShortcutsDialog,
     ...exportedState
   } = appState;
   return exportedState;
@@ -63,6 +70,7 @@ export function clearAppStatePropertiesForHistory(
   appState: AppState,
 ): Partial<AppState> {
   return {
+    selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
@@ -71,6 +79,7 @@ export function clearAppStatePropertiesForHistory(
     currentItemRoughness: appState.currentItemRoughness,
     currentItemOpacity: appState.currentItemOpacity,
     currentItemFont: appState.currentItemFont,
+    currentItemTextAlign: appState.currentItemTextAlign,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };

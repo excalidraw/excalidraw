@@ -1,10 +1,16 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 
 import { getElementAbsoluteCoords, hitTest } from "../element";
 import { AppState } from "../types";
 
 export const hasBackground = (type: string) =>
-  type === "rectangle" || type === "ellipse" || type === "diamond";
+  type === "rectangle" ||
+  type === "ellipse" ||
+  type === "diamond" ||
+  type === "line";
 
 export const hasStroke = (type: string) =>
   type === "rectangle" ||
@@ -16,7 +22,7 @@ export const hasStroke = (type: string) =>
 export const hasText = (type: string) => type === "text";
 
 export function getElementAtPosition(
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   x: number,
   y: number,

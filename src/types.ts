@@ -1,7 +1,9 @@
 import {
-  ExcalidrawElement,
   PointerType,
   ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  TextAlign,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -12,13 +14,13 @@ export type Point = Readonly<RoughPoint>;
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
-  draggingElement: ExcalidrawElement | null;
-  resizingElement: ExcalidrawElement | null;
-  multiElement: ExcalidrawLinearElement | null;
-  selectionElement: ExcalidrawElement | null;
+  draggingElement: NonDeletedExcalidrawElement | null;
+  resizingElement: NonDeletedExcalidrawElement | null;
+  multiElement: NonDeleted<ExcalidrawLinearElement> | null;
+  selectionElement: NonDeletedExcalidrawElement | null;
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
-  editingElement: ExcalidrawElement | null;
+  editingElement: NonDeletedExcalidrawElement | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
@@ -29,13 +31,16 @@ export type AppState = {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemFont: string;
+  currentItemTextAlign: TextAlign;
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
   cursorX: number;
   cursorY: number;
+  cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
+  username: string;
   isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
@@ -43,8 +48,20 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, { pointer?: { x: number; y: number } }>;
+  collaborators: Map<
+    string,
+    {
+      pointer?: {
+        x: number;
+        y: number;
+      };
+      button?: "up" | "down";
+      selectedElementIds?: AppState["selectedElementIds"];
+      username?: string | null;
+    }
+  >;
   shouldCacheIgnoreZoom: boolean;
+  showShortcutsDialog: boolean;
 };
 
 export type PointerCoords = Readonly<{

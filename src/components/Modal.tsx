@@ -26,9 +26,17 @@ export function Modal(props: {
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      tabIndex={-1}
     >
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
-      <div className="Modal__content" style={{ maxWidth: props.maxWidth }}>
+      <div
+        className="Modal__content"
+        style={{
+          maxWidth: props.maxWidth,
+          maxHeight: "100%",
+          overflowY: "scroll",
+        }}
+      >
         {props.children}
       </div>
     </div>,

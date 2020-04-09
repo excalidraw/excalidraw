@@ -1,13 +1,15 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-export function getElementAbsoluteCoords(element: ExcalidrawElement) {
+export function getElementAbsoluteCoords(
+  element: ExcalidrawElement,
+): [number, number, number, number] {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteBounds(element);
   }
@@ -34,9 +36,18 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 }
 
+export function getCurvePathOps(shape: Drawable): Op[] {
+  for (const set of shape.sets) {
+    if (set.type === "path") {
+      return set.ops;
+    }
+  }
+  return shape.sets[0].ops;
+}
+
 export function getLinearElementAbsoluteBounds(
   element: ExcalidrawLinearElement,
-) {
+): [number, number, number, number] {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
@@ -61,7 +72,7 @@ export function getLinearElementAbsoluteBounds(
   const shape = getShapeForElement(element) as Drawable[];
 
   // first element is always the curve
-  const ops = shape[0].sets[0].ops;
+  const ops = getCurvePathOps(shape[0]);
 
   let currentP: Point = [0, 0];
 
@@ -126,7 +137,7 @@ export function getArrowPoints(
   element: ExcalidrawLinearElement,
   shape: Drawable[],
 ) {
-  const ops = shape[0].sets[0].ops;
+  const ops = getCurvePathOps(shape[0]);
 
   const data = ops[ops.length - 1].data;
   const p3 = [data[4], data[5]] as Point;
@@ -186,26 +197,42 @@ export function getArrowPoints(
   return [x2, y2, x3, y3, x4, y4];
 }
 
-export function getCommonBounds(elements: readonly ExcalidrawElement[]) {
+export const getElementBounds = (
+  element: ExcalidrawElement,
+): [number, number, number, number] => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+  const minX = Math.min(x11, x12, x22, x21);
+  const minY = Math.min(y11, y12, y22, y21);
+  const maxX = Math.max(x11, x12, x22, x21);
+  const maxY = Math.max(y11, y12, y22, y21);
+  return [minX, minY, maxX, maxY];
+};
+
+export const getCommonBounds = (
+  elements: readonly ExcalidrawElement[],
+): [number, number, number, number] => {
+  if (!elements.length) {
+    return [0, 0, 0, 0];
+  }
+
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
   let maxY = -Infinity;
 
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const angle = element.angle;
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    const [x11, y11] = rotate(x1, y1, cx, cy, angle);
-    const [x12, y12] = rotate(x1, y2, cx, cy, angle);
-    const [x22, y22] = rotate(x2, y2, cx, cy, angle);
-    const [x21, y21] = rotate(x2, y1, cx, cy, angle);
-    minX = Math.min(minX, x11, x12, x22, x21);
-    minY = Math.min(minY, y11, y12, y22, y21);
-    maxX = Math.max(maxX, x11, x12, x22, x21);
-    maxY = Math.max(maxY, y11, y12, y22, y21);
+    const [x1, y1, x2, y2] = getElementBounds(element);
+    minX = Math.min(minX, x1);
+    minY = Math.min(minY, y1);
+    maxX = Math.max(maxX, x2);
+    maxY = Math.max(maxY, y2);
   });
 
   return [minX, minY, maxX, maxY];
-}
+};

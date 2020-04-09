@@ -7,6 +7,7 @@ import { done } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
+import { isPathALoop } from "../math";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -30,6 +31,23 @@ export const actionFinalize = register({
       }
       if (isInvisiblySmallElement(appState.multiElement)) {
         newElements = newElements.slice(0, -1);
+      }
+
+      // If the multi point line closes the loop,
+      // set the last point to first point.
+      // This ensures that loop remains closed at different scales.
+      if (appState.multiElement.type === "line") {
+        if (isPathALoop(appState.multiElement.points)) {
+          const linePoints = appState.multiElement.points;
+          const firstPoint = linePoints[0];
+          mutateElement(appState.multiElement, {
+            points: linePoints.map((point, i) =>
+              i === linePoints.length - 1
+                ? ([firstPoint[0], firstPoint[1]] as const)
+                : point,
+            ),
+          });
+        }
       }
 
       if (!appState.elementLocked) {

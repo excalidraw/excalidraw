@@ -36,6 +36,33 @@
   background-color: #eee;
 }
 
+.RoomDialog-usernameContainer {
+  display: flex;
+  margin: 1.5em 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RoomDialog-usernameLabel {
+}
+
+.RoomDialog-username {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin-left: 1em;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  background-color: #fff;
+  border: 1px solid #eee;
+}
+
 .RoomDialog-link:hover {
   background-color: #eee;
 }

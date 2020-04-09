@@ -1,3 +1,9 @@
+interface Document {
+  fonts?: {
+    ready?: Promise<void>;
+  };
+}
+
 interface Window {
   ClipboardItem: any;
 }

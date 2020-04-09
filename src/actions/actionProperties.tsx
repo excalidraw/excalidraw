@@ -1,11 +1,19 @@
 import React from "react";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  TextAlign,
+} from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
-import { isTextElement, redrawTextBoundingBox } from "../element";
+import {
+  isTextElement,
+  redrawTextBoundingBox,
+  getNonDeletedElements,
+} from "../element";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
@@ -33,10 +41,15 @@ const getFormValue = function <T>(
   defaultValue?: T,
 ): T | null {
   const editingElement = appState.editingElement;
+  const nonDeletedElements = getNonDeletedElements(elements);
   return (
     (editingElement && getAttribute(editingElement)) ??
-    (isSomeElementSelected(elements, appState)
-      ? getCommonAttributeOfSelectedElements(elements, appState, getAttribute)
+    (isSomeElementSelected(nonDeletedElements, appState)
+      ? getCommonAttributeOfSelectedElements(
+          nonDeletedElements,
+          appState,
+          getAttribute,
+        )
       : defaultValue) ??
     null
   );
@@ -346,6 +359,50 @@ export const actionChangeFontFamily = register({
           appState,
           (element) => isTextElement(element) && element.font.split("px ")[1],
           (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
+
+export const actionChangeTextAlign = register({
+  name: "changeTextAlign",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isTextElement(el)) {
+          const element: ExcalidrawTextElement = newElementWith(el, {
+            textAlign: value,
+          });
+          redrawTextBoundingBox(element);
+          return element;
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        currentItemTextAlign: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.textAlign")}</legend>
+      <ButtonSelect<TextAlign | false>
+        group="text-align"
+        options={[
+          { value: "left", text: t("labels.left") },
+          { value: "center", text: t("labels.center") },
+          { value: "right", text: t("labels.right") },
+        ]}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => isTextElement(element) && element.textAlign,
+          appState.currentItemTextAlign,
         )}
         onChange={(value) => updateData(value)}
       />
