@@ -96,6 +96,30 @@ const arrowResizeEnd: ResizeArrowFnType = (
   }
 };
 
+function applyResizeArrowFn(
+  element: ExcalidrawLinearElement,
+  resizeArrowFn: ResizeArrowFnType | null,
+  setResizeArrowFn: (fn: ResizeArrowFnType) => void,
+  isResizeEnd: boolean,
+  event: PointerEvent,
+  x: number,
+  y: number,
+  lastX: number,
+  lastY: number,
+) {
+  const angle = element.angle;
+  const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
+  if (!resizeArrowFn) {
+    if (isResizeEnd) {
+      resizeArrowFn = arrowResizeEnd;
+    } else {
+      resizeArrowFn = arrowResizeOrigin;
+    }
+  }
+  resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
+  setResizeArrowFn(resizeArrowFn);
+}
+
 export function resizeElements(
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
@@ -118,24 +142,41 @@ export function resizeElements(
     appState,
   );
   if (selectedElements.length === 1) {
-    const element = selectedElements[0];
+    const [element] = selectedElements;
     const angle = element.angle;
+
+    // TO REMOVE
     // reverse rotate delta
     const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
+
+    // COMMON MATHS
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = x1 + (x2 - x1) / 2;
+    const cy = y1 + (y2 - y1) / 2;
+    const [rotatedX, rotatedY] = rotate(x, y, cx, cy, -angle);
+    const handleOffset = 4 / appState.zoom; // XXX import constant
+    const dashedLinePadding = 4 / appState.zoom; // XXX import constant
+
     switch (resizeHandle) {
       case "nw":
-        if (isLinearElement(element) && element.points.length === 2) {
-          const [, p1] = element.points;
-
-          if (!resizeArrowFn) {
-            if (p1[0] < 0 || p1[1] < 0) {
-              resizeArrowFn = arrowResizeEnd;
-            } else {
-              resizeArrowFn = arrowResizeOrigin;
-            }
+        if (isLinearElement(element)) {
+          if (element.points.length > 2) {
+            // todo
+          } else {
+            const [, [px, py]] = element.points;
+            const isResizeEnd = px < 0 || py < 0;
+            applyResizeArrowFn(
+              element,
+              resizeArrowFn,
+              setResizeArrowFn,
+              isResizeEnd,
+              event,
+              x,
+              y,
+              lastX,
+              lastY,
+            );
           }
-          resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-          setResizeArrowFn(resizeArrowFn);
         } else {
           const width = element.width - deltaX;
           const height = event.shiftKey ? width : element.height - deltaY;
@@ -157,17 +198,24 @@ export function resizeElements(
         }
         break;
       case "ne":
-        if (isLinearElement(element) && element.points.length === 2) {
-          const [, p1] = element.points;
-          if (!resizeArrowFn) {
-            if (p1[0] >= 0) {
-              resizeArrowFn = arrowResizeEnd;
-            } else {
-              resizeArrowFn = arrowResizeOrigin;
-            }
+        if (isLinearElement(element)) {
+          if (element.points.length > 2) {
+            // todo
+          } else {
+            const [, [px]] = element.points;
+            const isResizeEnd = px >= 0;
+            applyResizeArrowFn(
+              element,
+              resizeArrowFn,
+              setResizeArrowFn,
+              isResizeEnd,
+              event,
+              x,
+              y,
+              lastX,
+              lastY,
+            );
           }
-          resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-          setResizeArrowFn(resizeArrowFn);
         } else {
           const width = element.width + deltaX;
           const height = event.shiftKey ? width : element.height - deltaY;
@@ -189,66 +237,140 @@ export function resizeElements(
         }
         break;
       case "sw":
-        if (isLinearElement(element) && element.points.length === 2) {
-          const [, p1] = element.points;
-          if (!resizeArrowFn) {
-            if (p1[0] <= 0) {
-              resizeArrowFn = arrowResizeEnd;
-            } else {
-              resizeArrowFn = arrowResizeOrigin;
-            }
+        if (isLinearElement(element)) {
+          if (element.points.length > 2) {
+            // todo
+          } else {
+            const [, [px]] = element.points;
+            const isResizeEnd = px <= 0;
+            applyResizeArrowFn(
+              element,
+              resizeArrowFn,
+              setResizeArrowFn,
+              isResizeEnd,
+              event,
+              x,
+              y,
+              lastX,
+              lastY,
+            );
           }
-          resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-          setResizeArrowFn(resizeArrowFn);
         } else {
-          const width = element.width - deltaX;
-          const height = event.shiftKey ? width : element.height + deltaY;
-          const dY = height - element.height;
+          // other elements diamond, rectangle or ellipse
+          const scaleX =
+            (x2 - handleOffset - dashedLinePadding - rotatedX) / (x2 - x1);
+          const scaleY =
+            (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+
+          let width = element.width * scaleX;
+          let height = element.height * scaleY;
+          let elementX = element.x - (x2 - element.x) * (scaleX - 1);
+          const elementY = element.y + (element.y - y1) * (scaleY - 1);
+
+          if (event.shiftKey) {
+            width = Math.max(width, height);
+            height = width;
+            elementX = elementX - width - x2 - rotatedX;
+          }
           mutateElement(element, {
+            x: elementX,
+            y: elementY,
             width,
             height,
-            ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
-            ...(isLinearElement(element) && width >= 0 && height >= 0
-              ? {
-                  points: rescalePoints(
-                    0,
-                    width,
-                    rescalePoints(1, height, element.points),
-                  ),
-                }
-              : {}),
+            ...adjustXYWithRotation(
+              "sw",
+              element,
+              width - element.width,
+              height - element.height,
+              angle,
+            ),
           });
+
+          // const width = element.width - deltaX;
+          // const height = event.shiftKey ? width : element.height + deltaY;
+          // const dY = height - element.height;
+          // mutateElement(element, {
+          //   width,
+          //   height,
+          //   ...adjustXYWithRotation("sw", element, deltaX, dY, angle),
+          //   ...(isLinearElement(element) && width >= 0 && height >= 0
+          //     ? {
+          //       points: rescalePoints(
+          //         0,
+          //         width,
+          //         rescalePoints(1, height, element.points),
+          //       ),
+          //     }
+          //     : {}),
+          // });
         }
         break;
       case "se":
-        if (isLinearElement(element) && element.points.length === 2) {
-          const [, p1] = element.points;
-          if (!resizeArrowFn) {
-            if (p1[0] > 0 || p1[1] > 0) {
-              resizeArrowFn = arrowResizeEnd;
-            } else {
-              resizeArrowFn = arrowResizeOrigin;
-            }
+        if (isLinearElement(element)) {
+          if (element.points.length > 2) {
+            const scaleX =
+              (rotatedX - handleOffset - dashedLinePadding - x1) / (x2 - x1);
+            const scaleY =
+              (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+            const width = element.width * scaleX;
+            const height = event.shiftKey ? width : element.height * scaleY;
+            mutateElement(element, {
+              width,
+              height,
+              ...adjustXYWithRotation(
+                "se",
+                element,
+                width - element.width,
+                height - element.height,
+                angle,
+              ),
+              ...(width >= 0 && height >= 0
+                ? {
+                    points: rescalePoints(
+                      0,
+                      width,
+                      rescalePoints(1, height, element.points),
+                    ),
+                  }
+                : {}),
+            });
+          } else {
+            const [, [px, py]] = element.points;
+            const isResizeEnd = px > 0 || py > 0;
+            applyResizeArrowFn(
+              element,
+              resizeArrowFn,
+              setResizeArrowFn,
+              isResizeEnd,
+              event,
+              x,
+              y,
+              lastX,
+              lastY,
+            );
           }
-          resizeArrowFn(element, 1, deltaX, deltaY, x, y, event.shiftKey);
-          setResizeArrowFn(resizeArrowFn);
         } else {
-          const width = element.width + deltaX;
-          const height = event.shiftKey ? width : element.height + deltaY;
-          const dY = height - element.height;
+          // other elements diamond, rectangle or ellipse
+          const scaleX =
+            (rotatedX - handleOffset - dashedLinePadding - x1) / (x2 - x1);
+          const scaleY =
+            (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+          let width = element.width * scaleX;
+          let height = element.height * scaleY;
+          if (event.shiftKey) {
+            width = Math.max(width, height);
+            height = width;
+          }
           mutateElement(element, {
             width,
             height,
-            ...adjustXYWithRotation("se", element, deltaX, dY, angle),
-            ...(isLinearElement(element) && width >= 0 && height >= 0
-              ? {
-                  points: rescalePoints(
-                    0,
-                    width,
-                    rescalePoints(1, height, element.points),
-                  ),
-                }
-              : {}),
+            ...adjustXYWithRotation(
+              "se",
+              element,
+              width - element.width,
+              height - element.height,
+              angle,
+            ),
           });
         }
         break;
