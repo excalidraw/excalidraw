@@ -3,6 +3,7 @@ import { getDateTime } from "./utils";
 import { t } from "./i18n";
 
 export const DEFAULT_FONT = "20px Virgil";
+export const DEFAULT_TEXT_ALIGN = "left";
 
 export const getDefaultAppState = (): AppState => {
   return {
@@ -22,6 +23,7 @@ export const getDefaultAppState = (): AppState => {
     currentItemRoughness: 1,
     currentItemOpacity: 100,
     currentItemFont: DEFAULT_FONT,
+    currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     viewBackgroundColor: "#ffffff",
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
@@ -77,6 +79,7 @@ export const clearAppStatePropertiesForHistory = (
     currentItemRoughness: appState.currentItemRoughness,
     currentItemOpacity: appState.currentItemOpacity,
     currentItemFont: appState.currentItemFont,
+    currentItemTextAlign: appState.currentItemTextAlign,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };

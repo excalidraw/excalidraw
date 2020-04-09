@@ -9,6 +9,7 @@ import { ToolButton } from "./ToolButton";
 import { capitalizeString, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
+import { getNonDeletedElements } from "../element";
 
 export const SelectedShapeActions = ({
   appState,
@@ -21,7 +22,10 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) => {
-  const targetElements = getTargetElement(elements, appState);
+  const targetElements = getTargetElement(
+    getNonDeletedElements(elements),
+    appState,
+  );
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
 
@@ -52,6 +56,8 @@ export const SelectedShapeActions = ({
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
+
+          {renderAction("changeTextAlign")}
         </>
       )}
 
@@ -82,48 +88,42 @@ export const SelectedShapeActions = ({
 export const ShapesSwitcher = ({
   elementType,
   setAppState,
-  setElements,
-  elements,
 }: {
   elementType: ExcalidrawElement["type"];
   setAppState: any;
-  setElements: any;
-  elements: readonly ExcalidrawElement[];
-}) => {
-  return (
-    <>
-      {SHAPES.map(({ value, icon }, index) => {
-        const label = t(`toolBar.${value}`);
-        const shortcut = `${capitalizeString(value)[0]} ${t(
-          "shortcutsDialog.or",
-        )} ${index + 1}`;
-        return (
-          <ToolButton
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={elementType === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${shortcut}`}
-            keyBindingLabel={`${index + 1}`}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={`${label[0]} ${index + 1}`}
-            data-testid={value}
-            onChange={() => {
-              setAppState({
-                elementType: value,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              setCursorForShape(value);
-              setAppState({});
-            }}
-          ></ToolButton>
-        );
-      })}
-    </>
-  );
-};
+}) => (
+  <>
+    {SHAPES.map(({ value, icon }, index) => {
+      const label = t(`toolBar.${value}`);
+      const shortcut = `${capitalizeString(value)[0]} ${t(
+        "shortcutsDialog.or",
+      )} ${index + 1}`;
+      return (
+        <ToolButton
+          key={value}
+          type="radio"
+          icon={icon}
+          checked={elementType === value}
+          name="editor-current-shape"
+          title={`${capitalizeString(label)} — ${shortcut}`}
+          keyBindingLabel={`${index + 1}`}
+          aria-label={capitalizeString(label)}
+          aria-keyshortcuts={`${label[0]} ${index + 1}`}
+          data-testid={value}
+          onChange={() => {
+            setAppState({
+              elementType: value,
+              multiElement: null,
+              selectedElementIds: {},
+            });
+            setCursorForShape(value);
+            setAppState({});
+          }}
+        ></ToolButton>
+      );
+    })}
+  </>
+);
 
 export const ZoomActions = ({
   renderAction,

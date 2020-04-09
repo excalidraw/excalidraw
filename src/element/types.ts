@@ -33,12 +33,19 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement;
 
+export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
+  isDeleted: false;
+};
+
+export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     font: string;
     text: string;
     baseline: number;
+    textAlign: TextAlign;
   }>;
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
@@ -49,3 +56,15 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";
+
+export type TextAlign = "left" | "center" | "right";
+
+export type ResizeArrowFnType = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  pointIndex: number,
+  deltaX: number,
+  deltaY: number,
+  pointerX: number,
+  pointerY: number,
+  perfect: boolean,
+) => void;

@@ -124,12 +124,6 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
-export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
-  const xd = x2 - x1;
-  const yd = y2 - y1;
-  return Math.hypot(xd, yd);
-};
-
 export const resetCursor = () => {
   document.documentElement.style.cursor = "";
 };

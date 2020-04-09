@@ -10,6 +10,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -102,6 +103,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -140,6 +142,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -207,6 +210,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -276,6 +280,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -323,6 +328,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#5f3dc4",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -392,6 +398,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -430,6 +437,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -468,6 +476,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -506,6 +515,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -544,6 +554,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#5f3dc4",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -591,6 +602,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -661,6 +673,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -699,6 +712,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -747,6 +761,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -818,6 +833,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -856,6 +872,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -895,6 +912,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -944,6 +962,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -1036,6 +1055,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1074,6 +1094,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1131,6 +1152,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1198,6 +1220,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -1313,6 +1336,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1351,6 +1375,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1408,6 +1433,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1484,6 +1510,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1571,6 +1598,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -1748,6 +1776,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
@@ -1764,6 +1793,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1802,6 +1832,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1859,6 +1890,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -1935,6 +1967,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2041,6 +2074,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2186,6 +2220,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2255,6 +2290,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2302,6 +2338,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2371,6 +2408,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2418,6 +2456,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2487,6 +2526,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2534,6 +2574,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2614,6 +2655,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2672,6 +2714,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2752,6 +2795,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2810,6 +2854,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -2890,6 +2935,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -2948,6 +2994,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -3017,6 +3064,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3064,6 +3112,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -3133,6 +3182,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3180,6 +3230,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -3260,6 +3311,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3318,6 +3370,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -3387,6 +3440,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3434,6 +3488,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
@@ -3489,6 +3544,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -3574,6 +3630,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3612,6 +3669,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3651,6 +3709,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3691,6 +3750,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3732,6 +3792,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3774,6 +3835,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3817,6 +3879,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3861,6 +3924,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3906,6 +3970,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3952,6 +4017,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -3999,6 +4065,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4047,6 +4114,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4096,6 +4164,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4146,6 +4215,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4197,6 +4267,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4249,6 +4320,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4302,6 +4374,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4365,6 +4438,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -4441,6 +4515,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4479,6 +4554,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4518,6 +4594,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4558,6 +4635,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4599,6 +4677,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4641,6 +4720,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4684,6 +4764,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4728,6 +4809,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4782,6 +4864,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -4856,6 +4939,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4894,6 +4978,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4933,6 +5018,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -4973,6 +5059,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5014,6 +5101,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5056,6 +5144,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5108,6 +5197,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -5180,6 +5270,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5218,6 +5309,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5257,6 +5349,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5297,6 +5390,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5347,6 +5441,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -5417,6 +5512,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5455,6 +5551,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5503,6 +5600,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -5587,6 +5685,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5625,6 +5724,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5664,6 +5764,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5704,6 +5805,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5745,6 +5847,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5787,6 +5890,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5830,6 +5934,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5874,6 +5979,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5919,6 +6025,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -5965,6 +6072,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6012,6 +6120,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6060,6 +6169,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6109,6 +6219,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6159,6 +6270,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6210,6 +6322,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6262,6 +6375,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6324,6 +6438,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -6406,6 +6521,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6444,6 +6560,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6483,6 +6600,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6523,6 +6641,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6564,6 +6683,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6606,6 +6726,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6649,6 +6770,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6693,6 +6815,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6738,6 +6861,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6784,6 +6908,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6831,6 +6956,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6879,6 +7005,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6928,6 +7055,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -6978,6 +7106,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7038,6 +7167,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -7118,6 +7248,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7156,6 +7287,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7195,6 +7327,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7235,6 +7368,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7276,6 +7410,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7318,6 +7453,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7361,6 +7497,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7405,6 +7542,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7450,6 +7588,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7496,6 +7635,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7543,6 +7683,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7591,6 +7732,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7649,6 +7791,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -7727,6 +7870,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7765,6 +7909,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7804,6 +7949,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7844,6 +7990,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7885,6 +8032,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7927,6 +8075,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -7970,6 +8119,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8014,6 +8164,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8059,6 +8210,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8105,6 +8257,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8161,6 +8314,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -8238,6 +8392,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8276,6 +8431,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8315,6 +8471,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8355,6 +8512,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8396,6 +8554,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8438,6 +8597,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8481,6 +8641,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8525,6 +8686,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8570,6 +8732,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8625,6 +8788,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -8700,6 +8864,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8738,6 +8903,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8777,6 +8943,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8817,6 +8984,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8858,6 +9026,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8900,6 +9069,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8943,6 +9113,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -8996,6 +9167,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -9069,6 +9241,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9107,6 +9280,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9146,6 +9320,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9186,6 +9361,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9227,6 +9403,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9278,6 +9455,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -9349,6 +9527,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9387,6 +9566,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9426,6 +9606,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9475,6 +9656,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -9560,6 +9742,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9598,6 +9781,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9637,6 +9821,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9677,6 +9862,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9718,6 +9904,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9760,6 +9947,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9803,6 +9991,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9847,6 +10036,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9892,6 +10082,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9938,6 +10129,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -9985,6 +10177,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10033,6 +10226,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10082,6 +10276,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10132,6 +10327,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10183,6 +10379,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10235,6 +10432,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10288,6 +10486,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10351,6 +10550,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -10434,6 +10634,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10472,6 +10673,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10511,6 +10713,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10551,6 +10754,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10592,6 +10796,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10634,6 +10839,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10677,6 +10883,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10721,6 +10928,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10766,6 +10974,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10812,6 +11021,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10859,6 +11069,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10907,6 +11118,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -10956,6 +11168,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11006,6 +11219,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11057,6 +11271,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11118,6 +11333,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -11199,6 +11415,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11237,6 +11454,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11276,6 +11494,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11316,6 +11535,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11357,6 +11577,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11399,6 +11620,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11442,6 +11664,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11486,6 +11709,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11531,6 +11755,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11577,6 +11802,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11624,6 +11850,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11672,6 +11899,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11721,6 +11949,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11780,6 +12009,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -11859,6 +12089,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11897,6 +12128,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11936,6 +12168,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -11976,6 +12209,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12017,6 +12251,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12059,6 +12294,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12102,6 +12338,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12146,6 +12383,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12191,6 +12429,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12237,6 +12476,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12284,6 +12524,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12341,6 +12582,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -12436,6 +12678,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12474,6 +12717,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12531,6 +12775,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12589,6 +12834,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12649,6 +12895,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -12719,6 +12966,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -12772,6 +13020,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
@@ -12827,6 +13076,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
@@ -12939,6 +13189,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -13017,6 +13268,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -13055,6 +13307,7 @@ Object {
         "currentItemRoughness": 1,
         "currentItemStrokeColor": "#000000",
         "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
@@ -13121,6 +13374,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,

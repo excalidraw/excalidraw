@@ -77,6 +77,7 @@ it("clones text element", () => {
     opacity: 100,
     text: "hello",
     font: "Arial 20px",
+    textAlign: "left",
   });
 
   const copy = duplicateElement(element);

@@ -20,9 +20,7 @@ import {
   getElementMap,
   getDrawingVersion,
   getSyncableElements,
-  hasNonDeletedElements,
   newLinearElement,
-  ResizeArrowFnType,
   resizeElements,
   getElementWithResizeHandler,
   canResizeMutlipleElements,
@@ -53,7 +51,13 @@ import {
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ResizeArrowFnType,
+} from "../element/types";
+
+import { distance2d, isPathALoop } from "../math";
 
 import {
   isWritableElement,
@@ -61,7 +65,6 @@ import {
   isToolIcon,
   debounce,
   distance,
-  distance2d,
   resetCursor,
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
@@ -98,7 +101,7 @@ import {
   POINTER_BUTTON,
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
-  ARROW_CONFIRM_THRESHOLD,
+  LINE_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
@@ -165,12 +168,35 @@ class Portal {
     this.roomID = null;
     this.roomKey = null;
   }
+
+  isOpen() {
+    return this.socketInitialized && this.socket && this.roomID && this.roomKey;
+  }
+
+  async _broadcastSocketData(
+    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+      _brand: "socketUpdateData";
+    },
+    volatile: boolean = false,
+  ) {
+    if (this.isOpen()) {
+      const json = JSON.stringify(data);
+      const encoded = new TextEncoder().encode(json);
+      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
+      this.socket!.emit(
+        volatile ? "server-volatile-broadcast" : "server-broadcast",
+        this.roomID,
+        encrypted.data,
+        encrypted.iv,
+      );
+    }
+  }
 }
 
 export class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  room: Portal = new Portal();
+  portal: Portal = new Portal();
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -187,7 +213,7 @@ export class App extends React.Component<any, AppState> {
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
-      () => globalSceneState.getAllElements(),
+      () => globalSceneState.getElementsIncludingDeleted(),
     );
     this.actionManager.registerAll(actions);
 
@@ -211,10 +237,7 @@ export class App extends React.Component<any, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={globalSceneState.getAllElements().filter((element) => {
-            return !element.isDeleted;
-          })}
-          setElements={this.setElements}
+          elements={globalSceneState.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onLockToggle={this.toggleLock}
@@ -312,7 +335,7 @@ export class App extends React.Component<any, AppState> {
     try {
       await Promise.race([
         document.fonts?.ready?.then(() => {
-          globalSceneState.getAllElements().forEach((element) => {
+          globalSceneState.getElementsIncludingDeleted().forEach((element) => {
             if (isTextElement(element)) {
               invalidateShapeForElement(element);
             }
@@ -433,7 +456,7 @@ export class App extends React.Component<any, AppState> {
   }
   private onResize = withBatchedUpdates(() => {
     globalSceneState
-      .getAllElements()
+      .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
     this.setState({});
   });
@@ -441,7 +464,7 @@ export class App extends React.Component<any, AppState> {
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
       this.state.isCollaborating &&
-      hasNonDeletedElements(globalSceneState.getAllElements())
+      globalSceneState.getElements().length > 0
     ) {
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
@@ -450,7 +473,7 @@ export class App extends React.Component<any, AppState> {
   });
 
   componentDidUpdate() {
-    if (this.state.isCollaborating && !this.room.socket) {
+    if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
 
@@ -486,8 +509,9 @@ export class App extends React.Component<any, AppState> {
       );
       cursorButton[socketID] = user.button;
     });
+    const elements = globalSceneState.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      globalSceneState.getAllElements().filter((element) => {
+      elements.filter((element) => {
         // don't render text element that's being currently edited (it's
         //  rendered on remote only)
         return (
@@ -519,22 +543,20 @@ export class App extends React.Component<any, AppState> {
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
-    const scrolledOutside =
-      !atLeastOneVisibleElement &&
-      hasNonDeletedElements(globalSceneState.getAllElements());
+    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
     this.saveDebounced();
 
     if (
-      getDrawingVersion(globalSceneState.getAllElements()) >
+      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastScene("SCENE_UPDATE");
     }
 
-    history.record(this.state, globalSceneState.getAllElements());
+    history.record(this.state, globalSceneState.getElementsIncludingDeleted());
   }
 
   // Copy/paste
@@ -545,7 +567,7 @@ export class App extends React.Component<any, AppState> {
     }
     this.copyAll();
     const { elements: nextElements, appState } = deleteSelectedElements(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElementsIncludingDeleted(),
       this.state,
     );
     globalSceneState.replaceAllElements(nextElements);
@@ -563,19 +585,16 @@ export class App extends React.Component<any, AppState> {
   });
 
   private copyAll = () => {
-    copyToAppClipboard(globalSceneState.getAllElements(), this.state);
+    copyToAppClipboard(globalSceneState.getElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
-    const selectedElements = getSelectedElements(
-      globalSceneState.getAllElements(),
-      this.state,
-    );
+    const elements = globalSceneState.getElements();
+
+    const selectedElements = getSelectedElements(elements, this.state);
     exportCanvas(
       "clipboard",
-      selectedElements.length
-        ? selectedElements
-        : globalSceneState.getAllElements(),
+      selectedElements.length ? selectedElements : elements,
       this.state,
       this.canvas!,
       this.state,
@@ -584,14 +603,14 @@ export class App extends React.Component<any, AppState> {
 
   private copyToClipboardAsSvg = () => {
     const selectedElements = getSelectedElements(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
     );
     exportCanvas(
       "clipboard-svg",
       selectedElements.length
         ? selectedElements
-        : globalSceneState.getAllElements(),
+        : globalSceneState.getElements(),
       this.state,
       this.canvas!,
       this.state,
@@ -671,7 +690,7 @@ export class App extends React.Component<any, AppState> {
     );
 
     globalSceneState.replaceAllElements([
-      ...globalSceneState.getAllElements(),
+      ...globalSceneState.getElementsIncludingDeleted(),
       ...newElements,
     ]);
     history.resumeRecording();
@@ -702,10 +721,11 @@ export class App extends React.Component<any, AppState> {
       opacity: this.state.currentItemOpacity,
       text: text,
       font: this.state.currentItemFont,
+      textAlign: this.state.currentItemTextAlign,
     });
 
     globalSceneState.replaceAllElements([
-      ...globalSceneState.getAllElements(),
+      ...globalSceneState.getElementsIncludingDeleted(),
       element,
     ]);
     this.setState({ selectedElementIds: { [element.id]: true } });
@@ -750,17 +770,17 @@ export class App extends React.Component<any, AppState> {
       isCollaborating: false,
       collaborators: new Map(),
     });
-    this.room.close();
+    this.portal.close();
   };
 
   private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
-    if (this.room.socket) {
+    if (this.portal.socket) {
       return;
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const initialize = () => {
-        this.room.socketInitialized = true;
+        this.portal.socketInitialized = true;
         clearTimeout(initializationTimer);
         if (this.state.isLoading && !this.unmounted) {
           this.setState({ isLoading: false });
@@ -791,15 +811,15 @@ export class App extends React.Component<any, AppState> {
         // elements with more staler versions than ours, ignore them
         // and keep ours.
         if (
-          globalSceneState.getAllElements() == null ||
-          globalSceneState.getAllElements().length === 0
+          globalSceneState.getElementsIncludingDeleted() == null ||
+          globalSceneState.getElementsIncludingDeleted().length === 0
         ) {
           globalSceneState.replaceAllElements(remoteElements);
         } else {
           // create a map of ids so we don't have to iterate
           // over the array more than once.
           const localElementMap = getElementMap(
-            globalSceneState.getAllElements(),
+            globalSceneState.getElementsIncludingDeleted(),
           );
 
           // Reconcile
@@ -866,26 +886,30 @@ export class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.room.socketInitialized === false) {
+        if (this.portal.socketInitialized === false) {
           initialize();
         }
       };
 
-      this.room.open(socketIOClient(SOCKET_SERVER), roomMatch[1], roomMatch[2]);
+      this.portal.open(
+        socketIOClient(SOCKET_SERVER),
+        roomMatch[1],
+        roomMatch[2],
+      );
 
-      this.room.socket!.on("init-room", () => {
-        this.room.socket &&
-          this.room.socket.emit("join-room", this.room.roomID);
+      this.portal.socket!.on("init-room", () => {
+        this.portal.socket &&
+          this.portal.socket.emit("join-room", this.portal.roomID);
       });
-      this.room.socket!.on(
+      this.portal.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-          if (!this.room.roomKey) {
+          if (!this.portal.roomKey) {
             return;
           }
           const decryptedData = await decryptAESGEM(
             encryptedData,
-            this.room.roomKey,
+            this.portal.roomKey,
             iv,
           );
 
@@ -893,7 +917,7 @@ export class App extends React.Component<any, AppState> {
             case "INVALID_RESPONSE":
               return;
             case "SCENE_INIT": {
-              if (!this.room.socketInitialized) {
+              if (!this.portal.socketInitialized) {
                 updateScene(decryptedData, { scrollToContent: true });
               }
               break;
@@ -926,13 +950,13 @@ export class App extends React.Component<any, AppState> {
           }
         },
       );
-      this.room.socket!.on("first-in-room", () => {
-        if (this.room.socket) {
-          this.room.socket.off("first-in-room");
+      this.portal.socket!.on("first-in-room", () => {
+        if (this.portal.socket) {
+          this.portal.socket.off("first-in-room");
         }
         initialize();
       });
-      this.room.socket!.on("room-user-change", (clients: string[]) => {
+      this.portal.socket!.on("room-user-change", (clients: string[]) => {
         this.setState((state) => {
           const collaborators: typeof state.collaborators = new Map();
           for (const socketID of clients) {
@@ -948,7 +972,7 @@ export class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.room.socket!.on("new-user", async (_socketID: string) => {
+      this.portal.socket!.on("new-user", async (_socketID: string) => {
         this.broadcastScene("SCENE_INIT");
       });
 
@@ -963,19 +987,20 @@ export class App extends React.Component<any, AppState> {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.room.socket?.id) {
+    if (this.portal.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketID: this.room.socket.id,
+          socketID: this.portal.socket.id,
           pointerCoords: payload.pointerCoords,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
           username: this.state.username,
         },
       };
-      return this._broadcastSocketData(
+      return this.portal._broadcastSocketData(
         data as typeof data & { _brand: "socketUpdateData" },
+        true, // volatile
       );
     }
   };
@@ -984,41 +1009,19 @@ export class App extends React.Component<any, AppState> {
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
-        elements: getSyncableElements(globalSceneState.getAllElements()),
+        elements: getSyncableElements(
+          globalSceneState.getElementsIncludingDeleted(),
+        ),
       },
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(globalSceneState.getAllElements()),
+      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
-    return this._broadcastSocketData(
+    return this.portal._broadcastSocketData(
       data as typeof data & { _brand: "socketUpdateData" },
     );
   };
-
-  // Low-level. Use type-specific broadcast* method.
-  private async _broadcastSocketData(
-    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-      _brand: "socketUpdateData";
-    },
-  ) {
-    if (
-      this.room.socketInitialized &&
-      this.room.socket &&
-      this.room.roomID &&
-      this.room.roomKey
-    ) {
-      const json = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.room.roomKey);
-      this.room.socket.emit(
-        "server-broadcast",
-        this.room.roomID,
-        encrypted.data,
-        encrypted.iv,
-      );
-    }
-  }
 
   private onSceneUpdated = () => {
     this.setState({});
@@ -1065,7 +1068,7 @@ export class App extends React.Component<any, AppState> {
         ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
         : ELEMENT_TRANSLATE_AMOUNT;
       globalSceneState.replaceAllElements(
-        globalSceneState.getAllElements().map((el) => {
+        globalSceneState.getElementsIncludingDeleted().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
             const update: { x?: number; y?: number } = {};
             if (event.key === KEYS.ARROW_LEFT) {
@@ -1085,7 +1088,7 @@ export class App extends React.Component<any, AppState> {
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
-        globalSceneState.getAllElements(),
+        globalSceneState.getElements(),
         this.state,
       );
 
@@ -1190,7 +1193,7 @@ export class App extends React.Component<any, AppState> {
 
     const deleteElement = () => {
       globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements().map((_element) => {
+        ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id) {
             return newElementWith(_element, { isDeleted: true });
           }
@@ -1201,7 +1204,7 @@ export class App extends React.Component<any, AppState> {
 
     const updateElement = (text: string) => {
       globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements().map((_element) => {
+        ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id) {
             return newTextElement({
               ...(_element as ExcalidrawTextElement),
@@ -1223,6 +1226,7 @@ export class App extends React.Component<any, AppState> {
       opacity: element.opacity,
       font: element.font,
       angle: element.angle,
+      textAlign: element.textAlign,
       zoom: this.state.zoom,
       onChange: withBatchedUpdates((text) => {
         if (text) {
@@ -1273,7 +1277,7 @@ export class App extends React.Component<any, AppState> {
     centerIfPossible?: boolean;
   }) => {
     const elementAtPosition = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElements(),
       this.state,
       x,
       y,
@@ -1294,6 +1298,7 @@ export class App extends React.Component<any, AppState> {
             opacity: this.state.currentItemOpacity,
             text: "",
             font: this.state.currentItemFont,
+            textAlign: this.state.currentItemTextAlign,
           });
 
     this.setState({ editingElement: element });
@@ -1328,7 +1333,7 @@ export class App extends React.Component<any, AppState> {
       });
     } else {
       globalSceneState.replaceAllElements([
-        ...globalSceneState.getAllElements(),
+        ...globalSceneState.getElementsIncludingDeleted(),
         element,
       ]);
 
@@ -1459,7 +1464,7 @@ export class App extends React.Component<any, AppState> {
         //  threshold, add a point
         if (
           distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          ARROW_CONFIRM_THRESHOLD
+          LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
             points: [...points, [x - rx, y - ry]],
@@ -1480,13 +1485,16 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
           mutateElement(multiElement, {
             points: points.slice(0, -1),
           });
         } else {
+          if (isPathALoop(points)) {
+            document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          }
           // update last uncommitted point
           mutateElement(multiElement, {
             points: [...points.slice(0, -1), [x - rx, y - ry]],
@@ -1505,13 +1513,12 @@ export class App extends React.Component<any, AppState> {
       return;
     }
 
-    const selectedElements = getSelectedElements(
-      globalSceneState.getAllElements(),
-      this.state,
-    );
+    const elements = globalSceneState.getElements();
+
+    const selectedElements = getSelectedElements(elements, this.state);
     if (selectedElements.length === 1 && !isOverScrollBar) {
       const elementWithResizeHandler = getElementWithResizeHandler(
-        globalSceneState.getAllElements(),
+        elements,
         this.state,
         { x, y },
         this.state.zoom,
@@ -1540,7 +1547,7 @@ export class App extends React.Component<any, AppState> {
       }
     }
     const hitElement = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      elements,
       this.state,
       x,
       y,
@@ -1739,13 +1746,11 @@ export class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
     if (this.state.elementType === "selection") {
-      const selectedElements = getSelectedElements(
-        globalSceneState.getAllElements(),
-        this.state,
-      );
+      const elements = globalSceneState.getElements();
+      const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1) {
         const elementWithResizeHandler = getElementWithResizeHandler(
-          globalSceneState.getAllElements(),
+          elements,
           this.state,
           { x, y },
           this.state.zoom,
@@ -1783,7 +1788,7 @@ export class App extends React.Component<any, AppState> {
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
-          globalSceneState.getAllElements(),
+          elements,
           this.state,
           x,
           y,
@@ -1811,7 +1816,7 @@ export class App extends React.Component<any, AppState> {
               },
             }));
             globalSceneState.replaceAllElements(
-              globalSceneState.getAllElements(),
+              globalSceneState.getElementsIncludingDeleted(),
             );
             hitElementWasAddedToSelection = true;
           }
@@ -1822,7 +1827,7 @@ export class App extends React.Component<any, AppState> {
             // put the duplicates where the selected elements used to be.
             const nextElements = [];
             const elementsToAppend = [];
-            for (const element of globalSceneState.getAllElements()) {
+            for (const element of globalSceneState.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
                 (element.id === hitElement.id && hitElementWasAddedToSelection)
@@ -1881,6 +1886,16 @@ export class App extends React.Component<any, AppState> {
       if (this.state.multiElement) {
         const { multiElement } = this.state;
 
+        // finalize if completing a loop
+        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+          mutateElement(multiElement, {
+            lastCommittedPoint:
+              multiElement.points[multiElement.points.length - 1],
+          });
+          this.actionManager.executeAction(actionFinalize);
+          return;
+        }
+
         const { x: rx, y: ry, lastCommittedPoint } = multiElement;
 
         // clicking inside commit zone → finalize arrow
@@ -1892,11 +1907,12 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           this.actionManager.executeAction(actionFinalize);
           return;
         }
+
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -1932,7 +1948,7 @@ export class App extends React.Component<any, AppState> {
           points: [...element.points, [0, 0]],
         });
         globalSceneState.replaceAllElements([
-          ...globalSceneState.getAllElements(),
+          ...globalSceneState.getElementsIncludingDeleted(),
           element,
         ]);
         this.setState({
@@ -1960,7 +1976,7 @@ export class App extends React.Component<any, AppState> {
         });
       } else {
         globalSceneState.replaceAllElements([
-          ...globalSceneState.getAllElements(),
+          ...globalSceneState.getElementsIncludingDeleted(),
           element,
         ]);
         this.setState({
@@ -2049,7 +2065,7 @@ export class App extends React.Component<any, AppState> {
         // if elements should be deselected on pointerup
         draggingOccurred = true;
         const selectedElements = getSelectedElements(
-          globalSceneState.getAllElements(),
+          globalSceneState.getElements(),
           this.state,
         );
         if (selectedElements.length > 0) {
@@ -2125,14 +2141,12 @@ export class App extends React.Component<any, AppState> {
       }
 
       if (this.state.elementType === "selection") {
-        if (
-          !event.shiftKey &&
-          isSomeElementSelected(globalSceneState.getAllElements(), this.state)
-        ) {
+        const elements = globalSceneState.getElements();
+        if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
           this.setState({ selectedElementIds: {} });
         }
         const elementsWithinSelection = getElementsWithinSelection(
-          globalSceneState.getAllElements(),
+          elements,
           draggingElement,
         );
         this.setState((prevState) => ({
@@ -2225,7 +2239,7 @@ export class App extends React.Component<any, AppState> {
       ) {
         // remove invisible element which was added in onPointerDown
         globalSceneState.replaceAllElements(
-          globalSceneState.getAllElements().slice(0, -1),
+          globalSceneState.getElementsIncludingDeleted().slice(0, -1),
         );
         this.setState({
           draggingElement: null,
@@ -2242,7 +2256,7 @@ export class App extends React.Component<any, AppState> {
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
         globalSceneState.replaceAllElements(
           globalSceneState
-            .getAllElements()
+            .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
         );
       }
@@ -2287,7 +2301,7 @@ export class App extends React.Component<any, AppState> {
 
       if (
         elementType !== "selection" ||
-        isSomeElementSelected(globalSceneState.getAllElements(), this.state)
+        isSomeElementSelected(globalSceneState.getElements(), this.state)
       ) {
         history.resumeRecording();
       }
@@ -2368,8 +2382,9 @@ export class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
+    const elements = globalSceneState.getElements();
     const element = getElementAtPosition(
-      globalSceneState.getAllElements(),
+      elements,
       this.state,
       x,
       y,
@@ -2383,12 +2398,12 @@ export class App extends React.Component<any, AppState> {
             action: () => this.pasteFromClipboard(null),
           },
           probablySupportsClipboardBlob &&
-            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+            elements.length > 0 && {
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
           probablySupportsClipboardWriteText &&
-            hasNonDeletedElements(globalSceneState.getAllElements()) && {
+            elements.length > 0 && {
               label: t("labels.copyAsSvg"),
               action: this.copyToClipboardAsSvg,
             },
@@ -2470,7 +2485,7 @@ export class App extends React.Component<any, AppState> {
     scale: number,
   ) {
     const elementClickedInside = getElementContainingPosition(
-      globalSceneState.getAllElements(),
+      globalSceneState.getElementsIncludingDeleted(),
       x,
       y,
     );
@@ -2512,7 +2527,7 @@ export class App extends React.Component<any, AppState> {
       // sometimes the pointer goes off screen
       return;
     }
-    this.room.socket &&
+    this.portal.socket &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,
@@ -2524,7 +2539,10 @@ export class App extends React.Component<any, AppState> {
   }, 300);
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(globalSceneState.getAllElements(), this.state);
+    saveToLocalStorage(
+      globalSceneState.getElementsIncludingDeleted(),
+      this.state,
+    );
   }, 300);
 }
 
@@ -2549,9 +2567,12 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
 
   Object.defineProperties(window.h, {
     elements: {
-      get: () => globalSceneState.getAllElements(),
-      set: (elements: ExcalidrawElement[]) =>
-        globalSceneState.replaceAllElements(elements),
+      get() {
+        return globalSceneState.getElementsIncludingDeleted();
+      },
+      set(elements: ExcalidrawElement[]) {
+        return globalSceneState.replaceAllElements(elements);
+      },
     },
     history: {
       get: () => history,

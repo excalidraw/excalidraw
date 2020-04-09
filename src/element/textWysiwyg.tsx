@@ -21,6 +21,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  textAlign: string;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
@@ -36,6 +37,7 @@ export const textWysiwyg = ({
   zoom,
   angle,
   onChange,
+  textAlign,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) => {
@@ -59,7 +61,7 @@ export const textWysiwyg = ({
     top: `${y}px`,
     left: `${x}px`,
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
-    textAlign: "left",
+    textAlign: textAlign,
     display: "inline-block",
     font: font,
     padding: "4px",
@@ -117,18 +119,13 @@ export const textWysiwyg = ({
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       handleSubmit();
-    }
-    if (
-      event.key === KEYS.ENTER &&
-      (event.shiftKey || event[KEYS.CTRL_OR_CMD])
-    ) {
+    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
       handleSubmit();
-    }
-    if (event.key === KEYS.ENTER && !event.shiftKey) {
+    } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
     }
   };

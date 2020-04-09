@@ -5,7 +5,7 @@ import { t, setLanguage } from "../i18n";
 import Stack from "./Stack";
 import { LanguageList } from "./LanguageList";
 import { showSelectedShapeActions } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
@@ -22,8 +22,7 @@ type MobileMenuProps = {
   actionManager: ActionManager;
   exportButton: React.ReactNode;
   setAppState: any;
-  elements: readonly ExcalidrawElement[];
-  setElements: any;
+  elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
@@ -32,7 +31,6 @@ type MobileMenuProps = {
 export const MobileMenu = ({
   appState,
   elements,
-  setElements,
   actionManager,
   exportButton,
   setAppState,
@@ -53,8 +51,6 @@ export const MobileMenu = ({
                   <ShapesSwitcher
                     elementType={appState.elementType}
                     setAppState={setAppState}
-                    setElements={setElements}
-                    elements={elements}
                   />
                 </Stack.Row>
               </Island>

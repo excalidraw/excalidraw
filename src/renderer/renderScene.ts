@@ -2,7 +2,10 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 
 import { FlooredNumber, AppState } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import {
   getElementAbsoluteCoords,
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
@@ -74,9 +77,9 @@ const strokeCircle = (
 };
 
 export const renderScene = (
-  allElements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  selectionElement: ExcalidrawElement | null,
+  selectionElement: NonDeletedExcalidrawElement | null,
   scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
@@ -98,8 +101,6 @@ export const renderScene = (
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
   }
-
-  const elements = allElements.filter((element) => !element.isDeleted);
 
   const context = canvas.getContext("2d")!;
   context.scale(scale, scale);
@@ -493,7 +494,7 @@ const isVisibleElement = (
 
 // This should be only called for exporting purposes
 export const renderSceneToSvg = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   {

@@ -3,9 +3,14 @@ import { Point } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
-import { isInvisiblySmallElement, normalizeDimensions } from "../element";
+import {
+  isInvisiblySmallElement,
+  normalizeDimensions,
+  isTextElement,
+} from "../element";
 import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
+import { DEFAULT_TEXT_ALIGN } from "../appState";
 
 export const restore = (
   // we're making the elements mutable for this API because we want to
@@ -51,6 +56,10 @@ export const restore = (
         }
         element.points = points;
       } else {
+        if (isTextElement(element)) {
+          element.textAlign = DEFAULT_TEXT_ALIGN;
+        }
+
         normalizeDimensions(element);
         // old spec, where non-linear elements used to have empty points arrays
         if ("points" in element) {
