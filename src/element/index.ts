@@ -29,7 +29,6 @@ export {
   getElementWithResizeHandler,
   getResizeHandlerFromCoords,
 } from "./resizeTest";
-export type { ResizeArrowFnType } from "./resizeElements";
 export { resizeElements, canResizeMutlipleElements } from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
