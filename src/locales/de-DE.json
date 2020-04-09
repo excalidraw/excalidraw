@@ -146,6 +146,8 @@
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
     "howto": "Folgen Sie unseren Anleitungen",
-    "github": "Ein Problem gefunden? Informieren Sie uns"
+    "github": "Ein Problem gefunden? Informieren Sie uns",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
