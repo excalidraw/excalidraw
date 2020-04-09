@@ -98,7 +98,7 @@ import {
   POINTER_BUTTON,
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
-  ARROW_CONFIRM_THRESHOLD,
+  LINE_CONFIRM_THRESHOLD,
 } from "../constants";
 import { LayerUI } from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
@@ -1457,7 +1457,7 @@ export class App extends React.Component<any, AppState> {
         //  threshold, add a point
         if (
           distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          ARROW_CONFIRM_THRESHOLD
+          LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
             points: [...points, [x - rx, y - ry]],
@@ -1478,7 +1478,7 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
           mutateElement(multiElement, {
@@ -1900,7 +1900,7 @@ export class App extends React.Component<any, AppState> {
             y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
-          ) < ARROW_CONFIRM_THRESHOLD
+          ) < LINE_CONFIRM_THRESHOLD
         ) {
           this.actionManager.executeAction(actionFinalize);
           return;

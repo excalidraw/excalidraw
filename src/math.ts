@@ -1,6 +1,5 @@
 import { Point } from "./types";
-
-const MAX_DISTANCE_TO_DETECT_LOOP = 8;
+import { LINE_CONFIRM_THRESHOLD } from "./constants";
 
 // https://stackoverflow.com/a/6853926/232122
 export function distanceBetweenPointAndSegment(
@@ -160,7 +159,7 @@ export function isPathALoop(points: Point[]): boolean {
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
     return (
       distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
-      MAX_DISTANCE_TO_DETECT_LOOP
+      LINE_CONFIRM_THRESHOLD
     );
   }
   return false;
