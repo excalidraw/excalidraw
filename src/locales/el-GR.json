@@ -111,8 +111,8 @@
   },
   "errorSplash": {
     "headingMain_pre": "Συνέβη κάποιο σφάλμα. Προσπαθήστε ",
-    "headingMain_button": "φορτώσετε ξανά την σελίδα.",
-    "clearCanvasMessage": "Εάν το παραπάνω δεν δουλέψει, προσπαθήστε ",
+    "headingMain_button": "φόρτωσε ξανά την σελίδα.",
+    "clearCanvasMessage": "Εάν το παραπάνω δεν δουλέψει, προσπάθησε ",
     "clearCanvasMessage_button": "καθαρίσετε τον κανβά.",
     "clearCanvasCaveat": " Αυτό θα προκαλέσει απώλεια της δουλειάς σου ",
     "trackedToSentry_pre": "Το σφάλμα με αναγνωριστικό ",
