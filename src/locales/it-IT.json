@@ -146,6 +146,8 @@
     "view": "Vista",
     "blog": "Leggi il nostro blog",
     "howto": "Segui le nostre guide",
-    "github": "Hai trovato un problema? Segnalalo"
+    "github": "Hai trovato un problema? Segnalalo",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
