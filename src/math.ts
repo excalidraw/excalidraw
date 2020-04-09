@@ -204,15 +204,15 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
   return null;
 };
 
-export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   const xd = x2 - x1;
   const yd = y2 - y1;
   return Math.hypot(xd, yd);
-}
+};
 
 // Checks if the first and last point are close enough
 // to be considered a loop
-export function isPathALoop(points: Point[]): boolean {
+export const isPathALoop = (points: Point[]): boolean => {
   if (points.length >= 3) {
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
     return (
@@ -221,16 +221,16 @@ export function isPathALoop(points: Point[]): boolean {
     );
   }
   return false;
-}
+};
 
 // Draw a line from the point to the right till infiinty
 // Check how many lines of the polygon does this infinite line intersects with
 // If the number of intersections is odd, point is in the polygon
-export function isPointInPolygon(
+export const isPointInPolygon = (
   points: Point[],
   x: number,
   y: number,
-): boolean {
+): boolean => {
   const vertices = points.length;
 
   // There must be at least 3 vertices in polygon
@@ -252,32 +252,32 @@ export function isPointInPolygon(
   }
   // true if count is off
   return count % 2 === 1;
-}
+};
 
 // Check if q lies on the line segment pr
-function onSegment(p: Point, q: Point, r: Point) {
+const onSegment = (p: Point, q: Point, r: Point) => {
   return (
     q[0] <= Math.max(p[0], r[0]) &&
     q[0] >= Math.min(p[0], r[0]) &&
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
   );
-}
+};
 
 // For the ordered points p, q, r, return
 // 0 if p, q, r are collinear
 // 1 if Clockwise
 // 2 if counterclickwise
-function orientation(p: Point, q: Point, r: Point) {
+const orientation = (p: Point, q: Point, r: Point) => {
   const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
   if (val === 0) {
     return 0;
   }
   return val > 0 ? 1 : 2;
-}
+};
 
 // Check is p1q1 intersects with p2q2
-function doIntersect(p1: Point, q1: Point, p2: Point, q2: Point) {
+const doIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   const o1 = orientation(p1, q1, p2);
   const o2 = orientation(p1, q1, q2);
   const o3 = orientation(p2, q2, p1);
@@ -308,4 +308,4 @@ function doIntersect(p1: Point, q1: Point, p2: Point, q2: Point) {
   }
 
   return false;
-}
+};
