@@ -1,6 +1,6 @@
 import React from "react";
 
-export const GitHubCorner = () => {
+export const GitHubCorner = React.memo(() => {
   // https://github.com/tholman/github-corners
   return (
     <svg
@@ -31,4 +31,4 @@ export const GitHubCorner = () => {
       </a>
     </svg>
   );
-};
+});
