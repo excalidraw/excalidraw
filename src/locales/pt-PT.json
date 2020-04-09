@@ -110,7 +110,7 @@
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
   },
   "errorSplash": {
-    "headingMain_pre": "Foi encontrado um erro. Experimente ",
+    "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
     "clearCanvasMessage_button": "limpar a tela.",
@@ -145,7 +145,7 @@
     "editor": "Editor",
     "view": "",
     "blog": "Leia o nosso blog",
-    "howto": "Siga nossos guias",
+    "howto": "Siga os nossos guias",
     "github": "Encontrou algum problema? Nos informe"
   }
 }
