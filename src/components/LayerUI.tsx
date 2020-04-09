@@ -25,6 +25,7 @@ import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
+import { GitHubCorner } from "./GitHubCorner";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -194,6 +195,9 @@ export const LayerUI = React.memo(
             </Stack.Col>
           </div>
         </FixedSideContainer>
+        <aside>
+          <GitHubCorner />
+        </aside>
         <footer role="contentinfo">
           <LanguageList
             onChange={(lng) => {
