@@ -81,11 +81,7 @@ export function resizePerfectLineForNWHandler(
 export function normalizeDimensions(
   element: ExcalidrawElement | null,
 ): element is ExcalidrawElement {
-  if (
-    !element ||
-    (element.width >= 0 && element.height >= 0) ||
-    isLinearElement(element)
-  ) {
+  if (!element || (element.width >= 0 && element.height >= 0)) {
     return false;
   }
 

@@ -7,7 +7,10 @@ import { getElementAbsoluteCoords, hitTest } from "../element";
 import { AppState } from "../types";
 
 export const hasBackground = (type: string) =>
-  type === "rectangle" || type === "ellipse" || type === "diamond";
+  type === "rectangle" ||
+  type === "ellipse" ||
+  type === "diamond" ||
+  type === "line";
 
 export const hasStroke = (type: string) =>
   type === "rectangle" ||

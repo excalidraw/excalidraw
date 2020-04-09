@@ -1,5 +1,5 @@
 export const DRAGGING_THRESHOLD = 10; // 10px
-export const ARROW_CONFIRM_THRESHOLD = 10; // 10px
+export const LINE_CONFIRM_THRESHOLD = 10; // 10px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
