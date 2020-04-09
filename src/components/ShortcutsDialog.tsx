@@ -86,6 +86,7 @@ Shortcut.defaultProps = {
 const ShortcutKey = (props: { children: React.ReactNode }) => (
   <span
     style={{
+      wordBreak: "keep-all",
       border: "1px solid #ced4da",
       padding: "2px 8px",
       margin: "0 4px",
