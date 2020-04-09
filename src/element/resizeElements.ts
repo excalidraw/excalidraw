@@ -2,7 +2,7 @@ import { AppState } from "../types";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
-import { rotate, calculateResizedPosition } from "../math";
+import { rotate, adjustXYWithRotation } from "../math";
 import {
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
@@ -118,6 +118,220 @@ function applyResizeArrowFn(
   }
   resizeArrowFn(element, 1, deltaX, deltaY, x, y, sidesWithSameLength);
   setResizeArrowFn(resizeArrowFn);
+}
+
+function calculateResizedPosition(
+  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  element: NonDeletedExcalidrawElement,
+  xPointer: number,
+  yPointer: number,
+  appState: AppState,
+  sidesWithSameLength: boolean,
+): { width: number; height: number; x: number; y: number } {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // center point for rotation
+  const cx = x1 + (x2 - x1) / 2;
+  const cy = y1 + (y2 - y1) / 2;
+
+  // rotation with current angle
+  const angle = element.angle;
+  const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
+
+  const handleOffset = 4 / appState.zoom; // XXX import constant
+  const dashedLinePadding = 4 / appState.zoom; // XXX import constant
+
+  let scaleX, scaleY, width, height, x, y;
+  switch (side) {
+    case "nw": {
+      scaleX = (x2 - handleOffset - dashedLinePadding - rotatedX) / (x2 - x1);
+      scaleY = (y2 - handleOffset - dashedLinePadding - rotatedY) / (y2 - y1);
+      width = element.width * scaleX;
+      height = element.height * scaleY;
+      x = element.x - (x2 - element.x) * (scaleX - 1);
+      y = element.y - (y2 - element.y) * (scaleY - 1);
+      if (sidesWithSameLength) {
+        width = Math.max(width, height);
+        height = width;
+        x = x - width - x2 - rotatedX;
+      }
+      return {
+        width,
+        height,
+        x,
+        y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          element.width - width,
+          element.height - height,
+        ),
+      };
+    }
+    case "ne": {
+      scaleX = (rotatedX - handleOffset - dashedLinePadding - x1) / (x2 - x1);
+      scaleY = (y2 - handleOffset - dashedLinePadding - rotatedY) / (y2 - y1);
+      width = element.width * scaleX;
+      height = element.height * scaleY;
+      x = element.x + (element.x - x1) * (scaleX - 1);
+      y = element.y - (y2 - element.y) * (scaleY - 1);
+      if (sidesWithSameLength) {
+        width = Math.max(width, height);
+        height = width;
+        x = x + (width - x2 - rotatedX);
+      }
+      return {
+        width,
+        height,
+        x,
+        y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          width - element.width,
+          element.height - height,
+        ),
+      };
+    }
+    case "sw": {
+      scaleX = (x2 - handleOffset - dashedLinePadding - rotatedX) / (x2 - x1);
+      scaleY = (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+      width = element.width * scaleX;
+      height = element.height * scaleY;
+      x = element.x - (x2 - element.x) * (scaleX - 1);
+      y = element.y + (element.y - y1) * (scaleY - 1);
+      if (sidesWithSameLength) {
+        width = Math.max(width, height);
+        height = width;
+        x = x - width - x2 - rotatedX;
+      }
+      return {
+        width,
+        height,
+        x,
+        y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          element.width - width,
+          height - element.height,
+        ),
+      };
+    }
+    case "se": {
+      scaleX = (rotatedX - handleOffset - dashedLinePadding - x1) / (x2 - x1);
+      scaleY = (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+      width = element.width * scaleX;
+      height = element.height * scaleY;
+      x = element.x + (element.x - x1) * (scaleX - 1);
+      y = element.y + (element.y - y1) * (scaleY - 1);
+      if (sidesWithSameLength) {
+        width = Math.max(width, height);
+        height = width;
+      }
+      return {
+        width,
+        height,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          width - element.width,
+          height - element.height,
+        ),
+      };
+    }
+    case "n": {
+      scaleY = (y2 - handleOffset - dashedLinePadding - rotatedY) / (y2 - y1);
+      height = element.height * scaleY;
+      y = element.y - (y2 - element.y) * (scaleY - 1);
+      return {
+        width: element.width,
+        height,
+        x: element.x,
+        y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          0,
+          element.height - height,
+        ),
+      };
+    }
+    case "w": {
+      scaleX = (x2 - handleOffset - dashedLinePadding - rotatedX) / (x2 - x1);
+      width = element.width * scaleX;
+      x = element.x - (x2 - element.x) * (scaleX - 1);
+      return {
+        width,
+        height: element.height,
+        x,
+        y: element.y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          element.width - width,
+          0,
+        ),
+      };
+    }
+    case "s": {
+      scaleY = (rotatedY - handleOffset - dashedLinePadding - y1) / (y2 - y1);
+      height = element.height * scaleY;
+      y = element.y + (element.y - y1) * (scaleY - 1);
+      return {
+        width: element.width,
+        height,
+        x: element.x,
+        y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          0,
+          height - element.height,
+        ),
+      };
+    }
+    case "e": {
+      scaleX = (rotatedX - handleOffset - dashedLinePadding - x1) / (x2 - x1);
+      width = element.width * scaleX;
+      x = element.x + (element.x - x1) * (scaleX - 1);
+      return {
+        width,
+        height: element.height,
+        x,
+        y: element.y,
+        ...adjustXYWithRotation(
+          side,
+          element.x,
+          element.y,
+          element.angle,
+          width - element.width,
+          0,
+        ),
+      };
+    }
+    default:
+      return {
+        width: element.width,
+        height: element.height,
+        x: element.x,
+        y: element.y,
+      };
+  }
 }
 
 export function resizeElements(
