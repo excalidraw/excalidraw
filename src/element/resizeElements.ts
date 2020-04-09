@@ -143,7 +143,7 @@ export function resizeElements(
   );
   const handleOffset = 4 / appState.zoom; // XXX import constant
   const dashedLinePadding = 4 / appState.zoom; // XXX import constant
-  const offset = handleOffset + dashedLinePadding;
+  const offsetPointer = handleOffset + dashedLinePadding;
   const minSize = handleOffset * 4;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -195,7 +195,7 @@ export function resizeElements(
         element.angle,
         xPointer,
         yPointer,
-        offset,
+        offsetPointer,
         event.shiftKey,
       );
       if (resized.width !== 0 && resized.height !== 0) {
@@ -239,8 +239,8 @@ export function resizeElements(
     switch (resizeHandle) {
       case "se": {
         const scale = Math.max(
-          (xPointer - offset - x1) / (x2 - x1),
-          (yPointer - offset - y1) / (y2 - y1),
+          (xPointer - offsetPointer - x1) / (x2 - x1),
+          (yPointer - offsetPointer - y1) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -255,8 +255,8 @@ export function resizeElements(
       }
       case "nw": {
         const scale = Math.max(
-          (x2 - offset - xPointer) / (x2 - x1),
-          (y2 - offset - yPointer) / (y2 - y1),
+          (x2 - offsetPointer - xPointer) / (x2 - x1),
+          (y2 - offsetPointer - yPointer) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -271,8 +271,8 @@ export function resizeElements(
       }
       case "ne": {
         const scale = Math.max(
-          (xPointer - offset - x1) / (x2 - x1),
-          (y2 - offset - yPointer) / (y2 - y1),
+          (xPointer - offsetPointer - x1) / (x2 - x1),
+          (y2 - offsetPointer - yPointer) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {
@@ -287,8 +287,8 @@ export function resizeElements(
       }
       case "sw": {
         const scale = Math.max(
-          (x2 - offset - xPointer) / (x2 - x1),
-          (yPointer - offset - y1) / (y2 - y1),
+          (x2 - offsetPointer - xPointer) / (x2 - x1),
+          (yPointer - offsetPointer - y1) / (y2 - y1),
         );
         if (scale > minScale) {
           selectedElements.forEach((element) => {

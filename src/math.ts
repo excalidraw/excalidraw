@@ -96,7 +96,7 @@ export function resizeXYWidthHightWithRotation(
   angle: number,
   xPointer: number,
   yPointer: number,
-  offset: number,
+  offsetPointer: number,
   sidesWithSameLength: boolean,
 ) {
   // center point for rotation
@@ -109,16 +109,16 @@ export function resizeXYWidthHightWithRotation(
   let scaleX = 1;
   let scaleY = 1;
   if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offset - x) / width;
+    scaleX = (rotatedX - offsetPointer - x) / width;
   }
   if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offset - y) / height;
+    scaleY = (rotatedY - offsetPointer - y) / height;
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x + width - offset - rotatedX) / width;
+    scaleX = (x + width - offsetPointer - rotatedX) / width;
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y + height - offset - rotatedY) / height;
+    scaleY = (y + height - offsetPointer - rotatedY) / height;
   }
 
   let nextWidth = width * scaleX;
