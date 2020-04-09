@@ -10,11 +10,12 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
+import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
@@ -226,15 +227,28 @@ function generateElement(
         break;
       case "line":
       case "arrow": {
-        const options = {
+        const options: Options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         };
+
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
         const points = element.points.length ? element.points : [[0, 0]];
+
+        // If shape is a line and is a closed shape,
+        // fill the shape if a color is set.
+        if (element.type === "line") {
+          if (isPathALoop(element.points)) {
+            options.fillStyle = element.fillStyle;
+            options.fill =
+              element.backgroundColor === "transparent"
+                ? undefined
+                : element.backgroundColor;
+          }
+        }
 
         // curve is always the first element
         // this simplifies finding the curve for an element

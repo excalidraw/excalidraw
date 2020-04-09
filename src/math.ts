@@ -1,4 +1,5 @@
 import { Point } from "./types";
+import { LINE_CONFIRM_THRESHOLD } from "./constants";
 
 // https://stackoverflow.com/a/6853926/232122
 export function distanceBetweenPointAndSegment(
@@ -144,3 +145,109 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
 
   return null;
 };
+
+export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+  const xd = x2 - x1;
+  const yd = y2 - y1;
+  return Math.hypot(xd, yd);
+}
+
+// Checks if the first and last point are close enough
+// to be considered a loop
+export function isPathALoop(points: Point[]): boolean {
+  if (points.length >= 3) {
+    const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
+    return (
+      distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
+      LINE_CONFIRM_THRESHOLD
+    );
+  }
+  return false;
+}
+
+// Draw a line from the point to the right till infiinty
+// Check how many lines of the polygon does this infinite line intersects with
+// If the number of intersections is odd, point is in the polygon
+export function isPointInPolygon(
+  points: Point[],
+  x: number,
+  y: number,
+): boolean {
+  const vertices = points.length;
+
+  // There must be at least 3 vertices in polygon
+  if (vertices < 3) {
+    return false;
+  }
+  const extreme: Point = [Number.MAX_SAFE_INTEGER, y];
+  const p: Point = [x, y];
+  let count = 0;
+  for (let i = 0; i < vertices; i++) {
+    const current = points[i];
+    const next = points[(i + 1) % vertices];
+    if (doIntersect(current, next, p, extreme)) {
+      if (orientation(current, p, next) === 0) {
+        return onSegment(current, p, next);
+      }
+      count++;
+    }
+  }
+  // true if count is off
+  return count % 2 === 1;
+}
+
+// Check if q lies on the line segment pr
+function onSegment(p: Point, q: Point, r: Point) {
+  return (
+    q[0] <= Math.max(p[0], r[0]) &&
+    q[0] >= Math.min(p[0], r[0]) &&
+    q[1] <= Math.max(p[1], r[1]) &&
+    q[1] >= Math.min(p[1], r[1])
+  );
+}
+
+// For the ordered points p, q, r, return
+// 0 if p, q, r are collinear
+// 1 if Clockwise
+// 2 if counterclickwise
+function orientation(p: Point, q: Point, r: Point) {
+  const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+  if (val === 0) {
+    return 0;
+  }
+  return val > 0 ? 1 : 2;
+}
+
+// Check is p1q1 intersects with p2q2
+function doIntersect(p1: Point, q1: Point, p2: Point, q2: Point) {
+  const o1 = orientation(p1, q1, p2);
+  const o2 = orientation(p1, q1, q2);
+  const o3 = orientation(p2, q2, p1);
+  const o4 = orientation(p2, q2, q1);
+
+  if (o1 !== o2 && o3 !== o4) {
+    return true;
+  }
+
+  // p1, q1 and p2 are colinear and p2 lies on segment p1q1
+  if (o1 === 0 && onSegment(p1, p2, q1)) {
+    return true;
+  }
+
+  // p1, q1 and p2 are colinear and q2 lies on segment p1q1
+  if (o2 === 0 && onSegment(p1, q2, q1)) {
+    return true;
+  }
+
+  // p2, q2 and p1 are colinear and p1 lies on segment p2q2
+  if (o3 === 0 && onSegment(p2, p1, q2)) {
+    return true;
+  }
+
+  // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+  if (o4 === 0 && onSegment(p2, q1, q2)) {
+    return true;
+  }
+
+  return false;
+}

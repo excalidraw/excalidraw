@@ -1,23 +1,35 @@
-import { distanceBetweenPointAndSegment } from "../math";
+import {
+  distanceBetweenPointAndSegment,
+  isPathALoop,
+  rotate,
+  isPointInPolygon,
+} from "../math";
+import { getPointsOnBezierCurves } from "roughjs/bin/geometry";
 
 import { NonDeletedExcalidrawElement } from "./types";
 
-import { getDiamondPoints, getElementAbsoluteCoords } from "./bounds";
+import {
+  getDiamondPoints,
+  getElementAbsoluteCoords,
+  getCurvePathOps,
+} from "./bounds";
 import { Point } from "../types";
-import { Drawable, OpSet } from "roughjs/bin/core";
+import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
-import { rotate } from "../math";
 
 function isElementDraggableFromInside(
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ): boolean {
-  return (
+  const dragFromInside =
     element.backgroundColor !== "transparent" ||
-    appState.selectedElementIds[element.id]
-  );
+    appState.selectedElementIds[element.id];
+  if (element.type === "line") {
+    return dragFromInside && isPathALoop(element.points);
+  }
+  return dragFromInside;
 }
 
 export function hitTest(
@@ -178,9 +190,18 @@ export function hitTest(
     const relX = x - element.x;
     const relY = y - element.y;
 
+    if (isElementDraggableFromInside(element, appState)) {
+      const hit = shape.some((subshape) =>
+        hitTestCurveInside(subshape, relX, relY, lineThreshold),
+      );
+      if (hit) {
+        return true;
+      }
+    }
+
     // hit thest all "subshapes" of the linear element
     return shape.some((subshape) =>
-      hitTestRoughShape(subshape.sets, relX, relY, lineThreshold),
+      hitTestRoughShape(subshape, relX, relY, lineThreshold),
     );
   } else if (element.type === "text") {
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
@@ -224,14 +245,41 @@ const pointInBezierEquation = (
   return false;
 };
 
+const hitTestCurveInside = (
+  drawable: Drawable,
+  x: number,
+  y: number,
+  lineThreshold: number,
+) => {
+  const ops = getCurvePathOps(drawable);
+  const points: Point[] = [];
+  for (const operation of ops) {
+    if (operation.op === "move") {
+      if (points.length) {
+        break;
+      }
+      points.push([operation.data[0], operation.data[1]]);
+    } else if (operation.op === "bcurveTo") {
+      points.push([operation.data[0], operation.data[1]]);
+      points.push([operation.data[2], operation.data[3]]);
+      points.push([operation.data[4], operation.data[5]]);
+    }
+  }
+  if (points.length >= 4) {
+    const polygonPoints = getPointsOnBezierCurves(points as any, 50);
+    return isPointInPolygon(polygonPoints, x, y);
+  }
+  return false;
+};
+
 const hitTestRoughShape = (
-  opSet: OpSet[],
+  drawable: Drawable,
   x: number,
   y: number,
   lineThreshold: number,
 ) => {
   // read operations from first opSet
-  const ops = opSet[0].ops;
+  const ops = getCurvePathOps(drawable);
 
   // set start position as (0,0) just in case
   // move operation does not exist (unlikely but it is worth safekeeping it)
