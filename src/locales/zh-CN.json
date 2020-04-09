@@ -146,6 +146,8 @@
     "view": "视图",
     "blog": "浏览我们的博客",
     "howto": "跟随我们的指南",
-    "github": "发现问题？提交"
+    "github": "发现问题？提交",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
