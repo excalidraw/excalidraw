@@ -41,6 +41,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -240,6 +241,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -358,6 +360,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -633,6 +636,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -793,6 +797,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -993,6 +998,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -1252,6 +1258,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -1603,7 +1610,32 @@ Object {
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
-  "editingElement": null,
+  "editingElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "fillStyle": "hachure",
+    "height": 0,
+    "id": "id6",
+    "isDeleted": false,
+    "lastCommittedPoint": null,
+    "opacity": 100,
+    "points": Array [
+      Array [
+        0,
+        0,
+      ],
+    ],
+    "roughness": 1,
+    "seed": 845789479,
+    "strokeColor": "#000000",
+    "strokeWidth": 1,
+    "type": "line",
+    "version": 6,
+    "versionNonce": 745419401,
+    "width": 0,
+    "x": 30,
+    "y": 30,
+  },
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1626,6 +1658,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2250,6 +2283,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2368,6 +2402,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2486,6 +2521,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2604,6 +2640,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2744,6 +2781,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -2884,6 +2922,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3024,6 +3063,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3142,6 +3182,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3260,6 +3301,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3400,6 +3442,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3518,6 +3561,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -3590,6 +3634,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -4475,6 +4520,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -4899,6 +4945,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -5230,6 +5277,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -5472,6 +5520,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -5645,6 +5694,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -6481,6 +6531,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -7208,6 +7259,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -7830,6 +7882,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -8352,6 +8405,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -8824,6 +8878,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -9201,6 +9256,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -9487,6 +9543,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -9702,6 +9759,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -10594,6 +10652,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -11375,6 +11434,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -12049,6 +12109,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -12616,6 +12677,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -12994,6 +13056,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -13050,6 +13113,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -13106,6 +13170,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
@@ -13402,6 +13467,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "wysiwygElement": null,
   "zoom": 1,
 }
 `;
