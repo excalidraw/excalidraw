@@ -22,8 +22,8 @@ type TextWysiwygParams = {
   zoom: number;
   angle: number;
   textAlign: string;
-  onChange?: (event: { text: string; font: string }) => void;
-  onSubmit: (event: { text: string; font: string }) => void;
+  onChange?: (text: string) => void;
+  onSubmit: (text: string) => void;
   onCancel: () => void;
 };
 
@@ -102,10 +102,7 @@ export function textWysiwyg({
 
   if (onChange) {
     editable.oninput = () => {
-      onChange({
-        text: trimText(editable.innerText),
-        font: editable.style.font,
-      });
+      onChange(trimText(editable.innerText));
     };
   }
 
@@ -131,10 +128,7 @@ export function textWysiwyg({
 
   function handleSubmit() {
     if (editable.innerText) {
-      onSubmit({
-        text: trimText(editable.innerText),
-        font: editable.style.font,
-      });
+      onSubmit(trimText(editable.innerText));
     } else {
       onCancel();
     }

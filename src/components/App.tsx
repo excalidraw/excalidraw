@@ -1210,7 +1210,7 @@ export class App extends React.Component<any, AppState> {
       ]);
     };
 
-    const updateElement = (text: string, font: string) => {
+    const updateElement = (text: string) => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id) {
@@ -1219,7 +1219,6 @@ export class App extends React.Component<any, AppState> {
               x: element.x,
               y: element.y,
               text,
-              font,
             });
           }
           return _element;
@@ -1237,15 +1236,15 @@ export class App extends React.Component<any, AppState> {
       angle: element.angle,
       textAlign: element.textAlign,
       zoom: this.state.zoom,
-      onChange: withBatchedUpdates((event) => {
-        if (event) {
-          updateElement(event.text, event.font);
+      onChange: withBatchedUpdates((text) => {
+        if (text) {
+          updateElement(text);
         } else {
           deleteElement();
         }
       }),
-      onSubmit: withBatchedUpdates((event) => {
-        updateElement(event.text, event.font);
+      onSubmit: withBatchedUpdates((text) => {
+        updateElement(text);
         this.setState((prevState) => ({
           wysiwygElement: null,
           selectedElementIds: {
@@ -1272,7 +1271,7 @@ export class App extends React.Component<any, AppState> {
 
     // do an initial update to re-initialize element position since we were
     //  modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.font);
+    updateElement(element.text);
   }
 
   private startTextEditing = ({

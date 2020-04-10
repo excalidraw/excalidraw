@@ -104,11 +104,14 @@ export function renderScene(
   }
 
   if (appState.wysiwygElement && appState.wysiwygElement.changeStyle) {
-    appState.wysiwygElement.changeStyle({
-      font: appState.editingElement
-        ? (appState.editingElement as ExcalidrawTextElement).font
-        : "",
-    });
+    if (appState.editingElement) {
+      appState.wysiwygElement.changeStyle({
+        font: (appState.editingElement as ExcalidrawTextElement).font,
+        textAlign: (appState.editingElement as ExcalidrawTextElement).textAlign,
+        color: (appState.editingElement as ExcalidrawTextElement).strokeColor,
+        opacity: (appState.editingElement as ExcalidrawTextElement).opacity,
+      });
+    }
   }
 
   const context = canvas.getContext("2d")!;
