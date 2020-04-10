@@ -22,8 +22,8 @@ type TextWysiwygParams = {
   zoom: number;
   angle: number;
   textAlign: string;
-  onChange?: (text: string) => void;
-  onSubmit: (text: string) => void;
+  onChange?: (event: { text: string; font: string }) => void;
+  onSubmit: (event: { text: string; font: string }) => void;
   onCancel: () => void;
 };
 
@@ -102,7 +102,10 @@ export function textWysiwyg({
 
   if (onChange) {
     editable.oninput = () => {
-      onChange(trimText(editable.innerText));
+      onChange({
+        text: trimText(editable.innerText),
+        font: editable.style.font,
+      });
     };
   }
 
@@ -120,7 +123,7 @@ export function textWysiwyg({
       event.stopPropagation();
     }
   };
-  editable.onblur = handleSubmit;
+  // editable.onblur = handleSubmit;
 
   function stopEvent(event: Event) {
     event.stopPropagation();
@@ -128,7 +131,10 @@ export function textWysiwyg({
 
   function handleSubmit() {
     if (editable.innerText) {
-      onSubmit(trimText(editable.innerText));
+      onSubmit({
+        text: trimText(editable.innerText),
+        font: editable.style.font,
+      });
     } else {
       onCancel();
     }
@@ -143,11 +149,22 @@ export function textWysiwyg({
     editable.onkeydown = null;
 
     window.removeEventListener("wheel", stopEvent, true);
-    document.body.removeChild(editable);
+    try {
+      document.body.removeChild(editable);
+    } catch (e) {
+      // TODO: figure why this is happening
+    }
   }
 
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
+
+  return {
+    submit: handleSubmit,
+    changeStyle: (style: any) => {
+      Object.assign(editable.style, style);
+    },
+  };
 }

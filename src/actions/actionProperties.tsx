@@ -290,6 +290,19 @@ export const actionChangeFontSize = register({
       }),
       appState: {
         ...appState,
+        editingElement: appState.editingElement
+          ? {
+              ...(appState.editingElement as ExcalidrawTextElement),
+              isDeleted: false,
+              font: `${value}px ${
+                appState
+                  ? (
+                      appState.editingElement as ExcalidrawTextElement
+                    ).font.split("px ")[1]
+                  : ""
+              }`,
+            }
+          : null,
         currentItemFont: `${value}px ${
           appState.currentItemFont.split("px ")[1]
         }`,

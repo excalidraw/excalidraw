@@ -5,6 +5,7 @@ import { FlooredNumber, AppState } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  ExcalidrawTextElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -100,6 +101,14 @@ export function renderScene(
 ) {
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
+  }
+
+  if (appState.wysiwygElement && appState.wysiwygElement.changeStyle) {
+    appState.wysiwygElement.changeStyle({
+      font: appState.editingElement
+        ? (appState.editingElement as ExcalidrawTextElement).font
+        : "",
+    });
   }
 
   const context = canvas.getContext("2d")!;

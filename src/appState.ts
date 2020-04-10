@@ -7,6 +7,7 @@ export const DEFAULT_TEXT_ALIGN = "left";
 
 export function getDefaultAppState(): AppState {
   return {
+    wysiwygElement: null,
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
