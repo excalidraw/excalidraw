@@ -165,6 +165,7 @@ export function textWysiwyg({
     submit: handleSubmit,
     changeStyle: (style: any) => {
       Object.assign(editable.style, style);
+      editable.focus();
     },
   };
 }
