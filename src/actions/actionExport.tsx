@@ -92,7 +92,7 @@ export const actionLoadScene = register({
             updateData({ elements: elements, appState: appState });
           })
           .catch((error) => {
-            updateData({ error: error });
+            updateData({ error: error.message });
           });
       }}
     />
