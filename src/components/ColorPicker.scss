@@ -1,7 +1,9 @@
+@import "open-color/open-color.scss";
+
 .color-picker {
-  background: rgb(255, 255, 255);
-  border: 0px solid rgba(0, 0, 0, 0.25);
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
+  background: $oc-white;
+  border: 0px solid transparentize($oc-white, 0.75);
+  box-shadow: transparentize($oc-black, 0.75) 0px 1px 4px;
   border-radius: 4px;
   position: absolute;
   :root[dir="ltr"] & {
@@ -23,7 +25,7 @@
   height: 0px;
   border-style: solid;
   border-width: 0px 9px 10px;
-  border-color: transparent transparent rgb(255, 255, 255);
+  border-color: transparent transparent $oc-white;
   position: absolute;
   top: -10px;
   :root[dir="ltr"] & {
@@ -35,7 +37,7 @@
 }
 
 .color-picker-triangle-shadow {
-  border-color: transparent transparent rgba(0, 0, 0, 0.1);
+  border-color: transparent transparent transparentize($oc-black, 0.9);
   top: -11px;
 }
 
@@ -59,17 +61,18 @@
   margin: 0;
   box-sizing: border-box;
   border: 1px solid #ddd;
+  background-color: currentColor !important;
 }
 
 .color-picker-swatch:focus {
-  /* Note: in the original react-color it uses the color of the element,
-     but it's too annoying to set from JavaScript without a css lib... */
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  /* TODO: only show the border when the color is too light to see as a shadow */
+  box-shadow: 0 0 4px 1px currentColor;
+  border-color: $oc-blue-5;
 }
 
 .color-picker-transparent {
   border-radius: 4px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset;
+  box-shadow: transparentize($oc-black, 0.9) 0px 0px 0px 1px inset;
   position: absolute;
   top: 0px;
   right: 0px;
@@ -83,7 +86,7 @@
 }
 
 .color-picker-hash {
-  background: #dee2e6;
+  background: $oc-gray-3;
   height: 1.875rem;
   width: 1.875rem;
   :root[dir="ltr"] & {
@@ -92,7 +95,7 @@
   :root[dir="rtl"] & {
     border-radius: 0px 4px 4px 0px;
   }
-  color: #495057;
+  color: $oc-gray-7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +103,7 @@
   position: relative;
 }
 .color-input-container:focus-within .color-picker-hash {
-  box-shadow: 0 0 0 2px #a5d8ff;
+  box-shadow: 0 0 0 2px $oc-blue-2;
 }
 .color-input-container:focus-within .color-picker-hash::before,
 .color-input-container:focus-within .color-picker-hash::after {
@@ -111,7 +114,7 @@
   top: 0;
 }
 .color-input-container:focus-within .color-picker-hash::before {
-  background: #dee2e6;
+  background: $oc-gray-3;
   :root[dir="ltr"] & {
     right: -1px;
   }
@@ -137,11 +140,11 @@
   width: 12ch; /* length of `transparent` + 1 */
   margin: 0;
   font-size: 1rem;
-  color: #343a40;
+  color: $oc-gray-8;
   border: 0px;
   outline: none;
   height: 1.75em;
-  box-shadow: #dee2e6 0px 0px 0px 1px inset;
+  box-shadow: $oc-gray-3 0px 0px 0px 1px inset;
   :root[dir="ltr"] & {
     border-radius: 0px 4px 4px 0px;
   }
@@ -158,7 +161,7 @@
   height: 1.875rem;
   width: 1.875rem;
   margin-inline-end: 0.25rem;
-  border: 1px solid #dee2e6;
+  border: 1px solid $oc-gray-3;
   position: relative;
   overflow: hidden;
   background-color: transparent !important;

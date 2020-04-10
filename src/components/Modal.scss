@@ -20,7 +20,7 @@
   right: 0;
   bottom: 0;
   z-index: 1;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: transparentize($oc-black, 0.7);
   backdrop-filter: blur(2px);
 }
 

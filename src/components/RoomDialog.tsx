@@ -83,7 +83,7 @@ function RoomModal({
             <input
               id="username"
               value={username || ""}
-              className="RoomDialog-username"
+              className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
             />
           </div>

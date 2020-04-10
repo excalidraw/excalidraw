@@ -1,3 +1,4 @@
+import oc from "open-color";
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
@@ -16,7 +17,7 @@ export function getDefaultAppState(): AppState {
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
-    currentItemStrokeColor: "#000000",
+    currentItemStrokeColor: oc.black,
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
     currentItemStrokeWidth: 1,
@@ -24,7 +25,7 @@ export function getDefaultAppState(): AppState {
     currentItemOpacity: 100,
     currentItemFont: DEFAULT_FONT,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
-    viewBackgroundColor: "#ffffff",
+    viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
