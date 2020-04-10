@@ -61,12 +61,13 @@
   margin: 0;
   box-sizing: border-box;
   border: 1px solid #ddd;
+  background-color: currentColor !important;
 }
 
 .color-picker-swatch:focus {
-  /* Note: in the original react-color it uses the color of the element,
-     but it's too annoying to set from JavaScript without a css lib... */
-  box-shadow: 0 0 4px transparentize($oc-black, 0.7);
+  /* TODO: only show the border when the color is too light to see as a shadow */
+  box-shadow: 0 0 4px 1px currentColor;
+  border-color: $oc-blue-5;
 }
 
 .color-picker-transparent {

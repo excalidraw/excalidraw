@@ -6,7 +6,7 @@ type Props = {
   top?: number;
   left?: number;
   children?: React.ReactNode;
-  onCloseRequest?(): void;
+  onCloseRequest?(e: PointerEvent): void;
   fitInViewport?: boolean;
 };
 
@@ -38,9 +38,9 @@ export function Popover({
 
   useEffect(() => {
     if (onCloseRequest) {
-      const handler = (e: Event) => {
+      const handler = (e: PointerEvent) => {
         if (!popoverRef.current?.contains(e.target as Node)) {
-          unstable_batchedUpdates(() => onCloseRequest());
+          unstable_batchedUpdates(() => onCloseRequest(e));
         }
       };
       document.addEventListener("pointerdown", handler, false);
