@@ -51,7 +51,8 @@
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
-    "untitled": "Başlıksız"
+    "untitled": "Başlıksız",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
