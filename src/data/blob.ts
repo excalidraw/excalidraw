@@ -15,7 +15,7 @@ export async function loadFromBlob(blob: any) {
       elements = data.elements || [];
       appState = { ...defaultAppState, ...data.appState };
     } catch {
-      throw new Error(t("alerts.couldNotLoadInvalidFile"));
+      throw t("alerts.couldNotLoadInvalidFile");
     }
     return { elements, appState };
   };
