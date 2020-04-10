@@ -14,6 +14,7 @@ import {
   handlerRectangles,
   getCommonBounds,
   canResizeMutlipleElements,
+  isTextElement,
 } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -104,7 +105,7 @@ export function renderScene(
   }
 
   if (appState.wysiwygElement && appState.wysiwygElement.changeStyle) {
-    if (appState.editingElement) {
+    if (isTextElement(appState.editingElement)) {
       appState.wysiwygElement.changeStyle({
         font: (appState.editingElement as ExcalidrawTextElement).font,
         textAlign: (appState.editingElement as ExcalidrawTextElement).textAlign,
