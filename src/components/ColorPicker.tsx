@@ -124,8 +124,8 @@ const Picker = function ({
         {colors.map((_color, i) => (
           <button
             className="color-picker-swatch"
-            onClick={(e) => {
-              (e.currentTarget as HTMLButtonElement).focus();
+            onClick={(event) => {
+              (event.currentTarget as HTMLButtonElement).focus();
               onChange(_color);
             }}
             title={`${_color} — ${keyBindings[i].toUpperCase()}`}
@@ -252,8 +252,8 @@ export function ColorPicker({
       <React.Suspense fallback="">
         {isActive ? (
           <Popover
-            onCloseRequest={(e) =>
-              e.target !== pickerButton.current && setActive(false)
+            onCloseRequest={(event) =>
+              event.target !== pickerButton.current && setActive(false)
             }
           >
             <Picker
