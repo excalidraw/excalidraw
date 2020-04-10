@@ -1,8 +1,10 @@
 import rough from "roughjs/bin/rough";
+import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
+import { renderElement } from "../renderer/renderElement";
+import { distance, SVG_NS, measureText } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 
@@ -16,11 +18,13 @@ export function exportToCanvas(
     exportPadding = 10,
     viewBackgroundColor,
     scale = 1,
+    addWatermark = false,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
+    addWatermark?: boolean;
   },
   createCanvas: (width: number, height: number) => any = function (
     width,
@@ -39,6 +43,17 @@ export function exportToCanvas(
 
   const tempCanvas: any = createCanvas(width, height);
 
+  const sceneState = {
+    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+    scrollX: normalizeScroll(-minX + exportPadding),
+    scrollY: normalizeScroll(-minY + exportPadding),
+    zoom: 1,
+    remotePointerViewportCoords: {},
+    remoteSelectedElementIds: {},
+    shouldCacheIgnoreZoom: false,
+    remotePointerUsernames: {},
+  };
+
   renderScene(
     elements,
     appState,
@@ -46,22 +61,41 @@ export function exportToCanvas(
     scale,
     rough.canvas(tempCanvas),
     tempCanvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: normalizeScroll(-minX + exportPadding),
-      scrollY: normalizeScroll(-minY + exportPadding),
-      zoom: 1,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-    },
+    sceneState,
     {
       renderScrollbars: false,
       renderSelection: false,
       renderOptimizations: false,
     },
   );
+
+  if (addWatermark) {
+    const context = tempCanvas.getContext("2d")!;
+    const text = "Made in Excalidraw";
+    const font = "20px Virgil";
+    const { width: textWidth, height: textHeight } = measureText(text, font);
+
+    renderElement(
+      newTextElement({
+        text,
+        font,
+        textAlign: "center",
+        x: maxX - textWidth / 2,
+        y: maxY - textHeight / 2,
+        strokeColor: "#000000",
+        backgroundColor: "transparent",
+        fillStyle: "hachure",
+        strokeWidth: 1,
+        roughness: 1,
+        opacity: 60,
+      }),
+      rough.canvas(tempCanvas),
+      context,
+      false,
+      sceneState,
+    );
+  }
+
   return tempCanvas;
 }
 

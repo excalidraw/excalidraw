@@ -294,12 +294,14 @@ export async function exportCanvas(
     viewBackgroundColor,
     name,
     scale = 1,
+    addWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
+    addWatermark?: boolean;
   },
 ) {
   if (elements.length === 0) {
@@ -327,6 +329,7 @@ export async function exportCanvas(
     viewBackgroundColor,
     exportPadding,
     scale,
+    addWatermark,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);

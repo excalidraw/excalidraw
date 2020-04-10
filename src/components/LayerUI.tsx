@@ -54,6 +54,7 @@ export const LayerUI = React.memo(
     function renderExportDialog() {
       const createExporter = (type: ExportType): ExportCB => (
         exportedElements,
+        addWatermark,
         scale,
       ) => {
         if (canvas) {
@@ -62,6 +63,7 @@ export const LayerUI = React.memo(
             name: appState.name,
             viewBackgroundColor: appState.viewBackgroundColor,
             scale,
+            addWatermark,
           });
         }
       };
@@ -73,7 +75,7 @@ export const LayerUI = React.memo(
           onExportToPng={createExporter("png")}
           onExportToSvg={createExporter("svg")}
           onExportToClipboard={createExporter("clipboard")}
-          onExportToBackend={(exportedElements) => {
+          onExportToBackend={(exportedElements, addWatermark) => {
             if (canvas) {
               exportCanvas(
                 "backend",
@@ -83,7 +85,7 @@ export const LayerUI = React.memo(
                   selectedElementIds: {},
                 },
                 canvas,
-                appState,
+                { ...appState, addWatermark },
               );
             }
           }}
