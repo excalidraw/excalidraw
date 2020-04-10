@@ -83,7 +83,14 @@
         }
       ],
       "prefer-template": "warn",
-      "prettier/prettier": "warn"
+      "prettier/prettier": "warn",
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "JSXText[value=/\\w/]",
+          "message": "Use 't(...)' instead of literal text in JSX"
+        }
+      ]
     }
   },
   "homepage": ".",
