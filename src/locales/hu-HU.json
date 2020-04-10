@@ -51,7 +51,8 @@
     "language": "Nyelv",
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
