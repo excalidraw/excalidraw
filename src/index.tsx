@@ -7,12 +7,12 @@ import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
 import "./styles.scss";
 
-const SentyEnvHostnameMap: { [key: string]: string } = {
+const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
   "now.sh": "staging",
 };
 
-const onlineEnv = Object.keys(SentyEnvHostnameMap).find(
+const onlineEnv = Object.keys(SentryEnvHostnameMap).find(
   (item) => window.location.hostname.indexOf(item) >= 0,
 );
 
@@ -21,7 +21,7 @@ Sentry.init({
   dsn: onlineEnv
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
-  environment: onlineEnv ? SentyEnvHostnameMap[onlineEnv] : undefined,
+  environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
   integrations: [
     new SentryIntegrations.CaptureConsole({
