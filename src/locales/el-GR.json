@@ -51,7 +51,8 @@
     "language": "Γλώσσα",
     "createRoom": "Έναρξη ζωντανής συνεδρίας",
     "duplicateSelection": "Δημιουργία αντιγράφου",
-    "untitled": "Χωρίς τίτλο"
+    "untitled": "Χωρίς τίτλο",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
