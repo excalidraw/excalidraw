@@ -147,6 +147,7 @@ export function textWysiwyg({
       document.body.removeChild(editable);
     } catch (e) {
       // TODO: figure why this is happening
+      console.error("failed to remove element");
     }
   }
 
