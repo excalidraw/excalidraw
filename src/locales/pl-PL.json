@@ -51,7 +51,8 @@
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Duplikuj",
-    "untitled": "Bez tytułu"
+    "untitled": "Bez tytułu",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
