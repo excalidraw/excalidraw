@@ -594,6 +594,16 @@ class App extends React.Component<any, AppState> {
     }
 
     history.record(this.state, globalSceneState.getElementsIncludingDeleted());
+
+    const { previousSelectedElementIds } = this.state;
+    if (Object.keys(previousSelectedElementIds).length !== 0) {
+      setTimeout(() => {
+        this.setState({
+          selectedElementIds: previousSelectedElementIds,
+          previousSelectedElementIds: {},
+        });
+      }, 1000);
+    }
   }
 
   // Copy/paste
@@ -2862,6 +2872,7 @@ class App extends React.Component<any, AppState> {
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
     const { deltaX, deltaY } = event;
+    const { selectedElementIds, previousSelectedElementIds } = this.state;
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
@@ -2875,6 +2886,9 @@ class App extends React.Component<any, AppState> {
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
         selectedElementIds: {},
+        previousSelectedElementIds: Object.keys(selectedElementIds).length !== 0
+          ? selectedElementIds
+          : previousSelectedElementIds,
       }));
       return;
     }
