@@ -112,6 +112,19 @@ const applyResizeArrowFn = (
   setResizeArrowFn(resizeArrowFn);
 };
 
+const shouldConstrainRotation = (
+  cx: number,
+  cy: number,
+  event: PointerEvent,
+  xPointer: number,
+  yPointer: number,
+  handleOffset: number,
+) =>
+  event.shiftKey ||
+  (event.pointerType !== "mouse" &&
+    Math.abs(xPointer - cx) <= handleOffset * 8 &&
+    Math.abs(yPointer - cy) <= handleOffset * 8);
+
 export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
@@ -144,7 +157,9 @@ export const resizeElements = (
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
       let angle = (5 * Math.PI) / 2 + Math.atan2(yPointer - cy, xPointer - cx);
-      if (event.shiftKey) {
+      if (
+        shouldConstrainRotation(cx, cy, event, xPointer, yPointer, handleOffset)
+      ) {
         angle += SHIFT_LOCKING_ANGLE / 2;
         angle -= angle % SHIFT_LOCKING_ANGLE;
       }
