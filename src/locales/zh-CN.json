@@ -51,7 +51,8 @@
     "language": "语言",
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素",
-    "untitled": "无标题"
+    "untitled": "无标题",
+    "name": ""
   },
   "buttons": {
     "clearReset": "重置画布",
