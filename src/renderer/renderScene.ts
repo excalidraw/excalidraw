@@ -1,5 +1,6 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
+import oc from "open-color";
 
 import { FlooredNumber, AppState } from "../types";
 import {
@@ -166,7 +167,7 @@ export function renderScene(
       const selectionColors = [];
       // local user
       if (appState.selectedElementIds[element.id]) {
-        selectionColors.push("#000000");
+        selectionColors.push(oc.black);
       }
       // remote users
       if (sceneState.remoteSelectedElementIds[element.id]) {
@@ -236,7 +237,7 @@ export function renderScene(
     // Paint resize handlers
     if (locallySelectedElements.length === 1) {
       context.translate(sceneState.scrollX, sceneState.scrollY);
-      context.fillStyle = "#fff";
+      context.fillStyle = oc.white;
       const handlers = handlerRectangles(
         locallySelectedElements[0],
         sceneState.zoom,
@@ -275,7 +276,7 @@ export function renderScene(
       if (canResizeMutlipleElements(locallySelectedElements)) {
         const dashedLinePadding = 4 / sceneState.zoom;
         context.translate(sceneState.scrollX, sceneState.scrollY);
-        context.fillStyle = "#fff";
+        context.fillStyle = oc.white;
         const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
         context.setLineDash([2 / sceneState.zoom]);
@@ -412,7 +413,7 @@ export function renderScene(
         measure.width + 2 * paddingHorizontal,
         measureHeight + 2 * paddingVertical,
       );
-      context.fillStyle = "#ffffff";
+      context.fillStyle = oc.white;
       context.fillText(
         username,
         offsetX + paddingHorizontal,

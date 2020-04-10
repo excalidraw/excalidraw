@@ -1,4 +1,5 @@
 import React from "react";
+import oc from "open-color";
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
@@ -33,7 +34,7 @@ const ShortcutIsland = (props: {
 }) => (
   <div
     style={{
-      border: "1px solid #ced4da",
+      border: `1px solid ${oc.gray[4]}`,
       marginBottom: "16px",
     }}
   >
@@ -41,7 +42,7 @@ const ShortcutIsland = (props: {
       style={{
         margin: "0",
         padding: "4px",
-        backgroundColor: "#e9ecef",
+        backgroundColor: oc.gray[2],
         textAlign: "center",
       }}
     >
@@ -58,7 +59,7 @@ const Shortcut = (props: {
 }) => (
   <div
     style={{
-      borderTop: "1px solid #ced4da",
+      borderTop: `1px solid ${oc.gray[4]}`,
     }}
   >
     <div
@@ -108,10 +109,10 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
   <span
     style={{
       wordBreak: "keep-all",
-      border: "1px solid #ced4da",
+      border: `1px solid ${oc.gray[4]}`,
       padding: "2px 8px",
       margin: "0 4px",
-      backgroundColor: "#e9ecef",
+      backgroundColor: oc.gray[2],
       borderRadius: "2px",
       fontSize: "0.8em",
     }}
@@ -125,7 +126,7 @@ const Footer = () => (
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-evenly",
-      borderTop: "1px solid #ced4da",
+      borderTop: `1px solid ${oc.gray[4]}`,
       marginTop: 8,
       paddingTop: 16,
     }}

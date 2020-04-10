@@ -24,6 +24,7 @@
     "browser-nativefs": "0.6.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
+    "open-color": "1.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
