@@ -51,7 +51,8 @@
     "language": "भाषा",
     "createRoom": "अधिवेशन",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "",
