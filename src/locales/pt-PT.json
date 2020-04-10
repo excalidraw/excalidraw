@@ -51,7 +51,8 @@
     "language": "Idioma",
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
     "duplicateSelection": "Duplicar",
-    "untitled": "Sem título"
+    "untitled": "Sem título",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
