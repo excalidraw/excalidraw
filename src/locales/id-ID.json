@@ -51,7 +51,8 @@
     "language": "Bahasa",
     "createRoom": "",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
