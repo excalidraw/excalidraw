@@ -51,7 +51,8 @@
     "language": "Език",
     "createRoom": "",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "",
