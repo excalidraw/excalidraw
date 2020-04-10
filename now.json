@@ -21,7 +21,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src https: data: 'unsafe-inline'; connect-src https://*.excalidraw.com wss://excalidraw-socket.herokuapp.com https://excalidraw-socket.herokuapp.com"
+          "value": "default-src https: data: 'unsafe-inline'; connect-src https://*.excalidraw.com wss://excalidraw-socket.herokuapp.com https://excalidraw-socket.herokuapp.com https://sentry.io"
         }
       ]
     }
