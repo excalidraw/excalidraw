@@ -120,7 +120,6 @@ export function textWysiwyg({
       event.stopPropagation();
     }
   };
-  // editable.onblur = handleSubmit;
 
   function stopEvent(event: Event) {
     event.stopPropagation();
@@ -137,7 +136,6 @@ export function textWysiwyg({
 
   function cleanup() {
     // remove events to ensure they don't late-fire
-    editable.onblur = null;
     editable.onpaste = null;
     editable.oninput = null;
     editable.onkeydown = null;
