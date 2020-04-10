@@ -28,12 +28,16 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 100%;
+  max-width: var(--max-width);
 
   opacity: 0;
   transform: translateY(10px);
   animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
   position: relative;
+
+  @media #{$media-query} {
+    max-width: 100%;
+  }
 }
 
 @keyframes Modal__content_fade-in {
