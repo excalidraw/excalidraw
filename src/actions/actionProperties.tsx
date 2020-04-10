@@ -279,7 +279,6 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    // let editingElement;
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
