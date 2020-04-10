@@ -25,6 +25,7 @@ import {
   getElementWithResizeHandler,
   canResizeMutlipleElements,
   getResizeHandlerFromCoords,
+  isNonDeletedElement,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -269,19 +270,31 @@ export class App extends React.Component<any, AppState> {
     if (this.unmounted) {
       return;
     }
+
+    let editingElement: AppState["editingElement"] | null = null;
     if (res.elements) {
+      res.elements.forEach((element) => {
+        if (
+          this.state.editingElement?.id === element.id &&
+          this.state.editingElement !== element &&
+          isNonDeletedElement(element)
+        ) {
+          editingElement = element;
+        }
+      });
       globalSceneState.replaceAllElements(res.elements);
       if (res.commitToHistory) {
         history.resumeRecording();
       }
     }
 
-    if (res.appState) {
+    if (res.appState || editingElement) {
       if (res.commitToHistory) {
         history.resumeRecording();
       }
       this.setState((state) => ({
         ...res.appState,
+        editingElement: editingElement || state.editingElement,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));

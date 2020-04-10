@@ -27,7 +27,10 @@ const changeProperty = (
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
 ) => {
   return elements.map((element) => {
-    if (appState.selectedElementIds[element.id]) {
+    if (
+      appState.selectedElementIds[element.id] ||
+      element.id === appState.editingElement?.id
+    ) {
       return callback(element);
     }
     return element;
@@ -276,6 +279,7 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
+    // let editingElement;
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
@@ -290,19 +294,6 @@ export const actionChangeFontSize = register({
       }),
       appState: {
         ...appState,
-        editingElement: appState.editingElement
-          ? {
-              ...(appState.editingElement as ExcalidrawTextElement),
-              isDeleted: false,
-              font: `${value}px ${
-                appState
-                  ? (
-                      appState.editingElement as ExcalidrawTextElement
-                    ).font.split("px ")[1]
-                  : ""
-              }`,
-            }
-          : null,
         currentItemFont: `${value}px ${
           appState.currentItemFont.split("px ")[1]
         }`,
