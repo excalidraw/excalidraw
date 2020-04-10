@@ -5,7 +5,9 @@
 
 import React from "react";
 
-const ACTIVE_ELEMENT_COLOR = "#ffa94d"; // OC ORANGE 4
+import oc from "open-color";
+
+const ACTIVE_ELEMENT_COLOR = oc.orange[4];
 type Opts = { width?: number; height?: number; mirror?: true } & React.SVGProps<
   SVGSVGElement
 >;
@@ -106,7 +108,7 @@ export const bringForward = createIcon(
   <>
     <path
       d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-      stroke="#000"
+      stroke={oc.black}
       strokeWidth="2"
     />
     <path
@@ -129,7 +131,7 @@ export const sendBackward = createIcon(
     />
     <path
       d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-      stroke="#000"
+      stroke={oc.black}
       strokeWidth="2"
     />
   </>,
@@ -140,7 +142,7 @@ export const bringToFront = createIcon(
   <>
     <path
       d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
-      stroke="#000"
+      stroke={oc.black}
       strokeWidth="2"
     />
     <path
@@ -164,7 +166,7 @@ export const sendToBack = createIcon(
     />
     <path
       d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
-      stroke="#000"
+      stroke={oc.black}
       strokeLinejoin="round"
       strokeWidth="2"
     />

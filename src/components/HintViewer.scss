@@ -1,7 +1,7 @@
 @import "../_variables";
 
 .HintViewer {
-  color: #868e96; /* OC: GRAY 6*/
+  color: $oc-gray-6;
   font-size: 0.8rem;
   left: 50%;
   pointer-events: none;
@@ -16,7 +16,7 @@
   }
 
   > span {
-    background-color: rgba(255, 255, 255, 0.88);
+    background-color: transparentize($oc-white, 0.12);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
   }
