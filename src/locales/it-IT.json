@@ -51,7 +51,8 @@
     "language": "Lingua",
     "createRoom": "Condividi una sessione di collaborazione in diretta",
     "duplicateSelection": "Duplica",
-    "untitled": "Senza titolo"
+    "untitled": "Senza titolo",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
