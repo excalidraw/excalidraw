@@ -44,9 +44,6 @@
   justify-content: center;
 }
 
-.RoomDialog-usernameLabel {
-}
-
 .RoomDialog-username {
   min-width: 0;
   flex: 1 1 auto;
@@ -55,7 +52,8 @@
   cursor: pointer;
   border: none;
   height: 2.5rem;
-  line-height: 2.5rem;
+  font-size: 1em;
+  line-height: 1.5;
   padding: 0 0.5rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
