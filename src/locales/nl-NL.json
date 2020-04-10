@@ -51,7 +51,8 @@
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
-    "untitled": "Naamloos"
+    "untitled": "Naamloos",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
