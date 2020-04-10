@@ -51,7 +51,8 @@
     "language": "Lenguaje",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar",
-    "untitled": "Sin título"
+    "untitled": "Sin título",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
