@@ -51,7 +51,8 @@
     "language": "언어",
     "createRoom": "실시간 협업 세션 공유",
     "duplicateSelection": "복제",
-    "untitled": "제목 없음"
+    "untitled": "제목 없음",
+    "name": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
