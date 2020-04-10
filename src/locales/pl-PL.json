@@ -147,7 +147,7 @@
     "blog": "Przeczytaj naszego bloga",
     "howto": "Skorzystaj z instrukcji",
     "github": "Znalazłeś problem? Zgłoś go",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "Dodaj nową linię (tekst)",
+    "textFinish": "Zakończ edycję (tekst)"
   }
 }
