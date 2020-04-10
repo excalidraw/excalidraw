@@ -51,7 +51,8 @@
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
