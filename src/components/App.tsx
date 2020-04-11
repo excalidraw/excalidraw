@@ -2574,6 +2574,8 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     this.portal.socket &&
+      // do not broadcast when more than 1 pointer since that shows flickering on the other side
+      gesture.pointers.size < 2 &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,
