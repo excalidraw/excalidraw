@@ -15,24 +15,24 @@
     "stroke": "Обводка",
     "background": "Фон",
     "fill": "Заливка",
-    "strokeWidth": "",
+    "strokeWidth": "Толщина штриха",
     "sloppiness": "Стиль обводки",
     "opacity": "Непрозрачность",
-    "textAlign": "",
-    "fontSize": "",
-    "fontFamily": "",
+    "textAlign": "Выравнивание текста",
+    "fontSize": "Размер шрифта",
+    "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
-    "handDrawn": "",
+    "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
     "code": "Код",
     "small": "Малый",
     "medium": "Средний",
     "large": "Большой",
-    "veryLarge": "",
+    "veryLarge": "Очень большой",
     "solid": "Однотонная",
     "hachure": "Штрихованная",
-    "crossHatch": "",
+    "crossHatch": "Перекрестная",
     "thin": "Тонкая",
     "bold": "Жирная",
     "left": "",
@@ -51,7 +51,8 @@
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -146,6 +147,8 @@
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

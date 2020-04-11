@@ -51,7 +51,8 @@
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
-    "untitled": "Başlıksız"
+    "untitled": "Başlıksız",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -146,6 +147,8 @@
     "view": "Görüntüle",
     "blog": "Blog'umuzu okuyun",
     "howto": "Rehberimizi takip edin",
-    "github": "Bir hata mı buldun? Bildir"
+    "github": "Bir hata mı buldun? Bildir",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
