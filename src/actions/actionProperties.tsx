@@ -27,7 +27,10 @@ const changeProperty = (
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
 ) => {
   return elements.map((element) => {
-    if (appState.selectedElementIds[element.id]) {
+    if (
+      appState.selectedElementIds[element.id] ||
+      element.id === appState.editingElement?.id
+    ) {
       return callback(element);
     }
     return element;
