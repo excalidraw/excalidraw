@@ -103,15 +103,17 @@ export function renderScene(
     return { atLeastOneVisibleElement: false };
   }
 
-  if (appState.wysiwygElement && appState.wysiwygElement.changeStyle) {
-    if (isTextElement(appState.editingElement)) {
-      appState.wysiwygElement.changeStyle({
-        font: appState.editingElement.font,
-        textAlign: appState.editingElement.textAlign,
-        color: appState.editingElement.strokeColor,
-        opacity: appState.editingElement.opacity,
-      });
-    }
+  if (
+    appState.wysiwygElement &&
+    appState.wysiwygElement.changeStyle &&
+    isTextElement(appState.editingElement)
+  ) {
+    appState.wysiwygElement.changeStyle({
+      font: appState.editingElement.font,
+      textAlign: appState.editingElement.textAlign,
+      color: appState.editingElement.strokeColor,
+      opacity: appState.editingElement.opacity,
+    });
   }
 
   const context = canvas.getContext("2d")!;
