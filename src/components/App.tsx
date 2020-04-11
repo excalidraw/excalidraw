@@ -1245,7 +1245,8 @@ export class App extends React.Component<any, AppState> {
       ]);
     };
 
-    const wysiwygElement = textWysiwyg({
+    textWysiwyg({
+      id: element.id,
       x,
       y,
       initText: element.text,
@@ -1265,7 +1266,6 @@ export class App extends React.Component<any, AppState> {
       onSubmit: withBatchedUpdates((text) => {
         updateElement(text);
         this.setState((prevState) => ({
-          wysiwygElement: null,
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [element.id]: true,
@@ -1286,7 +1286,7 @@ export class App extends React.Component<any, AppState> {
       }),
     });
     // deselect all other elements when inserting text
-    this.setState({ selectedElementIds: {}, wysiwygElement });
+    this.setState({ selectedElementIds: {} });
 
     // do an initial update to re-initialize element position since we were
     //  modifying element's x/y for sake of editor (case: syncing to remote)
@@ -1596,9 +1596,6 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    if (this.state.wysiwygElement && this.state.wysiwygElement.submit) {
-      this.state.wysiwygElement.submit();
-    }
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid

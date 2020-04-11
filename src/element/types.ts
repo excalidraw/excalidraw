@@ -68,8 +68,3 @@ export type ResizeArrowFnType = (
   pointerY: number,
   perfect: boolean,
 ) => void;
-
-export type WysiwigElement = {
-  submit: () => void;
-  changeStyle: (style: Record<string, any>) => void;
-};
