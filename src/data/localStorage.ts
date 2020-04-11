@@ -28,7 +28,7 @@ export function restoreUsernameFromLocalStorage(id: string): string | null {
       return JSON.parse(data).username;
     }
 
-    data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}`);
+    data = localStorage.getItem(LOCAL_STORAGE_KEY_COLLAB);
     if (data) {
       return JSON.parse(data).username;
     }
