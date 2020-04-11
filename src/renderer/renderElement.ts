@@ -447,7 +447,13 @@ export function renderElementToSvg(
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const offset = element.height - element.baseline;
+        const verticalOffset = element.height - element.baseline;
+        const horizontalOffset =
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
         const fontSplit = element.font.split(" ").filter((d) => !!d.trim());
         let fontFamily = fontSplit[0];
         let fontSize = "20px";
@@ -455,14 +461,21 @@ export function renderElementToSvg(
           fontFamily = fontSplit[1];
           fontSize = fontSplit[0];
         }
+        const textAnchor =
+          element.textAlign === "center"
+            ? "middle"
+            : element.textAlign === "right"
+            ? "end"
+            : "start";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
-          text.setAttribute("x", "0");
-          text.setAttribute("y", `${(i + 1) * lineHeight - offset}`);
+          text.setAttribute("x", `${horizontalOffset}`);
+          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
           text.setAttribute("font-family", fontFamily);
           text.setAttribute("font-size", fontSize);
           text.setAttribute("fill", element.strokeColor);
+          text.setAttribute("text-anchor", textAnchor);
           node.appendChild(text);
         }
         svgRoot.appendChild(node);
