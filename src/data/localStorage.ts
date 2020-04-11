@@ -10,7 +10,7 @@ const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 export function saveUsernameToLocalStorage(username: string) {
   try {
     localStorage.setItem(
-      `${LOCAL_STORAGE_KEY_COLLAB}`,
+      LOCAL_STORAGE_KEY_COLLAB,
       JSON.stringify({ username }),
     );
   } catch (error) {
