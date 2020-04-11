@@ -1818,29 +1818,6 @@ export class App extends React.Component<any, AppState> {
             );
             hitElementWasAddedToSelection = true;
           }
-
-          // We duplicate the selected element if alt is pressed on pointer down
-          if (event.altKey) {
-            // Move the currently selected elements to the top of the z index stack, and
-            // put the duplicates where the selected elements used to be.
-            const nextElements = [];
-            const elementsToAppend = [];
-            for (const element of globalSceneState.getElementsIncludingDeleted()) {
-              if (
-                this.state.selectedElementIds[element.id] ||
-                (element.id === hitElement.id && hitElementWasAddedToSelection)
-              ) {
-                nextElements.push(duplicateElement(element));
-                elementsToAppend.push(element);
-              } else {
-                nextElements.push(element);
-              }
-            }
-            globalSceneState.replaceAllElements([
-              ...nextElements,
-              ...elementsToAppend,
-            ]);
-          }
         }
       }
     } else {
@@ -1990,6 +1967,8 @@ export class App extends React.Component<any, AppState> {
       resizeArrowFn = fn;
     };
 
+    let selectedElementWasDuplicated = false;
+
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
@@ -2082,6 +2061,40 @@ export class App extends React.Component<any, AppState> {
           });
           lastX = x;
           lastY = y;
+
+          // We duplicate the selected element if alt is pressed on pointer move
+          if (event.altKey && !selectedElementWasDuplicated) {
+            // Move the currently selected elements to the top of the z index stack, and
+            // put the duplicates where the selected elements used to be.
+            // (the origin point where the dragging started)
+
+            selectedElementWasDuplicated = true;
+
+            const nextElements = [];
+            const elementsToAppend = [];
+            for (const element of globalSceneState.getElementsIncludingDeleted()) {
+              if (
+                this.state.selectedElementIds[element.id] ||
+                // case: the state.selectedElementIds might not have been
+                //  updated yet by the time this mousemove event is fired
+                (element.id === hitElement.id && hitElementWasAddedToSelection)
+              ) {
+                const duplicatedElement = duplicateElement(element);
+                mutateElement(duplicatedElement, {
+                  x: duplicatedElement.x + (originX - lastX),
+                  y: duplicatedElement.y + (originY - lastY),
+                });
+                nextElements.push(duplicatedElement);
+                elementsToAppend.push(element);
+              } else {
+                nextElements.push(element);
+              }
+            }
+            globalSceneState.replaceAllElements([
+              ...nextElements,
+              ...elementsToAppend,
+            ]);
+          }
           return;
         }
       }
