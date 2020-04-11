@@ -1,5 +1,6 @@
 import { KEYS } from "../keys";
 import { selectNode } from "../utils";
+import { WysiwigElement } from "./types";
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -40,7 +41,7 @@ export function textWysiwyg({
   textAlign,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams): WysiwigElement {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";

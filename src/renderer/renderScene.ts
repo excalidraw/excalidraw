@@ -5,7 +5,6 @@ import { FlooredNumber, AppState } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-  ExcalidrawTextElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -107,10 +106,10 @@ export function renderScene(
   if (appState.wysiwygElement && appState.wysiwygElement.changeStyle) {
     if (isTextElement(appState.editingElement)) {
       appState.wysiwygElement.changeStyle({
-        font: (appState.editingElement as ExcalidrawTextElement).font,
-        textAlign: (appState.editingElement as ExcalidrawTextElement).textAlign,
-        color: (appState.editingElement as ExcalidrawTextElement).strokeColor,
-        opacity: (appState.editingElement as ExcalidrawTextElement).opacity,
+        font: appState.editingElement.font,
+        textAlign: appState.editingElement.textAlign,
+        color: appState.editingElement.strokeColor,
+        opacity: appState.editingElement.opacity,
       });
     }
   }
