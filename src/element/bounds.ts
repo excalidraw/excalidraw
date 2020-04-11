@@ -282,42 +282,38 @@ export const getElementBounds = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  switch (element.type) {
-    case "line":
-    case "arrow":
-      return getLinearElementRotatedBounds(element, cx, cy);
-    case "diamond": {
-      const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
-      const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
-      const [x22, y22] = rotate(x2, cy, cx, cy, element.angle);
-      const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
-      const minX = Math.min(x11, x12, x22, x21);
-      const minY = Math.min(y11, y12, y22, y21);
-      const maxX = Math.max(x11, x12, x22, x21);
-      const maxY = Math.max(y11, y12, y22, y21);
-      return [minX, minY, maxX, maxY];
-    }
-    case "ellipse": {
-      const w = (x2 - x1) / 2;
-      const h = (y2 - y1) / 2;
-      const cos = Math.cos(element.angle);
-      const sin = Math.sin(element.angle);
-      const ww = Math.hypot(w * cos, h * sin);
-      const hh = Math.hypot(h * cos, w * sin);
-      return [cx - ww, cy - hh, cx + ww, cy + hh];
-    }
-    default: {
-      const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-      const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-      const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-      const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
-      const minX = Math.min(x11, x12, x22, x21);
-      const minY = Math.min(y11, y12, y22, y21);
-      const maxX = Math.max(x11, x12, x22, x21);
-      const maxY = Math.max(y11, y12, y22, y21);
-      return [minX, minY, maxX, maxY];
-    }
+  if (isLinearElement(element)) {
+    return getLinearElementRotatedBounds(element, cx, cy);
   }
+  if (element.type === "diamond") {
+    const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
+    const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
+    const [x22, y22] = rotate(x2, cy, cx, cy, element.angle);
+    const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
+    const minX = Math.min(x11, x12, x22, x21);
+    const minY = Math.min(y11, y12, y22, y21);
+    const maxX = Math.max(x11, x12, x22, x21);
+    const maxY = Math.max(y11, y12, y22, y21);
+    return [minX, minY, maxX, maxY];
+  }
+  if (element.type === "ellipse") {
+    const w = (x2 - x1) / 2;
+    const h = (y2 - y1) / 2;
+    const cos = Math.cos(element.angle);
+    const sin = Math.sin(element.angle);
+    const ww = Math.hypot(w * cos, h * sin);
+    const hh = Math.hypot(h * cos, w * sin);
+    return [cx - ww, cy - hh, cx + ww, cy + hh];
+  }
+  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+  const minX = Math.min(x11, x12, x22, x21);
+  const minY = Math.min(y11, y12, y22, y21);
+  const maxX = Math.max(x11, x12, x22, x21);
+  const maxY = Math.max(y11, y12, y22, y21);
+  return [minX, minY, maxX, maxY];
 };
 
 export const getCommonBounds = (
