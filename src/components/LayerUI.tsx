@@ -100,6 +100,7 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onUsernameChange={onUsernameChange}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
         onLockToggle={onLockToggle}
