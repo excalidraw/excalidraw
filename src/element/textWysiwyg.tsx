@@ -157,11 +157,11 @@ export function textWysiwyg({
 
   const rebindBlur = () => {
     window.removeEventListener("pointerup", rebindBlur);
-    editable.onblur = handleSubmit;
-    // case: clicking on the same property → no change → no update.
-    // Deferred because clicking on a UI button steals focus in next frame,
-    //  which would in turn blur wysiwyg again and confirm it
+    // deferred to guard against focus traps on various UIs that steal focus
+    //  upon pointerUp
     setTimeout(() => {
+      editable.onblur = handleSubmit;
+      // case: clicking on the same property → no change → no update → no focus
       editable.focus();
     });
   };
