@@ -244,9 +244,7 @@ export class App extends React.Component<any, AppState> {
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
-            if (this.portal.socket && this.portal.roomID && username) {
-              saveUsernameToLocalStorage(this.portal.roomID, username);
-            }
+            saveUsernameToLocalStorage(username);
             this.setState({
               username,
             });
@@ -921,12 +919,12 @@ export class App extends React.Component<any, AppState> {
       );
 
       this.portal.socket!.on("init-room", () => {
-        if (this.portal.socket && this.portal.roomID) {
-          const username = restoreUsernameFromLocalStorage(this.portal.roomID);
+        if (this.portal.socket) {
+          const username = restoreUsernameFromLocalStorage();
 
           this.portal.socket.emit("join-room", this.portal.roomID);
 
-          if (username) {
+          if (username !== null) {
             this.setState({
               username,
             });
