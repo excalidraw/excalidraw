@@ -19,16 +19,9 @@ export function saveUsernameToLocalStorage(username: string) {
   }
 }
 
-export function restoreUsernameFromLocalStorage(id: string): string | null {
+export function restoreUsernameFromLocalStorage(): string | null {
   try {
-    // Keep backwards compatibility for those that have already set a username
-    // This will be safe to remove after a couple of days/weeks
-    let data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}-${id}`);
-    if (data) {
-      return JSON.parse(data).username;
-    }
-
-    data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}`);
+    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}`);
     if (data) {
       return JSON.parse(data).username;
     }

@@ -919,8 +919,8 @@ export class App extends React.Component<any, AppState> {
       );
 
       this.portal.socket!.on("init-room", () => {
-        if (this.portal.socket && this.portal.roomID) {
-          const username = restoreUsernameFromLocalStorage(this.portal.roomID);
+        if (this.portal.socket) {
+          const username = restoreUsernameFromLocalStorage();
 
           this.portal.socket.emit("join-room", this.portal.roomID);
 
