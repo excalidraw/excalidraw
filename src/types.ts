@@ -4,6 +4,7 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   TextAlign,
+  WysiwigElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -12,6 +13,7 @@ export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
+  wysiwygElement: WysiwigElement | null;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;

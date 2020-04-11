@@ -25,6 +25,7 @@ import {
   getElementWithResizeHandler,
   canResizeMutlipleElements,
   getResizeHandlerFromCoords,
+  isNonDeletedElement,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -269,19 +270,31 @@ export class App extends React.Component<any, AppState> {
     if (this.unmounted) {
       return;
     }
+
+    let editingElement: AppState["editingElement"] | null = null;
     if (res.elements) {
+      res.elements.forEach((element) => {
+        if (
+          this.state.editingElement?.id === element.id &&
+          this.state.editingElement !== element &&
+          isNonDeletedElement(element)
+        ) {
+          editingElement = element;
+        }
+      });
       globalSceneState.replaceAllElements(res.elements);
       if (res.commitToHistory) {
         history.resumeRecording();
       }
     }
 
-    if (res.appState) {
+    if (res.appState || editingElement) {
       if (res.commitToHistory) {
         history.resumeRecording();
       }
       this.setState((state) => ({
         ...res.appState,
+        editingElement: editingElement || state.editingElement,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));
@@ -1186,9 +1199,6 @@ export class App extends React.Component<any, AppState> {
       });
     };
 
-    // deselect all other elements when inserting text
-    this.setState({ selectedElementIds: {} });
-
     const deleteElement = () => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
@@ -1216,7 +1226,7 @@ export class App extends React.Component<any, AppState> {
       ]);
     };
 
-    textWysiwyg({
+    const wysiwygElement = textWysiwyg({
       x,
       y,
       initText: element.text,
@@ -1236,6 +1246,7 @@ export class App extends React.Component<any, AppState> {
       onSubmit: withBatchedUpdates((text) => {
         updateElement(text);
         this.setState((prevState) => ({
+          wysiwygElement: null,
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [element.id]: true,
@@ -1255,6 +1266,8 @@ export class App extends React.Component<any, AppState> {
         resetSelection();
       }),
     });
+    // deselect all other elements when inserting text
+    this.setState({ selectedElementIds: {}, wysiwygElement });
 
     // do an initial update to re-initialize element position since we were
     //  modifying element's x/y for sake of editor (case: syncing to remote)
@@ -1564,6 +1577,9 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.state.wysiwygElement && this.state.wysiwygElement.submit) {
+      this.state.wysiwygElement.submit();
+    }
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid

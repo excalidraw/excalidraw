@@ -14,6 +14,7 @@ import {
   handlerRectangles,
   getCommonBounds,
   canResizeMutlipleElements,
+  isTextElement,
 } from "../element";
 
 import { roundRect } from "./roundRect";
@@ -101,6 +102,18 @@ export function renderScene(
 ) {
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
+  }
+
+  if (
+    appState.wysiwygElement?.changeStyle &&
+    isTextElement(appState.editingElement)
+  ) {
+    appState.wysiwygElement.changeStyle({
+      font: appState.editingElement.font,
+      textAlign: appState.editingElement.textAlign,
+      color: appState.editingElement.strokeColor,
+      opacity: appState.editingElement.opacity,
+    });
   }
 
   const context = canvas.getContext("2d")!;

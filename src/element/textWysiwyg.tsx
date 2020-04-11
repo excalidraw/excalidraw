@@ -1,5 +1,6 @@
 import { KEYS } from "../keys";
 import { selectNode } from "../utils";
+import { WysiwigElement } from "./types";
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -40,7 +41,7 @@ export function textWysiwyg({
   textAlign,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams): WysiwigElement {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -120,7 +121,6 @@ export function textWysiwyg({
       event.stopPropagation();
     }
   };
-  editable.onblur = handleSubmit;
 
   function stopEvent(event: Event) {
     event.stopPropagation();
@@ -137,7 +137,6 @@ export function textWysiwyg({
 
   function cleanup() {
     // remove events to ensure they don't late-fire
-    editable.onblur = null;
     editable.onpaste = null;
     editable.oninput = null;
     editable.onkeydown = null;
@@ -150,4 +149,12 @@ export function textWysiwyg({
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
+
+  return {
+    submit: handleSubmit,
+    changeStyle: (style: any) => {
+      Object.assign(editable.style, style);
+      editable.focus();
+    },
+  };
 }
