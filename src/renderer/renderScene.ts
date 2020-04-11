@@ -104,8 +104,7 @@ export function renderScene(
   }
 
   if (
-    appState.wysiwygElement &&
-    appState.wysiwygElement.changeStyle &&
+    appState.wysiwygElement?.changeStyle &&
     isTextElement(appState.editingElement)
   ) {
     appState.wysiwygElement.changeStyle({
