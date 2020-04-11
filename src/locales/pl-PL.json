@@ -51,7 +51,8 @@
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Duplikuj",
-    "untitled": "Bez tytułu"
+    "untitled": "Bez tytułu",
+    "name": "Nazwa"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -146,6 +147,8 @@
     "view": "Widok",
     "blog": "Przeczytaj naszego bloga",
     "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go"
+    "github": "Znalazłeś problem? Zgłoś go",
+    "textNewLine": "Dodaj nową linię (tekst)",
+    "textFinish": "Zakończ edycję (tekst)"
   }
 }

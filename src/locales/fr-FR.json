@@ -51,7 +51,8 @@
     "language": "Langue",
     "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer",
-    "untitled": ""
+    "untitled": "",
+    "name": "Nom"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -146,6 +147,8 @@
     "view": "",
     "blog": "Lisez notre blog",
     "howto": "Suivez notre guides",
-    "github": ""
+    "github": "",
+    "textNewLine": "Ajouter une nouvelle ligne (texte)",
+    "textFinish": "Terminer l'édition (texte)"
   }
 }
