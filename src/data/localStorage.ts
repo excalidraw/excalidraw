@@ -5,6 +5,33 @@ import { restore } from "./restore";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
+
+export function saveUsernameToLocalStorage(id: string, username: string) {
+  try {
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY_COLLAB}-${id}`,
+      JSON.stringify({ username }),
+    );
+  } catch (error) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+}
+
+export function restoreUsernameFromLocalStorage(id: string): string | null {
+  try {
+    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}-${id}`);
+    if (data) {
+      return JSON.parse(data).username;
+    }
+  } catch (error) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+
+  return null;
+}
 
 export function saveToLocalStorage(
   elements: readonly ExcalidrawElement[],

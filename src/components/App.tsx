@@ -112,6 +112,10 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
 import { actionFinalize } from "../actions";
+import {
+  restoreUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../data/localStorage";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -238,6 +242,14 @@ export class App extends React.Component<any, AppState> {
           elements={globalSceneState.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
+          onUsernameChange={(username) => {
+            if (this.portal.socket && this.portal.roomID && username) {
+              saveUsernameToLocalStorage(this.portal.roomID, username);
+            }
+            this.setState({
+              username,
+            });
+          }}
           onLockToggle={this.toggleLock}
         />
         <main>
@@ -896,8 +908,17 @@ export class App extends React.Component<any, AppState> {
       );
 
       this.portal.socket!.on("init-room", () => {
-        this.portal.socket &&
+        if (this.portal.socket && this.portal.roomID) {
+          const username = restoreUsernameFromLocalStorage(this.portal.roomID);
+
           this.portal.socket.emit("join-room", this.portal.roomID);
+
+          if (username) {
+            this.setState({
+              username,
+            });
+          }
+        }
       });
       this.portal.socket!.on(
         "client-broadcast",
