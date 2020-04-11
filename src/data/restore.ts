@@ -57,7 +57,9 @@ export function restore(
         element.points = points;
       } else {
         if (isTextElement(element)) {
-          element.textAlign = DEFAULT_TEXT_ALIGN;
+          if (!element.textAlign) {
+            element.textAlign = DEFAULT_TEXT_ALIGN;
+          }
         }
 
         normalizeDimensions(element);

@@ -1,4 +1,3 @@
-@import "./theme.css";
 @import "./_variables";
 
 :root {
@@ -6,6 +5,11 @@
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
+  --text-color-primary: #{$oc-gray-8};
+  --bg-color-main: #{$oc-white};
+  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --border-radius-m: 4px;
+  --space-factor: 0.25rem;
 }
 
 body {
@@ -25,7 +29,7 @@ body {
 a {
   font-weight: 500;
   text-decoration: none;
-  color: #1c7ed6; /* OC Blue 7 */
+  color: $oc-blue-7; /* OC Blue 7 */
 
   &:hover {
     text-decoration: underline;
@@ -123,20 +127,20 @@ canvas {
 
 .divider {
   width: 1px;
-  background-color: #e9ecef;
+  background-color: $oc-gray-2;
   margin: 1px;
 }
 
 .buttonList label:focus-within,
 input:focus {
   outline: transparent;
-  box-shadow: 0 0 0 2px #a5d8ff;
+  box-shadow: 0 0 0 2px $oc-blue-2;
 }
 
 button,
 .buttonList label {
   user-select: none;
-  background-color: #e9ecef;
+  background-color: $oc-gray-2;
   border: 0;
   border-radius: 4px;
   margin: 0.125rem 0;
@@ -147,15 +151,15 @@ button,
 
   &:focus {
     outline: transparent;
-    box-shadow: 0 0 0 2px #a5d8ff;
+    box-shadow: 0 0 0 2px $oc-blue-2;
   }
 
   &:hover {
-    background-color: #ced4da;
+    background-color: $oc-gray-4;
   }
 
   &:active {
-    background-color: #adb5bd;
+    background-color: $oc-gray-5;
   }
 
   &:disabled {
@@ -165,12 +169,12 @@ button,
 
 .active,
 .buttonList label.active {
-  background-color: #ced4da;
+  background-color: $oc-gray-4;
   &:hover {
-    background-color: #ced4da;
+    background-color: $oc-gray-4;
   }
   &:active {
-    background-color: #adb5bd;
+    background-color: $oc-gray-5;
   }
 }
 
@@ -297,8 +301,8 @@ button,
     justify-content: center;
 
     padding: 40px;
-    background-color: #fff5f5;
-    border: 3px solid #c92a2a;
+    background-color: $oc-red-1;
+    border: 3px solid $oc-red-9;
   }
 
   .ErrorSplash-paragraph {
@@ -338,9 +342,9 @@ button,
   padding: 0;
   padding-inline-start: 0.5rem;
   padding-inline-end: 1.5rem;
-  background-color: #e9ecef;
+  background-color: $oc-gray-2;
   border-radius: var(--space-factor);
-  border: 1px solid #ced4da;
+  border: 1px solid $oc-gray-4;
   font-size: 0.8rem;
   outline: none;
   appearance: none;
@@ -353,15 +357,15 @@ button,
   background-size: 0.65em auto, 100%;
 
   &:focus {
-    box-shadow: 0 0 0 2px #a5d8ff;
+    box-shadow: 0 0 0 2px $oc-blue-2;
   }
 
   &:hover {
-    background-color: #ced4da;
+    background-color: $oc-gray-4;
   }
 
   &:active {
-    background-color: #ced4da;
+    background-color: $oc-gray-4;
   }
   &.dropdown-select--floating {
     position: absolute;
@@ -403,7 +407,7 @@ button,
 .help-icon {
   position: fixed;
   cursor: pointer;
-  fill: #868e96;
+  fill: $oc-gray-6;
   bottom: 14px;
   :root[dir="ltr"] & {
     right: 14px;

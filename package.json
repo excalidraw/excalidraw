@@ -21,9 +21,10 @@
   "dependencies": {
     "@sentry/browser": "5.15.4",
     "@sentry/integrations": "5.15.4",
-    "browser-nativefs": "0.4.0",
+    "browser-nativefs": "0.6.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
+    "open-color": "1.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
@@ -83,7 +84,14 @@
         }
       ],
       "prefer-template": "warn",
-      "prettier/prettier": "warn"
+      "prettier/prettier": "warn",
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "JSXText[value=/\\w/]",
+          "message": "Use 't(...)' instead of literal text in JSX"
+        }
+      ]
     }
   },
   "homepage": ".",

@@ -51,7 +51,8 @@
     "language": "Language",
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "name": "Name"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -146,6 +147,8 @@
     "view": "View",
     "blog": "Read our blog",
     "howto": "Follow our guides",
-    "github": "Found an issue? Submit"
+    "github": "Found an issue? Submit",
+    "textNewLine": "Add new line (text)",
+    "textFinish": "Finish editing (text)"
   }
 }

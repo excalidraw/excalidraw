@@ -2358,7 +2358,7 @@ export class App extends React.Component<any, AppState> {
           }),
         )
         .catch((error) => {
-          this.setState({ isLoading: false, errorMessage: error });
+          this.setState({ isLoading: false, errorMessage: error.message });
         });
     } else {
       this.setState({
