@@ -128,7 +128,7 @@
     "desc_privacy": "No se preocupe, la sesión usa encriptación de extremo a extremo, por lo que todo lo que dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver qué se le ocurre.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
-    "desc_inProgressIntro": "Sesión de colaboración en vivo está ahora en progreso.",
+    "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
     "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
     "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
