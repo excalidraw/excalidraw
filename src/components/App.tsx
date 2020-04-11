@@ -25,6 +25,7 @@ import {
   getElementWithResizeHandler,
   canResizeMutlipleElements,
   getResizeHandlerFromCoords,
+  isNonDeletedElement,
 } from "../element";
 import {
   deleteSelectedElements,
@@ -112,6 +113,10 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
 import { actionFinalize } from "../actions";
+import {
+  restoreUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../data/localStorage";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -240,6 +245,14 @@ export class App extends React.Component<any, AppState> {
           elements={globalSceneState.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
+          onUsernameChange={(username) => {
+            if (this.portal.socket && this.portal.roomID && username) {
+              saveUsernameToLocalStorage(this.portal.roomID, username);
+            }
+            this.setState({
+              username,
+            });
+          }}
           onLockToggle={this.toggleLock}
         />
         <main>
@@ -271,19 +284,31 @@ export class App extends React.Component<any, AppState> {
     if (this.unmounted) {
       return;
     }
+
+    let editingElement: AppState["editingElement"] | null = null;
     if (res.elements) {
+      res.elements.forEach((element) => {
+        if (
+          this.state.editingElement?.id === element.id &&
+          this.state.editingElement !== element &&
+          isNonDeletedElement(element)
+        ) {
+          editingElement = element;
+        }
+      });
       globalSceneState.replaceAllElements(res.elements);
       if (res.commitToHistory) {
         history.resumeRecording();
       }
     }
 
-    if (res.appState) {
+    if (res.appState || editingElement) {
       if (res.commitToHistory) {
         history.resumeRecording();
       }
       this.setState((state) => ({
         ...res.appState,
+        editingElement: editingElement || state.editingElement,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));
@@ -898,8 +923,17 @@ export class App extends React.Component<any, AppState> {
       );
 
       this.portal.socket!.on("init-room", () => {
-        this.portal.socket &&
+        if (this.portal.socket && this.portal.roomID) {
+          const username = restoreUsernameFromLocalStorage(this.portal.roomID);
+
           this.portal.socket.emit("join-room", this.portal.roomID);
+
+          if (username) {
+            this.setState({
+              username,
+            });
+          }
+        }
       });
       this.portal.socket!.on(
         "client-broadcast",
@@ -1188,9 +1222,6 @@ export class App extends React.Component<any, AppState> {
       });
     };
 
-    // deselect all other elements when inserting text
-    this.setState({ selectedElementIds: {} });
-
     const deleteElement = () => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
@@ -1218,7 +1249,7 @@ export class App extends React.Component<any, AppState> {
       ]);
     };
 
-    textWysiwyg({
+    const wysiwygElement = textWysiwyg({
       x,
       y,
       initText: element.text,
@@ -1238,6 +1269,7 @@ export class App extends React.Component<any, AppState> {
       onSubmit: withBatchedUpdates((text) => {
         updateElement(text);
         this.setState((prevState) => ({
+          wysiwygElement: null,
           selectedElementIds: {
             ...prevState.selectedElementIds,
             [element.id]: true,
@@ -1257,6 +1289,8 @@ export class App extends React.Component<any, AppState> {
         resetSelection();
       }),
     });
+    // deselect all other elements when inserting text
+    this.setState({ selectedElementIds: {}, wysiwygElement });
 
     // do an initial update to re-initialize element position since we were
     //  modifying element's x/y for sake of editor (case: syncing to remote)
@@ -1566,6 +1600,9 @@ export class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.state.wysiwygElement && this.state.wysiwygElement.submit) {
+      this.state.wysiwygElement.submit();
+    }
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid

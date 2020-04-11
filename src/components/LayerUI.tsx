@@ -34,6 +34,7 @@ interface LayerUIProps {
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
 }
@@ -46,6 +47,7 @@ export const LayerUI = React.memo(
     canvas,
     elements,
     onRoomCreate,
+    onUsernameChange,
     onRoomDestroy,
     onLockToggle,
   }: LayerUIProps) => {
@@ -98,6 +100,7 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onUsernameChange={onUsernameChange}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
         onLockToggle={onLockToggle}
@@ -132,11 +135,7 @@ export const LayerUI = React.memo(
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
                         username={appState.username}
-                        onUsernameChange={(username) => {
-                          setAppState({
-                            username,
-                          });
-                        }}
+                        onUsernameChange={onUsernameChange}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
