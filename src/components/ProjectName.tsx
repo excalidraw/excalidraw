@@ -1,4 +1,4 @@
-import "./ProjectName.css";
+import "./TextInput.scss";
 
 import React, { Component } from "react";
 import { selectNode, removeSelection } from "../utils";
@@ -48,7 +48,7 @@ export class ProjectName extends Component<Props> {
         suppressContentEditableWarning
         ref={this.makeEditable}
         data-type="wysiwyg"
-        className="ProjectName"
+        className="TextInput"
         role="textbox"
         aria-label={this.props.label}
         onBlur={this.handleBlur}

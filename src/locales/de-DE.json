@@ -3,21 +3,21 @@
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
     "copy": "Kopieren",
-    "copyAsPng": "In Zwischenablage als PNG kopieren",
-    "copyAsSvg": "In Zwischenablage als SVG kopieren",
+    "copyAsPng": "In Zwischenablage kopieren (PNG)",
+    "copyAsSvg": "In Zwischenablage kopieren (SVG)",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
     "sendBackward": "Nach hinten",
     "delete": "Löschen",
-    "copyStyles": "Stile kopieren",
-    "pasteStyles": "Stile einfügen",
+    "copyStyles": "Formatierung kopieren",
+    "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
     "sloppiness": "Sauberkeit",
-    "opacity": "Sichtbarkeit",
+    "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
@@ -30,7 +30,7 @@
     "medium": "Mittel",
     "large": "Groß",
     "veryLarge": "Sehr groß",
-    "solid": "Solide",
+    "solid": "Deckend",
     "hachure": "Schraffiert",
     "crossHatch": "Kreuzschraffiert",
     "thin": "Dünn",
@@ -51,14 +51,15 @@
     "language": "Sprache",
     "createRoom": "Live-Kollaborationssitzung teilen",
     "duplicateSelection": "Duplizieren",
-    "untitled": "Unbenannt"
+    "untitled": "Unbenannt",
+    "name": "Name"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "export": "Exportieren",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
-    "copyToClipboard": "In die Zwischenablage kopieren",
+    "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "save": "Speichern",
     "load": "Laden",
@@ -76,7 +77,7 @@
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
-    "toggleFullScreen": "Vollbildmodus umschalten"
+    "toggleFullScreen": "Vollbild umschalten"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -130,7 +131,7 @@
     "desc_inProgressIntro": "Die Live-Kollaborationssitzung wird nun ausgeführt.",
     "desc_persistenceWarning": "Beachte, dass die Zeichnungsdaten bei der Zusammenarbeit über P2P geteilt und nicht auf unserem Server gespeichert werden. Wenn ihr alle die Verbindung trennt, gehen eure Daten verloren, es sei denn, ihr exportiert sie in eine Datei oder einen gemeinsam nutzbaren Link.",
     "desc_shareLink": "Teile diesen Link mit allen, mit denen du zusammenarbeiten möchtest:",
-    "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt, du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dieses keine Auswirkungen auf andere Personen hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
+    "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt. Du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dies keine Auswirkungen auf andere hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
   },
   "errorDialog": {
     "title": "Fehler"
@@ -146,6 +147,8 @@
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
     "howto": "Folgen Sie unseren Anleitungen",
-    "github": "Ein Problem gefunden? Informieren Sie uns"
+    "github": "Ein Problem gefunden? Informieren Sie uns",
+    "textNewLine": "Neue Zeile hinzufügen (Text)",
+    "textFinish": "Bearbeiten beenden (Text)"
   }
 }

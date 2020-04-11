@@ -51,7 +51,8 @@
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
-    "untitled": "Naamloos"
+    "untitled": "Naamloos",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -146,6 +147,8 @@
     "view": "Weergave",
     "blog": "Lees onze blog",
     "howto": "Volg onze handleidingen",
-    "github": "Probleem gevonden? Stuur een nieuwe issue"
+    "github": "Probleem gevonden? Stuur een nieuwe issue",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
