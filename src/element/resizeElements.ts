@@ -19,6 +19,10 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
+import {
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+} from "../keys";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -178,20 +182,18 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
-      const [x1, y1] = getElementAbsoluteCoords(element);
       const resized = resizeXYWidthHightWithRotation(
         resizeHandle,
-        x1,
-        y1,
+        element.x,
+        element.y,
         element.width,
         element.height,
-        x1 - element.x,
-        y1 - element.y,
         element.angle,
         xPointer,
         yPointer,
         offsetPointer,
-        event.shiftKey,
+        getResizeWithSidesSameLengthKey(event),
+        getResizeCenterPointKey(event),
       );
       if (resized.width !== 0 && resized.height !== 0) {
         mutateElement(element, {

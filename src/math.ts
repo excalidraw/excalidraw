@@ -63,6 +63,7 @@ const adjustXYWithRotation = (
   angle: number,
   deltaX: number,
   deltaY: number,
+  isResizeFromCenter: boolean,
 ) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
@@ -71,18 +72,34 @@ const adjustXYWithRotation = (
   if (side === "e" || side === "ne" || side === "se") {
     x += deltaX * (1 - cos);
     y += deltaX * -sin;
+    if (isResizeFromCenter) {
+      x += deltaX * cos;
+      y += deltaX * sin;
+    }
   }
   if (side === "s" || side === "sw" || side === "se") {
     x += deltaY * sin;
     y += deltaY * (1 - cos);
+    if (isResizeFromCenter) {
+      x += deltaY * -sin;
+      y += deltaY * cos;
+    }
   }
   if (side === "w" || side === "nw" || side === "sw") {
     x += deltaX * (1 + cos);
     y += deltaX * sin;
+    if (isResizeFromCenter) {
+      x -= deltaX * cos;
+      y -= deltaX * sin;
+    }
   }
   if (side === "n" || side === "nw" || side === "ne") {
     x += deltaY * -sin;
     y += deltaY * (1 + cos);
+    if (isResizeFromCenter) {
+      x -= deltaY * -sin;
+      y -= deltaY * cos;
+    }
   }
   return { x, y };
 };
@@ -93,13 +110,12 @@ export const resizeXYWidthHightWithRotation = (
   y: number,
   width: number,
   height: number,
-  offsetX: number,
-  offsetY: number,
   angle: number,
   xPointer: number,
   yPointer: number,
   offsetPointer: number,
   sidesWithSameLength: boolean,
+  isResizeFromCenter: boolean,
 ) => {
   // center point for rotation
   const cx = x + width / 2;
@@ -134,11 +150,12 @@ export const resizeXYWidthHightWithRotation = (
     height: nextHeight,
     ...adjustXYWithRotation(
       side,
-      x - offsetX,
-      y - offsetY,
+      x,
+      y,
       angle,
       width - nextWidth,
       height - nextHeight,
+      isResizeFromCenter,
     ),
   };
 };

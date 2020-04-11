@@ -26,3 +26,7 @@ export function isArrowKey(keyCode: string) {
     keyCode === KEYS.ARROW_UP
   );
 }
+
+export const getResizeCenterPointKey = (event: MouseEvent) => event.altKey;
+export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
+  event.shiftKey;
