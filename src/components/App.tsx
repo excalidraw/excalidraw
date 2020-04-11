@@ -2886,9 +2886,10 @@ class App extends React.Component<any, AppState> {
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
         selectedElementIds: {},
-        previousSelectedElementIds: Object.keys(selectedElementIds).length !== 0
-          ? selectedElementIds
-          : previousSelectedElementIds,
+        previousSelectedElementIds:
+          Object.keys(selectedElementIds).length !== 0
+            ? selectedElementIds
+            : previousSelectedElementIds,
       }));
       return;
     }
