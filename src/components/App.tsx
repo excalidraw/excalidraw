@@ -2075,7 +2075,9 @@ export class App extends React.Component<any, AppState> {
             for (const element of globalSceneState.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
-                (element.id === hitElement.id && hitElementWasAddedToSelection) // TODO: maybe remove this line?
+                // case: the state.selectedElementIds might not have been
+                //  updated yet by the time this mousemove event is fired
+                (element.id === hitElement.id && hitElementWasAddedToSelection)
               ) {
                 const duplicatedElement = duplicateElement(element);
                 mutateElement(duplicatedElement, {
