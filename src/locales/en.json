@@ -23,7 +23,7 @@
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
     "withBackground": "With Background",
-    "addWatermark": "Add watermark (help spread the word!)",
+    "addWatermark": "Add watermark",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
     "code": "Code",
@@ -53,7 +53,8 @@
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
-    "name": "Name"
+    "name": "Name",
+    "madeInExcalidraw": "Made in Excalidraw"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

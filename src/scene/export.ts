@@ -7,6 +7,7 @@ import { renderElement } from "../renderer/renderElement";
 import { distance, SVG_NS, measureText } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
+import { t } from "../i18n";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -39,7 +40,8 @@ export function exportToCanvas(
   // calculate smallest area to fit the contents in
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const height =
+    distance(minY, maxY) + exportPadding * 2 + (addWatermark ? 16 : 0);
 
   const tempCanvas: any = createCanvas(width, height);
 
@@ -71,9 +73,9 @@ export function exportToCanvas(
 
   if (addWatermark) {
     const context = tempCanvas.getContext("2d")!;
-    const text = "Made in Excalidraw";
-    const font = "20px Virgil";
-    const { width: textWidth, height: textHeight } = measureText(text, font);
+    const text = t("labels.madeInExcalidraw");
+    const font = "16px Virgil";
+    const { width: textWidth } = measureText(text, font);
 
     renderElement(
       newTextElement({
@@ -81,13 +83,13 @@ export function exportToCanvas(
         font,
         textAlign: "center",
         x: maxX - textWidth / 2,
-        y: maxY - textHeight / 2,
-        strokeColor: "#000000",
+        y: maxY + 16,
+        strokeColor: "#adb5bd", // OC Gray 5
         backgroundColor: "transparent",
         fillStyle: "hachure",
         strokeWidth: 1,
         roughness: 1,
-        opacity: 60,
+        opacity: 100,
       }),
       rough.canvas(tempCanvas),
       context,
