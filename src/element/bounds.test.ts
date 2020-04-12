@@ -62,30 +62,30 @@ describe("getElementBounds", () => {
     const [x1, y1, x2, y2] = getElementBounds(
       _ce({ x: 40, y: 30, w: 20, h: 10, a: Math.PI / 4, t: "rectangle" }),
     );
-    expect(x1).toBeCloseTo(39.39339828220179);
-    expect(y1).toBeCloseTo(24.393398282201787);
-    expect(x2).toBeCloseTo(60.60660171779821);
-    expect(y2).toBeCloseTo(45.60660171779821);
+    expect(x1).toEqual(39.39339828220179);
+    expect(y1).toEqual(24.393398282201787);
+    expect(x2).toEqual(60.60660171779821);
+    expect(y2).toEqual(45.60660171779821);
   });
 
   it("diamond", () => {
     const [x1, y1, x2, y2] = getElementBounds(
       _ce({ x: 40, y: 30, w: 20, h: 10, a: Math.PI / 4, t: "diamond" }),
     );
-    expect(x1).toBeCloseTo(42.928932188134524);
-    expect(y1).toBeCloseTo(27.928932188134524);
-    expect(x2).toBeCloseTo(57.071067811865476);
-    expect(y2).toBeCloseTo(42.071067811865476);
+    expect(x1).toEqual(42.928932188134524);
+    expect(y1).toEqual(27.928932188134524);
+    expect(x2).toEqual(57.071067811865476);
+    expect(y2).toEqual(42.071067811865476);
   });
 
   it("ellipse", () => {
     const [x1, y1, x2, y2] = getElementBounds(
       _ce({ x: 40, y: 30, w: 20, h: 10, a: Math.PI / 4, t: "ellipse" }),
     );
-    expect(x1).toBeCloseTo(42.09430584957905);
-    expect(y1).toBeCloseTo(27.09430584957905);
-    expect(x2).toBeCloseTo(57.90569415042095);
-    expect(y2).toBeCloseTo(42.90569415042095);
+    expect(x1).toEqual(42.09430584957905);
+    expect(y1).toEqual(27.09430584957905);
+    expect(x2).toEqual(57.90569415042095);
+    expect(y2).toEqual(42.90569415042095);
   });
 
   it("curved line", () => {
@@ -104,9 +104,9 @@ describe("getElementBounds", () => {
         [-102.7890625, 52.15625] as [number, number],
       ],
     } as ExcalidrawLinearElement);
-    expect(x1).toBeCloseTo(360.3176068760539);
-    expect(y1).toBeCloseTo(185.90654264413516);
-    expect(x2).toBeCloseTo(473.8171188951176);
-    expect(y2).toBeCloseTo(320.391865303557);
+    expect(x1).toEqual(360.3176068760539);
+    expect(y1).toEqual(185.90654264413516);
+    expect(x2).toEqual(473.8171188951176);
+    expect(y2).toEqual(320.391865303557);
   });
 });
