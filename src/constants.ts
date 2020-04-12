@@ -48,3 +48,8 @@ export const ENV = {
   TEST: "test",
   DEVELOPMENT: "development",
 };
+
+export const BROADCAST = {
+  SERVER_VOLATILE: "server-volatile-broadcast",
+  SERVER: "server-broadcast",
+};
