@@ -129,10 +129,10 @@ export const resizeElements = (
   lastX: number,
   lastY: number,
   elementOriginPosition: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
   },
   resizeWithCenter: { keyLifted: boolean },
 ) => {
