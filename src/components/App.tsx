@@ -594,16 +594,6 @@ class App extends React.Component<any, AppState> {
     }
 
     history.record(this.state, globalSceneState.getElementsIncludingDeleted());
-
-    const { previousSelectedElementIds } = this.state;
-    if (Object.keys(previousSelectedElementIds).length !== 0) {
-      setTimeout(() => {
-        this.setState({
-          selectedElementIds: previousSelectedElementIds,
-          previousSelectedElementIds: {},
-        });
-      }, 1000);
-    }
   }
 
   // Copy/paste
@@ -685,6 +675,17 @@ class App extends React.Component<any, AppState> {
       clearTimeout(tappedTwiceTimer);
     }
     event.preventDefault();
+  };
+
+  private onTapEnd = (event: TouchEvent) => {
+    event.preventDefault();
+    if (event.touches.length > 0) {
+      const { previousSelectedElementIds } = this.state;
+      this.setState({
+        previousSelectedElementIds: {},
+        selectedElementIds: previousSelectedElementIds,
+      });
+    }
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -1298,6 +1299,11 @@ class App extends React.Component<any, AppState> {
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    const { previousSelectedElementIds } = this.state;
+    this.setState({
+      previousSelectedElementIds: {},
+      selectedElementIds: previousSelectedElementIds,
+    });
     gesture.initialScale = null;
   });
 
@@ -2107,6 +2113,11 @@ class App extends React.Component<any, AppState> {
                 ? prevState.editingGroupId
                 : null,
           }));
+          const { selectedElementIds } = this.state;
+          this.setState({
+            selectedElementIds: {},
+            previousSelectedElementIds: selectedElementIds,
+          });
         }
 
         // If we click on something
@@ -2756,9 +2767,12 @@ class App extends React.Component<any, AppState> {
         passive: false,
       });
       this.canvas.addEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas.addEventListener("touchstart", this.onTapStart);
+      this.canvas.addEventListener("touchend", this.onTapEnd);
     } else {
       this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
       this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas?.removeEventListener("touchend", this.onTapEnd);
     }
   };
 
@@ -2883,6 +2897,14 @@ class App extends React.Component<any, AppState> {
         delta = MAX_STEP;
       }
       delta *= sign;
+      if (Object.keys(previousSelectedElementIds).length !== 0) {
+        setTimeout(() => {
+          this.setState({
+            selectedElementIds: previousSelectedElementIds,
+            previousSelectedElementIds: {},
+          });
+        }, 1000);
+      }
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
         selectedElementIds: {},

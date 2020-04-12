@@ -1366,7 +1366,9 @@ Object {
   "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id1": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -1569,7 +1571,9 @@ Object {
   "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id2": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15293,7 +15297,9 @@ Object {
   "multiElement": null,
   "name": "Unbenannt-201933152653",
   "openMenu": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id1": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15944,7 +15950,9 @@ Object {
   "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 11,
   "scrollY": -5,
