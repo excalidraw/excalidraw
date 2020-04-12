@@ -16,3 +16,35 @@ export const POINTER_BUTTON = {
   SECONDARY: 2,
   TOUCH: -1,
 };
+
+export enum SCENE {
+  INIT = "SCENE_INIT",
+  UPDATE = "SCENE_UPDATE",
+}
+
+export enum EVENT {
+  COPY = "copy",
+  PASTE = "paste",
+  CUT = "cut",
+  KEYDOWN = "keydown",
+  KEYUP = "keyup",
+  MOUSE_MOVE = "mousemove",
+  RESIZE = "resize",
+  UNLOAD = "unload",
+  BLUR = "blur",
+  DRAG_OVER = "dragover",
+  DROP = "drop",
+  GESTURE_END = "gestureend",
+  BEFORE_UNLOAD = "beforeunload",
+  GESTURE_START = "gesturestart",
+  GESTURE_CHANGE = "gesturechange",
+  POINTER_MOVE = "pointermove",
+  POINTER_UP = "pointerup",
+  WHEEL = "wheel",
+  TOUCH_START = "touchstart",
+}
+
+export const ENV = {
+  TEST: "test",
+  DEVELOPMENT: "development",
+};
