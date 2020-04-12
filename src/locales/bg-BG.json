@@ -31,7 +31,7 @@
     "large": "Голям",
     "veryLarge": "Много голям",
     "solid": "Солиден",
-    "hachure": "",
+    "hachure": "Хералдика",
     "crossHatch": "",
     "thin": "Тънък",
     "bold": "Ясно очертан",
@@ -44,12 +44,12 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Заглавие на файл",
     "colorPicker": "Избор на цвят",
-    "canvasBackground": "",
+    "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
     "layers": "Слоеве",
     "actions": "Действия",
     "language": "Език",
-    "createRoom": "",
+    "createRoom": "Споделете сесия за сътрудничество на живо",
     "duplicateSelection": "Дублирай",
     "untitled": "Неозаглавено",
     "name": "Име"
@@ -80,14 +80,14 @@
     "toggleFullScreen": "Превключване на цял екран"
   },
   "alerts": {
-    "clearReset": "",
-    "couldNotCreateShareableLink": "",
-    "couldNotLoadInvalidFile": "",
-    "importBackendFailed": "",
-    "cannotExportEmptyCanvas": "",
-    "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
-    "uploadedSecurly": ""
+    "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
+    "couldNotCreateShareableLink": "Връзката не може да бъде създадена.",
+    "couldNotLoadInvalidFile": "Невалиден файл не може да се зареди",
+    "importBackendFailed": "Импортирането от бекенд не беше успешно.",
+    "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
+    "couldNotCopyToClipboard": "Неуспешно копиране в клипборда. Опитайте да използвате браузъра Chrome.",
+    "decryptFailed": "Данните не можаха да се дешифрират.",
+    "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието."
   },
   "toolBar": {
     "selection": "Селекция",
@@ -105,33 +105,33 @@
     "shapes": "Фигури"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
-    "resize": "",
-    "rotate": ""
+    "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
+    "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
+    "resize": "Можете да ограничите пропорциите, като държите SHIFT, докато преоразмерите",
+    "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите"
   },
   "errorSplash": {
     "headingMain_pre": "Среща грешка. Опитайте ",
     "headingMain_button": "презареждане на страницата.",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "Ако презареждането не работи, опитайте ",
     "clearCanvasMessage_button": "изчистване на платното.",
-    "clearCanvasCaveat": "",
+    "clearCanvasCaveat": " Това ще доведе до загуба на работа ",
     "trackedToSentry_pre": "Грешката с идентификатор ",
     "trackedToSentry_post": " беше проследен в нашата система.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Бяхме много предпазливи да не включите информацията за вашата сцена при грешката. Ако сцената ви не е частна, моля, помислете за последващи действия на нашата ",
     "openIssueMessage_button": "тракер за грешки.",
     "openIssueMessage_post": "",
-    "sceneContent": ""
+    "sceneContent": "Съдържание на сцената:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Можете да поканите хора на текущата си сцена да си сътрудничат с вас.",
+    "desc_privacy": "Не се притеснявайте, сесията използва криптиране от край до край, така че каквото нарисувате ще остане частно. Дори нашият сървър няма да може да види какво предлагате.",
     "button_startSession": "Стартирайте сесията",
     "button_stopSession": "Стоп на сесията",
     "desc_inProgressIntro": "Сесията за сътрудничество на живо е в ход.",
-    "desc_persistenceWarning": "",
-    "desc_shareLink": "",
-    "desc_exitSession": ""
+    "desc_persistenceWarning": "Обърнете внимание, че данните за сцената се споделят между сътрудници по P2P начин и не се запазват на нашия сървър. По този начин, ако всички вие прекъснете връзката, ще загубите данните, освен ако не ги експортирате във файл или съвместна връзка.",
+    "desc_shareLink": "Споделете тази връзка с всеки, с когото искате да си сътрудничите:",
+    "desc_exitSession": "Спирането на сесията ще ви изключи от стаята, но ще можете да продължите да работите със сцената, локално. Имайте предвид, че това няма да засегне други хора и те все още ще могат да си сътрудничат с тяхната версия."
   },
   "errorDialog": {
     "title": "Грешка"
