@@ -312,6 +312,7 @@ export async function exportCanvas(
       exportBackground,
       viewBackgroundColor,
       exportPadding,
+      addWatermark,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {

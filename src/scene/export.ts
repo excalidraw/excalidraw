@@ -3,7 +3,6 @@ import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { renderElement } from "../renderer/renderElement";
 import { distance, SVG_NS, measureText } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
@@ -57,7 +56,7 @@ export function exportToCanvas(
   };
 
   renderScene(
-    elements,
+    addWatermark ? [...elements, getWatermarkElement(maxX, maxY)] : elements,
     appState,
     null,
     scale,
@@ -71,33 +70,6 @@ export function exportToCanvas(
     },
   );
 
-  if (addWatermark) {
-    const context = tempCanvas.getContext("2d")!;
-    const text = t("labels.madeInExcalidraw");
-    const font = "16px Virgil";
-    const { width: textWidth } = measureText(text, font);
-
-    renderElement(
-      newTextElement({
-        text,
-        font,
-        textAlign: "center",
-        x: maxX - textWidth / 2,
-        y: maxY + 16,
-        strokeColor: "#adb5bd", // OC Gray 5
-        backgroundColor: "transparent",
-        fillStyle: "hachure",
-        strokeWidth: 1,
-        roughness: 1,
-        opacity: 100,
-      }),
-      rough.canvas(tempCanvas),
-      context,
-      false,
-      sceneState,
-    );
-  }
-
   return tempCanvas;
 }
 
@@ -107,16 +79,19 @@ export function exportToSvg(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
+    addWatermark = false,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
+    addWatermark?: boolean;
   },
 ): SVGSVGElement {
   // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const height =
+    distance(minY, maxY) + exportPadding * 2 + (addWatermark ? 16 : 0);
 
   // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -152,9 +127,35 @@ export function exportToSvg(
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
-    offsetX: -minX + exportPadding,
-    offsetY: -minY + exportPadding,
-  });
+  renderSceneToSvg(
+    addWatermark ? [...elements, getWatermarkElement(maxX, maxY)] : elements,
+    rsvg,
+    svgRoot,
+    {
+      offsetX: -minX + exportPadding,
+      offsetY: -minY + exportPadding,
+    },
+  );
+
   return svgRoot;
+}
+
+function getWatermarkElement(maxX: number, maxY: number) {
+  const text = t("labels.madeInExcalidraw");
+  const font = "16px Virgil";
+  const { width: textWidth } = measureText(text, font);
+
+  return newTextElement({
+    text,
+    font,
+    textAlign: "center",
+    x: maxX - textWidth / 2,
+    y: maxY + 16,
+    strokeColor: "#adb5bd", // OC Gray 5
+    backgroundColor: "transparent",
+    fillStyle: "hachure",
+    strokeWidth: 1,
+    roughness: 1,
+    opacity: 100,
+  });
 }
