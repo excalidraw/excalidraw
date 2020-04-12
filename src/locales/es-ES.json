@@ -48,7 +48,7 @@
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
     "actions": "Acciones",
-    "language": "Lenguaje",
+    "language": "Idioma",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
@@ -124,7 +124,7 @@
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
-    "desc_intro": "Puede invitar personas a su escena actual para que le colaboren.",
+    "desc_intro": "Puedes invitar a gente a tu escena actual para colaborar contigo.",
     "desc_privacy": "No se preocupe, la sesión usa encriptación de extremo a extremo, por lo que todo lo que dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver qué se le ocurre.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
