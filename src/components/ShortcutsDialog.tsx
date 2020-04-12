@@ -290,7 +290,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.duplicateSelection")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+D")]}
+                shortcuts={[
+                  getShortcutKey("CtrlOrCmd+D"),
+                  getShortcutKey(`Alt+${t("shortcutsDialog.drag")}`),
+                ]}
               />
               <Shortcut
                 label={t("buttons.undo")}

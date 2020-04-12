@@ -3,7 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { FlooredNumber } from "../types";
+import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -41,7 +41,6 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  encryptAESGEM,
   saveToLocalStorage,
   loadScene,
   loadFromBlob,
@@ -49,6 +48,7 @@ import {
   SocketUpdateDataSource,
   exportCanvas,
 } from "../data";
+import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -95,6 +95,7 @@ import {
 import { normalizeScroll } from "../scene";
 import { getCenter, getDistance } from "../gesture";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+
 import {
   CURSOR_TYPE,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
@@ -103,7 +104,16 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   LINE_CONFIRM_THRESHOLD,
+  SCENE,
+  EVENT,
+  ENV,
 } from "../constants";
+import {
+  FONT_LOAD_THRESHOLD,
+  INITAL_SCENE_UPDATE_TIMEOUT,
+  TAP_TWICE_TIMEOUT,
+} from "../time_constants";
+
 import { LayerUI } from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
@@ -150,53 +160,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-class Portal {
-  socket: SocketIOClient.Socket | null = null;
-  socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
-  roomID: string | null = null;
-  roomKey: string | null = null;
-
-  open(socket: SocketIOClient.Socket, id: string, key: string) {
-    this.socket = socket;
-    this.roomID = id;
-    this.roomKey = key;
-  }
-
-  close() {
-    if (!this.socket) {
-      return;
-    }
-    this.socket.close();
-    this.socket = null;
-    this.roomID = null;
-    this.roomKey = null;
-  }
-
-  isOpen() {
-    return this.socketInitialized && this.socket && this.roomID && this.roomKey;
-  }
-
-  async _broadcastSocketData(
-    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-      _brand: "socketUpdateData";
-    },
-    volatile: boolean = false,
-  ) {
-    if (this.isOpen()) {
-      const json = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
-        volatile ? "server-volatile-broadcast" : "server-broadcast",
-        this.roomID,
-        encrypted.data,
-        encrypted.iv,
-      );
-    }
-  }
-}
-
-export class App extends React.Component<any, AppState> {
+class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal();
@@ -363,7 +327,7 @@ export class App extends React.Component<any, AppState> {
           });
         }),
         // if fonts don't load in 1s for whatever reason, don't block the UI
-        new Promise((resolve) => setTimeout(resolve, 1000)),
+        new Promise((resolve) => setTimeout(resolve, FONT_LOAD_THRESHOLD)),
       ]);
     } catch (error) {
       console.error(error);
@@ -411,32 +375,39 @@ export class App extends React.Component<any, AppState> {
       this.onSceneUpdated,
     );
 
-    document.addEventListener("copy", this.onCopy);
-    document.addEventListener("paste", this.pasteFromClipboard);
-    document.addEventListener("cut", this.onCut);
+    document.addEventListener(EVENT.COPY, this.onCopy);
+    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.addEventListener(EVENT.CUT, this.onCut);
 
-    document.addEventListener("keydown", this.onKeyDown, false);
-    document.addEventListener("keyup", this.onKeyUp, { passive: true });
-    document.addEventListener("mousemove", this.updateCurrentCursorPosition);
-    window.addEventListener("resize", this.onResize, false);
-    window.addEventListener("unload", this.onUnload, false);
-    window.addEventListener("blur", this.onBlur, false);
-    window.addEventListener("dragover", this.disableEvent, false);
-    window.addEventListener("drop", this.disableEvent, false);
+    document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
+    document.addEventListener(
+      EVENT.MOUSE_MOVE,
+      this.updateCurrentCursorPosition,
+    );
+    window.addEventListener(EVENT.RESIZE, this.onResize, false);
+    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.addEventListener(EVENT.BLUR, this.onBlur, false);
+    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.addEventListener(EVENT.DROP, this.disableEvent, false);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
-      "gesturestart",
+      EVENT.GESTURE_START,
       this.onGestureStart as any,
       false,
     );
     document.addEventListener(
-      "gesturechange",
+      EVENT.GESTURE_CHANGE,
       this.onGestureChange as any,
       false,
     );
-    document.addEventListener("gestureend", this.onGestureEnd as any, false);
-    window.addEventListener("beforeunload", this.beforeUnload);
+    document.addEventListener(
+      EVENT.GESTURE_END,
+      this.onGestureEnd as any,
+      false,
+    );
+    window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
 
     this.initializeScene();
   }
@@ -445,35 +416,39 @@ export class App extends React.Component<any, AppState> {
     this.unmounted = true;
     this.removeSceneCallback!();
 
-    document.removeEventListener("copy", this.onCopy);
-    document.removeEventListener("paste", this.pasteFromClipboard);
-    document.removeEventListener("cut", this.onCut);
+    document.removeEventListener(EVENT.COPY, this.onCopy);
+    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.removeEventListener(EVENT.CUT, this.onCut);
 
-    document.removeEventListener("keydown", this.onKeyDown, false);
+    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.removeEventListener(
-      "mousemove",
+      EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
       false,
     );
-    document.removeEventListener("keyup", this.onKeyUp);
-    window.removeEventListener("resize", this.onResize, false);
-    window.removeEventListener("unload", this.onUnload, false);
-    window.removeEventListener("blur", this.onBlur, false);
-    window.removeEventListener("dragover", this.disableEvent, false);
-    window.removeEventListener("drop", this.disableEvent, false);
+    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
+    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
+    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
+    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
 
     document.removeEventListener(
-      "gesturestart",
+      EVENT.GESTURE_START,
       this.onGestureStart as any,
       false,
     );
     document.removeEventListener(
-      "gesturechange",
+      EVENT.GESTURE_CHANGE,
       this.onGestureChange as any,
       false,
     );
-    document.removeEventListener("gestureend", this.onGestureEnd as any, false);
-    window.removeEventListener("beforeunload", this.beforeUnload);
+    document.removeEventListener(
+      EVENT.GESTURE_END,
+      this.onGestureEnd as any,
+      false,
+    );
+    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
   }
   private onResize = withBatchedUpdates(() => {
     globalSceneState
@@ -574,7 +549,7 @@ export class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastScene("SCENE_UPDATE");
+      this.broadcastScene(SCENE.UPDATE);
     }
 
     history.record(this.state, globalSceneState.getElementsIncludingDeleted());
@@ -638,11 +613,18 @@ export class App extends React.Component<any, AppState> {
     );
   };
 
+  private resetTapTwice() {
+    didTapTwice = false;
+  }
+
   private onTapStart = (event: TouchEvent) => {
     if (!didTapTwice) {
       didTapTwice = true;
       clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(() => (didTapTwice = false), 300);
+      tappedTwiceTimer = window.setTimeout(
+        this.resetTapTwice,
+        TAP_TWICE_TIMEOUT,
+      );
       return;
     }
     // insert text only if we tapped twice with a single finger
@@ -809,10 +791,13 @@ export class App extends React.Component<any, AppState> {
       };
       // fallback in case you're not alone in the room but still don't receive
       //  initial SCENE_UPDATE message
-      const initializationTimer = setTimeout(initialize, 5000);
+      const initializationTimer = setTimeout(
+        initialize,
+        INITAL_SCENE_UPDATE_TIMEOUT,
+      );
 
       const updateScene = (
-        decryptedData: SocketUpdateDataSource["SCENE_INIT" | "SCENE_UPDATE"],
+        decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
         { scrollToContent = false }: { scrollToContent?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
@@ -821,7 +806,7 @@ export class App extends React.Component<any, AppState> {
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
-              remoteElements.filter((element) => {
+              remoteElements.filter((element: { isDeleted: boolean }) => {
                 return !element.isDeleted;
               }),
             ),
@@ -946,13 +931,13 @@ export class App extends React.Component<any, AppState> {
           switch (decryptedData.type) {
             case "INVALID_RESPONSE":
               return;
-            case "SCENE_INIT": {
+            case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
                 updateScene(decryptedData, { scrollToContent: true });
               }
               break;
             }
-            case "SCENE_UPDATE":
+            case SCENE.UPDATE:
               updateScene(decryptedData);
               break;
             case "MOUSE_LOCATION": {
@@ -1003,7 +988,7 @@ export class App extends React.Component<any, AppState> {
         });
       });
       this.portal.socket!.on("new-user", async (_socketID: string) => {
-        this.broadcastScene("SCENE_INIT");
+        this.broadcastScene(SCENE.INIT);
       });
 
       this.setState({
@@ -1029,13 +1014,13 @@ export class App extends React.Component<any, AppState> {
         },
       };
       return this.portal._broadcastSocketData(
-        data as typeof data & { _brand: "socketUpdateData" },
+        data as SocketUpdateData,
         true, // volatile
       );
     }
   };
 
-  private broadcastScene = (sceneType: "SCENE_INIT" | "SCENE_UPDATE") => {
+  private broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
@@ -1048,9 +1033,7 @@ export class App extends React.Component<any, AppState> {
       this.lastBroadcastedOrReceivedSceneVersion,
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
-    return this.portal._broadcastSocketData(
-      data as typeof data & { _brand: "socketUpdateData" },
-    );
+    return this.portal._broadcastSocketData(data as SocketUpdateData);
   };
 
   private onSceneUpdated = () => {
@@ -1648,16 +1631,16 @@ export class App extends React.Component<any, AppState> {
             cursorButton: "up",
           });
           this.savePointer(event.clientX, event.clientY, "up");
-          window.removeEventListener("pointermove", onPointerMove);
-          window.removeEventListener("pointerup", teardown);
-          window.removeEventListener("blur", teardown);
+          window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+          window.removeEventListener(EVENT.POINTER_UP, teardown);
+          window.removeEventListener(EVENT.BLUR, teardown);
         }),
       );
-      window.addEventListener("blur", teardown);
-      window.addEventListener("pointermove", onPointerMove, {
+      window.addEventListener(EVENT.BLUR, teardown);
+      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
         passive: true,
       });
-      window.addEventListener("pointerup", teardown);
+      window.addEventListener(EVENT.POINTER_UP, teardown);
       return;
     }
 
@@ -1752,14 +1735,14 @@ export class App extends React.Component<any, AppState> {
           cursorButton: "up",
         });
         this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
       });
 
       lastPointerUp = onPointerUp;
 
-      window.addEventListener("pointermove", onPointerMove);
-      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       return;
     }
 
@@ -2227,8 +2210,8 @@ export class App extends React.Component<any, AppState> {
       resizeArrowFn = null;
       lastPointerUp = null;
 
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
 
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
@@ -2364,8 +2347,8 @@ export class App extends React.Component<any, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
   };
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
@@ -2374,13 +2357,13 @@ export class App extends React.Component<any, AppState> {
       this.canvas = canvas;
       this.rc = rough.canvas(this.canvas);
 
-      this.canvas.addEventListener("wheel", this.handleWheel, {
+      this.canvas.addEventListener(EVENT.WHEEL, this.handleWheel, {
         passive: false,
       });
-      this.canvas.addEventListener("touchstart", this.onTapStart);
+      this.canvas.addEventListener(EVENT.TOUCH_START, this.onTapStart);
     } else {
-      this.canvas?.removeEventListener("wheel", this.handleWheel);
-      this.canvas?.removeEventListener("touchstart", this.onTapStart);
+      this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
+      this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
     }
   };
 
@@ -2571,6 +2554,8 @@ export class App extends React.Component<any, AppState> {
       return;
     }
     this.portal.socket &&
+      // do not broadcast when more than 1 pointer since that shows flickering on the other side
+      gesture.pointers.size < 2 &&
       this.broadcastMouseLocation({
         pointerCoords,
         button,
@@ -2605,7 +2590,10 @@ declare global {
   }
 }
 
-if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
+if (
+  process.env.NODE_ENV === ENV.TEST ||
+  process.env.NODE_ENV === ENV.DEVELOPMENT
+) {
   window.h = {} as Window["h"];
 
   Object.defineProperties(window.h, {
@@ -2625,4 +2613,5 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
   });
 }
 
+export default App;
 // -----------------------------------------------------------------------------
