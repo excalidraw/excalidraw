@@ -3,7 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { FlooredNumber } from "../types";
+import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -41,7 +41,6 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  encryptAESGEM,
   saveToLocalStorage,
   loadScene,
   loadFromBlob,
@@ -49,6 +48,7 @@ import {
   SocketUpdateDataSource,
   exportCanvas,
 } from "../data";
+import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
@@ -160,53 +160,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-class Portal {
-  socket: SocketIOClient.Socket | null = null;
-  socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initalized
-  roomID: string | null = null;
-  roomKey: string | null = null;
-
-  open(socket: SocketIOClient.Socket, id: string, key: string) {
-    this.socket = socket;
-    this.roomID = id;
-    this.roomKey = key;
-  }
-
-  close() {
-    if (!this.socket) {
-      return;
-    }
-    this.socket.close();
-    this.socket = null;
-    this.roomID = null;
-    this.roomKey = null;
-  }
-
-  isOpen() {
-    return this.socketInitialized && this.socket && this.roomID && this.roomKey;
-  }
-
-  async _broadcastSocketData(
-    data: SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-      _brand: "socketUpdateData";
-    },
-    volatile: boolean = false,
-  ) {
-    if (this.isOpen()) {
-      const json = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
-        volatile ? "server-volatile-broadcast" : "server-broadcast",
-        this.roomID,
-        encrypted.data,
-        encrypted.iv,
-      );
-    }
-  }
-}
-
-export class App extends React.Component<any, AppState> {
+class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal();
@@ -1060,7 +1014,7 @@ export class App extends React.Component<any, AppState> {
         },
       };
       return this.portal._broadcastSocketData(
-        data as typeof data & { _brand: "socketUpdateData" },
+        data as SocketUpdateData,
         true, // volatile
       );
     }
@@ -1079,9 +1033,7 @@ export class App extends React.Component<any, AppState> {
       this.lastBroadcastedOrReceivedSceneVersion,
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
-    return this.portal._broadcastSocketData(
-      data as typeof data & { _brand: "socketUpdateData" },
-    );
+    return this.portal._broadcastSocketData(data as SocketUpdateData);
   };
 
   private onSceneUpdated = () => {
@@ -2664,4 +2616,5 @@ if (
   });
 }
 
+export default App;
 // -----------------------------------------------------------------------------
