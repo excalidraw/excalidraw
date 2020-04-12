@@ -5,7 +5,7 @@ import * as SentryIntegrations from "@sentry/integrations";
 
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
-import { App } from "./components/App";
+import App from "./components/App";
 import { register as registerServiceWorker } from "./serviceWorker";
 
 import "./css/styles.scss";
