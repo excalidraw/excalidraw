@@ -195,7 +195,7 @@ export function textWysiwyg({
         font: editingElement.font,
         textAlign: editingElement.textAlign,
         color: editingElement.strokeColor,
-        opacity: editingElement.opacity,
+        opacity: editingElement.opacity / 100,
       });
     }
     editable.focus();
