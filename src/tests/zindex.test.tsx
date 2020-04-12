@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import { App } from "../components/App";
+import App from "../components/App";
 import { reseed } from "../random";
 import { newElement } from "../element";
 import {
@@ -10,6 +10,7 @@ import {
   actionBringToFront,
   actionSendToBack,
 } from "../actions";
+import { ExcalidrawElement } from "../element/types";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -27,7 +28,7 @@ function populateElements(
   const selectedElementIds: any = {};
 
   h.elements = elements.map(({ id, isDeleted = false, isSelected = false }) => {
-    const element: Mutable<ReturnType<typeof newElement>> = newElement({
+    const element: Mutable<ExcalidrawElement> = newElement({
       type: "rectangle",
       x: 100,
       y: 100,

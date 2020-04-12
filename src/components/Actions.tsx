@@ -6,9 +6,10 @@ import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString, getShortcutKey, setCursorForShape } from "../utils";
+import { capitalizeString, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
+import { getNonDeletedElements } from "../element";
 
 export function SelectedShapeActions({
   appState,
@@ -21,7 +22,10 @@ export function SelectedShapeActions({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) {
-  const targetElements = getTargetElement(elements, appState);
+  const targetElements = getTargetElement(
+    getNonDeletedElements(elements),
+    appState,
+  );
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
 
@@ -52,6 +56,8 @@ export function SelectedShapeActions({
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
+
+          {renderAction("changeTextAlign")}
         </>
       )}
 
@@ -82,21 +88,17 @@ export function SelectedShapeActions({
 export function ShapesSwitcher({
   elementType,
   setAppState,
-  setElements,
-  elements,
 }: {
   elementType: ExcalidrawElement["type"];
   setAppState: any;
-  setElements: any;
-  elements: readonly ExcalidrawElement[];
 }) {
   return (
     <>
       {SHAPES.map(({ value, icon }, index) => {
         const label = t(`toolBar.${value}`);
-        const shortcut = getShortcutKey(
-          `${capitalizeString(value)[0]}, ${index + 1}`,
-        );
+        const shortcut = `${capitalizeString(value)[0]} ${t(
+          "shortcutsDialog.or",
+        )} ${index + 1}`;
         return (
           <ToolButton
             key={value}
@@ -104,10 +106,11 @@ export function ShapesSwitcher({
             icon={icon}
             checked={elementType === value}
             name="editor-current-shape"
-            title={`${capitalizeString(label)} ${shortcut}`}
+            title={`${capitalizeString(label)} — ${shortcut}`}
             keyBindingLabel={`${index + 1}`}
             aria-label={capitalizeString(label)}
             aria-keyshortcuts={`${label[0]} ${index + 1}`}
+            data-testid={value}
             onChange={() => {
               setAppState({
                 elementType: value,

@@ -1,4 +1,8 @@
-import { ExcalidrawElement } from "./types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+} from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
 
 export {
@@ -9,19 +13,27 @@ export {
 } from "./newElement";
 export {
   getElementAbsoluteCoords,
+  getElementBounds,
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
   getLinearElementAbsoluteBounds,
 } from "./bounds";
 
-export { handlerRectangles } from "./handlerRectangles";
+export {
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  handlerRectanglesFromCoords,
+  handlerRectangles,
+} from "./handlerRectangles";
 export { hitTest } from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,
   normalizeResizeHandle,
+  getElementWithResizeHandler,
+  getResizeHandlerFromCoords,
 } from "./resizeTest";
+export { resizeElements, canResizeMutlipleElements } from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
@@ -54,6 +66,15 @@ export function getDrawingVersion(elements: readonly ExcalidrawElement[]) {
   return elements.reduce((acc, el) => acc + el.version, 0);
 }
 
-export function hasNonDeletedElements(elements: readonly ExcalidrawElement[]) {
-  return elements.some((element) => !element.isDeleted);
+export function getNonDeletedElements(elements: readonly ExcalidrawElement[]) {
+  return (
+    elements.filter((element) => !element.isDeleted) as
+    readonly NonDeletedExcalidrawElement[]
+  );
+}
+
+export function isNonDeletedElement<T extends ExcalidrawElement>(
+  element: T,
+): element is NonDeleted<T> {
+  return !element.isDeleted;
 }

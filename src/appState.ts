@@ -1,10 +1,14 @@
+import oc from "open-color";
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
+import { t } from "./i18n";
 
 export const DEFAULT_FONT = "20px Virgil";
+export const DEFAULT_TEXT_ALIGN = "left";
 
 export function getDefaultAppState(): AppState {
   return {
+    wysiwygElement: null,
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
@@ -14,21 +18,23 @@ export function getDefaultAppState(): AppState {
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
-    currentItemStrokeColor: "#000000",
+    currentItemStrokeColor: oc.black,
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
     currentItemStrokeWidth: 1,
     currentItemRoughness: 1,
     currentItemOpacity: 100,
     currentItemFont: DEFAULT_FONT,
-    viewBackgroundColor: "#ffffff",
+    currentItemTextAlign: DEFAULT_TEXT_ALIGN,
+    viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
     cursorX: 0,
     cursorY: 0,
     cursorButton: "up",
     scrolledOutside: false,
-    name: `excalidraw-${getDateTime()}`,
+    name: `${t("labels.untitled")}-${getDateTime()}`,
+    username: "",
     isCollaborating: false,
     isResizing: false,
     isRotating: false,
@@ -75,6 +81,7 @@ export function clearAppStatePropertiesForHistory(
     currentItemRoughness: appState.currentItemRoughness,
     currentItemOpacity: appState.currentItemOpacity,
     currentItemFont: appState.currentItemFont,
+    currentItemTextAlign: appState.currentItemTextAlign,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };

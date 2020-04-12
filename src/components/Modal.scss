@@ -20,7 +20,7 @@
   right: 0;
   bottom: 0;
   z-index: 1;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: transparentize($oc-black, 0.7);
   backdrop-filter: blur(2px);
 }
 
@@ -28,12 +28,16 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 100%;
+  max-width: var(--max-width);
 
   opacity: 0;
   transform: translateY(10px);
   animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
   position: relative;
+
+  @media #{$media-query} {
+    max-width: 100%;
+  }
 }
 
 @keyframes Modal__content_fade-in {

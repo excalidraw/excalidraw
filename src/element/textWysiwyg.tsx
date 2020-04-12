@@ -1,5 +1,6 @@
 import { KEYS } from "../keys";
 import { selectNode } from "../utils";
+import { WysiwigElement } from "./types";
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -21,6 +22,7 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
+  textAlign: string;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
@@ -36,9 +38,10 @@ export function textWysiwyg({
   zoom,
   angle,
   onChange,
+  textAlign,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams): WysiwigElement {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -59,7 +62,7 @@ export function textWysiwyg({
     top: `${y}px`,
     left: `${x}px`,
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
-    textAlign: "left",
+    textAlign: textAlign,
     display: "inline-block",
     font: font,
     padding: "4px",
@@ -108,22 +111,16 @@ export function textWysiwyg({
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       handleSubmit();
-    }
-    if (
-      event.key === KEYS.ENTER &&
-      (event.shiftKey || event[KEYS.CTRL_OR_CMD])
-    ) {
+    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
       handleSubmit();
-    }
-    if (event.key === KEYS.ENTER && !event.shiftKey) {
+    } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
     }
   };
-  editable.onblur = handleSubmit;
 
   function stopEvent(event: Event) {
     event.stopPropagation();
@@ -140,7 +137,6 @@ export function textWysiwyg({
 
   function cleanup() {
     // remove events to ensure they don't late-fire
-    editable.onblur = null;
     editable.onpaste = null;
     editable.oninput = null;
     editable.onkeydown = null;
@@ -153,4 +149,12 @@ export function textWysiwyg({
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
+
+  return {
+    submit: handleSubmit,
+    changeStyle: (style: any) => {
+      Object.assign(editable.style, style);
+      editable.focus();
+    },
+  };
 }

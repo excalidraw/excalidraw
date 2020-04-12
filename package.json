@@ -20,13 +20,15 @@
   },
   "dependencies": {
     "@sentry/browser": "5.15.4",
-    "browser-nativefs": "0.4.0",
+    "@sentry/integrations": "5.15.4",
+    "browser-nativefs": "0.6.0",
     "i18next-browser-languagedetector": "4.0.2",
     "nanoid": "2.1.11",
+    "open-color": "1.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "roughjs": "4.0.4",
+    "roughjs": "4.1.4",
     "socket.io-client": "2.3.0"
   },
   "devDependencies": {
@@ -35,7 +37,7 @@
     "@types/jest": "25.2.1",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.32",
-    "@types/react-dom": "16.9.5",
+    "@types/react-dom": "16.9.6",
     "@types/socket.io-client": "1.4.32",
     "asar": "3.0.3",
     "eslint": "6.8.0",
@@ -82,7 +84,14 @@
         }
       ],
       "prefer-template": "warn",
-      "prettier/prettier": "warn"
+      "prettier/prettier": "warn",
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "JSXText[value=/\\w/]",
+          "message": "Use 't(...)' instead of literal text in JSX"
+        }
+      ]
     }
   },
   "homepage": ".",
@@ -109,6 +118,8 @@
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test": "npm run test:app",
+    "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
+    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
     "test:app": "react-scripts test --env=jsdom --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",

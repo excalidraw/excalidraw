@@ -16,6 +16,7 @@ export {
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,
+  actionChangeTextAlign,
 } from "./actionProperties";
 
 export {
@@ -40,4 +41,5 @@ export {
   actionToggleCanvasMenu,
   actionToggleEditMenu,
   actionFullScreen,
+  actionShortcuts,
 } from "./actionMenu";

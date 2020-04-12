@@ -4,7 +4,7 @@ import { calculateScrollCenter } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -25,15 +25,16 @@ import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
+import { GitHubCorner } from "./GitHubCorner";
 
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: AppState;
   canvas: HTMLCanvasElement | null;
   setAppState: any;
-  elements: readonly ExcalidrawElement[];
-  setElements: (elements: readonly ExcalidrawElement[]) => void;
+  elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
 }
@@ -45,8 +46,8 @@ export const LayerUI = React.memo(
     setAppState,
     canvas,
     elements,
-    setElements,
     onRoomCreate,
+    onUsernameChange,
     onRoomDestroy,
     onLockToggle,
   }: LayerUIProps) => {
@@ -96,10 +97,10 @@ export const LayerUI = React.memo(
       <MobileMenu
         appState={appState}
         elements={elements}
-        setElements={setElements}
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onUsernameChange={onUsernameChange}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
         onLockToggle={onLockToggle}
@@ -133,6 +134,8 @@ export const LayerUI = React.memo(
                       <RoomDialog
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
+                        username={appState.username}
+                        onUsernameChange={onUsernameChange}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
@@ -164,8 +167,6 @@ export const LayerUI = React.memo(
                         <ShapesSwitcher
                           elementType={appState.elementType}
                           setAppState={setAppState}
-                          setElements={setElements}
-                          elements={elements}
                         />
                       </Stack.Row>
                     </Island>
@@ -193,6 +194,9 @@ export const LayerUI = React.memo(
             </Stack.Col>
           </div>
         </FixedSideContainer>
+        <aside>
+          <GitHubCorner />
+        </aside>
         <footer role="contentinfo">
           <LanguageList
             onChange={(lng) => {
@@ -202,6 +206,7 @@ export const LayerUI = React.memo(
             languages={languages}
             floating
           />
+          {actionManager.renderAction("toggleShortcuts")}
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"

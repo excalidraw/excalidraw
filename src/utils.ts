@@ -10,21 +10,20 @@ export function setDateTimeForTests(dateTime: string) {
   mockDateTime = dateTime;
 }
 
-export function getDateTime() {
+export const getDateTime = () => {
   if (mockDateTime) {
     return mockDateTime;
   }
 
   const date = new Date();
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hr = date.getHours();
-  const min = date.getMinutes();
-  const secs = date.getSeconds();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const hr = `${date.getHours()}`.padStart(2, "0");
+  const min = `${date.getMinutes()}`.padStart(2, "0");
 
-  return `${year}${month}${day}${hr}${min}${secs}`;
-}
+  return `${year}-${month}-${day}-${hr}${min}`;
+};
 
 export function capitalizeString(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -135,12 +134,6 @@ export function distance(x: number, y: number) {
   return Math.abs(x - y);
 }
 
-export function distance2d(x1: number, y1: number, x2: number, y2: number) {
-  const xd = x2 - x1;
-  const yd = y2 - y1;
-  return Math.hypot(xd, yd);
-}
-
 export function resetCursor() {
   document.documentElement.style.cursor = "";
 }
@@ -161,17 +154,18 @@ export const allowFullScreen = () =>
 
 export const exitFullScreen = () => document.exitFullscreen();
 
-export const getShortcutKey = (shortcut: string, prefix = " — "): string => {
+export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
-    return `${prefix}${shortcut
+    return `${shortcut
       .replace("CtrlOrCmd+", "⌘")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃")
       .replace("Shift+", "⇧")
-      .replace("Del", "⌫")}`;
+      .replace("Del", "⌫")
+      .replace(/Enter|Return/, "↩")}`;
   }
-  return `${prefix}${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },

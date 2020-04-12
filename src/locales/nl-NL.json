@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Plak",
-    "selectAll": "Selecteer alles",
+    "selectAll": "Alles selecteren",
     "copy": "Kopieer",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
@@ -10,14 +10,15 @@
     "bringToFront": "Breng naar voorgrond",
     "sendBackward": "Breng naar achter",
     "delete": "Verwijderen",
-    "copyStyles": "Kopieer stijl",
-    "pasteStyles": "Plak stijl",
+    "copyStyles": "Stijl kopiëren",
+    "pasteStyles": "Stijl plakken",
     "stroke": "Lijn",
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
     "sloppiness": "Slordigheid",
     "opacity": "Doorzichtigheid",
+    "textAlign": "Uitlijning",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
@@ -28,12 +29,15 @@
     "small": "Klein",
     "medium": "Medium",
     "large": "Groot",
-    "veryLarge": "Zeer Groot",
+    "veryLarge": "Zeer groot",
     "solid": "Ingekleurd",
     "hachure": "Arcering",
     "crossHatch": "Tweemaal gearceerd",
     "thin": "Dun",
     "bold": "Vet",
+    "left": "Links",
+    "center": "Midden",
+    "right": "Rechts",
     "extraBold": "Zwaar",
     "architect": "Architect",
     "artist": "Artiest",
@@ -46,7 +50,9 @@
     "actions": "Acties",
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
-    "duplicateSelection": "Dupliceer geselecteerde object"
+    "duplicateSelection": "Dupliceer",
+    "untitled": "Naamloos",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -133,10 +139,16 @@
   "shortcutsDialog": {
     "title": "Sneltoetsen",
     "shapes": "Vormen",
+    "or": "of",
+    "click": "klik",
+    "curvedArrow": "Gebogen pijl",
+    "curvedLine": "Gebogen lijn",
     "editor": "Editor",
     "view": "Weergave",
     "blog": "Lees onze blog",
     "howto": "Volg onze handleidingen",
-    "github": "Probleem gevonden? Stuur een nieuwe issue"
+    "github": "Probleem gevonden? Stuur een nieuwe issue",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

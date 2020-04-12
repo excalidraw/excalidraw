@@ -1,5 +1,5 @@
 export const DRAGGING_THRESHOLD = 10; // 10px
-export const ARROW_CONFIRM_THRESHOLD = 10; // 10px
+export const LINE_CONFIRM_THRESHOLD = 10; // 10px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -15,4 +15,41 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
+};
+
+export enum SCENE {
+  INIT = "SCENE_INIT",
+  UPDATE = "SCENE_UPDATE",
+}
+
+export enum EVENT {
+  COPY = "copy",
+  PASTE = "paste",
+  CUT = "cut",
+  KEYDOWN = "keydown",
+  KEYUP = "keyup",
+  MOUSE_MOVE = "mousemove",
+  RESIZE = "resize",
+  UNLOAD = "unload",
+  BLUR = "blur",
+  DRAG_OVER = "dragover",
+  DROP = "drop",
+  GESTURE_END = "gestureend",
+  BEFORE_UNLOAD = "beforeunload",
+  GESTURE_START = "gesturestart",
+  GESTURE_CHANGE = "gesturechange",
+  POINTER_MOVE = "pointermove",
+  POINTER_UP = "pointerup",
+  WHEEL = "wheel",
+  TOUCH_START = "touchstart",
+}
+
+export const ENV = {
+  TEST: "test",
+  DEVELOPMENT: "development",
+};
+
+export const BROADCAST = {
+  SERVER_VOLATILE: "server-volatile-broadcast",
+  SERVER: "server-broadcast",
 };

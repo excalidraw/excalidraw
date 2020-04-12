@@ -2,10 +2,11 @@ import React from "react";
 import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { showSelectedShapeActions } from "../element";
+import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
+import { HelpIcon } from "../components/HelpIcon";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -38,7 +39,10 @@ export const actionToggleEditMenu = register({
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      visible={showSelectedShapeActions(appState, elements)}
+      visible={showSelectedShapeActions(
+        appState,
+        getNonDeletedElements(elements),
+      )}
       type="button"
       icon={palette}
       aria-label={t("buttons.edit")}
@@ -62,4 +66,21 @@ export const actionFullScreen = register({
     };
   },
   keyTest: (event) => event.keyCode === KEYS.F_KEY_CODE,
+});
+
+export const actionShortcuts = register({
+  name: "toggleShortcuts",
+  perform: (_elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        showShortcutsDialog: true,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <HelpIcon title={t("shortcutsDialog.title")} onClick={updateData} />
+  ),
+  keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });

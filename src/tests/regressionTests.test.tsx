@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../components/App";
+import App from "../components/App";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
@@ -162,12 +162,13 @@ function getSelectedElement(): ExcalidrawElement {
   return selectedElements[0];
 }
 
+type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 function getResizeHandles() {
-  const rects = handlerRectangles(
-    getSelectedElement(),
-    h.state.zoom,
-    pointerType,
-  );
+  const rects =
+    handlerRectangles(getSelectedElement(), h.state.zoom, pointerType) as
+    {
+      [T in HandlerRectanglesRet]: [number, number, number, number];
+    };
 
   const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
 
