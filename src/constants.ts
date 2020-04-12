@@ -53,3 +53,7 @@ export const BROADCAST = {
   SERVER_VOLATILE: "server-volatile-broadcast",
   SERVER: "server-broadcast",
 };
+
+export const CLASSES = {
+  SHAPE_ACTIONS_MENU: "App-menu__left",
+};
