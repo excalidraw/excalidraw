@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
-import { App } from "./components/App";
+import App from "./components/App";
 import "./styles.scss";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
