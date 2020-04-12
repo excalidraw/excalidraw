@@ -2,6 +2,7 @@ import { KEYS } from "../keys";
 import { selectNode, isWritableElement } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
+import { CLASSES } from "../constants";
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -174,7 +175,7 @@ export function textWysiwyg({
   const onPointerDown = (event: MouseEvent) => {
     if (
       event.target instanceof HTMLElement &&
-      event.target.closest(".App-menu__left") &&
+      event.target.closest(CLASSES.SHAPE_ACTIONS_MENU) &&
       !isWritableElement(event.target)
     ) {
       editable.onblur = null;
