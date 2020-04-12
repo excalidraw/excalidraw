@@ -71,7 +71,7 @@
     "zoomOut": "Alejarse",
     "resetZoom": "Restablecer zoom",
     "menu": "Menú",
-    "done": "Terminado",
+    "done": "Hecho",
     "edit": "Editar",
     "undo": "Deshacer",
     "redo": "Rehacer",
@@ -82,12 +82,12 @@
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
-    "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
+    "couldNotLoadInvalidFile": "No se pudo cargar el archivo inválido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido encriptada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -105,7 +105,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
+    "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
