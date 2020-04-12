@@ -10,7 +10,8 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState } from "../types";
+import { AppState, FlooredNumber } from "../types";
+import { ExcalidrawElement } from "../element/types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -158,4 +159,85 @@ export const actionResetZoom = register({
   keyTest: (event) =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
+
+type ExceedPixels = {
+  exceedX: number;
+  exceedY: number;
+};
+
+function getOutsideElements(
+  elements: readonly ExcalidrawElement[],
+): (ExceedPixels | null)[] {
+  const { innerWidth, innerHeight } = window;
+  return elements
+    .map(({ x, y, width, height }) => {
+      if (x + width > innerWidth || y + height > innerHeight) {
+        return {
+          exceedX: x + width > innerWidth ? x + width - innerWidth : 0,
+          exceedY: y + height > innerHeight ? y + height - innerHeight : 0,
+        };
+      }
+      if (x < 0 || y < 0) {
+        return {
+          exceedX: x < 0 ? Math.abs(x) : 0,
+          exceedY: y < 0 ? Math.abs(y) : 0,
+        };
+      }
+      return null;
+    })
+    .filter((element: ExceedPixels | null) => element);
+}
+
+export const actionZoomCenter = register({
+  name: "zoomCenter",
+  perform: (_elements, appState) => {
+    let greatestExcess = { type: "", excess: 0 };
+
+    getOutsideElements(_elements).forEach(({ exceedX, exceedY }: any) => {
+      if (exceedX > greatestExcess.excess) {
+        greatestExcess = { type: "x", excess: exceedX };
+      }
+      if (exceedY > greatestExcess.excess) {
+        greatestExcess = { type: "y", excess: exceedY };
+      }
+    });
+
+    const { innerHeight, innerWidth } = window;
+    const { excess, type } = greatestExcess;
+    let zoom = 1;
+
+    if (type === "x") {
+      zoom = (innerWidth / (excess + innerWidth)) * 0.5;
+    } else if (type === "y") {
+      zoom = (innerHeight / (excess + innerHeight)) * 0.5;
+    }
+
+    if (zoom <= 0.1) {
+      zoom = 0.1;
+    } else if (zoom >= 1) {
+      zoom = 1;
+    }
+
+    return {
+      appState: {
+        ...appState,
+        zoom,
+        scrollX: 0 as FlooredNumber,
+        scrollY: 0 as FlooredNumber,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={"x"}
+      title={""}
+      aria-label={""}
+      onClick={() => {
+        updateData(null);
+      }}
+    />
+  ),
 });

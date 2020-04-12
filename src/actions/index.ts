@@ -25,6 +25,7 @@ export {
   actionZoomIn,
   actionZoomOut,
   actionResetZoom,
+  actionZoomCenter,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";
