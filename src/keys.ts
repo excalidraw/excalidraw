@@ -14,6 +14,7 @@ export const KEYS = {
   SPACE: " ",
   QUESTION_MARK: "?",
   F_KEY_CODE: 70,
+  ALT_KEY_CODE: 18,
 } as const;
 
 export type Key = keyof typeof KEYS;
@@ -27,6 +28,7 @@ export function isArrowKey(keyCode: string) {
   );
 }
 
-export const getResizeCenterPointKey = (event: MouseEvent) => event.altKey;
+export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
+  event.altKey || event.which === KEYS.ALT_KEY_CODE;
 export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
   event.shiftKey;

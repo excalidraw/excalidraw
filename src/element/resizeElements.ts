@@ -128,6 +128,13 @@ export const resizeElements = (
   yPointer: number,
   lastX: number,
   lastY: number,
+  elementOriginPosition: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  },
+  resizeWithCenter: { keyLifted: boolean },
 ) => {
   setAppState({
     isResizing: resizeHandle !== "rotation",
@@ -208,6 +215,12 @@ export const resizeElements = (
               }
             : {}),
         });
+        if (resizeWithCenter.keyLifted) {
+          mutateElement(element, {
+            ...elementOriginPosition,
+          });
+          resizeWithCenter.keyLifted = false;
+        }
       }
     }
 

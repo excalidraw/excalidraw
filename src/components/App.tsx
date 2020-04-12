@@ -71,7 +71,7 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey } from "../keys";
+import { KEYS, isArrowKey, getResizeCenterPointKey } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -149,6 +149,7 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
+const resizeWithCenter = { keyLifted: false };
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1146,6 +1147,13 @@ class App extends React.Component<any, AppState> {
       }
       isHoldingSpace = false;
     }
+    if (
+      getResizeCenterPointKey(event) &&
+      this.state.isResizing &&
+      this.state.resizingElement
+    ) {
+      resizeWithCenter.keyLifted = true;
+    }
   });
 
   private selectShapeTool(elementType: AppState["elementType"]) {
@@ -1796,6 +1804,8 @@ class App extends React.Component<any, AppState> {
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
+    const elementOriginPosition = { x: 0, y: 0, width: 0, height: 0 };
+
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -1818,6 +1828,11 @@ class App extends React.Component<any, AppState> {
             elementWithResizeHandler,
           );
           isResizingElements = true;
+          elementOriginPosition.x = elementWithResizeHandler.element.x;
+          elementOriginPosition.y = elementWithResizeHandler.element.y;
+          elementOriginPosition.width = elementWithResizeHandler.element.width;
+          elementOriginPosition.height =
+            elementWithResizeHandler.element.height;
         }
       } else if (selectedElements.length > 1) {
         if (canResizeMutlipleElements(selectedElements)) {
@@ -2083,6 +2098,8 @@ class App extends React.Component<any, AppState> {
           y,
           lastX,
           lastY,
+          elementOriginPosition,
+          resizeWithCenter,
         );
       if (resized) {
         lastX = x;
