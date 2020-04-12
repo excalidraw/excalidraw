@@ -139,6 +139,10 @@ export function textWysiwyg({
   }
 
   function cleanup() {
+    if (isDestroyed) {
+      return;
+    }
+    isDestroyed = true;
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.onpaste = null;
@@ -196,6 +200,8 @@ export function textWysiwyg({
     }
     editable.focus();
   });
+
+  let isDestroyed = false;
 
   editable.onblur = handleSubmit;
   window.addEventListener("pointerdown", onPointerDown);
