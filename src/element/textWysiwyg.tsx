@@ -1,5 +1,8 @@
 import { KEYS } from "../keys";
-import { selectNode } from "../utils";
+import { selectNode, isWritableElement } from "../utils";
+import { globalSceneState } from "../scene";
+import { isTextElement } from "./typeChecks";
+import { CLASSES } from "../constants";
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -13,6 +16,7 @@ function trimText(text: string) {
 }
 
 type TextWysiwygParams = {
+  id: string;
   initText: string;
   x: number;
   y: number;
@@ -28,6 +32,7 @@ type TextWysiwygParams = {
 };
 
 export function textWysiwyg({
+  id,
   initText,
   x,
   y,
@@ -120,7 +125,6 @@ export function textWysiwyg({
       event.stopPropagation();
     }
   };
-  editable.onblur = handleSubmit;
 
   function stopEvent(event: Event) {
     event.stopPropagation();
@@ -136,6 +140,10 @@ export function textWysiwyg({
   }
 
   function cleanup() {
+    if (isDestroyed) {
+      return;
+    }
+    isDestroyed = true;
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.onpaste = null;
@@ -143,9 +151,61 @@ export function textWysiwyg({
     editable.onkeydown = null;
 
     window.removeEventListener("wheel", stopEvent, true);
+    window.removeEventListener("pointerdown", onPointerDown);
+    window.removeEventListener("pointerup", rebindBlur);
+    window.removeEventListener("blur", handleSubmit);
+
+    unbindUpdate();
+
     document.body.removeChild(editable);
   }
 
+  const rebindBlur = () => {
+    window.removeEventListener("pointerup", rebindBlur);
+    // deferred to guard against focus traps on various UIs that steal focus
+    //  upon pointerUp
+    setTimeout(() => {
+      editable.onblur = handleSubmit;
+      // case: clicking on the same property → no change → no update → no focus
+      editable.focus();
+    });
+  };
+
+  // prevent blur when changing properties from the menu
+  const onPointerDown = (event: MouseEvent) => {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.closest(CLASSES.SHAPE_ACTIONS_MENU) &&
+      !isWritableElement(event.target)
+    ) {
+      editable.onblur = null;
+      window.addEventListener("pointerup", rebindBlur);
+      // handle edge-case where pointerup doesn't fire e.g. due to user
+      //  alt-tabbing away
+      window.addEventListener("blur", handleSubmit);
+    }
+  };
+
+  // handle updates of textElement properties of editing element
+  const unbindUpdate = globalSceneState.addCallback(() => {
+    const editingElement = globalSceneState
+      .getElementsIncludingDeleted()
+      .find((element) => element.id === id);
+    if (editingElement && isTextElement(editingElement)) {
+      Object.assign(editable.style, {
+        font: editingElement.font,
+        textAlign: editingElement.textAlign,
+        color: editingElement.strokeColor,
+        opacity: editingElement.opacity / 100,
+      });
+    }
+    editable.focus();
+  });
+
+  let isDestroyed = false;
+
+  editable.onblur = handleSubmit;
+  window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();

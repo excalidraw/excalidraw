@@ -26,6 +26,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { GitHubCorner } from "./GitHubCorner";
+import { CLASSES } from "../constants";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -34,6 +35,7 @@ interface LayerUIProps {
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
 }
@@ -46,6 +48,7 @@ export const LayerUI = React.memo(
     canvas,
     elements,
     onRoomCreate,
+    onUsernameChange,
     onRoomDestroy,
     onLockToggle,
   }: LayerUIProps) => {
@@ -100,6 +103,7 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        onUsernameChange={onUsernameChange}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
         onLockToggle={onLockToggle}
@@ -134,11 +138,7 @@ export const LayerUI = React.memo(
                         isCollaborating={appState.isCollaborating}
                         collaboratorCount={appState.collaborators.size}
                         username={appState.username}
-                        onUsernameChange={(username) => {
-                          setAppState({
-                            username,
-                          });
-                        }}
+                        onUsernameChange={onUsernameChange}
                         onRoomCreate={onRoomCreate}
                         onRoomDestroy={onRoomDestroy}
                       />
@@ -149,7 +149,7 @@ export const LayerUI = React.memo(
               </Section>
               {showSelectedShapeActions(appState, elements) && (
                 <Section heading="selectedShapeActions">
-                  <Island className="App-menu__left" padding={4}>
+                  <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
                     <SelectedShapeActions
                       appState={appState}
                       elements={elements}

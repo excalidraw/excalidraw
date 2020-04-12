@@ -51,7 +51,8 @@
     "language": "Språk",
     "createRoom": "Del en sanntids-samarbeidsøkt",
     "duplicateSelection": "Dupliser",
-    "untitled": "Uten navn"
+    "untitled": "Uten navn",
+    "name": "Navn"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -146,6 +147,8 @@
     "view": "Visning",
     "blog": "Les bloggen vår",
     "howto": "Følg våre veiledninger",
-    "github": "Funnet et problem? Send inn"
+    "github": "Funnet et problem? Send inn",
+    "textNewLine": "Legg til ny linje (tekst)",
+    "textFinish": "Fullfør redigering (tekst)"
   }
 }

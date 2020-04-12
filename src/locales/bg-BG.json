@@ -1,6 +1,6 @@
 {
   "labels": {
-    "paste": "",
+    "paste": "Постави",
     "selectAll": "",
     "copy": "",
     "copyAsPng": "",
@@ -13,7 +13,7 @@
     "copyStyles": "",
     "pasteStyles": "",
     "stroke": "",
-    "background": "",
+    "background": "Фон",
     "fill": "",
     "strokeWidth": "",
     "sloppiness": "",
@@ -25,7 +25,7 @@
     "withBackground": "",
     "handDrawn": "",
     "normal": "",
-    "code": "",
+    "code": "Код",
     "small": "",
     "medium": "",
     "large": "",
@@ -48,10 +48,11 @@
     "drawingCanvas": "",
     "layers": "",
     "actions": "",
-    "language": "",
+    "language": "Език",
     "createRoom": "",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "",
@@ -146,6 +147,8 @@
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

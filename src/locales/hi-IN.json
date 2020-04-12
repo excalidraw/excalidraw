@@ -51,7 +51,8 @@
     "language": "भाषा",
     "createRoom": "अधिवेशन",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "",
@@ -146,6 +147,8 @@
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

@@ -1,6 +1,8 @@
+@import "../_variables";
+
 .RoomDialog-modalButton.is-collaborating {
-  background-color: #ebfbee; // OC GREEN-0
-  color: #2b8a3e; // OC GREEN-9
+  background-color: $oc-green-0;
+  color: $oc-green-9;
 }
 
 .RoomDialog-modalButton-collaborators {
@@ -10,8 +12,8 @@
   right: -5px;
   padding: 3px;
   border-radius: 50%;
-  background-color: #40c057; // OC GREEN-6
-  color: #fff;
+  background-color: $oc-green-6;
+  color: $oc-white;
   font-size: 0.7em;
   font-family: var(--ui-font);
 }
@@ -33,7 +35,7 @@
   padding: 0 0.5rem;
   white-space: nowrap;
   border-radius: var(--space-factor);
-  background-color: #eee;
+  background-color: var(--button-gray-1);
 }
 
 .RoomDialog-usernameContainer {
@@ -44,32 +46,15 @@
   justify-content: center;
 }
 
-.RoomDialog-usernameLabel {
-}
-
 .RoomDialog-username {
+  appearance: none;
   min-width: 0;
   flex: 1 1 auto;
   margin-left: 1em;
-  display: inline-block;
-  cursor: pointer;
-  border: none;
   height: 2.5rem;
-  line-height: 2.5rem;
+  font-size: 1em;
+  line-height: 1.5;
   padding: 0 0.5rem;
-  white-space: nowrap;
-  border-radius: var(--space-factor);
-  background-color: #fff;
-  border: 1px solid #eee;
-}
-
-.RoomDialog-link:hover {
-  background-color: #eee;
-}
-
-.RoomDialog-link:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px steelblue;
 }
 
 .RoomDialog-sessionStartButtonContainer {
@@ -78,6 +63,6 @@
 }
 
 .RoomDialog-stopSession {
-  background-color: #ffe3e3; // OC RED-1
-  color: #c92a2a; // OC RED-9
+  background-color: $oc-red-1;
+  color: $oc-red-9;
 }

@@ -1,8 +1,10 @@
+@import "open-color/open-color.scss";
+
 :root {
-  --button-gray-1: #e9ecef;
-  --button-gray-2: #ced4da;
-  --button-gray-3: #adb5bd;
-  --button-blue: #a5d8ff;
+  --button-gray-1: #{$oc-gray-2};
+  --button-gray-2: #{$oc-gray-4};
+  --button-gray-3: #{$oc-gray-5};
+  --button-blue: #{$oc-blue-2};
 }
 
 .ToolIcon {
@@ -116,7 +118,7 @@
   bottom: 2px;
   right: 3px;
   font-size: 0.5em;
-  color: var(--button-gray-3); // OC GRAY 5
+  color: var(--button-gray-3);
   font-family: var(--ui-font);
   user-select: none;
 }

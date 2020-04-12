@@ -24,6 +24,7 @@ type MobileMenuProps = {
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
+  onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
 };
@@ -35,6 +36,7 @@ export function MobileMenu({
   exportButton,
   setAppState,
   onRoomCreate,
+  onUsernameChange,
   onRoomDestroy,
   onLockToggle,
 }: MobileMenuProps) {
@@ -87,7 +89,7 @@ export function MobileMenu({
                     isCollaborating={appState.isCollaborating}
                     collaboratorCount={appState.collaborators.size}
                     username={appState.username}
-                    onUsernameChange={(username) => setAppState({ username })}
+                    onUsernameChange={onUsernameChange}
                     onRoomCreate={onRoomCreate}
                     onRoomDestroy={onRoomDestroy}
                   />
