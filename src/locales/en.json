@@ -151,5 +151,9 @@
     "github": "Found an issue? Submit",
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)"
+  },
+  "encrypted": {
+    "prefix": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
+    "postfix": "Read our blog post to learn more"
   }
 }

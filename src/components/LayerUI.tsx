@@ -25,8 +25,9 @@ import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
-import { GitHubCorner } from "./GitHubCorner";
 import { CLASSES } from "../constants";
+
+import "./LayerUI.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -39,6 +40,30 @@ interface LayerUIProps {
   onRoomDestroy: () => void;
   onLockToggle: () => void;
 }
+
+const renderEncryptedIcon = () => {
+  return (
+    <div className="encrypted-icon tooltip">
+      <span className="tooltip-text">
+        {t("encrypted.prefix")}{" "}
+        <a href="https://blog.excalidraw.com/end-to-end-encryption/">
+          {t("encrypted.postfix")}
+        </a>
+      </span>
+      <svg
+        width="1792"
+        height="1792"
+        viewBox="0 0 1792 1792"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill="currentColor"
+          d="M640 768h512v-192q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28h-960q-40 0-68-28t-28-68v-576q0-40 28-68t68-28h32v-192q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z"
+        />
+      </svg>
+    </div>
+  );
+};
 
 export const LayerUI = React.memo(
   ({
@@ -107,7 +132,7 @@ export const LayerUI = React.memo(
         onLockToggle={onLockToggle}
       />
     ) : (
-      <>
+      <div className="layer-ui__wrapper">
         {appState.isLoading && <LoadingMessage />}
         {appState.errorMessage && (
           <ErrorDialog
@@ -195,9 +220,7 @@ export const LayerUI = React.memo(
             </Stack.Col>
           </div>
         </FixedSideContainer>
-        <aside>
-          <GitHubCorner />
-        </aside>
+        <aside>{renderEncryptedIcon()}</aside>
         <footer role="contentinfo">
           <LanguageList
             onChange={(lng) => {
@@ -219,7 +242,7 @@ export const LayerUI = React.memo(
             </button>
           )}
         </footer>
-      </>
+      </div>
     );
   },
   (prev, next) => {
