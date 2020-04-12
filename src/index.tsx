@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
+
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import { App } from "./components/App";
-import "./styles.scss";
 import { register as registerServiceWorker } from "./serviceWorker";
+
+import "./css/styles.scss";
 
 const SentyEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",

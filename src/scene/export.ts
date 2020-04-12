@@ -90,11 +90,11 @@ export function exportToSvg(
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/FG_Virgil.ttf");
+        src: url("https://excalidraw.com/static/fonts/FG_Virgil.ttf");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.ttf");
+        src: url("https://excalidraw.com/static/fonts/Cascadia.ttf");
       }
     </style>
   </defs>
