@@ -26,6 +26,9 @@ Sentry.init({
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
+  ignoreErrors: [
+    "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
+  ],
   integrations: [
     new SentryIntegrations.CaptureConsole({
       levels: ["error"],
