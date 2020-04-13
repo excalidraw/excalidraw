@@ -339,7 +339,7 @@ export const getCommonBounds = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getClosestBounds = (
+export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
   from: { x: number; y: number },
 ) => {
