@@ -75,6 +75,11 @@ function registerValidSW(swUrl: string, config?: Config) {
               // but the previous service worker will still serve the older
               // content until all client tabs are closed.
 
+              // console.log(
+              //   "New content is available and will be used when all " +
+              //     "tabs for this page are closed.",
+              // );
+
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
@@ -83,6 +88,9 @@ function registerValidSW(swUrl: string, config?: Config) {
               // At this point, everything has been precached.
               // It's the perfect time to display a
               // "Content is cached for offline use." message.
+
+              // console.log("Content is cached for offline use.");
+
               // Execute callback
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
@@ -120,7 +128,11 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      // console.log(
+      //   "No internet connection found. App is running in offline mode.",
+      // );
+    });
 }
 
 export function unregister() {
