@@ -16,7 +16,6 @@ import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
-import { viewportCoordsToSceneCoords } from "../utils";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -135,13 +134,14 @@ export function MobileMenu({
               <button
                 className="scroll-back-to-content"
                 onClick={(event) => {
-                  const { x, y } = viewportCoordsToSceneCoords(
-                    event,
-                    appState,
-                    canvas,
-                    window.devicePixelRatio,
-                  );
-                  setAppState({ ...calculateScrollCenter(elements, { x, y }) });
+                  setAppState({
+                    ...calculateScrollCenter(elements, {
+                      event,
+                      appState,
+                      canvas,
+                      scale: window.devicePixelRatio,
+                    }),
+                  });
                 }}
               >
                 {t("buttons.scrollBackToContent")}
