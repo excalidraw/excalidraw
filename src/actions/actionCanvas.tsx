@@ -4,14 +4,15 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom } from "../scene";
+import { getNormalizedZoom, calculateScrollCenter } from "../scene";
 import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState, FlooredNumber } from "../types";
+import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
+import { getElementBounds } from "../element";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -161,32 +162,62 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-type ExceedPixels = {
-  exceedX: number;
-  exceedY: number;
+type ExceedCoords = {
+  exceedX1: number;
+  exceedX2: number;
+  exceedY1: number;
+  exceedY2: number;
 };
 
 function getOutsideElements(
   elements: readonly ExcalidrawElement[],
-): (ExceedPixels | null)[] {
+): ExceedCoords[] {
+  const outsideElements: ExceedCoords[] = [];
   const { innerWidth, innerHeight } = window;
-  return elements
-    .map(({ x, y, width, height }) => {
-      if (x + width > innerWidth || y + height > innerHeight) {
-        return {
-          exceedX: x + width > innerWidth ? x + width - innerWidth : 0,
-          exceedY: y + height > innerHeight ? y + height - innerHeight : 0,
-        };
-      }
-      if (x < 0 || y < 0) {
-        return {
-          exceedX: x < 0 ? Math.abs(x) : 0,
-          exceedY: y < 0 ? Math.abs(y) : 0,
-        };
-      }
-      return null;
-    })
-    .filter((element: ExceedPixels | null) => element);
+
+  elements.forEach((element) => {
+    const [x1, y1, x2, y2] = getElementBounds(element);
+    if (x2 > innerWidth || y2 > innerHeight) {
+      outsideElements.push({
+        exceedX1: 0,
+        exceedX2: x2 > innerWidth ? x2 - innerWidth : 0,
+        exceedY1: 0,
+        exceedY2: y2 > innerHeight ? y2 - innerHeight : 0,
+      });
+    } else if (x1 < 0 || y1 < 0) {
+      outsideElements.push({
+        exceedX1: x1 < 0 ? Math.abs(x1) : 0,
+        exceedX2: 0,
+        exceedY1: y1 < 0 ? Math.abs(y1) : 0,
+        exceedY2: 0,
+      });
+    }
+  });
+
+  return outsideElements;
+}
+
+function getZoomValue(greatestExcess: {
+  type: string;
+  excess: number;
+}): number {
+  const { innerWidth, innerHeight } = window;
+  const { excess, type } = greatestExcess;
+  let zoom = 1;
+
+  if (type === "x") {
+    zoom = innerWidth / (excess + innerWidth);
+  } else if (type === "y") {
+    zoom = innerHeight / (excess + innerHeight);
+  }
+
+  if (zoom <= 0.1) {
+    zoom = 0.1;
+  } else if (zoom >= 1) {
+    zoom = 1;
+  }
+
+  return zoom;
 }
 
 export const actionZoomCenter = register({
@@ -194,37 +225,28 @@ export const actionZoomCenter = register({
   perform: (_elements, appState) => {
     let greatestExcess = { type: "", excess: 0 };
 
-    getOutsideElements(_elements).forEach(({ exceedX, exceedY }: any) => {
-      if (exceedX > greatestExcess.excess) {
-        greatestExcess = { type: "x", excess: exceedX };
-      }
-      if (exceedY > greatestExcess.excess) {
-        greatestExcess = { type: "y", excess: exceedY };
-      }
-    });
-
-    const { innerHeight, innerWidth } = window;
-    const { excess, type } = greatestExcess;
-    let zoom = 1;
-
-    if (type === "x") {
-      zoom = (innerWidth / (excess + innerWidth)) * 0.5;
-    } else if (type === "y") {
-      zoom = (innerHeight / (excess + innerHeight)) * 0.5;
-    }
-
-    if (zoom <= 0.1) {
-      zoom = 0.1;
-    } else if (zoom >= 1) {
-      zoom = 1;
-    }
+    getOutsideElements(_elements).forEach(
+      ({ exceedX1, exceedY1, exceedX2, exceedY2 }: ExceedCoords) => {
+        if (exceedX1 > greatestExcess.excess) {
+          greatestExcess = { type: "x", excess: exceedX1 };
+        }
+        if (exceedX2 > greatestExcess.excess) {
+          greatestExcess = { type: "x", excess: exceedX2 };
+        }
+        if (exceedY1 > greatestExcess.excess) {
+          greatestExcess = { type: "y", excess: exceedY1 };
+        }
+        if (exceedY2 > greatestExcess.excess) {
+          greatestExcess = { type: "y", excess: exceedY2 };
+        }
+      },
+    );
 
     return {
       appState: {
         ...appState,
-        zoom,
-        scrollX: 0 as FlooredNumber,
-        scrollY: 0 as FlooredNumber,
+        zoom: getZoomValue(greatestExcess),
+        ...calculateScrollCenter(_elements),
       },
       commitToHistory: false,
     };
