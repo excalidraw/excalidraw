@@ -18,10 +18,6 @@
         {
           "key": "Referrer-Policy",
           "value": "origin"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src https: data: 'unsafe-inline'; connect-src https://*.excalidraw.com https://*.excalidraw.now.sh wss://excalidraw-socket.herokuapp.com https://excalidraw-socket.herokuapp.com https://sentry.io;"
         }
       ]
     }
