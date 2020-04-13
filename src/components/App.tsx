@@ -149,7 +149,10 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
-const resizeWithCenter = { keyLifted: false };
+let resizeWithCenterKeyLifted = false;
+const setResizeWithCenterKeyLifted = (v: boolean) => {
+  resizeWithCenterKeyLifted = v;
+};
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1152,7 +1155,7 @@ class App extends React.Component<any, AppState> {
       this.state.isResizing &&
       this.state.resizingElement
     ) {
-      resizeWithCenter.keyLifted = true;
+      setResizeWithCenterKeyLifted(true);
     }
   });
 
@@ -2031,7 +2034,7 @@ class App extends React.Component<any, AppState> {
     }
 
     let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrrowFn = (fn: ResizeArrowFnType) => {
+    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
       resizeArrowFn = fn;
     };
 
@@ -2092,14 +2095,15 @@ class App extends React.Component<any, AppState> {
           this.state,
           this.setAppState,
           resizeArrowFn,
-          setResizeArrrowFn,
+          setResizeArrowFn,
           event,
           x,
           y,
           lastX,
           lastY,
           elementOriginPosition,
-          resizeWithCenter,
+          resizeWithCenterKeyLifted,
+          setResizeWithCenterKeyLifted,
         );
       if (resized) {
         lastX = x;
