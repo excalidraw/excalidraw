@@ -48,7 +48,7 @@
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
     "actions": "Acciones",
-    "language": "Lenguaje",
+    "language": "Idioma",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
@@ -71,7 +71,7 @@
     "zoomOut": "Alejarse",
     "resetZoom": "Restablecer zoom",
     "menu": "Menú",
-    "done": "Terminado",
+    "done": "Hecho",
     "edit": "Editar",
     "undo": "Deshacer",
     "redo": "Rehacer",
@@ -82,12 +82,12 @@
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
-    "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
+    "couldNotLoadInvalidFile": "No se pudo cargar el archivo inválido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido encriptada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -105,7 +105,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "Haga clic para iniciar varios puntos, arrastre para una sola línea",
+    "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
@@ -124,11 +124,11 @@
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
-    "desc_intro": "Puede invitar personas a su escena actual para que le colaboren.",
+    "desc_intro": "Puedes invitar a gente a tu escena actual para colaborar contigo.",
     "desc_privacy": "No se preocupe, la sesión usa encriptación de extremo a extremo, por lo que todo lo que dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver qué se le ocurre.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
-    "desc_inProgressIntro": "Sesión de colaboración en vivo está ahora en progreso.",
+    "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
     "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
     "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
@@ -141,6 +141,7 @@
     "shapes": "Formas",
     "or": "o",
     "click": "hacer clic",
+    "drag": "",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "editor": "Editor",
