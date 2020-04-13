@@ -24,6 +24,14 @@
   ],
   "redirects": [
     {
+      "source": "/FG_Virgil.woff2",
+      "destination": "/static/fonts/FG_Virgil.woff2"
+    },
+    {
+      "source": "/Cascadia.woff2",
+      "destination": "/static/fonts/Cascadia.woff2"
+    },
+    {
       "source": "/([^.]+)",
       "destination": "/",
       "statusCode": 301
