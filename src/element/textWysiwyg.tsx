@@ -175,7 +175,7 @@ export function textWysiwyg({
   const onPointerDown = (event: MouseEvent) => {
     if (
       event.target instanceof HTMLElement &&
-      event.target.closest(CLASSES.SHAPE_ACTIONS_MENU) &&
+      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
       !isWritableElement(event.target)
     ) {
       editable.onblur = null;
