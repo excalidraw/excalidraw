@@ -18,6 +18,7 @@ export {
   getDiamondPoints,
   getArrowPoints,
   getLinearElementAbsoluteBounds,
+  getClosestBounds,
 } from "./bounds";
 
 export {
