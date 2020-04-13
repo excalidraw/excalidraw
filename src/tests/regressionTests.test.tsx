@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
 import { render, fireEvent } from "./test-utils";
-import { App } from "../components/App";
+import App from "../components/App";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";

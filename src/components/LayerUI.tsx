@@ -26,6 +26,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { GitHubCorner } from "./GitHubCorner";
+import { CLASSES } from "../constants";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -146,7 +147,7 @@ export const LayerUI = React.memo(
               </Section>
               {showSelectedShapeActions(appState, elements) && (
                 <Section heading="selectedShapeActions">
-                  <Island className="App-menu__left" padding={4}>
+                  <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
                     <SelectedShapeActions
                       appState={appState}
                       elements={elements}

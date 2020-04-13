@@ -424,6 +424,13 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
+        if (
+          element.type === "line" &&
+          isPathALoop(element.points) &&
+          element.backgroundColor !== "transparent"
+        ) {
+          node.setAttribute("fill-rule", "evenodd");
+        }
         group.appendChild(node);
       });
       svgRoot.appendChild(group);

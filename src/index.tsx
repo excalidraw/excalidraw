@@ -2,10 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
+
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
-import { App } from "./components/App";
-import "./styles.scss";
+import App from "./components/App";
+import { register as registerServiceWorker } from "./serviceWorker";
+
+import "./css/styles.scss";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
@@ -23,6 +26,9 @@ Sentry.init({
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
+  ignoreErrors: [
+    "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
+  ],
   integrations: [
     new SentryIntegrations.CaptureConsole({
       levels: ["error"],
@@ -52,3 +58,5 @@ ReactDOM.render(
   </TopErrorBoundary>,
   rootElement,
 );
+
+registerServiceWorker();

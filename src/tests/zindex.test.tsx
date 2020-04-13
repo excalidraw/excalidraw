@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import { App } from "../components/App";
+import App from "../components/App";
 import { reseed } from "../random";
 import { newElement } from "../element";
 import {

@@ -4,16 +4,15 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   TextAlign,
-  WysiwigElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
+import { SocketUpdateDataSource } from "./data";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type AppState = {
-  wysiwygElement: WysiwigElement | null;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
@@ -82,3 +81,7 @@ export declare class GestureEvent extends UIEvent {
   readonly rotation: number;
   readonly scale: number;
 }
+
+export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+  _brand: "socketUpdateData";
+};

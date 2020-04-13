@@ -7,10 +7,10 @@ const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 
-export const saveUsernameToLocalStorage = (id: string, username: string) => {
+export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
-      `${LOCAL_STORAGE_KEY_COLLAB}-${id}`,
+      LOCAL_STORAGE_KEY_COLLAB,
       JSON.stringify({ username }),
     );
   } catch (error) {
@@ -19,9 +19,9 @@ export const saveUsernameToLocalStorage = (id: string, username: string) => {
   }
 };
 
-export const restoreUsernameFromLocalStorage = (id: string): string | null => {
+export const restoreUsernameFromLocalStorage = (): string | null => {
   try {
-    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY_COLLAB}-${id}`);
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_COLLAB);
     if (data) {
       return JSON.parse(data).username;
     }
