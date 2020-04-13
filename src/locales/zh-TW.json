@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
-    "selectAll": "",
+    "selectAll": "全選",
     "copy": "複製",
     "copyAsPng": "複製為 PNG 到剪貼板",
     "copyAsSvg": "",
@@ -141,6 +141,7 @@
     "shapes": "",
     "or": "",
     "click": "",
+    "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "",
