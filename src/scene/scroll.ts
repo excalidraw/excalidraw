@@ -1,6 +1,6 @@
 import { FlooredNumber } from "../types";
 import { ExcalidrawElement } from "../element/types";
-import { getCommonBounds } from "../element";
+import { getCommonBounds, getClosestBounds } from "../element";
 
 export function normalizeScroll(pos: number) {
   return Math.floor(pos) as FlooredNumber;
@@ -8,6 +8,7 @@ export function normalizeScroll(pos: number) {
 
 export function calculateScrollCenter(
   elements: readonly ExcalidrawElement[],
+  from?: { x: number; y: number },
 ): { scrollX: FlooredNumber; scrollY: FlooredNumber } {
   if (!elements.length) {
     return {
@@ -16,7 +17,13 @@ export function calculateScrollCenter(
     };
   }
 
-  const [x1, y1, x2, y2] = getCommonBounds(elements);
+  let x1, y1, x2, y2;
+
+  if (from) {
+    [x1, y1, x2, y2] = getClosestBounds(elements, from);
+  } else {
+    [x1, y1, x2, y2] = getCommonBounds(elements);
+  }
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
