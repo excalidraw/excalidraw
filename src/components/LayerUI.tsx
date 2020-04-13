@@ -27,6 +27,7 @@ import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { GitHubCorner } from "./GitHubCorner";
 import { CLASSES } from "../constants";
+import { viewportCoordsToSceneCoords } from "../utils";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -101,6 +102,7 @@ export const LayerUI = React.memo(
         actionManager={actionManager}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
+        canvas={canvas}
         onUsernameChange={onUsernameChange}
         onRoomCreate={onRoomCreate}
         onRoomDestroy={onRoomDestroy}
@@ -211,8 +213,14 @@ export const LayerUI = React.memo(
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
-              onClick={() => {
-                setAppState({ ...calculateScrollCenter(elements) });
+              onClick={(event) => {
+                const { x, y } = viewportCoordsToSceneCoords(
+                  event,
+                  appState,
+                  canvas,
+                  window.devicePixelRatio,
+                );
+                setAppState({ ...calculateScrollCenter(elements, { x, y }) });
               }}
             >
               {t("buttons.scrollBackToContent")}

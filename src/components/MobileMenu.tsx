@@ -16,11 +16,13 @@ import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
+import { viewportCoordsToSceneCoords } from "../utils";
 
 type MobileMenuProps = {
   appState: AppState;
   actionManager: ActionManager;
   exportButton: React.ReactNode;
+  canvas: HTMLCanvasElement | null;
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
@@ -34,6 +36,7 @@ export function MobileMenu({
   elements,
   actionManager,
   exportButton,
+  canvas,
   setAppState,
   onRoomCreate,
   onUsernameChange,
@@ -131,8 +134,14 @@ export function MobileMenu({
             {appState.scrolledOutside && (
               <button
                 className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({ ...calculateScrollCenter(elements) });
+                onClick={(event) => {
+                  const { x, y } = viewportCoordsToSceneCoords(
+                    event,
+                    appState,
+                    canvas,
+                    window.devicePixelRatio,
+                  );
+                  setAppState({ ...calculateScrollCenter(elements, { x, y }) });
                 }}
               >
                 {t("buttons.scrollBackToContent")}
