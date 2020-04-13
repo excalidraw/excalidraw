@@ -70,11 +70,11 @@ const adjustXYWithRotation = (
   deltaX /= 2;
   deltaY /= 2;
   if (side === "e" || side === "ne" || side === "se") {
-    x += deltaX * (1 - cos);
-    y += deltaX * -sin;
     if (isResizeFromCenter) {
-      x += deltaX * cos;
-      y += deltaX * sin;
+      x += deltaX;
+    } else {
+      x += deltaX * (1 - cos);
+      y += deltaX * -sin;
     }
   }
   if (side === "s" || side === "sw" || side === "se") {
