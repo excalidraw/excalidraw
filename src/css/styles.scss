@@ -1,4 +1,6 @@
 @import "./_variables";
+@import "./theme";
+@import "./fonts";
 
 :root {
   --sat: env(safe-area-inset-top);

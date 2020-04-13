@@ -2,10 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
+
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import App from "./components/App";
-import "./styles.scss";
+import { register as registerServiceWorker } from "./serviceWorker";
+
+import "./css/styles.scss";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
@@ -52,3 +55,5 @@ ReactDOM.render(
   </TopErrorBoundary>,
   rootElement,
 );
+
+registerServiceWorker();
