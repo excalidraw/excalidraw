@@ -35,9 +35,9 @@
     "crossHatch": "Перекрестная",
     "thin": "Тонкая",
     "bold": "Жирная",
-    "left": "",
-    "center": "",
-    "right": "",
+    "left": "Слева",
+    "center": "Центр",
+    "right": "Справа",
     "extraBold": "",
     "architect": "Архитектор",
     "artist": "Художник",
@@ -50,9 +50,9 @@
     "actions": "Действия",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
-    "duplicateSelection": "",
+    "duplicateSelection": "Дубликат",
     "untitled": "",
-    "name": ""
+    "name": "Имя"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -65,7 +65,7 @@
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
-    "selectLanguage": "",
+    "selectLanguage": "Выбрать язык",
     "scrollBackToContent": "Вернуться к содержимому",
     "zoomIn": "Увеличить",
     "zoomOut": "Уменьшить",
@@ -137,7 +137,7 @@
     "title": "Ошибка"
   },
   "shortcutsDialog": {
-    "title": "",
+    "title": "Сочетания клавиш",
     "shapes": "Фигуры",
     "or": "или",
     "click": "",
@@ -146,10 +146,10 @@
     "curvedLine": "Изогнутая линия",
     "editor": "",
     "view": "",
-    "blog": "",
+    "blog": "Прочитайте наш блог",
     "howto": "",
     "github": "",
-    "textNewLine": "",
+    "textNewLine": "Добавить новую строку (текст)",
     "textFinish": ""
   }
 }
