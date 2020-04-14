@@ -190,12 +190,15 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
+      const [x1, y1] = getElementAbsoluteCoords(element);
       const resized = resizeXYWidthHightWithRotation(
         resizeHandle,
-        element.x,
-        element.y,
+        x1,
+        y1,
         element.width,
         element.height,
+        x1 - element.x,
+        y1 - element.y,
         element.angle,
         xPointer,
         yPointer,
