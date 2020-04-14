@@ -124,13 +124,14 @@ const Picker = function ({
         {colors.map((_color, i) => (
           <button
             className="color-picker-swatch"
-            onClick={() => {
+            onClick={(event) => {
+              (event.currentTarget as HTMLButtonElement).focus();
               onChange(_color);
             }}
             title={`${_color} — ${keyBindings[i].toUpperCase()}`}
             aria-label={_color}
             aria-keyshortcuts={keyBindings[i]}
-            style={{ backgroundColor: _color }}
+            style={{ color: _color }}
             key={_color}
             ref={(el) => {
               if (el && i === 0) {
@@ -250,7 +251,11 @@ export function ColorPicker({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover onCloseRequest={() => setActive(false)}>
+          <Popover
+            onCloseRequest={(event) =>
+              event.target !== pickerButton.current && setActive(false)
+            }
+          >
             <Picker
               colors={colors[type]}
               color={color || null}

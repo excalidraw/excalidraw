@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
-    "selectAll": "",
+    "selectAll": "全選",
     "copy": "複製",
     "copyAsPng": "複製為 PNG 到剪貼板",
     "copyAsSvg": "",
@@ -51,7 +51,8 @@
     "language": "語系",
     "createRoom": "分享即時協作會議",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -140,12 +141,15 @@
     "shapes": "",
     "or": "",
     "click": "",
+    "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "",
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

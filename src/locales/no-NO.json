@@ -32,7 +32,7 @@
     "veryLarge": "Svært stor",
     "solid": "Helfarge",
     "hachure": "Skravert",
-    "crossHatch": "Skravering",
+    "crossHatch": "Krysskravert",
     "thin": "Tynn",
     "bold": "Tykk",
     "left": "Venstre",
@@ -51,7 +51,8 @@
     "language": "Språk",
     "createRoom": "Del en sanntids-samarbeidsøkt",
     "duplicateSelection": "Dupliser",
-    "untitled": "Uten navn"
+    "untitled": "Uten navn",
+    "name": "Navn"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -140,12 +141,15 @@
     "shapes": "Figurer",
     "or": "eller",
     "click": "klikk",
+    "drag": "dra",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "editor": "Redigering",
     "view": "Visning",
     "blog": "Les bloggen vår",
     "howto": "Følg våre veiledninger",
-    "github": "Funnet et problem? Send inn"
+    "github": "Funnet et problem? Send inn",
+    "textNewLine": "Legg til ny linje (tekst)",
+    "textFinish": "Fullfør redigering (tekst)"
   }
 }

@@ -2,17 +2,20 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
+
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
-import { App } from "./components/App";
-import "./styles.scss";
+import App from "./components/App";
+import { register as registerServiceWorker } from "./serviceWorker";
 
-const SentyEnvHostnameMap: { [key: string]: string } = {
+import "./css/styles.scss";
+
+const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
   "now.sh": "staging",
 };
 
-const onlineEnv = Object.keys(SentyEnvHostnameMap).find(
+const onlineEnv = Object.keys(SentryEnvHostnameMap).find(
   (item) => window.location.hostname.indexOf(item) >= 0,
 );
 
@@ -21,8 +24,11 @@ Sentry.init({
   dsn: onlineEnv
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
-  environment: onlineEnv ? SentyEnvHostnameMap[onlineEnv] : undefined,
+  environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
+  ignoreErrors: [
+    "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
+  ],
   integrations: [
     new SentryIntegrations.CaptureConsole({
       levels: ["error"],
@@ -52,3 +58,5 @@ ReactDOM.render(
   </TopErrorBoundary>,
   rootElement,
 );
+
+registerServiceWorker();

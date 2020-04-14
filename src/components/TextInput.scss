@@ -1,0 +1,20 @@
+@import "../css/_variables.scss";
+
+.TextInput {
+  display: inline-block;
+  border: 1.5px solid $oc-gray-2;
+  line-height: 1;
+  padding: 0.75rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  background-color: $oc-white;
+  &:not(:focus) {
+    &:hover {
+      background-color: $oc-gray-1;
+    }
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px $oc-blue-5;
+  }
+}

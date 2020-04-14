@@ -51,7 +51,8 @@
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
-    "untitled": "Başlıksız"
+    "untitled": "Başlıksız",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -140,12 +141,15 @@
     "shapes": "Şekiller",
     "or": "veya",
     "click": "tıkla",
+    "drag": "",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "editor": "Düzenleyici",
     "view": "Görüntüle",
     "blog": "Blog'umuzu okuyun",
     "howto": "Rehberimizi takip edin",
-    "github": "Bir hata mı buldun? Bildir"
+    "github": "Bir hata mı buldun? Bildir",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

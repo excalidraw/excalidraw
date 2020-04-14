@@ -51,7 +51,8 @@
     "language": "Language",
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "name": "Name"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -140,6 +141,7 @@
     "shapes": "Shapes",
     "or": "or",
     "click": "click",
+    "drag": "drag",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "editor": "Editor",

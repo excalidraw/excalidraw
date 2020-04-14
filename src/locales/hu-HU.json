@@ -51,7 +51,8 @@
     "language": "Nyelv",
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -140,12 +141,15 @@
     "shapes": "",
     "or": "",
     "click": "",
+    "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "",
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

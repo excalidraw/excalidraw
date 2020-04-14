@@ -51,7 +51,8 @@
     "language": "语言",
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素",
-    "untitled": "无标题"
+    "untitled": "无标题",
+    "name": "名字"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -140,12 +141,15 @@
     "shapes": "形状",
     "or": "或者",
     "click": "点击",
+    "drag": "",
     "curvedArrow": "曲线（带有箭头）",
     "curvedLine": "曲线（无箭头）",
     "editor": "编辑者",
     "view": "视图",
     "blog": "浏览我们的博客",
     "howto": "跟随我们的指南",
-    "github": "发现问题？提交"
+    "github": "发现问题？提交",
+    "textNewLine": "文本换行",
+    "textFinish": "完成编辑文本"
   }
 }

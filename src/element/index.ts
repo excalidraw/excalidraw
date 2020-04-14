@@ -1,4 +1,8 @@
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+} from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
 
 export {
@@ -67,4 +71,10 @@ export function getNonDeletedElements(elements: readonly ExcalidrawElement[]) {
     elements.filter((element) => !element.isDeleted) as
     readonly NonDeletedExcalidrawElement[]
   );
+}
+
+export function isNonDeletedElement<T extends ExcalidrawElement>(
+  element: T,
+): element is NonDeleted<T> {
+  return !element.isDeleted;
 }

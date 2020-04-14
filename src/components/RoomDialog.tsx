@@ -78,12 +78,12 @@ function RoomModal({
           </div>
           <div className="RoomDialog-usernameContainer">
             <label className="RoomDialog-usernameLabel" htmlFor="username">
-              Username:
+              {t("labels.name")}
             </label>
             <input
               id="username"
               value={username || ""}
-              className="RoomDialog-username"
+              className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
             />
           </div>

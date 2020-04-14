@@ -19,8 +19,8 @@
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
-    "fontSize": "Rozmiar czcionki",
-    "fontFamily": "Nazwa czcionki",
+    "fontSize": "Rozmiar tekstu",
+    "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
     "withBackground": "Z tłem dokumentu",
     "handDrawn": "Odręczny",
@@ -50,8 +50,9 @@
     "actions": "Akcje",
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
-    "duplicateSelection": "Duplikuj",
-    "untitled": "Bez tytułu"
+    "duplicateSelection": "Powiel",
+    "untitled": "Bez tytułu",
+    "name": "Nazwa"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -140,12 +141,15 @@
     "shapes": "Kształty",
     "or": "lub",
     "click": "kliknięcie",
+    "drag": "przeciągnij",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "editor": "Edytor",
     "view": "Widok",
     "blog": "Przeczytaj naszego bloga",
     "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go"
+    "github": "Znalazłeś problem? Zgłoś go",
+    "textNewLine": "Dodaj nową linię (tekst)",
+    "textFinish": "Zakończ edycję (tekst)"
   }
 }

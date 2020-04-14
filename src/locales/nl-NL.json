@@ -51,7 +51,8 @@
     "language": "Taal",
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
-    "untitled": "Naamloos"
+    "untitled": "Naamloos",
+    "name": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -140,12 +141,15 @@
     "shapes": "Vormen",
     "or": "of",
     "click": "klik",
+    "drag": "slepen",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Gebogen lijn",
     "editor": "Editor",
     "view": "Weergave",
     "blog": "Lees onze blog",
     "howto": "Volg onze handleidingen",
-    "github": "Probleem gevonden? Stuur een nieuwe issue"
+    "github": "Probleem gevonden? Stuur een nieuwe issue",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }

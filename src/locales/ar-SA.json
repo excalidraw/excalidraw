@@ -51,7 +51,8 @@
     "language": "اللغة",
     "createRoom": "مشاركة الجلسة مباشرة",
     "duplicateSelection": "",
-    "untitled": ""
+    "untitled": "",
+    "name": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -140,12 +141,15 @@
     "shapes": "",
     "or": "",
     "click": "",
+    "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "",
     "view": "",
     "blog": "",
     "howto": "",
-    "github": ""
+    "github": "",
+    "textNewLine": "",
+    "textFinish": ""
   }
 }
