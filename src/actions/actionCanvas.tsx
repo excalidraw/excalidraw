@@ -197,18 +197,19 @@ const getPartiallyVisibleElements = (
 export const actionZoomCenter = register({
   name: "zoomCenter",
   perform: (elements, appState) => {
-    const scrollCenter = calculateScrollCenter(elements);
+    const nonDeletedElements = elements.filter((element) => !element.isDeleted);
+    const scrollCenter = calculateScrollCenter(nonDeletedElements);
     const { zoom } = appState;
     let newZoom = zoom;
     let partiallyVisibleElements = getPartiallyVisibleElements(
-      elements,
+      nonDeletedElements,
       zoom,
       scrollCenter,
     );
 
     while (partiallyVisibleElements.length !== 0) {
       partiallyVisibleElements = getPartiallyVisibleElements(
-        elements,
+        nonDeletedElements,
         newZoom,
         scrollCenter,
       );
