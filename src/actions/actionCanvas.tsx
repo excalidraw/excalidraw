@@ -173,25 +173,27 @@ const getPartiallyVisibleElements = (
     scrollY: FlooredNumber;
   },
 ) => {
-  return elements
-    .map((element) => {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-      const { innerHeight, innerWidth } = window;
-      const viewportWidthWithZoom = innerWidth / zoom;
-      const viewportHeightWithZoom = innerHeight / zoom;
-      const viewportWidthDiff = innerWidth - viewportWidthWithZoom;
-      const viewportHeightDiff = innerHeight - viewportHeightWithZoom;
+  const partiallyVisibleElements: boolean[] = [];
+  elements.forEach((element) => {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const { innerHeight, innerWidth } = window;
+    const viewportWidthWithZoom = innerWidth / zoom;
+    const viewportHeightWithZoom = innerHeight / zoom;
+    const viewportWidthDiff = innerWidth - viewportWidthWithZoom;
+    const viewportHeightDiff = innerHeight - viewportHeightWithZoom;
+    const isPartiallyHidden =
+      x2 + scrollX - viewportWidthDiff / 2 >= element.width &&
+      x1 + scrollX - viewportWidthDiff / 2 <=
+        viewportWidthWithZoom - element.width &&
+      y2 + scrollY - viewportHeightDiff / 2 >= element.height &&
+      y1 + scrollY - viewportHeightDiff / 2 <=
+        viewportHeightWithZoom - element.height;
 
-      return (
-        x2 + scrollX - viewportWidthDiff / 2 >= element.width &&
-        x1 + scrollX - viewportWidthDiff / 2 <=
-          viewportWidthWithZoom - element.width &&
-        y2 + scrollY - viewportHeightDiff / 2 >= element.height &&
-        y1 + scrollY - viewportHeightDiff / 2 <=
-          viewportHeightWithZoom - element.height
-      );
-    })
-    .filter((element) => !element);
+    if (!isPartiallyHidden) {
+      partiallyVisibleElements.push(isPartiallyHidden);
+    }
+  });
+  return partiallyVisibleElements;
 };
 
 export const actionZoomCenter = register({
