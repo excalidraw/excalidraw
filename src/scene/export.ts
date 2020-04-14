@@ -1,4 +1,5 @@
 import rough from "roughjs/bin/rough";
+import oc from "open-color";
 import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
@@ -151,7 +152,7 @@ function getWatermarkElement(maxX: number, maxY: number) {
     textAlign: "center",
     x: maxX - textWidth / 2,
     y: maxY + 16,
-    strokeColor: "#adb5bd", // OC Gray 5
+    strokeColor: oc.gray[5],
     backgroundColor: "transparent",
     fillStyle: "hachure",
     strokeWidth: 1,
