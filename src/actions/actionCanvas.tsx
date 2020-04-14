@@ -79,6 +79,7 @@ const KEY_CODES = {
   NUM_SUBTRACT: "NumpadSubtract",
   NUM_ADD: "NumpadAdd",
   NUM_ZERO: "Numpad0",
+  C: "KeyC",
 };
 
 export const actionZoomIn = register({
@@ -181,7 +182,7 @@ const getPartiallyVisibleElements = (
     const viewportHeightWithZoom = innerHeight / zoom;
     const viewportWidthDiff = innerWidth - viewportWidthWithZoom;
     const viewportHeightDiff = innerHeight - viewportHeightWithZoom;
-    const isPartiallyHidden =
+    const isFullyVisible =
       x2 + scrollX - viewportWidthDiff / 2 >= element.width &&
       x1 + scrollX - viewportWidthDiff / 2 <=
         viewportWidthWithZoom - element.width &&
@@ -189,8 +190,8 @@ const getPartiallyVisibleElements = (
       y1 + scrollY - viewportHeightDiff / 2 <=
         viewportHeightWithZoom - element.height;
 
-    if (!isPartiallyHidden) {
-      partiallyVisibleElements.push(isPartiallyHidden);
+    if (!isFullyVisible) {
+      partiallyVisibleElements.push(isFullyVisible);
     }
   });
   return partiallyVisibleElements;
@@ -233,15 +234,6 @@ export const actionZoomCenter = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={"x"}
-      title={""}
-      aria-label={""}
-      onClick={() => {
-        updateData(null);
-      }}
-    />
-  ),
+  keyTest: (event) =>
+    event.code === KEY_CODES.C && event[KEYS.CTRL_OR_CMD] && event.shiftKey,
 });
