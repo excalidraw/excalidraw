@@ -13,7 +13,7 @@ import {
 import {
   getElementAbsoluteCoords,
   getCommonBounds,
-  getLinearElementResizedAbsoluteWidthHeight,
+  getResizedElementAbsoluteBounds,
 } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -183,20 +183,8 @@ export const resizeElements = (
       );
     } else if (resizeHandle) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-      const calculateXYDeltas = (
-        nextWidth: number,
-        nextHeight: number,
-      ): [number, number] => {
-        if (!isLinearElement(element) || element.points.length <= 2) {
-          return [element.width - nextWidth, element.height - nextHeight];
-        }
-        const [w, h] = getLinearElementResizedAbsoluteWidthHeight(
-          element,
-          nextWidth,
-          nextHeight,
-        );
-        return [x2 - x1 - w, y2 - y1 - h];
-      };
+      const calculateResizedBounds = (nextWidth: number, nextHeight: number) =>
+        getResizedElementAbsoluteBounds(element, nextWidth, nextHeight);
       const resized = resizeXYWidthHightWithRotation(
         resizeHandle,
         x1,
@@ -211,7 +199,7 @@ export const resizeElements = (
         xPointer,
         yPointer,
         offsetPointer,
-        calculateXYDeltas,
+        calculateResizedBounds,
         event.shiftKey,
       );
       if (resized.width !== 0 && resized.height !== 0) {

@@ -304,11 +304,20 @@ export const getCommonBounds = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getLinearElementResizedAbsoluteWidthHeight = (
-  element: ExcalidrawLinearElement,
+export const getResizedElementAbsoluteBounds = (
+  element: ExcalidrawElement,
   nextWidth: number,
   nextHeight: number,
-): [number, number] => {
+): [number, number, number, number] => {
+  if (!isLinearElement(element) || element.points.length <= 2) {
+    return [
+      element.x,
+      element.y,
+      element.x + nextWidth,
+      element.y + nextHeight,
+    ];
+  }
+
   const points = rescalePoints(
     0,
     nextWidth,
@@ -324,5 +333,10 @@ export const getLinearElementResizedAbsoluteWidthHeight = (
   const curve = gen.curve(points as [number, number][], options);
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-  return [maxX - minX, maxY - minY];
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
 };

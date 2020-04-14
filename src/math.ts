@@ -101,7 +101,10 @@ export const resizeXYWidthHightWithRotation = (
   xPointer: number,
   yPointer: number,
   offsetPointer: number,
-  calculateXYDeltas: (w: number, h: number) => [number, number],
+  calculateResizedBounds: (
+    nextWidth: number,
+    nextHeight: number,
+  ) => [number, number, number, number],
   sidesWithSameLength: boolean,
 ) => {
   // center point for rotation
@@ -131,7 +134,25 @@ export const resizeXYWidthHightWithRotation = (
   if (sidesWithSameLength) {
     nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
   }
-  const [deltaX, deltaY] = calculateXYDeltas(nextWidth, nextHeight);
+
+  const [nextX1, nextY1, nextX2, nextY2] = calculateResizedBounds(
+    nextWidth,
+    nextHeight,
+  );
+  let deltaX = 0;
+  let deltaY = 0;
+  if (side === "e" || side === "ne" || side === "se") {
+    deltaX = x1 - nextX1 + elementWidth - nextWidth;
+  }
+  if (side === "s" || side === "sw" || side === "se") {
+    deltaY = y1 - nextY1 + elementHeight - nextHeight;
+  }
+  if (side === "w" || side === "nw" || side === "sw") {
+    deltaX = x2 - nextX2;
+  }
+  if (side === "n" || side === "nw" || side === "ne") {
+    deltaY = y2 - nextY2;
+  }
 
   return {
     width: nextWidth,
