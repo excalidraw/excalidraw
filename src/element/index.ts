@@ -67,10 +67,9 @@ export function getDrawingVersion(elements: readonly ExcalidrawElement[]) {
 }
 
 export function getNonDeletedElements(elements: readonly ExcalidrawElement[]) {
-  return (
-    elements.filter((element) => !element.isDeleted) as
-    readonly NonDeletedExcalidrawElement[]
-  );
+  return elements.filter(
+    (element) => !element.isDeleted,
+  ) as readonly NonDeletedExcalidrawElement[];
 }
 
 export function isNonDeletedElement<T extends ExcalidrawElement>(
