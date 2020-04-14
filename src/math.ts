@@ -46,7 +46,7 @@ export function rotate(
   x2: number,
   y2: number,
   angle: number,
-) {
+): [number, number] {
   // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
   // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
   // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
@@ -89,21 +89,24 @@ const adjustXYWithRotation = (
 
 export const resizeXYWidthHightWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  offsetX: number,
-  offsetY: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  elementWidth: number,
+  elementHeight: number,
+  elementX: number,
+  elementY: number,
   angle: number,
   xPointer: number,
   yPointer: number,
   offsetPointer: number,
+  calculateXYDeltas: (w: number, h: number) => [number, number],
   sidesWithSameLength: boolean,
 ) => {
   // center point for rotation
-  const cx = x + width / 2;
-  const cy = y + height / 2;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
 
   // rotation with current angle
   const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
@@ -111,35 +114,29 @@ export const resizeXYWidthHightWithRotation = (
   let scaleX = 1;
   let scaleY = 1;
   if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offsetPointer - x) / width;
+    scaleX = (rotatedX - offsetPointer - x1) / (x2 - x1);
   }
   if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offsetPointer - y) / height;
+    scaleY = (rotatedY - offsetPointer - y1) / (y2 - y1);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x + width - offsetPointer - rotatedX) / width;
+    scaleX = (x2 - offsetPointer - rotatedX) / (x2 - x1);
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y + height - offsetPointer - rotatedY) / height;
+    scaleY = (y2 - offsetPointer - rotatedY) / (y2 - y1);
   }
 
-  let nextWidth = width * scaleX;
-  let nextHeight = height * scaleY;
+  let nextWidth = elementWidth * scaleX;
+  let nextHeight = elementHeight * scaleY;
   if (sidesWithSameLength) {
     nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
   }
+  const [deltaX, deltaY] = calculateXYDeltas(nextWidth, nextHeight);
 
   return {
     width: nextWidth,
     height: nextHeight,
-    ...adjustXYWithRotation(
-      side,
-      x - offsetX,
-      y - offsetY,
-      angle,
-      width - nextWidth,
-      height - nextHeight,
-    ),
+    ...adjustXYWithRotation(side, elementX, elementY, angle, deltaX, deltaY),
   };
 };
 

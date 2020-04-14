@@ -10,7 +10,11 @@ import {
   NonDeleted,
   ResizeArrowFnType,
 } from "./types";
-import { getElementAbsoluteCoords, getCommonBounds } from "./bounds";
+import {
+  getElementAbsoluteCoords,
+  getCommonBounds,
+  getLinearElementResizedAbsoluteWidthHeight,
+} from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize, normalizeDimensions } from "./sizeHelpers";
@@ -178,19 +182,36 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
-      const [x1, y1] = getElementAbsoluteCoords(element);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const calculateXYDeltas = (
+        nextWidth: number,
+        nextHeight: number,
+      ): [number, number] => {
+        if (!isLinearElement(element) || element.points.length <= 2) {
+          return [element.width - nextWidth, element.height - nextHeight];
+        }
+        const [w, h] = getLinearElementResizedAbsoluteWidthHeight(
+          element,
+          nextWidth,
+          nextHeight,
+        );
+        return [x2 - x1 - w, y2 - y1 - h];
+      };
       const resized = resizeXYWidthHightWithRotation(
         resizeHandle,
         x1,
         y1,
+        x2,
+        y2,
         element.width,
         element.height,
-        x1 - element.x,
-        y1 - element.y,
+        element.x,
+        element.y,
         element.angle,
         xPointer,
         yPointer,
         offsetPointer,
+        calculateXYDeltas,
         event.shiftKey,
       );
       if (resized.width !== 0 && resized.height !== 0) {
