@@ -78,27 +78,27 @@ const adjustXYWithRotation = (
     }
   }
   if (side === "s" || side === "sw" || side === "se") {
-    x += deltaY * sin;
-    y += deltaY * (1 - cos);
     if (isResizeFromCenter) {
-      x += deltaY * -sin;
-      y += deltaY * cos;
+      y += deltaY;
+    } else {
+      x += deltaY * sin;
+      y += deltaY * (1 - cos);
     }
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    x += deltaX * (1 + cos);
-    y += deltaX * sin;
     if (isResizeFromCenter) {
-      x -= deltaX * cos;
-      y -= deltaX * sin;
+      x += deltaX;
+    } else {
+      x += deltaX * (1 + cos);
+      y += deltaX * sin;
     }
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    x += deltaY * -sin;
-    y += deltaY * (1 + cos);
     if (isResizeFromCenter) {
-      x -= deltaY * -sin;
-      y -= deltaY * cos;
+      y += deltaY;
+    } else {
+      x += deltaY * -sin;
+      y += deltaY * (1 + cos);
     }
   }
   return { x, y };
