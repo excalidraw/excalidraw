@@ -10,9 +10,9 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState } from "../types";
+import { AppState, FlooredNumber } from "../types";
 import { ExcalidrawElement } from "../element/types";
-import { getElementBounds } from "../element";
+import { getElementAbsoluteCoords } from "../element";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -162,91 +162,70 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-type ExceedCoords = {
-  exceedX1: number;
-  exceedX2: number;
-  exceedY1: number;
-  exceedY2: number;
-};
-
-function getOutsideElements(
+const getPartiallyVisibleElements = (
   elements: readonly ExcalidrawElement[],
-): ExceedCoords[] {
-  const outsideElements: ExceedCoords[] = [];
-  const { innerWidth, innerHeight } = window;
+  zoom: number,
+  {
+    scrollX,
+    scrollY,
+  }: {
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
+  },
+) => {
+  return elements
+    .map((element) => {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const { innerHeight, innerWidth } = window;
+      const viewportWidthWithZoom = innerWidth / zoom;
+      const viewportHeightWithZoom = innerHeight / zoom;
+      const viewportWidthDiff = innerWidth - viewportWidthWithZoom;
+      const viewportHeightDiff = innerHeight - viewportHeightWithZoom;
 
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element);
-    if (x2 > innerWidth || y2 > innerHeight) {
-      outsideElements.push({
-        exceedX1: 0,
-        exceedX2: x2 > innerWidth ? x2 - innerWidth : 0,
-        exceedY1: 0,
-        exceedY2: y2 > innerHeight ? y2 - innerHeight : 0,
-      });
-    } else if (x1 < 0 || y1 < 0) {
-      outsideElements.push({
-        exceedX1: x1 < 0 ? Math.abs(x1) : 0,
-        exceedX2: 0,
-        exceedY1: y1 < 0 ? Math.abs(y1) : 0,
-        exceedY2: 0,
-      });
-    }
-  });
-
-  return outsideElements;
-}
-
-function getZoomValue(greatestExcess: {
-  type: string;
-  excess: number;
-}): number {
-  const { innerWidth, innerHeight } = window;
-  const { excess, type } = greatestExcess;
-  let zoom = 1;
-
-  if (type === "x") {
-    zoom = innerWidth / (excess + innerWidth);
-  } else if (type === "y") {
-    zoom = innerHeight / (excess + innerHeight);
-  }
-
-  if (zoom <= 0.1) {
-    zoom = 0.1;
-  } else if (zoom >= 1) {
-    zoom = 1;
-  }
-
-  return zoom;
-}
+      return (
+        x2 + scrollX - viewportWidthDiff / 2 >= element.width &&
+        x1 + scrollX - viewportWidthDiff / 2 <=
+          viewportWidthWithZoom - element.width &&
+        y2 + scrollY - viewportHeightDiff / 2 >= element.height &&
+        y1 + scrollY - viewportHeightDiff / 2 <=
+          viewportHeightWithZoom - element.height
+      );
+    })
+    .filter((element) => !element);
+};
 
 export const actionZoomCenter = register({
   name: "zoomCenter",
-  perform: (_elements, appState) => {
-    let greatestExcess = { type: "", excess: 0 };
-
-    getOutsideElements(_elements).forEach(
-      ({ exceedX1, exceedY1, exceedX2, exceedY2 }: ExceedCoords) => {
-        if (exceedX1 > greatestExcess.excess) {
-          greatestExcess = { type: "x", excess: exceedX1 };
-        }
-        if (exceedX2 > greatestExcess.excess) {
-          greatestExcess = { type: "x", excess: exceedX2 };
-        }
-        if (exceedY1 > greatestExcess.excess) {
-          greatestExcess = { type: "y", excess: exceedY1 };
-        }
-        if (exceedY2 > greatestExcess.excess) {
-          greatestExcess = { type: "y", excess: exceedY2 };
-        }
-      },
+  perform: (elements, appState) => {
+    const scrollCenter = calculateScrollCenter(elements);
+    const { zoom } = appState;
+    let newZoom = zoom;
+    let partiallyVisibleElements = getPartiallyVisibleElements(
+      elements,
+      zoom,
+      scrollCenter,
     );
+
+    while (partiallyVisibleElements.length !== 0) {
+      partiallyVisibleElements = getPartiallyVisibleElements(
+        elements,
+        newZoom,
+        scrollCenter,
+      );
+      newZoom -= 0.01;
+    }
+
+    if (newZoom >= 1) {
+      newZoom = 1;
+    } else if (newZoom <= 0.1) {
+      newZoom = 0.1;
+    }
 
     return {
       appState: {
         ...appState,
-        zoom: getZoomValue(greatestExcess),
-        ...calculateScrollCenter(_elements),
+        zoom: newZoom,
+        ...scrollCenter,
       },
       commitToHistory: false,
     };
