@@ -53,7 +53,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
-  function renderExportDialog() {
+  const renderExportDialog = () => {
     const createExporter = (type: ExportType): ExportCB => (
       exportedElements,
       scale,
@@ -91,73 +91,59 @@ const LayerUI = ({
         }}
       />
     );
-  }
+  };
 
-  return isMobile ? (
-    <MobileMenu
-      appState={appState}
-      elements={elements}
-      actionManager={actionManager}
-      exportButton={renderExportDialog()}
-      setAppState={setAppState}
-      onUsernameChange={onUsernameChange}
-      onRoomCreate={onRoomCreate}
-      onRoomDestroy={onRoomDestroy}
-      onLockToggle={onLockToggle}
-    />
-  ) : (
-    <>
-      {appState.isLoading && <LoadingMessage />}
-      {appState.errorMessage && (
-        <ErrorDialog
-          message={appState.errorMessage}
-          onClose={() => setAppState({ errorMessage: null })}
+  const renderCanvasActions = () => (
+    <Section heading="canvasActions">
+      {/* the zIndex ensures this menu has higher stacking order,
+         see https://github.com/excalidraw/excalidraw/pull/1445 */}
+      <Island padding={4} style={{ zIndex: 1 }}>
+        <Stack.Col gap={4}>
+          <Stack.Row gap={1} justifyContent="space-between">
+            {actionManager.renderAction("loadScene")}
+            {actionManager.renderAction("saveScene")}
+            {renderExportDialog()}
+            {actionManager.renderAction("clearCanvas")}
+            <RoomDialog
+              isCollaborating={appState.isCollaborating}
+              collaboratorCount={appState.collaborators.size}
+              username={appState.username}
+              onUsernameChange={onUsernameChange}
+              onRoomCreate={onRoomCreate}
+              onRoomDestroy={onRoomDestroy}
+            />
+          </Stack.Row>
+          {actionManager.renderAction("changeViewBackgroundColor")}
+        </Stack.Col>
+      </Island>
+    </Section>
+  );
+
+  const renderSelectedShapeActions = () => (
+    <Section heading="selectedShapeActions">
+      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
+        <SelectedShapeActions
+          appState={appState}
+          elements={elements}
+          renderAction={actionManager.renderAction}
+          elementType={appState.elementType}
         />
-      )}
-      {appState.showShortcutsDialog && (
-        <ShortcutsDialog
-          onClose={() => setAppState({ showShortcutsDialog: null })}
-        />
-      )}
+      </Island>
+    </Section>
+  );
+
+  const renderFixedSideContainer = () => {
+    const shouldRenderSelectedShapeActions = showSelectedShapeActions(
+      appState,
+      elements,
+    );
+    return (
       <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col gap={4}>
-            <Section heading="canvasActions">
-              {/* the zIndex ensures this menu has higher stacking order,
-                     see https://github.com/excalidraw/excalidraw/pull/1445 */}
-              <Island padding={4} style={{ zIndex: 1 }}>
-                <Stack.Col gap={4}>
-                  <Stack.Row gap={1} justifyContent={"space-between"}>
-                    {actionManager.renderAction("loadScene")}
-                    {actionManager.renderAction("saveScene")}
-                    {renderExportDialog()}
-                    {actionManager.renderAction("clearCanvas")}
-                    <RoomDialog
-                      isCollaborating={appState.isCollaborating}
-                      collaboratorCount={appState.collaborators.size}
-                      username={appState.username}
-                      onUsernameChange={onUsernameChange}
-                      onRoomCreate={onRoomCreate}
-                      onRoomDestroy={onRoomDestroy}
-                    />
-                  </Stack.Row>
-                  {actionManager.renderAction("changeViewBackgroundColor")}
-                </Stack.Col>
-              </Island>
-            </Section>
-            {showSelectedShapeActions(appState, elements) && (
-              <Section heading="selectedShapeActions">
-                <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
-                  <SelectedShapeActions
-                    appState={appState}
-                    elements={elements}
-                    renderAction={actionManager.renderAction}
-                    elementType={appState.elementType}
-                  />
-                </Island>
-              </Section>
-            )}
+            {renderCanvasActions()}
+            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           <Section heading="shapes">
             {(heading) => (
@@ -196,30 +182,64 @@ const LayerUI = ({
           </Stack.Col>
         </div>
       </FixedSideContainer>
+    );
+  };
+
+  const renderFooter = () => (
+    <footer role="contentinfo">
+      <LanguageList
+        onChange={(lng) => {
+          setLanguage(lng);
+          setAppState({});
+        }}
+        languages={languages}
+        floating
+      />
+      {actionManager.renderAction("toggleShortcuts")}
+      {appState.scrolledOutside && (
+        <button
+          className="scroll-back-to-content"
+          onClick={() => {
+            setAppState({ ...calculateScrollCenter(elements) });
+          }}
+        >
+          {t("buttons.scrollBackToContent")}
+        </button>
+      )}
+    </footer>
+  );
+
+  return isMobile ? (
+    <MobileMenu
+      appState={appState}
+      elements={elements}
+      actionManager={actionManager}
+      exportButton={renderExportDialog()}
+      setAppState={setAppState}
+      onUsernameChange={onUsernameChange}
+      onRoomCreate={onRoomCreate}
+      onRoomDestroy={onRoomDestroy}
+      onLockToggle={onLockToggle}
+    />
+  ) : (
+    <>
+      {appState.isLoading && <LoadingMessage />}
+      {appState.errorMessage && (
+        <ErrorDialog
+          message={appState.errorMessage}
+          onClose={() => setAppState({ errorMessage: null })}
+        />
+      )}
+      {appState.showShortcutsDialog && (
+        <ShortcutsDialog
+          onClose={() => setAppState({ showShortcutsDialog: null })}
+        />
+      )}
+      {renderFixedSideContainer()}
       <aside>
         <GitHubCorner />
       </aside>
-      <footer role="contentinfo">
-        <LanguageList
-          onChange={(lng) => {
-            setLanguage(lng);
-            setAppState({});
-          }}
-          languages={languages}
-          floating
-        />
-        {actionManager.renderAction("toggleShortcuts")}
-        {appState.scrolledOutside && (
-          <button
-            className="scroll-back-to-content"
-            onClick={() => {
-              setAppState({ ...calculateScrollCenter(elements) });
-            }}
-          >
-            {t("buttons.scrollBackToContent")}
-          </button>
-        )}
-      </footer>
+      {renderFooter()}
     </>
   );
 };
