@@ -15,12 +15,14 @@ function RoomModal({
   onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
+  onPressingEnter,
 }: {
   activeRoomLink: string;
   username: string;
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
+  onPressingEnter: () => void;
 }) {
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
@@ -85,6 +87,7 @@ function RoomModal({
               value={username || ""}
               className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
+              onKeyPress={(event) => event.key === "Enter" && onPressingEnter()}
             />
           </div>
           <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
@@ -173,6 +176,7 @@ export function RoomDialog({
             onUsernameChange={onUsernameChange}
             onRoomCreate={onRoomCreate}
             onRoomDestroy={onRoomDestroy}
+            onPressingEnter={handleClose}
           />
         </Dialog>
       )}
