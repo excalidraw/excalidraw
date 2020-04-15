@@ -12,3 +12,4 @@ static
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
+.idea
