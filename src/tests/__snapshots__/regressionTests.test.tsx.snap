@@ -2,6 +2,7 @@
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -96,6 +97,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -135,6 +137,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -202,6 +205,7 @@ exports[`regression tests alt-drag duplicates an element: [end of test] number o
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -273,6 +277,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -320,6 +325,7 @@ exports[`regression tests arrow keys: [end of test] number of renders 1`] = `12`
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
@@ -391,6 +397,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -430,6 +437,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -469,6 +477,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "#fa5252",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -508,6 +517,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "#fa5252",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -547,6 +557,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "#fa5252",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -594,6 +605,7 @@ exports[`regression tests change the properties of a shape: [end of test] number
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -666,6 +678,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -705,6 +718,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -753,6 +767,7 @@ exports[`regression tests click on an element and drag it: [dragged] number of r
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -826,6 +841,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -865,6 +881,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -905,6 +922,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -954,6 +972,7 @@ exports[`regression tests click on an element and drag it: [end of test] number 
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1048,6 +1067,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1087,6 +1107,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1145,6 +1166,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1212,6 +1234,7 @@ exports[`regression tests click to select a shape: [end of test] number of rende
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1329,6 +1352,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1368,6 +1392,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1426,6 +1451,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1503,6 +1529,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1590,6 +1617,7 @@ exports[`regression tests click-drag to select a group: [end of test] number of 
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1794,6 +1822,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1811,6 +1840,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1850,6 +1880,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1908,6 +1939,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -1985,6 +2017,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2092,6 +2125,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2237,6 +2271,7 @@ exports[`regression tests draw every type of shape: [end of test] number of rend
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2308,6 +2343,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2355,6 +2391,7 @@ exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number 
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2426,6 +2463,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2473,6 +2511,7 @@ exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2544,6 +2583,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2591,6 +2631,7 @@ exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2673,6 +2714,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2731,6 +2773,7 @@ exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of r
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2813,6 +2856,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -2871,6 +2915,7 @@ exports[`regression tests hotkey 6 selects line tool: [end of test] number of re
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2953,6 +2998,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3011,6 +3057,7 @@ exports[`regression tests hotkey a selects arrow tool: [end of test] number of r
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3082,6 +3129,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3129,6 +3177,7 @@ exports[`regression tests hotkey d selects diamond tool: [end of test] number of
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3200,6 +3249,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3247,6 +3297,7 @@ exports[`regression tests hotkey e selects ellipse tool: [end of test] number of
 
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3329,6 +3380,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3387,6 +3439,7 @@ exports[`regression tests hotkey l selects line tool: [end of test] number of re
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3458,6 +3511,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3505,6 +3559,7 @@ exports[`regression tests hotkey r selects rectangle tool: [end of test] number 
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3561,6 +3616,7 @@ exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -3648,6 +3704,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3687,6 +3744,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3727,6 +3785,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3768,6 +3827,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3810,6 +3870,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3853,6 +3914,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3897,6 +3959,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3942,6 +4005,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -3988,6 +4052,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4035,6 +4100,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4083,6 +4149,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4132,6 +4199,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4182,6 +4250,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4233,6 +4302,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4285,6 +4355,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4338,6 +4409,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4392,6 +4464,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4455,6 +4528,7 @@ exports[`regression tests resize an element, trying every resize handle: [end of
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4533,6 +4607,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4572,6 +4647,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4612,6 +4688,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4653,6 +4730,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4695,6 +4773,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4738,6 +4817,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4782,6 +4862,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4827,6 +4908,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4881,6 +4963,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4957,6 +5040,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -4996,6 +5080,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5036,6 +5121,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5077,6 +5163,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5119,6 +5206,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5162,6 +5250,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5214,6 +5303,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5288,6 +5378,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5327,6 +5418,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5367,6 +5459,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5408,6 +5501,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5458,6 +5552,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5530,6 +5625,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5569,6 +5665,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5617,6 +5714,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5703,6 +5801,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5742,6 +5841,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5782,6 +5882,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5823,6 +5924,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5865,6 +5967,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5908,6 +6011,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5952,6 +6056,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -5997,6 +6102,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6043,6 +6149,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6090,6 +6197,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6138,6 +6246,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6187,6 +6296,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6237,6 +6347,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6288,6 +6399,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6340,6 +6452,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6393,6 +6506,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6455,6 +6569,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -6539,6 +6654,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6578,6 +6694,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6618,6 +6735,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6659,6 +6777,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6701,6 +6820,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6744,6 +6864,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6788,6 +6909,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6833,6 +6955,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6879,6 +7002,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6926,6 +7050,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -6974,6 +7099,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7023,6 +7149,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7073,6 +7200,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7124,6 +7252,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7184,6 +7313,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -7266,6 +7396,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7305,6 +7436,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7345,6 +7477,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7386,6 +7519,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7428,6 +7562,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7471,6 +7606,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7515,6 +7651,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7560,6 +7697,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7606,6 +7744,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7653,6 +7792,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7701,6 +7841,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7750,6 +7891,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7808,6 +7950,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -7888,6 +8031,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7927,6 +8071,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -7967,6 +8112,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8008,6 +8154,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8050,6 +8197,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8093,6 +8241,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8137,6 +8286,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8182,6 +8332,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8228,6 +8379,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8275,6 +8427,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8331,6 +8484,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -8410,6 +8564,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8449,6 +8604,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8489,6 +8645,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8530,6 +8687,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8572,6 +8730,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8615,6 +8774,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8659,6 +8819,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8704,6 +8865,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8750,6 +8912,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8805,6 +8968,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -8882,6 +9046,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8921,6 +9086,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -8961,6 +9127,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9002,6 +9169,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9044,6 +9212,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9087,6 +9256,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9131,6 +9301,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9184,6 +9355,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -9259,6 +9431,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9298,6 +9471,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9338,6 +9512,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9379,6 +9554,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9421,6 +9597,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9472,6 +9649,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -9545,6 +9723,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9584,6 +9763,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9624,6 +9804,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9673,6 +9854,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -9760,6 +9942,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9799,6 +9982,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9839,6 +10023,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9880,6 +10065,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9922,6 +10108,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -9965,6 +10152,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10009,6 +10197,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10054,6 +10243,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10100,6 +10290,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10147,6 +10338,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10195,6 +10387,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10244,6 +10437,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10294,6 +10488,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10345,6 +10540,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10397,6 +10593,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10450,6 +10647,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10504,6 +10702,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10567,6 +10766,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -10652,6 +10852,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10691,6 +10892,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10731,6 +10933,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10772,6 +10975,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10814,6 +11018,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10857,6 +11062,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10901,6 +11107,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10946,6 +11153,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -10992,6 +11200,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11039,6 +11248,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11087,6 +11297,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11136,6 +11347,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11186,6 +11398,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11237,6 +11450,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11289,6 +11503,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11350,6 +11565,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -11433,6 +11649,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11472,6 +11689,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11512,6 +11730,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11553,6 +11772,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11595,6 +11815,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11638,6 +11859,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11682,6 +11904,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11727,6 +11950,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11773,6 +11997,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11820,6 +12045,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11868,6 +12094,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11917,6 +12144,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -11967,6 +12195,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12026,6 +12255,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -12107,6 +12337,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12146,6 +12377,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12186,6 +12418,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12227,6 +12460,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12269,6 +12503,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12312,6 +12547,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12356,6 +12592,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12401,6 +12638,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12447,6 +12685,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12494,6 +12733,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12542,6 +12782,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12599,6 +12840,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests shift-click to select a group, then drag: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -12696,6 +12938,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12735,6 +12978,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12793,6 +13037,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12852,6 +13097,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12913,6 +13159,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -12983,6 +13230,7 @@ exports[`regression tests shift-click to select a group, then drag: [end of test
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -13037,6 +13285,7 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] numb
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -13093,6 +13342,7 @@ exports[`regression tests two-finger scroll works: [end of test] number of rende
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -13207,6 +13457,7 @@ Object {
   "redoStack": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -13286,6 +13537,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -13325,6 +13577,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "addWatermark": false,
         "currentItemBackgroundColor": "transparent",
         "currentItemFillStyle": "hachure",
         "currentItemFont": "20px Virgil",
@@ -13391,6 +13644,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] number of 
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
+  "addWatermark": false,
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
