@@ -37,16 +37,22 @@ export function exportToCanvas(
     return tempCanvas;
   },
 ) {
+  let sceneElements = elements;
+  if (addWatermark) {
+    const [, , maxX, maxY] = getCommonBounds(elements);
+    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
+  }
+
   // calculate smallest area to fit the contents in
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
-    distance(minY, maxY) + exportPadding * 2 + (addWatermark ? 16 : 0);
+    distance(minY, maxY) + exportPadding + (addWatermark ? 0 : exportPadding);
 
   const tempCanvas: any = createCanvas(width, height);
 
   renderScene(
-    addWatermark ? [...elements, getWatermarkElement(maxX, maxY)] : elements,
+    sceneElements,
     appState,
     null,
     scale,
@@ -86,11 +92,17 @@ export function exportToSvg(
     addWatermark: boolean;
   },
 ): SVGSVGElement {
+  let sceneElements = elements;
+  if (addWatermark) {
+    const [, , maxX, maxY] = getCommonBounds(elements);
+    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
+  }
+
   // calculate canvas dimensions
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
-    distance(minY, maxY) + exportPadding * 2 + (addWatermark ? 16 : 0);
+    distance(minY, maxY) + exportPadding + (addWatermark ? 0 : exportPadding);
 
   // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -126,15 +138,10 @@ export function exportToSvg(
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(
-    addWatermark ? [...elements, getWatermarkElement(maxX, maxY)] : elements,
-    rsvg,
-    svgRoot,
-    {
-      offsetX: -minX + exportPadding,
-      offsetY: -minY + exportPadding,
-    },
-  );
+  renderSceneToSvg(sceneElements, rsvg, svgRoot, {
+    offsetX: -minX + exportPadding,
+    offsetY: -minY + exportPadding,
+  });
 
   return svgRoot;
 }
