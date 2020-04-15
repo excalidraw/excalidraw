@@ -135,13 +135,10 @@ const withBatchedUpdates = <
   TFunction extends ((event: any) => void) | (() => void)
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) => {
-  return (
-    ((event) => {
-      unstable_batchedUpdates(func as TFunction, event);
-    }) as TFunction
-  );
-};
+) =>
+  ((event) => {
+    unstable_batchedUpdates(func as TFunction, event);
+  }) as TFunction;
 
 const { history } = createHistory();
 
@@ -1581,6 +1578,8 @@ class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    event.persist();
+
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid

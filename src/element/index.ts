@@ -64,17 +64,11 @@ export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
 export const getDrawingVersion = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce((acc, el) => acc + el.version, 0);
 
-export const getNonDeletedElements = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  return (
-    elements.filter((element) => !element.isDeleted) as
-    readonly NonDeletedExcalidrawElement[]
-  );
-};
+export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter(
+    (element) => !element.isDeleted,
+  ) as readonly NonDeletedExcalidrawElement[];
 
 export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
-): element is NonDeleted<T> => {
-  return !element.isDeleted;
-};
+): element is NonDeleted<T> => !element.isDeleted;

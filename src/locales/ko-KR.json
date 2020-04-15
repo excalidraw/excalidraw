@@ -141,7 +141,7 @@
     "shapes": "그리기",
     "or": "또는",
     "click": "클릭",
-    "drag": "",
+    "drag": "드래그",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "editor": "편집",
@@ -149,7 +149,7 @@
     "blog": "블로그 읽어보기",
     "howto": "가이드 참고하기",
     "github": "이슈 제보하기",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "줄바꾸기",
+    "textFinish": "편집 완료"
   }
 }

@@ -52,7 +52,7 @@
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
-    "name": ""
+    "name": "Nome"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -141,7 +141,7 @@
     "shapes": "Formas",
     "or": "ou",
     "click": "clicar",
-    "drag": "",
+    "drag": "arrastar",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "editor": "Editor",
@@ -149,7 +149,7 @@
     "blog": "Leia o nosso blog",
     "howto": "Siga os nossos guias",
     "github": "Encontrou algum problema? Nos informe",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "Adicionar nova linha (texto)",
+    "textFinish": "Finalizar edição (texto)"
   }
 }
