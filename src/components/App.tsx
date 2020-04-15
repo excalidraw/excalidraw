@@ -675,6 +675,11 @@ class App extends React.Component<any, AppState> {
       clearTimeout(tappedTwiceTimer);
     }
     event.preventDefault();
+    if (event.touches.length === 2) {
+      this.setState({
+        selectedElementIds: {},
+      });
+    }
   };
 
   private onTapEnd = (event: TouchEvent) => {
@@ -1286,6 +1291,9 @@ class App extends React.Component<any, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      selectedElementIds: {},
+    });
     gesture.initialScale = this.state.zoom;
   });
 
@@ -2159,6 +2167,11 @@ class App extends React.Component<any, AppState> {
             hitElementWasAddedToSelection = true;
           }
         }
+
+        const { selectedElementIds } = this.state;
+        this.setState({
+          previousSelectedElementIds: selectedElementIds,
+        });
       }
     } else {
       this.setState({
