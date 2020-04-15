@@ -21,7 +21,6 @@ const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
-  addWatermark: boolean,
   scale?: number,
 ) => void;
 
@@ -48,9 +47,8 @@ function ExportModal({
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
-  const [addWatermark, setAddWatermark] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { exportBackground, viewBackgroundColor } = appState;
+  const { exportBackground, viewBackgroundColor, addWatermark } = appState;
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState)
@@ -94,18 +92,14 @@ function ExportModal({
               label="PNG"
               title={t("buttons.exportToPng")}
               aria-label={t("buttons.exportToPng")}
-              onClick={() =>
-                onExportToPng(exportedElements, addWatermark, scale)
-              }
+              onClick={() => onExportToPng(exportedElements, scale)}
             />
             <ToolButton
               type="button"
               label="SVG"
               title={t("buttons.exportToSvg")}
               aria-label={t("buttons.exportToSvg")}
-              onClick={() =>
-                onExportToSvg(exportedElements, addWatermark, scale)
-              }
+              onClick={() => onExportToSvg(exportedElements, scale)}
             />
             {probablySupportsClipboardBlob && (
               <ToolButton
@@ -113,9 +107,7 @@ function ExportModal({
                 icon={clipboard}
                 title={t("buttons.copyPngToClipboard")}
                 aria-label={t("buttons.copyPngToClipboard")}
-                onClick={() =>
-                  onExportToClipboard(exportedElements, addWatermark, scale)
-                }
+                onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
             <ToolButton
@@ -123,7 +115,7 @@ function ExportModal({
               icon={link}
               title={t("buttons.getShareableLink")}
               aria-label={t("buttons.getShareableLink")}
-              onClick={() => onExportToBackend(exportedElements, addWatermark)}
+              onClick={() => onExportToBackend(exportedElements)}
             />
           </Stack.Row>
           <div className="ExportDialog__name">
@@ -160,14 +152,7 @@ function ExportModal({
             </label>
           </div>
         )}
-        <label>
-          <input
-            type="checkbox"
-            checked={addWatermark}
-            onChange={(event) => setAddWatermark(event.currentTarget.checked)}
-          />{" "}
-          {t("labels.addWatermark")}
-        </label>
+        {actionManager.renderAction("changeAddWatermark")}
       </Stack.Col>
     </div>
   );

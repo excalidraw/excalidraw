@@ -17,6 +17,7 @@ export function getDefaultAppState(): AppState {
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
+    addWatermark: false,
     currentItemStrokeColor: oc.black,
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
@@ -73,6 +74,7 @@ export function clearAppStatePropertiesForHistory(
   return {
     selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
+    addWatermark: appState.addWatermark,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
     currentItemFillStyle: appState.currentItemFillStyle,

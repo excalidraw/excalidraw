@@ -301,7 +301,7 @@ export async function exportCanvas(
     viewBackgroundColor: string;
     name: string;
     scale?: number;
-    addWatermark?: boolean;
+    addWatermark: boolean;
   },
 ) {
   if (elements.length === 0) {

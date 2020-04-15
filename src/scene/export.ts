@@ -19,13 +19,13 @@ export function exportToCanvas(
     exportPadding = 10,
     viewBackgroundColor,
     scale = 1,
-    addWatermark = false,
+    addWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
-    addWatermark?: boolean;
+    addWatermark: boolean;
   },
   createCanvas: (width: number, height: number) => any = function (
     width,
@@ -45,17 +45,6 @@ export function exportToCanvas(
 
   const tempCanvas: any = createCanvas(width, height);
 
-  const sceneState = {
-    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-    scrollX: normalizeScroll(-minX + exportPadding),
-    scrollY: normalizeScroll(-minY + exportPadding),
-    zoom: 1,
-    remotePointerViewportCoords: {},
-    remoteSelectedElementIds: {},
-    shouldCacheIgnoreZoom: false,
-    remotePointerUsernames: {},
-  };
-
   renderScene(
     addWatermark ? [...elements, getWatermarkElement(maxX, maxY)] : elements,
     appState,
@@ -63,7 +52,16 @@ export function exportToCanvas(
     scale,
     rough.canvas(tempCanvas),
     tempCanvas,
-    sceneState,
+    {
+      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      scrollX: normalizeScroll(-minX + exportPadding),
+      scrollY: normalizeScroll(-minY + exportPadding),
+      zoom: 1,
+      remotePointerViewportCoords: {},
+      remoteSelectedElementIds: {},
+      shouldCacheIgnoreZoom: false,
+      remotePointerUsernames: {},
+    },
     {
       renderScrollbars: false,
       renderSelection: false,
@@ -80,12 +78,12 @@ export function exportToSvg(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    addWatermark = false,
+    addWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    addWatermark?: boolean;
+    addWatermark: boolean;
   },
 ): SVGSVGElement {
   // calculate canvas dimensions
