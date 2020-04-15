@@ -61,28 +61,32 @@ const adjustXYWithRotation = (
   x: number,
   y: number,
   angle: number,
-  deltaX: number,
-  deltaY: number,
+  deltaX1: number,
+  deltaY1: number,
+  deltaX2: number,
+  deltaY2: number,
 ) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  deltaX /= 2;
-  deltaY /= 2;
   if (side === "e" || side === "ne" || side === "se") {
-    x += deltaX * (1 - cos);
-    y += deltaX * -sin;
+    x += deltaX1 * cos;
+    y += deltaX1 * sin;
+    x += deltaX2 * (1 - cos);
+    y += deltaX2 * -sin;
   }
   if (side === "s" || side === "sw" || side === "se") {
-    x += deltaY * sin;
-    y += deltaY * (1 - cos);
+    x += deltaY1 * sin;
+    y += deltaY1 * cos;
+    x += deltaY2 * sin;
+    y += deltaY2 * (1 - cos);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    x += deltaX * (1 + cos);
-    y += deltaX * sin;
+    x += deltaX2 * (1 + cos);
+    y += deltaX2 * sin;
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    x += deltaY * -sin;
-    y += deltaY * (1 + cos);
+    x += deltaY2 * -sin;
+    y += deltaY2 * (1 + cos);
   }
   return { x, y };
 };
@@ -139,25 +143,24 @@ export const resizeXYWidthHightWithRotation = (
     nextWidth,
     nextHeight,
   );
-  let deltaX = 0;
-  let deltaY = 0;
-  if (side === "e" || side === "ne" || side === "se") {
-    deltaX = x1 - nextX1 + elementWidth - nextWidth;
-  }
-  if (side === "s" || side === "sw" || side === "se") {
-    deltaY = y1 - nextY1 + elementHeight - nextHeight;
-  }
-  if (side === "w" || side === "nw" || side === "sw") {
-    deltaX = x2 - nextX2;
-  }
-  if (side === "n" || side === "nw" || side === "ne") {
-    deltaY = y2 - nextY2;
-  }
+  const deltaX1 = x1 - nextX1;
+  const deltaY1 = y1 - nextY1;
+  const deltaX2 = (x2 - nextX2) / 2;
+  const deltaY2 = (y2 - nextY2) / 2;
 
   return {
     width: nextWidth,
     height: nextHeight,
-    ...adjustXYWithRotation(side, elementX, elementY, angle, deltaX, deltaY),
+    ...adjustXYWithRotation(
+      side,
+      elementX,
+      elementY,
+      angle,
+      deltaX1,
+      deltaY1,
+      deltaX2,
+      deltaY2,
+    ),
   };
 };
 
