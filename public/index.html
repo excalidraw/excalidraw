@@ -9,8 +9,10 @@
     />
     <meta name="referrer" content="origin" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
 
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#fff" />
 
     <meta
       http-equiv="origin-trial"
@@ -48,8 +50,6 @@
     <meta property="og:image:height" content="669" />
     <meta property="og:image:alt" content="Excalidraw logo with byline." />
 
-    <!-- Chrome -->
-    <meta name="theme-color" content="#FFFF" />
     <!-- Safari -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
@@ -62,12 +62,8 @@
     />
     <!-- OG tags require absolute url for images -->
     <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="block-all-mixed-content; child-src 'self' https://codesandbox.io https://*.csb.app; connect-src 'self' https: wss: http: ws:; default-src 'self'; font-src 'self' data: https: filesystem:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://codesandbox.io https://*.csb.app https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https:;"
-    />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="fonts.css" type="text/css" />
     <link
       rel="preload"
       href="FG_Virgil.woff2"
@@ -82,6 +78,7 @@
       type="font/woff2"
       crossorigin="anonymous"
     />
+
     <link
       href="https://excalidraw-socket.herokuapp.com/socket.io"
       rel="preconnect"

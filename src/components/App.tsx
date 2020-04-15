@@ -134,11 +134,9 @@ import {
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
 >(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
-  return (
-    ((event) => {
-      unstable_batchedUpdates(func as TFunction, event);
-    }) as TFunction
-  );
+  return ((event) => {
+    unstable_batchedUpdates(func as TFunction, event);
+  }) as TFunction;
 }
 
 const { history } = createHistory();
@@ -1579,6 +1577,8 @@ class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    event.persist();
+
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid
@@ -1603,6 +1603,10 @@ class App extends React.Component<any, AppState> {
         (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
     ) {
       isPanning = true;
+
+      let nextPastePrevented = false;
+      const isLinux = /Linux/.test(window.navigator.platform);
+
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
       let { clientX: lastX, clientY: lastY } = event;
       const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
@@ -1610,6 +1614,40 @@ class App extends React.Component<any, AppState> {
         const deltaY = lastY - event.clientY;
         lastX = event.clientX;
         lastY = event.clientY;
+
+        /*
+         * Prevent paste event if we move while middle clicking on Linux.
+         * See issue #1383.
+         */
+        if (
+          isLinux &&
+          !nextPastePrevented &&
+          (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
+        ) {
+          nextPastePrevented = true;
+
+          /* Prevent the next paste event */
+          const preventNextPaste = (event: ClipboardEvent) => {
+            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+            event.stopPropagation();
+          };
+
+          /*
+           * Reenable next paste in case of disabled middle click paste for
+           * any reason:
+           * - rigth click paste
+           * - empty clipboard
+           */
+          const enableNextPaste = () => {
+            setTimeout(() => {
+              document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+              window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+            }, 100);
+          };
+
+          document.body.addEventListener(EVENT.PASTE, preventNextPaste);
+          window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+        }
 
         this.setState({
           scrollX: normalizeScroll(
@@ -2614,4 +2652,3 @@ if (
 }
 
 export default App;
-// -----------------------------------------------------------------------------

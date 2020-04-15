@@ -13,9 +13,7 @@ export function IsMobileProvider({ children }: { children: React.ReactNode }) {
           matches: false,
           addListener: () => {},
           removeListener: () => {},
-        } as
-          any) as
-        MediaQueryList);
+        } as any) as MediaQueryList);
   }
   const [isMobile, setMobile] = useState(query.current.matches);
 

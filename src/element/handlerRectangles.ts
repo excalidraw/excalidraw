@@ -193,48 +193,38 @@ export function handlerRectangles(
       const [, p1] = element.points;
 
       if (p1[0] === 0 || p1[1] === 0) {
-        return (
-          {
-            nw: handlers.nw,
-            se: handlers.se,
-          } as typeof handlers
-        );
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
       }
 
       if (p1[0] > 0 && p1[1] < 0) {
-        return (
-          {
-            ne: handlers.ne,
-            sw: handlers.sw,
-          } as typeof handlers
-        );
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
       }
 
       if (p1[0] > 0 && p1[1] > 0) {
-        return (
-          {
-            nw: handlers.nw,
-            se: handlers.se,
-          } as typeof handlers
-        );
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
       }
 
       if (p1[0] < 0 && p1[1] > 0) {
-        return (
-          {
-            ne: handlers.ne,
-            sw: handlers.sw,
-          } as typeof handlers
-        );
+        return {
+          ne: handlers.ne,
+          sw: handlers.sw,
+        } as typeof handlers;
       }
 
       if (p1[0] < 0 && p1[1] < 0) {
-        return (
-          {
-            nw: handlers.nw,
-            se: handlers.se,
-          } as typeof handlers
-        );
+        return {
+          nw: handlers.nw,
+          se: handlers.se,
+        } as typeof handlers;
       }
     }
   }
