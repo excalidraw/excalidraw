@@ -26,6 +26,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
+import { shield } from "./icons";
 
 import "./LayerUI.scss";
 
@@ -50,17 +51,7 @@ const renderEncryptedIcon = () => {
           {t("encrypted.postfix")}
         </a>
       </span>
-      <svg
-        width="1792"
-        height="1792"
-        viewBox="0 0 1792 1792"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill="currentColor"
-          d="M640 768h512v-192q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28h-960q-40 0-68-28t-28-68v-576q0-40 28-68t68-28h32v-192q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z"
-        />
-      </svg>
+      {shield}
     </div>
   );
 };
