@@ -47,7 +47,11 @@ const renderEncryptedIcon = () => {
     <div className="encrypted-icon tooltip">
       <span className="tooltip-text">
         {t("encrypted.prefix")}{" "}
-        <a href="https://blog.excalidraw.com/end-to-end-encryption/">
+        <a
+          href="https://blog.excalidraw.com/end-to-end-encryption/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {t("encrypted.postfix")}
         </a>
       </span>
