@@ -125,7 +125,7 @@ export const LayerUI = React.memo(
           <div className="App-menu App-menu_top">
             <Stack.Col gap={4}>
               <Section heading="canvasActions">
-                <Island padding={4}>
+                <Island padding={4} style={{ zIndex: 1 }}>
                   <Stack.Col gap={4}>
                     <Stack.Row gap={1} justifyContent={"space-between"}>
                       {actionManager.renderAction("loadScene")}
