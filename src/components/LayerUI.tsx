@@ -27,6 +27,7 @@ import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
+import { GitHubCorner } from "./GitHubCorner";
 
 import "./LayerUI.scss";
 
@@ -211,11 +212,14 @@ export const LayerUI = React.memo(
                     zoom={appState.zoom}
                   />
                 </Island>
+                {renderEncryptedIcon()}
               </Section>
             </Stack.Col>
           </div>
         </FixedSideContainer>
-        <aside>{renderEncryptedIcon()}</aside>
+        <aside>
+          <GitHubCorner />
+        </aside>
         <footer role="contentinfo">
           <LanguageList
             onChange={(lng) => {
