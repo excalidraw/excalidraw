@@ -5,4 +5,5 @@
   box-shadow: var(--shadow-island);
   border-radius: var(--border-radius-m);
   padding: calc(var(--padding) * var(--space-factor));
+  position: relative;
 }
