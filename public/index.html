@@ -8,11 +8,10 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
     />
     <meta name="referrer" content="origin" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-touch-fullscreen" content="yes" />
 
-    <meta name="theme-color" content="#fff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta name="theme-color" content="#000" />
 
     <!-- Origin Trial token for the Native File System API v1 https://developers.chrome.com/origintrials/#/view_trial/3868592079911256065 (Chrome 78–81) -->
     <meta
@@ -57,9 +56,6 @@
     <meta property="og:image:height" content="669" />
     <meta property="og:image:alt" content="Excalidraw logo with byline." />
 
-    <!-- Safari -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Excalidraw" />
@@ -92,57 +88,12 @@
       crossorigin="anonymous"
     />
 
-    <link rel="manifest" href="manifest.json" />
     <link
-      href="splashscreen_images/iphone5_splash.png"
-      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
+      rel="manifest"
+      href="manifest.json"
+      style="--pwacompat-splash-font: 24px Virgil;"
     />
-    <link
-      href="splashscreen_images/iphone6_splash.png"
-      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/iphoneplus_splash.png"
-      media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/iphonex_splash.png"
-      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/iphonexr_splash.png"
-      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/iphonexsmax_splash.png"
-      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/ipad_splash.png"
-      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/ipadpro1_splash.png"
-      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/ipadpro3_splash.png"
-      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
-    <link
-      href="splashscreen_images/ipadpro2_splash.png"
-      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
-      rel="apple-touch-startup-image"
-    />
+
     <style>
       .LoadingMessage {
         position: fixed;
