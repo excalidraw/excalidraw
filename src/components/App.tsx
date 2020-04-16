@@ -71,7 +71,12 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey, getResizeCenterPointKey } from "../keys";
+import {
+  KEYS,
+  isArrowKey,
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+} from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -134,9 +139,11 @@ import {
 function withBatchedUpdates<
   TFunction extends ((event: any) => void) | (() => void)
 >(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
-  return ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
+  return (
+    ((event) => {
+      unstable_batchedUpdates(func as TFunction, event);
+    }) as TFunction
+  );
 }
 
 const { history } = createHistory();
@@ -2205,7 +2212,7 @@ class App extends React.Component<any, AppState> {
           });
         }
       } else {
-        if (event.shiftKey) {
+        if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
             width,
@@ -2217,9 +2224,19 @@ class App extends React.Component<any, AppState> {
           }
         }
 
+        let newX = x < originX ? originX - width : originX;
+        let newY = y < originY ? originY - height : originY;
+
+        if (getResizeCenterPointKey(event)) {
+          width += width;
+          height += height;
+          newX = originX - width / 2;
+          newY = originY - height / 2;
+        }
+
         mutateElement(draggingElement, {
-          x: x < originX ? originX - width : originX,
-          y: y < originY ? originY - height : originY,
+          x: newX,
+          y: newY,
           width: width,
           height: height,
         });
