@@ -45,7 +45,12 @@ interface LayerUIProps {
 
 const renderEncryptedIcon = () => {
   return (
-    <div className="encrypted-icon tooltip">
+    <a
+      className="encrypted-icon tooltip"
+      href="https://blog.excalidraw.com/end-to-end-encryption/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <span className="tooltip-text">
         {t("encrypted.prefix")} <br />
         <a
@@ -57,7 +62,7 @@ const renderEncryptedIcon = () => {
         </a>
       </span>
       {shield}
-    </div>
+    </a>
   );
 };
 
