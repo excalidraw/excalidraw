@@ -21,6 +21,8 @@ body {
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;
   user-select: none;
+  width: 100vw;
+  height: 100vh;
 }
 [contenteditable] {
   user-select: auto;
@@ -193,7 +195,10 @@ button,
   left: 0;
   right: 0;
   --bar-padding: calc(4 * var(--space-factor));
-  padding-top: #{"max(var(--bar-padding), var(--sat))"};
+  padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
   z-index: 4;
   display: flex;
   align-items: flex-end;
