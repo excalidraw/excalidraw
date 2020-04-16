@@ -125,7 +125,7 @@
   },
   "roomDialog": {
     "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
-    "desc_privacy": "Keine Sorge, die Sitzung verwendet eine Ende-zu-Ende-Verschlüsselung, so dass alles, was Sie zeichnen, privat bleibt. Nicht einmal unser Server wird in der Lage sein, zu erkennen, was Sie gezeichnet haben.",
+    "desc_privacy": "Keine Sorge, die Sitzung verwendet Ende-zu-Ende-Verschlüsselung, sodass alles, was du zeichnest, privat bleibt. Nicht einmal unser Server kann einsehen was du dir einfallen lässt.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
@@ -143,7 +143,7 @@
     "click": "klicken",
     "drag": "ziehen",
     "curvedArrow": "Gebogener Pfeil",
-    "curvedLine": "Kurve",
+    "curvedLine": "Gebogene Linie",
     "editor": "Editor",
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
