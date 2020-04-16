@@ -10,6 +10,13 @@ import { register as registerServiceWorker } from "./serviceWorker";
 
 import "./css/styles.scss";
 
+// On Apple mobile devices add the proprietary app icon and splashscreen markup.
+// No one should have to do this manually, and eventually this annoyance will
+// go away once https://bugs.webkit.org/show_bug.cgi?id=183937 is fixed.
+if (/\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent)) {
+  import("pwacompat");
+}
+
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
   "now.sh": "staging",

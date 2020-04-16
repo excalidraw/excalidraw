@@ -15,12 +15,14 @@
 
 body {
   margin: 0;
-  --ui-font: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Helvetica,
-    Arial, sans-serif;
+  --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;
   user-select: none;
+  width: 100vw;
+  height: 100vh;
 }
 [contenteditable] {
   user-select: auto;
@@ -56,6 +58,13 @@ canvas {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.FixedSideContainer {
+  padding-top: var(--sat, 0px);
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
 }
 
 .panelRow {
@@ -186,10 +195,10 @@ button,
   left: 0;
   right: 0;
   --bar-padding: calc(4 * var(--space-factor));
-  padding-top: #{"max(var(--bar-padding), var(--sat))"};
-  padding-left: var(--sal);
-  padding-right: var(--sar);
-  padding-bottom: var(--sab);
+  padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
   z-index: 4;
   display: flex;
   align-items: flex-end;
@@ -423,8 +432,7 @@ button,
     display: none;
   }
   .scroll-back-to-content {
-    bottom: 80px;
-    bottom: calc(80px + var(--sab));
+    bottom: calc(80px + var(--sab, 0px));
     z-index: -1;
   }
 }
