@@ -5,14 +5,17 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 1.2rem;
-    height: 1.2rem;
 
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: var(--space-factor);
     color: $oc-green-9;
+
+    svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
 
     &.tooltip .tooltip-text {
       visibility: hidden;
