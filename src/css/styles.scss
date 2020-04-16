@@ -58,6 +58,13 @@ canvas {
   right: 0;
 }
 
+.FixedSideContainer {
+  padding-top: var(--sat, 0px);
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
+}
+
 .panelRow {
   display: flex;
   justify-content: space-between;
@@ -187,9 +194,6 @@ button,
   right: 0;
   --bar-padding: calc(4 * var(--space-factor));
   padding-top: #{"max(var(--bar-padding), var(--sat))"};
-  padding-left: var(--sal);
-  padding-right: var(--sar);
-  padding-bottom: var(--sab);
   z-index: 4;
   display: flex;
   align-items: flex-end;
@@ -423,8 +427,7 @@ button,
     display: none;
   }
   .scroll-back-to-content {
-    bottom: 80px;
-    bottom: calc(80px + var(--sab));
+    bottom: calc(80px + var(--sab, 0px));
     z-index: -1;
   }
 }
