@@ -1048,6 +1048,11 @@ class App extends React.Component<any, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+    // ensures we don't prevent devTools select-element feature
+    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
+      return;
+    }
+
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
