@@ -1,6 +1,5 @@
 import React from "react";
 
-import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber, SocketUpdateData } from "../types";
@@ -774,7 +773,7 @@ class App extends React.Component<any, AppState> {
     this.portal.close();
   };
 
-  private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
+  private initializeSocketClient = async (opts: { showLoadingState: boolean }) => {
     if (this.portal.socket) {
       return;
     }
@@ -895,6 +894,8 @@ class App extends React.Component<any, AppState> {
         }
       };
 
+      const socketIOClientLib: any = await import(/* webpackChunkName: "socketIoClient.min" */ 'socket.io-client');
+      const socketIOClient = socketIOClientLib.default;
       this.portal.open(
         socketIOClient(SOCKET_SERVER),
         roomMatch[1],
