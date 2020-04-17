@@ -114,7 +114,7 @@ import {
   TAP_TWICE_TIMEOUT,
 } from "../time_constants";
 
-import { LayerUI } from "./LayerUI";
+import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
