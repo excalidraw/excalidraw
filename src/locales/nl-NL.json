@@ -151,5 +151,8 @@
     "github": "Probleem gevonden? Stuur een nieuwe issue",
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)"
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
