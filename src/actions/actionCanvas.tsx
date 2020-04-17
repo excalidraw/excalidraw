@@ -4,7 +4,11 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom, calculateScrollCenter } from "../scene";
+import {
+  getNormalizedZoom,
+  calculateScrollCenter,
+  normalizeScroll,
+} from "../scene";
 import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
@@ -162,9 +166,11 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
+const ZOOM_CENTER__TOP_OFFSET = 100;
+
 const calculateZoom = (
   commonBounds: number[],
-  zoom: number,
+  currentZoom: number,
   {
     scrollX,
     scrollY,
@@ -174,9 +180,10 @@ const calculateZoom = (
   },
 ): number => {
   const { innerWidth, innerHeight } = window;
+  const availHeight = innerHeight - ZOOM_CENTER__TOP_OFFSET;
   const [x, y] = commonBounds;
   const zoomX = -innerWidth / (2 * scrollX + 2 * x - innerWidth);
-  const zoomY = -innerHeight / (2 * scrollY + 2 * y - innerHeight);
+  const zoomY = -availHeight / (2 * scrollY + 2 * y - availHeight);
   const margin = 0.01;
   let newZoom;
 
@@ -185,7 +192,7 @@ const calculateZoom = (
   } else if (zoomY <= zoomX) {
     newZoom = zoomY - margin;
   } else {
-    newZoom = zoom;
+    newZoom = currentZoom;
   }
 
   if (newZoom <= 0.1) {
@@ -209,7 +216,10 @@ export const actionZoomCenter = register({
     return {
       appState: {
         ...appState,
-        ...scrollCenter,
+        scrollX: scrollCenter.scrollX,
+        scrollY: normalizeScroll(
+          scrollCenter.scrollY + ZOOM_CENTER__TOP_OFFSET,
+        ),
         zoom,
       },
       commitToHistory: false,
