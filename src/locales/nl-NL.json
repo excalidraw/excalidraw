@@ -153,6 +153,6 @@
     "textFinish": "Voltooi bewerken (tekst)"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Je illustratie is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server ze nooit zal zien. Klik op het icoon om meer te weten..."
   }
 }
