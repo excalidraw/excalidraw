@@ -82,7 +82,6 @@ const KEY_CODES = {
   NUM_SUBTRACT: "NumpadSubtract",
   NUM_ADD: "NumpadAdd",
   NUM_ZERO: "Numpad0",
-  C: "KeyC",
 };
 
 export const actionZoomIn = register({
@@ -225,6 +224,5 @@ export const actionZoomCenter = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) =>
-    event.code === KEY_CODES.C && event[KEYS.CTRL_OR_CMD] && event.shiftKey,
+  keyTest: (event) => event.key === "z" && event.altKey,
 });
