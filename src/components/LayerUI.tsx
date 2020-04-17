@@ -25,8 +25,11 @@ import { RoomDialog } from "./RoomDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
-import { GitHubCorner } from "./GitHubCorner";
 import { CLASSES } from "../constants";
+import { shield } from "./icons";
+import { GitHubCorner } from "./GitHubCorner";
+
+import "./LayerUI.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -52,6 +55,18 @@ const LayerUI = ({
   onLockToggle,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
+
+  const renderEncryptedIcon = () => (
+    <a
+      className="encrypted-icon tooltip"
+      href="https://blog.excalidraw.com/end-to-end-encryption/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span className="tooltip-text">{t("encrypted.tooltip")}</span>
+      {shield}
+    </a>
+  );
 
   const renderExportDialog = () => {
     const createExporter = (type: ExportType): ExportCB => (
@@ -178,6 +193,7 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
+              {renderEncryptedIcon()}
             </Section>
           </Stack.Col>
         </div>
@@ -222,7 +238,7 @@ const LayerUI = ({
       onLockToggle={onLockToggle}
     />
   ) : (
-    <>
+    <div className="layer-ui__wrapper">
       {appState.isLoading && <LoadingMessage />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -240,7 +256,7 @@ const LayerUI = ({
         <GitHubCorner />
       </aside>
       {renderFooter()}
-    </>
+    </div>
   );
 };
 

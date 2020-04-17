@@ -266,6 +266,10 @@ button,
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
+
+  section {
+    display: flex;
+  }
 }
 
 .App-menu_bottom > * {
