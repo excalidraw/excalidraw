@@ -1,4 +1,4 @@
-@import "../_variables";
+@import "../css/_variables";
 
 .Modal {
   position: fixed;
@@ -34,6 +34,10 @@
   transform: translateY(10px);
   animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
   position: relative;
+
+  // for modals, reset blurry bg
+  background: #fff;
+  backdrop-filter: none;
 
   @media #{$media-query} {
     max-width: 100%;

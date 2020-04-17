@@ -2,10 +2,23 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
+
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import App from "./components/App";
-import "./styles.scss";
+import { register as registerServiceWorker } from "./serviceWorker";
+
+import "./css/styles.scss";
+
+// On Apple mobile devices add the proprietary app icon and splashscreen markup.
+// No one should have to do this manually, and eventually this annoyance will
+// go away once https://bugs.webkit.org/show_bug.cgi?id=183937 is fixed.
+if (
+  /\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent) &&
+  !matchMedia("(display-mode: standalone)").matches
+) {
+  import("pwacompat");
+}
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
@@ -23,6 +36,9 @@ Sentry.init({
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
   release: process.env.REACT_APP_GIT_SHA,
+  ignoreErrors: [
+    "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
+  ],
   integrations: [
     new SentryIntegrations.CaptureConsole({
       levels: ["error"],
@@ -52,3 +68,5 @@ ReactDOM.render(
   </TopErrorBoundary>,
   rootElement,
 );
+
+registerServiceWorker();
