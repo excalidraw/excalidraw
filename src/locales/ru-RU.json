@@ -151,5 +151,8 @@
     "github": "",
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
