@@ -39,6 +39,13 @@
     "socket.io-client": "2.3.0"
   },
   "devDependencies": {
+    "@babel/core": "7.9.0",
+    "@babel/plugin-transform-arrow-functions": "7.8.3",
+    "@babel/plugin-transform-async-to-generator": "7.8.3",
+    "@babel/plugin-transform-typescript": "7.9.4",
+    "@babel/preset-env": "7.9.5",
+    "@babel/preset-react": "7.9.4",
+    "@babel/preset-typescript": "7.9.0",
     "@sentry/browser": "5.15.4",
     "@sentry/integrations": "5.15.4",
     "@testing-library/jest-dom": "5.5.0",
@@ -49,6 +56,8 @@
     "@types/react-dom": "16.9.6",
     "@types/socket.io-client": "1.4.32",
     "asar": "3.0.3",
+    "babel-loader": "8.1.0",
+    "babel-plugin-transform-class-properties": "6.24.1",
     "css-loader": "3.5.2",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
@@ -67,8 +76,8 @@
     "terser-webpack-plugin": "2.3.5",
     "ts-loader": "7.0.0",
     "typescript": "3.8.3",
-    "webpack-cli": "3.3.11",
-    "webpack": "4.42.0"
+    "webpack": "4.42.0",
+    "webpack-cli": "3.3.11"
   },
   "engines": {
     "node": ">=12.0.0"

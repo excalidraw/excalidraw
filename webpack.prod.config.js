@@ -10,7 +10,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    library: "excalidraw",
+    library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
   },
@@ -29,12 +29,26 @@ module.exports = {
         ],
       },
       {
-        test: /\.(ts|tsx)$/,
+        test: /\.(ts|tsx|js|jsx|mjs)$/,
+        exclude: /node_modules\/(?!(roughjs|socket.io-client|browser-nativefs)\/).*/,
         use: [
           {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
+              configFile:'tsconfig.prod.json'
+            },
+          },
+          {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+              plugins: [
+                "@babel/plugin-proposal-object-rest-spread",
+                "@babel/plugin-transform-arrow-functions",
+                "transform-class-properties",
+                "@babel/plugin-transform-async-to-generator"
+              ],
             },
           },
         ],
@@ -48,8 +62,8 @@ module.exports = {
         test: /\.min\.js($|\?)/i,
       }),
       new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1
-      })
+        maxChunks: 2,
+      }),
     ],
   },
   plugins: [new MiniCssExtractPlugin({ filename: "[name].css" })],
