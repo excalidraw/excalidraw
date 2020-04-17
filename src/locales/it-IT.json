@@ -151,5 +151,8 @@
     "github": "Hai trovato un problema? Segnalalo",
     "textNewLine": "",
     "textFinish": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
