@@ -151,5 +151,8 @@
     "github": "",
     "textNewLine": "",
     "textFinish": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
