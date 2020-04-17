@@ -151,5 +151,8 @@
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)"
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
