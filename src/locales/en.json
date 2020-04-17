@@ -152,5 +152,8 @@
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)",
     "zoomCenter": "Zoom out to display all elements"
+  },
+  "encrypted": {
+    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.\nClick the icon to learn more..."
   }
 }
