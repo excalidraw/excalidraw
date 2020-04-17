@@ -165,7 +165,7 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-const ZOOM_CENTER__TOP_OFFSET = 100;
+const ZOOM_CENTER__TOP_OFFSET = 70;
 
 const calculateZoom = (
   commonBounds: number[],
