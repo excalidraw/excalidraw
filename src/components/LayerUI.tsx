@@ -63,16 +63,7 @@ const LayerUI = ({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <span className="tooltip-text">
-        {t("encrypted.prefix")} <br />
-        <a
-          href="https://blog.excalidraw.com/end-to-end-encryption/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t("encrypted.postfix")}
-        </a>
-      </span>
+      <span className="tooltip-text">{t("encrypted.tooltip")}</span>
       {shield}
     </a>
   );

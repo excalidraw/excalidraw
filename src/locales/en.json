@@ -153,7 +153,6 @@
     "textFinish": "Finish editing (text)"
   },
   "encrypted": {
-    "prefix": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
-    "postfix": "Read our blog post to learn more"
+    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.\nClick the icon to learn more..."
   }
 }
