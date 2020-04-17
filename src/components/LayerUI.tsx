@@ -43,28 +43,26 @@ interface LayerUIProps {
   onLockToggle: () => void;
 }
 
-const renderEncryptedIcon = () => {
-  return (
-    <a
-      className="encrypted-icon tooltip"
-      href="https://blog.excalidraw.com/end-to-end-encryption/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span className="tooltip-text">
-        {t("encrypted.prefix")} <br />
-        <a
-          href="https://blog.excalidraw.com/end-to-end-encryption/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t("encrypted.postfix")}
-        </a>
-      </span>
-      {shield}
-    </a>
-  );
-};
+const renderEncryptedIcon = () => (
+  <a
+    className="encrypted-icon tooltip"
+    href="https://blog.excalidraw.com/end-to-end-encryption/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <span className="tooltip-text">
+      {t("encrypted.prefix")} <br />
+      <a
+        href="https://blog.excalidraw.com/end-to-end-encryption/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {t("encrypted.postfix")}
+      </a>
+    </span>
+    {shield}
+  </a>
+);
 
 export const LayerUI = React.memo(
   ({
