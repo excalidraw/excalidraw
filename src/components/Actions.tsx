@@ -140,7 +140,6 @@ export function ZoomActions({
         {renderAction("zoomIn")}
         {renderAction("zoomOut")}
         {renderAction("resetZoom")}
-        {renderAction("zoomCenter")}
         <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
       </Stack.Row>
     </Stack.Col>
