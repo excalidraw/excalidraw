@@ -11,8 +11,7 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import { AppState, FlooredNumber } from "../types";
-import { ExcalidrawElement } from "../element/types";
-import { getElementAbsoluteCoords } from "../element";
+import { getCommonBounds } from "../element";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -163,8 +162,8 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-const getPartiallyVisibleElements = (
-  elements: readonly ExcalidrawElement[],
+const calculateZoom = (
+  commonBounds: number[],
   zoom: number,
   {
     scrollX,
@@ -173,28 +172,30 @@ const getPartiallyVisibleElements = (
     scrollX: FlooredNumber;
     scrollY: FlooredNumber;
   },
-) => {
-  const partiallyVisibleElements: boolean[] = [];
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const { innerHeight, innerWidth } = window;
-    const viewportWidthWithZoom = innerWidth / zoom;
-    const viewportHeightWithZoom = innerHeight / zoom;
-    const viewportWidthDiff = innerWidth - viewportWidthWithZoom;
-    const viewportHeightDiff = innerHeight - viewportHeightWithZoom;
-    const isFullyVisible =
-      x2 + scrollX - viewportWidthDiff / 2 >= element.width &&
-      x1 + scrollX - viewportWidthDiff / 2 <=
-        viewportWidthWithZoom - element.width &&
-      y2 + scrollY - viewportHeightDiff / 2 >= element.height &&
-      y1 + scrollY - viewportHeightDiff / 2 <=
-        viewportHeightWithZoom - element.height;
+): number => {
+  const { innerWidth, innerHeight } = window;
+  const [x, y] = commonBounds;
+  const zoomX = -innerWidth / (2 * scrollX + 2 * x - innerWidth);
+  const zoomY = -innerHeight / (2 * scrollY + 2 * y - innerHeight);
+  const margin = 0.01;
+  let newZoom;
 
-    if (!isFullyVisible) {
-      partiallyVisibleElements.push(isFullyVisible);
-    }
-  });
-  return partiallyVisibleElements;
+  if (zoomX < zoomY) {
+    newZoom = zoomX - margin;
+  } else if (zoomY <= zoomX) {
+    newZoom = zoomY - margin;
+  } else {
+    newZoom = zoom;
+  }
+
+  if (newZoom <= 0.1) {
+    return 0.1;
+  }
+  if (newZoom >= 1) {
+    return 1;
+  }
+
+  return newZoom;
 };
 
 export const actionZoomCenter = register({
@@ -202,34 +203,14 @@ export const actionZoomCenter = register({
   perform: (elements, appState) => {
     const nonDeletedElements = elements.filter((element) => !element.isDeleted);
     const scrollCenter = calculateScrollCenter(nonDeletedElements);
-    const { zoom } = appState;
-    let newZoom = zoom;
-    let partiallyVisibleElements = getPartiallyVisibleElements(
-      nonDeletedElements,
-      zoom,
-      scrollCenter,
-    );
-
-    while (partiallyVisibleElements.length !== 0) {
-      partiallyVisibleElements = getPartiallyVisibleElements(
-        nonDeletedElements,
-        newZoom,
-        scrollCenter,
-      );
-      newZoom -= 0.01;
-    }
-
-    if (newZoom >= 1) {
-      newZoom = 1;
-    } else if (newZoom <= 0.1) {
-      newZoom = 0.1;
-    }
+    const commonBounds = getCommonBounds(nonDeletedElements);
+    const zoom = calculateZoom(commonBounds, appState.zoom, scrollCenter);
 
     return {
       appState: {
         ...appState,
-        zoom: newZoom,
         ...scrollCenter,
+        zoom,
       },
       commitToHistory: false,
     };
