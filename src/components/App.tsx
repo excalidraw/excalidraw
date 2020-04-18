@@ -71,7 +71,7 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey } from "../keys";
+import { KEYS, isArrowKey, ZEN_MODE_KEY } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -187,6 +187,7 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
+    const { showZenMode } = this.state;
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
@@ -212,6 +213,7 @@ class App extends React.Component<any, AppState> {
             });
           }}
           onLockToggle={this.toggleLock}
+          showZenMode={showZenMode}
         />
         <main>
           <canvas
@@ -766,6 +768,11 @@ class App extends React.Component<any, AppState> {
     }));
   };
 
+  toggleZenMode() {
+    this.setState({
+      showZenMode: !this.state.showZenMode,
+    });
+  }
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1065,6 +1072,10 @@ class App extends React.Component<any, AppState> {
       this.setState({
         showShortcutsDialog: true,
       });
+    }
+
+    if (ZEN_MODE_KEY.includes(event.key)) {
+      this.toggleZenMode();
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {

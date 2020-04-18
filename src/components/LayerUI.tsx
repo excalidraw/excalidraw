@@ -41,6 +41,7 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  showZenMode: boolean;
 }
 
 const LayerUI = ({
@@ -53,6 +54,7 @@ const LayerUI = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
+  showZenMode,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -157,8 +159,10 @@ const LayerUI = ({
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col gap={4}>
-            {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            {!showZenMode && renderCanvasActions()}
+            {!showZenMode &&
+              shouldRenderSelectedShapeActions &&
+              renderSelectedShapeActions()}
           </Stack.Col>
           <Section heading="shapes">
             {(heading) => (
@@ -173,44 +177,50 @@ const LayerUI = ({
                       />
                     </Stack.Row>
                   </Island>
-                  <LockIcon
-                    checked={appState.elementLocked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                  />
+                  {!showZenMode && (
+                    <LockIcon
+                      checked={appState.elementLocked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                    />
+                  )}
                 </Stack.Row>
               </Stack.Col>
             )}
           </Section>
           <div />
         </div>
-        <div className="App-menu App-menu_bottom">
-          <Stack.Col gap={2}>
-            <Section heading="canvasActions">
-              <Island padding={1}>
-                <ZoomActions
-                  renderAction={actionManager.renderAction}
-                  zoom={appState.zoom}
-                />
-              </Island>
-              {renderEncryptedIcon()}
-            </Section>
-          </Stack.Col>
-        </div>
+        {!showZenMode && (
+          <div className="App-menu App-menu_bottom">
+            <Stack.Col gap={2}>
+              <Section heading="canvasActions">
+                <Island padding={1}>
+                  <ZoomActions
+                    renderAction={actionManager.renderAction}
+                    zoom={appState.zoom}
+                  />
+                </Island>
+                {renderEncryptedIcon()}
+              </Section>
+            </Stack.Col>
+          </div>
+        )}
       </FixedSideContainer>
     );
   };
 
   const renderFooter = () => (
     <footer role="contentinfo">
-      <LanguageList
-        onChange={(lng) => {
-          setLanguage(lng);
-          setAppState({});
-        }}
-        languages={languages}
-        floating
-      />
+      {!showZenMode && (
+        <LanguageList
+          onChange={(lng) => {
+            setLanguage(lng);
+            setAppState({});
+          }}
+          languages={languages}
+          floating
+        />
+      )}
       {actionManager.renderAction("toggleShortcuts")}
       {appState.scrolledOutside && (
         <button
@@ -252,9 +262,11 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      <aside>
-        <GitHubCorner />
-      </aside>
+      {!showZenMode && (
+        <aside>
+          <GitHubCorner />
+        </aside>
+      )}
       {renderFooter()}
     </div>
   );

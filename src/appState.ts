@@ -45,6 +45,7 @@ export function getDefaultAppState(): AppState {
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
+    showZenMode: false,
   };
 }
 
