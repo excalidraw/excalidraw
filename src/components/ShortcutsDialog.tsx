@@ -233,7 +233,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={["F"]}
               />
               <Shortcut
-                label={t("shortcutsDialog.zoomCenter")}
+                label={t("shortcutsDialog.zoomToFit")}
                 shortcuts={["Alt+Z"]}
               />
             </ShortcutIsland>

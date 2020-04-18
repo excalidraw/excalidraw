@@ -48,7 +48,7 @@ export type ActionName =
   | "zoomIn"
   | "zoomOut"
   | "resetZoom"
-  | "zoomCenter"
+  | "zoomToFit"
   | "changeFontFamily"
   | "changeTextAlign"
   | "toggleFullScreen"

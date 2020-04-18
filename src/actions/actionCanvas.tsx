@@ -198,8 +198,8 @@ const calculateZoom = (
   return newZoom;
 };
 
-export const actionZoomCenter = register({
-  name: "zoomCenter",
+export const actionZoomToFit = register({
+  name: "zoomToFit",
   perform: (elements, appState) => {
     const nonDeletedElements = elements.filter((element) => !element.isDeleted);
     const scrollCenter = calculateScrollCenter(nonDeletedElements);
