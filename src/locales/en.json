@@ -150,7 +150,8 @@
     "howto": "Follow our guides",
     "github": "Found an issue? Submit",
     "textNewLine": "Add new line (text)",
-    "textFinish": "Finish editing (text)"
+    "textFinish": "Finish editing (text)",
+    "zoomToFit": "Zoom to fit all elements"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.\nClick the icon to learn more..."
