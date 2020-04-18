@@ -150,6 +150,10 @@
     "howto": "Følg våre veiledninger",
     "github": "Funnet et problem? Send inn",
     "textNewLine": "Legg til ny linje (tekst)",
-    "textFinish": "Fullfør redigering (tekst)"
+    "textFinish": "Fullfør redigering (tekst)",
+    "zoomToFit": "Zoom for å passe alle elementene"
+  },
+  "encrypted": {
+    "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem. Klikk på ikonet for å lære mer..."
   }
 }

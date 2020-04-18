@@ -150,6 +150,10 @@
     "howto": "",
     "github": "",
     "textNewLine": "Добавить новую строку (текст)",
-    "textFinish": ""
+    "textFinish": "",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
