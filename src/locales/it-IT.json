@@ -150,7 +150,8 @@
     "howto": "Segui le nostre guide",
     "github": "Hai trovato un problema? Segnalalo",
     "textNewLine": "",
-    "textFinish": ""
+    "textFinish": "",
+    "zoomToFit": ""
   },
   "encrypted": {
     "tooltip": ""
