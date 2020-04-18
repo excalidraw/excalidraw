@@ -14,6 +14,7 @@ export const KEYS = {
   SPACE: " ",
   QUESTION_MARK: "?",
   F_KEY_CODE: 70,
+  Z_KEY_CODE: 90,
 } as const;
 
 export type Key = keyof typeof KEYS;
@@ -26,5 +27,3 @@ export function isArrowKey(keyCode: string) {
     keyCode === KEYS.ARROW_UP
   );
 }
-
-export const ZEN_MODE_KEY = ["K", "k"];

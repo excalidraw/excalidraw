@@ -168,7 +168,10 @@ const LayerUI = ({
             {(heading) => (
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
-                  <Island padding={1} className={showZenMode ? 'zen-mode' : undefined}>
+                  <Island
+                    padding={1}
+                    className={showZenMode ? "zen-mode" : undefined}
+                  >
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher

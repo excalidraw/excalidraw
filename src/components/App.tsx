@@ -71,7 +71,7 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey, ZEN_MODE_KEY } from "../keys";
+import { KEYS, isArrowKey } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -1074,7 +1074,11 @@ class App extends React.Component<any, AppState> {
       });
     }
 
-    if (ZEN_MODE_KEY.includes(event.key)) {
+    if (
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.altKey &&
+      event.keyCode === KEYS.Z_KEY_CODE
+    ) {
       this.toggleZenMode();
     }
 

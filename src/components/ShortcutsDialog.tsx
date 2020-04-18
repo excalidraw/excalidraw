@@ -236,6 +236,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("buttons.toggleFullScreen")}
                 shortcuts={["F"]}
               />
+              <Shortcut
+                label={t("buttons.toggleZenMode")}
+                shortcuts={["Alt+Z"]}
+              />
             </ShortcutIsland>
           </Column>
           <Column>
