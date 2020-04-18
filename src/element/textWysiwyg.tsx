@@ -1,8 +1,26 @@
-import { KEYS } from "../keys";
-import { selectNode, isWritableElement } from "../utils";
+import { isWritableElement } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
+
+import Quill from "quill/core";
+import Toolbar from "quill/modules/toolbar";
+import Bubble from "quill/themes/bubble";
+import { ColorClass, ColorStyle } from "quill/formats/color";
+import { SizeClass, SizeStyle } from "quill/formats/size";
+import "quill/dist/quill.bubble.css";
+import "quill/dist/quill.core.css";
+
+Quill.register({
+  "modules/toolbar": Toolbar,
+  "themes/bubble": Bubble,
+  "attributors/class/color": ColorClass,
+  "attributors/style/color": ColorStyle,
+  "formats/color": ColorStyle,
+  "attributors/class/size": SizeClass,
+  "attributors/style/size": SizeStyle,
+  "formats/size": SizeClass,
+});
 
 function trimText(text: string) {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -47,92 +65,107 @@ export function textWysiwyg({
   onCancel,
 }: TextWysiwygParams) {
   const editable = document.createElement("div");
-  try {
-    editable.contentEditable = "plaintext-only";
-  } catch {
-    editable.contentEditable = "true";
-  }
-  editable.dir = "auto";
-  editable.tabIndex = 0;
-  editable.innerText = initText;
-  editable.dataset.type = "wysiwyg";
 
-  const degree = (180 * angle) / Math.PI;
+  // try {
+  //   editable.contentEditable = "plaintext-only";
+  // } catch {
+  //   editable.contentEditable = "true";
+  // }
+  // editable.dir = "auto";
+  editable.id = "editor";
+  // editable.tabIndex = 0;
+  // editable.innerText = initText;
+  // editable.dataset.type = "wysiwyg";
+
+  // const degree = (180 * angle) / Math.PI;
 
   Object.assign(editable.style, {
-    color: strokeColor,
     position: "fixed",
-    opacity: opacity / 100,
     top: `${y}px`,
     left: `${x}px`,
-    transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
-    textAlign: textAlign,
-    display: "inline-block",
-    font: font,
-    padding: "4px",
-    // This needs to have "1px solid" otherwise the carret doesn't show up
-    // the first time on Safari and Chrome!
-    outline: "1px solid transparent",
-    whiteSpace: "nowrap",
-    minHeight: "1em",
-    backfaceVisibility: "hidden",
+    height: "auto",
+    // display: "inline-block",
+    // font: font,
+    // padding: "4px",
+    // whiteSpace: "nowrap",
+    // minHeight: "1em",
+    // backfaceVisibility: "hidden",
   });
 
-  editable.onpaste = (event) => {
-    try {
-      const selection = window.getSelection();
-      if (!selection?.rangeCount) {
-        return;
-      }
-      selection.deleteFromDocument();
+  // Object.assign(editable.style, {
+  //   color: strokeColor,
+  //   position: "fixed",
+  //   opacity: opacity / 100,
+  //   top: `${y}px`,
+  //   left: `${x}px`,
+  //   transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
+  //   textAlign: textAlign,
+  //   display: "inline-block",
+  //   font: font,
+  //   padding: "4px",
+  //   // This needs to have "1px solid" otherwise the carret doesn't show up
+  //   // the first time on Safari and Chrome!
+  //   outline: "1px solid transparent",
+  //   whiteSpace: "nowrap",
+  //   minHeight: "1em",
+  //   backfaceVisibility: "hidden",
+  // });
 
-      const text = event.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
+  // editable.onpaste = (event) => {
+  //   try {
+  //     const selection = window.getSelection();
+  //     if (!selection?.rangeCount) {
+  //       return;
+  //     }
+  //     selection.deleteFromDocument();
 
-      const span = document.createElement("span");
-      span.innerText = text;
-      const range = selection.getRangeAt(0);
-      range.insertNode(span);
+  //     const text = event.clipboardData!.getData("text").replace(/\r\n?/g, "\n");
 
-      // deselect
-      window.getSelection()!.removeAllRanges();
-      range.setStart(span, span.childNodes.length);
-      range.setEnd(span, span.childNodes.length);
-      selection.addRange(range);
+  //     const span = document.createElement("span");
+  //     span.innerText = text;
+  //     const range = selection.getRangeAt(0);
+  //     range.insertNode(span);
 
-      event.preventDefault();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     // deselect
+  //     window.getSelection()!.removeAllRanges();
+  //     range.setStart(span, span.childNodes.length);
+  //     range.setEnd(span, span.childNodes.length);
+  //     selection.addRange(range);
 
-  if (onChange) {
-    editable.oninput = () => {
-      onChange(trimText(editable.innerText));
-    };
-  }
+  //     event.preventDefault();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-  editable.onkeydown = (event) => {
-    if (event.key === KEYS.ESCAPE) {
-      event.preventDefault();
-      handleSubmit();
-    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
-      event.preventDefault();
-      if (event.isComposing || event.keyCode === 229) {
-        return;
-      }
-      handleSubmit();
-    } else if (event.key === KEYS.ENTER && !event.altKey) {
-      event.stopPropagation();
-    }
-  };
+  // if (onChange) {
+  //   editable.oninput = () => {
+  //     onChange(trimText(editable.innerText));
+  //   };
+  // }
+
+  // editable.onkeydown = (event) => {
+  //   if (event.key === KEYS.ESCAPE) {
+  //     event.preventDefault();
+  //     handleSubmit();
+  //   } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
+  //     event.preventDefault();
+  //     if (event.isComposing || event.keyCode === 229) {
+  //       return;
+  //     }
+  //     handleSubmit();
+  //   } else if (event.key === KEYS.ENTER && !event.altKey) {
+  //     event.stopPropagation();
+  //   }
+  // };
 
   function stopEvent(event: Event) {
     event.stopPropagation();
   }
 
   function handleSubmit() {
-    if (editable.innerText) {
-      onSubmit(trimText(editable.innerText));
+    if (quill.root.innerHTML) {
+      onSubmit(trimText(quill.root.innerHTML));
     } else {
       onCancel();
     }
@@ -145,29 +178,27 @@ export function textWysiwyg({
     }
     isDestroyed = true;
     // remove events to ensure they don't late-fire
-    editable.onblur = null;
-    editable.onpaste = null;
-    editable.oninput = null;
-    editable.onkeydown = null;
-
+    // editable.onblur = null;
+    // editable.onpaste = null;
+    // editable.oninput = null;
+    // editable.onkeydown = null;
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", rebindBlur);
     window.removeEventListener("blur", handleSubmit);
-
     unbindUpdate();
-
-    document.body.removeChild(editable);
+    // document.body.removeChild(editable);
+    // document.getElementById("editor")?.remove();
   }
 
   const rebindBlur = () => {
-    window.removeEventListener("pointerup", rebindBlur);
+    // window.removeEventListener("pointerup", rebindBlur);
     // deferred to guard against focus traps on various UIs that steal focus
     //  upon pointerUp
     setTimeout(() => {
-      editable.onblur = handleSubmit;
+      quill.root.onblur = handleSubmit;
       // case: clicking on the same property → no change → no update → no focus
-      editable.focus();
+      quill.focus();
     });
   };
 
@@ -178,7 +209,7 @@ export function textWysiwyg({
       event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
       !isWritableElement(event.target)
     ) {
-      editable.onblur = null;
+      quill.root.onblur = null;
       window.addEventListener("pointerup", rebindBlur);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       //  alt-tabbing away
@@ -192,22 +223,38 @@ export function textWysiwyg({
       .getElementsIncludingDeleted()
       .find((element) => element.id === id);
     if (editingElement && isTextElement(editingElement)) {
-      Object.assign(editable.style, {
-        font: editingElement.font,
-        textAlign: editingElement.textAlign,
-        color: editingElement.strokeColor,
-        opacity: editingElement.opacity / 100,
-      });
+      quill.format("color", editingElement.strokeColor);
+      const sizesMap: any = {
+        "16px": "small",
+        "20px": "normal",
+        "28px": "large",
+        "36px": "huge",
+      };
+      quill.format("size", sizesMap[editingElement.font.split(" ")[0]]);
+      // Object.assign(editable.style, {
+      //   font: editingElement.font,
+      //   textAlign: editingElement.textAlign,
+      //   color: editingElement.strokeColor,
+      //   opacity: editingElement.opacity / 100,
+      // });
     }
-    editable.focus();
+    quill.focus();
   });
 
   let isDestroyed = false;
 
-  editable.onblur = handleSubmit;
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
-  editable.focus();
-  selectNode(editable);
+  // selectNode(editable);
+
+  const quill = new Quill("#editor", {
+    modules: {
+      toolbar: false,
+    },
+    theme: "bubble",
+  });
+
+  quill.focus();
+  quill.root.onblur = handleSubmit;
 }

@@ -61,6 +61,7 @@ export function isWritableElement(
   | HTMLDivElement {
   return (
     (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    (target instanceof HTMLElement && target.classList.contains("ql-editor")) ||
     target instanceof HTMLBRElement || // newline in wysiwyg
     target instanceof HTMLTextAreaElement ||
     (target instanceof HTMLInputElement &&

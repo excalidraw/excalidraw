@@ -22,10 +22,15 @@ body {
   -webkit-text-size-adjust: 100%;
   user-select: none;
 }
-[contenteditable] {
-  user-select: auto;
-  cursor: text;
-}
+
+// [contenteditable] {
+//   user-select: auto;
+//   cursor: text;
+// }
+// #editor {
+//   user-select: auto;
+//   cursor: text;
+// }
 
 a {
   font-weight: 500;
@@ -444,4 +449,10 @@ button,
   :root[dir="rtl"] & {
     left: 0;
   }
+}
+
+.ql-editor {
+  padding: 0;
+  margin: 0;
+  font-size: 18px;
 }
