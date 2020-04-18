@@ -150,7 +150,8 @@
     "howto": "Suivez notre guides",
     "github": "Vous avez trouvé un problème ? Envoyer",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
-    "textFinish": "Terminer l'édition (texte)"
+    "textFinish": "Terminer l'édition (texte)",
+    "zoomToFit": ""
   },
   "encrypted": {
     "tooltip": ""
