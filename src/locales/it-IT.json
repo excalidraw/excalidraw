@@ -120,7 +120,7 @@
     "trackedToSentry_post": " è stato tracciato nel nostro sistema.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
@@ -141,19 +141,19 @@
     "shapes": "Forme",
     "or": "oppure",
     "click": "click",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "drag": "trascina",
+    "curvedArrow": "Freccia curva",
+    "curvedLine": "Linea curva",
     "editor": "Editor",
     "view": "Vista",
     "blog": "Leggi il nostro blog",
     "howto": "Segui le nostre guide",
     "github": "Hai trovato un problema? Segnalalo",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": ""
+    "textNewLine": "Aggiungi nuova riga (testo)",
+    "textFinish": "Completa la modifica (testo)",
+    "zoomToFit": "Adatta zoom per mostrare tutti gli elementi"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.\nClicca l'icona per saperne di più..."
   }
 }
