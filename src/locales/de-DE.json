@@ -150,7 +150,8 @@
     "howto": "Folgen Sie unseren Anleitungen",
     "github": "Ein Problem gefunden? Informieren Sie uns",
     "textNewLine": "Neue Zeile hinzufügen (Text)",
-    "textFinish": "Bearbeiten beenden (Text)"
+    "textFinish": "Bearbeiten beenden (Text)",
+    "zoomToFit": ""
   },
   "encrypted": {
     "tooltip": ""
