@@ -1,4 +1,4 @@
-import "./Island.css";
+import "./Island.scss";
 
 import React from "react";
 
