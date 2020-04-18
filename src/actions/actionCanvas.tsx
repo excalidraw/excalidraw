@@ -74,6 +74,7 @@ const ZOOM_STEP = 0.1;
 const KEY_CODES = {
   MINUS: "Minus",
   EQUAL: "Equal",
+  ONE: "Digit1",
   ZERO: "Digit0",
   NUM_SUBTRACT: "NumpadSubtract",
   NUM_ADD: "NumpadAdd",
@@ -215,5 +216,9 @@ export const actionZoomCenter = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.key === "z" && event.altKey,
+  keyTest: (event) =>
+    event.code === KEY_CODES.ONE &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
 });
