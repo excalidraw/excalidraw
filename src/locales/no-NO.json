@@ -153,6 +153,6 @@
     "textFinish": "Fullfør redigering (tekst)"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem. Klikk på ikonet for å lære mer..."
   }
 }
