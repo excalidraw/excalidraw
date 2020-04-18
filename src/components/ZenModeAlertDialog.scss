@@ -1,0 +1,19 @@
+@import "open-color/open-color";
+
+.zen-mode-alert {
+  .btn {
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  &__footer {
+    margin-top: 10px;
+    &--exit {
+      margin-left: 10px;
+    }
+
+    &--continue {
+      background: $oc-blue-2;
+    }
+  }
+}
