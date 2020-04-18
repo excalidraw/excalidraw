@@ -150,6 +150,10 @@
     "howto": "",
     "github": "",
     "textNewLine": "",
-    "textFinish": ""
+    "textFinish": "",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

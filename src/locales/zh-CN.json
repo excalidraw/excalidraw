@@ -150,6 +150,10 @@
     "howto": "跟随我们的指南",
     "github": "发现问题？提交",
     "textNewLine": "文本换行",
-    "textFinish": "完成编辑文本"
+    "textFinish": "完成编辑文本",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

@@ -118,7 +118,7 @@
     "clearCanvasCaveat": " Dies wird zum Verlust von Daten führen ",
     "trackedToSentry_pre": "Der Fehler mit der Kennung ",
     "trackedToSentry_post": " wurde in unserem System registriert.",
-    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in den Fehler aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
+    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
     "openIssueMessage_button": "Bug-Tracker.",
     "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
     "sceneContent": "Zeichnungsinhalt:"
@@ -150,6 +150,10 @@
     "howto": "Folgen Sie unseren Anleitungen",
     "github": "Ein Problem gefunden? Informieren Sie uns",
     "textNewLine": "Neue Zeile hinzufügen (Text)",
-    "textFinish": "Bearbeiten beenden (Text)"
+    "textFinish": "Bearbeiten beenden (Text)",
+    "zoomToFit": "Zoomen um alle Elemente einzupassen"
+  },
+  "encrypted": {
+    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird. Klicke auf das Symbol um mehr zu erfahren..."
   }
 }
