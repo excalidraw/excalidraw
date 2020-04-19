@@ -42,6 +42,26 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeShouldAddWatermark = register({
+  name: "changeShouldAddWatermark",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, shouldAddWatermark: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={appState.shouldAddWatermark}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.addWatermark")}
+    </label>
+  ),
+});
+
 export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {

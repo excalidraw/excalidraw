@@ -79,6 +79,7 @@ const LayerUI = ({
           name: appState.name,
           viewBackgroundColor: appState.viewBackgroundColor,
           scale,
+          shouldAddWatermark: appState.shouldAddWatermark,
         });
       }
     };
