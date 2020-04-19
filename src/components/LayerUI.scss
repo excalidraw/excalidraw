@@ -62,4 +62,11 @@
       }
     }
   }
+
+  &__footer-left {
+    transition: transform 0.5s ease-in-out;
+    &.zen-mode {
+      transform: translate(-999px, 0);
+    }
+  }
 }

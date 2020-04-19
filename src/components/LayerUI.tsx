@@ -195,8 +195,8 @@ const LayerUI = ({
           </Section>
           <div />
         </div>
-        {!zenModeEnabled && (
-          <div className="App-menu App-menu_bottom">
+        {(
+          <div className={`App-menu App-menu_bottom layer-ui__wrapper__footer-left ${zenModeEnabled ? "zen-mode" : undefined}`}>
             <Stack.Col gap={2}>
               <Section heading="canvasActions">
                 <Island padding={1}>
