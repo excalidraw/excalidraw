@@ -23,6 +23,7 @@
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
     "withBackground": "Con Sfondo",
+    "addWatermark": "",
     "handDrawn": "A mano libera",
     "normal": "Normale",
     "code": "Codice",
@@ -52,7 +53,8 @@
     "createRoom": "Condividi una sessione di collaborazione in diretta",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
-    "name": "Nome"
+    "name": "Nome",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
