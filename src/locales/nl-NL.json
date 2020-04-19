@@ -52,7 +52,7 @@
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
-    "name": ""
+    "name": "Naam"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -149,7 +149,11 @@
     "blog": "Lees onze blog",
     "howto": "Volg onze handleidingen",
     "github": "Probleem gevonden? Stuur een nieuwe issue",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "textFinish": "Voltooi bewerken (tekst)",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": "Je illustratie is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server ze nooit zal zien. Klik op het icoon om meer te weten..."
   }
 }

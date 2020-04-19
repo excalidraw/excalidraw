@@ -114,7 +114,7 @@ import {
   TAP_TWICE_TIMEOUT,
 } from "../time_constants";
 
-import { LayerUI } from "./LayerUI";
+import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -1048,6 +1048,11 @@ class App extends React.Component<any, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+    // ensures we don't prevent devTools select-element feature
+    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
+      return;
+    }
+
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons

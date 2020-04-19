@@ -150,6 +150,10 @@
     "howto": "Seguir nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
-    "textFinish": "Finalizar edición (texto)"
+    "textFinish": "Finalizar edición (texto)",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }
