@@ -23,6 +23,7 @@
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
     "withBackground": "Z tłem dokumentu",
+    "addWatermark": "",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
     "code": "Kod",
@@ -52,7 +53,8 @@
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
-    "name": "Nazwa"
+    "name": "Nazwa",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
