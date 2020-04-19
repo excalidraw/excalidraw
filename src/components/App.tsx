@@ -77,7 +77,6 @@ import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
-import ZenModeAlertDialog from "./ZenModeAlertDialog";
 
 import { ActionManager } from "../actions/manager";
 import "../actions";
@@ -187,14 +186,8 @@ class App extends React.Component<any, AppState> {
     this.actionManager.registerAction(createRedoAction(history));
   }
 
-  closeZenModeAlert = () => {
-    this.setState({
-      showZenModeAlertDialog: false,
-    });
-  };
-
   public render() {
-    const { zenModeEnabled, showZenModeAlertDialog } = this.state;
+    const { zenModeEnabled } = this.state;
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
@@ -243,14 +236,6 @@ class App extends React.Component<any, AppState> {
             {t("labels.drawingCanvas")}
           </canvas>
         </main>
-
-        {showZenModeAlertDialog && (
-          <ZenModeAlertDialog
-            onClose={this.closeZenModeAlert}
-            onExit={this.toggleZenMode}
-            onContinue={this.closeZenModeAlert}
-          />
-        )}
       </div>
     );
   }
@@ -326,17 +311,8 @@ class App extends React.Component<any, AppState> {
       } else {
         scene = await loadScene(null);
       }
-
       if (scene) {
         this.syncActionResult(scene);
-        if (scene.appState) {
-          const { zenModeEnabled: zenModeEnabled } = scene.appState;
-          if (zenModeEnabled) {
-            this.setState({
-              showZenModeAlertDialog: true,
-            });
-          }
-        }
       }
     }
 
@@ -792,13 +768,11 @@ class App extends React.Component<any, AppState> {
     }));
   };
 
-  toggleZenMode = () => {
+  toggleZenMode() {
     this.setState({
       zenModeEnabled: !this.state.zenModeEnabled,
-      showZenModeAlertDialog: false,
     });
-  };
-
+  }
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,

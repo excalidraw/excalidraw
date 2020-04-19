@@ -46,7 +46,6 @@ export function getDefaultAppState(): AppState {
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
     zenModeEnabled: false,
-    showZenModeAlertDialog: false,
   };
 }
 

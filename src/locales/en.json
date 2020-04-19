@@ -156,13 +156,5 @@
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.\nClick the icon to learn more..."
-  },
-  "zenModeAlertDialog": {
-    "title": "Zen mode Alert",
-    "content": "You are about to enter Zen mode. Would you like to continue ?",
-    "btn": {
-      "continue": "Yes, Continue",
-      "exit": "Exit zen mode"
-    }
   }
 }
