@@ -23,6 +23,7 @@
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
     "withBackground": "Com fundo",
+    "addWatermark": "",
     "handDrawn": "Manuscrito",
     "normal": "Normal",
     "code": "Código",
@@ -52,7 +53,8 @@
     "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
-    "name": "Nome"
+    "name": "Nome",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
