@@ -4,7 +4,7 @@
     "selectAll": "Seleziona tutto",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
-    "copyAsSvg": "Copia negli appunti come PNG",
+    "copyAsSvg": "Copia negli appunti come SVG",
     "bringForward": "Porta avanti",
     "sendToBack": "Manda in fondo",
     "bringToFront": "Porta in cima",
@@ -120,7 +120,7 @@
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
     "trackedToSentry_pre": "L'errore con identificativo ",
     "trackedToSentry_post": " è stato tracciato nel nostro sistema.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro ",
     "openIssueMessage_button": "bug tracker.",
     "openIssueMessage_post": " Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
     "sceneContent": "Contenuto della scena:"
