@@ -49,16 +49,16 @@ export const ToolButton = React.forwardRef(function (
       <button
         className={`ToolIcon_type_button ToolIcon ${sizeCn}${
           props.selected ? " ToolIcon--selected" : ""
-        } ${props.className || ""}`}
+        } ${props.className || ""} ${
+          props.visible
+            ? "ToolIcon_type_button--hide"
+            : "ToolIcon_type_button--show"
+        }`}
         title={props.title}
         aria-label={props["aria-label"]}
         type="button"
         onClick={props.onClick}
         ref={innerRef}
-        style={{
-          visibility:
-            props.visible || props.visible == null ? "visible" : "hidden",
-        }}
       >
         <div className="ToolIcon__icon" aria-hidden="true">
           {props.icon || props.label}

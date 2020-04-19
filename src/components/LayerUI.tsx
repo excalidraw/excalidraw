@@ -111,7 +111,8 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <Section heading="canvasActions">
+    <Section heading="canvasActions" className={`layer-ui__wrapper__canvas-actions${zenModeEnabled
+    ? " zen-mode" : ''}`}>
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
       <Island padding={4} style={{ zIndex: 1 }}>
@@ -155,11 +156,12 @@ const LayerUI = ({
       elements,
     );
     return (
-      <FixedSideContainer side="top">
+      <FixedSideContainer side="top" className={zenModeEnabled ? "zen-mode" : undefined}
+      >
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col gap={4}>
-            {!zenModeEnabled && renderCanvasActions()}
+            { renderCanvasActions()}
             {!zenModeEnabled &&
               shouldRenderSelectedShapeActions &&
               renderSelectedShapeActions()}
