@@ -42,11 +42,11 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-export const actionChangeAddWatermark = register({
-  name: "changeAddWatermark",
+export const actionChangeShouldAddWatermark = register({
+  name: "changeShouldAddWatermark",
   perform: (_elements, appState, value) => {
     return {
-      appState: { ...appState, addWatermark: value },
+      appState: { ...appState, shouldAddWatermark: value },
       commitToHistory: false,
     };
   },
@@ -54,7 +54,7 @@ export const actionChangeAddWatermark = register({
     <label>
       <input
         type="checkbox"
-        checked={appState.addWatermark}
+        checked={appState.shouldAddWatermark}
         onChange={(event) => updateData(event.target.checked)}
       />{" "}
       {t("labels.addWatermark")}

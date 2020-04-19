@@ -39,7 +39,7 @@ export type ActionName =
   | "finalize"
   | "changeProjectName"
   | "changeExportBackground"
-  | "changeAddWatermark"
+  | "changeShouldAddWatermark"
   | "saveScene"
   | "loadScene"
   | "duplicateSelection"

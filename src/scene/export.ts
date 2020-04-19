@@ -19,13 +19,13 @@ export function exportToCanvas(
     exportPadding = 10,
     viewBackgroundColor,
     scale = 1,
-    addWatermark,
+    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
-    addWatermark: boolean;
+    shouldAddWatermark: boolean;
   },
   createCanvas: (width: number, height: number) => any = function (
     width,
@@ -38,7 +38,7 @@ export function exportToCanvas(
   },
 ) {
   let sceneElements = elements;
-  if (addWatermark) {
+  if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
     sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
   }
@@ -47,7 +47,9 @@ export function exportToCanvas(
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
-    distance(minY, maxY) + exportPadding + (addWatermark ? 0 : exportPadding);
+    distance(minY, maxY) +
+    exportPadding +
+    (shouldAddWatermark ? 0 : exportPadding);
 
   const tempCanvas: any = createCanvas(width, height);
 
@@ -84,16 +86,16 @@ export function exportToSvg(
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    addWatermark,
+    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    addWatermark: boolean;
+    shouldAddWatermark: boolean;
   },
 ): SVGSVGElement {
   let sceneElements = elements;
-  if (addWatermark) {
+  if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
     sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
   }
@@ -102,7 +104,9 @@ export function exportToSvg(
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
-    distance(minY, maxY) + exportPadding + (addWatermark ? 0 : exportPadding);
+    distance(minY, maxY) +
+    exportPadding +
+    (shouldAddWatermark ? 0 : exportPadding);
 
   // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -147,7 +151,7 @@ export function exportToSvg(
 }
 
 function getWatermarkElement(maxX: number, maxY: number) {
-  const text = t("labels.madeInExcalidraw");
+  const text = t("labels.madeWithExcalidraw");
   const font = "16px Virgil";
   const { width: textWidth } = measureText(text, font);
 

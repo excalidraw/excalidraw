@@ -25,7 +25,7 @@ export type AppState = {
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
-  addWatermark: boolean;
+  shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: string;
