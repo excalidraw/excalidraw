@@ -23,6 +23,7 @@
     "fontFamily": "",
     "onlySelected": "المحدد فقط",
     "withBackground": "مع الخلفية",
+    "addWatermark": "",
     "handDrawn": "",
     "normal": "عادي",
     "code": "الرمز",
@@ -52,7 +53,8 @@
     "createRoom": "مشاركة الجلسة مباشرة",
     "duplicateSelection": "",
     "untitled": "",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
