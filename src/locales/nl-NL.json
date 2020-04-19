@@ -23,6 +23,7 @@
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
     "withBackground": "Met achtergrond",
+    "addWatermark": "",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
-    "name": "Naam"
+    "name": "Naam",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
