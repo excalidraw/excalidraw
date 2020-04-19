@@ -23,6 +23,7 @@
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
+    "addWatermark": "",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
     "code": "Код",
@@ -52,7 +53,8 @@
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "Дубликат",
     "untitled": "",
-    "name": "Имя"
+    "name": "Имя",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
