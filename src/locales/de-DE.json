@@ -23,6 +23,7 @@
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
+    "addWatermark": "",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Live-Kollaborationssitzung teilen",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
-    "name": "Name"
+    "name": "Name",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
