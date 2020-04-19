@@ -23,6 +23,7 @@
     "fontFamily": "",
     "onlySelected": "只針對選取的",
     "withBackground": "包含背景",
+    "addWatermark": "",
     "handDrawn": "",
     "normal": "正常",
     "code": "程式碼",
@@ -52,7 +53,8 @@
     "createRoom": "分享即時協作會議",
     "duplicateSelection": "",
     "untitled": "",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
