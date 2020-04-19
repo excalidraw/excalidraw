@@ -23,7 +23,7 @@
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
     "withBackground": "Con Sfondo",
-    "addWatermark": "",
+    "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
     "code": "Codice",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Creato con Excalidraw"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
