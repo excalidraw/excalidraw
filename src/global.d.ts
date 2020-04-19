@@ -32,3 +32,4 @@ declare module "quill/formats/bold";
 declare module "quill/formats/italic";
 declare module "quill/formats/color";
 declare module "quill/formats/size";
+declare module "quill/formats/font";

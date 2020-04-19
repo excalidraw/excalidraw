@@ -8,8 +8,14 @@ import Toolbar from "quill/modules/toolbar";
 import Bubble from "quill/themes/bubble";
 import { ColorClass, ColorStyle } from "quill/formats/color";
 import { SizeClass, SizeStyle } from "quill/formats/size";
+import { FontClass, FontStyle } from "quill/formats/font";
+
 import "quill/dist/quill.bubble.css";
 import "quill/dist/quill.core.css";
+
+// const Font = Quill.import("formats/font");
+FontClass.whitelist = ["Cascadia", "Virgil"];
+Quill.register(FontClass, true);
 
 Quill.register({
   "modules/toolbar": Toolbar,
@@ -20,6 +26,9 @@ Quill.register({
   "attributors/class/size": SizeClass,
   "attributors/style/size": SizeStyle,
   "formats/size": SizeClass,
+  "attributors/class/font": FontClass,
+  "attributors/style/font": FontStyle,
+  "formats/font": FontClass,
 });
 
 function trimText(text: string) {
@@ -187,8 +196,8 @@ export function textWysiwyg({
     window.removeEventListener("pointerup", rebindBlur);
     window.removeEventListener("blur", handleSubmit);
     unbindUpdate();
-    // document.body.removeChild(editable);
-    // document.getElementById("editor")?.remove();
+    document.body.removeChild(editable);
+    document.getElementById("editor")?.remove();
   }
 
   const rebindBlur = () => {
@@ -231,6 +240,7 @@ export function textWysiwyg({
         "36px": "huge",
       };
       quill.format("size", sizesMap[editingElement.font.split(" ")[0]]);
+      quill.format("font", editingElement.font.split(" ")[1]);
       // Object.assign(editable.style, {
       //   font: editingElement.font,
       //   textAlign: editingElement.textAlign,

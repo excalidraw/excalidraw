@@ -17,6 +17,7 @@ import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import { measureText } from "../utils";
 
 const CANVAS_PADDING = 20;
 
@@ -98,38 +99,97 @@ function drawElementOnCanvas(
     }
     default: {
       if (isTextElement(element)) {
-        const font = context.font;
-        context.font = element.font;
-        const fillStyle = context.fillStyle;
-        context.fillStyle = element.strokeColor;
-        const textAlign = context.textAlign;
-        context.textAlign = element.textAlign as CanvasTextAlign;
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        for (let i = 0; i < lines.length; i++) {
-          context.fillText(
-            lines[i],
-            0 + horizontalOffset,
-            (i + 1) * lineHeight - verticalOffset,
-          );
+        let lineCounter = 0;
+        for (const outerItem of createElement(element.text).children) {
+          if (outerItem.tagName === "P") {
+            const items = outerItem.children;
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+
+              const font = context.font;
+              const fillStyle = context.fillStyle;
+              const textAlign = context.textAlign;
+
+              const styles: any = Array.from(item.attributes).reduce(
+                (initial: any, current: any) => {
+                  const { nodeName, nodeValue } = current;
+                  if (nodeName === "style") {
+                    const styles = nodeValue
+                      .split(";")
+                      .filter((item: any) => item !== "");
+                    const [name, value] = styles[0].split(":");
+                    return {
+                      ...initial,
+                      [name]: value,
+                    };
+                  }
+                  if (nodeName === "class") {
+                    return {
+                      ...initial,
+                      font: `22px ${nodeValue.replace("ql-font-", "")}`,
+                    };
+                  }
+
+                  return {};
+                },
+                {},
+              );
+
+              context.fillStyle = styles.color || element.strokeColor;
+              context.font = styles.font || element.font;
+              context.textAlign = styles["text-align"] || element.textAlign;
+
+              const { width, height, baseline } = measureText(
+                item.innerHTML,
+                styles.font,
+              );
+              const lineHeight = height;
+              const verticalOffset = height - baseline;
+              const horizontalOffset =
+                element.textAlign === "center"
+                  ? width / 2
+                  : element.textAlign === "right"
+                  ? width
+                  : 0;
+
+              let horizontalOffsetOfItem = 0;
+              if (i > 0) {
+                horizontalOffsetOfItem = measureText(
+                  items[i - 1].innerHTML,
+                  styles.font,
+                ).width;
+              }
+              context.fillText(
+                item.textContent || "",
+                0 + horizontalOffset + horizontalOffsetOfItem,
+                (lineCounter + 1) * lineHeight - verticalOffset,
+              );
+
+              context.fillStyle = fillStyle;
+              context.font = font;
+              context.textAlign = textAlign;
+            }
+            lineCounter += 1;
+          }
         }
-        context.fillStyle = fillStyle;
-        context.font = font;
-        context.textAlign = textAlign;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }
   }
   context.globalAlpha = 1;
+}
+
+function createElement(str: string) {
+  var frag = document.createDocumentFragment();
+
+  var elem = document.createElement("div");
+  elem.innerHTML = str;
+
+  while (elem.childNodes[0]) {
+    frag.appendChild(elem.childNodes[0]);
+  }
+  return frag;
 }
 
 const elementWithCanvasCache = new WeakMap<
