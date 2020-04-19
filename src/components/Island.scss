@@ -6,6 +6,7 @@
   border-radius: var(--border-radius-m);
   padding: calc(var(--padding) * var(--space-factor));
   position: relative;
+  transition: box-shadow 0.5s ease-in-out;
 
   &.zen-mode {
     box-shadow: none;

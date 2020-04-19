@@ -194,7 +194,7 @@ class App extends React.Component<any, AppState> {
   };
 
   public render() {
-    const { showZenMode, showZenModeAlertDialog } = this.state;
+    const { zenModeEnabled, showZenModeAlertDialog } = this.state;
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
@@ -220,7 +220,7 @@ class App extends React.Component<any, AppState> {
             });
           }}
           onLockToggle={this.toggleLock}
-          showZenMode={showZenMode}
+          zenModeEnabled={zenModeEnabled}
         />
         <main>
           <canvas
@@ -330,8 +330,8 @@ class App extends React.Component<any, AppState> {
       if (scene) {
         this.syncActionResult(scene);
         if (scene.appState) {
-          const { showZenMode } = scene.appState;
-          if (showZenMode) {
+          const { zenModeEnabled: zenModeEnabled } = scene.appState;
+          if (zenModeEnabled) {
             this.setState({
               showZenModeAlertDialog: true,
             });
@@ -794,7 +794,7 @@ class App extends React.Component<any, AppState> {
 
   toggleZenMode = () => {
     this.setState({
-      showZenMode: !this.state.showZenMode,
+      zenModeEnabled: !this.state.zenModeEnabled,
       showZenModeAlertDialog: false,
     });
   };

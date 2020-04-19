@@ -39,10 +39,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -240,10 +240,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -360,10 +360,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -637,10 +637,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -799,10 +799,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1001,10 +1001,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1262,10 +1262,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1663,10 +1663,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2289,10 +2289,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2409,10 +2409,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2529,10 +2529,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2649,10 +2649,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2791,10 +2791,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2933,10 +2933,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3075,10 +3075,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3195,10 +3195,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3315,10 +3315,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3457,10 +3457,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3577,10 +3577,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3651,10 +3651,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -4538,10 +4538,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -4964,10 +4964,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5297,10 +5297,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5541,10 +5541,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5716,10 +5716,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -6554,10 +6554,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -7283,10 +7283,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -7907,10 +7907,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -8431,10 +8431,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -8905,10 +8905,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9284,10 +9284,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9572,10 +9572,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9789,10 +9789,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -10683,10 +10683,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -11466,10 +11466,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -12142,10 +12142,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -12711,10 +12711,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13091,10 +13091,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13149,10 +13149,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13207,10 +13207,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13505,10 +13505,10 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
-  "showZenMode": false,
   "showZenModeAlertDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;

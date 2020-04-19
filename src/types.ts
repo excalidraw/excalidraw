@@ -63,7 +63,7 @@ export type AppState = {
   >;
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
-  showZenMode: boolean;
+  zenModeEnabled: boolean;
   showZenModeAlertDialog: boolean;
 };
 

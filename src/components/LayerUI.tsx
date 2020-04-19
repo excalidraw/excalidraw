@@ -41,7 +41,7 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
-  showZenMode: boolean;
+  zenModeEnabled: boolean;
 }
 
 const LayerUI = ({
@@ -54,7 +54,7 @@ const LayerUI = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
-  showZenMode,
+  zenModeEnabled,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -159,8 +159,8 @@ const LayerUI = ({
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col gap={4}>
-            {!showZenMode && renderCanvasActions()}
-            {!showZenMode &&
+            {!zenModeEnabled && renderCanvasActions()}
+            {!zenModeEnabled &&
               shouldRenderSelectedShapeActions &&
               renderSelectedShapeActions()}
           </Stack.Col>
@@ -170,7 +170,7 @@ const LayerUI = ({
                 <Stack.Row gap={1}>
                   <Island
                     padding={1}
-                    className={showZenMode ? "zen-mode" : undefined}
+                    className={zenModeEnabled ? "zen-mode" : undefined}
                   >
                     {heading}
                     <Stack.Row gap={1}>
@@ -180,7 +180,7 @@ const LayerUI = ({
                       />
                     </Stack.Row>
                   </Island>
-                  {!showZenMode && (
+                  {!zenModeEnabled && (
                     <LockIcon
                       checked={appState.elementLocked}
                       onChange={onLockToggle}
@@ -193,7 +193,7 @@ const LayerUI = ({
           </Section>
           <div />
         </div>
-        {!showZenMode && (
+        {!zenModeEnabled && (
           <div className="App-menu App-menu_bottom">
             <Stack.Col gap={2}>
               <Section heading="canvasActions">
@@ -214,7 +214,7 @@ const LayerUI = ({
 
   const renderFooter = () => (
     <footer role="contentinfo">
-      {!showZenMode && (
+      {!zenModeEnabled && (
         <LanguageList
           onChange={(lng) => {
             setLanguage(lng);
@@ -265,7 +265,7 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      {!showZenMode && (
+      {!zenModeEnabled && (
         <aside>
           <GitHubCorner />
         </aside>
