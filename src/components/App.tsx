@@ -266,7 +266,7 @@ class App extends React.Component<any, AppState> {
       }
       this.setState((state) => ({
         ...res.appState,
-        editingElement: editingElement || state.editingElement,
+        editingElement: editingElement || res.appState?.editingElement || null,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));
