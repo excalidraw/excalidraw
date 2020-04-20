@@ -23,7 +23,7 @@
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
-    "addWatermark": "",
+    "addWatermark": "Добавить \"Сделано с Excalidraw\"",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
     "code": "Код",
