@@ -218,7 +218,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  checkpoint("end of test");
+  // checkpoint("end of test");
 });
 
 describe("regression tests", () => {
@@ -531,7 +531,7 @@ describe("regression tests", () => {
     hotkeyPress("ARROW_DOWN");
   });
 
-  it("undo/redo drawing an element", () => {
+  it.only("undo/redo drawing an element", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
     pointerMove(20, 20);
@@ -542,12 +542,19 @@ describe("regression tests", () => {
     pointerMove(40, 20);
     pointerUp();
 
-    clickTool("rectangle");
-    pointerDown(50, 10);
-    pointerMove(60, 20);
+    clickTool("arrow");
+    pointerDown(10, 30);
     pointerUp();
+    pointerMove(20, 40);
+    pointerDown(20, 40);
+    pointerUp();
+    pointerMove(10, 50);
+    pointerDown(10, 50);
+    pointerUp();
+    hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
+    keyPress("z", true); // press twice for multi arrow
     keyPress("z", true);
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     keyPress("z", true);
