@@ -36,18 +36,22 @@ module.exports = {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              configFile:'tsconfig.prod.json'
+              configFile: "tsconfig.prod.json",
             },
           },
           {
             loader: "babel-loader",
             options: {
-              presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+              presets: [
+                "@babel/preset-env",
+                "@babel/preset-react",
+                "@babel/preset-typescript",
+              ],
               plugins: [
                 "@babel/plugin-proposal-object-rest-spread",
                 "@babel/plugin-transform-arrow-functions",
                 "transform-class-properties",
-                "@babel/plugin-transform-async-to-generator"
+                "@babel/plugin-transform-async-to-generator",
               ],
             },
           },

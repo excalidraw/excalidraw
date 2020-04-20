@@ -773,7 +773,9 @@ class App extends React.Component<any, AppState> {
     this.portal.close();
   };
 
-  private initializeSocketClient = async (opts: { showLoadingState: boolean }) => {
+  private initializeSocketClient = async (opts: {
+    showLoadingState: boolean;
+  }) => {
     if (this.portal.socket) {
       return;
     }
@@ -894,7 +896,9 @@ class App extends React.Component<any, AppState> {
         }
       };
 
-      const socketIOClientLib: any = await import(/* webpackChunkName: "socketIoClient.min" */ 'socket.io-client');
+      const socketIOClientLib: any = await import(
+        /* webpackChunkName: "socketIoClient.min" */ "socket.io-client"
+      );
       const socketIOClient = socketIOClientLib.default;
       this.portal.open(
         socketIOClient(SOCKET_SERVER),
