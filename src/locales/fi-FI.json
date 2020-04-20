@@ -127,8 +127,8 @@
   },
   "roomDialog": {
     "desc_intro": "Voit kutsua ihmisiä piirrokseesi tekemään yhteistyötä kanssasi.",
-    "desc_privacy": "",
-    "button_startSession": "",
+    "desc_privacy": "Älä huoli, istunto käyttää päästä päähän salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme ei näe mitä keksit.",
+    "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
     "desc_persistenceWarning": "Huomaa, että työn tiedot jaetaan muiden muiden käyttäjien kesken P2P-menetelmällä, eikä niitä tallenneta palvelimellemme. Jos kaikki työn käyttäjät katkaisevat yhteyden, menetätte työn, ellette tallenna sitä tiedostoksi tai jaettavaksi linkiksi.",
