@@ -22,7 +22,7 @@
     "@sentry/browser": "5.15.4",
     "@sentry/integrations": "5.15.4",
     "browser-nativefs": "0.7.1",
-    "i18next-browser-languagedetector": "4.0.2",
+    "i18next-browser-languagedetector": "4.1.1",
     "nanoid": "2.1.11",
     "open-color": "1.7.0",
     "pwacompat": "2.0.11",
