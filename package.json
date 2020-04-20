@@ -25,11 +25,12 @@
     "i18next-browser-languagedetector": "4.1.1",
     "nanoid": "2.1.11",
     "open-color": "1.7.0",
+    "points-on-curve": "0.2.0",
     "pwacompat": "2.0.11",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "roughjs": "4.1.4",
+    "roughjs": "4.2.1",
     "socket.io-client": "2.3.0"
   },
   "devDependencies": {
@@ -103,7 +104,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|browser-nativefs)/)"
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
     ]
   },
   "private": true,
