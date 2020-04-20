@@ -218,7 +218,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // checkpoint("end of test");
+  checkpoint("end of test");
 });
 
 describe("regression tests", () => {
@@ -531,7 +531,7 @@ describe("regression tests", () => {
     hotkeyPress("ARROW_DOWN");
   });
 
-  it.only("undo/redo drawing an element", () => {
+  it("undo/redo drawing an element", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
     pointerMove(20, 20);
