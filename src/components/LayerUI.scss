@@ -47,26 +47,14 @@
     }
   }
 
-  &__canvas-actions {
-    visibility: visible;
-    transition: visibility 1s ease-in-out;
-    .ToolIcon_type_button {
-      transition: visibility 1s ease-in-out;
-      visibility: visible;
-    }
-    &.zen-mode {
-      visibility: hidden;
-
-      .ToolIcon_type_button {
-        visibility: hidden;
-      }
-    }
-  }
-
-  &__footer-left {
+  .zen-mode-transition {
     transition: transform 0.5s ease-in-out;
-    &.zen-mode {
+
+    &.transition-left {
       transform: translate(-999px, 0);
+    }
+    &.transition-bottom {
+      transform: translate(0px, -999px);
     }
   }
 }

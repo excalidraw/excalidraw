@@ -167,3 +167,12 @@
     right: 2px;
   }
 }
+
+.zen-mode-visibility {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+
+  &.hidden {
+    opacity: 0;
+  }
+}

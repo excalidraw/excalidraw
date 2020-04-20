@@ -111,8 +111,10 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <Section heading="canvasActions" className={`layer-ui__wrapper__canvas-actions${zenModeEnabled
-    ? " zen-mode" : ''}`}>
+    <Section
+      heading="canvasActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
       <Island padding={4} style={{ zIndex: 1 }}>
@@ -138,7 +140,10 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => (
-    <Section heading="selectedShapeActions">
+    <Section
+      heading="selectedShapeActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
         <SelectedShapeActions
           appState={appState}
@@ -156,15 +161,12 @@ const LayerUI = ({
       elements,
     );
     return (
-      <FixedSideContainer side="top" className={zenModeEnabled ? "zen-mode" : undefined}
-      >
+      <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col gap={4}>
-            { renderCanvasActions()}
-            {!zenModeEnabled &&
-              shouldRenderSelectedShapeActions &&
-              renderSelectedShapeActions()}
+            {renderCanvasActions()}
+            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           <Section heading="shapes">
             {(heading) => (
@@ -182,21 +184,24 @@ const LayerUI = ({
                       />
                     </Stack.Row>
                   </Island>
-                  {!zenModeEnabled && (
-                    <LockIcon
-                      checked={appState.elementLocked}
-                      onChange={onLockToggle}
-                      title={t("toolBar.lock")}
-                    />
-                  )}
+                  <LockIcon
+                    zenModeEnabled={zenModeEnabled}
+                    checked={appState.elementLocked}
+                    onChange={onLockToggle}
+                    title={t("toolBar.lock")}
+                  />
                 </Stack.Row>
               </Stack.Col>
             )}
           </Section>
           <div />
         </div>
-        {(
-          <div className={`App-menu App-menu_bottom layer-ui__wrapper__footer-left ${zenModeEnabled ? "zen-mode" : undefined}`}>
+        {
+          <div
+            className={`App-menu App-menu_bottom zen-mode-transition ${
+              zenModeEnabled && "transition-left"
+            }`}
+          >
             <Stack.Col gap={2}>
               <Section heading="canvasActions">
                 <Island padding={1}>
@@ -209,14 +214,18 @@ const LayerUI = ({
               </Section>
             </Stack.Col>
           </div>
-        )}
+        }
       </FixedSideContainer>
     );
   };
 
   const renderFooter = () => (
     <footer role="contentinfo">
-      {!zenModeEnabled && (
+      <div
+        className={`zen-mode-transition ${
+          zenModeEnabled && "transition-bottom"
+        }`}
+      >
         <LanguageList
           onChange={(lng) => {
             setLanguage(lng);
@@ -225,7 +234,7 @@ const LayerUI = ({
           languages={languages}
           floating
         />
-      )}
+      </div>
       {actionManager.renderAction("toggleShortcuts")}
       {appState.scrolledOutside && (
         <button
