@@ -172,10 +172,7 @@ const LayerUI = ({
             {(heading) => (
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
-                  <Island
-                    padding={1}
-                    className={zenModeEnabled ? "zen-mode" : undefined}
-                  >
+                  <Island padding={1} className={zenModeEnabled && "zen-mode"}>
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher
@@ -220,10 +217,10 @@ const LayerUI = ({
   };
 
   const renderFooter = () => (
-    <footer role="contentinfo">
+    <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
         className={`zen-mode-transition ${
-          zenModeEnabled && "transition-bottom"
+          zenModeEnabled && "transition-right"
         }`}
       >
         <LanguageList
@@ -234,8 +231,8 @@ const LayerUI = ({
           languages={languages}
           floating
         />
+        {actionManager.renderAction("toggleShortcuts")}
       </div>
-      {actionManager.renderAction("toggleShortcuts")}
       {appState.scrolledOutside && (
         <button
           className="scroll-back-to-content"
@@ -276,11 +273,15 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      {!zenModeEnabled && (
-        <aside>
+      {
+        <aside
+          className={`layer-ui__wrapper__github-corner zen-mode-transition ${
+            zenModeEnabled && "transition-right"
+          }`}
+        >
           <GitHubCorner />
         </aside>
-      )}
+      }
       {renderFooter()}
     </div>
   );

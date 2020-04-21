@@ -47,14 +47,25 @@
     }
   }
 
+  &__github-corner {
+    top: 0;
+    right: 0;
+    position: absolute;
+    width: 40px;
+  }
+  &__footer {
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 190px;
+  }
   .zen-mode-transition {
     transition: transform 0.5s ease-in-out;
-
     &.transition-left {
       transform: translate(-999px, 0);
     }
-    &.transition-bottom {
-      transform: translate(0px, -999px);
+    &.transition-right {
+      transform: translate(999px, 0px);
     }
   }
 }
