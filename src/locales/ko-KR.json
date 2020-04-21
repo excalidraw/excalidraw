@@ -23,6 +23,7 @@
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
     "withBackground": "배경 포함",
+    "addWatermark": "",
     "handDrawn": "필기체",
     "normal": "일반",
     "code": "코드",
@@ -52,7 +53,8 @@
     "createRoom": "실시간 협업 세션 공유",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",

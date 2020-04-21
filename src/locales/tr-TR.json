@@ -23,6 +23,7 @@
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
     "withBackground": "Arka Plan İle Beraber",
+    "addWatermark": "",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
     "code": "Kod",
@@ -52,7 +53,8 @@
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
     "untitled": "Başlıksız",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",

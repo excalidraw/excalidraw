@@ -23,6 +23,7 @@
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
+    "addWatermark": "",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans titre",
-    "name": "Nom"
+    "name": "Nom",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",

@@ -23,6 +23,7 @@
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
     "withBackground": "С фон",
+    "addWatermark": "",
     "handDrawn": "Нарисувано на ръка",
     "normal": "Нормален",
     "code": "Код",
@@ -52,7 +53,8 @@
     "createRoom": "Споделете сесия за сътрудничество на живо",
     "duplicateSelection": "Дублирай",
     "untitled": "Неозаглавено",
-    "name": "Име"
+    "name": "Име",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",

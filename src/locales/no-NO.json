@@ -23,6 +23,7 @@
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
     "withBackground": "Inkluder bakgrunn",
+    "addWatermark": "",
     "handDrawn": "Håndtegnet",
     "normal": "Normal",
     "code": "Kode",
@@ -52,7 +53,8 @@
     "createRoom": "Del en sanntids-samarbeidsøkt",
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
-    "name": "Navn"
+    "name": "Navn",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",

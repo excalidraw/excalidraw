@@ -23,6 +23,7 @@
     "fontFamily": "",
     "onlySelected": "",
     "withBackground": "",
+    "addWatermark": "",
     "handDrawn": "",
     "normal": "",
     "code": "",
@@ -52,7 +53,8 @@
     "createRoom": "",
     "duplicateSelection": "",
     "untitled": "",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "",

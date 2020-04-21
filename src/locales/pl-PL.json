@@ -23,6 +23,7 @@
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
     "withBackground": "Z tłem dokumentu",
+    "addWatermark": "",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
     "code": "Kod",
@@ -52,7 +53,8 @@
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
-    "name": "Nazwa"
+    "name": "Nazwa",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -151,7 +153,7 @@
     "github": "Znalazłeś problem? Zgłoś go",
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": ""
+    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz. Kliknij ikonę, aby dowiedzieć się więcej..."
