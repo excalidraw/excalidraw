@@ -100,6 +100,7 @@ export const resizeXYWidthHightWithRotation = (
   yPointer: number,
   offsetPointer: number,
   sidesWithSameLength: boolean,
+  maintainRatio: boolean,
 ) => {
   // center point for rotation
   const cx = x + width / 2;
@@ -123,6 +124,9 @@ export const resizeXYWidthHightWithRotation = (
     scaleY = (y + height - offsetPointer - rotatedY) / height;
   }
 
+  if (maintainRatio) {
+    scaleX = scaleY = Math.max(scaleX, scaleY);
+  }
   let nextWidth = width * scaleX;
   let nextHeight = height * scaleY;
   if (sidesWithSameLength) {

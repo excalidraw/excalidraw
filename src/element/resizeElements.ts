@@ -192,6 +192,7 @@ export const resizeElements = (
         yPointer,
         offsetPointer,
         event.shiftKey,
+        event.altKey,
       );
       if (resized.width !== 0 && resized.height !== 0) {
         mutateElement(element, {
