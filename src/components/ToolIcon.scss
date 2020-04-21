@@ -169,10 +169,10 @@
 }
 
 .zen-mode-visibility {
-  transition: opacity 0.5s ease-in-out;
-  opacity: 1;
+  transition: visibility 0.5s ease-in-out;
+  visibility: visible;
 
   &.hidden {
-    opacity: 0;
+    visibility: hidden;
   }
 }
