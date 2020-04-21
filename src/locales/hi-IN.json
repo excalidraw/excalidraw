@@ -23,6 +23,7 @@
     "fontFamily": "",
     "onlySelected": "",
     "withBackground": "",
+    "addWatermark": "",
     "handDrawn": "",
     "normal": "साधारण",
     "code": "",
@@ -52,7 +53,8 @@
     "createRoom": "अधिवेशन",
     "duplicateSelection": "",
     "untitled": "",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "",

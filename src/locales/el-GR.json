@@ -23,6 +23,7 @@
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
     "withBackground": "Με Φόντο",
+    "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
     "handDrawn": "Σχεδιασμένο στο χέρι",
     "normal": "Κανονική",
     "code": "Κώδικας",
@@ -52,7 +53,8 @@
     "createRoom": "Έναρξη ζωντανής συνεδρίας",
     "duplicateSelection": "Δημιουργία αντιγράφου",
     "untitled": "Χωρίς τίτλο",
-    "name": "Όνομα"
+    "name": "Όνομα",
+    "madeWithExcalidraw": "Φτιαγμένο με Excalidraw"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",

@@ -23,6 +23,7 @@
     "fontFamily": "",
     "onlySelected": "Csak a kiválasztott",
     "withBackground": "Háttérrel együtt",
+    "addWatermark": "",
     "handDrawn": "",
     "normal": "Normál",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
     "untitled": "",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",

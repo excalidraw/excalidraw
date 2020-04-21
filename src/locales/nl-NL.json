@@ -1,8 +1,8 @@
 {
   "labels": {
-    "paste": "Plak",
+    "paste": "Plakken",
     "selectAll": "Alles selecteren",
-    "copy": "Kopieer",
+    "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
     "bringForward": "Breng naar voren",
@@ -23,6 +23,7 @@
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
     "withBackground": "Met achtergrond",
+    "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
-    "name": "Naam"
+    "name": "Naam",
+    "madeWithExcalidraw": "Gemaakt met Excalidraw"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -151,7 +153,7 @@
     "github": "Probleem gevonden? Stuur een nieuwe issue",
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)",
-    "zoomToFit": ""
+    "zoomToFit": "Zoom in op alle elementen"
   },
   "encrypted": {
     "tooltip": "Je illustratie is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server ze nooit zal zien. Klik op het icoon om meer te weten..."

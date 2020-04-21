@@ -23,6 +23,7 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "添加背景",
+    "addWatermark": "",
     "handDrawn": "手写",
     "normal": "正常",
     "code": "代码",
@@ -52,7 +53,8 @@
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素",
     "untitled": "无标题",
-    "name": "名字"
+    "name": "名字",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "重置画布",
