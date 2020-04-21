@@ -3,7 +3,7 @@
 .layer-ui__wrapper {
   .encrypted-icon {
     position: relative;
-    margin-left: 15px;
+    margin-inline-start: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,8 +18,13 @@
     &.tooltip .tooltip-text {
       visibility: hidden;
       width: 20rem;
-      bottom: calc(50% + 0.8rem);
-      left: -5px;
+      bottom: calc(50% + 0.8rem + 6px);
+      :root[dir="ltr"] & {
+        left: -5px;
+      }
+      :root[dir="rtl"] & {
+        right: -5px;
+      }
       background-color: $oc-black;
       color: $oc-white;
       text-align: center;

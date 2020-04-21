@@ -63,7 +63,9 @@ const LayerUI = ({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <span className="tooltip-text">{t("encrypted.tooltip")}</span>
+      <span className="tooltip-text" dir="auto">
+        {t("encrypted.tooltip")}
+      </span>
       {shield}
     </a>
   );
