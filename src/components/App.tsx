@@ -214,6 +214,7 @@ class App extends React.Component<any, AppState> {
           }}
           onLockToggle={this.toggleLock}
           zenModeEnabled={zenModeEnabled}
+          toggleZenMode={this.toggleZenMode}
         />
         <main>
           <canvas
@@ -768,11 +769,12 @@ class App extends React.Component<any, AppState> {
     }));
   };
 
-  toggleZenMode() {
+  toggleZenMode = () => {
     this.setState({
       zenModeEnabled: !this.state.zenModeEnabled,
     });
-  }
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,

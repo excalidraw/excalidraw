@@ -42,6 +42,7 @@ interface LayerUIProps {
   onRoomDestroy: () => void;
   onLockToggle: () => void;
   zenModeEnabled: boolean;
+  toggleZenMode: () => void;
 }
 
 const LayerUI = ({
@@ -55,6 +56,7 @@ const LayerUI = ({
   onRoomDestroy,
   onLockToggle,
   zenModeEnabled,
+  toggleZenMode,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -218,6 +220,9 @@ const LayerUI = ({
 
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
+      <button className="switch-zen-mode" onClick={toggleZenMode}>
+        {zenModeEnabled ? "Exit Zen mode" : "Enable Zen Mode"}
+      </button>
       <div
         className={`zen-mode-transition ${
           zenModeEnabled && "transition-right"
