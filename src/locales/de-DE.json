@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten",
+    "resize": "",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
   },
   "errorSplash": {
