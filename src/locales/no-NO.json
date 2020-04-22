@@ -23,7 +23,7 @@
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
     "withBackground": "Inkluder bakgrunn",
-    "addWatermark": "",
+    "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
     "normal": "Normal",
     "code": "Kode",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Laget med Excalidraw"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
