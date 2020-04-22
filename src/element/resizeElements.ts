@@ -19,6 +19,10 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
+import {
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+} from "../keys";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -117,13 +121,13 @@ export const resizeElements = (
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   appState: AppState,
   setAppState: (obj: any) => void,
-  resizeArrowFn: ResizeArrowFnType | null,
-  setResizeArrowFn: (fn: ResizeArrowFnType) => void,
-  event: PointerEvent,
+  resizeArrowFn: ResizeArrowFnType | null, // XXX eliminate in #1339
+  setResizeArrowFn: (fn: ResizeArrowFnType) => void, // XXX eliminate in #1339
+  event: PointerEvent, // XXX we want to make it independent?
   xPointer: number,
   yPointer: number,
-  lastX: number,
-  lastY: number,
+  lastX: number, // XXX eliminate in #1339
+  lastY: number, // XXX eliminate in #1339
 ) => {
   setAppState({
     isResizing: resizeHandle !== "rotation",
@@ -191,7 +195,8 @@ export const resizeElements = (
         xPointer,
         yPointer,
         offsetPointer,
-        event.shiftKey,
+        getResizeWithSidesSameLengthKey(event),
+        getResizeCenterPointKey(event),
       );
       if (resized.width !== 0 && resized.height !== 0) {
         mutateElement(element, {
