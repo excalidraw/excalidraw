@@ -140,7 +140,7 @@ export const resizeElements = (
   const handleOffset = 4 / appState.zoom; // XXX import constant
   const dashedLinePadding = 4 / appState.zoom; // XXX import constant
   const offsetPointer = handleOffset + dashedLinePadding;
-  const minSize = handleOffset * 2;
+  const minSize = offsetPointer;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
