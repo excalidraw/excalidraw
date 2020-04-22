@@ -156,6 +156,6 @@
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi"
   },
   "encrypted": {
-    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.\nClicca l'icona per saperne di più..."
+    "tooltip": ""
   }
 }
