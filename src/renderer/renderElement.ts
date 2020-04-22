@@ -14,8 +14,10 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance } from "../utils";
+import { SVG_NS, distance, getPixelRatio } from "../utils";
 import { isPathALoop } from "../math";
+import { createCanvasObject } from "../utils";
+
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
@@ -32,7 +34,7 @@ function generateElementCanvas(
   element: NonDeletedExcalidrawElement,
   zoom: number,
 ): ExcalidrawElementWithCanvas {
-  const canvas = document.createElement("canvas");
+  const canvas = createCanvasObject();
   const context = canvas.getContext("2d")!;
 
   const isLinear = /\b(arrow|line)\b/.test(element.type);
@@ -43,36 +45,32 @@ function generateElementCanvas(
   if (isLinear) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
-      distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(x1, x2) * getPixelRatio() * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(y1, y2) * getPixelRatio() * zoom + CANVAS_PADDING * 2;
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.x, x1)) * getPixelRatio()
         : 0;
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.y, y1)) * getPixelRatio()
         : 0;
     context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
   } else {
-    canvas.width =
-      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+    canvas.width = element.width * getPixelRatio() * zoom + CANVAS_PADDING * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      element.height * getPixelRatio() * zoom + CANVAS_PADDING * 2;
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
-  context.scale(window.devicePixelRatio * zoom, window.devicePixelRatio * zoom);
+  context.scale(getPixelRatio() * zoom, getPixelRatio() * zoom);
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
-  context.scale(
-    1 / (window.devicePixelRatio * zoom),
-    1 / (window.devicePixelRatio * zoom),
-  );
+  context.scale(1 / (getPixelRatio() * zoom), 1 / (getPixelRatio() * zoom));
   return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
 }
 
@@ -296,23 +294,23 @@ function drawElementFromCanvas(
 ) {
   const element = elementWithCanvas.element;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * getPixelRatio();
+  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * getPixelRatio();
+  context.scale(1 / getPixelRatio(), 1 / getPixelRatio());
   context.translate(cx, cy);
   context.rotate(element.angle);
   context.drawImage(
     elementWithCanvas.canvas!,
-    (-(x2 - x1) / 2) * window.devicePixelRatio -
+    (-(x2 - x1) / 2) * getPixelRatio() -
       CANVAS_PADDING / elementWithCanvas.canvasZoom,
-    (-(y2 - y1) / 2) * window.devicePixelRatio -
+    (-(y2 - y1) / 2) * getPixelRatio() -
       CANVAS_PADDING / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
-  context.scale(window.devicePixelRatio, window.devicePixelRatio);
+  context.scale(getPixelRatio(), getPixelRatio());
 }
 
 export function renderElement(

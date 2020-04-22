@@ -222,3 +222,16 @@ export function getGlobalCSSVariable(name: string) {
     `--${name}`,
   );
 }
+
+export const isServer = () => typeof window === "undefined";
+
+export const getPixelRatio = (): number =>
+  isServer() ? 1 : window.devicePixelRatio;
+
+export function createCanvasObject() {
+  if (isServer()) {
+    const createCanvas = require("canvas").createCanvas;
+    return createCanvas();
+  }
+  return document.createElement("canvas");
+}

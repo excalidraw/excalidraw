@@ -1,4 +1,6 @@
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
+export const isDarwin =
+  typeof window !== "undefined" &&
+  /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 
 export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
