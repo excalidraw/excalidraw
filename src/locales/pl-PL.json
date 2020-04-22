@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT",
+    "resize": "",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
