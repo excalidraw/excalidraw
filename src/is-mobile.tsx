@@ -11,7 +11,7 @@ export const IsMobileProvider = ({
   if (!query.current) {
     query.current = window.matchMedia
       ? window.matchMedia(
-          "(max-width: 600px), (max-height: 500px) and (max-width: 1000px)",
+          "(max-width: 640px), (max-height: 500px) and (max-width: 1000px)",
         )
       : (({
           matches: false,

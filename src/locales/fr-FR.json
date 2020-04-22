@@ -20,16 +20,17 @@
     "opacity": "Opacité",
     "textAlign": "Alignement du texte",
     "fontSize": "Taille de la police",
-    "fontFamily": "",
+    "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
+    "addWatermark": "",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
     "small": "Petit",
     "medium": "Moyen",
     "large": "Grand",
-    "veryLarge": "",
+    "veryLarge": "Très grand",
     "solid": "Solide",
     "hachure": "Hachure",
     "crossHatch": "Hachure croisée",
@@ -51,8 +52,9 @@
     "language": "Langue",
     "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer",
-    "untitled": "",
-    "name": "Nom"
+    "untitled": "Sans titre",
+    "name": "Nom",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -65,7 +67,7 @@
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",
-    "selectLanguage": "",
+    "selectLanguage": "Choisir une langue",
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoomer",
     "zoomOut": "Dézoomer",
@@ -140,16 +142,20 @@
     "title": "Raccourcis clavier",
     "shapes": "Formes",
     "or": "ou",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "click": "cliquer",
+    "drag": "glisser",
+    "curvedArrow": "Flèche courbée",
+    "curvedLine": "Ligne courbée",
     "editor": "Éditeur",
-    "view": "",
+    "view": "Afficher",
     "blog": "Lisez notre blog",
     "howto": "Suivez notre guides",
-    "github": "",
+    "github": "Vous avez trouvé un problème ? Envoyer",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
-    "textFinish": "Terminer l'édition (texte)"
+    "textFinish": "Terminer l'édition (texte)",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

@@ -1,10 +1,13 @@
 import rough from "roughjs/bin/rough";
+import oc from "open-color";
+import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
+import { distance, SVG_NS, measureText } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
+import { t } from "../i18n";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -16,11 +19,13 @@ export const exportToCanvas = (
     exportPadding = 10,
     viewBackgroundColor,
     scale = 1,
+    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
+    shouldAddWatermark: boolean;
   },
   createCanvas: (width: number, height: number) => any = (width, height) => {
     const tempCanvas = document.createElement("canvas");
@@ -29,15 +34,24 @@ export const exportToCanvas = (
     return tempCanvas;
   },
 ) => {
+  let sceneElements = elements;
+  if (shouldAddWatermark) {
+    const [, , maxX, maxY] = getCommonBounds(elements);
+    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
+  }
+
   // calculate smallest area to fit the contents in
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const height =
+    distance(minY, maxY) +
+    exportPadding +
+    (shouldAddWatermark ? 0 : exportPadding);
 
   const tempCanvas: any = createCanvas(width, height);
 
   renderScene(
-    elements,
+    sceneElements,
     appState,
     null,
     scale,
@@ -59,6 +73,7 @@ export const exportToCanvas = (
       renderOptimizations: false,
     },
   );
+
   return tempCanvas;
 };
 
@@ -68,16 +83,27 @@ export const exportToSvg = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
+    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
+    shouldAddWatermark: boolean;
   },
 ): SVGSVGElement => {
+  let sceneElements = elements;
+  if (shouldAddWatermark) {
+    const [, , maxX, maxY] = getCommonBounds(elements);
+    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
+  }
+
   // calculate canvas dimensions
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
   const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const height =
+    distance(minY, maxY) +
+    exportPadding +
+    (shouldAddWatermark ? 0 : exportPadding);
 
   // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -113,9 +139,30 @@ export const exportToSvg = (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
+  renderSceneToSvg(sceneElements, rsvg, svgRoot, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });
+
   return svgRoot;
+};
+
+const getWatermarkElement = (maxX: number, maxY: number) => {
+  const text = t("labels.madeWithExcalidraw");
+  const font = "16px Virgil";
+  const { width: textWidth } = measureText(text, font);
+
+  return newTextElement({
+    text,
+    font,
+    textAlign: "center",
+    x: maxX - textWidth / 2,
+    y: maxY + 16,
+    strokeColor: oc.gray[5],
+    backgroundColor: "transparent",
+    fillStyle: "hachure",
+    strokeWidth: 1,
+    roughness: 1,
+    opacity: 100,
+  });
 };

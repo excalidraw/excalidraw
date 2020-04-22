@@ -23,6 +23,7 @@
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
     "withBackground": "With Background",
+    "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
-    "name": "Name"
+    "name": "Name",
+    "madeWithExcalidraw": "Made with Excalidraw"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -107,7 +109,7 @@
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "You can constrain proportions by holding SHIFT while resizing",
+    "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating"
   },
   "errorSplash": {
@@ -150,6 +152,10 @@
     "howto": "Follow our guides",
     "github": "Found an issue? Submit",
     "textNewLine": "Add new line (text)",
-    "textFinish": "Finish editing (text)"
+    "textFinish": "Finish editing (text)",
+    "zoomToFit": "Zoom to fit all elements"
+  },
+  "encrypted": {
+    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
   }
 }

@@ -48,7 +48,11 @@ const ExportModal = ({
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { exportBackground, viewBackgroundColor } = appState;
+  const {
+    exportBackground,
+    viewBackgroundColor,
+    shouldAddWatermark,
+  } = appState;
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState)
@@ -65,6 +69,7 @@ const ExportModal = ({
       viewBackgroundColor,
       exportPadding,
       scale,
+      shouldAddWatermark,
     });
     previewNode?.appendChild(canvas);
     return () => {
@@ -77,6 +82,7 @@ const ExportModal = ({
     exportPadding,
     viewBackgroundColor,
     scale,
+    shouldAddWatermark,
   ]);
 
   return (
@@ -150,6 +156,7 @@ const ExportModal = ({
             </label>
           </div>
         )}
+        {actionManager.renderAction("changeShouldAddWatermark")}
       </Stack.Col>
     </div>
   );

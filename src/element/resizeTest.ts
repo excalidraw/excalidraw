@@ -101,6 +101,16 @@ export const getResizeHandlerFromCoords = (
   return (found || false) as HandlerRectanglesRet;
 };
 
+const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
+const rotateResizeCursor = (cursor: string, angle: number) => {
+  const index = RESIZE_CURSORS.indexOf(cursor);
+  if (index >= 0) {
+    const a = Math.round(angle / (Math.PI / 4));
+    cursor = RESIZE_CURSORS[(index + a) % RESIZE_CURSORS.length];
+  }
+  return cursor;
+};
+
 /*
  * Returns bi-directional cursor for the element being resized
  */
@@ -139,8 +149,11 @@ export const getCursorForResizingElement = (resizingElement: {
       }
       break;
     case "rotation":
-      cursor = "ew";
-      break;
+      return "grab";
+  }
+
+  if (cursor && element) {
+    cursor = rotateResizeCursor(cursor, element.angle);
   }
 
   return cursor ? `${cursor}-resize` : "";
