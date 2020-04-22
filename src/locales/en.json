@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "You can constrain proportions by holding SHIFT while resizing",
+    "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating"
   },
   "errorSplash": {
