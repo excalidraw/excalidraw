@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "Puoi mantenere le proporzioni tenendo premuto SHIFT durante il ridimensionamento",
+    "resize": "",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
   },
   "errorSplash": {
