@@ -109,7 +109,7 @@ const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
 const rotateResizeCursor = (cursor: string, angle: number) => {
   const index = RESIZE_CURSORS.indexOf(cursor);
   if (index >= 0) {
-    const a = Math.floor((angle + Math.PI / 8) / (Math.PI / 4));
+    const a = Math.round(angle / (Math.PI / 4));
     cursor = RESIZE_CURSORS[(index + a) % RESIZE_CURSORS.length];
   }
   return cursor;
