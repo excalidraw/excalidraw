@@ -156,6 +156,6 @@
     "zoomToFit": "Zoom in op alle elementen"
   },
   "encrypted": {
-    "tooltip": "Je illustratie is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server ze nooit zal zien. Klik op het icoon om meer te weten..."
+    "tooltip": ""
   }
 }
