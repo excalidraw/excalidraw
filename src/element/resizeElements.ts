@@ -121,21 +121,13 @@ export const resizeElements = (
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   appState: AppState,
   setAppState: (obj: any) => void,
-  resizeArrowFn: ResizeArrowFnType | null,
-  setResizeArrowFn: (fn: ResizeArrowFnType) => void,
-  event: PointerEvent,
+  resizeArrowFn: ResizeArrowFnType | null, // XXX eliminate in #1339
+  setResizeArrowFn: (fn: ResizeArrowFnType) => void, // XXX eliminate in #1339
+  event: PointerEvent, // XXX we want to make it independent?
   xPointer: number,
   yPointer: number,
-  lastX: number,
-  lastY: number,
-  elementOriginPosition: {
-    readonly x: number;
-    readonly y: number;
-    readonly width: number;
-    readonly height: number;
-  },
-  resizeWithCenterKeyLifted: boolean,
-  setResizeWithCenterKeyLifted: (nextValue: boolean) => void,
+  lastX: number, // XXX eliminate in #1339
+  lastY: number, // XXX eliminate in #1339
 ) => {
   setAppState({
     isResizing: resizeHandle !== "rotation",
@@ -219,12 +211,6 @@ export const resizeElements = (
               }
             : {}),
         });
-        if (resizeWithCenterKeyLifted) {
-          mutateElement(element, {
-            ...elementOriginPosition,
-          });
-          setResizeWithCenterKeyLifted(false);
-        }
       }
     }
 
