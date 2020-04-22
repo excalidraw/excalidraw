@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "resize": "Je kan de verhouding behouden door SHIFT in te drukken tijdens het schalen",
+    "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
   },
   "errorSplash": {
