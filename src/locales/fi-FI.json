@@ -109,7 +109,7 @@
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
-    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa",
+    "resize": "",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi"
   },
   "errorSplash": {
