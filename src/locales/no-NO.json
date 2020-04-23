@@ -156,6 +156,6 @@
     "zoomToFit": "Zoom for å passe alle elementene"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
   }
 }
