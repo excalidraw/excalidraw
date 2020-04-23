@@ -57,45 +57,6 @@
   "engines": {
     "node": ">=12.0.0"
   },
-  "eslintConfig": {
-    "extends": [
-      "prettier",
-      "react-app"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "curly": "warn",
-      "no-console": [
-        "warn",
-        {
-          "allow": [
-            "warn",
-            "error",
-            "info"
-          ]
-        }
-      ],
-      "no-else-return": "warn",
-      "no-useless-return": "warn",
-      "prefer-const": [
-        "warn",
-        {
-          "destructuring": "all"
-        }
-      ],
-      "prefer-template": "warn",
-      "prettier/prettier": "warn",
-      "no-restricted-syntax": [
-        "warn",
-        {
-          "selector": "JSXText[value=/\\w/]",
-          "message": "Use 't(...)' instead of literal text in JSX"
-        }
-      ]
-    }
-  },
   "homepage": ".",
   "husky": {
     "hooks": {
