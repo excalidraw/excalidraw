@@ -156,6 +156,6 @@
     "zoomToFit": "Zoomaa kaikki elementit näkyviin"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   }
 }
