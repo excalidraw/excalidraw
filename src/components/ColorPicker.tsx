@@ -7,6 +7,17 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
+const standardizeColor = (
+  value: string,
+  canvasContext: CanvasRenderingContext2D,
+): string | null => {
+  const defaultHexColor = "#000000";
+  canvasContext.fillStyle = value;
+  const hexColor = canvasContext.fillStyle;
+  canvasContext.fillStyle = defaultHexColor;
+  return hexColor !== defaultHexColor || value === "black" ? hexColor : null;
+};
+
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
 
@@ -182,6 +193,9 @@ const ColorInput = React.forwardRef(
     const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
+    const canvasContext = React.useRef<CanvasRenderingContext2D>(
+      document.createElement("canvas").getContext("2d"),
+    );
 
     React.useEffect(() => {
       setInnerValue(color);
@@ -200,6 +214,11 @@ const ColorInput = React.forwardRef(
             const value = event.target.value.toLowerCase();
             if (value.match(colorRegex)) {
               onChange(value === "transparent" ? "transparent" : `#${value}`);
+            } else if (canvasContext.current) {
+              const hexColor = standardizeColor(value, canvasContext.current);
+              if (hexColor) {
+                onChange(hexColor);
+              }
             }
             setInnerValue(value);
           }}
