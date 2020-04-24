@@ -23,6 +23,7 @@
     "fontFamily": "Tipo de letra",
     "onlySelected": "Sólo seleccionados",
     "withBackground": "Con fondo",
+    "addWatermark": "",
     "handDrawn": "Dibujado a mano",
     "normal": "Normal",
     "code": "Código",
@@ -52,7 +53,8 @@
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
-    "name": "Nombre"
+    "name": "Nombre",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -150,6 +152,10 @@
     "howto": "Seguir nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
-    "textFinish": "Finalizar edición (texto)"
+    "textFinish": "Finalizar edición (texto)",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

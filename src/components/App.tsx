@@ -71,7 +71,12 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey } from "../keys";
+import {
+  KEYS,
+  isArrowKey,
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+} from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -269,7 +274,7 @@ class App extends React.Component<any, AppState> {
       }
       this.setState((state) => ({
         ...res.appState,
-        editingElement: editingElement || state.editingElement,
+        editingElement: editingElement || res.appState?.editingElement || null,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));
@@ -1818,6 +1823,7 @@ class App extends React.Component<any, AppState> {
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
+
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -2038,7 +2044,7 @@ class App extends React.Component<any, AppState> {
     }
 
     let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrrowFn = (fn: ResizeArrowFnType) => {
+    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
       resizeArrowFn = fn;
     };
 
@@ -2099,7 +2105,7 @@ class App extends React.Component<any, AppState> {
           this.state,
           this.setAppState,
           resizeArrowFn,
-          setResizeArrrowFn,
+          setResizeArrowFn,
           event,
           x,
           y,
@@ -2206,7 +2212,7 @@ class App extends React.Component<any, AppState> {
           });
         }
       } else {
-        if (event.shiftKey) {
+        if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
             width,
@@ -2218,9 +2224,19 @@ class App extends React.Component<any, AppState> {
           }
         }
 
+        let newX = x < originX ? originX - width : originX;
+        let newY = y < originY ? originY - height : originY;
+
+        if (getResizeCenterPointKey(event)) {
+          width += width;
+          height += height;
+          newX = originX - width / 2;
+          newY = originY - height / 2;
+        }
+
         mutateElement(draggingElement, {
-          x: x < originX ? originX - width : originX,
-          y: y < originY ? originY - height : originY,
+          x: newX,
+          y: newY,
           width: width,
           height: height,
         });

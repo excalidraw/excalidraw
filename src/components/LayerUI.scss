@@ -3,7 +3,7 @@
 .layer-ui__wrapper {
   .encrypted-icon {
     position: relative;
-    margin-left: 15px;
+    margin-inline-start: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,8 +18,13 @@
     &.tooltip .tooltip-text {
       visibility: hidden;
       width: 20rem;
-      bottom: calc(50% + 0.8rem);
-      left: -5px;
+      bottom: calc(50% + 0.8rem + 6px);
+      :root[dir="ltr"] & {
+        left: -5px;
+      }
+      :root[dir="rtl"] & {
+        right: -5px;
+      }
       background-color: $oc-black;
       color: $oc-white;
       text-align: center;
@@ -30,6 +35,21 @@
       font-size: 13px;
       line-height: 1.5;
       white-space: pre-wrap;
+
+      &::after {
+        --size: 6px;
+        content: "";
+        border: var(--size) solid transparent;
+        border-top-color: $oc-black;
+        position: absolute;
+        bottom: calc(-2 * var(--size));
+        :root[dir="ltr"] & {
+          left: calc(5px + var(--size) / 2);
+        }
+        :root[dir="rtl"] & {
+          right: calc(5px + var(--size) / 2);
+        }
+      }
     }
 
     // the following 3 rules ensure that the tooltip doesn't show (nor affect

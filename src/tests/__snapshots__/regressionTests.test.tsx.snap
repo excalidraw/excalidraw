@@ -37,6 +37,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -110,6 +111,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -150,6 +152,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -237,6 +240,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -288,6 +292,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -356,6 +361,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -407,6 +413,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -446,6 +453,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -485,6 +493,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -524,6 +533,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -563,6 +573,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -632,6 +643,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -683,6 +695,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -723,6 +736,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -793,6 +807,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -844,6 +859,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -884,6 +900,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -925,6 +942,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -994,6 +1012,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -1067,6 +1086,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1106,6 +1126,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1165,6 +1186,7 @@ Object {
           "id0": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1254,6 +1276,7 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -1349,6 +1372,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1388,6 +1412,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1446,6 +1471,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1525,6 +1551,7 @@ Object {
           "id1": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1610,32 +1637,7 @@ Object {
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
-  "editingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id6",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        0,
-        0,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 845789479,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "line",
-    "version": 6,
-    "versionNonce": 745419401,
-    "width": 0,
-    "x": 30,
-    "y": 30,
-  },
+  "editingElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1654,6 +1656,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -1813,6 +1816,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -1832,6 +1836,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1871,6 +1876,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1929,6 +1935,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2006,6 +2013,7 @@ Object {
         "selectedElementIds": Object {
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2113,6 +2121,7 @@ Object {
         "selectedElementIds": Object {
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2279,6 +2288,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2330,6 +2340,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2398,6 +2409,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2449,6 +2461,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2517,6 +2530,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2568,6 +2582,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2636,6 +2651,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2698,6 +2714,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2777,6 +2794,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2839,6 +2857,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2918,6 +2937,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -2980,6 +3000,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3059,6 +3080,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -3110,6 +3132,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3178,6 +3201,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -3229,6 +3253,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3297,6 +3322,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -3359,6 +3385,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3438,6 +3465,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -3489,6 +3517,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3557,6 +3586,7 @@ Object {
     "id0": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
   "username": "",
@@ -3630,6 +3660,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -3681,6 +3712,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3721,6 +3753,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3762,6 +3795,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3804,6 +3838,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3847,6 +3882,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3891,6 +3927,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3936,6 +3973,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3982,6 +4020,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4029,6 +4068,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4077,6 +4117,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4126,6 +4167,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4176,6 +4218,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4227,6 +4270,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4279,6 +4323,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4332,6 +4377,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4386,6 +4432,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4441,6 +4488,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4516,6 +4564,7 @@ Object {
     "id7": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -4567,6 +4616,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4607,6 +4657,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4648,6 +4699,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4690,6 +4742,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4733,6 +4786,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4777,6 +4831,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4822,6 +4877,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4868,6 +4924,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4941,6 +4998,7 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -4992,6 +5050,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5032,6 +5091,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5073,6 +5133,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5115,6 +5176,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5158,6 +5220,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5202,6 +5265,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5273,6 +5337,7 @@ Object {
     "id3": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -5324,6 +5389,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5364,6 +5430,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5405,6 +5472,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5447,6 +5515,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5516,6 +5585,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -5567,6 +5637,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5607,6 +5678,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5690,6 +5762,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -5741,6 +5814,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5781,6 +5855,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5822,6 +5897,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5864,6 +5940,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5907,6 +5984,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5951,6 +6029,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5996,6 +6075,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6042,6 +6122,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6089,6 +6170,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6137,6 +6219,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6186,6 +6269,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6236,6 +6320,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6287,6 +6372,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6339,6 +6425,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6392,6 +6479,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6446,6 +6534,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6527,6 +6616,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -6578,6 +6668,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6618,6 +6709,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6659,6 +6751,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6701,6 +6794,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6744,6 +6838,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6788,6 +6883,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6833,6 +6929,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6879,6 +6976,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6926,6 +7024,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6974,6 +7073,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7023,6 +7123,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7073,6 +7174,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7124,6 +7226,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7176,6 +7279,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7255,6 +7359,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -7306,6 +7411,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7346,6 +7452,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7387,6 +7494,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7429,6 +7537,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7472,6 +7581,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7516,6 +7626,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7561,6 +7672,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7607,6 +7719,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7654,6 +7767,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7702,6 +7816,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7751,6 +7866,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7801,6 +7917,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7878,6 +7995,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -7929,6 +8047,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7969,6 +8088,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8010,6 +8130,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8052,6 +8173,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8095,6 +8217,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8139,6 +8262,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8184,6 +8308,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8230,6 +8355,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8277,6 +8403,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8325,6 +8452,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8401,6 +8529,7 @@ Object {
     "id8": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -8452,6 +8581,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8492,6 +8622,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8533,6 +8664,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8575,6 +8707,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8618,6 +8751,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8662,6 +8796,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8707,6 +8842,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8753,6 +8889,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8800,6 +8937,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8874,6 +9012,7 @@ Object {
     "id6": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -8925,6 +9064,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8965,6 +9105,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9006,6 +9147,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9048,6 +9190,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9091,6 +9234,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9135,6 +9279,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9180,6 +9325,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9252,6 +9398,7 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -9303,6 +9450,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9343,6 +9491,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9384,6 +9533,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9426,6 +9576,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9469,6 +9620,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9539,6 +9691,7 @@ Object {
     "id2": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -9590,6 +9743,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9630,6 +9784,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9671,6 +9826,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9755,6 +9911,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -9806,6 +9963,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9846,6 +10004,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9887,6 +10046,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9929,6 +10089,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9972,6 +10133,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10016,6 +10178,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10061,6 +10224,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10107,6 +10271,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10154,6 +10319,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10202,6 +10368,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10251,6 +10418,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10301,6 +10469,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10352,6 +10521,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10404,6 +10574,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10457,6 +10628,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10511,6 +10683,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10566,6 +10739,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10648,6 +10822,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -10699,6 +10874,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10739,6 +10915,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10780,6 +10957,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10822,6 +11000,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10865,6 +11044,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10909,6 +11089,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10954,6 +11135,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11000,6 +11182,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11047,6 +11230,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11095,6 +11279,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11144,6 +11329,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11194,6 +11380,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11245,6 +11432,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11297,6 +11485,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11350,6 +11539,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11430,6 +11620,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -11481,6 +11672,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11521,6 +11713,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11562,6 +11755,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11604,6 +11798,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11647,6 +11842,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11691,6 +11887,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11736,6 +11933,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11782,6 +11980,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11829,6 +12028,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11877,6 +12077,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11926,6 +12127,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11976,6 +12178,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12027,6 +12230,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12105,6 +12309,7 @@ Object {
     "id9": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -12156,6 +12361,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12196,6 +12402,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12237,6 +12444,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12279,6 +12487,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12322,6 +12531,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12366,6 +12576,7 @@ Object {
           "id4": true,
           "id5": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12411,6 +12622,7 @@ Object {
           "id5": true,
           "id6": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12457,6 +12669,7 @@ Object {
           "id6": true,
           "id7": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12504,6 +12717,7 @@ Object {
           "id7": true,
           "id8": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12552,6 +12766,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12601,6 +12816,7 @@ Object {
           "id8": true,
           "id9": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12673,6 +12889,7 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -12746,6 +12963,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12785,6 +13003,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12844,6 +13063,7 @@ Object {
           "id0": true,
           "id2": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12905,6 +13125,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12967,6 +13188,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13052,6 +13274,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -13109,6 +13332,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": true,
   "showShortcutsDialog": false,
   "username": "",
@@ -13166,6 +13390,7 @@ Object {
     "id1": true,
   },
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",
@@ -13227,17 +13452,31 @@ Object {
   "height": 10,
   "id": "id2",
   "isDeleted": true,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
   "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
   "roughness": 1,
   "seed": 1116226695,
   "strokeColor": "#000000",
   "strokeWidth": 1,
-  "type": "rectangle",
-  "version": 5,
-  "versionNonce": 1006504105,
+  "type": "arrow",
+  "version": 9,
+  "versionNonce": 2004587015,
   "width": 10,
-  "x": 50,
-  "y": 10,
+  "x": 10,
+  "y": 30,
 }
 `;
 
@@ -13260,6 +13499,103 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 20,
+          "id": "id2",
+          "isDeleted": false,
+          "lastCommittedPoint": Array [
+            0,
+            20,
+          ],
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+            Array [
+              0,
+              20,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 1116226695,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 8,
+          "versionNonce": 81784553,
+          "width": 10,
+          "x": 10,
+          "y": 30,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13308,17 +13644,31 @@ Object {
           "height": 10,
           "id": "id2",
           "isDeleted": false,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
           "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
           "roughness": 1,
           "seed": 1116226695,
           "strokeColor": "#000000",
           "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1014066025,
+          "type": "arrow",
+          "version": 6,
+          "versionNonce": 1604849351,
           "width": 10,
-          "x": 50,
-          "y": 10,
+          "x": 10,
+          "y": 30,
         },
       ],
     },
@@ -13339,6 +13689,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13378,6 +13729,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13427,7 +13779,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `17`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -13463,6 +13815,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectionElement": null,
+  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showShortcutsDialog": false,
   "username": "",

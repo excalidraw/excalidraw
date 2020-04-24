@@ -67,7 +67,9 @@ const LayerUI = ({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <span className="tooltip-text">{t("encrypted.tooltip")}</span>
+      <span className="tooltip-text" dir="auto">
+        {t("encrypted.tooltip")}
+      </span>
       {shield}
     </a>
   );
@@ -83,6 +85,7 @@ const LayerUI = ({
           name: appState.name,
           viewBackgroundColor: appState.viewBackgroundColor,
           scale,
+          shouldAddWatermark: appState.shouldAddWatermark,
         });
       }
     };
