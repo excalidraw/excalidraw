@@ -71,13 +71,23 @@
     }
   }
 
-  .switch-zen-mode {
+  .disable-zen-mode {
     height: 30px;
     position: absolute;
     bottom: 10px;
-    right: 230px;
+    right: 15px;
     font-size: 10px;
     padding: 10px;
     font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0s linear 0s, opacity 0.5s;
+
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+      transition: visibility 0s linear 300ms, opacity 0.5s;
+      transition-delay: 0.8s;
+    }
   }
 }

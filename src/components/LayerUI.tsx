@@ -220,9 +220,6 @@ const LayerUI = ({
 
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
-      <button className="switch-zen-mode" onClick={toggleZenMode}>
-        {zenModeEnabled ? "Exit Zen mode" : "Enable Zen Mode"}
-      </button>
       <div
         className={`zen-mode-transition ${
           zenModeEnabled && "transition-right"
@@ -238,6 +235,14 @@ const LayerUI = ({
         />
         {actionManager.renderAction("toggleShortcuts")}
       </div>
+      <button
+        className={`disable-zen-mode ${
+          zenModeEnabled && "disable-zen-mode--visible"
+        }`}
+        onClick={toggleZenMode}
+      >
+        {t("buttons.exitZenMode")}
+      </button>
       {appState.scrolledOutside && (
         <button
           className="scroll-back-to-content"
