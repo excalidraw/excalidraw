@@ -7,15 +7,23 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
-const standardizeColor = (
-  value: string,
+const normalizeColor = (
+  color: string,
   canvasContext: CanvasRenderingContext2D,
 ): string | null => {
-  const defaultHexColor = "#000000";
-  canvasContext.fillStyle = value;
+  // Excalidraw only supports "transparent" as a valid transparent value.
+  // Default canvas fill style value is `#000000`, which is also a valid
+  // Excalidraw color. Let's set it to another Canvas-valid but
+  // Excalidraw-invalid value to detect successful normalizations.
+  if (color === "transparent") {
+    return color;
+  }
+
+  const defaultColor = "rgba(0,0,0,0)";
+  canvasContext.fillStyle = defaultColor;
+  canvasContext.fillStyle = color;
   const hexColor = canvasContext.fillStyle;
-  canvasContext.fillStyle = defaultHexColor;
-  return hexColor !== defaultHexColor || value === "black" ? hexColor : null;
+  return hexColor.startsWith("#") ? hexColor : null;
 };
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
@@ -190,7 +198,6 @@ const ColorInput = React.forwardRef(
     },
     ref,
   ) => {
-    const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
     const canvasContext = React.useRef<CanvasRenderingContext2D>(
@@ -203,6 +210,20 @@ const ColorInput = React.forwardRef(
 
     React.useImperativeHandle(ref, () => inputRef.current);
 
+    const changeColor = React.useCallback(
+      (inputValue: string) => {
+        const value = inputValue.toLowerCase();
+        if (canvasContext.current) {
+          const normalizedValue = normalizeColor(value, canvasContext.current);
+          if (normalizedValue) {
+            onChange(normalizedValue);
+          }
+        }
+        setInnerValue(value);
+      },
+      [canvasContext, onChange, setInnerValue],
+    );
+
     return (
       <label className="color-input-container">
         <div className="color-picker-hash">#</div>
@@ -210,20 +231,9 @@ const ColorInput = React.forwardRef(
           spellCheck={false}
           className="color-picker-input"
           aria-label={label}
-          onChange={(event) => {
-            const value = event.target.value.toLowerCase();
-            if (value.match(colorRegex)) {
-              onChange(value === "transparent" ? "transparent" : `#${value}`);
-            } else if (canvasContext.current) {
-              const hexColor = standardizeColor(value, canvasContext.current);
-              if (hexColor) {
-                onChange(hexColor);
-              }
-            }
-            setInnerValue(value);
-          }}
+          onChange={(event) => changeColor(event.target.value)}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={(event) => onChange(event.clipboardData.getData("text"))}
+          onPaste={(event) => changeColor(event.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
