@@ -54,7 +54,8 @@ export function handlerRectanglesFromCoords(
   const cy = (y1 + y2) / 2;
 
   const dashedLineMargin = 4 / zoom;
-  const centeringOffset = dashedLineMargin + size / 2 / zoom;
+
+  const centeringOffset = (size - 8) / (2 * zoom);
 
   const handlers: Partial<
     { [T in Sides]: [number, number, number, number] }
