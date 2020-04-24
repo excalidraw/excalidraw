@@ -137,13 +137,10 @@ export const resizeElements = (
     globalSceneState.getElements(),
     appState,
   );
-  /*
   const handleOffset = 4 / appState.zoom; // XXX import constant
   const dashedLinePadding = 4 / appState.zoom; // XXX import constant
   const offsetPointer = handleOffset + dashedLinePadding;
-  */
-  const offsetPointer = 0; // https://github.com/excalidraw/excalidraw/pull/1475#issuecomment-618533540
-  const minSize = offsetPointer;
+  const minSize = 0;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
