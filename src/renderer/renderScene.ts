@@ -114,8 +114,9 @@ export function renderScene(
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
       sceneState.viewBackgroundColor === "transparent" ||
-      sceneState.viewBackgroundColor.length === 5 ||
-      sceneState.viewBackgroundColor.length === 9;
+      sceneState.viewBackgroundColor.length === 5 || // #RGBA
+      sceneState.viewBackgroundColor.length === 9 || // #RRGGBBA
+      /(hsla|rgba)\(/.test(sceneState.viewBackgroundColor);
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
