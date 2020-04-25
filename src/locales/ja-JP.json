@@ -79,7 +79,9 @@
     "redo": "",
     "roomDialog": "",
     "createNewRoom": "",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "",
