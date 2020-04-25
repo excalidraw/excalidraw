@@ -15,6 +15,10 @@
   z-index: 2;
 }
 
+.FixedSideContainer_side_top.zen-mode {
+  right: 42px;
+}
+
 /* TODO: if these are used, make sure to implement RTL support
 .FixedSideContainer_side_left {
   left: var(--margin);

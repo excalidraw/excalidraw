@@ -41,6 +41,8 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  zenModeEnabled: boolean;
+  toggleZenMode: () => void;
 }
 
 const LayerUI = ({
@@ -53,6 +55,8 @@ const LayerUI = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
+  zenModeEnabled,
+  toggleZenMode,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -112,7 +116,10 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <Section heading="canvasActions">
+    <Section
+      heading="canvasActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
       <Island padding={4} style={{ zIndex: 1 }}>
@@ -138,7 +145,10 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => (
-    <Section heading="selectedShapeActions">
+    <Section
+      heading="selectedShapeActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
         <SelectedShapeActions
           appState={appState}
@@ -167,7 +177,7 @@ const LayerUI = ({
             {(heading) => (
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
-                  <Island padding={1}>
+                  <Island padding={1} className={zenModeEnabled && "zen-mode"}>
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher
@@ -177,6 +187,7 @@ const LayerUI = ({
                     </Stack.Row>
                   </Island>
                   <LockIcon
+                    zenModeEnabled={zenModeEnabled}
                     checked={appState.elementLocked}
                     onChange={onLockToggle}
                     title={t("toolBar.lock")}
@@ -187,34 +198,54 @@ const LayerUI = ({
           </Section>
           <div />
         </div>
-        <div className="App-menu App-menu_bottom">
-          <Stack.Col gap={2}>
-            <Section heading="canvasActions">
-              <Island padding={1}>
-                <ZoomActions
-                  renderAction={actionManager.renderAction}
-                  zoom={appState.zoom}
-                />
-              </Island>
-              {renderEncryptedIcon()}
-            </Section>
-          </Stack.Col>
-        </div>
+        {
+          <div
+            className={`App-menu App-menu_bottom zen-mode-transition ${
+              zenModeEnabled && "transition-left"
+            }`}
+          >
+            <Stack.Col gap={2}>
+              <Section heading="canvasActions">
+                <Island padding={1}>
+                  <ZoomActions
+                    renderAction={actionManager.renderAction}
+                    zoom={appState.zoom}
+                  />
+                </Island>
+                {renderEncryptedIcon()}
+              </Section>
+            </Stack.Col>
+          </div>
+        }
       </FixedSideContainer>
     );
   };
 
   const renderFooter = () => (
-    <footer role="contentinfo">
-      <LanguageList
-        onChange={(lng) => {
-          setLanguage(lng);
-          setAppState({});
-        }}
-        languages={languages}
-        floating
-      />
-      {actionManager.renderAction("toggleShortcuts")}
+    <footer role="contentinfo" className="layer-ui__wrapper__footer">
+      <div
+        className={`zen-mode-transition ${
+          zenModeEnabled && "transition-right"
+        }`}
+      >
+        <LanguageList
+          onChange={(lng) => {
+            setLanguage(lng);
+            setAppState({});
+          }}
+          languages={languages}
+          floating
+        />
+        {actionManager.renderAction("toggleShortcuts")}
+      </div>
+      <button
+        className={`disable-zen-mode ${
+          zenModeEnabled && "disable-zen-mode--visible"
+        }`}
+        onClick={toggleZenMode}
+      >
+        {t("buttons.exitZenMode")}
+      </button>
       {appState.scrolledOutside && (
         <button
           className="scroll-back-to-content"
@@ -255,9 +286,15 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      <aside>
-        <GitHubCorner />
-      </aside>
+      {
+        <aside
+          className={`layer-ui__wrapper__github-corner zen-mode-transition ${
+            zenModeEnabled && "transition-right"
+          }`}
+        >
+          <GitHubCorner />
+        </aside>
+      }
       {renderFooter()}
     </div>
   );

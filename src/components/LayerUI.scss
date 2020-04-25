@@ -66,4 +66,48 @@
       visibility: visible;
     }
   }
+
+  &__github-corner {
+    top: 0;
+    right: 0;
+    position: absolute;
+    width: 40px;
+  }
+
+  &__footer {
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 190px;
+  }
+
+  .zen-mode-transition {
+    transition: transform 0.5s ease-in-out;
+    &.transition-left {
+      transform: translate(-999px, 0);
+    }
+    &.transition-right {
+      transform: translate(999px, 0px);
+    }
+  }
+
+  .disable-zen-mode {
+    height: 30px;
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 10px;
+    padding: 10px;
+    font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0s linear 0s, opacity 0.5s;
+
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+      transition: visibility 0s linear 300ms, opacity 0.5s;
+      transition-delay: 0.8s;
+    }
+  }
 }
