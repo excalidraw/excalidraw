@@ -79,7 +79,9 @@
     "redo": "Újra végrehajtás",
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
