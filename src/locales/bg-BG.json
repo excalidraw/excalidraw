@@ -79,7 +79,9 @@
     "redo": "Повтори",
     "roomDialog": "Започнете сътрудничество на живо",
     "createNewRoom": "Създай нова стая",
-    "toggleFullScreen": "Превключване на цял екран"
+    "toggleFullScreen": "Превключване на цял екран",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
