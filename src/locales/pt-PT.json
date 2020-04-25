@@ -79,7 +79,9 @@
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
-    "toggleFullScreen": "Alterar tela cheia"
+    "toggleFullScreen": "Alterar tela cheia",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
