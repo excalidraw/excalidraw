@@ -1,11 +1,11 @@
-import "./Island.css";
+import "./Island.scss";
 
 import React from "react";
 
 type IslandProps = {
   children: React.ReactNode;
   padding?: number;
-  className?: string;
+  className?: string | boolean;
   style?: object;
 };
 

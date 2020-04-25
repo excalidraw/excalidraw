@@ -192,6 +192,7 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
+    const { zenModeEnabled } = this.state;
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
@@ -217,6 +218,8 @@ class App extends React.Component<any, AppState> {
             });
           }}
           onLockToggle={this.toggleLock}
+          zenModeEnabled={zenModeEnabled}
+          toggleZenMode={this.toggleZenMode}
         />
         <main>
           <canvas
@@ -771,6 +774,12 @@ class App extends React.Component<any, AppState> {
     }));
   };
 
+  toggleZenMode = () => {
+    this.setState({
+      zenModeEnabled: !this.state.zenModeEnabled,
+    });
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1070,6 +1079,14 @@ class App extends React.Component<any, AppState> {
       this.setState({
         showShortcutsDialog: true,
       });
+    }
+
+    if (
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.altKey &&
+      event.keyCode === KEYS.Z_KEY_CODE
+    ) {
+      this.toggleZenMode();
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
