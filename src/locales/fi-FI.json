@@ -79,7 +79,9 @@
     "redo": "Tee uudelleen",
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
-    "toggleFullScreen": "Koko näytön tila päälle/pois"
+    "toggleFullScreen": "Koko näytön tila päälle/pois",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
