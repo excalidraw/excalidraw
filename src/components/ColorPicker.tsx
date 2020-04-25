@@ -7,23 +7,22 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
-const normalizeColor = (
-  color: string,
-  canvasContext: CanvasRenderingContext2D,
-): string | null => {
-  // Excalidraw only supports "transparent" as a valid transparent value.
-  // Default canvas fill style value is `#000000`, which is also a valid
-  // Excalidraw color. Let's set it to another Canvas-valid but
-  // Excalidraw-invalid value to detect successful normalizations.
+function isValidColor(color: string) {
+  const style = new Option().style;
+  style.color = color;
+  return !!style.color;
+}
+
+const getColor = (color: string): string | null => {
   if (color === "transparent") {
     return color;
   }
 
-  const defaultColor = "rgba(0,0,0,0)";
-  canvasContext.fillStyle = defaultColor;
-  canvasContext.fillStyle = color;
-  const hexColor = canvasContext.fillStyle;
-  return hexColor.startsWith("#") ? hexColor : null;
+  return isValidColor(color)
+    ? color
+    : isValidColor(`#${color}`)
+    ? `#${color}`
+    : null;
 };
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
@@ -200,9 +199,6 @@ const ColorInput = React.forwardRef(
   ) => {
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
-    const canvasContext = React.useRef<CanvasRenderingContext2D>(
-      document.createElement("canvas").getContext("2d"),
-    );
 
     React.useEffect(() => {
       setInnerValue(color);
@@ -213,15 +209,13 @@ const ColorInput = React.forwardRef(
     const changeColor = React.useCallback(
       (inputValue: string) => {
         const value = inputValue.toLowerCase();
-        if (canvasContext.current) {
-          const normalizedValue = normalizeColor(value, canvasContext.current);
-          if (normalizedValue) {
-            onChange(normalizedValue);
-          }
+        const color = getColor(value);
+        if (color) {
+          onChange(color);
         }
         setInnerValue(value);
       },
-      [canvasContext, onChange, setInnerValue],
+      [onChange],
     );
 
     return (
@@ -233,7 +227,6 @@ const ColorInput = React.forwardRef(
           aria-label={label}
           onChange={(event) => changeColor(event.target.value)}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={(event) => changeColor(event.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
