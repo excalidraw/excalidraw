@@ -79,7 +79,9 @@
     "redo": "Gjør om",
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
-    "toggleFullScreen": "Skru fullskjerm av/på"
+    "toggleFullScreen": "Skru fullskjerm av/på",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
