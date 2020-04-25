@@ -79,7 +79,9 @@
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
-    "toggleFullScreen": "Alternar pantalla completa"
+    "toggleFullScreen": "Alternar pantalla completa",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
