@@ -126,19 +126,29 @@ export const resizeXYWidthHightWithRotation = (
   // rotation with current angle
   const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
 
+  // XXX this might be slow with closure
+  const adjustWithOffsetPointer = (w: number) => {
+    if (w > offsetPointer) {
+      return w - offsetPointer;
+    } else if (w < -offsetPointer) {
+      return w + offsetPointer;
+    }
+    return 0;
+  };
+
   let scaleX = 1;
   let scaleY = 1;
   if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offsetPointer - x1) / (x2 - x1);
+    scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
   }
   if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offsetPointer - y1) / (y2 - y1);
+    scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x2 - offsetPointer - rotatedX) / (x2 - x1);
+    scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y2 - offsetPointer - rotatedY) / (y2 - y1);
+    scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
   }
 
   let nextWidth = elementWidth * scaleX;
