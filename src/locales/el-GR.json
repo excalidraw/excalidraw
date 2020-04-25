@@ -80,8 +80,8 @@
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Εναλλαγή λειτουργίας Zen",
+    "exitZenMode": "Έξοδος απο την λειτουργία Zen"
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
