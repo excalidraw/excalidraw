@@ -80,8 +80,8 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
     "toggleFullScreen": "Skru fullskjerm av/på",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Slå av/på zen-modus",
+    "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
