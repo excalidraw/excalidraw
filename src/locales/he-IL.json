@@ -116,14 +116,14 @@
   },
   "errorSplash": {
     "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
+    "headingMain_button": "טוען את העמוד מחדש.",
+    "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
+    "clearCanvasMessage_button": "מנקה את הלוח.",
+    "clearCanvasCaveat": " זה יביא לאובדן עבודה ",
+    "trackedToSentry_pre": "שגיאה עם מזהה ",
+    "trackedToSentry_post": " נמצאה במערכת שלנו.",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
+    "openIssueMessage_button": "מעקב באגים.",
     "openIssueMessage_post": "",
     "sceneContent": ""
   },
@@ -138,11 +138,11 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "שגיאה"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
+    "title": "קיצורי מקלדת",
+    "shapes": "צורות",
     "or": "או",
     "click": "לחץ",
     "drag": "גרור",
@@ -152,12 +152,12 @@
     "view": "תצוגה",
     "blog": "קרא את הבלוג שלנו",
     "howto": "עקוב אחר המדריכים שלנו",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
+    "github": "מצאת בעיה? דווח",
+    "textNewLine": "הוסף שורה חדשה (טקסט)",
+    "textFinish": "סיים עריכה (טקסט)",
     "zoomToFit": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
   }
 }
