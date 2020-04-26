@@ -32,8 +32,8 @@
     "large": "גדול",
     "veryLarge": "גדול מאוד",
     "solid": "מוצק",
-    "hachure": "",
-    "crossHatch": "",
+    "hachure": "קווים משופעים",
+    "crossHatch": "קווים מוצלבים",
     "thin": "דק",
     "bold": "מודגש",
     "left": "שמאל",
@@ -111,8 +111,8 @@
   "hints": {
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
-    "resize": "",
-    "rotate": ""
+    "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
+    "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב"
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
@@ -130,11 +130,11 @@
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_persistenceWarning": "",
-    "desc_shareLink": "",
+    "button_startSession": "התחל שיתוף",
+    "button_stopSession": "הפסק שיתוף",
+    "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
+    "desc_persistenceWarning": "שים לב ששיתוף הלוח נעשה בין המשתתפים ממחשב למחשב באופן ישיר, ולא נשמר בשרתים שלנו. לכן, אם כולכם תתנתקו, המידע יאבד אלא אם כן תייצא אותו לקובץ או באמצעות לינק הניתן לשיתוף.",
+    "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
     "desc_exitSession": ""
   },
   "errorDialog": {
