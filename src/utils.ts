@@ -223,15 +223,15 @@ export function getGlobalCSSVariable(name: string) {
   );
 }
 
-export const isServer = () => typeof window === "undefined";
-
 export const getPixelRatio = (): number =>
-  isServer() ? 1 : window.devicePixelRatio;
+  typeof window !== "undefined" && window.devicePixelRatio
+    ? window.devicePixelRatio
+    : 1;
 
 export function createCanvasObject() {
-  if (isServer()) {
-    const createCanvas = require("canvas").createCanvas;
-    return createCanvas();
+  if (typeof document !== "undefined" && document.createElement) {
+    return document.createElement("canvas");
   }
-  return document.createElement("canvas");
+
+  return require("canvas").createCanvas();
 }
