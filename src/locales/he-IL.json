@@ -85,32 +85,32 @@
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
-    "couldNotCreateShareableLink": "לא יכול לייצר לינק לשיתוף.",
-    "couldNotLoadInvalidFile": "לא יכול לטעון קובץ שאיננו תואם",
+    "couldNotCreateShareableLink": "לא ניתן לייצר לינק לשיתוף.",
+    "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
-    "cannotExportEmptyCanvas": "",
-    "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
-    "uploadedSecurly": ""
+    "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
+    "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
+    "decryptFailed": "לא ניתן לפענח מידע.",
+    "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן."
   },
   "toolBar": {
-    "selection": "",
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "text": "",
-    "lock": ""
+    "selection": "בחירה",
+    "rectangle": "מרובע",
+    "diamond": "יהלום",
+    "ellipse": "אליפסה",
+    "arrow": "חץ",
+    "line": "קו",
+    "text": "טקסט",
+    "lock": "השאר את כלי הבחירה פעיל לאחר ציור"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "פעולות הלוח",
+    "selectedShapeActions": "פעולות צורה שנבחרה",
+    "shapes": "צורות"
   },
   "hints": {
-    "linearElement": "",
-    "linearElementMulti": "",
+    "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
+    "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "resize": "",
     "rotate": ""
   },
