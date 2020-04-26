@@ -79,7 +79,9 @@
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
-    "toggleFullScreen": "Attiva/Disattiva schermo intero"
+    "toggleFullScreen": "Attiva/Disattiva schermo intero",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "Puoi mantenere le proporzioni tenendo premuto SHIFT durante il ridimensionamento",
+    "resize": "",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi"
   },
   "encrypted": {
-    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.\nClicca l'icona per saperne di più..."
+    "tooltip": ""
   }
 }

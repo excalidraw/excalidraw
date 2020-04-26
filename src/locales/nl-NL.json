@@ -79,7 +79,9 @@
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
-    "toggleFullScreen": "Schermvullende weergave"
+    "toggleFullScreen": "Schermvullende weergave",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "resize": "Je kan de verhouding behouden door SHIFT in te drukken tijdens het schalen",
+    "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Zoom in op alle elementen"
   },
   "encrypted": {
-    "tooltip": "Je illustratie is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server ze nooit zal zien. Klik op het icoon om meer te weten..."
+    "tooltip": ""
   }
 }
