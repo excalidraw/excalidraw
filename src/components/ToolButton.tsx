@@ -50,9 +50,9 @@ export const ToolButton = React.forwardRef(function (
         className={`ToolIcon_type_button ToolIcon ${sizeCn}${
           props.selected ? " ToolIcon--selected" : ""
         } ${props.className || ""} ${
-          props.visible
-            ? "ToolIcon_type_button--hide"
-            : "ToolIcon_type_button--show"
+          props.visible || props.visible == null
+            ? "ToolIcon_type_button--show"
+            : "ToolIcon_type_button--hide"
         }`}
         title={props.title}
         aria-label={props["aria-label"]}
