@@ -80,8 +80,8 @@
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Activer/désactiver le mode zen",
+    "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
