@@ -79,7 +79,9 @@
     "redo": "İleri Al",
     "roomDialog": "Ortak Çalışma Ortamı Yarat",
     "createNewRoom": "Yeni Oda Oluştur",
-    "toggleFullScreen": "Tam ekranı aç/kapa"
+    "toggleFullScreen": "Tam ekranı aç/kapa",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Tüm canvas temizlenecek. Emin misiniz?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
-    "resize": "Yeniden boyutlandırırken SHIFT tuşuna basılı tutarak oranları koruyabilirsiniz",
+    "resize": "",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz"
   },
   "errorSplash": {

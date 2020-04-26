@@ -79,7 +79,9 @@
     "redo": "Tee uudelleen",
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
-    "toggleFullScreen": "Koko näytön tila päälle/pois"
+    "toggleFullScreen": "Koko näytön tila päälle/pois",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
-    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa",
+    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Zoomaa kaikki elementit näkyviin"
   },
   "encrypted": {
-    "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä. Klikkaa ikonia lukeaksesi lisää..."
+    "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   }
 }

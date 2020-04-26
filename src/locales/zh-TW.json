@@ -79,7 +79,9 @@
     "redo": "重做",
     "roomDialog": "分享即時協作會議",
     "createNewRoom": "建立新的會議室",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",

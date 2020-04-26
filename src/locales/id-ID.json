@@ -79,7 +79,9 @@
     "redo": "Mengulang",
     "roomDialog": "Mulai kolaborasi secara langsung",
     "createNewRoom": "Buat ruang baru",
-    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh"
+    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",

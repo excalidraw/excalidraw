@@ -79,7 +79,9 @@
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
-    "toggleFullScreen": "Vollbild umschalten"
+    "toggleFullScreen": "Vollbild umschalten",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten",
+    "resize": "",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen"
   },
   "encrypted": {
-    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird. Klicke auf das Symbol um mehr zu erfahren..."
+    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird."
   }
 }

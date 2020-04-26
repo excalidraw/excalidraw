@@ -30,6 +30,12 @@ export const languages = [
     data: require("./locales/ar-SA.json"),
     rtl: true,
   },
+  {
+    lng: "he-IL",
+    label: "עברית",
+    data: require("./locales/he-IL.json"),
+    rtl: true,
+  },
 ];
 
 let currentLanguage = languages[0];

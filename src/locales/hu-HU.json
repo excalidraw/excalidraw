@@ -79,7 +79,9 @@
     "redo": "Újra végrehajtás",
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
-    "resize": "A SHIFT billentyű lenyomva tartásával megőrizheti az arányokat",
+    "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
   },
   "errorSplash": {
