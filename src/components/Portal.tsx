@@ -1,18 +1,36 @@
 import { encryptAESGEM } from "../data";
 
 import { SocketUpdateData } from "../types";
-import { BROADCAST } from "../constants";
+import { BROADCAST, SCENE } from "../constants";
+import App from "./App";
 
 class Portal {
+  app: App;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomID: string | null = null;
   roomKey: string | null = null;
 
+  constructor(app: App) {
+    this.app = app;
+  }
+
   open(socket: SocketIOClient.Socket, id: string, key: string) {
     this.socket = socket;
     this.roomID = id;
     this.roomKey = key;
+
+    // Initialize socket listeners (moving from App)
+    this.socket!.on("init-room", () => {
+      if (this.socket) {
+        this.socket.emit("join-room", this.roomID);
+
+        this.app.restoreUserName();
+      }
+    });
+    this.socket!.on("new-user", async (_socketID: string) => {
+      this.app.broadcastScene(SCENE.INIT);
+    });
   }
 
   close() {
