@@ -140,7 +140,7 @@ export const resizeElements = (
   const handleOffset = 4 / appState.zoom; // XXX import constant
   const dashedLinePadding = 4 / appState.zoom; // XXX import constant
   const offsetPointer = handleOffset + dashedLinePadding;
-  const minSize = handleOffset * 4;
+  const minSize = 0;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
@@ -182,15 +182,17 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
-      const [x1, y1] = getElementAbsoluteCoords(element);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
       const resized = resizeXYWidthHightWithRotation(
         resizeHandle,
         x1,
         y1,
+        x2,
+        y2,
         element.width,
         element.height,
-        x1 - element.x,
-        y1 - element.y,
+        element.x,
+        element.y,
         element.angle,
         xPointer,
         yPointer,
@@ -198,7 +200,10 @@ export const resizeElements = (
         getResizeWithSidesSameLengthKey(event),
         getResizeCenterPointKey(event),
       );
-      if (resized.width !== 0 && resized.height !== 0) {
+      if (
+        Math.abs(resized.width) > minSize &&
+        Math.abs(resized.height) > minSize
+      ) {
         mutateElement(element, {
           ...resized,
           ...(isLinearElement(element)

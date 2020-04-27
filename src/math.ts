@@ -46,7 +46,7 @@ export function rotate(
   x2: number,
   y2: number,
   angle: number,
-) {
+): [number, number] {
   // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
   // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
   // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
@@ -67,8 +67,6 @@ const adjustXYWithRotation = (
 ) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  deltaX /= 2;
-  deltaY /= 2;
   if (side === "e" || side === "ne" || side === "se") {
     if (isResizeFromCenter) {
       x += deltaX;
@@ -106,12 +104,14 @@ const adjustXYWithRotation = (
 
 export const resizeXYWidthHightWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  offsetX: number,
-  offsetY: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  elementWidth: number,
+  elementHeight: number,
+  elementX: number,
+  elementY: number,
   angle: number,
   xPointer: number,
   yPointer: number,
@@ -120,43 +120,56 @@ export const resizeXYWidthHightWithRotation = (
   isResizeFromCenter: boolean,
 ) => {
   // center point for rotation
-  const cx = x + width / 2;
-  const cy = y + height / 2;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
 
   // rotation with current angle
   const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
 
+  // XXX this might be slow with closure
+  const adjustWithOffsetPointer = (w: number) => {
+    if (w > offsetPointer) {
+      return w - offsetPointer;
+    } else if (w < -offsetPointer) {
+      return w + offsetPointer;
+    }
+    return 0;
+  };
+
   let scaleX = 1;
   let scaleY = 1;
   if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offsetPointer - x) / width;
+    scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
   }
   if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offsetPointer - y) / height;
+    scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x + width - offsetPointer - rotatedX) / width;
+    scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y + height - offsetPointer - rotatedY) / height;
+    scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
   }
 
-  let nextWidth = width * scaleX;
-  let nextHeight = height * scaleY;
+  let nextWidth = elementWidth * scaleX;
+  let nextHeight = elementHeight * scaleY;
   if (sidesWithSameLength) {
     nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
   }
+
+  const deltaX = (elementWidth - nextWidth) / 2;
+  const deltaY = (elementHeight - nextHeight) / 2;
 
   return {
     width: nextWidth,
     height: nextHeight,
     ...adjustXYWithRotation(
       side,
-      x - offsetX,
-      y - offsetY,
+      elementX,
+      elementY,
       angle,
-      width - nextWidth,
-      height - nextHeight,
+      deltaX,
+      deltaY,
       isResizeFromCenter,
     ),
   };
