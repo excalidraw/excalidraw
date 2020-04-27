@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.5.0",
-    "@testing-library/react": "10.0.2",
+    "@testing-library/react": "10.0.3",
     "@types/jest": "25.2.1",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.34",
