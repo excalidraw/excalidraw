@@ -166,7 +166,7 @@ const gesture: Gesture = {
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  portal: Portal = new Portal();
+  portal: Portal = new Portal(this);
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -915,19 +915,7 @@ class App extends React.Component<any, AppState> {
         roomMatch[2],
       );
 
-      this.portal.socket!.on("init-room", () => {
-        if (this.portal.socket) {
-          const username = restoreUsernameFromLocalStorage();
-
-          this.portal.socket.emit("join-room", this.portal.roomID);
-
-          if (username !== null) {
-            this.setState({
-              username,
-            });
-          }
-        }
-      });
+      // All socket listeners are moving to Portal
       this.portal.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
@@ -999,9 +987,6 @@ class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.portal.socket!.on("new-user", async (_socketID: string) => {
-        this.broadcastScene(SCENE.INIT);
-      });
 
       this.setState({
         isCollaborating: true,
@@ -1032,7 +1017,8 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  private broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
+  // maybe should move to Portal
+  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
@@ -1058,6 +1044,16 @@ class App extends React.Component<any, AppState> {
       cursorY = event.y;
     },
   );
+
+  restoreUserName() {
+    const username = restoreUsernameFromLocalStorage();
+
+    if (username !== null) {
+      this.setState({
+        username,
+      });
+    }
+  }
 
   // Input handling
 
