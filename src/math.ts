@@ -71,9 +71,9 @@ const adjustXYWithRotation = (
   const sin = Math.sin(angle);
   if (side === "e" || side === "ne" || side === "se") {
     if (isResizeFromCenter) {
-      x += deltaX2;
+      x += deltaX1 + deltaX2;
     } else {
-      x += deltaX1 * cos;
+      x += deltaX1 * (1 + cos);
       y += deltaX1 * sin;
       x += deltaX2 * (1 - cos);
       y += deltaX2 * -sin;
@@ -81,26 +81,30 @@ const adjustXYWithRotation = (
   }
   if (side === "s" || side === "sw" || side === "se") {
     if (isResizeFromCenter) {
-      y += deltaY2;
+      y += deltaY1 + deltaY2;
     } else {
-      x += deltaY1 * sin;
-      y += deltaY1 * cos;
+      x += deltaY1 * -sin;
+      y += deltaY1 * (1 + cos);
       x += deltaY2 * sin;
       y += deltaY2 * (1 - cos);
     }
   }
   if (side === "w" || side === "nw" || side === "sw") {
     if (isResizeFromCenter) {
-      x += deltaX2;
+      x += deltaX1 + deltaX2;
     } else {
+      x += deltaX1 * (1 - cos);
+      y += deltaX1 * -sin;
       x += deltaX2 * (1 + cos);
       y += deltaX2 * sin;
     }
   }
   if (side === "n" || side === "nw" || side === "ne") {
     if (isResizeFromCenter) {
-      y += deltaY2;
+      y += deltaY1 + deltaY2;
     } else {
+      x += deltaY1 * sin;
+      y += deltaY1 * (1 - cos);
       x += deltaY2 * -sin;
       y += deltaY2 * (1 + cos);
     }
@@ -171,8 +175,8 @@ export const resizeXYWidthHightWithRotation = (
     nextWidth,
     nextHeight,
   );
-  const deltaX1 = x1 - nextX1;
-  const deltaY1 = y1 - nextY1;
+  const deltaX1 = (x1 - nextX1) / 2;
+  const deltaY1 = (y1 - nextY1) / 2;
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
 
