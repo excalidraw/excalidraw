@@ -17,6 +17,7 @@ export function getDefaultAppState(): AppState {
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
+    shouldAddWatermark: false,
     currentItemStrokeColor: oc.black,
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
@@ -45,6 +46,7 @@ export function getDefaultAppState(): AppState {
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
+    zenModeEnabled: false,
   };
 }
 
@@ -73,6 +75,7 @@ export function clearAppStatePropertiesForHistory(
   return {
     selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
+    shouldAddWatermark: appState.shouldAddWatermark,
     currentItemStrokeColor: appState.currentItemStrokeColor,
     currentItemBackgroundColor: appState.currentItemBackgroundColor,
     currentItemFillStyle: appState.currentItemFillStyle,

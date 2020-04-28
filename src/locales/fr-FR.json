@@ -20,16 +20,17 @@
     "opacity": "Opacité",
     "textAlign": "Alignement du texte",
     "fontSize": "Taille de la police",
-    "fontFamily": "",
+    "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
+    "addWatermark": "",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
     "small": "Petit",
     "medium": "Moyen",
     "large": "Grand",
-    "veryLarge": "",
+    "veryLarge": "Très grand",
     "solid": "Solide",
     "hachure": "Hachure",
     "crossHatch": "Hachure croisée",
@@ -51,8 +52,9 @@
     "language": "Langue",
     "createRoom": "Partager une session de collaboration en direct",
     "duplicateSelection": "Dupliquer",
-    "untitled": "",
-    "name": "Nom"
+    "untitled": "Sans titre",
+    "name": "Nom",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -65,7 +67,7 @@
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",
-    "selectLanguage": "",
+    "selectLanguage": "Choisir une langue",
     "scrollBackToContent": "Revenir au contenu",
     "zoomIn": "Zoomer",
     "zoomOut": "Dézoomer",
@@ -77,7 +79,9 @@
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
-    "toggleFullScreen": "Mode plein-écran"
+    "toggleFullScreen": "Mode plein-écran",
+    "toggleZenMode": "Activer/désactiver le mode zen",
+    "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "Vous pouvez contraindre les proportions en maintenant la touche MAJ enfoncée tout en redimensionnant",
+    "resize": "",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
   },
   "errorSplash": {
@@ -140,16 +144,20 @@
     "title": "Raccourcis clavier",
     "shapes": "Formes",
     "or": "ou",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "click": "cliquer",
+    "drag": "glisser",
+    "curvedArrow": "Flèche courbée",
+    "curvedLine": "Ligne courbée",
     "editor": "Éditeur",
-    "view": "",
+    "view": "Afficher",
     "blog": "Lisez notre blog",
     "howto": "Suivez notre guides",
-    "github": "",
+    "github": "Vous avez trouvé un problème ? Envoyer",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
-    "textFinish": "Terminer l'édition (texte)"
+    "textFinish": "Terminer l'édition (texte)",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

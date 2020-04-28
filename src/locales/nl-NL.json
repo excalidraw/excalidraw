@@ -1,8 +1,8 @@
 {
   "labels": {
-    "paste": "Plak",
+    "paste": "Plakken",
     "selectAll": "Alles selecteren",
-    "copy": "Kopieer",
+    "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
     "bringForward": "Breng naar voren",
@@ -23,6 +23,7 @@
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
     "withBackground": "Met achtergrond",
+    "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Deel een live-samenwerkingssessie",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
-    "name": ""
+    "name": "Naam",
+    "madeWithExcalidraw": "Gemaakt met Excalidraw"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -77,7 +79,9 @@
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
-    "toggleFullScreen": "Schermvullende weergave"
+    "toggleFullScreen": "Schermvullende weergave",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "resize": "Je kan de verhouding behouden door SHIFT in te drukken tijdens het schalen",
+    "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
   },
   "errorSplash": {
@@ -149,7 +153,11 @@
     "blog": "Lees onze blog",
     "howto": "Volg onze handleidingen",
     "github": "Probleem gevonden? Stuur een nieuwe issue",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "textFinish": "Voltooi bewerken (tekst)",
+    "zoomToFit": "Zoom in op alle elementen"
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

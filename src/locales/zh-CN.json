@@ -23,6 +23,7 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "添加背景",
+    "addWatermark": "",
     "handDrawn": "手写",
     "normal": "正常",
     "code": "代码",
@@ -52,7 +53,8 @@
     "createRoom": "分享实时协作会议",
     "duplicateSelection": "复制所有已选择的元素",
     "untitled": "无标题",
-    "name": "名字"
+    "name": "名字",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -77,7 +79,9 @@
     "redo": "重做",
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
-    "toggleFullScreen": "切换全屏显示"
+    "toggleFullScreen": "切换全屏显示",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
-    "resize": "调整大小时可以按住 Shift 来约束比例",
+    "resize": "",
     "rotate": "旋转时可以按住 Shift 来约束角度"
   },
   "errorSplash": {
@@ -144,12 +148,16 @@
     "drag": "",
     "curvedArrow": "曲线（带有箭头）",
     "curvedLine": "曲线（无箭头）",
-    "editor": "编辑者",
+    "editor": "编辑器",
     "view": "视图",
     "blog": "浏览我们的博客",
     "howto": "跟随我们的指南",
     "github": "发现问题？提交",
     "textNewLine": "文本换行",
-    "textFinish": "完成编辑文本"
+    "textFinish": "完成编辑文本",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

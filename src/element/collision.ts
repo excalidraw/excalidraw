@@ -4,7 +4,7 @@ import {
   rotate,
   isPointInPolygon,
 } from "../math";
-import { getPointsOnBezierCurves } from "roughjs/bin/geometry";
+import { pointsOnBezierCurves } from "points-on-curve";
 
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -266,7 +266,7 @@ const hitTestCurveInside = (
     }
   }
   if (points.length >= 4) {
-    const polygonPoints = getPointsOnBezierCurves(points as any, 50);
+    const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
   return false;

@@ -294,12 +294,14 @@ export async function exportCanvas(
     viewBackgroundColor,
     name,
     scale = 1,
+    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
+    shouldAddWatermark: boolean;
   },
 ) {
   if (elements.length === 0) {
@@ -310,6 +312,7 @@ export async function exportCanvas(
       exportBackground,
       viewBackgroundColor,
       exportPadding,
+      shouldAddWatermark,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
@@ -327,6 +330,7 @@ export async function exportCanvas(
     viewBackgroundColor,
     exportPadding,
     scale,
+    shouldAddWatermark,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);

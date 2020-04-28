@@ -4,13 +4,14 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom } from "../scene";
+import { getNormalizedZoom, calculateScrollCenter } from "../scene";
 import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState } from "../types";
+import { AppState, FlooredNumber } from "../types";
+import { getCommonBounds } from "../element";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -73,6 +74,7 @@ const ZOOM_STEP = 0.1;
 const KEY_CODES = {
   MINUS: "Minus",
   EQUAL: "Equal",
+  ONE: "Digit1",
   ZERO: "Digit0",
   NUM_SUBTRACT: "NumpadSubtract",
   NUM_ADD: "NumpadAdd",
@@ -158,4 +160,65 @@ export const actionResetZoom = register({
   keyTest: (event) =>
     (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
+
+const calculateZoom = (
+  commonBounds: number[],
+  currentZoom: number,
+  {
+    scrollX,
+    scrollY,
+  }: {
+    scrollX: FlooredNumber;
+    scrollY: FlooredNumber;
+  },
+): number => {
+  const { innerWidth, innerHeight } = window;
+  const [x, y] = commonBounds;
+  const zoomX = -innerWidth / (2 * scrollX + 2 * x - innerWidth);
+  const zoomY = -innerHeight / (2 * scrollY + 2 * y - innerHeight);
+  const margin = 0.01;
+  let newZoom;
+
+  if (zoomX < zoomY) {
+    newZoom = zoomX - margin;
+  } else if (zoomY <= zoomX) {
+    newZoom = zoomY - margin;
+  } else {
+    newZoom = currentZoom;
+  }
+
+  if (newZoom <= 0.1) {
+    return 0.1;
+  }
+  if (newZoom >= 1) {
+    return 1;
+  }
+
+  return newZoom;
+};
+
+export const actionZoomToFit = register({
+  name: "zoomToFit",
+  perform: (elements, appState) => {
+    const nonDeletedElements = elements.filter((element) => !element.isDeleted);
+    const scrollCenter = calculateScrollCenter(nonDeletedElements);
+    const commonBounds = getCommonBounds(nonDeletedElements);
+    const zoom = calculateZoom(commonBounds, appState.zoom, scrollCenter);
+
+    return {
+      appState: {
+        ...appState,
+        scrollX: scrollCenter.scrollX,
+        scrollY: scrollCenter.scrollY,
+        zoom,
+      },
+      commitToHistory: false,
+    };
+  },
+  keyTest: (event) =>
+    event.code === KEY_CODES.ONE &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
 });

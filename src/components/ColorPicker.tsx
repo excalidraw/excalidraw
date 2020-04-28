@@ -7,6 +7,24 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
+function isValidColor(color: string) {
+  const style = new Option().style;
+  style.color = color;
+  return !!style.color;
+}
+
+const getColor = (color: string): string | null => {
+  if (color === "transparent") {
+    return color;
+  }
+
+  return isValidColor(color)
+    ? color
+    : isValidColor(`#${color}`)
+    ? `#${color}`
+    : null;
+};
+
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
 
@@ -179,7 +197,6 @@ const ColorInput = React.forwardRef(
     },
     ref,
   ) => {
-    const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
 
@@ -189,6 +206,18 @@ const ColorInput = React.forwardRef(
 
     React.useImperativeHandle(ref, () => inputRef.current);
 
+    const changeColor = React.useCallback(
+      (inputValue: string) => {
+        const value = inputValue.toLowerCase();
+        const color = getColor(value);
+        if (color) {
+          onChange(color);
+        }
+        setInnerValue(value);
+      },
+      [onChange],
+    );
+
     return (
       <label className="color-input-container">
         <div className="color-picker-hash">#</div>
@@ -196,15 +225,8 @@ const ColorInput = React.forwardRef(
           spellCheck={false}
           className="color-picker-input"
           aria-label={label}
-          onChange={(event) => {
-            const value = event.target.value.toLowerCase();
-            if (value.match(colorRegex)) {
-              onChange(value === "transparent" ? "transparent" : `#${value}`);
-            }
-            setInnerValue(value);
-          }}
+          onChange={(event) => changeColor(event.target.value)}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={(event) => onChange(event.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />

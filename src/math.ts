@@ -65,28 +65,45 @@ const adjustXYWithRotation = (
   deltaY1: number,
   deltaX2: number,
   deltaY2: number,
+  isResizeFromCenter: boolean,
 ) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   if (side === "e" || side === "ne" || side === "se") {
-    x += deltaX1 * cos;
-    y += deltaX1 * sin;
-    x += deltaX2 * (1 - cos);
-    y += deltaX2 * -sin;
+    if (isResizeFromCenter) {
+      x += deltaX2;
+    } else {
+      x += deltaX1 * cos;
+      y += deltaX1 * sin;
+      x += deltaX2 * (1 - cos);
+      y += deltaX2 * -sin;
+    }
   }
   if (side === "s" || side === "sw" || side === "se") {
-    x += deltaY1 * sin;
-    y += deltaY1 * cos;
-    x += deltaY2 * sin;
-    y += deltaY2 * (1 - cos);
+    if (isResizeFromCenter) {
+      y += deltaY2;
+    } else {
+      x += deltaY1 * sin;
+      y += deltaY1 * cos;
+      x += deltaY2 * sin;
+      y += deltaY2 * (1 - cos);
+    }
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    x += deltaX2 * (1 + cos);
-    y += deltaX2 * sin;
+    if (isResizeFromCenter) {
+      x += deltaX2;
+    } else {
+      x += deltaX2 * (1 + cos);
+      y += deltaX2 * sin;
+    }
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    x += deltaY2 * -sin;
-    y += deltaY2 * (1 + cos);
+    if (isResizeFromCenter) {
+      y += deltaY2;
+    } else {
+      x += deltaY2 * -sin;
+      y += deltaY2 * (1 + cos);
+    }
   }
   return { x, y };
 };
@@ -110,6 +127,7 @@ export const resizeXYWidthHightWithRotation = (
     nextHeight: number,
   ) => [number, number, number, number],
   sidesWithSameLength: boolean,
+  isResizeFromCenter: boolean,
 ) => {
   // center point for rotation
   const cx = (x1 + x2) / 2;
@@ -118,19 +136,29 @@ export const resizeXYWidthHightWithRotation = (
   // rotation with current angle
   const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
 
+  // XXX this might be slow with closure
+  const adjustWithOffsetPointer = (w: number) => {
+    if (w > offsetPointer) {
+      return w - offsetPointer;
+    } else if (w < -offsetPointer) {
+      return w + offsetPointer;
+    }
+    return 0;
+  };
+
   let scaleX = 1;
   let scaleY = 1;
   if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offsetPointer - x1) / (x2 - x1);
+    scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
   }
   if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offsetPointer - y1) / (y2 - y1);
+    scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
   }
   if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x2 - offsetPointer - rotatedX) / (x2 - x1);
+    scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
   }
   if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y2 - offsetPointer - rotatedY) / (y2 - y1);
+    scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
   }
 
   let nextWidth = elementWidth * scaleX;
@@ -160,6 +188,7 @@ export const resizeXYWidthHightWithRotation = (
       deltaY1,
       deltaX2,
       deltaY2,
+      isResizeFromCenter,
     ),
   };
 };

@@ -30,7 +30,11 @@ export async function saveAsJSON(
 
   const name = `${appState.name}.excalidraw`;
   await fileSave(
-    new Blob([serialized], { type: "application/json" }),
+    new Blob([serialized], {
+      type: /\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent)
+        ? "application/json"
+        : "application/vnd.excalidraw+json",
+    }),
     {
       fileName: name,
       description: "Excalidraw file",
@@ -42,7 +46,7 @@ export async function loadFromJSON() {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: ["json", "excalidraw"],
-    mimeTypes: ["application/json"],
+    mimeTypes: ["application/json", "application/vnd.excalidraw+json"],
   });
   return loadFromBlob(blob);
 }

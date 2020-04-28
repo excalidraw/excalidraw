@@ -23,6 +23,7 @@
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
     "withBackground": "배경 포함",
+    "addWatermark": "",
     "handDrawn": "필기체",
     "normal": "일반",
     "code": "코드",
@@ -52,7 +53,8 @@
     "createRoom": "실시간 협업 세션 공유",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
-    "name": ""
+    "name": "",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -77,7 +79,9 @@
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "",
-    "toggleFullScreen": "전체화면"
+    "toggleFullScreen": "전체화면",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
-    "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다.",
+    "resize": "",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다."
   },
   "errorSplash": {
@@ -141,7 +145,7 @@
     "shapes": "그리기",
     "or": "또는",
     "click": "클릭",
-    "drag": "",
+    "drag": "드래그",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "editor": "편집",
@@ -149,7 +153,11 @@
     "blog": "블로그 읽어보기",
     "howto": "가이드 참고하기",
     "github": "이슈 제보하기",
-    "textNewLine": "",
-    "textFinish": ""
+    "textNewLine": "줄바꾸기",
+    "textFinish": "편집 완료",
+    "zoomToFit": ""
+  },
+  "encrypted": {
+    "tooltip": ""
   }
 }

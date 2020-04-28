@@ -19,6 +19,7 @@ export const languages = [
   { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
   { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
   { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
+  { lng: "fi-FI", label: "Suomi", data: require("./locales/fi-FI.json") },
   { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
   { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
   { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
@@ -27,6 +28,12 @@ export const languages = [
     lng: "ar-SA",
     label: "العربية",
     data: require("./locales/ar-SA.json"),
+    rtl: true,
+  },
+  {
+    lng: "he-IL",
+    label: "עברית",
+    data: require("./locales/he-IL.json"),
     rtl: true,
   },
 ];

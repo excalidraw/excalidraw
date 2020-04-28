@@ -25,6 +25,7 @@ export type AppState = {
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
+  shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: string;
@@ -63,6 +64,7 @@ export type AppState = {
   >;
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
+  zenModeEnabled: boolean;
 };
 
 export type PointerCoords = Readonly<{

@@ -23,6 +23,7 @@
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
+    "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Live-Kollaborationssitzung teilen",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
-    "name": "Name"
+    "name": "Name",
+    "madeWithExcalidraw": "Made with Excalidraw"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -77,7 +79,9 @@
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
-    "toggleFullScreen": "Vollbild umschalten"
+    "toggleFullScreen": "Vollbild umschalten",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten",
+    "resize": "",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
   },
   "errorSplash": {
@@ -118,17 +122,17 @@
     "clearCanvasCaveat": " Dies wird zum Verlust von Daten führen ",
     "trackedToSentry_pre": "Der Fehler mit der Kennung ",
     "trackedToSentry_post": " wurde in unserem System registriert.",
-    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in den Fehler aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
+    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
     "openIssueMessage_button": "Bug-Tracker.",
     "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
-    "desc_intro": "Du kannst Leute zur Zusammenarbeit an deiner aktuellen Zeichnung einladen.",
-    "desc_privacy": "Keine Sorge, die Sitzung verwendet Ende-zu-Ende-Verschlüsselung, so dass alles, was du zeichnest, privat bleibt. Nicht einmal unser Server kann einsehen was du dir einfallen lässt.",
+    "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
+    "desc_privacy": "Sei beruhigt, da die Sitzung eine Ende-zu-Ende-Verschlüsselung nutzt. Alles von dir gezeichnete, privat bleibt. Auch unsere Server sehen nicht, was du dir einfallen lässt.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
-    "desc_inProgressIntro": "Die Live-Kollaborationssitzung wird nun ausgeführt.",
+    "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
     "desc_persistenceWarning": "Beachte, dass die Zeichnungsdaten bei der Zusammenarbeit über P2P geteilt und nicht auf unserem Server gespeichert werden. Wenn ihr alle die Verbindung trennt, gehen eure Daten verloren, es sei denn, ihr exportiert sie in eine Datei oder einen gemeinsam nutzbaren Link.",
     "desc_shareLink": "Teile diesen Link mit allen, mit denen du zusammenarbeiten möchtest:",
     "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt. Du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dies keine Auswirkungen auf andere hat und diese weiterhin gemeinsam an ihrer Version arbeiten können."
@@ -147,9 +151,13 @@
     "editor": "Editor",
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
-    "howto": "Folgen Sie unseren Anleitungen",
-    "github": "Ein Problem gefunden? Informieren Sie uns",
+    "howto": "Folge unseren Anleitungen",
+    "github": "Ein Problem gefunden? Informiere uns",
     "textNewLine": "Neue Zeile hinzufügen (Text)",
-    "textFinish": "Bearbeiten beenden (Text)"
+    "textFinish": "Bearbeiten beenden (Text)",
+    "zoomToFit": "Zoomen um alle Elemente einzupassen"
+  },
+  "encrypted": {
+    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird."
   }
 }
