@@ -979,7 +979,8 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  /* Portal-only */ setCollaborators(sockets: string[]) {
+  // Portal-only
+  setCollaborators(sockets: string[]) {
     this.setState((state) => {
       const collaborators: typeof state.collaborators = new Map();
       for (const socketID of sockets) {
