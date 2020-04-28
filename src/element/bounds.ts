@@ -47,7 +47,7 @@ export function getCurvePathOps(shape: Drawable): Op[] {
   return shape.sets[0].ops;
 }
 
-export const getMinMaxXYFromCurvePathOps = (
+const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (x: number, y: number) => [number, number],
 ): [number, number, number, number] => {
