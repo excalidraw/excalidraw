@@ -971,22 +971,6 @@ class App extends React.Component<any, AppState> {
         }
         initialize();
       });
-      this.portal.socket!.on("room-user-change", (clients: string[]) => {
-        this.setState((state) => {
-          const collaborators: typeof state.collaborators = new Map();
-          for (const socketID of clients) {
-            if (state.collaborators.has(socketID)) {
-              collaborators.set(socketID, state.collaborators.get(socketID)!);
-            } else {
-              collaborators.set(socketID, {});
-            }
-          }
-          return {
-            ...state,
-            collaborators,
-          };
-        });
-      });
 
       this.setState({
         isCollaborating: true,
@@ -994,6 +978,24 @@ class App extends React.Component<any, AppState> {
       });
     }
   };
+
+  // Portal-only
+  setCollaborators(sockets: string[]) {
+    this.setState((state) => {
+      const collaborators: typeof state.collaborators = new Map();
+      for (const socketID of sockets) {
+        if (state.collaborators.has(socketID)) {
+          collaborators.set(socketID, state.collaborators.get(socketID)!);
+        } else {
+          collaborators.set(socketID, {});
+        }
+      }
+      return {
+        ...state,
+        collaborators,
+      };
+    });
+  }
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
