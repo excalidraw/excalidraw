@@ -147,8 +147,8 @@ export const resizeElements = (
   const minSize = 0;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     if (resizeHandle === "rotation") {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
       let angle = (5 * Math.PI) / 2 + Math.atan2(yPointer - cy, xPointer - cx);
@@ -186,7 +186,6 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
       const calculateResizedBounds = (nextWidth: number, nextHeight: number) =>
         getResizedElementAbsoluteBounds(element, nextWidth, nextHeight);
       const resized = resizeXYWidthHightWithRotation(
@@ -228,8 +227,58 @@ export const resizeElements = (
 
     if (resizeHandle) {
       setResizeHandle(normalizeResizeHandle(element, resizeHandle));
+      if (element.width < 0 || element.height < 0) {
+        let flipDiffX = 0;
+        let flipDiffY = 0;
+        const [newX1, newY1, newX2, newY2] = getResizedElementAbsoluteBounds(
+          element,
+          Math.abs(element.width),
+          Math.abs(element.height),
+        );
+        if (element.width < 0) {
+          if (
+            resizeHandle === "e" ||
+            resizeHandle === "ne" ||
+            resizeHandle === "se"
+          ) {
+            flipDiffX = newX2 - x1;
+          }
+          if (
+            resizeHandle === "w" ||
+            resizeHandle === "nw" ||
+            resizeHandle === "sw"
+          ) {
+            flipDiffX = newX1 - x2;
+          }
+          mutateElement(element, {
+            width: Math.abs(element.width),
+            x: element.x - flipDiffX,
+          });
+        }
+        if (element.height < 0) {
+          if (
+            resizeHandle === "s" ||
+            resizeHandle === "se" ||
+            resizeHandle === "sw"
+          ) {
+            flipDiffY = newY2 - y1;
+          }
+          if (
+            resizeHandle === "n" ||
+            resizeHandle === "ne" ||
+            resizeHandle === "nw"
+          ) {
+            flipDiffY = newY1 - y2;
+          }
+          mutateElement(element, {
+            height: Math.abs(element.height),
+            y: element.y - flipDiffY,
+          });
+        }
+      }
+    } else {
+      normalizeDimensions(element);
     }
-    normalizeDimensions(element);
 
     // do we need this?
     document.documentElement.style.cursor = getCursorForResizingElement({
