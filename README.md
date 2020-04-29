@@ -48,6 +48,25 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm run test:update` | Update test snapshots             |
 | `npm run test:code`   | Test for formatting with Prettier |
 
+### Docker Installation
+
+A production-ready version for deploying to e.g. Kubernetes or OpenShift can be built using Docker.
+
+#### Docker Compose
+
+```sh
+docker-compose up --build -d
+```
+
+#### Native Docker
+
+```sh
+docker build -t excalidraw/excalidraw .
+docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
+```
+
+After building the image and running the container, open <http://localhost:5000> to see the application.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
