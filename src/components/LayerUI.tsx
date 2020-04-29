@@ -169,7 +169,10 @@ const LayerUI = ({
       <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={4}>
+          <Stack.Col
+            gap={4}
+            className={zenModeEnabled && "disable-pointerEvents"}
+          >
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -201,7 +204,7 @@ const LayerUI = ({
         {
           <div
             className={`App-menu App-menu_bottom zen-mode-transition ${
-              zenModeEnabled && "transition-left"
+              zenModeEnabled && "transition-left disable-pointerEvents"
             }`}
           >
             <Stack.Col gap={2}>
@@ -225,7 +228,7 @@ const LayerUI = ({
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
         className={`zen-mode-transition ${
-          zenModeEnabled && "transition-right"
+          zenModeEnabled && "transition-right disable-pointerEvents"
         }`}
       >
         <LanguageList
