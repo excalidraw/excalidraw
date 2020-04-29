@@ -17,7 +17,7 @@ import {
 } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
-import { getPerfectElementSize, normalizeDimensions } from "./sizeHelpers";
+import { getPerfectElementSize } from "./sizeHelpers";
 import {
   resizeTest,
   getCursorForResizingElement,
@@ -227,57 +227,16 @@ export const resizeElements = (
 
     if (resizeHandle) {
       setResizeHandle(normalizeResizeHandle(element, resizeHandle));
-      if (element.width < 0 || element.height < 0) {
-        let flipDiffX = 0;
-        let flipDiffY = 0;
-        const [newX1, newY1, newX2, newY2] = getResizedElementAbsoluteBounds(
-          element,
-          Math.abs(element.width),
-          Math.abs(element.height),
-        );
-        if (element.width < 0) {
-          if (
-            resizeHandle === "e" ||
-            resizeHandle === "ne" ||
-            resizeHandle === "se"
-          ) {
-            flipDiffX = newX2 - x1;
-          }
-          if (
-            resizeHandle === "w" ||
-            resizeHandle === "nw" ||
-            resizeHandle === "sw"
-          ) {
-            flipDiffX = newX1 - x2;
-          }
-          mutateElement(element, {
-            width: Math.abs(element.width),
-            x: element.x - flipDiffX,
-          });
-        }
-        if (element.height < 0) {
-          if (
-            resizeHandle === "s" ||
-            resizeHandle === "se" ||
-            resizeHandle === "sw"
-          ) {
-            flipDiffY = newY2 - y1;
-          }
-          if (
-            resizeHandle === "n" ||
-            resizeHandle === "ne" ||
-            resizeHandle === "nw"
-          ) {
-            flipDiffY = newY1 - y2;
-          }
-          mutateElement(element, {
-            height: Math.abs(element.height),
-            y: element.y - flipDiffY,
-          });
-        }
+      if (element.width < 0) {
+        mutateElement(element, {
+          width: -element.width,
+        });
       }
-    } else {
-      normalizeDimensions(element);
+      if (element.height < 0) {
+        mutateElement(element, {
+          height: -element.height,
+        });
+      }
     }
 
     // do we need this?

@@ -180,13 +180,36 @@ export const resizeXYWidthHightWithRotation = (
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
 
+  const [finalX1, finalY1, finalX2, finalY2] = calculateResizedBounds(
+    Math.abs(nextWidth),
+    Math.abs(nextHeight),
+  );
+  let flipDiffX = 0;
+  let flipDiffY = 0;
+  if (nextWidth < 0) {
+    if (side === "e" || side === "ne" || side === "se") {
+      flipDiffX = finalX2 - nextX1;
+    }
+    if (side === "w" || side === "nw" || side === "sw") {
+      flipDiffX = finalX1 - nextX2;
+    }
+  }
+  if (nextHeight < 0) {
+    if (side === "s" || side === "se" || side === "sw") {
+      flipDiffY = finalY2 - nextY1;
+    }
+    if (side === "n" || side === "ne" || side === "nw") {
+      flipDiffY = finalY1 - nextY2;
+    }
+  }
+
   return {
     width: nextWidth,
     height: nextHeight,
     ...adjustXYWithRotation(
       side,
-      elementX,
-      elementY,
+      elementX - flipDiffX,
+      elementY - flipDiffY,
       angle,
       deltaX1,
       deltaY1,
