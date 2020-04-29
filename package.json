@@ -31,16 +31,18 @@
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
     "roughjs": "4.2.3",
-    "socket.io-client": "2.3.0"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "5.5.0",
-    "@testing-library/react": "10.0.3",
+    "socket.io-client": "2.3.0",
+    "node-sass": "4.14.0",
+    "typescript": "3.8.3",
     "@types/jest": "25.2.1",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.34",
     "@types/react-dom": "16.9.6",
     "@types/socket.io-client": "1.4.32",
+    "@testing-library/jest-dom": "5.5.0",
+    "@testing-library/react": "10.0.3"
+  },
+  "devDependencies": {
     "asar": "3.0.3",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.11.0",
@@ -48,11 +50,9 @@
     "husky": "4.2.5",
     "jest-canvas-mock": "2.2.0",
     "lint-staged": "10.1.7",
-    "node-sass": "4.14.0",
     "pepjs": "0.5.2",
     "prettier": "2.0.5",
-    "rewire": "5.0.0",
-    "typescript": "3.8.3"
+    "rewire": "5.0.0"
   },
   "engines": {
     "node": ">=12.0.0"
