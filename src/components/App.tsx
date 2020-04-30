@@ -117,6 +117,7 @@ import {
   FONT_LOAD_THRESHOLD,
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  CURSOR_SYNC_TIMEOUT,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -189,6 +190,16 @@ class App extends React.Component<any, AppState> {
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
+
+    this.handleCanvasPointerMove = debounce(
+      this.handleCanvasPointerMove.bind(this),
+      CURSOR_SYNC_TIMEOUT,
+    );
+
+    this.handleCanvasPointerDown = debounce(
+      this.handleCanvasPointerDown.bind(this),
+      CURSOR_SYNC_TIMEOUT,
+    );
   }
 
   public render() {
@@ -232,9 +243,9 @@ class App extends React.Component<any, AppState> {
             height={canvasHeight}
             ref={this.handleCanvasRef}
             onContextMenu={this.handleCanvasContextMenu}
-            onPointerDown={this.handleCanvasPointerDown}
+            onPointerDown={this.onMouseDown}
             onDoubleClick={this.handleCanvasDoubleClick}
-            onPointerMove={this.handleCanvasPointerMove}
+            onPointerMove={this.onMouseMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
             onDrop={this.handleCanvasOnDrop}
@@ -245,6 +256,16 @@ class App extends React.Component<any, AppState> {
       </div>
     );
   }
+
+  private onMouseDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    event.persist();
+    this.handleCanvasPointerDown(event);
+  };
+
+  private onMouseMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    event.persist();
+    this.handleCanvasPointerMove(event);
+  };
 
   private syncActionResult = withBatchedUpdates((res: ActionResult) => {
     if (this.unmounted) {
@@ -1602,8 +1623,6 @@ class App extends React.Component<any, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    event.persist();
-
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
       // this can happen when a contextual menu or alert is triggered. In order to avoid
