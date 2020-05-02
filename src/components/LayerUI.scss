@@ -69,7 +69,12 @@
 
   &__github-corner {
     top: 0;
-    right: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
     position: absolute;
     width: 40px;
   }
@@ -77,7 +82,12 @@
   &__footer {
     position: absolute;
     bottom: 0px;
-    right: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
     width: 190px;
   }
 
@@ -88,6 +98,12 @@
     }
     &.transition-right {
       transform: translate(999px, 0px);
+    }
+    :root[dir="rtl"] &.transition-left {
+      transform: translate(999px, 0);
+    }
+    :root[dir="rtl"] &.transition-right {
+      transform: translate(-999px, 0);
     }
   }
 
