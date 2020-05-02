@@ -2570,7 +2570,8 @@ class App extends React.Component<any, AppState> {
     // scroll horizontally when shift pressed
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
-        scrollX: normalizeScroll(scrollX - deltaY / zoom),
+        // on Mac, shift+wheel tends to result in deltaX
+        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom),
       }));
       return;
     }
