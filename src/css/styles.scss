@@ -393,6 +393,7 @@ button,
     right: 44px;
   }
   :root[dir="rtl"] & {
+    position: fixed;
     left: 44px;
   }
 }
