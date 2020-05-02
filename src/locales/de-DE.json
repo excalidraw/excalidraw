@@ -124,7 +124,7 @@
     "trackedToSentry_post": " wurde in unserem System registriert.",
     "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
     "openIssueMessage_button": "Bug-Tracker.",
-    "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
+    "openIssueMessage_post": " Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
@@ -158,6 +158,6 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen"
   },
   "encrypted": {
-    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird."
+    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
   }
 }
