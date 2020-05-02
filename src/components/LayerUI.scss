@@ -93,10 +93,10 @@
 
   .zen-mode-transition {
     transition: transform 0.5s ease-in-out;
-    &.transition-left {
+    :root[dir="ltr"] &.transition-left {
       transform: translate(-999px, 0);
     }
-    &.transition-right {
+    :root[dir="ltr"] &.transition-right {
       transform: translate(999px, 0px);
     }
     :root[dir="rtl"] &.transition-left {
