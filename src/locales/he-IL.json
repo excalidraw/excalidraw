@@ -5,18 +5,18 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
-    "bringForward": "הבא קדימה",
-    "sendToBack": "העבר אחורה",
+    "bringForward": "הבא שכבה קדימה",
+    "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
-    "sendBackward": "שלח לאחור",
+    "sendBackward": "העבר שכבה אחורה",
     "delete": "מחק",
     "copyStyles": "העתק סגנון",
     "pasteStyles": "הדבק סגנון",
     "stroke": "קו מתאר",
     "background": "רקע",
     "fill": "מילוי",
-    "strokeWidth": "עובי קו המתאר",
-    "sloppiness": "רישול",
+    "strokeWidth": "עובי קו מתאר",
+    "sloppiness": "סגנון",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "fontSize": "גודל גופן",
@@ -24,13 +24,13 @@
     "onlySelected": "רק מה שנבחר",
     "withBackground": "עם רקע",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
-    "handDrawn": "ציור יד",
+    "handDrawn": "כתב יד",
     "normal": "רגיל",
     "code": "קוד",
     "small": "קטן",
     "medium": "בנוני",
     "large": "גדול",
-    "veryLarge": "גדול מאוד",
+    "veryLarge": "ענק",
     "solid": "מוצק",
     "hachure": "קווים משופעים",
     "crossHatch": "קווים מוצלבים",
@@ -39,7 +39,7 @@
     "left": "שמאל",
     "center": "מרכז",
     "right": "ימין",
-    "extraBold": "מודגש במיוחד",
+    "extraBold": "עבה",
     "architect": "ארכיטקט",
     "artist": "אמן",
     "cartoonist": "קריקטוריסט",
@@ -80,8 +80,8 @@
     "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
+    "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -96,12 +96,12 @@
   "toolBar": {
     "selection": "בחירה",
     "rectangle": "מרובע",
-    "diamond": "יהלום",
+    "diamond": "מעוין",
     "ellipse": "אליפסה",
     "arrow": "חץ",
     "line": "קו",
     "text": "טקסט",
-    "lock": "השאר את כלי הבחירה פעיל לאחר ציור"
+    "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -155,7 +155,7 @@
     "github": "מצאת בעיה? דווח",
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
-    "zoomToFit": "התקרב והתאם לכל האלמנטים"
+    "zoomToFit": "זום להתאמת כל האלמנטים למסך"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."

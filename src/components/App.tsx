@@ -971,22 +971,6 @@ class App extends React.Component<any, AppState> {
         }
         initialize();
       });
-      this.portal.socket!.on("room-user-change", (clients: string[]) => {
-        this.setState((state) => {
-          const collaborators: typeof state.collaborators = new Map();
-          for (const socketID of clients) {
-            if (state.collaborators.has(socketID)) {
-              collaborators.set(socketID, state.collaborators.get(socketID)!);
-            } else {
-              collaborators.set(socketID, {});
-            }
-          }
-          return {
-            ...state,
-            collaborators,
-          };
-        });
-      });
 
       this.setState({
         isCollaborating: true,
@@ -994,6 +978,24 @@ class App extends React.Component<any, AppState> {
       });
     }
   };
+
+  // Portal-only
+  setCollaborators(sockets: string[]) {
+    this.setState((state) => {
+      const collaborators: typeof state.collaborators = new Map();
+      for (const socketID of sockets) {
+        if (state.collaborators.has(socketID)) {
+          collaborators.set(socketID, state.collaborators.get(socketID)!);
+        } else {
+          collaborators.set(socketID, {});
+        }
+      }
+      return {
+        ...state,
+        collaborators,
+      };
+    });
+  }
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
@@ -2561,6 +2563,15 @@ class App extends React.Component<any, AppState> {
       delta *= sign;
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+      }));
+      return;
+    }
+
+    // scroll horizontally when shift pressed
+    if (event.shiftKey) {
+      this.setState(({ zoom, scrollX }) => ({
+        // on Mac, shift+wheel tends to result in deltaX
+        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom),
       }));
       return;
     }

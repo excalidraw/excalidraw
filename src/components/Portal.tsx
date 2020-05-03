@@ -21,15 +21,18 @@ class Portal {
     this.roomKey = key;
 
     // Initialize socket listeners (moving from App)
-    this.socket!.on("init-room", () => {
+    this.socket.on("init-room", () => {
       if (this.socket) {
         this.socket.emit("join-room", this.roomID);
 
         this.app.restoreUserName();
       }
     });
-    this.socket!.on("new-user", async (_socketID: string) => {
+    this.socket.on("new-user", async (_socketID: string) => {
       this.app.broadcastScene(SCENE.INIT);
+    });
+    this.socket.on("room-user-change", (clients: string[]) => {
+      this.app.setCollaborators(clients);
     });
   }
 
