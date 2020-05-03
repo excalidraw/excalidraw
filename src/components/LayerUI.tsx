@@ -63,9 +63,7 @@ const LayerUI = ({
   const renderEncryptedIcon = () => (
     <a
       className={`encrypted-icon tooltip zen-mode-visibility ${
-        zenModeEnabled
-          ? "zen-mode-visibility--hidden disable-pointerEvents"
-          : ""
+        zenModeEnabled ? "zen-mode-visibility--hidden" : ""
       }`}
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"

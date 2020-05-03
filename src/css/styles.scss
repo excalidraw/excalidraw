@@ -468,6 +468,8 @@ button,
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s linear 300ms, opacity 0.5s;
+    width: 0;
+    height: 0;
   }
 }
 
