@@ -458,3 +458,19 @@ button,
     left: 0;
   }
 }
+
+.zen-mode-visibility {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 0.5s;
+
+  &.zen-mode-visibility--hidden {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 300ms, opacity 0.5s;
+  }
+}
+
+.disable-pointerEvents {
+  pointer-events: none !important;
+}
