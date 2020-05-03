@@ -69,7 +69,12 @@
 
   &__github-corner {
     top: 0;
-    right: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
     position: absolute;
     width: 40px;
   }
@@ -77,17 +82,28 @@
   &__footer {
     position: absolute;
     bottom: 0px;
-    right: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
     width: 190px;
   }
 
   .zen-mode-transition {
     transition: transform 0.5s ease-in-out;
-    &.transition-left {
+    :root[dir="ltr"] &.transition-left {
       transform: translate(-999px, 0);
     }
-    &.transition-right {
+    :root[dir="ltr"] &.transition-right {
       transform: translate(999px, 0px);
+    }
+    :root[dir="rtl"] &.transition-left {
+      transform: translate(999px, 0);
+    }
+    :root[dir="rtl"] &.transition-right {
+      transform: translate(-999px, 0);
     }
   }
 
