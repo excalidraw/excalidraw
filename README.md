@@ -75,6 +75,14 @@ Pull requests are welcome. For major changes, please [open an issue](https://git
 
 To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
 
+Before submittin an issue to translate to any language, please, check whether the language you are translation has userbase of more than 500K, otherwise, we won't approve. Why? 
+
+You'll probably be the only one to be able to translate to Yakut, which means the localization would cease to be up to date should you be unable to continue. Apart from bundle size (we currently don't code-split localizations, but this can change in the future), we also probably don't want to end up with a huge list of languages that most users would need to scroll and scan through to be able to find the commonly used languages.
+
+It's not the place to give opinions on whether translating technical texts on graphic design software is the best way to preserve a language. Our focus at Excalidraw isn't language preservation. 
+
+
+
 ## Excalidraw is built using these awesome tools
 
 - [React](https://reactjs.org)
