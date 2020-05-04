@@ -56,123 +56,118 @@ export function rotate(
   ];
 }
 
-const adjustXYWithRotation = (
+export const adjustXYWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
   angle: number,
-  deltaX: number,
-  deltaY: number,
+  deltaX1: number,
+  deltaY1: number,
+  deltaX2: number,
+  deltaY2: number,
   isResizeFromCenter: boolean,
-) => {
+): [number, number] => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   if (side === "e" || side === "ne" || side === "se") {
     if (isResizeFromCenter) {
-      x += deltaX;
+      x += deltaX1 + deltaX2;
     } else {
-      x += deltaX * (1 - cos);
-      y += deltaX * -sin;
+      x += deltaX1 * (1 + cos);
+      y += deltaX1 * sin;
+      x += deltaX2 * (1 - cos);
+      y += deltaX2 * -sin;
     }
   }
   if (side === "s" || side === "sw" || side === "se") {
     if (isResizeFromCenter) {
-      y += deltaY;
+      y += deltaY1 + deltaY2;
     } else {
-      x += deltaY * sin;
-      y += deltaY * (1 - cos);
+      x += deltaY1 * -sin;
+      y += deltaY1 * (1 + cos);
+      x += deltaY2 * sin;
+      y += deltaY2 * (1 - cos);
     }
   }
   if (side === "w" || side === "nw" || side === "sw") {
     if (isResizeFromCenter) {
-      x += deltaX;
+      x += deltaX1 + deltaX2;
     } else {
-      x += deltaX * (1 + cos);
-      y += deltaX * sin;
+      x += deltaX1 * (1 - cos);
+      y += deltaX1 * -sin;
+      x += deltaX2 * (1 + cos);
+      y += deltaX2 * sin;
     }
   }
   if (side === "n" || side === "nw" || side === "ne") {
     if (isResizeFromCenter) {
-      y += deltaY;
+      y += deltaY1 + deltaY2;
     } else {
-      x += deltaY * -sin;
-      y += deltaY * (1 + cos);
+      x += deltaY1 * sin;
+      y += deltaY1 * (1 - cos);
+      x += deltaY2 * -sin;
+      y += deltaY2 * (1 + cos);
     }
   }
-  return { x, y };
+  return [x, y];
 };
 
-export const resizeXYWidthHightWithRotation = (
+export const getFlipAdjustment = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  elementWidth: number,
-  elementHeight: number,
-  elementX: number,
-  elementY: number,
+  nextWidth: number,
+  nextHeight: number,
+  nextX1: number,
+  nextY1: number,
+  nextX2: number,
+  nextY2: number,
+  finalX1: number,
+  finalY1: number,
+  finalX2: number,
+  finalY2: number,
+  needsRotation: boolean,
   angle: number,
-  xPointer: number,
-  yPointer: number,
-  offsetPointer: number,
-  sidesWithSameLength: boolean,
-  isResizeFromCenter: boolean,
-) => {
-  // center point for rotation
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-
-  // rotation with current angle
-  const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
-
-  // XXX this might be slow with closure
-  const adjustWithOffsetPointer = (w: number) => {
-    if (w > offsetPointer) {
-      return w - offsetPointer;
-    } else if (w < -offsetPointer) {
-      return w + offsetPointer;
+): [number, number] => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  let flipDiffX = 0;
+  let flipDiffY = 0;
+  if (nextWidth < 0) {
+    if (side === "e" || side === "ne" || side === "se") {
+      if (needsRotation) {
+        flipDiffX += (finalX2 - nextX1) * cos;
+        flipDiffY += (finalX2 - nextX1) * sin;
+      } else {
+        flipDiffX += finalX2 - nextX1;
+      }
     }
-    return 0;
-  };
-
-  let scaleX = 1;
-  let scaleY = 1;
-  if (side === "e" || side === "ne" || side === "se") {
-    scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
+    if (side === "w" || side === "nw" || side === "sw") {
+      if (needsRotation) {
+        flipDiffX += (finalX1 - nextX2) * cos;
+        flipDiffY += (finalX1 - nextX2) * sin;
+      } else {
+        flipDiffX += finalX1 - nextX2;
+      }
+    }
   }
-  if (side === "s" || side === "sw" || side === "se") {
-    scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
+  if (nextHeight < 0) {
+    if (side === "s" || side === "se" || side === "sw") {
+      if (needsRotation) {
+        flipDiffY += (finalY2 - nextY1) * cos;
+        flipDiffX += (finalY2 - nextY1) * -sin;
+      } else {
+        flipDiffY += finalY2 - nextY1;
+      }
+    }
+    if (side === "n" || side === "ne" || side === "nw") {
+      if (needsRotation) {
+        flipDiffY += (finalY1 - nextY2) * cos;
+        flipDiffX += (finalY1 - nextY2) * -sin;
+      } else {
+        flipDiffY += finalY1 - nextY2;
+      }
+    }
   }
-  if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
-  }
-  if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
-  }
-
-  let nextWidth = elementWidth * scaleX;
-  let nextHeight = elementHeight * scaleY;
-  if (sidesWithSameLength) {
-    nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
-  }
-
-  const deltaX = (elementWidth - nextWidth) / 2;
-  const deltaY = (elementHeight - nextHeight) / 2;
-
-  return {
-    width: nextWidth,
-    height: nextHeight,
-    ...adjustXYWithRotation(
-      side,
-      elementX,
-      elementY,
-      angle,
-      deltaX,
-      deltaY,
-      isResizeFromCenter,
-    ),
-  };
+  return [flipDiffX, flipDiffY];
 };
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
