@@ -258,36 +258,36 @@ export const resizeElements = (
       if (nextWidth < 0) {
         if (side === "e" || side === "ne" || side === "se") {
           if (isLinearElement(element)) {
-            flipDiffX = (finalX2 - nextX1) * Math.cos(element.angle);
-            flipDiffY = (finalX2 - nextX1) * Math.sin(element.angle);
+            flipDiffX += (finalX2 - nextX1) * Math.cos(element.angle);
+            flipDiffY += (finalX2 - nextX1) * Math.sin(element.angle);
           } else {
-            flipDiffX = finalX2 - nextX1;
+            flipDiffX += finalX2 - nextX1;
           }
         }
         if (side === "w" || side === "nw" || side === "sw") {
           if (isLinearElement(element)) {
-            flipDiffX = (finalX1 - nextX2) * Math.cos(element.angle);
-            flipDiffY = (finalX1 - nextX2) * Math.sin(element.angle);
+            flipDiffX += (finalX1 - nextX2) * Math.cos(element.angle);
+            flipDiffY += (finalX1 - nextX2) * Math.sin(element.angle);
           } else {
-            flipDiffX = finalX1 - nextX2;
+            flipDiffX += finalX1 - nextX2;
           }
         }
       }
       if (nextHeight < 0) {
         if (side === "s" || side === "se" || side === "sw") {
           if (isLinearElement(element)) {
-            flipDiffY = (finalY2 - nextY1) * Math.cos(element.angle);
-            flipDiffX = (finalY2 - nextY1) * -Math.sin(element.angle);
+            flipDiffY += (finalY2 - nextY1) * Math.cos(element.angle);
+            flipDiffX += (finalY2 - nextY1) * -Math.sin(element.angle);
           } else {
-            flipDiffY = finalY2 - nextY1;
+            flipDiffY += finalY2 - nextY1;
           }
         }
         if (side === "n" || side === "ne" || side === "nw") {
           if (isLinearElement(element)) {
-            flipDiffY = (finalY1 - nextY2) * Math.cos(element.angle);
-            flipDiffX = (finalY1 - nextY2) * -Math.sin(element.angle);
+            flipDiffY += (finalY1 - nextY2) * Math.cos(element.angle);
+            flipDiffX += (finalY1 - nextY2) * -Math.sin(element.angle);
           } else {
-            flipDiffY = finalY1 - nextY2;
+            flipDiffY += finalY1 - nextY2;
           }
         }
       }
