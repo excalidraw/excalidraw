@@ -257,22 +257,38 @@ export const resizeElements = (
       let flipDiffY = 0;
       if (nextWidth < 0) {
         if (side === "e" || side === "ne" || side === "se") {
-          flipDiffX = (finalX2 - nextX1) * Math.cos(element.angle);
-          flipDiffY = (finalX2 - nextX1) * Math.sin(element.angle);
+          if (isLinearElement(element)) {
+            flipDiffX = (finalX2 - nextX1) * Math.cos(element.angle);
+            flipDiffY = (finalX2 - nextX1) * Math.sin(element.angle);
+          } else {
+            flipDiffX = finalX2 - nextX1;
+          }
         }
         if (side === "w" || side === "nw" || side === "sw") {
-          flipDiffX = (finalX1 - nextX2) * Math.cos(element.angle);
-          flipDiffY = (finalX1 - nextX2) * Math.sin(element.angle);
+          if (isLinearElement(element)) {
+            flipDiffX = (finalX1 - nextX2) * Math.cos(element.angle);
+            flipDiffY = (finalX1 - nextX2) * Math.sin(element.angle);
+          } else {
+            flipDiffX = finalX1 - nextX2;
+          }
         }
       }
       if (nextHeight < 0) {
         if (side === "s" || side === "se" || side === "sw") {
-          flipDiffY = (finalY2 - nextY1) * Math.cos(element.angle);
-          flipDiffX = (finalY2 - nextY1) * -Math.sin(element.angle);
+          if (isLinearElement(element)) {
+            flipDiffY = (finalY2 - nextY1) * Math.cos(element.angle);
+            flipDiffX = (finalY2 - nextY1) * -Math.sin(element.angle);
+          } else {
+            flipDiffY = finalY2 - nextY1;
+          }
         }
         if (side === "n" || side === "ne" || side === "nw") {
-          flipDiffY = (finalY1 - nextY2) * Math.cos(element.angle);
-          flipDiffX = (finalY1 - nextY2) * -Math.sin(element.angle);
+          if (isLinearElement(element)) {
+            flipDiffY = (finalY1 - nextY2) * Math.cos(element.angle);
+            flipDiffX = (finalY1 - nextY2) * -Math.sin(element.angle);
+          } else {
+            flipDiffY = finalY1 - nextY2;
+          }
         }
       }
       const resized = {
