@@ -3,7 +3,7 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 
-import { rotate, resizeXYWidthHightWithRotation } from "../math";
+import { rotate, adjustXYWithRotation } from "../math";
 import {
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
@@ -148,9 +148,9 @@ export const resizeElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
     if (resizeHandle === "rotation") {
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
       let angle = (5 * Math.PI) / 2 + Math.atan2(yPointer - cy, xPointer - cx);
       if (event.shiftKey) {
         angle += SHIFT_LOCKING_ANGLE / 2;
@@ -186,29 +186,115 @@ export const resizeElements = (
         lastY,
       );
     } else if (resizeHandle) {
-      const calculateResizedBounds = (nextWidth: number, nextHeight: number) =>
-        getResizedElementAbsoluteBounds(element, nextWidth, nextHeight);
-      const resized = resizeXYWidthHightWithRotation(
-        resizeHandle,
-        x1,
-        y1,
-        x2,
-        y2,
-        element.width,
-        element.height,
-        element.x,
-        element.y,
-        element.angle,
+      const side = resizeHandle;
+      // rotation with current angle
+      const [rotatedX, rotatedY] = rotate(
         xPointer,
         yPointer,
-        offsetPointer,
-        calculateResizedBounds,
-        getResizeWithSidesSameLengthKey(event),
-        getResizeCenterPointKey(event),
+        cx,
+        cy,
+        -element.angle,
       );
+      // XXX this might be slow with closure
+      const adjustWithOffsetPointer = (wh: number) => {
+        if (wh > offsetPointer) {
+          return wh - offsetPointer;
+        } else if (wh < -offsetPointer) {
+          return wh + offsetPointer;
+        }
+        return 0;
+      };
+      let scaleX = 1;
+      let scaleY = 1;
+      if (side === "e" || side === "ne" || side === "se") {
+        scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
+      }
+      if (side === "s" || side === "sw" || side === "se") {
+        scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
+      }
+      if (side === "w" || side === "nw" || side === "sw") {
+        scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
+      }
+      if (side === "n" || side === "nw" || side === "ne") {
+        scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
+      }
+      let nextWidth = element.width * scaleX;
+      let nextHeight = element.height * scaleY;
+      if (getResizeWithSidesSameLengthKey(event)) {
+        nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
+      }
+      const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteBounds(
+        element,
+        nextWidth,
+        nextHeight,
+      );
+      const deltaX1 = (x1 - nextX1) / 2;
+      const deltaY1 = (y1 - nextY1) / 2;
+      const deltaX2 = (x2 - nextX2) / 2;
+      const deltaY2 = (y2 - nextY2) / 2;
+      const [
+        finalX1,
+        finalY1,
+        finalX2,
+        finalY2,
+      ] = getResizedElementAbsoluteBounds(
+        {
+          ...element,
+          ...(isLinearElement(element)
+            ? {
+                points: rescalePoints(
+                  0,
+                  nextWidth,
+                  rescalePoints(1, nextHeight, element.points),
+                ),
+              }
+            : {}),
+        },
+        Math.abs(nextWidth),
+        Math.abs(nextHeight),
+      );
+      let flipDiffX = 0;
+      let flipDiffY = 0;
+      if (nextWidth < 0) {
+        if (side === "e" || side === "ne" || side === "se") {
+          flipDiffX = (finalX2 - nextX1) * Math.cos(element.angle);
+          flipDiffY = (finalX2 - nextX1) * Math.sin(element.angle);
+        }
+        if (side === "w" || side === "nw" || side === "sw") {
+          flipDiffX = (finalX1 - nextX2) * Math.cos(element.angle);
+          flipDiffY = (finalX1 - nextX2) * Math.sin(element.angle);
+        }
+      }
+      if (nextHeight < 0) {
+        if (side === "s" || side === "se" || side === "sw") {
+          flipDiffY = (finalY2 - nextY1) * Math.cos(element.angle);
+          flipDiffX = (finalY2 - nextY1) * -Math.sin(element.angle);
+        }
+        if (side === "n" || side === "ne" || side === "nw") {
+          flipDiffY = (finalY1 - nextY2) * Math.cos(element.angle);
+          flipDiffX = (finalY1 - nextY2) * -Math.sin(element.angle);
+        }
+      }
+      const resized = {
+        width: nextWidth,
+        height: nextHeight,
+        ...adjustXYWithRotation(
+          resizeHandle,
+          element.x - flipDiffX,
+          element.y - flipDiffY,
+          element.angle,
+          deltaX1,
+          deltaY1,
+          deltaX2,
+          deltaY2,
+          getResizeCenterPointKey(event),
+        ),
+      };
       if (
         Math.abs(resized.width) > minSize &&
-        Math.abs(resized.height) > minSize
+        Math.abs(resized.height) > minSize &&
+        !Number.isNaN(resized.x) &&
+        !Number.isNaN(resized.y)
       ) {
         mutateElement(element, {
           ...resized,

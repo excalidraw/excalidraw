@@ -56,7 +56,7 @@ export function rotate(
   ];
 }
 
-const adjustXYWithRotation = (
+export const adjustXYWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
@@ -112,6 +112,7 @@ const adjustXYWithRotation = (
   return { x, y };
 };
 
+/*
 export const resizeXYWidthHightWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x1: number,
@@ -219,6 +220,7 @@ export const resizeXYWidthHightWithRotation = (
     ),
   };
 };
+*/
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;
