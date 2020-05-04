@@ -40,7 +40,7 @@
     "@types/react-dom": "16.9.6",
     "@types/socket.io-client": "1.4.32",
     "@testing-library/jest-dom": "5.5.0",
-    "@testing-library/react": "10.0.3"
+    "@testing-library/react": "10.0.4"
   },
   "devDependencies": {
     "asar": "3.0.3",
