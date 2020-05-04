@@ -13,7 +13,7 @@ import {
 import {
   getElementAbsoluteCoords,
   getCommonBounds,
-  getResizedElementAbsoluteBounds,
+  getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -223,7 +223,7 @@ export const resizeElements = (
       if (getResizeWithSidesSameLengthKey(event)) {
         nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
       }
-      const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteBounds(
+      const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
         element,
         nextWidth,
         nextHeight,
@@ -237,7 +237,7 @@ export const resizeElements = (
         finalY1,
         finalX2,
         finalY2,
-      ] = getResizedElementAbsoluteBounds(
+      ] = getResizedElementAbsoluteCoords(
         {
           ...element,
           ...(isLinearElement(element)

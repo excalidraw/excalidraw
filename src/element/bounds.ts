@@ -13,7 +13,7 @@ export function getElementAbsoluteCoords(
   element: ExcalidrawElement,
 ): [number, number, number, number] {
   if (isLinearElement(element)) {
-    return getLinearElementAbsoluteBounds(element);
+    return getLinearElementAbsoluteCoords(element);
   }
   return [
     element.x,
@@ -108,9 +108,9 @@ const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export function getLinearElementAbsoluteBounds(
+const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
@@ -145,7 +145,7 @@ export function getLinearElementAbsoluteBounds(
     maxX + element.x,
     maxY + element.y,
   ];
-}
+};
 
 export function getArrowPoints(
   element: ExcalidrawLinearElement,
@@ -304,7 +304,7 @@ export const getCommonBounds = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getResizedElementAbsoluteBounds = (
+export const getResizedElementAbsoluteCoords = (
   element: ExcalidrawElement,
   nextWidth: number,
   nextHeight: number,
