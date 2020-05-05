@@ -79,7 +79,9 @@
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
-    "resize": "Вы можете сохранить пропорции, удерживая SHIFT во время изменения размера",
+    "resize": "",
     "rotate": ""
   },
   "errorSplash": {

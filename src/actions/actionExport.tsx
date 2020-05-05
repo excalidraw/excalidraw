@@ -112,6 +112,10 @@ export const actionLoadScene = register({
             updateData({ elements: elements, appState: appState });
           })
           .catch((error) => {
+            // if user cancels, ignore the error
+            if (error.name === "AbortError") {
+              return;
+            }
             updateData({ error: error.message });
           });
       }}

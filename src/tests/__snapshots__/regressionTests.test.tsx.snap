@@ -42,6 +42,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -244,6 +245,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -364,6 +366,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -645,6 +648,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -808,6 +812,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1012,6 +1017,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1275,6 +1281,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -1654,6 +1661,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2285,6 +2293,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2405,6 +2414,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2525,6 +2535,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2645,6 +2656,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2787,6 +2799,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -2929,6 +2942,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3071,6 +3085,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3191,6 +3206,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3311,6 +3327,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3453,6 +3470,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3573,6 +3591,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -3646,6 +3665,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -4549,6 +4569,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -4982,6 +5003,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5320,6 +5342,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5567,6 +5590,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -5743,6 +5767,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -6596,6 +6621,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -7338,6 +7364,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -7973,6 +8000,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -8506,6 +8534,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -8988,6 +9017,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9373,6 +9403,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9665,6 +9696,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -9884,6 +9916,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -10794,6 +10827,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -11591,6 +11625,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -12279,6 +12314,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -12858,6 +12894,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13242,6 +13279,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13299,6 +13337,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13356,6 +13395,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;
@@ -13780,6 +13820,7 @@ Object {
   "showShortcutsDialog": false,
   "username": "",
   "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
   "zoom": 1,
 }
 `;

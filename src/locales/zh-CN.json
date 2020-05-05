@@ -79,7 +79,9 @@
     "redo": "重做",
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
-    "toggleFullScreen": "切换全屏显示"
+    "toggleFullScreen": "切换全屏显示",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
-    "resize": "调整大小时可以按住 Shift 来约束比例",
+    "resize": "",
     "rotate": "旋转时可以按住 Shift 来约束角度"
   },
   "errorSplash": {

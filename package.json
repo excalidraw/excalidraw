@@ -19,8 +19,8 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "5.15.4",
-    "@sentry/integrations": "5.15.4",
+    "@sentry/browser": "5.15.5",
+    "@sentry/integrations": "5.15.5",
     "browser-nativefs": "0.7.1",
     "i18next-browser-languagedetector": "4.1.1",
     "nanoid": "2.1.11",
@@ -30,71 +30,32 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "roughjs": "4.2.1",
-    "socket.io-client": "2.3.0"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "5.5.0",
-    "@testing-library/react": "10.0.2",
+    "roughjs": "4.2.3",
+    "socket.io-client": "2.3.0",
+    "node-sass": "4.14.0",
+    "typescript": "3.8.3",
     "@types/jest": "25.2.1",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.34",
-    "@types/react-dom": "16.9.6",
+    "@types/react-dom": "16.9.7",
     "@types/socket.io-client": "1.4.32",
+    "@testing-library/jest-dom": "5.5.0",
+    "@testing-library/react": "10.0.4"
+  },
+  "devDependencies": {
     "asar": "3.0.3",
     "eslint": "6.8.0",
-    "eslint-config-prettier": "6.10.1",
+    "eslint-config-prettier": "6.11.0",
     "eslint-plugin-prettier": "3.1.3",
     "husky": "4.2.5",
     "jest-canvas-mock": "2.2.0",
-    "lint-staged": "10.1.6",
-    "node-sass": "4.13.1",
+    "lint-staged": "10.2.2",
     "pepjs": "0.5.2",
-    "prettier": "2.0.4",
-    "rewire": "5.0.0",
-    "typescript": "3.8.3"
+    "prettier": "2.0.5",
+    "rewire": "5.0.0"
   },
   "engines": {
     "node": ">=12.0.0"
-  },
-  "eslintConfig": {
-    "extends": [
-      "prettier",
-      "react-app"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "curly": "warn",
-      "no-console": [
-        "warn",
-        {
-          "allow": [
-            "warn",
-            "error",
-            "info"
-          ]
-        }
-      ],
-      "no-else-return": "warn",
-      "no-useless-return": "warn",
-      "prefer-const": [
-        "warn",
-        {
-          "destructuring": "all"
-        }
-      ],
-      "prefer-template": "warn",
-      "prettier/prettier": "warn",
-      "no-restricted-syntax": [
-        "warn",
-        {
-          "selector": "JSXText[value=/\\w/]",
-          "message": "Use 't(...)' instead of literal text in JSX"
-        }
-      ]
-    }
   },
   "homepage": ".",
   "husky": {

@@ -23,7 +23,7 @@
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
     "withBackground": "Z tłem dokumentu",
-    "addWatermark": "",
+    "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
     "code": "Kod",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Zrobione w Excalidraw"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -79,7 +79,9 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy"
+    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT",
+    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHITH, przytrzymaj ALT by zmienać rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
   },
   "encrypted": {
-    "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz. Kliknij ikonę, aby dowiedzieć się więcej..."
+    "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
   }
 }

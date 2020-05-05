@@ -388,6 +388,7 @@ button,
 }
 
 .dropdown-select__language.dropdown-select--floating {
+  position: fixed;
   bottom: 10px;
   :root[dir="ltr"] & {
     right: 44px;
@@ -448,7 +449,7 @@ button,
 }
 
 .github-corner {
-  position: absolute;
+  position: fixed;
   top: 0;
   :root[dir="ltr"] & {
     right: 0;

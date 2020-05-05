@@ -46,6 +46,7 @@ export const getDefaultAppState = (): AppState => {
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
+    zenModeEnabled: false,
   };
 };
 

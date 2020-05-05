@@ -81,6 +81,7 @@ export const shapesShortcutKeys = SHAPES.map((shape, index) => [
 ]).flat(1);
 
 export const findShapeByKey = (key: string) =>
-  SHAPES.find((shape, index) => {
-    return shape.value[0] === key || key === (index + 1).toString();
-  })?.value || "selection";
+  SHAPES.find(
+    (shape, index) =>
+      shape.value[0] === key.toLowerCase() || key === (index + 1).toString(),
+  )?.value || "selection";
