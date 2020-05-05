@@ -23,7 +23,7 @@
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
-    "addWatermark": "",
+    "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans titre",
     "name": "Nom",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Fabriqué avec Excalidraw"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -111,7 +111,7 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "",
+    "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
   },
   "errorSplash": {
@@ -151,13 +151,13 @@
     "editor": "Éditeur",
     "view": "Afficher",
     "blog": "Lisez notre blog",
-    "howto": "Suivez notre guides",
+    "howto": "Suivez nos guides",
     "github": "Vous avez trouvé un problème ? Envoyer",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
-    "zoomToFit": ""
+    "zoomToFit": "Zoomer pour visualiser tous les éléments"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Vos dessins sont cryptés de bout en bout, donc les serveurs d'Excalidraw ne les verront jamais."
   }
 }
