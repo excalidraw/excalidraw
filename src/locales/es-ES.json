@@ -23,7 +23,7 @@
     "fontFamily": "Tipo de letra",
     "onlySelected": "Sólo seleccionados",
     "withBackground": "Con fondo",
-    "addWatermark": "",
+    "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
     "normal": "Normal",
     "code": "Código",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
     "name": "Nombre",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Hecho con Excalidraw"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -80,8 +80,8 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Cambiar a modo zen",
+    "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -111,7 +111,7 @@
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "resize": "",
+    "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
   },
   "errorSplash": {
@@ -145,7 +145,7 @@
     "shapes": "Formas",
     "or": "o",
     "click": "hacer clic",
-    "drag": "",
+    "drag": "arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "editor": "Editor",
@@ -155,9 +155,9 @@
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": ""
+    "zoomToFit": "Acercar para mostrar todos los elementos"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
   }
 }
