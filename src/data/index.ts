@@ -113,7 +113,7 @@ export async function generateCollaborationLink() {
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
 }
 
-function getImportedKey(key: string, usage: string): PromiseLike<CryptoKey> {
+async function getImportedKey(key: string, usage: string): Promise<CryptoKey> {
   return window.crypto.subtle.importKey(
     "jwk",
     {
