@@ -29,7 +29,7 @@ class Portal {
       }
     });
     this.socket.on("new-user", async (_socketID: string) => {
-      this.app.broadcastScene(SCENE.INIT);
+      this.app.broadcastScene(SCENE.INIT, /* syncAll */ true);
     });
     this.socket.on("room-user-change", (clients: string[]) => {
       this.app.setCollaborators(clients);
