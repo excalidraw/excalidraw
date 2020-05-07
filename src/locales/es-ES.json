@@ -37,7 +37,7 @@
     "thin": "Fino",
     "bold": "Grueso",
     "left": "Izquierda",
-    "center": "Centro",
+    "center": "Centrado",
     "right": "Derecha",
     "extraBold": "Extra negrita",
     "architect": "Arquitecto",
@@ -80,7 +80,7 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
-    "toggleZenMode": "Cambiar a modo zen",
+    "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
@@ -91,7 +91,7 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido encriptada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -124,7 +124,7 @@
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos para no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
+    "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
@@ -133,7 +133,7 @@
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
-    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
+    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o los compartan con enlace.",
     "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
   },
@@ -155,7 +155,7 @@
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": "Acercar para mostrar todos los elementos"
+    "zoomToFit": "Ajustar la vista para mostrar todos los elementos"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
