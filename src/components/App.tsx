@@ -480,7 +480,7 @@ class App extends React.Component<any, AppState> {
   });
 
   queueBroadcastAllElements = throttle(() => {
-    this.broadcastScene(SCENE.UPDATE, true);
+    this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate() {
@@ -564,7 +564,7 @@ class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastScene(SCENE.UPDATE, false);
+      this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
       this.queueBroadcastAllElements();
     }
 
