@@ -114,7 +114,6 @@ import {
   ENV,
 } from "../constants";
 import {
-  FONT_LOAD_THRESHOLD,
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
 } from "../time_constants";
@@ -303,6 +302,15 @@ class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private onFontLoaded = () => {
+    globalSceneState.getElementsIncludingDeleted().forEach((element) => {
+      if (isTextElement(element)) {
+        invalidateShapeForElement(element);
+      }
+    });
+    this.onSceneUpdated();
+  };
+
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -325,23 +333,6 @@ class App extends React.Component<any, AppState> {
       if (scene) {
         this.syncActionResult(scene);
       }
-    }
-
-    // rerender text elements on font load to fix #637
-    try {
-      await Promise.race([
-        document.fonts?.ready?.then(() => {
-          globalSceneState.getElementsIncludingDeleted().forEach((element) => {
-            if (isTextElement(element)) {
-              invalidateShapeForElement(element);
-            }
-          });
-        }),
-        // if fonts don't load in 1s for whatever reason, don't block the UI
-        new Promise((resolve) => setTimeout(resolve, FONT_LOAD_THRESHOLD)),
-      ]);
-    } catch (error) {
-      console.error(error);
     }
 
     if (this.state.isLoading) {
@@ -401,6 +392,9 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
+
+    // rerender text elements on font load to fix #637 && #1553
+    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
