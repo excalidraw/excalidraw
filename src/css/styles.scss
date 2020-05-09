@@ -267,6 +267,12 @@ button,
   cursor: default;
   pointer-events: none !important;
 
+  &--transition-left {
+    section {
+      width: 185px;
+    }
+  }
+
   section {
     display: flex;
   }
@@ -460,16 +466,15 @@ button,
 }
 
 .zen-mode-visibility {
-  visibility: visible;
   opacity: 1;
-  transition: visibility 0s linear 0s, opacity 0.5s;
+  height: auto;
+  transition: height 0s linear 0s, opacity 0.5s;
 
   &.zen-mode-visibility--hidden {
-    visibility: hidden;
     opacity: 0;
-    transition: visibility 0s linear 300ms, opacity 0.5s;
     width: 0;
     height: 0;
+    transition: height 0s linear 300ms, opacity 0.5s;
   }
 }
 
