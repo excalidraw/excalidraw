@@ -158,12 +158,12 @@ export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
     return `${shortcut
-      .replace("CtrlOrCmd", "Cmd")
-      .replace("Alt", "Option")
-      .replace("Del", "Delete")
-      .replace(/Enter|Return/, "Enter")}`;
+      .replace(/CtrlOrCmd/i, "Cmd")
+      .replace(/Alt/i, "Option")
+      .replace(/Del/i, "Delete")
+      .replace(/Enter|Return/i, "Enter")}`;
   }
-  return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
+  return `${shortcut.replace(/CtrlOrCmd/i, "Ctrl")}`;
 };
 export function viewportCoordsToSceneCoords(
   { clientX, clientY }: { clientX: number; clientY: number },
