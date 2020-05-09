@@ -105,6 +105,10 @@
     :root[dir="rtl"] &.transition-right {
       transform: translate(-999px, 0);
     }
+
+    &.App-menu_bottom--transition-left {
+      transform: translate(-92px, 0);
+    }
   }
 
   .disable-zen-mode {
@@ -126,8 +130,4 @@
       transition-delay: 0.8s;
     }
   }
-}
-
-.disable-pointerEvents {
-  pointer-events: none !important;
 }
