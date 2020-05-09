@@ -127,7 +127,7 @@ const resizeSingleTwoPointElement = (
   resizeHandle: "nw" | "ne" | "sw" | "se",
   resizeArrowFn: ResizeArrowFnType | null,
   setResizeArrowFn: (fn: ResizeArrowFnType) => void,
-  sidesWithSameLength: boolean,
+  isAngleLocking: boolean,
   pointerX: number,
   pointerY: number,
   lastX: number,
@@ -144,7 +144,7 @@ const resizeSingleTwoPointElement = (
     resizeArrowFn,
     setResizeArrowFn,
     isResizeEnd,
-    sidesWithSameLength,
+    isAngleLocking,
     pointerX,
     pointerY,
     lastX,
@@ -159,7 +159,7 @@ const arrowResizeOrigin: ResizeArrowFnType = (
   deltaY,
   pointerX,
   pointerY,
-  sidesWithSameLength,
+  isAngleLocking,
 ) => {
   const [px, py] = element.points[pointIndex];
   let x = element.x + deltaX;
@@ -167,7 +167,7 @@ const arrowResizeOrigin: ResizeArrowFnType = (
   let pointX = px - deltaX;
   let pointY = py - deltaY;
 
-  if (sidesWithSameLength) {
+  if (isAngleLocking) {
     const { width, height } = getPerfectElementSize(
       element.type,
       px + element.x - pointerX,
@@ -195,10 +195,10 @@ const arrowResizeEnd: ResizeArrowFnType = (
   deltaY,
   pointerX,
   pointerY,
-  sidesWithSameLength,
+  isAngleLocking,
 ) => {
   const [px, py] = element.points[pointIndex];
-  if (sidesWithSameLength) {
+  if (isAngleLocking) {
     const { width, height } = getPerfectElementSize(
       element.type,
       pointerX - element.x,
@@ -223,7 +223,7 @@ const applyResizeArrowFn = (
   resizeArrowFn: ResizeArrowFnType | null,
   setResizeArrowFn: (fn: ResizeArrowFnType) => void,
   isResizeEnd: boolean,
-  sidesWithSameLength: boolean,
+  isAngleLocking: boolean,
   x: number,
   y: number,
   lastX: number,
@@ -238,7 +238,7 @@ const applyResizeArrowFn = (
       resizeArrowFn = arrowResizeOrigin;
     }
   }
-  resizeArrowFn(element, 1, deltaX, deltaY, x, y, sidesWithSameLength);
+  resizeArrowFn(element, 1, deltaX, deltaY, x, y, isAngleLocking);
   setResizeArrowFn(resizeArrowFn);
 };
 
