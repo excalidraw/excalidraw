@@ -159,6 +159,7 @@ export const getShortcutKey = (shortcut: string): string => {
   if (isMac) {
     return `${shortcut
       .replace("CtrlOrCmd", "Cmd")
+      .replace("Alt", "Option")
       .replace("Del", "Delete")
       .replace(/Enter|Return/, "Enter")}`;
   }
