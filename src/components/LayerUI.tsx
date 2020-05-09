@@ -206,8 +206,7 @@ const LayerUI = ({
         {
           <div
             className={`App-menu App-menu_bottom zen-mode-transition ${
-              zenModeEnabled &&
-              "App-menu_bottom--transition-left"
+              zenModeEnabled && "App-menu_bottom--transition-left"
             }`}
           >
             <Stack.Col gap={2}>
