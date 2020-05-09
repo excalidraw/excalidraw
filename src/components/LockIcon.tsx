@@ -47,7 +47,7 @@ export function LockIcon(props: LockIconProps) {
     <label
       className={`ToolIcon ToolIcon__lock ToolIcon_type_floating ${sizeCn} zen-mode-visibility ${
         props.zenModeEnabled &&
-        "zen-mode-visibility--hidden disable-pointerEvents"
+        "zen-mode-visibility--hidden"
       }`}
       title={`${props.title} — Q`}
     >

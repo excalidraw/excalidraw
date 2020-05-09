@@ -466,15 +466,18 @@ button,
 }
 
 .zen-mode-visibility {
+  visibility: visible;
   opacity: 1;
   height: auto;
-  transition: height 0s linear 0s, opacity 0.5s;
+  width: auto;
+  transition: opacity 0.5s;
 
   &.zen-mode-visibility--hidden {
+    visibility: hidden;
     opacity: 0;
-    width: 0;
     height: 0;
-    transition: height 0s linear 300ms, opacity 0.5s;
+    width: 0;
+    transition: opacity 0.5s;
   }
 }
 
