@@ -24,6 +24,7 @@ import {
   resizeElements,
   getElementWithResizeHandler,
   canResizeMutlipleElements,
+  getResizeOffsetXY,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
 } from "../element";
@@ -1845,6 +1846,7 @@ class App extends React.Component<any, AppState> {
     const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
       resizeHandle = nextResizeHandle;
     };
+    let resizeOffsetXY: [number, number] = [0, 0];
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1890,6 +1892,14 @@ class App extends React.Component<any, AppState> {
             isResizingElements = true;
           }
         }
+      }
+      if (isResizingElements) {
+        resizeOffsetXY = getResizeOffsetXY(
+          resizeHandle,
+          selectedElements,
+          x,
+          y,
+        );
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
@@ -2135,6 +2145,8 @@ class App extends React.Component<any, AppState> {
           event,
           x,
           y,
+          resizeOffsetXY[0],
+          resizeOffsetXY[1],
           lastX,
           lastY,
         );
@@ -2310,6 +2322,7 @@ class App extends React.Component<any, AppState> {
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
       resizeArrowFn = null;
+      resizeOffsetXY = [0, 0];
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
