@@ -20,7 +20,7 @@
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
     "fontSize": "Tamaño de la fuente",
-    "fontFamily": "Tipo de letra",
+    "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
     "withBackground": "Con fondo",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
@@ -54,7 +54,7 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
     "name": "Nombre",
-    "yourName": "",
+    "yourName": "Nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw"
   },
   "buttons": {
