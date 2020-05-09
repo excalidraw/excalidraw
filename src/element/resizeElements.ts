@@ -1,6 +1,4 @@
-import { AppState } from "../types";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 
 import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
@@ -33,31 +31,21 @@ type ResizeTestType = ReturnType<typeof resizeTest>;
 export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
-  appState: AppState,
-  setAppState: (obj: any) => void,
+  selectedElements: NonDeletedExcalidrawElement[],
   resizeArrowFn: ResizeArrowFnType | null, // XXX eliminate in #1339
   setResizeArrowFn: (fn: ResizeArrowFnType) => void, // XXX eliminate in #1339
   event: PointerEvent, // XXX we want to make it independent?
-  xPointer: number,
-  yPointer: number,
+  pointerX: number,
+  pointerY: number,
+  offsetX: number,
+  offsetY: number,
   lastX: number, // XXX eliminate in #1339
   lastY: number, // XXX eliminate in #1339
 ) => {
-  setAppState({
-    isResizing: resizeHandle && resizeHandle !== "rotation",
-    isRotating: resizeHandle === "rotation",
-  });
-  const selectedElements = getSelectedElements(
-    globalSceneState.getElements(),
-    appState,
-  );
-  const handleOffset = 4 / appState.zoom; // XXX import constant
-  const dashedLinePadding = 4 / appState.zoom; // XXX import constant
-  const offsetPointer = handleOffset + dashedLinePadding;
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
-      rotateSingleElement(element, xPointer, yPointer, event.shiftKey);
+      rotateSingleElement(element, pointerX, pointerY, event.shiftKey);
     } else if (
       isLinearElement(element) &&
       element.points.length === 2 &&
@@ -72,8 +60,8 @@ export const resizeElements = (
         resizeArrowFn,
         setResizeArrowFn,
         event.shiftKey,
-        xPointer,
-        yPointer,
+        pointerX,
+        pointerY,
         lastX,
         lastY,
       );
@@ -83,9 +71,10 @@ export const resizeElements = (
         resizeHandle,
         getResizeWithSidesSameLengthKey(event),
         getResizeCenterPointKey(event),
-        xPointer,
-        yPointer,
-        offsetPointer,
+        pointerX,
+        pointerY,
+        offsetX,
+        offsetY,
       );
       setResizeHandle(normalizeResizeHandle(element, resizeHandle));
       if (element.width < 0) {
@@ -96,18 +85,12 @@ export const resizeElements = (
       }
     }
 
-    // XXX do we need this?
+    // update cursor
+    // FIXME it is not very nice to have this here
     document.documentElement.style.cursor = getCursorForResizingElement({
       element,
       resizeHandle,
     });
-    // XXX why do we need this?
-    if (appState.resizingElement) {
-      mutateElement(appState.resizingElement, {
-        x: element.x,
-        y: element.y,
-      });
-    }
 
     return true;
   } else if (
@@ -120,9 +103,10 @@ export const resizeElements = (
     resizeMultipleElements(
       selectedElements,
       resizeHandle,
-      xPointer,
-      yPointer,
-      offsetPointer,
+      pointerX,
+      pointerY,
+      offsetX,
+      offsetY,
     );
     return true;
   }
@@ -131,14 +115,14 @@ export const resizeElements = (
 
 const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
-  xPointer: number,
-  yPointer: number,
+  pointerX: number,
+  pointerY: number,
   isAngleLocking: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  let angle = (5 * Math.PI) / 2 + Math.atan2(yPointer - cy, xPointer - cx);
+  let angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
   if (isAngleLocking) {
     angle += SHIFT_LOCKING_ANGLE / 2;
     angle -= angle % SHIFT_LOCKING_ANGLE;
@@ -155,8 +139,8 @@ const resizeSingleTwoPointElement = (
   resizeArrowFn: ResizeArrowFnType | null,
   setResizeArrowFn: (fn: ResizeArrowFnType) => void,
   sidesWithSameLength: boolean,
-  xPointer: number,
-  yPointer: number,
+  pointerX: number,
+  pointerY: number,
   lastX: number,
   lastY: number,
 ) => {
@@ -172,8 +156,8 @@ const resizeSingleTwoPointElement = (
     setResizeArrowFn,
     isResizeEnd,
     sidesWithSameLength,
-    xPointer,
-    yPointer,
+    pointerX,
+    pointerY,
     lastX,
     lastY,
   );
@@ -274,43 +258,35 @@ const resizeSingleElement = (
   resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   sidesWithSameLength: boolean,
   isResizeFromCenter: boolean,
-  xPointer: number,
-  yPointer: number,
-  offsetPointer: number,
+  pointerX: number,
+  pointerY: number,
+  offsetX: number,
+  offsetY: number,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // rotation pointer with reverse angle
   const [rotatedX, rotatedY] = rotate(
-    xPointer,
-    yPointer,
+    pointerX - offsetX,
+    pointerY - offsetY,
     cx,
     cy,
     -element.angle,
   );
-  // XXX this might be slow with closure
-  const adjustWithOffsetPointer = (wh: number) => {
-    if (wh > offsetPointer) {
-      return wh - offsetPointer;
-    } else if (wh < -offsetPointer) {
-      return wh + offsetPointer;
-    }
-    return 0;
-  };
   let scaleX = 1;
   let scaleY = 1;
   if (resizeHandle === "e" || resizeHandle === "ne" || resizeHandle === "se") {
-    scaleX = adjustWithOffsetPointer(rotatedX - x1) / (x2 - x1);
+    scaleX = (rotatedX - x1) / (x2 - x1);
   }
   if (resizeHandle === "s" || resizeHandle === "sw" || resizeHandle === "se") {
-    scaleY = adjustWithOffsetPointer(rotatedY - y1) / (y2 - y1);
+    scaleY = (rotatedY - y1) / (y2 - y1);
   }
   if (resizeHandle === "w" || resizeHandle === "nw" || resizeHandle === "sw") {
-    scaleX = adjustWithOffsetPointer(x2 - rotatedX) / (x2 - x1);
+    scaleX = (x2 - rotatedX) / (x2 - x1);
   }
   if (resizeHandle === "n" || resizeHandle === "nw" || resizeHandle === "ne") {
-    scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
+    scaleY = (y2 - rotatedY) / (y2 - y1);
   }
   let nextWidth = element.width * scaleX;
   let nextHeight = element.height * scaleY;
@@ -388,16 +364,17 @@ const resizeSingleElement = (
 const resizeMultipleElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   resizeHandle: "nw" | "ne" | "sw" | "se",
-  xPointer: number,
-  yPointer: number,
-  offsetPointer: number,
+  pointerX: number,
+  pointerY: number,
+  offsetX: number,
+  offsetY: number,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
   switch (resizeHandle) {
     case "se": {
       const scale = Math.max(
-        (xPointer - offsetPointer - x1) / (x2 - x1),
-        (yPointer - offsetPointer - y1) / (y2 - y1),
+        (pointerX - offsetX - x1) / (x2 - x1),
+        (pointerY - offsetY - y1) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -412,8 +389,8 @@ const resizeMultipleElements = (
     }
     case "nw": {
       const scale = Math.max(
-        (x2 - offsetPointer - xPointer) / (x2 - x1),
-        (y2 - offsetPointer - yPointer) / (y2 - y1),
+        (x2 - (pointerX - offsetX)) / (x2 - x1),
+        (y2 - (pointerY - offsetY)) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -428,8 +405,8 @@ const resizeMultipleElements = (
     }
     case "ne": {
       const scale = Math.max(
-        (xPointer - offsetPointer - x1) / (x2 - x1),
-        (y2 - offsetPointer - yPointer) / (y2 - y1),
+        (pointerX - offsetX - x1) / (x2 - x1),
+        (y2 - (pointerY - offsetY)) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -444,8 +421,8 @@ const resizeMultipleElements = (
     }
     case "sw": {
       const scale = Math.max(
-        (x2 - offsetPointer - xPointer) / (x2 - x1),
-        (yPointer - offsetPointer - y1) / (y2 - y1),
+        (x2 - (pointerX - offsetX)) / (x2 - x1),
+        (pointerY - offsetY - y1) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -467,4 +444,40 @@ export const canResizeMutlipleElements = (
   return elements.every((element) =>
     ["rectangle", "diamond", "ellipse"].includes(element.type),
   );
+};
+
+export const getResizeOffsetXY = (
+  resizeHandle: ResizeTestType,
+  selectedElements: NonDeletedExcalidrawElement[],
+  x: number,
+  y: number,
+): [number, number] => {
+  const [x1, y1, x2, y2] =
+    selectedElements.length === 1
+      ? getElementAbsoluteCoords(selectedElements[0])
+      : getCommonBounds(selectedElements);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const angle = selectedElements.length === 1 ? selectedElements[0].angle : 0;
+  [x, y] = rotate(x, y, cx, cy, -angle);
+  switch (resizeHandle) {
+    case "n":
+      return rotate(x - (x1 + x2) / 2, y - y1, 0, 0, angle);
+    case "s":
+      return rotate(x - (x1 + x2) / 2, y - y2, 0, 0, angle);
+    case "w":
+      return rotate(x - x1, y - (y1 + y2) / 2, 0, 0, angle);
+    case "e":
+      return rotate(x - x2, y - (y1 + y2) / 2, 0, 0, angle);
+    case "nw":
+      return rotate(x - x1, y - y1, 0, 0, angle);
+    case "ne":
+      return rotate(x - x2, y - y1, 0, 0, angle);
+    case "sw":
+      return rotate(x - x1, y - y2, 0, 0, angle);
+    case "se":
+      return rotate(x - x2, y - y2, 0, 0, angle);
+    default:
+      return [0, 0];
+  }
 };
