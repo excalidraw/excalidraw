@@ -158,12 +158,9 @@ export const getShortcutKey = (shortcut: string): string => {
   const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
   if (isMac) {
     return `${shortcut
-      .replace("CtrlOrCmd+", "⌘")
-      .replace("Alt+", "⌥")
-      .replace("Ctrl+", "⌃")
-      .replace("Shift+", "⇧")
-      .replace("Del", "⌫")
-      .replace(/Enter|Return/, "↩")}`;
+      .replace("CtrlOrCmd", "Cmd")
+      .replace("Del", "Delete")
+      .replace(/Enter|Return/, "Enter")}`;
   }
   return `${shortcut.replace("CtrlOrCmd", "Ctrl")}`;
 };
