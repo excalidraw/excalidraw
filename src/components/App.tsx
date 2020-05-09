@@ -2133,13 +2133,19 @@ class App extends React.Component<any, AppState> {
         }
       }
 
-      const resized =
-        isResizingElements &&
-        resizeElements(
+      if (isResizingElements) {
+        const selectedElements = getSelectedElements(
+          globalSceneState.getElements(),
+          this.state,
+        );
+        this.setState({
+          isResizing: resizeHandle && resizeHandle !== "rotation",
+          isRotating: resizeHandle === "rotation",
+        });
+        const resized = resizeElements(
           resizeHandle,
           setResizeHandle,
-          this.state,
-          this.setAppState,
+          selectedElements,
           resizeArrowFn,
           setResizeArrowFn,
           event,
@@ -2150,10 +2156,11 @@ class App extends React.Component<any, AppState> {
           lastX,
           lastY,
         );
-      if (resized) {
-        lastX = x;
-        lastY = y;
-        return;
+        if (resized) {
+          lastX = x;
+          lastY = y;
+          return;
+        }
       }
 
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {

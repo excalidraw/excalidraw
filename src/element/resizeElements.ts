@@ -1,6 +1,4 @@
-import { AppState } from "../types";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import { getSelectedElements, globalSceneState } from "../scene";
 import { rescalePoints } from "../points";
 
 import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
@@ -33,8 +31,7 @@ type ResizeTestType = ReturnType<typeof resizeTest>;
 export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
-  appState: AppState,
-  setAppState: (obj: any) => void,
+  selectedElements: NonDeletedExcalidrawElement[],
   resizeArrowFn: ResizeArrowFnType | null, // XXX eliminate in #1339
   setResizeArrowFn: (fn: ResizeArrowFnType) => void, // XXX eliminate in #1339
   event: PointerEvent, // XXX we want to make it independent?
@@ -45,14 +42,6 @@ export const resizeElements = (
   lastX: number, // XXX eliminate in #1339
   lastY: number, // XXX eliminate in #1339
 ) => {
-  setAppState({
-    isResizing: resizeHandle && resizeHandle !== "rotation",
-    isRotating: resizeHandle === "rotation",
-  });
-  const selectedElements = getSelectedElements(
-    globalSceneState.getElements(),
-    appState,
-  );
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
@@ -96,18 +85,12 @@ export const resizeElements = (
       }
     }
 
-    // XXX do we need this?
+    // update cursor
+    // FIXME it is not very nice to have this here
     document.documentElement.style.cursor = getCursorForResizingElement({
       element,
       resizeHandle,
     });
-    // XXX why do we need this?
-    if (appState.resizingElement) {
-      mutateElement(appState.resizingElement, {
-        x: element.x,
-        y: element.y,
-      });
-    }
 
     return true;
   } else if (
