@@ -54,7 +54,7 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
-    "yourName": "Nome",
+    "yourName": "Seu nome",
     "madeWithExcalidraw": "Feito com Excalidraw"
   },
   "buttons": {
@@ -81,8 +81,8 @@
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
     "toggleFullScreen": "Alterar tela cheia",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Alternar modo zen",
+    "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",

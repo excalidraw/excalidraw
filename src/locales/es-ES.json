@@ -20,10 +20,10 @@
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
     "fontSize": "Tamaño de la fuente",
-    "fontFamily": "Tipo de letra",
+    "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
     "withBackground": "Con fondo",
-    "addWatermark": "",
+    "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
     "normal": "Normal",
     "code": "Código",
@@ -37,7 +37,7 @@
     "thin": "Fino",
     "bold": "Grueso",
     "left": "Izquierda",
-    "center": "Centro",
+    "center": "Centrado",
     "right": "Derecha",
     "extraBold": "Extra negrita",
     "architect": "Arquitecto",
@@ -55,7 +55,7 @@
     "untitled": "Sin título",
     "name": "Nombre",
     "yourName": "Nombre",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Hecho con Excalidraw"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -81,8 +81,8 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Cambiar a modo zen",
+    "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -92,7 +92,7 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido encriptada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -112,7 +112,7 @@
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "resize": "",
+    "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
   },
   "errorSplash": {
@@ -125,7 +125,7 @@
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos para no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
+    "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
@@ -146,7 +146,7 @@
     "shapes": "Formas",
     "or": "o",
     "click": "hacer clic",
-    "drag": "",
+    "drag": "arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "editor": "Editor",
@@ -156,9 +156,9 @@
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": ""
+    "zoomToFit": "Ajustar la vista para mostrar todos los elementos"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
   }
 }
