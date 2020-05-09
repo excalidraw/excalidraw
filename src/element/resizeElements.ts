@@ -37,8 +37,6 @@ export const resizeElements = (
   event: PointerEvent, // XXX we want to make it independent?
   pointerX: number,
   pointerY: number,
-  offsetX: number,
-  offsetY: number,
   lastX: number, // XXX eliminate in #1339
   lastY: number, // XXX eliminate in #1339
 ) => {
@@ -73,8 +71,6 @@ export const resizeElements = (
         getResizeCenterPointKey(event),
         pointerX,
         pointerY,
-        offsetX,
-        offsetY,
       );
       setResizeHandle(normalizeResizeHandle(element, resizeHandle));
       if (element.width < 0) {
@@ -100,14 +96,7 @@ export const resizeElements = (
       resizeHandle === "sw" ||
       resizeHandle === "se")
   ) {
-    resizeMultipleElements(
-      selectedElements,
-      resizeHandle,
-      pointerX,
-      pointerY,
-      offsetX,
-      offsetY,
-    );
+    resizeMultipleElements(selectedElements, resizeHandle, pointerX, pointerY);
     return true;
   }
   return false;
@@ -260,16 +249,14 @@ const resizeSingleElement = (
   isResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
-  offsetX: number,
-  offsetY: number,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // rotation pointer with reverse angle
   const [rotatedX, rotatedY] = rotate(
-    pointerX - offsetX,
-    pointerY - offsetY,
+    pointerX,
+    pointerY,
     cx,
     cy,
     -element.angle,
@@ -366,15 +353,13 @@ const resizeMultipleElements = (
   resizeHandle: "nw" | "ne" | "sw" | "se",
   pointerX: number,
   pointerY: number,
-  offsetX: number,
-  offsetY: number,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
   switch (resizeHandle) {
     case "se": {
       const scale = Math.max(
-        (pointerX - offsetX - x1) / (x2 - x1),
-        (pointerY - offsetY - y1) / (y2 - y1),
+        (pointerX - x1) / (x2 - x1),
+        (pointerY - y1) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -389,8 +374,8 @@ const resizeMultipleElements = (
     }
     case "nw": {
       const scale = Math.max(
-        (x2 - (pointerX - offsetX)) / (x2 - x1),
-        (y2 - (pointerY - offsetY)) / (y2 - y1),
+        (x2 - pointerX) / (x2 - x1),
+        (y2 - pointerY) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -405,8 +390,8 @@ const resizeMultipleElements = (
     }
     case "ne": {
       const scale = Math.max(
-        (pointerX - offsetX - x1) / (x2 - x1),
-        (y2 - (pointerY - offsetY)) / (y2 - y1),
+        (pointerX - x1) / (x2 - x1),
+        (y2 - pointerY) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {
@@ -421,8 +406,8 @@ const resizeMultipleElements = (
     }
     case "sw": {
       const scale = Math.max(
-        (x2 - (pointerX - offsetX)) / (x2 - x1),
-        (pointerY - offsetY - y1) / (y2 - y1),
+        (x2 - pointerX) / (x2 - x1),
+        (pointerY - y1) / (y2 - y1),
       );
       if (scale > 0) {
         elements.forEach((element) => {

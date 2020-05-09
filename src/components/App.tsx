@@ -2149,10 +2149,8 @@ class App extends React.Component<any, AppState> {
           resizeArrowFn,
           setResizeArrowFn,
           event,
-          x,
-          y,
-          resizeOffsetXY[0],
-          resizeOffsetXY[1],
+          x - resizeOffsetXY[0],
+          y - resizeOffsetXY[1],
           lastX,
           lastY,
         );
