@@ -52,10 +52,10 @@
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "Дубликат",
-    "untitled": "",
+    "untitled": "Без названия",
     "name": "Имя",
-    "yourName": "",
-    "madeWithExcalidraw": ""
+    "yourName": "Ваше имя",
+    "madeWithExcalidraw": "Сделано в Excalidraw"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -80,7 +80,7 @@
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
-    "toggleFullScreen": "",
+    "toggleFullScreen": "Переключить полноэкранный режим",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
