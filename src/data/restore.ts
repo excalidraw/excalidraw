@@ -76,6 +76,7 @@ export function restore(
         id: element.id || randomId(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
+        strokeStyle: element.strokeStyle ?? "solid",
         roughness: element.roughness ?? 1,
         opacity:
           element.opacity === null || element.opacity === undefined

@@ -20,6 +20,9 @@ import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
 
+const DASHARRAY_DASHED = [12, 8];
+const DASHARRAY_DOTTED = [4, 6];
+
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -86,14 +89,29 @@ function drawElementOnCanvas(
     case "rectangle":
     case "diamond":
     case "ellipse": {
+      if (element.strokeStyle === "dashed") {
+        context.setLineDash(DASHARRAY_DASHED);
+      } else if (element.strokeStyle === "dotted") {
+        context.setLineDash(DASHARRAY_DOTTED);
+      }
       rc.draw(getShapeForElement(element) as Drawable);
+      // reset
+      context.setLineDash([]);
       break;
     }
     case "arrow":
     case "line": {
-      (getShapeForElement(element) as Drawable[]).forEach((shape) =>
-        rc.draw(shape),
-      );
+      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+        if (shape.shape === "curve") {
+          if (element.strokeStyle === "dashed") {
+            context.setLineDash(DASHARRAY_DASHED);
+          } else if (element.strokeStyle === "dotted") {
+            context.setLineDash(DASHARRAY_DOTTED);
+          }
+        }
+        rc.draw(shape);
+        context.setLineDash([]);
+      });
       break;
     }
     default: {
@@ -400,6 +418,11 @@ export function renderElementToSvg(
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
       }
+      if (element.strokeStyle === "dashed") {
+        node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
+      } else if (element.strokeStyle === "dotted") {
+        node.setAttribute("stroke-dasharray", DASHARRAY_DOTTED.join(","));
+      }
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
@@ -416,6 +439,13 @@ export function renderElementToSvg(
       const opacity = element.opacity / 100;
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
+        if (shape.shape === "curve") {
+          if (element.strokeStyle === "dashed") {
+            node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
+          } else if (element.strokeStyle === "dotted") {
+            node.setAttribute("stroke-dasharray", DASHARRAY_DOTTED.join(","));
+          }
+        }
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);

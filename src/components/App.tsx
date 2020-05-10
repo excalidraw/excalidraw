@@ -728,6 +728,7 @@ class App extends React.Component<any, AppState> {
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       text: text,
@@ -1356,6 +1357,7 @@ class App extends React.Component<any, AppState> {
             backgroundColor: this.state.currentItemBackgroundColor,
             fillStyle: this.state.currentItemFillStyle,
             strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentStrokeStyle,
             roughness: this.state.currentItemRoughness,
             opacity: this.state.currentItemOpacity,
             text: "",
@@ -2035,6 +2037,7 @@ class App extends React.Component<any, AppState> {
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
           strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
         });
@@ -2065,6 +2068,7 @@ class App extends React.Component<any, AppState> {
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
       });

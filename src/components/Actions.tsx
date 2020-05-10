@@ -45,7 +45,7 @@ export function SelectedShapeActions({
         targetElements.some((element) => hasStroke(element.type))) && (
         <>
           {renderAction("changeStrokeWidth")}
-
+          {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>
       )}

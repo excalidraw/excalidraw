@@ -8,6 +8,7 @@ type _ExcalidrawElementBase = Readonly<{
   backgroundColor: string;
   fillStyle: string;
   strokeWidth: number;
+  strokeStyle: "solid" | "dashed" | "dotted";
   roughness: number;
   opacity: number;
   width: number;
