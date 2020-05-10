@@ -2325,7 +2325,6 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      resizeOffsetXY = [0, 0];
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
