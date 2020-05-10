@@ -25,6 +25,7 @@ import {
   getElementWithResizeHandler,
   canResizeMutlipleElements,
   getResizeOffsetXY,
+  getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
 } from "../element";
@@ -53,11 +54,7 @@ import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  ResizeArrowFnType,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
@@ -1847,6 +1844,7 @@ class App extends React.Component<any, AppState> {
       resizeHandle = nextResizeHandle;
     };
     let resizeOffsetXY: [number, number] = [0, 0];
+    let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1900,6 +1898,16 @@ class App extends React.Component<any, AppState> {
           x,
           y,
         );
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0]) &&
+          selectedElements[0].points.length === 2
+        ) {
+          resizeArrowDirection = getResizeArrowDirection(
+            resizeHandle,
+            selectedElements[0],
+          );
+        }
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
@@ -2079,11 +2087,6 @@ class App extends React.Component<any, AppState> {
       }
     }
 
-    let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
-      resizeArrowFn = fn;
-    };
-
     let selectedElementWasDuplicated = false;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
@@ -2142,23 +2145,17 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
-        const resized = resizeElements(
-          resizeHandle,
-          setResizeHandle,
-          selectedElements,
-          resizeArrowFn,
-          setResizeArrowFn,
-          event,
-          x,
-          y,
-          resizeOffsetXY[0],
-          resizeOffsetXY[1],
-          lastX,
-          lastY,
-        );
-        if (resized) {
-          lastX = x;
-          lastY = y;
+        if (
+          resizeElements(
+            resizeHandle,
+            setResizeHandle,
+            selectedElements,
+            resizeArrowDirection,
+            event,
+            x - resizeOffsetXY[0],
+            y - resizeOffsetXY[1],
+          )
+        ) {
           return;
         }
       }
@@ -2328,8 +2325,6 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      resizeArrowFn = null;
-      resizeOffsetXY = [0, 0];
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);

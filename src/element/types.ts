@@ -58,13 +58,3 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type PointerType = "mouse" | "pen" | "touch";
 
 export type TextAlign = "left" | "center" | "right";
-
-export type ResizeArrowFnType = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  pointIndex: number,
-  deltaX: number,
-  deltaY: number,
-  pointerX: number,
-  pointerY: number,
-  perfect: boolean,
-) => void;
