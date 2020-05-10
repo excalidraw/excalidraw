@@ -187,7 +187,12 @@ function generateElement(
               : element.backgroundColor,
           fillStyle: element.fillStyle,
           strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
+          roughness:
+            element.strokeStyle === "solid"
+              ? element.roughness
+              : // reduce roughness to minimize double lines for dashed/dotted
+                //  strokes
+                Math.min(0.5, element.roughness),
           seed: element.seed,
         });
 
@@ -218,7 +223,12 @@ function generateElement(
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
+            roughness:
+              element.strokeStyle === "solid"
+                ? element.roughness
+                : // reduce roughness to minimize double lines for dashed/dotted
+                  //  strokes
+                  Math.min(0.5, element.roughness),
             seed: element.seed,
           },
         );
@@ -238,7 +248,8 @@ function generateElement(
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
+            // non-solid style doesn't work well with roughness and ellipses
+            roughness: element.strokeStyle === "solid" ? element.roughness : 0,
             seed: element.seed,
             curveFitting: 1,
           },
@@ -249,7 +260,11 @@ function generateElement(
         const options: Options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
+          // non-solid style doesn't work well with roughness and lines
+          roughness:
+            element.points.length <= 2 || element.strokeStyle === "solid"
+              ? element.roughness
+              : Math.min(0.5, element.roughness),
           seed: element.seed,
         };
 
