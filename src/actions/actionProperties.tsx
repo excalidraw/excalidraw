@@ -236,7 +236,7 @@ export const actionChangeStrokeStyle = register({
           strokeStyle: value,
         }),
       ),
-      appState: { ...appState, currentStrokeStyle: value },
+      appState: { ...appState, currentItemStrokeStyle: value },
       commitToHistory: true,
     };
   },
@@ -254,7 +254,7 @@ export const actionChangeStrokeStyle = register({
           elements,
           appState,
           (element) => element.strokeStyle,
-          appState.currentStrokeStyle,
+          appState.currentItemStrokeStyle,
         )}
         onChange={(value) => updateData(value)}
       />

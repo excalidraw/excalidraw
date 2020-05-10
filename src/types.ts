@@ -31,7 +31,7 @@ export type AppState = {
   currentItemBackgroundColor: string;
   currentItemFillStyle: string;
   currentItemStrokeWidth: number;
-  currentStrokeStyle: ExcalidrawElement["strokeStyle"];
+  currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemFont: string;

@@ -22,7 +22,7 @@ export function getDefaultAppState(): AppState {
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
     currentItemStrokeWidth: 1,
-    currentStrokeStyle: "solid",
+    currentItemStrokeStyle: "solid",
     currentItemRoughness: 1,
     currentItemOpacity: 100,
     currentItemFont: DEFAULT_FONT,
