@@ -6,7 +6,6 @@ import {
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
-  ResizeArrowFnType,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -32,13 +31,10 @@ export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   selectedElements: NonDeletedExcalidrawElement[],
-  resizeArrowFn: ResizeArrowFnType | null, // XXX eliminate in #1339
-  setResizeArrowFn: (fn: ResizeArrowFnType) => void, // XXX eliminate in #1339
+  resizeArrowDirection: "origin" | "end",
   event: PointerEvent, // XXX we want to make it independent?
   pointerX: number,
   pointerY: number,
-  lastX: number, // XXX eliminate in #1339
-  lastY: number, // XXX eliminate in #1339
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -54,14 +50,10 @@ export const resizeElements = (
     ) {
       resizeSingleTwoPointElement(
         element,
-        resizeHandle,
-        resizeArrowFn,
-        setResizeArrowFn,
+        resizeArrowDirection,
         event.shiftKey,
         pointerX,
         pointerY,
-        lastX,
-        lastY,
       );
     } else if (resizeHandle) {
       resizeSingleElement(
@@ -124,122 +116,61 @@ const rotateSingleElement = (
 
 const resizeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
-  resizeHandle: "nw" | "ne" | "sw" | "se",
-  resizeArrowFn: ResizeArrowFnType | null,
-  setResizeArrowFn: (fn: ResizeArrowFnType) => void,
+  resizeArrowDirection: "origin" | "end",
   isAngleLocking: boolean,
   pointerX: number,
   pointerY: number,
-  lastX: number,
-  lastY: number,
 ) => {
-  const [, [px, py]] = element.points;
-  const isResizeEnd =
-    (resizeHandle === "nw" && (px < 0 || py < 0)) ||
-    (resizeHandle === "ne" && px >= 0) ||
-    (resizeHandle === "sw" && px <= 0) ||
-    (resizeHandle === "se" && (px > 0 || py > 0));
-  applyResizeArrowFn(
-    element,
-    resizeArrowFn,
-    setResizeArrowFn,
-    isResizeEnd,
-    isAngleLocking,
-    pointerX,
-    pointerY,
-    lastX,
-    lastY,
-  );
-};
-
-const arrowResizeOrigin: ResizeArrowFnType = (
-  element,
-  pointIndex,
-  deltaX,
-  deltaY,
-  pointerX,
-  pointerY,
-  isAngleLocking,
-) => {
-  const [px, py] = element.points[pointIndex];
-  let x = element.x + deltaX;
-  let y = element.y + deltaY;
-  let pointX = px - deltaX;
-  let pointY = py - deltaY;
-
-  if (isAngleLocking) {
-    const { width, height } = getPerfectElementSize(
-      element.type,
-      px + element.x - pointerX,
-      py + element.y - pointerY,
-    );
-    x = px + element.x - width;
-    y = py + element.y - height;
-    pointX = width;
-    pointY = height;
-  }
-
-  mutateElement(element, {
-    x,
-    y,
-    points: element.points.map((point, i) =>
-      i === pointIndex ? ([pointX, pointY] as const) : point,
-    ),
-  });
-};
-
-const arrowResizeEnd: ResizeArrowFnType = (
-  element,
-  pointIndex,
-  deltaX,
-  deltaY,
-  pointerX,
-  pointerY,
-  isAngleLocking,
-) => {
-  const [px, py] = element.points[pointIndex];
-  if (isAngleLocking) {
-    const { width, height } = getPerfectElementSize(
-      element.type,
-      pointerX - element.x,
-      pointerY - element.y,
-    );
-    mutateElement(element, {
-      points: element.points.map((point, i) =>
-        i === pointIndex ? ([width, height] as const) : point,
-      ),
-    });
-  } else {
-    mutateElement(element, {
-      points: element.points.map((point, i) =>
-        i === pointIndex ? ([px + deltaX, py + deltaY] as const) : point,
-      ),
-    });
-  }
-};
-
-const applyResizeArrowFn = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  resizeArrowFn: ResizeArrowFnType | null,
-  setResizeArrowFn: (fn: ResizeArrowFnType) => void,
-  isResizeEnd: boolean,
-  isAngleLocking: boolean,
-  x: number,
-  y: number,
-  lastX: number,
-  lastY: number,
-) => {
-  const angle = element.angle;
-  const [deltaX, deltaY] = rotate(x - lastX, y - lastY, 0, 0, -angle);
-  if (!resizeArrowFn) {
-    if (isResizeEnd) {
-      resizeArrowFn = arrowResizeEnd;
+  const pointOrigin = element.points[0]; // can assume always [0, 0]?
+  const pointEnd = element.points[1];
+  if (resizeArrowDirection === "end") {
+    if (isAngleLocking) {
+      const { width, height } = getPerfectElementSize(
+        element.type,
+        pointerX - element.x,
+        pointerY - element.y,
+      );
+      mutateElement(element, {
+        points: [pointOrigin, [width, height]],
+      });
     } else {
-      resizeArrowFn = arrowResizeOrigin;
+      mutateElement(element, {
+        points: [
+          pointOrigin,
+          [
+            pointerX - pointOrigin[0] - element.x,
+            pointerY - pointOrigin[1] - element.y,
+          ],
+        ],
+      });
+    }
+  } else {
+    // resizeArrowDirection === "origin"
+    if (isAngleLocking) {
+      const { width, height } = getPerfectElementSize(
+        element.type,
+        element.x + pointEnd[0] - pointOrigin[0] - pointerX,
+        element.y + pointEnd[1] - pointOrigin[1] - pointerY,
+      );
+      mutateElement(element, {
+        x: element.x + pointEnd[0] - pointOrigin[0] - width,
+        y: element.y + pointEnd[1] - pointOrigin[1] - height,
+        points: [pointOrigin, [width, height]],
+      });
+    } else {
+      mutateElement(element, {
+        x: pointerX,
+        y: pointerY,
+        points: [
+          pointOrigin,
+          [
+            pointEnd[0] - (pointerX - pointOrigin[0] - element.x),
+            pointEnd[1] - (pointerY - pointOrigin[1] - element.y),
+          ],
+        ],
+      });
     }
   }
-  resizeArrowFn(element, 1, deltaX, deltaY, x, y, isAngleLocking);
-  setResizeArrowFn(resizeArrowFn);
 };
 
 const resizeSingleElement = (
@@ -465,4 +396,17 @@ export const getResizeOffsetXY = (
     default:
       return [0, 0];
   }
+};
+
+export const getResizeArrowDirection = (
+  resizeHandle: ResizeTestType,
+  element: NonDeleted<ExcalidrawLinearElement>,
+): "origin" | "end" => {
+  const [, [px, py]] = element.points;
+  const isResizeEnd =
+    (resizeHandle === "nw" && (px < 0 || py < 0)) ||
+    (resizeHandle === "ne" && px >= 0) ||
+    (resizeHandle === "sw" && px <= 0) ||
+    (resizeHandle === "se" && (px > 0 || py > 0));
+  return isResizeEnd ? "end" : "origin";
 };
