@@ -21,7 +21,11 @@ export function getPerfectElementSize(
   const absWidth = Math.abs(width);
   const absHeight = Math.abs(height);
 
-  if (elementType === "line" || elementType === "arrow") {
+  if (
+    elementType === "line" ||
+    elementType === "arrow" ||
+    elementType === "draw"
+  ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *
       SHIFT_LOCKING_ANGLE;

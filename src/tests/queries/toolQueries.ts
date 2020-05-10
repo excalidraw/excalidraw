@@ -7,6 +7,7 @@ const toolMap = {
   ellipse: "ellipse",
   arrow: "arrow",
   line: "line",
+  draw: "draw",
 };
 
 export type ToolName = keyof typeof toolMap;

@@ -1981,13 +1981,17 @@ class App extends React.Component<any, AppState> {
       return;
     } else if (
       this.state.elementType === "arrow" ||
+      this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
       if (this.state.multiElement) {
         const { multiElement } = this.state;
 
         // finalize if completing a loop
-        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+        if (
+          (multiElement.type === "draw" || multiElement.type === "line") &&
+          isPathALoop(multiElement.points)
+        ) {
           mutateElement(multiElement, {
             lastCommittedPoint:
               multiElement.points[multiElement.points.length - 1],
@@ -2129,7 +2133,8 @@ class App extends React.Component<any, AppState> {
       if (
         !draggingOccurred &&
         (this.state.elementType === "arrow" ||
-          this.state.elementType === "line")
+          this.state.elementType === "line" ||
+          this.state.elementType === "draw")
       ) {
         if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
           return;
@@ -2249,9 +2254,15 @@ class App extends React.Component<any, AppState> {
         if (points.length === 1) {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
+          if (draggingElement.type === "draw") {
+            mutateElement(draggingElement, {
+              points: [...points, [dx, dy]],
+            });
+          } else {
+            mutateElement(draggingElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
+            });
+          }
         }
       } else {
         if (getResizeWithSidesSameLengthKey(event)) {

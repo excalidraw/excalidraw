@@ -36,7 +36,10 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      if (appState.multiElement.type === "line") {
+      if (
+        appState.multiElement.type === "line" ||
+        appState.multiElement.type === "draw"
+      ) {
         if (isPathALoop(appState.multiElement.points)) {
           const linePoints = appState.multiElement.points;
           const firstPoint = linePoints[0];

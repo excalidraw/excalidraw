@@ -26,7 +26,7 @@ function isElementDraggableFromInside(
   const dragFromInside =
     element.backgroundColor !== "transparent" ||
     appState.selectedElementIds[element.id];
-  if (element.type === "line") {
+  if (element.type === "line" || element.type === "draw") {
     return dragFromInside && isPathALoop(element.points);
   }
   return dragFromInside;
