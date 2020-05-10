@@ -2145,18 +2145,17 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
-        const resized = resizeElements(
-          resizeHandle,
-          setResizeHandle,
-          selectedElements,
-          resizeArrowDirection,
-          event,
-          x - resizeOffsetXY[0],
-          y - resizeOffsetXY[1],
-        );
-        if (resized) {
-          lastX = x;
-          lastY = y;
+        if (
+          resizeElements(
+            resizeHandle,
+            setResizeHandle,
+            selectedElements,
+            resizeArrowDirection,
+            event,
+            x - resizeOffsetXY[0],
+            y - resizeOffsetXY[1],
+          )
+        ) {
           return;
         }
       }
