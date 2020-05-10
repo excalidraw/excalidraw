@@ -43,6 +43,7 @@ export type ActionName =
   | "saveScene"
   | "loadScene"
   | "duplicateSelection"
+  | "shapeDifference"
   | "deleteSelectedElements"
   | "changeViewBackgroundColor"
   | "clearCanvas"

@@ -5,6 +5,8 @@ import {
 } from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
 
+export { differenceElement } from "./path/boolop";
+
 export {
   newElement,
   newTextElement,
