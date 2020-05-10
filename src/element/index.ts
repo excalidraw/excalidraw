@@ -36,6 +36,7 @@ export {
   resizeElements,
   canResizeMutlipleElements,
   getResizeOffsetXY,
+  getResizeArrowDirection,
 } from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
