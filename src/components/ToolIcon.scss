@@ -17,7 +17,7 @@
   -webkit-tap-highlight-color: transparent;
   border-radius: var(--space-factor);
 
-  &__icon {
+  .ToolIcon__icon {
     width: 2.5rem;
     height: 2.5rem;
 
@@ -47,7 +47,7 @@
     }
   }
 
-  &__label {
+  .ToolIcon__label {
     font-family: var(--ui-font);
     margin: 0 0.8em;
     text-overflow: ellipsis;
@@ -80,17 +80,17 @@
       }
     }
 
-    &--show {
+    .ToolIcon--show {
       visibility: visible;
     }
 
-    &--hide {
+    .ToolIcon--hide {
       visibility: hidden;
     }
   }
 
-  &_type_radio,
-  &_type_checkbox {
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
     position: absolute;
     opacity: 0;
     pointer-events: none;
@@ -108,7 +108,7 @@
     }
   }
 
-  &_type_floating {
+  .ToolIcon_type_floating {
     background-color: transparent;
 
     &:hover {
@@ -129,13 +129,13 @@
     }
   }
 
-  &.ToolIcon__lock {
-    &.ToolIcon_type_floating {
+  .ToolIcon.ToolIcon__lock {
+    .ToolIcon.ToolIcon_type_floating {
       margin-left: 0.1rem;
     }
   }
 
-  &__keybinding {
+  .ToolIcon__keybinding {
     position: absolute;
     bottom: 2px;
     right: 3px;

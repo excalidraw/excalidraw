@@ -12,7 +12,7 @@
   overflow: auto;
   padding: calc(var(--space-factor) * 10);
 
-  &__background {
+  .Modal__background {
     position: fixed;
     top: 0;
     left: 0;
@@ -23,7 +23,7 @@
     backdrop-filter: blur(2px);
   }
 
-  &__content {
+  .Modal__content {
     position: relative;
     z-index: 2;
     width: 100%;
@@ -43,7 +43,7 @@
     }
   }
 
-  &__close {
+  .Modal__close {
     width: calc(var(--space-factor) * 7);
     height: calc(var(--space-factor) * 7);
     display: flex;
@@ -77,7 +77,7 @@
   .Modal {
     padding: 0;
 
-    &__content {
+    .Modal__content {
       position: fixed;
       top: 0;
       left: 0;

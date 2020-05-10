@@ -1,6 +1,6 @@
 @import "../css/_variables";
 .Dialog {
-  &__title {
+  .Dialog__title {
     display: grid;
     align-items: center;
     margin-top: 0;
@@ -8,7 +8,7 @@
     grid-gap: var(--metric);
   }
 
-  &__titleContent {
+  .Dialog__titleContent {
     flex: 1;
   }
 
@@ -23,7 +23,7 @@
     --inset-left: #{"max(var(--metric), var(--sal))"};
     --inset-right: #{"max(var(--metric), var(--sar))"};
 
-    &__title {
+    .Dialog__title {
       grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
           var(--space-factor) * 7
         );
@@ -43,7 +43,7 @@
       z-index: 1;
     }
 
-    &__titleContent {
+    .Dialog__titleContent {
       text-align: center;
     }
 
