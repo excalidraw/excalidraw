@@ -46,7 +46,7 @@ export function rotate(
   x2: number,
   y2: number,
   angle: number,
-) {
+): [number, number] {
   // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
   // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
   // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
@@ -56,110 +56,118 @@ export function rotate(
   ];
 }
 
-const adjustXYWithRotation = (
+export const adjustXYWithRotation = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   x: number,
   y: number,
   angle: number,
-  deltaX: number,
-  deltaY: number,
+  deltaX1: number,
+  deltaY1: number,
+  deltaX2: number,
+  deltaY2: number,
   isResizeFromCenter: boolean,
-) => {
+): [number, number] => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  deltaX /= 2;
-  deltaY /= 2;
   if (side === "e" || side === "ne" || side === "se") {
     if (isResizeFromCenter) {
-      x += deltaX;
+      x += deltaX1 + deltaX2;
     } else {
-      x += deltaX * (1 - cos);
-      y += deltaX * -sin;
+      x += deltaX1 * (1 + cos);
+      y += deltaX1 * sin;
+      x += deltaX2 * (1 - cos);
+      y += deltaX2 * -sin;
     }
   }
   if (side === "s" || side === "sw" || side === "se") {
     if (isResizeFromCenter) {
-      y += deltaY;
+      y += deltaY1 + deltaY2;
     } else {
-      x += deltaY * sin;
-      y += deltaY * (1 - cos);
+      x += deltaY1 * -sin;
+      y += deltaY1 * (1 + cos);
+      x += deltaY2 * sin;
+      y += deltaY2 * (1 - cos);
     }
   }
   if (side === "w" || side === "nw" || side === "sw") {
     if (isResizeFromCenter) {
-      x += deltaX;
+      x += deltaX1 + deltaX2;
     } else {
-      x += deltaX * (1 + cos);
-      y += deltaX * sin;
+      x += deltaX1 * (1 - cos);
+      y += deltaX1 * -sin;
+      x += deltaX2 * (1 + cos);
+      y += deltaX2 * sin;
     }
   }
   if (side === "n" || side === "nw" || side === "ne") {
     if (isResizeFromCenter) {
-      y += deltaY;
+      y += deltaY1 + deltaY2;
     } else {
-      x += deltaY * -sin;
-      y += deltaY * (1 + cos);
+      x += deltaY1 * sin;
+      y += deltaY1 * (1 - cos);
+      x += deltaY2 * -sin;
+      y += deltaY2 * (1 + cos);
     }
   }
-  return { x, y };
+  return [x, y];
 };
 
-export const resizeXYWidthHightWithRotation = (
+export const getFlipAdjustment = (
   side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  offsetX: number,
-  offsetY: number,
+  nextWidth: number,
+  nextHeight: number,
+  nextX1: number,
+  nextY1: number,
+  nextX2: number,
+  nextY2: number,
+  finalX1: number,
+  finalY1: number,
+  finalX2: number,
+  finalY2: number,
+  needsRotation: boolean,
   angle: number,
-  xPointer: number,
-  yPointer: number,
-  offsetPointer: number,
-  sidesWithSameLength: boolean,
-  isResizeFromCenter: boolean,
-) => {
-  // center point for rotation
-  const cx = x + width / 2;
-  const cy = y + height / 2;
-
-  // rotation with current angle
-  const [rotatedX, rotatedY] = rotate(xPointer, yPointer, cx, cy, -angle);
-
-  let scaleX = 1;
-  let scaleY = 1;
-  if (side === "e" || side === "ne" || side === "se") {
-    scaleX = (rotatedX - offsetPointer - x) / width;
+): [number, number] => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  let flipDiffX = 0;
+  let flipDiffY = 0;
+  if (nextWidth < 0) {
+    if (side === "e" || side === "ne" || side === "se") {
+      if (needsRotation) {
+        flipDiffX += (finalX2 - nextX1) * cos;
+        flipDiffY += (finalX2 - nextX1) * sin;
+      } else {
+        flipDiffX += finalX2 - nextX1;
+      }
+    }
+    if (side === "w" || side === "nw" || side === "sw") {
+      if (needsRotation) {
+        flipDiffX += (finalX1 - nextX2) * cos;
+        flipDiffY += (finalX1 - nextX2) * sin;
+      } else {
+        flipDiffX += finalX1 - nextX2;
+      }
+    }
   }
-  if (side === "s" || side === "sw" || side === "se") {
-    scaleY = (rotatedY - offsetPointer - y) / height;
+  if (nextHeight < 0) {
+    if (side === "s" || side === "se" || side === "sw") {
+      if (needsRotation) {
+        flipDiffY += (finalY2 - nextY1) * cos;
+        flipDiffX += (finalY2 - nextY1) * -sin;
+      } else {
+        flipDiffY += finalY2 - nextY1;
+      }
+    }
+    if (side === "n" || side === "ne" || side === "nw") {
+      if (needsRotation) {
+        flipDiffY += (finalY1 - nextY2) * cos;
+        flipDiffX += (finalY1 - nextY2) * -sin;
+      } else {
+        flipDiffY += finalY1 - nextY2;
+      }
+    }
   }
-  if (side === "w" || side === "nw" || side === "sw") {
-    scaleX = (x + width - offsetPointer - rotatedX) / width;
-  }
-  if (side === "n" || side === "nw" || side === "ne") {
-    scaleY = (y + height - offsetPointer - rotatedY) / height;
-  }
-
-  let nextWidth = width * scaleX;
-  let nextHeight = height * scaleY;
-  if (sidesWithSameLength) {
-    nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
-  }
-
-  return {
-    width: nextWidth,
-    height: nextHeight,
-    ...adjustXYWithRotation(
-      side,
-      x - offsetX,
-      y - offsetY,
-      angle,
-      width - nextWidth,
-      height - nextHeight,
-      isResizeFromCenter,
-    ),
-  };
+  return [flipDiffX, flipDiffY];
 };
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {

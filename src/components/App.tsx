@@ -24,6 +24,7 @@ import {
   resizeElements,
   getElementWithResizeHandler,
   canResizeMutlipleElements,
+  getResizeOffsetXY,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
 } from "../element";
@@ -114,7 +115,6 @@ import {
   ENV,
 } from "../constants";
 import {
-  FONT_LOAD_THRESHOLD,
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
 } from "../time_constants";
@@ -132,6 +132,8 @@ import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
+
+import throttle from "lodash.throttle";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -163,11 +165,14 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
+
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  portal: Portal = new Portal();
+  portal: Portal = new Portal(this);
   lastBroadcastedOrReceivedSceneVersion: number = -1;
+  broadcastedElementVersions: Map<string, number> = new Map();
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
   actionManager: ActionManager;
@@ -298,6 +303,15 @@ class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private onFontLoaded = () => {
+    globalSceneState.getElementsIncludingDeleted().forEach((element) => {
+      if (isTextElement(element)) {
+        invalidateShapeForElement(element);
+      }
+    });
+    this.onSceneUpdated();
+  };
+
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -320,23 +334,6 @@ class App extends React.Component<any, AppState> {
       if (scene) {
         this.syncActionResult(scene);
       }
-    }
-
-    // rerender text elements on font load to fix #637
-    try {
-      await Promise.race([
-        document.fonts?.ready?.then(() => {
-          globalSceneState.getElementsIncludingDeleted().forEach((element) => {
-            if (isTextElement(element)) {
-              invalidateShapeForElement(element);
-            }
-          });
-        }),
-        // if fonts don't load in 1s for whatever reason, don't block the UI
-        new Promise((resolve) => setTimeout(resolve, FONT_LOAD_THRESHOLD)),
-      ]);
-    } catch (error) {
-      console.error(error);
     }
 
     if (this.state.isLoading) {
@@ -396,6 +393,9 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
+
+    // rerender text elements on font load to fix #637 && #1553
+    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
@@ -473,6 +473,10 @@ class App extends React.Component<any, AppState> {
       event.returnValue = "";
     }
   });
+
+  queueBroadcastAllElements = throttle(() => {
+    this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
+  }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.portal.socket) {
@@ -555,7 +559,8 @@ class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastScene(SCENE.UPDATE);
+      this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
+      this.queueBroadcastAllElements();
     }
 
     history.record(this.state, globalSceneState.getElementsIncludingDeleted());
@@ -915,19 +920,7 @@ class App extends React.Component<any, AppState> {
         roomMatch[2],
       );
 
-      this.portal.socket!.on("init-room", () => {
-        if (this.portal.socket) {
-          const username = restoreUsernameFromLocalStorage();
-
-          this.portal.socket.emit("join-room", this.portal.roomID);
-
-          if (username !== null) {
-            this.setState({
-              username,
-            });
-          }
-        }
-      });
+      // All socket listeners are moving to Portal
       this.portal.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
@@ -983,25 +976,6 @@ class App extends React.Component<any, AppState> {
         }
         initialize();
       });
-      this.portal.socket!.on("room-user-change", (clients: string[]) => {
-        this.setState((state) => {
-          const collaborators: typeof state.collaborators = new Map();
-          for (const socketID of clients) {
-            if (state.collaborators.has(socketID)) {
-              collaborators.set(socketID, state.collaborators.get(socketID)!);
-            } else {
-              collaborators.set(socketID, {});
-            }
-          }
-          return {
-            ...state,
-            collaborators,
-          };
-        });
-      });
-      this.portal.socket!.on("new-user", async (_socketID: string) => {
-        this.broadcastScene(SCENE.INIT);
-      });
 
       this.setState({
         isCollaborating: true,
@@ -1009,6 +983,24 @@ class App extends React.Component<any, AppState> {
       });
     }
   };
+
+  // Portal-only
+  setCollaborators(sockets: string[]) {
+    this.setState((state) => {
+      const collaborators: typeof state.collaborators = new Map();
+      for (const socketID of sockets) {
+        if (state.collaborators.has(socketID)) {
+          collaborators.set(socketID, state.collaborators.get(socketID)!);
+        } else {
+          collaborators.set(socketID, {});
+        }
+      }
+      return {
+        ...state,
+        collaborators,
+      };
+    });
+  }
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
@@ -1032,19 +1024,44 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  private broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
+  // maybe should move to Portal
+  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE, syncAll: boolean) => {
+    if (sceneType === SCENE.INIT && !syncAll) {
+      throw new Error("syncAll must be true when sending SCENE.INIT");
+    }
+
+    let syncableElements = getSyncableElements(
+      globalSceneState.getElementsIncludingDeleted(),
+    );
+
+    if (!syncAll) {
+      // sync out only the elements we think we need to to save bandwidth.
+      // periodically we'll resync the whole thing to make sure no one diverges
+      // due to a dropped message (server goes down etc).
+      syncableElements = syncableElements.filter(
+        (syncableElement) =>
+          !this.broadcastedElementVersions.has(syncableElement.id) ||
+          syncableElement.version >
+            this.broadcastedElementVersions.get(syncableElement.id)!,
+      );
+    }
+
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
-        elements: getSyncableElements(
-          globalSceneState.getElementsIncludingDeleted(),
-        ),
+        elements: syncableElements,
       },
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
+    for (const syncableElement of syncableElements) {
+      this.broadcastedElementVersions.set(
+        syncableElement.id,
+        syncableElement.version,
+      );
+    }
     return this.portal._broadcastSocketData(data as SocketUpdateData);
   };
 
@@ -1058,6 +1075,16 @@ class App extends React.Component<any, AppState> {
       cursorY = event.y;
     },
   );
+
+  restoreUserName() {
+    const username = restoreUsernameFromLocalStorage();
+
+    if (username !== null) {
+      this.setState({
+        username,
+      });
+    }
+  }
 
   // Input handling
 
@@ -1819,6 +1846,7 @@ class App extends React.Component<any, AppState> {
     const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
       resizeHandle = nextResizeHandle;
     };
+    let resizeOffsetXY: [number, number] = [0, 0];
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1864,6 +1892,14 @@ class App extends React.Component<any, AppState> {
             isResizingElements = true;
           }
         }
+      }
+      if (isResizingElements) {
+        resizeOffsetXY = getResizeOffsetXY(
+          resizeHandle,
+          selectedElements,
+          x,
+          y,
+        );
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
@@ -2097,25 +2133,34 @@ class App extends React.Component<any, AppState> {
         }
       }
 
-      const resized =
-        isResizingElements &&
-        resizeElements(
+      if (isResizingElements) {
+        const selectedElements = getSelectedElements(
+          globalSceneState.getElements(),
+          this.state,
+        );
+        this.setState({
+          isResizing: resizeHandle && resizeHandle !== "rotation",
+          isRotating: resizeHandle === "rotation",
+        });
+        const resized = resizeElements(
           resizeHandle,
           setResizeHandle,
-          this.state,
-          this.setAppState,
+          selectedElements,
           resizeArrowFn,
           setResizeArrowFn,
           event,
           x,
           y,
+          resizeOffsetXY[0],
+          resizeOffsetXY[1],
           lastX,
           lastY,
         );
-      if (resized) {
-        lastX = x;
-        lastY = y;
-        return;
+        if (resized) {
+          lastX = x;
+          lastY = y;
+          return;
+        }
       }
 
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
@@ -2284,6 +2329,7 @@ class App extends React.Component<any, AppState> {
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
       resizeArrowFn = null;
+      resizeOffsetXY = [0, 0];
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
@@ -2565,6 +2611,15 @@ class App extends React.Component<any, AppState> {
       delta *= sign;
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+      }));
+      return;
+    }
+
+    // scroll horizontally when shift pressed
+    if (event.shiftKey) {
+      this.setState(({ zoom, scrollX }) => ({
+        // on Mac, shift+wheel tends to result in deltaX
+        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom),
       }));
       return;
     }

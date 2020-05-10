@@ -17,7 +17,6 @@ export {
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
-  getLinearElementAbsoluteBounds,
 } from "./bounds";
 
 export {
@@ -33,7 +32,11 @@ export {
   getElementWithResizeHandler,
   getResizeHandlerFromCoords,
 } from "./resizeTest";
-export { resizeElements, canResizeMutlipleElements } from "./resizeElements";
+export {
+  resizeElements,
+  canResizeMutlipleElements,
+  getResizeOffsetXY,
+} from "./resizeElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";

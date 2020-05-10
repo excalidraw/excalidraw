@@ -54,6 +54,7 @@
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
+    "yourName": "Nimesi",
     "madeWithExcalidraw": "Tehty Excalidrawilla"
   },
   "buttons": {
@@ -80,8 +81,8 @@
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Zen-tila päälle",
+    "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",

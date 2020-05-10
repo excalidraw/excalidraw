@@ -49,8 +49,8 @@ export const ToolButton = React.forwardRef(function (
       <button
         className={`ToolIcon_type_button ToolIcon ${sizeCn}${
           props.selected ? " ToolIcon--selected" : ""
-        } ${props.className || ""} ${
-          props.visible || props.visible == null
+        } ${props.className} ${
+          props.visible
             ? "ToolIcon_type_button--show"
             : "ToolIcon_type_button--hide"
         }`}
@@ -94,3 +94,8 @@ export const ToolButton = React.forwardRef(function (
     </label>
   );
 });
+
+ToolButton.defaultProps = {
+  visible: true,
+  className: "",
+};

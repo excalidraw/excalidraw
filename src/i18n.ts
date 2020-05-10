@@ -21,6 +21,7 @@ export const languages = [
   { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
   { lng: "fi-FI", label: "Suomi", data: require("./locales/fi-FI.json") },
   { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
+  { lng: "ja-JP", label: "日本語", data: require("./locales/ja-JP.json") },
   { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
   { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
   { lng: "zh-CN", label: "简体中文", data: require("./locales/zh-CN.json") },

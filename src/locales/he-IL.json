@@ -5,18 +5,18 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
-    "bringForward": "הבא קדימה",
-    "sendToBack": "העבר אחורה",
+    "bringForward": "הבא שכבה קדימה",
+    "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
-    "sendBackward": "שלח לאחור",
+    "sendBackward": "העבר שכבה אחורה",
     "delete": "מחק",
     "copyStyles": "העתק סגנון",
     "pasteStyles": "הדבק סגנון",
     "stroke": "קו מתאר",
     "background": "רקע",
     "fill": "מילוי",
-    "strokeWidth": "עובי קו המתאר",
-    "sloppiness": "רישול",
+    "strokeWidth": "עובי קו מתאר",
+    "sloppiness": "סגנון",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "fontSize": "גודל גופן",
@@ -24,13 +24,13 @@
     "onlySelected": "רק מה שנבחר",
     "withBackground": "עם רקע",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
-    "handDrawn": "ציור יד",
+    "handDrawn": "כתב יד",
     "normal": "רגיל",
     "code": "קוד",
     "small": "קטן",
     "medium": "בנוני",
     "large": "גדול",
-    "veryLarge": "גדול מאוד",
+    "veryLarge": "ענק",
     "solid": "מוצק",
     "hachure": "קווים משופעים",
     "crossHatch": "קווים מוצלבים",
@@ -39,7 +39,7 @@
     "left": "שמאל",
     "center": "מרכז",
     "right": "ימין",
-    "extraBold": "מודגש במיוחד",
+    "extraBold": "עבה",
     "architect": "ארכיטקט",
     "artist": "אמן",
     "cartoonist": "קריקטוריסט",
@@ -50,10 +50,11 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "createRoom": "",
+    "createRoom": "התחל שיתוף פעולה חי",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
+    "yourName": "",
     "madeWithExcalidraw": "נוצר באמצעות Excalidraw"
   },
   "buttons": {
@@ -80,8 +81,8 @@
     "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
+    "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -96,12 +97,12 @@
   "toolBar": {
     "selection": "בחירה",
     "rectangle": "מרובע",
-    "diamond": "יהלום",
+    "diamond": "מעוין",
     "ellipse": "אליפסה",
     "arrow": "חץ",
     "line": "קו",
     "text": "טקסט",
-    "lock": "השאר את כלי הבחירה פעיל לאחר ציור"
+    "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -124,18 +125,18 @@
     "trackedToSentry_post": " נמצאה במערכת שלנו.",
     "openIssueMessage_pre": "נזהרנו מאוד שלא לכלול מידע שלך בשגיאה. אם המידע איננו אישי, בבקשה עקוב אחר ",
     "openIssueMessage_button": "מעקב באגים.",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "openIssueMessage_post": " בבקשה כלול את המידע למטה באמצעות העתקה והדבקה בנושא ב GitHub.",
+    "sceneContent": "תוכן הלוח:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "אתה יכול להזמין אנשים ללוח הנוכחי שלך בכדי לשתף פעולה.",
+    "desc_privacy": "אל דאגה, השיתוף מוצפן מקצה לקצה, כך שכל מה שתצייר ישאר פרטי. אפילו השרתים שלנו לא יוכלו לראות את מה שאתה ממציא.",
     "button_startSession": "התחל שיתוף",
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
     "desc_persistenceWarning": "שים לב ששיתוף הלוח נעשה בין המשתתפים ממחשב למחשב באופן ישיר, ולא נשמר בשרתים שלנו. לכן, אם כולכם תתנתקו, המידע יאבד אלא אם כן תייצא אותו לקובץ או באמצעות לינק הניתן לשיתוף.",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
-    "desc_exitSession": ""
+    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תןכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
   },
   "errorDialog": {
     "title": "שגיאה"
@@ -155,7 +156,7 @@
     "github": "מצאת בעיה? דווח",
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
-    "zoomToFit": ""
+    "zoomToFit": "זום להתאמת כל האלמנטים למסך"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."

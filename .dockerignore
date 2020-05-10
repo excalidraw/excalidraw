@@ -1,0 +1,7 @@
+*
+!public/
+!src/
+!.npmrc
+!package-lock.json
+!package.json
+!tsconfig.json
