@@ -262,7 +262,7 @@ function generateElement(
           strokeWidth: element.strokeWidth,
           // non-solid style doesn't work well with roughness and lines
           roughness:
-            element.points.length <= 2 || element.strokeStyle === "solid"
+            element.strokeStyle === "solid"
               ? element.roughness
               : Math.min(0.5, element.roughness),
           seed: element.seed,
