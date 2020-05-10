@@ -102,6 +102,7 @@ function drawElementOnCanvas(
     case "arrow":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+        // only render curves (meaning, not the arrow points) as dash/dotted
         if (shape.shape === "curve") {
           if (element.strokeStyle === "dashed") {
             context.setLineDash(DASHARRAY_DASHED);
@@ -439,6 +440,7 @@ export function renderElementToSvg(
       const opacity = element.opacity / 100;
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
+        // only render curves (meaning, not the arrow points) as dash/dotted
         if (shape.shape === "curve") {
           if (element.strokeStyle === "dashed") {
             node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
