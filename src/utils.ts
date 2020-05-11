@@ -220,3 +220,16 @@ export function getGlobalCSSVariable(name: string) {
     `--${name}`,
   );
 }
+
+export const getPixelRatio = (): number =>
+  typeof window !== "undefined" && window.devicePixelRatio
+    ? window.devicePixelRatio
+    : 1;
+
+export function createCanvasObject() {
+  if (typeof document !== "undefined" && document.createElement) {
+    return document.createElement("canvas");
+  }
+
+  return require("canvas").createCanvas();
+}

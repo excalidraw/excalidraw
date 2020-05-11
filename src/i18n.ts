@@ -97,4 +97,6 @@ languageDetector.init({
   checkWhitelist: false,
 });
 
-setLanguage(languageDetector.detect());
+if (typeof window !== "undefined") {
+  setLanguage(languageDetector.detect());
+}

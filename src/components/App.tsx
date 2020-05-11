@@ -4,6 +4,7 @@ import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { FlooredNumber, SocketUpdateData } from "../types";
+import { getPixelRatio } from "../utils";
 
 import {
   newElement,
@@ -198,7 +199,7 @@ class App extends React.Component<any, AppState> {
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
-    const canvasScale = window.devicePixelRatio;
+    const canvasScale = getPixelRatio();
 
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
@@ -508,7 +509,7 @@ class App extends React.Component<any, AppState> {
         },
         this.state,
         this.canvas,
-        window.devicePixelRatio,
+        getPixelRatio(),
       );
       cursorButton[socketID] = user.button;
     });
@@ -525,7 +526,7 @@ class App extends React.Component<any, AppState> {
       }),
       this.state,
       this.state.selectionElement,
-      window.devicePixelRatio,
+      getPixelRatio(),
       this.rc!,
       this.canvas!,
       {
@@ -687,7 +688,7 @@ class App extends React.Component<any, AppState> {
       { clientX: cursorX, clientY: cursorY },
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
 
     const dx = x - elementsCenterX;
@@ -718,7 +719,7 @@ class App extends React.Component<any, AppState> {
       { clientX: cursorX, clientY: cursorY },
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
 
     const element = newTextElement({
@@ -1382,7 +1383,7 @@ class App extends React.Component<any, AppState> {
         { sceneX: centerElementX, sceneY: centerElementY },
         this.state,
         this.canvas,
-        window.devicePixelRatio,
+        getPixelRatio(),
       );
 
       textX = centerElementXInViewport;
@@ -1405,7 +1406,7 @@ class App extends React.Component<any, AppState> {
           y,
           this.state,
           this.canvas,
-          window.devicePixelRatio,
+          getPixelRatio(),
         );
 
         if (snappedToCenterPosition) {
@@ -1445,7 +1446,7 @@ class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
 
     this.startTextEditing({
@@ -1510,7 +1511,7 @@ class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
     if (this.state.multiElement) {
       const { multiElement } = this.state;
@@ -1778,7 +1779,7 @@ class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
     let lastX = x;
     let lastY = y;
@@ -1961,7 +1962,7 @@ class App extends React.Component<any, AppState> {
         event,
         this.state,
         this.canvas,
-        window.devicePixelRatio,
+        getPixelRatio(),
       );
 
       this.startTextEditing({
@@ -2119,7 +2120,7 @@ class App extends React.Component<any, AppState> {
         event,
         this.state,
         this.canvas,
-        window.devicePixelRatio,
+        getPixelRatio(),
       );
 
       // for arrows, don't start dragging until a given threshold
@@ -2173,7 +2174,7 @@ class App extends React.Component<any, AppState> {
             event,
             this.state,
             this.canvas,
-            window.devicePixelRatio,
+            getPixelRatio(),
           );
 
           selectedElements.forEach((element) => {
@@ -2339,7 +2340,7 @@ class App extends React.Component<any, AppState> {
             childEvent,
             this.state,
             this.canvas,
-            window.devicePixelRatio,
+            getPixelRatio(),
           );
           mutateElement(draggingElement, {
             points: [
@@ -2522,7 +2523,7 @@ class App extends React.Component<any, AppState> {
       event,
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
 
     const elements = globalSceneState.getElements();
@@ -2672,7 +2673,7 @@ class App extends React.Component<any, AppState> {
       { clientX: x, clientY: y },
       this.state,
       this.canvas,
-      window.devicePixelRatio,
+      getPixelRatio(),
     );
 
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {

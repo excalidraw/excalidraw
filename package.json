@@ -29,6 +29,7 @@
     "@types/react-dom": "16.9.7",
     "@types/socket.io-client": "1.4.32",
     "browser-nativefs": "0.7.1",
+    "canvas": "2.6.1",
     "i18next-browser-languagedetector": "4.1.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
