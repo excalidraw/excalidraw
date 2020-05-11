@@ -3,7 +3,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { isTextElement } from "../element/typeChecks";
+import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
@@ -35,12 +35,10 @@ function generateElementCanvas(
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  const isLinear = /\b(arrow|line|draw)\b/.test(element.type);
-
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
-  if (isLinear) {
+  if (isLinearElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
