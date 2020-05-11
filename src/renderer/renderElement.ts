@@ -179,19 +179,18 @@ function generateElement(
               ? undefined
               : element.backgroundColor,
           fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness:
-            element.strokeStyle === "solid"
-              ? element.roughness
-              : // reduce roughness to minimize double lines for dashed/dotted
-                //  strokes
-                Math.min(0.5, element.roughness),
+          strokeWidth:
+            element.strokeStyle !== "solid"
+              ? element.strokeWidth + 0.5
+              : element.strokeWidth,
+          roughness: element.roughness,
           strokeLineDash:
             element.strokeStyle === "dashed"
               ? DASHARRAY_DASHED
               : element.strokeStyle === "dotted"
               ? DASHARRAY_DOTTED
               : undefined,
+          disableMultiStroke: element.strokeStyle !== "solid",
           seed: element.seed,
         });
 
@@ -221,19 +220,18 @@ function generateElement(
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
+            strokeWidth:
+              element.strokeStyle !== "solid"
+                ? element.strokeWidth + 0.5
+                : element.strokeWidth,
             strokeLineDash:
               element.strokeStyle === "dashed"
                 ? DASHARRAY_DASHED
                 : element.strokeStyle === "dotted"
                 ? DASHARRAY_DOTTED
                 : undefined,
-            roughness:
-              element.strokeStyle === "solid"
-                ? element.roughness
-                : // reduce roughness to minimize double lines for dashed/dotted
-                  //  strokes
-                  Math.min(0.5, element.roughness),
+            roughness: element.roughness,
+            disableMultiStroke: element.strokeStyle !== "solid",
             seed: element.seed,
           },
         );
@@ -252,7 +250,10 @@ function generateElement(
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
+            strokeWidth:
+              element.strokeStyle !== "solid"
+                ? element.strokeWidth + 0.5
+                : element.strokeWidth,
             strokeLineDash:
               element.strokeStyle === "dashed"
                 ? DASHARRAY_DASHED
@@ -270,7 +271,10 @@ function generateElement(
       case "arrow": {
         const options: Options = {
           stroke: element.strokeColor,
-          strokeWidth: element.strokeWidth,
+          strokeWidth:
+            element.strokeStyle !== "solid"
+              ? element.strokeWidth + 0.5
+              : element.strokeWidth,
           seed: element.seed,
           // we need to add dashed stroked for arrows manually outside rough,
           //  because we want to prevent dashed stroke for arrow points
@@ -280,15 +284,8 @@ function generateElement(
               : element.type === "line" && element.strokeStyle === "dotted"
               ? DASHARRAY_DOTTED
               : undefined,
-          roughness:
-            element.strokeStyle === "solid" || element.points.length > 2
-              ? element.roughness
-              : // reduce roughness to minimize double lines for dashed/dotted
-                //  strokes
-                Math.min(0.5, element.roughness),
-          // multiStroke in ellipses tend to not work well with dashed lines
-          disableMultiStroke:
-            element.strokeStyle !== "solid" && element.points.length > 2,
+          roughness: element.roughness,
+          disableMultiStroke: element.strokeStyle !== "solid",
         };
 
         // points array can be empty in the beginning, so it is important to add
