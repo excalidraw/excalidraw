@@ -89,21 +89,14 @@ function drawElementOnCanvas(
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      if (element.strokeStyle === "dashed") {
-        context.setLineDash(DASHARRAY_DASHED);
-      } else if (element.strokeStyle === "dotted") {
-        context.setLineDash(DASHARRAY_DOTTED);
-      }
       rc.draw(getShapeForElement(element) as Drawable);
-      // reset
-      context.setLineDash([]);
       break;
     }
     case "arrow":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         // only render curves (meaning, not the arrow points) as dash/dotted
-        if (shape.shape === "curve") {
+        if (element.type === "arrow" && shape.shape === "curve") {
           if (element.strokeStyle === "dashed") {
             context.setLineDash(DASHARRAY_DASHED);
           } else if (element.strokeStyle === "dotted") {
@@ -193,6 +186,12 @@ function generateElement(
               : // reduce roughness to minimize double lines for dashed/dotted
                 //  strokes
                 Math.min(0.5, element.roughness),
+          strokeLineDash:
+            element.strokeStyle === "dashed"
+              ? DASHARRAY_DASHED
+              : element.strokeStyle === "dotted"
+              ? DASHARRAY_DOTTED
+              : undefined,
           seed: element.seed,
         });
 
@@ -248,8 +247,14 @@ function generateElement(
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
-            // non-solid style doesn't work well with roughness and ellipses
-            roughness: element.strokeStyle === "solid" ? element.roughness : 0,
+            strokeLineDash:
+              element.strokeStyle === "dashed"
+                ? DASHARRAY_DASHED
+                : element.strokeStyle === "dotted"
+                ? DASHARRAY_DOTTED
+                : undefined,
+            // multiStroke in ellipses tend to not work well with dashed lines
+            disableMultiStroke: element.strokeStyle !== "solid",
             seed: element.seed,
             curveFitting: 1,
           },
@@ -260,12 +265,24 @@ function generateElement(
         const options: Options = {
           stroke: element.strokeColor,
           strokeWidth: element.strokeWidth,
-          // non-solid style doesn't work well with roughness and lines
-          roughness:
-            element.strokeStyle === "solid"
-              ? element.roughness
-              : Math.min(0.5, element.roughness),
           seed: element.seed,
+          // we need to add dashed stroked for arrows manually outside rough,
+          //  because we want to prevent dashed stroke for arrow points
+          strokeLineDash:
+            element.type === "line" && element.strokeStyle === "dashed"
+              ? DASHARRAY_DASHED
+              : element.type === "line" && element.strokeStyle === "dotted"
+              ? DASHARRAY_DOTTED
+              : undefined,
+          roughness:
+            element.strokeStyle === "solid" || element.points.length > 2
+              ? element.roughness
+              : // reduce roughness to minimize double lines for dashed/dotted
+                //  strokes
+                Math.min(0.5, element.roughness),
+          // multiStroke in ellipses tend to not work well with dashed lines
+          disableMultiStroke:
+            element.strokeStyle !== "solid" && element.points.length > 2,
         };
 
         // points array can be empty in the beginning, so it is important to add
@@ -434,11 +451,6 @@ export function renderElementToSvg(
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
       }
-      if (element.strokeStyle === "dashed") {
-        node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
-      } else if (element.strokeStyle === "dotted") {
-        node.setAttribute("stroke-dasharray", DASHARRAY_DOTTED.join(","));
-      }
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
@@ -456,7 +468,7 @@ export function renderElementToSvg(
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
         // only render curves (meaning, not the arrow points) as dash/dotted
-        if (shape.shape === "curve") {
+        if (element.type === "arrow" && shape.shape === "curve") {
           if (element.strokeStyle === "dashed") {
             node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
           } else if (element.strokeStyle === "dotted") {
