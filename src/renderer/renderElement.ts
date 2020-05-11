@@ -21,7 +21,7 @@ import rough from "roughjs/bin/rough";
 const CANVAS_PADDING = 20;
 
 const DASHARRAY_DASHED = [12, 8];
-const DASHARRAY_DOTTED = [4, 6];
+const DASHARRAY_DOTTED = [3, 6];
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
