@@ -276,16 +276,16 @@
     cursor: default;
     pointer-events: none !important;
 
-  &--transition-left {
+    &--transition-left {
+      section {
+        width: 185px;
+      }
+    }
+
     section {
-      width: 185px;
+      display: flex;
     }
   }
-
-  section {
-    display: flex;
-  }
-}
 
   .App-menu_bottom > * {
     pointer-events: all;
@@ -406,16 +406,16 @@
     }
   }
 
-.dropdown-select__language.dropdown-select--floating {
-  position: fixed;
-  bottom: 10px;
-  :root[dir="ltr"] & {
-    right: 44px;
+  .dropdown-select__language.dropdown-select--floating {
+    position: fixed;
+    bottom: 10px;
+    :root[dir="ltr"] & {
+      right: 44px;
+    }
+    :root[dir="rtl"] & {
+      left: 44px;
+    }
   }
-  :root[dir="rtl"] & {
-    left: 44px;
-  }
-}
 
   .zIndexButton {
     margin: 0 5px;
@@ -469,16 +469,16 @@
     }
   }
 
-.github-corner {
-  position: fixed;
-  top: 0;
-  :root[dir="ltr"] & {
-    right: 0;
+  .github-corner {
+    position: fixed;
+    top: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
   }
-  :root[dir="rtl"] & {
-    left: 0;
-  }
-}
 
   .LoadingMessage {
     position: fixed;
@@ -498,24 +498,24 @@
     padding: 0.8em 1.2em;
     font-size: 1.3em;
   }
-}
 
-.zen-mode-visibility {
-  visibility: visible;
-  opacity: 1;
-  height: auto;
-  width: auto;
-  transition: opacity 0.5s;
-
-  &.zen-mode-visibility--hidden {
-    visibility: hidden;
-    opacity: 0;
-    height: 0;
-    width: 0;
+  .zen-mode-visibility {
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+    width: auto;
     transition: opacity 0.5s;
-  }
-}
 
-.disable-pointerEvents {
-  pointer-events: none !important;
+    &.zen-mode-visibility--hidden {
+      visibility: hidden;
+      opacity: 0;
+      height: 0;
+      width: 0;
+      transition: opacity 0.5s;
+    }
+  }
+
+  .disable-pointerEvents {
+    pointer-events: none !important;
+  }
 }
