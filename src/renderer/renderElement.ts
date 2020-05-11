@@ -222,6 +222,12 @@ function generateElement(
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
             strokeWidth: element.strokeWidth,
+            strokeLineDash:
+              element.strokeStyle === "dashed"
+                ? DASHARRAY_DASHED
+                : element.strokeStyle === "dotted"
+                ? DASHARRAY_DOTTED
+                : undefined,
             roughness:
               element.strokeStyle === "solid"
                 ? element.roughness
