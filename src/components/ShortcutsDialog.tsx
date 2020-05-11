@@ -179,12 +179,13 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
           <Column>
             <ShortcutIsland caption={t("shortcutsDialog.shapes")}>
               <Shortcut label={t("toolBar.selection")} shortcuts={["S", "1"]} />
-              <Shortcut label={t("toolBar.rectangle")} shortcuts={["R", "2"]} />
-              <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
-              <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
-              <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
-              <Shortcut label={t("toolBar.line")} shortcuts={["L", "6"]} />
-              <Shortcut label={t("toolBar.text")} shortcuts={["T", "7"]} />
+              <Shortcut label={t("toolBar.draw")} shortcuts={["X", "2"]} />
+              <Shortcut label={t("toolBar.rectangle")} shortcuts={["R", "3"]} />
+              <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "4"]} />
+              <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "5"]} />
+              <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "6"]} />
+              <Shortcut label={t("toolBar.line")} shortcuts={["L", "7"]} />
+              <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
               <Shortcut
                 label={t("shortcutsDialog.textNewLine")}
                 shortcuts={[
