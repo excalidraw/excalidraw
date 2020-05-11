@@ -162,6 +162,15 @@ function generateElement(
   if (!shape) {
     elementWithCanvasCache.delete(element);
 
+    const strokeLineDash =
+      element.strokeStyle === "dashed"
+        ? DASHARRAY_DASHED
+        : element.strokeStyle === "dotted"
+        ? DASHARRAY_DOTTED
+        : undefined;
+    // for non-solid strokes, disable multiStroke because it tends to make
+    //  dashes/dots overlay each other
+    const disableMultiStroke = element.strokeStyle !== "solid";
     // for non-solid strokes, increase the width a bit to make it visually
     //  similar to solid strokes, because we're also disabling multiStroke
     const strokeWidth =
@@ -180,6 +189,8 @@ function generateElement(
           strokeWidth,
           fillWeight,
           hachureGap,
+          strokeLineDash,
+          disableMultiStroke,
           stroke: element.strokeColor,
           fill:
             element.backgroundColor === "transparent"
@@ -187,13 +198,6 @@ function generateElement(
               : element.backgroundColor,
           fillStyle: element.fillStyle,
           roughness: element.roughness,
-          strokeLineDash:
-            element.strokeStyle === "dashed"
-              ? DASHARRAY_DASHED
-              : element.strokeStyle === "dotted"
-              ? DASHARRAY_DOTTED
-              : undefined,
-          disableMultiStroke: element.strokeStyle !== "solid",
           seed: element.seed,
         });
 
@@ -220,20 +224,15 @@ function generateElement(
             strokeWidth,
             fillWeight,
             hachureGap,
+            strokeLineDash,
+            disableMultiStroke,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeLineDash:
-              element.strokeStyle === "dashed"
-                ? DASHARRAY_DASHED
-                : element.strokeStyle === "dotted"
-                ? DASHARRAY_DOTTED
-                : undefined,
             roughness: element.roughness,
-            disableMultiStroke: element.strokeStyle !== "solid",
             seed: element.seed,
           },
         );
@@ -249,20 +248,14 @@ function generateElement(
             strokeWidth,
             fillWeight,
             hachureGap,
+            strokeLineDash,
+            disableMultiStroke,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeLineDash:
-              element.strokeStyle === "dashed"
-                ? DASHARRAY_DASHED
-                : element.strokeStyle === "dotted"
-                ? DASHARRAY_DOTTED
-                : undefined,
-            // multiStroke in ellipses tend to not work well with dashed lines
-            disableMultiStroke: element.strokeStyle !== "solid",
             roughness: element.roughness,
             seed: element.seed,
             curveFitting: 1,
@@ -275,18 +268,11 @@ function generateElement(
           strokeWidth,
           fillWeight,
           hachureGap,
+          strokeLineDash,
+          disableMultiStroke,
           stroke: element.strokeColor,
           seed: element.seed,
-          // we need to add dashed stroked for arrows manually outside rough,
-          //  because we want to prevent dashed stroke for arrow points
-          strokeLineDash:
-            element.strokeStyle === "dashed"
-              ? DASHARRAY_DASHED
-              : element.strokeStyle === "dotted"
-              ? DASHARRAY_DOTTED
-              : undefined,
           roughness: element.roughness,
-          disableMultiStroke: element.strokeStyle !== "solid",
         };
 
         // points array can be empty in the beginning, so it is important to add
