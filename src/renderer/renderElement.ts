@@ -35,7 +35,7 @@ function generateElementCanvas(
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  const isLinear = /\b(arrow|line)\b/.test(element.type);
+  const isLinear = /\b(arrow|line|draw)\b/.test(element.type);
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;

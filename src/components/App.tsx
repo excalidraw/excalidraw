@@ -2058,7 +2058,6 @@ class App extends React.Component<any, AppState> {
         this.setState({
           draggingElement: element,
           editingElement: element,
-          multiElement: element,
         });
       }
     } else {
