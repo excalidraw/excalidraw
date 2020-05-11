@@ -265,6 +265,11 @@ describe("regression tests", () => {
     pointerMove(30, 50);
     pointerUp();
     hotkeyPress("ENTER");
+
+    clickTool("draw");
+    pointerDown(30, 10);
+    pointerMove(40, 20);
+    pointerUp();
   });
 
   it("click to select a shape", () => {
@@ -286,10 +291,11 @@ describe("regression tests", () => {
 
   for (const [keys, shape] of [
     ["2r", "rectangle"],
-    ["3d", "diamond"],
-    ["4e", "ellipse"],
-    ["5a", "arrow"],
-    ["6l", "line"],
+    ["3x", "draw"],
+    ["4d", "diamond"],
+    ["5e", "ellipse"],
+    ["6a", "arrow"],
+    ["7l", "line"],
   ] as [string, ExcalidrawElement["type"]][]) {
     for (const key of keys) {
       it(`hotkey ${key} selects ${shape} tool`, () => {

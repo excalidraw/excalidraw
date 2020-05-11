@@ -11,6 +11,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "selection",
+    key: "s",
   },
   {
     icon: (
@@ -20,6 +21,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "rectangle",
+    key: "r",
   },
   {
     icon: (
@@ -32,6 +34,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "draw",
+    key: "x",
   },
   {
     icon: (
@@ -41,6 +44,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
+    key: "d",
   },
   {
     icon: (
@@ -50,6 +54,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
+    key: "e",
   },
   {
     icon: (
@@ -59,6 +64,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "arrow",
+    key: "a",
   },
   {
     icon: (
@@ -75,6 +81,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "line",
+    key: "l",
   },
   {
     icon: (
@@ -84,20 +91,19 @@ export const SHAPES = [
       </svg>
     ),
     value: "text",
+    key: "t",
   },
 ] as const;
 
 export const shapesShortcutKeys = SHAPES.map((shape, index) => [
-  shape.value[0],
+  shape.key,
   (index + 1).toString(),
 ]).flat(1);
 
 export function findShapeByKey(key: string) {
   return (
     SHAPES.find((shape, index) => {
-      return (
-        shape.value[0] === key.toLowerCase() || key === (index + 1).toString()
-      );
+      return shape.key === key.toLowerCase() || key === (index + 1).toString();
     })?.value || "selection"
   );
 }

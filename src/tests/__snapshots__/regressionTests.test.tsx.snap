@@ -1633,7 +1633,7 @@ Object {
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
-  "cursorButton": "up",
+  "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
@@ -1654,7 +1654,9 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": Object {
+    "id7": true,
+  },
   "selectionElement": null,
   "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
@@ -1737,15 +1739,15 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id3",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
       10,
@@ -1757,9 +1759,9 @@ Object {
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 4,
-  "versionNonce": 915032327,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 493213705,
+  "width": 10,
   "x": 70,
   "y": 10,
 }
@@ -1770,15 +1772,15 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id4",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
       10,
@@ -1786,13 +1788,13 @@ Object {
     ],
   ],
   "roughness": 1,
-  "seed": 1006504105,
+  "seed": 760410951,
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "line",
-  "version": 4,
-  "versionNonce": 1898319239,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 289600103,
+  "width": 10,
   "x": 90,
   "y": 10,
 }
@@ -1803,8 +1805,8 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
-  "id": "id5",
+  "height": 10,
+  "id": "id7",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
@@ -1813,46 +1815,21 @@ Object {
       0,
       0,
     ],
-  ],
-  "roughness": 1,
-  "seed": 81784553,
-  "strokeColor": "#000000",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "version": 2,
-  "versionNonce": 747212839,
-  "width": 0,
-  "x": 10,
-  "y": 30,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 6 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "fillStyle": "hachure",
-  "height": 0,
-  "id": "id6",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
     Array [
-      0,
-      0,
+      10,
+      10,
     ],
   ],
   "roughness": 1,
-  "seed": 1723083209,
+  "seed": 1051383431,
   "strokeColor": "#000000",
   "strokeWidth": 1,
-  "type": "line",
-  "version": 2,
-  "versionNonce": 760410951,
-  "width": 0,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 1279028647,
+  "width": 10,
   "x": 30,
-  "y": 30,
+  "y": 10,
 }
 `;
 
@@ -2069,7 +2046,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id3": false,
+          "id3": true,
         },
         "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
@@ -2136,12 +2113,16 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id3",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
+            Array [
+              0,
+              0,
+            ],
             Array [
               10,
               10,
@@ -2152,9 +2133,9 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "arrow",
-          "version": 5,
-          "versionNonce": 915032327,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
           "x": 70,
           "y": 10,
         },
@@ -2173,7 +2154,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id4": false,
+          "id4": true,
         },
         "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
@@ -2240,15 +2221,15 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id3",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
             Array [
-              10,
-              10,
+              0,
+              0,
             ],
             Array [
               10,
@@ -2260,9 +2241,9 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "arrow",
-          "version": 5,
-          "versionNonce": 915032327,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
           "x": 70,
           "y": 10,
         },
@@ -2270,26 +2251,198 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id4",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
             Array [
+              0,
+              0,
+            ],
+            Array [
               10,
               10,
             ],
           ],
           "roughness": 1,
-          "seed": 1006504105,
+          "seed": 760410951,
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "line",
-          "version": 5,
-          "versionNonce": 1898319239,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 289600103,
+          "width": 10,
           "x": 90,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id7": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "diamond",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 1116226695,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "ellipse",
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id3",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 1505387817,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
+          "x": 70,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id4",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 760410951,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "line",
+          "version": 4,
+          "versionNonce": 289600103,
+          "width": 10,
+          "x": 90,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id7",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 1051383431,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "draw",
+          "version": 4,
+          "versionNonce": 1279028647,
+          "width": 10,
+          "x": 30,
           "y": 10,
         },
       ],
@@ -2298,9 +2451,9 @@ Object {
 }
 `;
 
-exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `5`;
+exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `34`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `38`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -2423,7 +2576,7 @@ exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number 
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
+exports[`regression tests hotkey 3 selects draw tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
@@ -2469,12 +2622,12 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] element 0 1`] = `
+exports[`regression tests hotkey 3 selects draw tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -2484,33 +2637,89 @@ Object {
       0,
       0,
     ],
+    Array [
+      10,
+      10,
+    ],
   ],
   "roughness": 1,
   "seed": 337897,
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "draw",
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
   "x": 10,
   "y": 10,
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] history 1`] = `
+exports[`regression tests hotkey 3 selects draw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "draw",
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of elements 1`] = `0`;
+exports[`regression tests hotkey 3 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 3 selects draw tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
+exports[`regression tests hotkey 4 selects diamond tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
@@ -2556,7 +2765,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] element 0 1`] = `
+exports[`regression tests hotkey 4 selects diamond tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -2578,7 +2787,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] history 1`] = `
+exports[`regression tests hotkey 4 selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -2627,11 +2836,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests hotkey 4 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 4 selects diamond tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
+exports[`regression tests hotkey 5 selects ellipse tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
@@ -2677,7 +2886,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] element 0 1`] = `
+exports[`regression tests hotkey 5 selects ellipse tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -2699,7 +2908,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] history 1`] = `
+exports[`regression tests hotkey 5 selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -2748,11 +2957,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests hotkey 5 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 5 selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
+exports[`regression tests hotkey 6 selects arrow tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
@@ -2766,68 +2975,10 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
-  "editingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "draggingElement": null,
+  "editingElement": null,
   "elementLocked": false,
-  "elementType": "arrow",
+  "elementType": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
@@ -2835,36 +2986,7 @@ Object {
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
-  "multiElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
   "resizingElement": null,
@@ -2872,7 +2994,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": false,
+    "id0": true,
   },
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -2885,20 +3007,20 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] element 0 1`] = `
+exports[`regression tests hotkey 6 selects arrow tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
       10,
@@ -2910,15 +3032,15 @@ Object {
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
   "x": 10,
   "y": 10,
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] history 1`] = `
+exports[`regression tests hotkey 6 selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -2936,7 +3058,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id0": false,
+          "id0": true,
         },
         "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
@@ -2946,12 +3068,16 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id0",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
+            Array [
+              0,
+              0,
+            ],
             Array [
               10,
               10,
@@ -2962,9 +3088,9 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "arrow",
-          "version": 5,
-          "versionNonce": 453191,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
           "x": 10,
           "y": 10,
         },
@@ -2974,9 +3100,152 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests hotkey 6 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 6 selects arrow tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests hotkey 7 selects line tool: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFont": "20px Virgil",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests hotkey 7 selects line tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "line",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests hotkey 7 selects line tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "line",
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests hotkey 7 selects line tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests hotkey 7 selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -2992,68 +3261,10 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
-  "editingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "draggingElement": null,
+  "editingElement": null,
   "elementLocked": false,
-  "elementType": "arrow",
+  "elementType": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
@@ -3061,36 +3272,7 @@ Object {
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
-  "multiElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "arrow",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
   "resizingElement": null,
@@ -3098,7 +3280,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": false,
+    "id0": true,
   },
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -3116,15 +3298,15 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
       10,
@@ -3136,9 +3318,9 @@ Object {
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
   "x": 10,
   "y": 10,
 }
@@ -3162,7 +3344,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id0": false,
+          "id0": true,
         },
         "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
@@ -3172,12 +3354,16 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id0",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
+            Array [
+              0,
+              0,
+            ],
             Array [
               10,
               10,
@@ -3188,9 +3374,9 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "arrow",
-          "version": 5,
-          "versionNonce": 453191,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
           "x": 10,
           "y": 10,
         },
@@ -3215,7 +3401,7 @@ Object {
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
-  "cursorButton": "down",
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
@@ -3255,25 +3441,18 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": null,
   "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-  ],
   "roughness": 1,
   "seed": 337897,
   "strokeColor": "#000000",
   "strokeWidth": 1,
-  "type": "draw",
+  "type": "diamond",
   "version": 2,
   "versionNonce": 1278240551,
-  "width": 0,
+  "width": 10,
   "x": 10,
   "y": 10,
 }
@@ -3283,11 +3462,52 @@ exports[`regression tests hotkey d selects diamond tool: [end of test] history 1
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "diamond",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
 }
 `;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `0`;
+exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `6`;
 
@@ -3426,68 +3646,10 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "line",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
-  "editingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "line",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "draggingElement": null,
+  "editingElement": null,
   "elementLocked": false,
-  "elementType": "line",
+  "elementType": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "isCollaborating": false,
@@ -3495,36 +3657,7 @@ Object {
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
-  "multiElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "fillStyle": "hachure",
-    "height": 0,
-    "id": "id0",
-    "isDeleted": false,
-    "lastCommittedPoint": null,
-    "opacity": 100,
-    "points": Array [
-      Array [
-        10,
-        10,
-      ],
-      Array [
-        10,
-        10,
-      ],
-    ],
-    "roughness": 1,
-    "seed": 337897,
-    "strokeColor": "#000000",
-    "strokeWidth": 1,
-    "type": "line",
-    "version": 4,
-    "versionNonce": 453191,
-    "width": 0,
-    "x": 10,
-    "y": 10,
-  },
+  "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
   "resizingElement": null,
@@ -3532,7 +3665,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": false,
+    "id0": true,
   },
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -3550,15 +3683,15 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "fillStyle": "hachure",
-  "height": 0,
+  "height": 10,
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
       10,
@@ -3570,9 +3703,9 @@ Object {
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "line",
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 0,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
   "x": 10,
   "y": 10,
 }
@@ -3596,7 +3729,7 @@ Object {
         "exportBackground": true,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id0": false,
+          "id0": true,
         },
         "shouldAddWatermark": false,
         "viewBackgroundColor": "#ffffff",
@@ -3606,12 +3739,16 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 0,
+          "height": 10,
           "id": "id0",
           "isDeleted": false,
           "lastCommittedPoint": null,
           "opacity": 100,
           "points": Array [
+            Array [
+              0,
+              0,
+            ],
             Array [
               10,
               10,
@@ -3622,9 +3759,9 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "line",
-          "version": 5,
-          "versionNonce": 453191,
-          "width": 0,
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
           "x": 10,
           "y": 10,
         },
@@ -3758,6 +3895,149 @@ Object {
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFont": "20px Virgil",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "down",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "draw",
+          "version": 4,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -13596,7 +13876,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": true,
+    "id1": true,
   },
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -13638,15 +13918,15 @@ Object {
   "fillStyle": "hachure",
   "height": 10,
   "id": "id1",
-  "isDeleted": true,
+  "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
   "seed": 453191,
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 4,
-  "versionNonce": 1006504105,
+  "version": 3,
+  "versionNonce": 401146281,
   "width": 10,
   "x": 30,
   "y": 10,
@@ -13662,18 +13942,18 @@ Object {
   "id": "id2",
   "isDeleted": true,
   "lastCommittedPoint": Array [
-    0,
-    20,
+    10,
+    10,
   ],
   "opacity": 100,
   "points": Array [
     Array [
-      10,
-      10,
+      0,
+      0,
     ],
     Array [
-      0,
-      20,
+      10,
+      10,
     ],
   ],
   "roughness": 1,
@@ -13681,69 +13961,11 @@ Object {
   "strokeColor": "#000000",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 8,
-  "versionNonce": 289600103,
+  "version": 9,
+  "versionNonce": 2004587015,
   "width": 10,
   "x": 10,
   "y": 30,
-}
-`;
-
-exports[`regression tests undo/redo drawing an element: [end of test] element 3 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "fillStyle": "hachure",
-  "height": 0,
-  "id": "id3",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-  ],
-  "roughness": 1,
-  "seed": 238820263,
-  "strokeColor": "#000000",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "version": 2,
-  "versionNonce": 400692809,
-  "width": 0,
-  "x": 20,
-  "y": 40,
-}
-`;
-
-exports[`regression tests undo/redo drawing an element: [end of test] element 4 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "fillStyle": "hachure",
-  "height": 0,
-  "id": "id4",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-  ],
-  "roughness": 1,
-  "seed": 1604849351,
-  "strokeColor": "#000000",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "version": 2,
-  "versionNonce": 1505387817,
-  "width": 0,
-  "x": 10,
-  "y": 50,
 }
 `;
 
@@ -13812,7 +14034,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "fillStyle": "hachure",
-          "height": 10,
+          "height": 20,
           "id": "id2",
           "isDeleted": false,
           "lastCommittedPoint": Array [
@@ -13821,6 +14043,10 @@ Object {
           ],
           "opacity": 100,
           "points": Array [
+            Array [
+              0,
+              0,
+            ],
             Array [
               10,
               10,
@@ -13835,11 +14061,145 @@ Object {
           "strokeColor": "#000000",
           "strokeWidth": 1,
           "type": "arrow",
-          "version": 7,
-          "versionNonce": 1505387817,
+          "version": 8,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 10,
           "y": 30,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 453191,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 1116226695,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 6,
+          "versionNonce": 1604849351,
+          "width": 10,
+          "x": 10,
+          "y": 30,
+        },
+      ],
+    },
+  ],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
         },
       ],
     },
@@ -13903,54 +14263,12 @@ Object {
       ],
     },
   ],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "currentItemBackgroundColor": "transparent",
-        "currentItemFillStyle": "hachure",
-        "currentItemFont": "20px Virgil",
-        "currentItemOpacity": 100,
-        "currentItemRoughness": 1,
-        "currentItemStrokeColor": "#000000",
-        "currentItemStrokeWidth": 1,
-        "currentItemTextAlign": "left",
-        "exportBackground": true,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "shouldAddWatermark": false,
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "fillStyle": "hachure",
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-  ],
 }
 `;
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `22`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
