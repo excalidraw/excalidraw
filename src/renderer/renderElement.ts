@@ -303,7 +303,13 @@ function generateElement(
         // add lines only in arrow
         if (element.type === "arrow") {
           const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
-          delete options.strokeLineDash;
+          // for dotted arrows caps, reduce gap to make it more legible
+          if (element.strokeStyle === "dotted") {
+            options.strokeLineDash = [3, 4];
+            // for solid/dashed, keep solid arrow cap
+          } else {
+            delete options.strokeLineDash;
+          }
           shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
