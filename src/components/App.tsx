@@ -3,6 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { simplify, Point } from "points-on-curve";
 import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
@@ -2256,7 +2257,7 @@ class App extends React.Component<any, AppState> {
         } else if (points.length > 1) {
           if (draggingElement.type === "draw") {
             mutateElement(draggingElement, {
-              points: [...points, [dx, dy]],
+              points: simplify([...(points as Point[]), [dx, dy]], 2),
             });
           } else {
             mutateElement(draggingElement, {
