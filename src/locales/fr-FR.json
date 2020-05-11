@@ -78,7 +78,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer le collaboration en temps réel",
+    "roomDialog": "Démarrer la collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
@@ -159,6 +159,6 @@
     "zoomToFit": "Zoomer pour visualiser tous les éléments"
   },
   "encrypted": {
-    "tooltip": "Vos dessins sont cryptés de bout en bout, donc les serveurs d'Excalidraw ne les verront jamais."
+    "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   }
 }
