@@ -56,50 +56,52 @@ const Shortcut = (props: {
   label: string;
   shortcuts: string[];
   isOr: boolean;
-}) => (
-  <div
-    style={{
-      borderTop: `1px solid ${oc.gray[4]}`,
-    }}
-  >
+}) => {
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        margin: "0",
-        padding: "4px",
-        alignItems: "center",
+        borderTop: `1px solid ${oc.gray[4]}`,
       }}
     >
       <div
         style={{
-          flexBasis: 0,
-          flexGrow: 2,
-          lineHeight: 1.4,
-        }}
-      >
-        {props.label}
-      </div>
-      <div
-        style={{
           display: "flex",
-          flexBasis: 0,
-          flexGrow: 1,
-          justifyContent: "center",
+          margin: "0",
+          padding: "4px 8px",
+          alignItems: "center",
         }}
       >
-        {props.shortcuts.map((shortcut, index) => (
-          <React.Fragment key={index}>
-            <ShortcutKey>{shortcut}</ShortcutKey>
-            {props.isOr &&
-              index !== props.shortcuts.length - 1 &&
-              t("shortcutsDialog.or")}
-          </React.Fragment>
-        ))}
+        <div
+          style={{
+            lineHeight: 1.4,
+          }}
+        >
+          {props.label}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flex: "0 0 auto",
+            justifyContent: "flex-end",
+            marginLeft: isRTL ? "0em" : "auto",
+            marginRight: isRTL ? "auto" : "0em",
+            minWidth: "30%",
+          }}
+        >
+          {props.shortcuts.map((shortcut, index) => (
+            <React.Fragment key={index}>
+              <ShortcutKey>{shortcut}</ShortcutKey>
+              {props.isOr &&
+                index !== props.shortcuts.length - 1 &&
+                t("shortcutsDialog.or")}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 Shortcut.defaultProps = {
   isOr: true,
@@ -111,10 +113,14 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
       wordBreak: "keep-all",
       border: `1px solid ${oc.gray[4]}`,
       padding: "2px 8px",
-      margin: "0 4px",
+      margin: "auto 4px",
       backgroundColor: oc.gray[2],
       borderRadius: "2px",
       fontSize: "0.8em",
+      minHeight: "26px",
+      boxSizing: "border-box",
+      display: "flex",
+      alignItems: "center",
     }}
     {...props}
   />
@@ -165,7 +171,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
   return (
     <>
       <Dialog
-        maxWidth={800}
+        maxWidth={900}
         onCloseRequest={handleClose}
         title={t("shortcutsDialog.title")}
       >
