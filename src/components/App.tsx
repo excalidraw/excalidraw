@@ -2350,6 +2350,7 @@ class App extends React.Component<any, AppState> {
             [draggingElement.id]: true,
           },
         }));
+        return;
       }
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
