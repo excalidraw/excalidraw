@@ -95,16 +95,7 @@ function drawElementOnCanvas(
     case "arrow":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
-        // only render curves (meaning, not the arrow points) as dash/dotted
-        if (element.type === "arrow" && shape.shape === "curve") {
-          if (element.strokeStyle === "dashed") {
-            context.setLineDash(DASHARRAY_DASHED);
-          } else if (element.strokeStyle === "dotted") {
-            context.setLineDash(DASHARRAY_DOTTED);
-          }
-        }
         rc.draw(shape);
-        context.setLineDash([]);
       });
       break;
     }
@@ -280,9 +271,9 @@ function generateElement(
           // we need to add dashed stroked for arrows manually outside rough,
           //  because we want to prevent dashed stroke for arrow points
           strokeLineDash:
-            element.type === "line" && element.strokeStyle === "dashed"
+            element.strokeStyle === "dashed"
               ? DASHARRAY_DASHED
-              : element.type === "line" && element.strokeStyle === "dotted"
+              : element.strokeStyle === "dotted"
               ? DASHARRAY_DOTTED
               : undefined,
           roughness: element.roughness,
@@ -312,6 +303,7 @@ function generateElement(
         // add lines only in arrow
         if (element.type === "arrow") {
           const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
+          delete options.strokeLineDash;
           shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
@@ -471,14 +463,6 @@ export function renderElementToSvg(
       const opacity = element.opacity / 100;
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
-        // only render curves (meaning, not the arrow points) as dash/dotted
-        if (element.type === "arrow" && shape.shape === "curve") {
-          if (element.strokeStyle === "dashed") {
-            node.setAttribute("stroke-dasharray", DASHARRAY_DASHED.join(","));
-          } else if (element.strokeStyle === "dotted") {
-            node.setAttribute("stroke-dasharray", DASHARRAY_DOTTED.join(","));
-          }
-        }
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
