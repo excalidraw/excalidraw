@@ -161,19 +161,31 @@ function generateElement(
   let shape = shapeCache.get(element) || null;
   if (!shape) {
     elementWithCanvasCache.delete(element);
+
+    // for non-solid strokes, increase the width a bit to make it visually
+    //  similar to solid strokes, because we're also disabling multiStroke
+    const strokeWidth =
+      element.strokeStyle !== "solid"
+        ? element.strokeWidth + 0.5
+        : element.strokeWidth;
+    // when increasing strokeWidth, we must explicitly set fillWeight and
+    //  hachureGap because if not specified, roughjs uses strokeWidth to
+    //  calculate them (and we don't want the fills to be modified)
+    const fillWeight = element.strokeWidth / 2;
+    const hachureGap = element.strokeWidth * 4;
+
     switch (element.type) {
       case "rectangle":
         shape = generator.rectangle(0, 0, element.width, element.height, {
+          strokeWidth,
+          fillWeight,
+          hachureGap,
           stroke: element.strokeColor,
           fill:
             element.backgroundColor === "transparent"
               ? undefined
               : element.backgroundColor,
           fillStyle: element.fillStyle,
-          strokeWidth:
-            element.strokeStyle !== "solid"
-              ? element.strokeWidth + 0.5
-              : element.strokeWidth,
           roughness: element.roughness,
           strokeLineDash:
             element.strokeStyle === "dashed"
@@ -205,16 +217,15 @@ function generateElement(
             [leftX, leftY],
           ],
           {
+            strokeWidth,
+            fillWeight,
+            hachureGap,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth:
-              element.strokeStyle !== "solid"
-                ? element.strokeWidth + 0.5
-                : element.strokeWidth,
             strokeLineDash:
               element.strokeStyle === "dashed"
                 ? DASHARRAY_DASHED
@@ -235,16 +246,15 @@ function generateElement(
           element.width,
           element.height,
           {
+            strokeWidth,
+            fillWeight,
+            hachureGap,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth:
-              element.strokeStyle !== "solid"
-                ? element.strokeWidth + 0.5
-                : element.strokeWidth,
             strokeLineDash:
               element.strokeStyle === "dashed"
                 ? DASHARRAY_DASHED
@@ -262,11 +272,10 @@ function generateElement(
       case "line":
       case "arrow": {
         const options: Options = {
+          strokeWidth,
+          fillWeight,
+          hachureGap,
           stroke: element.strokeColor,
-          strokeWidth:
-            element.strokeStyle !== "solid"
-              ? element.strokeWidth + 0.5
-              : element.strokeWidth,
           seed: element.seed,
           // we need to add dashed stroked for arrows manually outside rough,
           //  because we want to prevent dashed stroke for arrow points
