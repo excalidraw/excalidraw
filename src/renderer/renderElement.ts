@@ -262,6 +262,7 @@ function generateElement(
                 : undefined,
             // multiStroke in ellipses tend to not work well with dashed lines
             disableMultiStroke: element.strokeStyle !== "solid",
+            roughness: element.roughness,
             seed: element.seed,
             curveFitting: 1,
           },
