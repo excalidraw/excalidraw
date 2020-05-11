@@ -32,7 +32,7 @@
     "i18next-browser-languagedetector": "4.1.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
-    "node-sass": "4.14.0",
+    "node-sass": "4.14.1",
     "open-color": "1.7.0",
     "points-on-curve": "0.2.0",
     "pwacompat": "2.0.11",
