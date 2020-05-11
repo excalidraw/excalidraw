@@ -291,11 +291,11 @@ describe("regression tests", () => {
 
   for (const [keys, shape] of [
     ["2r", "rectangle"],
-    ["3x", "draw"],
-    ["4d", "diamond"],
-    ["5e", "ellipse"],
-    ["6a", "arrow"],
-    ["7l", "line"],
+    ["3d", "diamond"],
+    ["4e", "ellipse"],
+    ["5a", "arrow"],
+    ["6l", "line"],
+    ["7x", "draw"],
   ] as [string, ExcalidrawElement["type"]][]) {
     for (const key of keys) {
       it(`hotkey ${key} selects ${shape} tool`, () => {
