@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
+    "draw": "",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""
