@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
+    "draw": "",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "freeDraw": "",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
