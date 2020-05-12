@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
+    "draw": "",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
+    "freeDraw": "",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
