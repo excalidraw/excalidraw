@@ -1633,7 +1633,7 @@ Object {
   "currentItemStrokeColor": "#000000",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
-  "cursorButton": "up",
+  "cursorButton": "down",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
@@ -1654,7 +1654,9 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": Object {
+    "id7": true,
+  },
   "selectionElement": null,
   "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
@@ -1794,6 +1796,39 @@ Object {
   "versionNonce": 289600103,
   "width": 10,
   "x": 90,
+  "y": 10,
+}
+`;
+
+exports[`regression tests draw every type of shape: [end of test] element 5 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id7",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 1051383431,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 1279028647,
+  "width": 10,
+  "x": 30,
   "y": 10,
 }
 `;
@@ -2248,9 +2283,9 @@ Object {
 }
 `;
 
-exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `5`;
+exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `34`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `38`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -2901,6 +2936,97 @@ exports[`regression tests hotkey 6 selects line tool: [end of test] number of el
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
 
+exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFont": "20px Virgil",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "down",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests hotkey 7 selects draw tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests hotkey 7 selects draw tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [],
+}
+`;
+
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `6`;
+
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
@@ -3549,6 +3675,97 @@ Object {
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFont": "20px Virgil",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "down",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [],
+}
+`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {

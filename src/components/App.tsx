@@ -3,6 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { simplify, Point } from "points-on-curve";
 import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
@@ -1981,6 +1982,7 @@ class App extends React.Component<any, AppState> {
       return;
     } else if (
       this.state.elementType === "arrow" ||
+      this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
       if (this.state.multiElement) {
@@ -2122,7 +2124,7 @@ class App extends React.Component<any, AppState> {
         window.devicePixelRatio,
       );
 
-      // for arrows, don't start dragging until a given threshold
+      // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
       //  triggering pointermove)
@@ -2249,9 +2251,15 @@ class App extends React.Component<any, AppState> {
         if (points.length === 1) {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
+          if (draggingElement.type === "draw") {
+            mutateElement(draggingElement, {
+              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+            });
+          } else {
+            mutateElement(draggingElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
+            });
+          }
         }
       } else {
         if (getResizeWithSidesSameLengthKey(event)) {
@@ -2330,6 +2338,10 @@ class App extends React.Component<any, AppState> {
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
 
+      if (draggingElement?.type === "draw") {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();

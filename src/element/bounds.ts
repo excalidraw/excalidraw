@@ -52,7 +52,6 @@ const getMinMaxXYFromCurvePathOps = (
   transformXY?: (x: number, y: number) => [number, number],
 ): [number, number, number, number] => {
   let currentP: Point = [0, 0];
-
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
       // There are only four operation types:
