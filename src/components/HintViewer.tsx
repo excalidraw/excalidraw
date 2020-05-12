@@ -15,15 +15,15 @@ interface Hint {
 const getHints = ({ appState, elements }: Hint) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
-  if (
-    elementType === "arrow" ||
-    elementType === "line" ||
-    elementType === "draw"
-  ) {
+  if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
     }
     return t("hints.linearElementMulti");
+  }
+
+  if (elementType === "draw") {
+    return t("hints.freeDraw");
   }
 
   const selectedElements = getSelectedElements(elements, appState);
