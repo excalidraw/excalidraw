@@ -2257,7 +2257,7 @@ class App extends React.Component<any, AppState> {
         } else if (points.length > 1) {
           if (draggingElement.type === "draw") {
             mutateElement(draggingElement, {
-              points: simplify([...(points as Point[]), [dx, dy]], 2),
+              points: simplify([...(points as Point[]), [dx, dy]], 0.5),
             });
           } else {
             mutateElement(draggingElement, {
