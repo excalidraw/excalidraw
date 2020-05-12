@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Selectie",
+    "draw": "",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
+    "freeDraw": "",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
     "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
