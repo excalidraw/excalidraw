@@ -2340,12 +2340,6 @@ class App extends React.Component<any, AppState> {
 
       if (draggingElement?.type === "draw") {
         this.actionManager.executeAction(actionFinalize);
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [draggingElement.id]: true,
-          },
-        }));
         return;
       }
       if (isLinearElement(draggingElement)) {

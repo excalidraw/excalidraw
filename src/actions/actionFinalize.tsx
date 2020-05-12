@@ -81,7 +81,13 @@ export const actionFinalize = register({
         draggingElement: null,
         multiElement: null,
         editingElement: null,
-        selectedElementIds: {},
+        selectedElementIds:
+          multiPointElement && !appState.elementLocked
+            ? {
+                ...appState.selectedElementIds,
+                [multiPointElement.id]: true,
+              }
+            : appState.selectedElementIds,
       },
       commitToHistory: false,
     };
