@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Selezione",
+    "draw": "",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
+    "freeDraw": "",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
