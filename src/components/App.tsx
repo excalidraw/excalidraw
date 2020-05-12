@@ -1989,10 +1989,7 @@ class App extends React.Component<any, AppState> {
         const { multiElement } = this.state;
 
         // finalize if completing a loop
-        if (
-          (multiElement.type === "draw" || multiElement.type === "line") &&
-          isPathALoop(multiElement.points)
-        ) {
+        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
           mutateElement(multiElement, {
             lastCommittedPoint:
               multiElement.points[multiElement.points.length - 1],
@@ -2127,15 +2124,14 @@ class App extends React.Component<any, AppState> {
         window.devicePixelRatio,
       );
 
-      // for arrows, don't start dragging until a given threshold
+      // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
       //  triggering pointermove)
       if (
         !draggingOccurred &&
         (this.state.elementType === "arrow" ||
-          this.state.elementType === "line" ||
-          this.state.elementType === "draw")
+          this.state.elementType === "line")
       ) {
         if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
           return;
