@@ -50,7 +50,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "arrow" | "line";
+    type: "arrow" | "line" | "draw";
     points: Point[];
     lastCommittedPoint?: Point | null;
   }>;

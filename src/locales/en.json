@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Selection",
+    "draw": "Free draw",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
+    "freeDraw": "Click and drag, release when you're finished",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating"

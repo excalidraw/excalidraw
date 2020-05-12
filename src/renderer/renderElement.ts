@@ -3,7 +3,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { isTextElement } from "../element/typeChecks";
+import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
@@ -35,12 +35,10 @@ function generateElementCanvas(
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  const isLinear = /\b(arrow|line)\b/.test(element.type);
-
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
-  if (isLinear) {
+  if (isLinearElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
@@ -90,6 +88,7 @@ function drawElementOnCanvas(
       break;
     }
     case "arrow":
+    case "draw":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) =>
         rc.draw(shape),
@@ -226,6 +225,7 @@ function generateElement(
         );
         break;
       case "line":
+      case "draw":
       case "arrow": {
         const options: Options = {
           stroke: element.strokeColor,
@@ -240,7 +240,7 @@ function generateElement(
 
         // If shape is a line and is a closed shape,
         // fill the shape if a color is set.
-        if (element.type === "line") {
+        if (element.type === "line" || element.type === "draw") {
           if (isPathALoop(element.points)) {
             options.fillStyle = element.fillStyle;
             options.fill =
@@ -343,6 +343,7 @@ export function renderElement(
     case "diamond":
     case "ellipse":
     case "line":
+    case "draw":
     case "arrow":
     case "text": {
       const elementWithCanvas = generateElement(element, generator, sceneState);
@@ -410,6 +411,7 @@ export function renderElementToSvg(
       break;
     }
     case "line":
+    case "draw":
     case "arrow": {
       generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
@@ -427,7 +429,7 @@ export function renderElementToSvg(
           }) rotate(${degree} ${cx} ${cy})`,
         );
         if (
-          element.type === "line" &&
+          (element.type === "line" || element.type === "draw") &&
           isPathALoop(element.points) &&
           element.backgroundColor !== "transparent"
         ) {

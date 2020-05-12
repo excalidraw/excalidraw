@@ -94,11 +94,11 @@ export function ShapesSwitcher({
 }) {
   return (
     <>
-      {SHAPES.map(({ value, icon }, index) => {
+      {SHAPES.map(({ value, icon, key }, index) => {
         const label = t(`toolBar.${value}`);
-        const shortcut = `${capitalizeString(value)[0]} ${t(
-          "shortcutsDialog.or",
-        )} ${index + 1}`;
+        const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
+          index + 1
+        }`;
         return (
           <ToolButton
             key={value}
@@ -109,7 +109,7 @@ export function ShapesSwitcher({
             title={`${capitalizeString(label)} — ${shortcut}`}
             keyBindingLabel={`${index + 1}`}
             aria-label={capitalizeString(label)}
-            aria-keyshortcuts={`${label[0]} ${index + 1}`}
+            aria-keyshortcuts={`${key} ${index + 1}`}
             data-testid={value}
             onChange={() => {
               setAppState({
