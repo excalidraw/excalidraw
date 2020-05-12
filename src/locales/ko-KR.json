@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "선택",
+    "draw": "",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
+    "freeDraw": "",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
     "resize": "",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다."
