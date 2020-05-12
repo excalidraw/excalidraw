@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "",
+    "draw": "",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""
