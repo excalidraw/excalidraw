@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
+    "draw": "",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
+    "freeDraw": "",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz"
