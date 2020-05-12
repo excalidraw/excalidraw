@@ -180,7 +180,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
             <ShortcutIsland caption={t("shortcutsDialog.shapes")}>
               <Shortcut label={t("toolBar.selection")} shortcuts={["S", "1"]} />
               <Shortcut label={t("toolBar.rectangle")} shortcuts={["R", "2"]} />
-              <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
+              <Shortcut label={t("toolBar.diamond")} shortcuts={["G", "3"]} />
               <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
               <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
               <Shortcut label={t("toolBar.line")} shortcuts={["L", "6"]} />
@@ -277,7 +277,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.delete")}
-                shortcuts={[getShortcutKey("Del")]}
+                shortcuts={[getShortcutKey("D"), getShortcutKey("Del")]}
               />
               <Shortcut
                 label={t("labels.sendToBack")}

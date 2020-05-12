@@ -3412,6 +3412,127 @@ exports[`regression tests hotkey e selects ellipse tool: [end of test] number of
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
+exports[`regression tests hotkey g selects diamond tool: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFont": "20px Virgil",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests hotkey g selects diamond tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeWidth": 1,
+  "type": "diamond",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests hotkey g selects diamond tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "currentItemBackgroundColor": "transparent",
+        "currentItemFillStyle": "hachure",
+        "currentItemFont": "20px Virgil",
+        "currentItemOpacity": 100,
+        "currentItemRoughness": 1,
+        "currentItemStrokeColor": "#000000",
+        "currentItemStrokeWidth": 1,
+        "currentItemTextAlign": "left",
+        "exportBackground": true,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "shouldAddWatermark": false,
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeWidth": 1,
+          "type": "diamond",
+          "version": 3,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests hotkey g selects diamond tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests hotkey g selects diamond tool: [end of test] number of renders 1`] = `6`;
+
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},

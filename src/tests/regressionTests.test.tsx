@@ -291,7 +291,7 @@ describe("regression tests", () => {
 
   for (const [keys, shape] of [
     ["2r", "rectangle"],
-    ["3d", "diamond"],
+    ["3g", "diamond"],
     ["4e", "ellipse"],
     ["5a", "arrow"],
     ["6l", "line"],

@@ -29,7 +29,10 @@ export const actionDeleteSelected = register({
   },
   contextItemLabel: "labels.delete",
   contextMenuOrder: 3,
-  keyTest: (event) => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
+  keyTest: (event) =>
+    event.key === KEYS.BACKSPACE ||
+    event.key === KEYS.DELETE ||
+    event.key.toLowerCase() === "d",
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"

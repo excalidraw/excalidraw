@@ -31,7 +31,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
-    key: "d",
+    key: "g",
   },
   {
     icon: (
