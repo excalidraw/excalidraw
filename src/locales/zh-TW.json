@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "選擇",
+    "draw": "",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "按下 Escape 或 Enter 來完成",
     "resize": "",
     "rotate": ""
