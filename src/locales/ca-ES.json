@@ -96,6 +96,7 @@
   },
   "toolBar": {
     "selection": "",
+    "draw": "",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
@@ -111,6 +112,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""
