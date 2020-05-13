@@ -1,5 +1,6 @@
 import React from "react";
 
+import { fileOpen } from "browser-nativefs";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -7,6 +8,7 @@ import { simplify, Point } from "points-on-curve";
 import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
+  newImageElement,
   newElement,
   newTextElement,
   duplicateElement,
@@ -2058,6 +2060,30 @@ class App extends React.Component<any, AppState> {
           editingElement: element,
         });
       }
+    } else if (this.state.elementType === "image") {
+      const element = newImageElement({
+        x: x,
+        y: y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+      });
+      this.setState(() => ({
+        selectedElementIds: {
+          [element.id]: true,
+        },
+      }));
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getElementsIncludingDeleted(),
+        element,
+      ]);
+      this.setState({
+        draggingElement: element,
+        editingElement: element,
+      });
     } else {
       const element = newElement({
         type: this.state.elementType,
@@ -2313,7 +2339,7 @@ class App extends React.Component<any, AppState> {
       }
     });
 
-    const onPointerUp = withBatchedUpdates((childEvent: PointerEvent) => {
+    const onPointerUp = withBatchedUpdates(async (childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -2337,6 +2363,24 @@ class App extends React.Component<any, AppState> {
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+
+      if (draggingElement?.type === "image") {
+        const selectedFile = await fileOpen({
+          description: "Image",
+          extensions: ["jpg", "jpeg", "png"],
+          mimeTypes: ["image/jpeg", "image/png"],
+        });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          mutateElement(draggingElement, {
+            imageData: reader.result as string,
+          });
+          this.actionManager.executeAction(actionFinalize);
+        };
+        reader.readAsDataURL(selectedFile);
+        return;
+      }
 
       if (draggingElement?.type === "draw") {
         this.actionManager.executeAction(actionFinalize);

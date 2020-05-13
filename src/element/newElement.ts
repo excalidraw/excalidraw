@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
@@ -107,6 +108,15 @@ export function newLinearElement(
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
     lastCommittedPoint: opts.lastCommittedPoint || null,
+  };
+}
+
+export function newImageElement(
+  opts: ElementConstructorOpts,
+): NonDeleted<ExcalidrawImageElement> {
+  return {
+    ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    imageData: "",
   };
 }
 
