@@ -96,7 +96,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
-    "draw": "Freies Zeichnen",
+    "draw": "Freihand Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
