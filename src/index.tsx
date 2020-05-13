@@ -3,10 +3,12 @@ import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 
+import { EVENT } from "./constants";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import App from "./components/App";
 import { register as registerServiceWorker } from "./serviceWorker";
+import { t } from "./i18n";
 
 import "./css/styles.scss";
 
@@ -69,4 +71,23 @@ ReactDOM.render(
   rootElement,
 );
 
-registerServiceWorker();
+registerServiceWorker({
+  onUpdate: (registration) => {
+    const waitingServiceWorker = registration.waiting;
+    if (waitingServiceWorker) {
+      waitingServiceWorker.addEventListener(
+        EVENT.STATE_CHANGE,
+        (event: Event) => {
+          const target = event.target as ServiceWorker;
+          const state = target.state as ServiceWorkerState;
+          if (state === "activated") {
+            if (window.confirm(t("alerts.newVersionAvailable"))) {
+              window.location.reload();
+            }
+          }
+        },
+      );
+      waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+    }
+  },
+});
