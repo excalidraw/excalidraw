@@ -485,6 +485,7 @@ export function renderElementToSvg(
           text.setAttribute("font-size", fontSize);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
+          text.setAttribute("style", "white-space: pre;");
           node.appendChild(text);
         }
         svgRoot.appendChild(node);
