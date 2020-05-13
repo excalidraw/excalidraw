@@ -8,7 +8,6 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { IsMobileProvider } from "./is-mobile";
 import App from "./components/App";
 import { register as registerServiceWorker } from "./serviceWorker";
-import { t } from "./i18n";
 
 import "./css/styles.scss";
 
@@ -81,9 +80,7 @@ registerServiceWorker({
           const target = event.target as ServiceWorker;
           const state = target.state as ServiceWorkerState;
           if (state === "activated") {
-            if (window.confirm(t("alerts.newVersionAvailable"))) {
-              window.location.reload();
-            }
+            window.location.reload();
           }
         },
       );

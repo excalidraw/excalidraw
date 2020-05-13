@@ -92,8 +92,7 @@
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
-    "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
-    "newVersionAvailable": "Eine neue Version von Excalidraw ist verfügbar. Möchtest du die App neu laden?"
+    "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen."
   },
   "toolBar": {
     "selection": "Auswahl",
