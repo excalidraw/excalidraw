@@ -89,7 +89,7 @@ export const actionFinalize = register({
               }
             : appState.selectedElementIds,
       },
-      commitToHistory: false,
+      commitToHistory: appState.elementType === "draw",
     };
   },
   keyTest: (event, appState) =>
