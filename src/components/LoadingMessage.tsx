@@ -1,5 +1,7 @@
 import React from "react";
 
+import "./LoadigMessage.scss";
+
 export const LoadingMessage = () => {
   // !! KEEP THIS IN SYNC WITH index.html !!
   return (
