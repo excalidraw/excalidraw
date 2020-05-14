@@ -96,7 +96,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
-    "draw": "",
+    "draw": "Dessin libre",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",
