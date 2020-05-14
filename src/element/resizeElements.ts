@@ -173,6 +173,21 @@ const resizeSingleTwoPointElement = (
   }
 };
 
+const rescalePointsInElement = (
+  element: NonDeletedExcalidrawElement,
+  width: number,
+  height: number,
+) =>
+  isLinearElement(element)
+    ? {
+        points: rescalePoints(
+          0,
+          width,
+          rescalePoints(1, height, element.points),
+        ),
+      }
+    : {};
+
 const resizeSingleElement = (
   element: NonDeletedExcalidrawElement,
   resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
@@ -220,15 +235,7 @@ const resizeSingleElement = (
   const deltaY1 = (y1 - nextY1) / 2;
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
-  const rescaledPoints = isLinearElement(element)
-    ? {
-        points: rescalePoints(
-          0,
-          nextWidth,
-          rescalePoints(1, nextHeight, element.points),
-        ),
-      }
-    : {};
+  const rescaledPoints = rescalePointsInElement(element, nextWidth, nextHeight);
   const [finalX1, finalY1, finalX2, finalY2] = getResizedElementAbsoluteCoords(
     {
       ...element,
@@ -296,9 +303,19 @@ const resizeMultipleElements = (
         elements.forEach((element) => {
           const width = element.width * scale;
           const height = element.height * scale;
-          const x = element.x + (element.x - x1) * (scale - 1);
-          const y = element.y + (element.y - y1) * (scale - 1);
-          mutateElement(element, { width, height, x, y });
+          const [origX1, origY1] = getElementAbsoluteCoords(element);
+          const rescaledPoints = rescalePointsInElement(element, width, height);
+          const [finalX1, finalY1] = getResizedElementAbsoluteCoords(
+            {
+              ...element,
+              ...rescaledPoints,
+            },
+            width,
+            height,
+          );
+          const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
+          const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+          mutateElement(element, { width, height, x, y, ...rescaledPoints });
         });
       }
       break;
@@ -312,9 +329,19 @@ const resizeMultipleElements = (
         elements.forEach((element) => {
           const width = element.width * scale;
           const height = element.height * scale;
-          const x = element.x - (x2 - element.x) * (scale - 1);
-          const y = element.y - (y2 - element.y) * (scale - 1);
-          mutateElement(element, { width, height, x, y });
+          const [, , origX2, origY2] = getElementAbsoluteCoords(element);
+          const rescaledPoints = rescalePointsInElement(element, width, height);
+          const [, , finalX2, finalY2] = getResizedElementAbsoluteCoords(
+            {
+              ...element,
+              ...rescaledPoints,
+            },
+            width,
+            height,
+          );
+          const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
+          const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+          mutateElement(element, { width, height, x, y, ...rescaledPoints });
         });
       }
       break;
@@ -328,9 +355,19 @@ const resizeMultipleElements = (
         elements.forEach((element) => {
           const width = element.width * scale;
           const height = element.height * scale;
-          const x = element.x + (element.x - x1) * (scale - 1);
-          const y = element.y - (y2 - element.y) * (scale - 1);
-          mutateElement(element, { width, height, x, y });
+          const [origX1, , , origY2] = getElementAbsoluteCoords(element);
+          const rescaledPoints = rescalePointsInElement(element, width, height);
+          const [finalX1, , , finalY2] = getResizedElementAbsoluteCoords(
+            {
+              ...element,
+              ...rescaledPoints,
+            },
+            width,
+            height,
+          );
+          const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
+          const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+          mutateElement(element, { width, height, x, y, ...rescaledPoints });
         });
       }
       break;
@@ -344,9 +381,19 @@ const resizeMultipleElements = (
         elements.forEach((element) => {
           const width = element.width * scale;
           const height = element.height * scale;
-          const x = element.x - (x2 - element.x) * (scale - 1);
-          const y = element.y + (element.y - y1) * (scale - 1);
-          mutateElement(element, { width, height, x, y });
+          const [, origY1, origX2] = getElementAbsoluteCoords(element);
+          const rescaledPoints = rescalePointsInElement(element, width, height);
+          const [, finalY1, finalX2] = getResizedElementAbsoluteCoords(
+            {
+              ...element,
+              ...rescaledPoints,
+            },
+            width,
+            height,
+          );
+          const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
+          const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+          mutateElement(element, { width, height, x, y, ...rescaledPoints });
         });
       }
       break;
@@ -357,8 +404,10 @@ const resizeMultipleElements = (
 export const canResizeMutlipleElements = (
   elements: readonly NonDeletedExcalidrawElement[],
 ) => {
-  return elements.every((element) =>
-    ["rectangle", "diamond", "ellipse"].includes(element.type),
+  return elements.every(
+    (element) =>
+      ["rectangle", "diamond", "ellipse"].includes(element.type) ||
+      (isLinearElement(element) && element.points.length > 2),
   );
 };
 
