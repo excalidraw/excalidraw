@@ -20,6 +20,9 @@ import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
 
+const DASHARRAY_DASHED = [12, 8];
+const DASHARRAY_DOTTED = [3, 6];
+
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -90,9 +93,9 @@ function drawElementOnCanvas(
     case "arrow":
     case "draw":
     case "line": {
-      (getShapeForElement(element) as Drawable[]).forEach((shape) =>
-        rc.draw(shape),
-      );
+      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+        rc.draw(shape);
+      });
       break;
     }
     default: {
@@ -157,16 +160,42 @@ function generateElement(
   let shape = shapeCache.get(element) || null;
   if (!shape) {
     elementWithCanvasCache.delete(element);
+
+    const strokeLineDash =
+      element.strokeStyle === "dashed"
+        ? DASHARRAY_DASHED
+        : element.strokeStyle === "dotted"
+        ? DASHARRAY_DOTTED
+        : undefined;
+    // for non-solid strokes, disable multiStroke because it tends to make
+    //  dashes/dots overlay each other
+    const disableMultiStroke = element.strokeStyle !== "solid";
+    // for non-solid strokes, increase the width a bit to make it visually
+    //  similar to solid strokes, because we're also disabling multiStroke
+    const strokeWidth =
+      element.strokeStyle !== "solid"
+        ? element.strokeWidth + 0.5
+        : element.strokeWidth;
+    // when increasing strokeWidth, we must explicitly set fillWeight and
+    //  hachureGap because if not specified, roughjs uses strokeWidth to
+    //  calculate them (and we don't want the fills to be modified)
+    const fillWeight = element.strokeWidth / 2;
+    const hachureGap = element.strokeWidth * 4;
+
     switch (element.type) {
       case "rectangle":
         shape = generator.rectangle(0, 0, element.width, element.height, {
+          strokeWidth,
+          fillWeight,
+          hachureGap,
+          strokeLineDash,
+          disableMultiStroke,
           stroke: element.strokeColor,
           fill:
             element.backgroundColor === "transparent"
               ? undefined
               : element.backgroundColor,
           fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
           roughness: element.roughness,
           seed: element.seed,
         });
@@ -191,13 +220,17 @@ function generateElement(
             [leftX, leftY],
           ],
           {
+            strokeWidth,
+            fillWeight,
+            hachureGap,
+            strokeLineDash,
+            disableMultiStroke,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
             roughness: element.roughness,
             seed: element.seed,
           },
@@ -211,13 +244,17 @@ function generateElement(
           element.width,
           element.height,
           {
+            strokeWidth,
+            fillWeight,
+            hachureGap,
+            strokeLineDash,
+            disableMultiStroke,
             stroke: element.strokeColor,
             fill:
               element.backgroundColor === "transparent"
                 ? undefined
                 : element.backgroundColor,
             fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
             roughness: element.roughness,
             seed: element.seed,
             curveFitting: 1,
@@ -228,10 +265,14 @@ function generateElement(
       case "draw":
       case "arrow": {
         const options: Options = {
+          strokeWidth,
+          fillWeight,
+          hachureGap,
+          strokeLineDash,
+          disableMultiStroke,
           stroke: element.strokeColor,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
           seed: element.seed,
+          roughness: element.roughness,
         };
 
         // points array can be empty in the beginning, so it is important to add
@@ -257,6 +298,13 @@ function generateElement(
         // add lines only in arrow
         if (element.type === "arrow") {
           const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
+          // for dotted arrows caps, reduce gap to make it more legible
+          if (element.strokeStyle === "dotted") {
+            options.strokeLineDash = [3, 4];
+            // for solid/dashed, keep solid arrow cap
+          } else {
+            delete options.strokeLineDash;
+          }
           shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
