@@ -227,6 +227,41 @@ export const actionChangeSloppiness = register({
   ),
 });
 
+export const actionChangeStrokeStyle = register({
+  name: "changeStrokeStyle",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeStyle: value,
+        }),
+      ),
+      appState: { ...appState, currentItemStrokeStyle: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.strokeStyle")}</legend>
+      <ButtonSelect
+        group="strokeStyle"
+        options={[
+          { value: "solid", text: t("labels.strokeStyle_solid") },
+          { value: "dashed", text: t("labels.strokeStyle_dashed") },
+          { value: "dotted", text: t("labels.strokeStyle_dotted") },
+        ]}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => element.strokeStyle,
+          appState.currentItemStrokeStyle,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
+
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
