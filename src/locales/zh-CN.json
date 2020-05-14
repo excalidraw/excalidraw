@@ -140,7 +140,7 @@
     "button_startSession": "启动会议",
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
-    "desc_persistenceWarning": "注意，画布数据通过 P2P 方式与协作者共享, 并且不会保存到我们的服务器. 因此, 如果失去网络连接, 你可能会丢失数据，除非将数据导出成文件或者是公开链接",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "分享此链接给你要协作的用户",
     "desc_exitSession": "停止会话将中断你在会议室的连接，但你依然可以在本地继续使用画布. 注意，这不会影响到其他用户, 他们仍可以在自己的版本上继续协作。"
   },
