@@ -2340,6 +2340,7 @@ class App extends React.Component<any, AppState> {
 
       if (draggingElement?.type === "draw") {
         this.actionManager.executeAction(actionFinalize);
+        history.resumeRecording();
         return;
       }
       if (isLinearElement(draggingElement)) {
