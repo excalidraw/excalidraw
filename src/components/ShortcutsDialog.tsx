@@ -245,7 +245,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("buttons.toggleZenMode")}
-                shortcuts={["Alt+Z"]}
+                shortcuts={[getShortcutKey("Alt+Z")]}
               />
             </ShortcutIsland>
           </Column>
