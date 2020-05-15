@@ -31,6 +31,7 @@ export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
+  | ExcalidrawPathElement
   | ExcalidrawLinearElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
@@ -53,6 +54,12 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     type: "arrow" | "line";
     points: Point[];
     lastCommittedPoint?: Point | null;
+  }>;
+
+export type ExcalidrawPathElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "path";
+    d: string;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

@@ -4,8 +4,19 @@ const pathCommand = /([cmz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
 const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
 
 export default class Path {
-  constructor({ d, ...options }) {
+  constructor(d, options) {
     this.path = this.parsePathString(d);
+  }
+
+  position([x, y]) {
+    this.path.forEach((path) => {
+      for (let i = 1; i < path.length; i += 2) {
+        const newX = x + path[i];
+        const newY = y + path[i + 1];
+        path[i] = newX;
+        path[i + 1] = newY;
+      }
+    });
   }
 
   parsePathString(pathString) {
@@ -43,7 +54,7 @@ export default class Path {
    *
    * @returns string (path string)
    */
-  difference(path) {
-    return difference(this, path);
+  difference({ path }) {
+    return difference(this.path, path);
   }
 }

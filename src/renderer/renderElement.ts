@@ -85,7 +85,8 @@ function drawElementOnCanvas(
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "path": {
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
@@ -266,6 +267,21 @@ function generateElement(
         }
         break;
       }
+      case "path": {
+        shape = generator.path(element.d, {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed,
+        });
+
+        break;
+      }
       case "text": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
@@ -344,6 +360,7 @@ export function renderElement(
     case "ellipse":
     case "line":
     case "arrow":
+    case "path":
     case "text": {
       const elementWithCanvas = generateElement(element, generator, sceneState);
 
@@ -380,6 +397,7 @@ export function renderElementToSvg(
   offsetY?: number,
 ) {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
   const degree = (180 * element.angle) / Math.PI;

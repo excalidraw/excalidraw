@@ -12,6 +12,7 @@ export {
   newTextElement,
   newLinearElement,
   duplicateElement,
+  newPathElement,
 } from "./newElement";
 export {
   getElementAbsoluteCoords,

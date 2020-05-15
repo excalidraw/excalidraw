@@ -1,11 +1,11 @@
-import raphael from "raphael";
+import R from "./R";
 
 /**
  * convert raphael's internal path representation (must be converted to curves before) to segments / bezier curves
  *
  * @returns array segments (path as a collection of segments)
  */
-function generatePathSegments({ path }) {
+function generatePathSegments(path) {
   const segments = [];
 
   path.forEach((pathCommand, i) => {
@@ -60,7 +60,10 @@ function markSubpathEndings(...pathSegments) {
 
       //if ending point of a segment is different from starting  point of next seg. mark both
       if (i < segments.length - 1) {
-        if (seg[6] !== nextSeg[0] || seg[7] !== nextSeg[1]) {
+        if (
+          seg.items[6] !== nextSeg.items[0] ||
+          seg.items[7] !== nextSeg.items[1]
+        ) {
           seg.endPoint = `S${subPaths}`;
           subPaths++;
           nextSeg.startPoint = `S${subPaths}`;
@@ -103,7 +106,6 @@ function operateBool(type, path1, path2) {
   }
 
   var newParts = buildNewPathParts(type, path1Segs, path2Segs);
-
   var indexes = buildPartIndexes(newParts);
 
   return buildNewPath(type, newParts, indexes.inversions, indexes.startIndex);
@@ -136,32 +138,34 @@ var pathSegsToStr = function (pathSegs) {
  *
  * @returns array pathArr (RaphaelJS path array)
  */
-var pathSegsToArr = function (pathSegs) {
+var pathSegsToArr = function (segments) {
   var pathArr = [];
 
-  for (var i = 0; i < pathSegs.length; i++) {
+  segments.forEach((segment, i) => {
     //ignore empty segments
-    if (pathSegs[i].length === 0) {
-      continue;
+    if (segment.items.length === 0) {
+      return;
     }
-    var command = [];
+
+    const prevSegment = segments[i - 1];
+    let command = [];
     //if start point of current segment is different from end point of previous segment add a new subpath
     if (
       i === 0 ||
-      pathSegs[i][0] !== pathSegs[i - 1][pathSegs[i - 1].length - 2] ||
-      pathSegs[i][1] !== pathSegs[i - 1][pathSegs[i - 1].length - 1]
+      segment.items[0] !== prevSegment.items[prevSegment.items.length - 2] ||
+      segment.items[1] !== prevSegment.items[prevSegment.items.length - 1]
     ) {
-      command.push("M", pathSegs[i][0], pathSegs[i][1]);
+      command.push("M", segment.items[0], segment.items[1]);
       pathArr.push(command);
       command = [];
     }
     command.push("C");
 
-    for (var j = 2; j < pathSegs[i].length; j++) {
-      command.push(pathSegs[i][j]);
+    for (var j = 2; j < segment.items.length; j++) {
+      command.push(segment.items[j]);
     }
     pathArr.push(command);
-  }
+  });
 
   return pathArr;
 };
@@ -206,15 +210,20 @@ function splitSegment(segments, segNr, t, newPoint, intersId) {
   ];
 
   //set coordinates for new segments
-  const newSeg1 = [items[0], items[1], ...newA1_1, ...newA1_2, ...newPoint];
-  if (typeof oldSeg.startPoint != "undefined") {
+  const newSeg1 = {
+    items: [items[0], items[1], ...newA1_1, ...newA1_2, ...newPoint],
+  };
+
+  if (typeof oldSeg.startPoint !== undefined) {
     newSeg1.startPoint = oldSeg.startPoint;
   }
   newSeg1.endPoint = `I${intersId}`; //mark end point as intersection
 
-  const newSeg2 = [...newPoint, ...newA2_1, ...newA2_2, items[6], items[7]];
+  const newSeg2 = {
+    items: [...newPoint, ...newA2_1, ...newA2_2, items[6], items[7]],
+  };
   newSeg2.startPoint = `I${intersId}`; //mark start point as intersection
-  if (typeof oldSeg.endPoint != "undefined") {
+  if (typeof oldSeg.endPoint !== undefined) {
     newSeg2.endPoint = oldSeg.endPoint;
   }
 
@@ -285,10 +294,10 @@ function insertIntersectionPoints(pathSegs, pathNr, inters) {
  */
 var isSegInsidePath = function (segments, path) {
   //get point on segment (t = 0.5)
-  var point = raphael.findDotsAtSegment(...[...segments, 0.5]);
+  var point = R.findDotsAtSegment(...[...segments, 0.5]);
 
   //is point inside of given path
-  return raphael.isPointInsidePath(path, point.x, point.y);
+  return R.isPointInsidePath(path, point.x, point.y);
 };
 
 /**
@@ -321,22 +330,25 @@ var invertSeg = function (segCoords) {
  * returns void
  */
 var invertPart = function (part) {
-  for (var q = 0; q < part.length; q++) {
-    invertSeg(part[q]);
-  }
+  const length = part.segments.length;
+  const firstSegment = part.segments[0];
+  const lastSegment = part.segments[length - 1];
+
+  part.segments.map((segment) => invertSeg(segment.items));
+
   //invert order of segments
-  part.reverse();
+  part.segments.reverse();
 
   //switch starting and ending points
-  var oldStartPoint = part[part.length - 1].startPoint;
-  part[0].startPoint = part[0].endPoint;
-  if (part.length > 1) {
-    delete part[0].endPoint;
+  var oldStartPoint = lastSegment.startPoint;
+  firstSegment.startPoint = firstSegment.endPoint;
+  if (length > 1) {
+    delete firstSegment.endPoint;
   }
 
-  part[part.length - 1].endPoint = oldStartPoint;
-  if (part.length > 1) {
-    delete part[part.length - 1].startPoint;
+  lastSegment.endPoint = oldStartPoint;
+  if (length > 1) {
+    delete lastSegment.startPoint;
   }
 };
 
@@ -356,14 +368,14 @@ var getPathDirection = function (pathSegArr) {
 
   //convert path to string
   var path = pathSegsToStr(pathSegArr);
-  var box = raphael.pathBBox(path);
+  var box = R.pathDimensions(path);
 
   //"draw" a horizontal line from left to right at half height of path's bbox
   var lineY = box.y + box.height / 2;
   var line = `M${box.x},${lineY}L${box.x2},${lineY}`;
 
   //get intersections of line and path
-  var inters = raphael.pathIntersection(line, path);
+  var inters = R.pathIntersection(line, path);
 
   //get intersections with extrema for t on line
   for (var i = 0; i < inters.length; i++) {
@@ -410,7 +422,7 @@ var getPathDirection = function (pathSegArr) {
  */
 function getIntersections(path1, path2) {
   const d = 0.1; //min. deviation to assume point as different from another
-  const inters = raphael.pathIntersection(path1, path2);
+  const inters = R.pathIntersection(path1, path2);
   const validInters = [];
   let valid = true;
 
@@ -457,12 +469,11 @@ function getIntersections(path1, path2) {
  * @returns array newParts (array of arrays holding segments)
  */
 function buildNewPathParts(type, path1Segs, path2Segs) {
-  var IOSituationChecked = false;
-  var insideOtherPath; //temporary flag
-  var partNeeded = false;
-  var segCoords; //temporary array of coordinates of current segment
-  var newPathPart = [];
-  var newParts = [];
+  let IOSituationChecked = false;
+  let insideOtherPath; //temporary flag
+  let partNeeded = false;
+  let newPathPart = { segments: [] };
+  const newParts = [];
 
   /*
   Add-Part-to-new-Path-Rules:
@@ -476,7 +487,7 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
     path1 - segment inside path2
     path2 - segment inside path1
   */
-  var rules = {
+  const rules = {
     union: {
       0: false,
       1: false,
@@ -507,7 +518,8 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
     const path = paths[p];
 
     for (let s = 0; s < path.segs.length; s++) {
-      segCoords = path.segs[s].items;
+      const segment = path.segs[s];
+      const segCoords = segment.items;
 
       if (segCoords.length === 0) {
         continue;
@@ -517,21 +529,22 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
           segCoords,
           pathSegsToStr(paths[p ^ 1].segs),
         );
+
         IOSituationChecked = true;
         partNeeded = rules[type][p] === insideOtherPath;
       }
 
       //if conditions are satisfied add current segment to new part
       if (partNeeded) {
-        newPathPart.push(segCoords);
+        newPathPart.segments.push(segment);
       }
 
-      if (typeof segCoords.endPoint !== "undefined") {
+      if (typeof segment.endPoint !== undefined) {
         if (partNeeded) {
           newPathPart.pathNr = path.nr;
           newParts.push(newPathPart);
         }
-        newPathPart = [];
+        newPathPart = { segments: [] };
         IOSituationChecked = false;
       }
     }
@@ -547,27 +560,25 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
  *
  * @returns object (holding indexes and information about inverted parts)
  */
-var buildPartIndexes = function (parts) {
+function buildPartIndexes(parts) {
   var startIndex = {};
   var endIndex = {};
   var inversions = {
     1: 0,
     2: 0,
   }; //count inversions on parts formerly belonging to path with the particular number
-  const length = parts.length;
 
   //iterate all parts of the new path and build indices of starting and ending points
-  for (var p = 0; p < length; p++) {
-    const part = parts[p];
-    const first = part[0];
-    const last = part[length - 1];
+  parts.forEach((part, i) => {
+    const firstSegment = part.segments[0];
+    const lastSegment = part.segments[part.segments.length - 1];
 
     //if starting point or ending point id already exists (and there are different) invert the part
-    if (first.startPoint !== last.endPoint) {
+    if (firstSegment.startPoint !== lastSegment.endPoint) {
       //part.pathNr == 2 &&
       if (
-        typeof startIndex[first.startPoint] != "undefined" ||
-        typeof endIndex[last.endPoint] != "undefined"
+        typeof startIndex[firstSegment.startPoint.segments] !== undefined ||
+        typeof endIndex[lastSegment.endPoint] !== undefined
       ) {
         //invert the segments
         invertPart(part);
@@ -579,9 +590,9 @@ var buildPartIndexes = function (parts) {
     }
 
     //save intersection id at starting point
-    startIndex[first.startPoint] = p;
-    endIndex[last.endPoint] = p;
-  }
+    startIndex[firstSegment.startPoint] = i;
+    endIndex[lastSegment.endPoint] = i;
+  });
 
   return {
     inversions: inversions,
@@ -620,30 +631,32 @@ function buildNewPath(type, parts, inversions, startIndex) {
 
   //build new path as an array of (closed) sub-paths (segment representation)
   if (parts.length > 0) {
-    var partsAdded = 0;
-    var curPart = parts[0];
-    var firstStartPoint = parts[0][0].startPoint;
-    var endPointId;
-    var subPath = [];
+    let partsAdded = 0;
+    let curPart = parts[0];
+    let endPointId;
+    let subPath = [];
+    let firstStartPoint = curPart.segments[0].startPoint;
 
     while (partsAdded < parts.length) {
-      partsAdded++;
+      const firstSegment = curPart.segments[0];
+      const lastSegment = curPart.segments[curPart.segments.length - 1];
 
       //for difference operation prepare correction of path directions where necessary
       if (type === "difference") {
         //if part was belonging to path 2 and starting point = ending point (means part was a subpath of path2 and completely inside path1)
         if (
           curPart.pathNr === 2 &&
-          curPart[0].startPoint === curPart[curPart.length - 1].endPoint
+          firstSegment.startPoint === lastSegment.endPoint
         ) {
           dirCheck.push(newPath.length);
         }
       }
 
       subPath = subPath.concat(curPart);
-
-      endPointId = curPart[curPart.length - 1].endPoint;
+      partsAdded++;
+      endPointId = lastSegment.endPoint;
       curPart.added = true;
+
       if (endPointId !== firstStartPoint) {
         //path isn't closed yet
         curPart = parts[startIndex[endPointId]]; //new part to add is the one that has current ending point as starting point
@@ -655,7 +668,7 @@ function buildNewPath(type, parts, inversions, startIndex) {
         for (let p = 1; p < parts.length; p++) {
           if (!parts[p].added) {
             curPart = parts[p];
-            firstStartPoint = parts[p][0].startPoint;
+            firstStartPoint = curPart.segments[0].startPoint;
             break;
           }
         }
@@ -687,12 +700,9 @@ function buildNewPath(type, parts, inversions, startIndex) {
   }
 
   //flatten new path
-  var resultPath = [];
-  for (let i = 0; i < newPath.length; i++) {
-    resultPath = resultPath.concat(newPath[i]);
-  }
-
-  return resultPath;
+  return newPath.reduce((acc, path) => {
+    return acc.concat(...path.map(({ segments }) => segments));
+  }, []);
 }
 
 /**

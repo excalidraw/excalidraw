@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawPathElement,
   ExcalidrawGenericElement,
   NonDeleted,
   TextAlign,
@@ -107,6 +108,18 @@ export function newLinearElement(
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
     lastCommittedPoint: opts.lastCommittedPoint || null,
+  };
+}
+
+export function newPathElement(
+  opts: {
+    type: ExcalidrawPathElement["type"];
+    d: string;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawPathElement> {
+  return {
+    ..._newElementBase<ExcalidrawPathElement>(opts.type, opts),
+    d: opts.d || "",
   };
 }
 
