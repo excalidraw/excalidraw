@@ -9,6 +9,7 @@ import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
 import { handlerRectangles } from "../element";
+import { isLinearElement } from "../element/typeChecks";
 
 const { h } = window;
 
@@ -33,6 +34,24 @@ function pointerDown(
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerDown(canvas, {
+    clientX,
+    clientY,
+    altKey,
+    shiftKey,
+    pointerId: 1,
+    pointerType,
+  });
+}
+
+function doubleClick(
+  clientX: number = lastClientX,
+  clientY: number = lastClientY,
+  altKey: boolean = false,
+  shiftKey: boolean = false,
+) {
+  lastClientX = clientX;
+  lastClientY = clientY;
+  fireEvent.doubleClick(canvas, {
     clientX,
     clientY,
     altKey,
@@ -577,5 +596,35 @@ describe("regression tests", () => {
     fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
     expect(h.state.zoom).toBe(1);
+  });
+
+  it("double click to edit arrow", () => {
+    expect(h.elements.length).toBe(0);
+    clickTool("arrow");
+    pointerDown(10, 10);
+    pointerMove(20, 20);
+    pointerUp();
+    expect(h.app.state.multiElement).toBe(null);
+    doubleClick();
+    expect(h.app.state.multiElement).not.toBe(null);
+    pointerDown();
+    pointerUp();
+    pointerMove(20, 10);
+    pointerDown();
+    pointerUp();
+    pointerDown();
+    pointerUp();
+    expect(h.app.state.multiElement).toBe(null);
+    expect(h.elements.length).toBe(1);
+    expect(isLinearElement(h.elements[0]) && h.elements[0].points).toEqual([
+      [0, 0],
+      [10, 10],
+      [10, 0],
+    ]);
+
+    // make sure a doubleclick immediately after finalizing (which can happen when a
+    // user clicks an arrow to finalize it) does not do anything.
+    doubleClick();
+    expect(h.app.state.multiElement).toBe(null);
   });
 });
