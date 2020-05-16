@@ -46,7 +46,7 @@
     "extraBold": "Extra negreta",
     "architect": "Arquitecte",
     "artist": "Artista",
-    "cartoonist": "",
+    "cartoonist": "Dibuixant",
     "fileTitle": "Títol del fitxer",
     "colorPicker": "Selector de colors",
     "canvasBackground": "Fons de la tela",
@@ -96,7 +96,7 @@
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
     "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
     "decryptFailed": "No s'ha pogut desencriptar.",
-    "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge extrem a extrem, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut."
+    "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut."
   },
   "toolBar": {
     "selection": "Selecció",
@@ -125,46 +125,46 @@
     "headingMain_pre": "S'ha produït un error. Intentar ",
     "headingMain_button": "recarregar la pàgina.",
     "clearCanvasMessage": "Si la recarrega no funciona, intentar ",
-    "clearCanvasMessage_button": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "clearCanvasMessage_button": "esborrar el llenç.",
+    "clearCanvasCaveat": " Això resultarà en pèrdua de feina ",
+    "trackedToSentry_pre": "L'error amb l'identificador ",
+    "trackedToSentry_post": " s'ha rastrejat en el nostre sistema.",
+    "openIssueMessage_pre": "Estàvem molt amb compte de no incloure la teva informació de l'escena en l'error. Si la teva escena no és privada, pots fer el seguiment al nostre ",
+    "openIssueMessage_button": "rastrejador d'errors.",
+    "openIssueMessage_post": " Si us plau incloure la informació a continuació copiant i enganxant a GitHub Issues.",
+    "sceneContent": "Contingut de l'escena:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_persistenceWarning": "",
-    "desc_shareLink": "",
-    "desc_exitSession": ""
+    "desc_intro": "Pots convidar persones a la teva escena actual a col·laborar amb tu.",
+    "desc_privacy": "No et preocupis, la sessió utilitza el xifratge de punta a punta, de manera que qualsevol cosa que dibuixis quedarà privada. Ni tan sols el nostre servidor podrà veure el que fas.",
+    "button_startSession": "Iniciar sessió",
+    "button_stopSession": "Aturar sessió",
+    "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
+    "desc_persistenceWarning": "Tingues en compte que les dades de l'escena es comparteixen entre col·laboradors de manera P2P i no es desen al nostre servidor. Així, si tots us desconnecteu, perdreu les dades, tret que els exporteu a un fitxer o a un enllaç per a compartir.",
+    "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
+    "desc_exitSession": "Si atures la sessió, et desconectaras de la sala, però podrás continuar treballant amb l'escena localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Error"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": ""
+    "title": "Dreceres de teclat",
+    "shapes": "Formes",
+    "or": "o",
+    "click": "fer clic",
+    "drag": "arrosegar",
+    "curvedArrow": "Fletxa curva",
+    "curvedLine": "Línea curva",
+    "editor": "Editor",
+    "view": "Vista",
+    "blog": "Llegir el nostre blog",
+    "howto": "Seguir els nostres guies",
+    "github": "Has trobat un problema? Enviar-ho",
+    "textNewLine": "Afegir línea nova (text)",
+    "textFinish": "Acabar d'editar (text)",
+    "zoomToFit": "Zoom per veure tots els elements"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
   }
 }
