@@ -16,6 +16,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "边框",
     "opacity": "透明度",
     "textAlign": "文本对齐",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "选择",
+    "draw": "",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
+    "freeDraw": "",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "resize": "",
     "rotate": "旋转时可以按住 Shift 来约束角度"
@@ -134,7 +140,7 @@
     "button_startSession": "启动会议",
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
-    "desc_persistenceWarning": "注意，画布数据通过 P2P 方式与协作者共享, 并且不会保存到我们的服务器. 因此, 如果失去网络连接, 你可能会丢失数据，除非将数据导出成文件或者是公开链接",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "分享此链接给你要协作的用户",
     "desc_exitSession": "停止会话将中断你在会议室的连接，但你依然可以在本地继续使用画布. 注意，这不会影响到其他用户, 他们仍可以在自己的版本上继续协作。"
   },

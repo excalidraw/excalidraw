@@ -16,6 +16,10 @@
     "background": "Arka plan",
     "fill": "Doldur",
     "strokeWidth": "Kontur genişliği",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Üstün körülük",
     "opacity": "Opaklık",
     "textAlign": "",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
+    "draw": "",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
+    "freeDraw": "",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz"
@@ -134,7 +140,7 @@
     "button_startSession": "Çalışma Ortamı Oluştur",
     "button_stopSession": "Çalışma Ortamını Sonlandır",
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
-    "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız yalnızca ortama katılmış diğer kişilerle paylaşılmaktadır. Katılımcılar eş zamanlı olarak bağlantı sorunları yaşadığında kaybolacaktır. Bunu önlemek için çalışma ortamını bir dosyaya veya paylaşılabilir bir bağlantıya aktarın.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
   },

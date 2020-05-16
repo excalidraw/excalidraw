@@ -16,6 +16,10 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Sloppiness",
     "opacity": "Opasitas",
     "textAlign": "Perataan Teks",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
+    "draw": "",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""

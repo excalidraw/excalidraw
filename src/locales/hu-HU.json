@@ -16,6 +16,10 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Stílus",
     "opacity": "Áttetszőség",
     "textAlign": "",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Kiválasztás",
+    "draw": "",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
+    "freeDraw": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
@@ -134,7 +140,7 @@
     "button_startSession": "Munkamenet indítása",
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
-    "desc_persistenceWarning": "Vegye figyelembe, hogy a jelenet adatait P2P formátumban osztják meg az együttműködők között és nem maradnak meg a szerverünkön. Így ha mindketten bezárják az ablakot, akkor elveszítik az adatokat, hacsak nem exportálják fájlba vagy nem hoznak létre egy megosztható linket.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
     "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
   },

@@ -16,6 +16,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "筆劃寬度",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "",
     "opacity": "透明度",
     "textAlign": "",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "選擇",
+    "draw": "",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "按下 Escape 或 Enter 來完成",
     "resize": "",
     "rotate": ""
@@ -134,7 +140,7 @@
     "button_startSession": "啟動會議",
     "button_stopSession": "暫停會議",
     "desc_inProgressIntro": "即時協作會議正在進行中。",
-    "desc_persistenceWarning": "注意，畫面的資料是透過 P2P 方式與協作者之間共享，不會保留在我們的伺服器。因此，如果所有人中斷連線時，將會遺失資料，除非將資料導出成檔案或是一個可共享的連結。",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "與要協作的任何人分享此連結：",
     "desc_exitSession": "停止會議將會中斷你與會議室的連線，但你可以繼續在本機端繼續處理工作。注意，這不會影響到其他人，他們仍然可以在他們自己的版本上繼續協作。"
   },
