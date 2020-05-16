@@ -55,7 +55,12 @@ import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  ExcalidrawLinearElement,
+} from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
@@ -172,6 +177,7 @@ class App extends React.Component<any, AppState> {
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   broadcastedElementVersions: Map<string, number> = new Map();
   removeSceneCallback: SceneStateCallbackRemover | null = null;
+  doubleClickPreventedAt: number | null = null;
 
   actionManager: ActionManager;
   canvasOnlyActions = ["selectAll"];
@@ -1442,7 +1448,12 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
-    resetCursor();
+    if (
+      typeof this.doubleClickPreventedAt === "number" &&
+      event.timeStamp - this.doubleClickPreventedAt < TAP_TWICE_TIMEOUT
+    ) {
+      return;
+    }
 
     const { x, y } = viewportCoordsToSceneCoords(
       event,
@@ -1451,6 +1462,33 @@ class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
+    const elements = globalSceneState.getElements();
+    const selectedElements = getSelectedElements(elements, this.state);
+    if (selectedElements.length === 1) {
+      const [selectedElement] = selectedElements;
+      if (selectedElement.type === "arrow") {
+        mutateElement(selectedElement, {
+          points: selectedElement.points.slice(0, -1),
+          lastCommittedPoint:
+            selectedElement.points[selectedElement.points.length - 2],
+        });
+        this.setState({
+          elementType: selectedElement.type,
+          multiElement: selectedElement,
+          draggingElement: selectedElement,
+          editingElement: selectedElement,
+        });
+        this.handleCanvasPointerMoveWhileDrawingMultiElement(
+          x,
+          y,
+          selectedElement,
+        );
+        return;
+      }
+    }
+
+    resetCursor();
+
     this.startTextEditing({
       x: x,
       y: y,
@@ -1458,6 +1496,62 @@ class App extends React.Component<any, AppState> {
       clientY: event.clientY,
       centerIfPossible: !event.altKey,
     });
+  };
+
+  private handleCanvasPointerMoveWhileDrawingMultiElement = (
+    x: number,
+    y: number,
+    multiElement: NonDeleted<ExcalidrawLinearElement>,
+  ) => {
+    const { x: rx, y: ry } = multiElement;
+
+    const { points, lastCommittedPoint } = multiElement;
+    const lastPoint = points[points.length - 1];
+
+    setCursorForShape(this.state.elementType);
+
+    if (lastPoint === lastCommittedPoint) {
+      // if we haven't yet created a temp point and we're beyond commit-zone
+      //  threshold, add a point
+      if (
+        distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
+        LINE_CONFIRM_THRESHOLD
+      ) {
+        mutateElement(multiElement, {
+          points: [...points, [x - rx, y - ry]],
+        });
+      } else {
+        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+        // in this branch, we're inside the commit zone, and no uncommitted
+        //  point exists. Thus do nothing (don't add/remove points).
+      }
+    } else {
+      // cursor moved inside commit zone, and there's uncommitted point,
+      //  thus remove it
+      if (
+        points.length > 2 &&
+        lastCommittedPoint &&
+        distance2d(
+          x - rx,
+          y - ry,
+          lastCommittedPoint[0],
+          lastCommittedPoint[1],
+        ) < LINE_CONFIRM_THRESHOLD
+      ) {
+        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+        mutateElement(multiElement, {
+          points: points.slice(0, -1),
+        });
+      } else {
+        if (isPathALoop(points)) {
+          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+        }
+        // update last uncommitted point
+        mutateElement(multiElement, {
+          points: [...points.slice(0, -1), [x - rx, y - ry]],
+        });
+      }
+    }
   };
 
   private handleCanvasPointerMove = (
@@ -1516,56 +1610,11 @@ class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
     if (this.state.multiElement) {
-      const { multiElement } = this.state;
-      const { x: rx, y: ry } = multiElement;
-
-      const { points, lastCommittedPoint } = multiElement;
-      const lastPoint = points[points.length - 1];
-
-      setCursorForShape(this.state.elementType);
-
-      if (lastPoint === lastCommittedPoint) {
-        // if we haven't yet created a temp point and we're beyond commit-zone
-        //  threshold, add a point
-        if (
-          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          LINE_CONFIRM_THRESHOLD
-        ) {
-          mutateElement(multiElement, {
-            points: [...points, [x - rx, y - ry]],
-          });
-        } else {
-          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
-          // in this branch, we're inside the commit zone, and no uncommitted
-          //  point exists. Thus do nothing (don't add/remove points).
-        }
-      } else {
-        // cursor moved inside commit zone, and there's uncommitted point,
-        //  thus remove it
-        if (
-          points.length > 2 &&
-          lastCommittedPoint &&
-          distance2d(
-            x - rx,
-            y - ry,
-            lastCommittedPoint[0],
-            lastCommittedPoint[1],
-          ) < LINE_CONFIRM_THRESHOLD
-        ) {
-          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
-          mutateElement(multiElement, {
-            points: points.slice(0, -1),
-          });
-        } else {
-          if (isPathALoop(points)) {
-            document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
-          }
-          // update last uncommitted point
-          mutateElement(multiElement, {
-            points: [...points.slice(0, -1), [x - rx, y - ry]],
-          });
-        }
-      }
+      this.handleCanvasPointerMoveWhileDrawingMultiElement(
+        x,
+        y,
+        this.state.multiElement,
+      );
       return;
     }
 
@@ -1626,6 +1675,12 @@ class App extends React.Component<any, AppState> {
       document.documentElement.style.cursor =
         hitElement && !isOverScrollBar ? "move" : "";
     }
+  };
+
+  private preventDoubleClick = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.doubleClickPreventedAt = event.timeStamp;
   };
 
   private handleCanvasPointerDown = (
@@ -2013,6 +2068,7 @@ class App extends React.Component<any, AppState> {
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
         ) {
+          this.preventDoubleClick(event);
           this.actionManager.executeAction(actionFinalize);
           return;
         }
