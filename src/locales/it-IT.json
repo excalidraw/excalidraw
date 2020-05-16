@@ -16,10 +16,10 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
-    "strokeStyle": "",
-    "strokeStyle_solid": "",
-    "strokeStyle_dashed": "",
-    "strokeStyle_dotted": "",
+    "strokeStyle": "Stile del tratto",
+    "strokeStyle_solid": "Pieno",
+    "strokeStyle_dashed": "Tratteggiato",
+    "strokeStyle_dotted": "Punteggiato",
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
@@ -58,7 +58,7 @@
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
-    "yourName": "",
+    "yourName": "Il vostro nome",
     "madeWithExcalidraw": "Creato con Excalidraw"
   },
   "buttons": {
@@ -85,8 +85,8 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Attiva/Disattiva modalità zen",
+    "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
@@ -100,7 +100,7 @@
   },
   "toolBar": {
     "selection": "Selezione",
-    "draw": "",
+    "draw": "Disegno libero",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
@@ -116,9 +116,9 @@
   },
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
-    "freeDraw": "",
+    "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "",
+    "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
   },
   "errorSplash": {
