@@ -16,6 +16,10 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
+    "strokeStyle": "Viivan tyyli",
+    "strokeStyle_solid": "Yhtenäinen",
+    "strokeStyle_dashed": "Katkoviiva",
+    "strokeStyle_dotted": "Pisteviiva",
     "sloppiness": "Viivan tarkkuus",
     "opacity": "Peittävyys",
     "textAlign": "Tekstin tasaus",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Valinta",
+    "draw": "Vapaa piirto",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
+    "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi"

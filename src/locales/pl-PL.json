@@ -16,6 +16,10 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
+    "draw": "",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
+    "freeDraw": "",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHITH, przytrzymaj ALT by zmienać rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
@@ -134,7 +140,7 @@
     "button_startSession": "Rozpocznij sesję",
     "button_stopSession": "Zakończ sesję",
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
-    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
     "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   },

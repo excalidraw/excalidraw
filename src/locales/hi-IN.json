@@ -16,6 +16,10 @@
     "background": "पृष्ठभूमि",
     "fill": "भरें",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "",
     "opacity": "",
     "textAlign": "",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "",
+    "draw": "",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""

@@ -16,6 +16,10 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
+    "strokeStyle": "Estilo del trazo",
+    "strokeStyle_solid": "Sólido",
+    "strokeStyle_dashed": "Linea discontinua",
+    "strokeStyle_dotted": "Punteado",
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
@@ -54,7 +58,7 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
     "name": "Nombre",
-    "yourName": "Nombre",
+    "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw"
   },
   "buttons": {
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Selección",
+    "draw": "Dibujo libre",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
     "ellipse": "Elipse",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
+    "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
@@ -134,7 +140,7 @@
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
-    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
+    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, usted perderá los datos a menos que los exporte a un archivo o un enlace para compartir.",
     "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
     "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
   },

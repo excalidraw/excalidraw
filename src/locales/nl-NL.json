@@ -16,6 +16,10 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Slordigheid",
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Selectie",
+    "draw": "",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
+    "freeDraw": "",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
     "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
@@ -134,7 +140,7 @@
     "button_startSession": "Sessie starten",
     "button_stopSession": "Sessie afbreken",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
-    "desc_persistenceWarning": "Merk op dat de data op P2P-wijze wordt gedeeld over collaborators, en niet wordt bewaard op onze server. Als de verbinding met jullie allemaal wordt verbroken, verlies je de gegevens, tenzij je deze naar een bestand of een deelbare link exporteert.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Deel deze link met iedereen waarmee je wil samenwerken:",
     "desc_exitSession": "Als je de sessie stopt, maar je kunt doorgaan met werken met de scène, lokaal. Merk op dat dit geen invloed heeft op andere mensen, en dat ze nog steeds samen kunnen werken aan hun versie."
   },
