@@ -115,16 +115,16 @@
     "shapes": "Formes"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
-    "linearElementMulti": "",
-    "resize": "",
-    "rotate": ""
+    "linearElement": "Fer clic per dibuixar múltiples punts; arrossegar per una sola línea",
+    "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
+    "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
+    "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
+    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)"
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "",
+    "headingMain_pre": "S'ha produït un error. Intentar ",
+    "headingMain_button": "recarregar la pàgina.",
+    "clearCanvasMessage": "Si la recarrega no funciona, intentar ",
     "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
     "trackedToSentry_pre": "",
