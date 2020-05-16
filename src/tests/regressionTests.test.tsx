@@ -7,7 +7,7 @@ import App from "../components/App";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, PointerType } from "../element/types";
 import { handlerRectangles } from "../element";
 import { isLinearElement } from "../element/typeChecks";
 
@@ -23,7 +23,27 @@ function clickTool(toolName: ToolName) {
 
 let lastClientX = 0;
 let lastClientY = 0;
-let pointerType: "mouse" | "pen" | "touch" = "mouse";
+let pointerType: PointerType = "mouse";
+
+function _updateLastClientPosition(
+  clientX: number,
+  clientY: number,
+  altKey: boolean,
+  shiftKey: boolean,
+) {
+  if (clientX !== lastClientX || clientY !== lastClientY) {
+    fireEvent.pointerMove(canvas, {
+      clientX,
+      clientY,
+      altKey,
+      shiftKey,
+      pointerId: 1,
+      pointerType: "mouse",
+    });
+  }
+  lastClientX = clientX;
+  lastClientY = clientY;
+}
 
 function pointerDown(
   clientX: number = lastClientX,
@@ -31,8 +51,7 @@ function pointerDown(
   altKey: boolean = false,
   shiftKey: boolean = false,
 ) {
-  lastClientX = clientX;
-  lastClientY = clientY;
+  _updateLastClientPosition(clientX, clientY, altKey, shiftKey);
   fireEvent.pointerDown(canvas, {
     clientX,
     clientY,
@@ -49,8 +68,7 @@ function doubleClick(
   altKey: boolean = false,
   shiftKey: boolean = false,
 ) {
-  lastClientX = clientX;
-  lastClientY = clientY;
+  _updateLastClientPosition(clientX, clientY, altKey, shiftKey);
   fireEvent.doubleClick(canvas, {
     clientX,
     clientY,
@@ -112,8 +130,7 @@ function pointerUp(
   altKey: boolean = false,
   shiftKey: boolean = false,
 ) {
-  lastClientX = clientX;
-  lastClientY = clientY;
+  _updateLastClientPosition(clientX, clientY, altKey, shiftKey);
   fireEvent.pointerUp(canvas, { pointerId: 1, pointerType, shiftKey, altKey });
 }
 
@@ -244,63 +261,51 @@ describe("regression tests", () => {
   it("draw every type of shape", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickTool("diamond");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
 
     clickTool("ellipse");
     pointerDown(50, 10);
-    pointerMove(60, 20);
-    pointerUp();
+    pointerUp(60, 20);
 
     clickTool("arrow");
     pointerDown(70, 10);
-    pointerMove(80, 20);
-    pointerUp();
+    pointerUp(80, 20);
 
     clickTool("line");
     pointerDown(90, 10);
-    pointerMove(100, 20);
-    pointerUp();
+    pointerUp(100, 20);
 
     clickTool("arrow");
     pointerDown(10, 30);
     pointerUp();
-    pointerMove(20, 40);
-    pointerUp();
-    pointerMove(10, 50);
-    pointerUp();
+    pointerUp(20, 40);
+    pointerUp(10, 50);
     hotkeyPress("ENTER");
 
     clickTool("line");
     pointerDown(30, 30);
     pointerUp();
-    pointerMove(40, 40);
-    pointerUp();
-    pointerMove(30, 50);
-    pointerUp();
+    pointerUp(40, 40);
+    pointerUp(30, 50);
     hotkeyPress("ENTER");
 
     clickTool("draw");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
   });
 
   it("click to select a shape", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickTool("rectangle");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
 
     const prevSelectedId = getSelectedElement().id;
     pointerDown(10, 10);
@@ -321,8 +326,7 @@ describe("regression tests", () => {
         keyPress(key);
 
         pointerDown(10, 10);
-        pointerMove(20, 20);
-        pointerUp();
+        pointerUp(20, 20);
 
         expect(getSelectedElement().type).toBe(shape);
       });
@@ -332,8 +336,7 @@ describe("regression tests", () => {
   it("change the properties of a shape", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickLabeledElement("Background");
     clickLabeledElement("#fa5252");
@@ -346,8 +349,7 @@ describe("regression tests", () => {
   it("resize an element, trying every resize handle", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     const resizeHandles = getResizeHandles();
     delete resizeHandles.rotation; // exclude rotation handle
@@ -355,8 +357,7 @@ describe("regression tests", () => {
       const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
       pointerDown(x, y);
-      pointerMove(x - 5, y - 5);
-      pointerUp();
+      pointerUp(x - 5, y - 5);
       const {
         width: nextWidthNegative,
         height: nextHeightNegative,
@@ -367,16 +368,14 @@ describe("regression tests", () => {
       checkpoint(`resize handle ${handlePos} (-5, -5)`);
 
       pointerDown();
-      pointerMove(x, y);
-      pointerUp();
+      pointerUp(x, y);
       const { width, height } = getSelectedElement();
       expect(width).toBe(prevWidth);
       expect(height).toBe(prevHeight);
       checkpoint(`unresize handle ${handlePos} (-5, -5)`);
 
       pointerDown(x, y);
-      pointerMove(x + 5, y + 5);
-      pointerUp();
+      pointerUp(x + 5, y + 5);
       const {
         width: nextWidthPositive,
         height: nextHeightPositive,
@@ -387,8 +386,7 @@ describe("regression tests", () => {
       checkpoint(`resize handle ${handlePos} (+5, +5)`);
 
       pointerDown();
-      pointerMove(x, y);
-      pointerUp();
+      pointerUp(x, y);
       const { width: finalWidth, height: finalHeight } = getSelectedElement();
       expect(finalWidth).toBe(prevWidth);
       expect(finalHeight).toBe(prevHeight);
@@ -400,13 +398,11 @@ describe("regression tests", () => {
   it("click on an element and drag it", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     const { x: prevX, y: prevY } = getSelectedElement();
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     const { x: nextX, y: nextY } = getSelectedElement();
     expect(nextX).toBeGreaterThan(prevX);
@@ -415,8 +411,7 @@ describe("regression tests", () => {
     checkpoint("dragged");
 
     pointerDown();
-    pointerMove(10, 10);
-    pointerUp();
+    pointerUp(10, 10);
 
     const { x, y } = getSelectedElement();
     expect(x).toBe(prevX);
@@ -426,14 +421,12 @@ describe("regression tests", () => {
   it("alt-drag duplicates an element", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(1);
     pointerDown(10, 10, true);
-    pointerMove(20, 20, true);
     pointerUp(20, 20, true);
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
@@ -443,22 +436,18 @@ describe("regression tests", () => {
   it("click-drag to select a group", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickTool("rectangle");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
 
     clickTool("rectangle");
     pointerDown(50, 10);
-    pointerMove(60, 20);
-    pointerUp();
+    pointerUp(60, 20);
 
     pointerDown(0, 0);
-    pointerMove(45, 25);
-    pointerUp();
+    pointerUp(45, 25);
 
     expect(
       h.elements.filter((element) => h.state.selectedElementIds[element.id])
@@ -469,13 +458,11 @@ describe("regression tests", () => {
   it("shift-click to select a group, then drag", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickTool("rectangle");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
 
     const prevRectsXY = h.elements
       .filter((element) => element.type === "rectangle")
@@ -485,8 +472,7 @@ describe("regression tests", () => {
     pointerDown(30, 10, false, true);
     pointerUp();
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
     h.elements
       .filter((element) => element.type === "rectangle")
       .forEach((element, i) => {
@@ -535,8 +521,7 @@ describe("regression tests", () => {
     const { scrollX: startScrollX, scrollY: startScrollY } = h.state;
     hotkeyDown("SPACE");
     pointerDown(50, 50);
-    pointerMove(60, 60);
-    pointerUp();
+    pointerUp(60, 60);
     hotkeyUp("SPACE");
     const { scrollX, scrollY } = h.state;
     expect(scrollX).not.toEqual(startScrollX);
@@ -546,8 +531,7 @@ describe("regression tests", () => {
   it("arrow keys", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
     hotkeyPress("ARROW_LEFT");
     hotkeyPress("ARROW_LEFT");
     hotkeyPress("ARROW_RIGHT");
@@ -559,21 +543,17 @@ describe("regression tests", () => {
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
 
     clickTool("rectangle");
     pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    pointerUp(40, 20);
 
     clickTool("arrow");
     pointerDown(10, 30);
     pointerUp();
-    pointerMove(20, 40);
     pointerDown(20, 40);
     pointerUp();
-    pointerMove(10, 50);
     pointerDown(10, 50);
     pointerUp();
     hotkeyPress("ENTER");
@@ -602,15 +582,13 @@ describe("regression tests", () => {
     expect(h.elements.length).toBe(0);
     clickTool("arrow");
     pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    pointerUp(20, 20);
     expect(h.app.state.multiElement).toBe(null);
     doubleClick();
     expect(h.app.state.multiElement).not.toBe(null);
     pointerDown();
     pointerUp();
-    pointerMove(20, 10);
-    pointerDown();
+    pointerDown(20, 10);
     pointerUp();
     pointerDown();
     pointerUp();
