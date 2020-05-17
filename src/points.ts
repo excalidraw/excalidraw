@@ -18,7 +18,8 @@ export function rescalePoints(
   const prevMinDimension = Math.min(...prevDimValues);
   const prevDimensionSize = prevMaxDimension - prevMinDimension;
 
-  const dimensionScaleFactor = nextDimensionSize / prevDimensionSize;
+  const dimensionScaleFactor =
+    prevDimensionSize === 0 ? 1 : nextDimensionSize / prevDimensionSize;
 
   let nextMinDimension = Infinity;
 
