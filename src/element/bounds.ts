@@ -1,9 +1,12 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
 import rough from "roughjs/bin/rough";
-import { Drawable, Op, Options } from "roughjs/bin/core";
+import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
+import {
+  getShapeForElement,
+  generateRoughOptions,
+} from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
@@ -323,13 +326,11 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
-  const options: Options = {
-    strokeWidth: element.strokeWidth,
-    roughness: element.roughness,
-    seed: element.seed,
-  };
   const gen = rough.generator();
-  const curve = gen.curve(points as [number, number][], options);
+  const curve = gen.curve(
+    points as [number, number][],
+    generateRoughOptions(element),
+  );
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
