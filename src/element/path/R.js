@@ -1,3 +1,6 @@
+const pathCommand = /([cmz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
+const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
+
 function findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
   var t1 = 1 - t;
   return {
@@ -55,105 +58,6 @@ function curveDim(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
   return {
     min: { x: Math.min.apply(0, x), y: Math.min.apply(0, y) },
     max: { x: Math.max.apply(0, x), y: Math.max.apply(0, y) },
-  };
-}
-
-const pathCommand = /([cmz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
-const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
-
-function parsePathString(pathString) {
-  const paramCounts = {
-    c: 6,
-    m: 2,
-    z: 0,
-  };
-  const data = [];
-
-  if (!data.length) {
-    pathString.replace(pathCommand, function (a, b, c) {
-      var params = [],
-        name = b.toLowerCase();
-      c.replace(pathValues, function (a, b) {
-        b && params.push(+b);
-      });
-      while (params.length >= paramCounts[name]) {
-        data.push([b].concat(params.splice(0, paramCounts[name])));
-        if (!paramCounts[name]) {
-          break;
-        }
-      }
-    });
-  }
-
-  return data;
-}
-
-function pathDimensions(path) {
-  var x = 0,
-    y = 0,
-    X = [],
-    Y = [],
-    p;
-  for (var i = 0, ii = path.length; i < ii; i++) {
-    p = path[i];
-    if (p[0] === "M") {
-      x = p[1];
-      y = p[2];
-      X.push(x);
-      Y.push(y);
-    } else {
-      var dim = curveDim(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-      X = X.concat(dim.min.x, dim.max.x);
-      Y = Y.concat(dim.min.y, dim.max.y);
-      x = p[5];
-      y = p[6];
-    }
-  }
-  var xmin = Math.min.apply(0, X),
-    ymin = Math.min.apply(0, Y),
-    xmax = Math.max.apply(0, X),
-    ymax = Math.max.apply(0, Y),
-    width = xmax - xmin,
-    height = ymax - ymin,
-    bb = {
-      x: xmin,
-      y: ymin,
-      x2: xmax,
-      y2: ymax,
-      width: width,
-      height: height,
-      cx: xmin + width / 2,
-      cy: ymin + height / 2,
-    };
-  return bb;
-}
-
-function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-  var t1 = 1 - t,
-    t13 = Math.pow(t1, 3),
-    t12 = Math.pow(t1, 2),
-    t2 = t * t,
-    t3 = t2 * t,
-    x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
-    y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y,
-    mx = p1x + 2 * t * (c1x - p1x) + t2 * (c2x - 2 * c1x + p1x),
-    my = p1y + 2 * t * (c1y - p1y) + t2 * (c2y - 2 * c1y + p1y),
-    nx = c1x + 2 * t * (c2x - c1x) + t2 * (p2x - 2 * c2x + c1x),
-    ny = c1y + 2 * t * (c2y - c1y) + t2 * (p2y - 2 * c2y + c1y),
-    ax = t1 * p1x + t * c1x,
-    ay = t1 * p1y + t * c1y,
-    cx = t1 * c2x + t * p2x,
-    cy = t1 * c2y + t * p2y,
-    alpha = 90 - (Math.atan2(mx - nx, my - ny) * 180) / Math.PI;
-  (mx > nx || my < ny) && (alpha += 180);
-  return {
-    x: x,
-    y: y,
-    m: { x: mx, y: my },
-    n: { x: nx, y: ny },
-    start: { x: ax, y: ay },
-    end: { x: cx, y: cy },
-    alpha: alpha,
   };
 }
 
@@ -389,7 +293,7 @@ function _path2curve(path) {
   return path;
 }
 
-function pathIntersection(path1, path2) {
+export function pathIntersection(path1, path2) {
   var x1,
     y1,
     x2,
@@ -448,7 +352,34 @@ function pathIntersection(path1, path2) {
   return res;
 }
 
-function isPointInsidePath(path, x, y) {
+export function parsePathString(pathString) {
+  const paramCounts = {
+    c: 6,
+    m: 2,
+    z: 0,
+  };
+  const data = [];
+
+  if (!data.length) {
+    pathString.replace(pathCommand, function (a, b, c) {
+      var params = [],
+        name = b.toLowerCase();
+      c.replace(pathValues, function (a, b) {
+        b && params.push(+b);
+      });
+      while (params.length >= paramCounts[name]) {
+        data.push([b].concat(params.splice(0, paramCounts[name])));
+        if (!paramCounts[name]) {
+          break;
+        }
+      }
+    });
+  }
+
+  return data;
+}
+
+export function isPointInsidePath(path, x, y) {
   if (typeof path === "string") {
     path = parsePathString(path);
   }
@@ -462,9 +393,71 @@ function isPointInsidePath(path, x, y) {
   );
 }
 
-export default {
-  findDotsAtSegment,
-  isPointInsidePath,
-  pathDimensions,
-  pathIntersection,
-};
+export function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+  var t1 = 1 - t,
+    t13 = Math.pow(t1, 3),
+    t12 = Math.pow(t1, 2),
+    t2 = t * t,
+    t3 = t2 * t,
+    x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
+    y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y,
+    mx = p1x + 2 * t * (c1x - p1x) + t2 * (c2x - 2 * c1x + p1x),
+    my = p1y + 2 * t * (c1y - p1y) + t2 * (c2y - 2 * c1y + p1y),
+    nx = c1x + 2 * t * (c2x - c1x) + t2 * (p2x - 2 * c2x + c1x),
+    ny = c1y + 2 * t * (c2y - c1y) + t2 * (p2y - 2 * c2y + c1y),
+    ax = t1 * p1x + t * c1x,
+    ay = t1 * p1y + t * c1y,
+    cx = t1 * c2x + t * p2x,
+    cy = t1 * c2y + t * p2y,
+    alpha = 90 - (Math.atan2(mx - nx, my - ny) * 180) / Math.PI;
+  (mx > nx || my < ny) && (alpha += 180);
+  return {
+    x: x,
+    y: y,
+    m: { x: mx, y: my },
+    n: { x: nx, y: ny },
+    start: { x: ax, y: ay },
+    end: { x: cx, y: cy },
+    alpha: alpha,
+  };
+}
+
+export function pathDimensions(path) {
+  var x = 0,
+    y = 0,
+    X = [],
+    Y = [],
+    p;
+  for (var i = 0, ii = path.length; i < ii; i++) {
+    p = path[i];
+    if (p[0] === "M") {
+      x = p[1];
+      y = p[2];
+      X.push(x);
+      Y.push(y);
+    } else {
+      var dim = curveDim(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+      X = X.concat(dim.min.x, dim.max.x);
+      Y = Y.concat(dim.min.y, dim.max.y);
+      x = p[5];
+      y = p[6];
+    }
+  }
+  var xmin = Math.min.apply(0, X),
+    ymin = Math.min.apply(0, Y),
+    xmax = Math.max.apply(0, X),
+    ymax = Math.max.apply(0, Y),
+    width = xmax - xmin,
+    height = ymax - ymin,
+    bb = {
+      x: xmin,
+      y: ymin,
+      x2: xmax,
+      y2: ymax,
+      width: width,
+      height: height,
+      cx: xmin + width / 2,
+      cy: ymin + height / 2,
+    };
+  return bb;
+}

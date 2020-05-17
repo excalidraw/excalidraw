@@ -1,4 +1,4 @@
-import R from "./R";
+import * as R from "./R";
 
 /**
  * convert raphael's internal path representation (must be converted to curves before) to segments / bezier curves
@@ -214,7 +214,7 @@ function splitSegment(segments, segNr, t, newPoint, intersId) {
     items: [items[0], items[1], ...newA1_1, ...newA1_2, ...newPoint],
   };
 
-  if (typeof oldSeg.startPoint !== undefined) {
+  if (typeof oldSeg.startPoint !== "undefined") {
     newSeg1.startPoint = oldSeg.startPoint;
   }
   newSeg1.endPoint = `I${intersId}`; //mark end point as intersection
@@ -223,7 +223,7 @@ function splitSegment(segments, segNr, t, newPoint, intersId) {
     items: [...newPoint, ...newA2_1, ...newA2_2, items[6], items[7]],
   };
   newSeg2.startPoint = `I${intersId}`; //mark start point as intersection
-  if (typeof oldSeg.endPoint !== undefined) {
+  if (typeof oldSeg.endPoint !== "undefined") {
     newSeg2.endPoint = oldSeg.endPoint;
   }
 
@@ -341,12 +341,16 @@ var invertPart = function (part) {
 
   //switch starting and ending points
   var oldStartPoint = lastSegment.startPoint;
-  firstSegment.startPoint = firstSegment.endPoint;
+  if (firstSegment.endPoint) {
+    firstSegment.startPoint = firstSegment.endPoint;
+  }
   if (length > 1) {
     delete firstSegment.endPoint;
   }
 
-  lastSegment.endPoint = oldStartPoint;
+  if (oldStartPoint) {
+    lastSegment.endPoint = oldStartPoint;
+  }
   if (length > 1) {
     delete lastSegment.startPoint;
   }
@@ -539,7 +543,7 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
         newPathPart.segments.push(segment);
       }
 
-      if (typeof segment.endPoint !== undefined) {
+      if (typeof segment.endPoint !== "undefined") {
         if (partNeeded) {
           newPathPart.pathNr = path.nr;
           newParts.push(newPathPart);
@@ -577,8 +581,8 @@ function buildPartIndexes(parts) {
     if (firstSegment.startPoint !== lastSegment.endPoint) {
       //part.pathNr == 2 &&
       if (
-        typeof startIndex[firstSegment.startPoint.segments] !== undefined ||
-        typeof endIndex[lastSegment.endPoint] !== undefined
+        typeof startIndex[firstSegment.startPoint] !== "undefined" ||
+        typeof endIndex[lastSegment.endPoint] !== "undefined"
       ) {
         //invert the segments
         invertPart(part);

@@ -1,11 +1,9 @@
 import { difference } from "./path-boolop";
-
-const pathCommand = /([cmz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
-const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
+import { parsePathString } from "./R";
 
 export default class Path {
   constructor(d, options) {
-    this.path = this.parsePathString(d);
+    this.path = parsePathString(d);
   }
 
   position([x, y]) {
@@ -17,33 +15,6 @@ export default class Path {
         path[i + 1] = newY;
       }
     });
-  }
-
-  parsePathString(pathString) {
-    const paramCounts = {
-      c: 6,
-      m: 2,
-      z: 0,
-    };
-    const data = [];
-
-    if (!data.length) {
-      pathString.replace(pathCommand, function (a, b, c) {
-        var params = [],
-          name = b.toLowerCase();
-        c.replace(pathValues, function (a, b) {
-          b && params.push(+b);
-        });
-        while (params.length >= paramCounts[name]) {
-          data.push([b].concat(params.splice(0, paramCounts[name])));
-          if (!paramCounts[name]) {
-            break;
-          }
-        }
-      });
-    }
-
-    return data;
   }
 
   /**

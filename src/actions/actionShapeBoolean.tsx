@@ -55,16 +55,16 @@ export const actionShapeDifference = register({
       },
     );
 
-    // const {
-    //   elements: nextElements,
-    //   appState: nextAppState,
-    // } = deleteSelectedElements(elements, appState);
+    const {
+      elements: nextElements,
+      appState: nextAppState,
+    } = deleteSelectedElements(elements, appState);
 
-    // nextElements.splice(selectedElements.firstSelectedIndex, 0, newElement);
+    nextElements.splice(selectedElements.firstSelectedIndex, 0, newElement);
 
     return {
-      elements,
-      appState,
+      elements: nextElements,
+      appState: nextAppState,
       commitToHistory: true,
     };
   },

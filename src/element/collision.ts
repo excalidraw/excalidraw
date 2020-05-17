@@ -5,6 +5,7 @@ import {
   isPointInPolygon,
 } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
+import { isPointInsidePath } from "./path/R";
 
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -206,6 +207,10 @@ export function hitTest(
   } else if (element.type === "text") {
     return x >= x1 && x <= x2 && y >= y1 && y <= y2;
   } else if (element.type === "path") {
+    if (isElementDraggableFromInside(element, appState)) {
+      return isPointInsidePath(element.d, x - element.x, y - element.y);
+    }
+
     return false;
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
