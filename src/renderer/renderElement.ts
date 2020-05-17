@@ -152,6 +152,70 @@ export function invalidateShapeForElement(element: ExcalidrawElement) {
   shapeCache.delete(element);
 }
 
+export function generateRoughOptions(element: ExcalidrawElement): Options {
+  const options: Options = {
+    seed: element.seed,
+    strokeLineDash:
+      element.strokeStyle === "dashed"
+        ? DASHARRAY_DASHED
+        : element.strokeStyle === "dotted"
+        ? DASHARRAY_DOTTED
+        : undefined,
+    // for non-solid strokes, disable multiStroke because it tends to make
+    //  dashes/dots overlay each other
+    disableMultiStroke: element.strokeStyle !== "solid",
+    // for non-solid strokes, increase the width a bit to make it visually
+    //  similar to solid strokes, because we're also disabling multiStroke
+    strokeWidth:
+      element.strokeStyle !== "solid"
+        ? element.strokeWidth + 0.5
+        : element.strokeWidth,
+    // when increasing strokeWidth, we must explicitly set fillWeight and
+    //  hachureGap because if not specified, roughjs uses strokeWidth to
+    //  calculate them (and we don't want the fills to be modified)
+    fillWeight: element.strokeWidth / 2,
+    hachureGap: element.strokeWidth * 4,
+    roughness: element.roughness,
+    stroke: element.strokeColor,
+  };
+
+  switch (element.type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse": {
+      options.fillStyle = element.fillStyle;
+      options.fill =
+        element.backgroundColor === "transparent"
+          ? undefined
+          : element.backgroundColor;
+      if (element.type === "ellipse") {
+        options.curveFitting = 1;
+      }
+      return options;
+    }
+    case "line":
+    case "draw":
+    case "arrow": {
+      // If shape is a line and is a closed shape,
+      // fill the shape if a color is set.
+      if (element.type === "line" || element.type === "draw") {
+        if (isPathALoop(element.points)) {
+          options.fillStyle = element.fillStyle;
+          options.fill =
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor;
+        }
+      }
+
+      return options;
+    }
+    default: {
+      throw new Error(`Unimplemented type ${element.type}`);
+    }
+  }
+}
+
 function generateElement(
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
@@ -161,44 +225,15 @@ function generateElement(
   if (!shape) {
     elementWithCanvasCache.delete(element);
 
-    const strokeLineDash =
-      element.strokeStyle === "dashed"
-        ? DASHARRAY_DASHED
-        : element.strokeStyle === "dotted"
-        ? DASHARRAY_DOTTED
-        : undefined;
-    // for non-solid strokes, disable multiStroke because it tends to make
-    //  dashes/dots overlay each other
-    const disableMultiStroke = element.strokeStyle !== "solid";
-    // for non-solid strokes, increase the width a bit to make it visually
-    //  similar to solid strokes, because we're also disabling multiStroke
-    const strokeWidth =
-      element.strokeStyle !== "solid"
-        ? element.strokeWidth + 0.5
-        : element.strokeWidth;
-    // when increasing strokeWidth, we must explicitly set fillWeight and
-    //  hachureGap because if not specified, roughjs uses strokeWidth to
-    //  calculate them (and we don't want the fills to be modified)
-    const fillWeight = element.strokeWidth / 2;
-    const hachureGap = element.strokeWidth * 4;
-
     switch (element.type) {
       case "rectangle":
-        shape = generator.rectangle(0, 0, element.width, element.height, {
-          strokeWidth,
-          fillWeight,
-          hachureGap,
-          strokeLineDash,
-          disableMultiStroke,
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          roughness: element.roughness,
-          seed: element.seed,
-        });
+        shape = generator.rectangle(
+          0,
+          0,
+          element.width,
+          element.height,
+          generateRoughOptions(element),
+        );
 
         break;
       case "diamond": {
@@ -219,21 +254,7 @@ function generateElement(
             [bottomX, bottomY],
             [leftX, leftY],
           ],
-          {
-            strokeWidth,
-            fillWeight,
-            hachureGap,
-            strokeLineDash,
-            disableMultiStroke,
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            roughness: element.roughness,
-            seed: element.seed,
-          },
+          generateRoughOptions(element),
         );
         break;
       }
@@ -243,53 +264,17 @@ function generateElement(
           element.height / 2,
           element.width,
           element.height,
-          {
-            strokeWidth,
-            fillWeight,
-            hachureGap,
-            strokeLineDash,
-            disableMultiStroke,
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            roughness: element.roughness,
-            seed: element.seed,
-            curveFitting: 1,
-          },
+          generateRoughOptions(element),
         );
         break;
       case "line":
       case "draw":
       case "arrow": {
-        const options: Options = {
-          strokeWidth,
-          fillWeight,
-          hachureGap,
-          strokeLineDash,
-          disableMultiStroke,
-          stroke: element.strokeColor,
-          seed: element.seed,
-          roughness: element.roughness,
-        };
+        const options = generateRoughOptions(element);
 
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
         const points = element.points.length ? element.points : [[0, 0]];
-
-        // If shape is a line and is a closed shape,
-        // fill the shape if a color is set.
-        if (element.type === "line" || element.type === "draw") {
-          if (isPathALoop(element.points)) {
-            options.fillStyle = element.fillStyle;
-            options.fill =
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor;
-          }
-        }
 
         // curve is always the first element
         // this simplifies finding the curve for an element
