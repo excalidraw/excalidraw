@@ -323,10 +323,31 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
+  // FIXME we should not copy & paste from renderElement
+  const DASHARRAY_DASHED = [12, 8];
+  const DASHARRAY_DOTTED = [3, 6];
+  const strokeLineDash =
+    element.strokeStyle === "dashed"
+      ? DASHARRAY_DASHED
+      : element.strokeStyle === "dotted"
+      ? DASHARRAY_DOTTED
+      : undefined;
+  const strokeWidth =
+    element.strokeStyle !== "solid"
+      ? element.strokeWidth + 0.5
+      : element.strokeWidth;
+  const fillWeight = element.strokeWidth / 2;
+  const hachureGap = element.strokeWidth * 4;
+  const disableMultiStroke = element.strokeStyle !== "solid";
+
   const options: Options = {
-    strokeWidth: element.strokeWidth,
     roughness: element.roughness,
     seed: element.seed,
+    strokeWidth,
+    fillWeight,
+    strokeLineDash,
+    hachureGap,
+    disableMultiStroke,
   };
   const gen = rough.generator();
   const curve = gen.curve(points as [number, number][], options);
