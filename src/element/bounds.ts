@@ -1,9 +1,12 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
 import rough from "roughjs/bin/rough";
-import { Drawable, Op, Options } from "roughjs/bin/core";
+import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
+import {
+  getShapeForElement,
+  generateRoughOptions,
+} from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
@@ -323,34 +326,11 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
-  // FIXME we should not copy & paste from renderElement
-  const DASHARRAY_DASHED = [12, 8];
-  const DASHARRAY_DOTTED = [3, 6];
-  const strokeLineDash =
-    element.strokeStyle === "dashed"
-      ? DASHARRAY_DASHED
-      : element.strokeStyle === "dotted"
-      ? DASHARRAY_DOTTED
-      : undefined;
-  const strokeWidth =
-    element.strokeStyle !== "solid"
-      ? element.strokeWidth + 0.5
-      : element.strokeWidth;
-  const fillWeight = element.strokeWidth / 2;
-  const hachureGap = element.strokeWidth * 4;
-  const disableMultiStroke = element.strokeStyle !== "solid";
-
-  const options: Options = {
-    roughness: element.roughness,
-    seed: element.seed,
-    strokeWidth,
-    fillWeight,
-    strokeLineDash,
-    hachureGap,
-    disableMultiStroke,
-  };
   const gen = rough.generator();
-  const curve = gen.curve(points as [number, number][], options);
+  const curve = gen.curve(
+    points as [number, number][],
+    generateRoughOptions(element),
+  );
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
