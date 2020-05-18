@@ -57,7 +57,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop } from "../math";
+import { distance2d, isPathALoop, rotate } from "../math";
 
 import {
   isWritableElement,
@@ -132,6 +132,7 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -479,6 +480,13 @@ class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
+    }
+
+    if (
+      this.state.editingLinearElement &&
+      !this.state.selectedElementIds[this.state.editingLinearElement.element.id]
+    ) {
+      this.actionManager.executeAction(actionFinalize);
     }
 
     const cursorButton: {
@@ -1158,6 +1166,13 @@ class App extends React.Component<any, AppState> {
 
       if (
         selectedElements.length === 1 &&
+        isLinearElement(selectedElements[0])
+      ) {
+        this.setState({
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+        });
+      } else if (
+        selectedElements.length === 1 &&
         !isLinearElement(selectedElements[0])
       ) {
         const selectedElement = selectedElements[0];
@@ -1442,6 +1457,18 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
+    const selectedElements = getSelectedElements(
+      globalSceneState.getElements(),
+      this.state,
+    );
+
+    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      this.setState({
+        editingLinearElement: new LinearElementEditor(selectedElements[0]),
+      });
+      return;
+    }
+
     resetCursor();
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -1515,6 +1542,39 @@ class App extends React.Component<any, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
+
+    if (this.state.editingLinearElement) {
+      const { element, lastUncommittedPoint } = this.state.editingLinearElement;
+      const { x: rx, y: ry, points } = element;
+      const lastPoint = points[points.length - 1];
+
+      if (!event[KEYS.CTRL_OR_CMD]) {
+        if (lastPoint === lastUncommittedPoint) {
+          mutateElement(element, {
+            points: points.slice(0, -1),
+          });
+        }
+        return;
+      }
+
+      if (lastPoint === lastUncommittedPoint) {
+        mutateElement(element, {
+          points: [...points.slice(0, -1), [x - rx, y - ry]],
+        });
+      } else {
+        mutateElement(element, {
+          points: [...points, [x - rx, y - ry]],
+        });
+      }
+      this.setState({
+        editingLinearElement: {
+          ...this.state.editingLinearElement,
+          lastUncommittedPoint: element.points[element.points.length - 1],
+        },
+      });
+      return;
+    }
+
     if (this.state.multiElement) {
       const { multiElement } = this.state;
       const { x: rx, y: ry } = multiElement;
@@ -1913,6 +1973,45 @@ class App extends React.Component<any, AppState> {
         }
       }
       if (!isResizingElements) {
+        if (this.state.editingLinearElement) {
+          if (event[KEYS.CTRL_OR_CMD]) {
+            const { element } = this.state.editingLinearElement;
+            if (!this.state.editingLinearElement.lastUncommittedPoint) {
+              const { x, y } = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+                this.canvas,
+                window.devicePixelRatio,
+              );
+              mutateElement(element, {
+                points: [...element.points, [x - element.x, y - element.y]],
+              });
+            }
+            this.setState({
+              editingLinearElement: {
+                ...this.state.editingLinearElement,
+                activePointIndex: element.points.length - 1,
+                lastUncommittedPoint: null,
+              },
+            });
+            return;
+          }
+
+          const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+            this.state.editingLinearElement.element,
+            x,
+            y,
+          );
+
+          this.setState({
+            editingLinearElement: {
+              ...this.state.editingLinearElement,
+              activePointIndex:
+                clickedPointIndex > -1 ? clickedPointIndex : null,
+            },
+          });
+        }
+
         hitElement = getElementAtPosition(
           elements,
           this.state,
@@ -2094,6 +2193,7 @@ class App extends React.Component<any, AppState> {
     }
 
     let selectedElementWasDuplicated = false;
+    let draggingElementPointIndex: number | null = null;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
@@ -2162,6 +2262,55 @@ class App extends React.Component<any, AppState> {
             y - resizeOffsetXY[1],
           )
         ) {
+          return;
+        }
+      }
+
+      if (this.state.editingLinearElement) {
+        const clickedPointIndex =
+          draggingElementPointIndex ??
+          LinearElementEditor.getPointIndexUnderCursor(
+            this.state.editingLinearElement.element,
+            x,
+            y,
+          );
+
+        if (clickedPointIndex > -1) {
+          draggingElementPointIndex =
+            draggingElementPointIndex ?? clickedPointIndex;
+          const { x, y } = viewportCoordsToSceneCoords(
+            event,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
+
+          const { element, activePointIndex } = this.state.editingLinearElement;
+
+          if (activePointIndex === null) {
+            this.setState({
+              editingLinearElement: {
+                ...this.state.editingLinearElement,
+                activePointIndex: clickedPointIndex,
+              },
+            });
+          }
+
+          const [deltaX, deltaY] = rotate(
+            x - lastX,
+            y - lastY,
+            0,
+            0,
+            -element.angle,
+          );
+          const targetPoint = element.points[clickedPointIndex];
+          LinearElementEditor.movePoint(element, clickedPointIndex, [
+            targetPoint[0] + deltaX,
+            targetPoint[1] + deltaY,
+          ]);
+
+          lastX = x;
+          lastY = y;
           return;
         }
       }
@@ -2337,7 +2486,28 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
+      // if moving start/end point towards start/end point within threshold,
+      //  close the loop
+      if (this.state.editingLinearElement) {
+        const { element } = this.state.editingLinearElement;
+        if (
+          draggingElementPointIndex !== null &&
+          (draggingElementPointIndex === 0 ||
+            draggingElementPointIndex === element.points.length - 1) &&
+          isPathALoop(element.points)
+        ) {
+          LinearElementEditor.movePoint(
+            element,
+            draggingElementPointIndex,
+            draggingElementPointIndex === 0
+              ? element.points[element.points.length - 1]
+              : element.points[0],
+          );
+        }
+      }
+
       lastPointerUp = null;
+      draggingElementPointIndex = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);

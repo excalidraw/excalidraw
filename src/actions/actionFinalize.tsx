@@ -12,6 +12,22 @@ import { isPathALoop } from "../math";
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
+    if (appState.editingLinearElement) {
+      const { element } = appState.editingLinearElement;
+
+      return {
+        elements:
+          element.points.length < 2 || isInvisiblySmallElement(element)
+            ? elements.filter((el) => el.id !== element.id)
+            : undefined,
+        appState: {
+          ...appState,
+          editingLinearElement: null,
+        },
+        commitToHistory: false,
+      };
+    }
+
     let newElements = elements;
     if (window.document.activeElement instanceof HTMLElement) {
       window.document.activeElement.blur();
@@ -94,8 +110,8 @@ export const actionFinalize = register({
   },
   keyTest: (event, appState) =>
     (event.key === KEYS.ESCAPE &&
-      !appState.draggingElement &&
-      appState.multiElement === null) ||
+      (appState.editingLinearElement !== null ||
+        (!appState.draggingElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData }) => (

@@ -1,4 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import { getShortcutKey } from "./utils";
 
 export const languages = [
   { lng: "en", label: "English", data: require("./locales/en.json") },
@@ -84,7 +85,7 @@ export function t(path: string, replacement?: { [key: string]: string }) {
       translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }
-  return translation;
+  return getShortcutKey(translation);
 }
 
 const languageDetector = new LanguageDetector();

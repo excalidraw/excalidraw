@@ -6,6 +6,8 @@ import { FlooredNumber, AppState } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -27,6 +29,8 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
+import { isLinearElement } from "../element/typeChecks";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -75,6 +79,44 @@ function strokeCircle(
   context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
   context.fill();
   context.stroke();
+}
+
+function renderLinearPointHandles(
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  sceneState: SceneState,
+  element: NonDeleted<ExcalidrawLinearElement>,
+) {
+  context.translate(sceneState.scrollX, sceneState.scrollY);
+  const origStrokeStyle = context.strokeStyle;
+  const lineWidth = context.lineWidth;
+  context.lineWidth = 1 / sceneState.zoom;
+
+  LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
+    (point, idx) => {
+      if (appState.editingLinearElement?.activePointIndex === idx) {
+        context.strokeStyle = "red";
+        context.fillStyle = "rgba(255,0,0,.2)";
+        context.setLineDash([]);
+      } else {
+        context.setLineDash([4, 4]);
+        context.fillStyle = "rgba(255,255,255,.5)";
+        context.strokeStyle = "black";
+      }
+      const { POINT_HANDLE_SIZE } = LinearElementEditor;
+      strokeCircle(
+        context,
+        point[0] - POINT_HANDLE_SIZE / 2,
+        point[1] - POINT_HANDLE_SIZE / 2,
+        POINT_HANDLE_SIZE,
+        POINT_HANDLE_SIZE,
+      );
+    },
+  );
+  context.setLineDash([]);
+  context.lineWidth = lineWidth;
+  context.translate(-sceneState.scrollX, -sceneState.scrollY);
+  context.strokeStyle = origStrokeStyle;
 }
 
 export function renderScene(
@@ -147,6 +189,13 @@ export function renderScene(
 
   visibleElements.forEach((element) => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
+    if (
+      isLinearElement(element) &&
+      appState.editingLinearElement &&
+      appState.editingLinearElement.element === element
+    ) {
+      renderLinearPointHandles(context, appState, sceneState, element);
+    }
   });
 
   // Pain selection element

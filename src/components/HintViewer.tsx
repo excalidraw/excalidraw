@@ -43,6 +43,15 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.rotate");
   }
 
+  if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+    if (appState.editingLinearElement) {
+      return appState.editingLinearElement.activePointIndex
+        ? t("hints.lineEditor_pointSelected")
+        : t("hints.lineEditor_nothingSelected");
+    }
+    return t("hints.lineEditor_info");
+  }
+
   return null;
 };
 

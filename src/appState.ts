@@ -14,6 +14,7 @@ export function getDefaultAppState(): AppState {
     resizingElement: null,
     multiElement: null,
     editingElement: null,
+    editingLinearElement: null,
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
@@ -75,6 +76,7 @@ export function clearAppStatePropertiesForHistory(
 ): Partial<AppState> {
   return {
     selectedElementIds: appState.selectedElementIds,
+    // editingLinearElement: appState.editingLinearElement,
     exportBackground: appState.exportBackground,
     shouldAddWatermark: appState.shouldAddWatermark,
     currentItemStrokeColor: appState.currentItemStrokeColor,
