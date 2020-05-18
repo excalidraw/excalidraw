@@ -1,12 +1,3 @@
-body {
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
-  --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
-  Helvetica, Arial, sans-serif;
-  font-family: var(--ui-font);
-}
-
 .visually-hidden {
   position: absolute !important;
   height: 1px;

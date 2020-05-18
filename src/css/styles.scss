@@ -55,16 +55,6 @@
     image-rendering: -moz-crisp-edges; // FF
   }
 
-  .visually-hidden {
-    position: absolute !important;
-    height: 1px;
-    width: 1px;
-    overflow: hidden;
-    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-    clip: rect(1px, 1px, 1px, 1px);
-    white-space: nowrap; /* added line */
-  }
-
   .FixedSideContainer {
     padding-top: var(--sat, 0px);
     padding-right: var(--sar, 0px);
@@ -479,7 +469,7 @@
       left: 0;
     }
   }
-  
+
   .zen-mode-visibility {
     visibility: visible;
     opacity: 1;

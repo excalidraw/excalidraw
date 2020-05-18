@@ -67,7 +67,7 @@
     <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <link rel="stylesheet" href="index.css" type="text/css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
     <link
       rel="preload"
       href="FG_Virgil.woff2"
@@ -94,6 +94,17 @@
       href="manifest.json"
       style="--pwacompat-splash-font: 24px Virgil;"
     />
+
+    <style>
+      body {
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+        Helvetica, Arial, sans-serif;
+        font-family: var(--ui-font);
+      }
+    </style>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
