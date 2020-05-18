@@ -1,0 +1,29 @@
+button,
+.buttonList label {
+  user-select: none;
+  background-color: $oc-gray-2;
+  border: 0;
+  border-radius: 4px;
+  margin: 0.125rem 0;
+  padding: 0.25rem;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  &:focus {
+    outline: transparent;
+    box-shadow: 0 0 0 2px $oc-blue-2;
+  }
+
+  &:hover {
+    background-color: $oc-gray-4;
+  }
+
+  &:active {
+    background-color: $oc-gray-5;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
