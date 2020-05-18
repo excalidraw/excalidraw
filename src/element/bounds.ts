@@ -114,6 +114,7 @@ const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
 ): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
+    // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
         limits.minY = Math.min(limits.minY, y);
@@ -219,6 +220,7 @@ const getLinearElementRotatedBounds = (
   cy: number,
 ): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
+    // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
         [x, y] = rotate(element.x + x, element.y + y, cx, cy, element.angle);
@@ -311,7 +313,7 @@ export const getResizedElementAbsoluteCoords = (
   nextWidth: number,
   nextHeight: number,
 ): [number, number, number, number] => {
-  if (!isLinearElement(element) || element.points.length <= 2) {
+  if (!isLinearElement(element)) {
     return [
       element.x,
       element.y,

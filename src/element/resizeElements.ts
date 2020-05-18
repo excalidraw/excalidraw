@@ -407,7 +407,7 @@ export const canResizeMutlipleElements = (
   return elements.every(
     (element) =>
       ["rectangle", "diamond", "ellipse"].includes(element.type) ||
-      (isLinearElement(element) && element.points.length > 2),
+      isLinearElement(element),
   );
 };
 
