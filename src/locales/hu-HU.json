@@ -1,11 +1,11 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "selectAll": "",
+    "selectAll": "Összes kijelölése",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
-    "copyAsSvg": "",
-    "bringForward": "",
+    "copyAsSvg": "Vágólapra másolás mint SVG",
+    "bringForward": "Előrébb hozás",
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
