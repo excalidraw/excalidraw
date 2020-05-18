@@ -36,6 +36,7 @@ function populateElements(
       backgroundColor: h.state.currentItemBackgroundColor,
       fillStyle: h.state.currentItemFillStyle,
       strokeWidth: h.state.currentItemStrokeWidth,
+      strokeStyle: h.state.currentItemStrokeStyle,
       roughness: h.state.currentItemRoughness,
       opacity: h.state.currentItemOpacity,
     });

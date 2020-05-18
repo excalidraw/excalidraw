@@ -16,6 +16,10 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Ujevnhet",
     "opacity": "Synlighet",
     "textAlign": "Tekstjustering",
@@ -54,7 +58,7 @@
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
-    "yourName": "",
+    "yourName": "Ditt navn",
     "madeWithExcalidraw": "Laget med Excalidraw"
   },
   "buttons": {
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Velg",
+    "draw": "Frihåndstegning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
+    "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer"
@@ -134,7 +140,7 @@
     "button_startSession": "Start økt",
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
-    "desc_persistenceWarning": "Vær oppmerksom på at scene-data deles på tvers av samarbeidspartnere på en P2P-måte, og ikke vedvarende på serveren vår. Dette betyr at hvis alle kobler fra, mister du dataene med mindre du eksporterer dem til en fil eller en delbar link.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
     "desc_exitSession": "Når du avslutter økten, frakobles du fra rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt være i stand til å samarbeide på deres versjon."
   },

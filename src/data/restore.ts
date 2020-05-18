@@ -43,7 +43,7 @@ export function restore(
           ];
         }
         element.points = points;
-      } else if (element.type === "line") {
+      } else if (element.type === "line" || element.type === "draw") {
         // old spec, pre-arrows
         // old spec, post-arrows
         if (!Array.isArray(element.points) || element.points.length === 0) {
@@ -76,6 +76,7 @@ export function restore(
         id: element.id || randomId(),
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
+        strokeStyle: element.strokeStyle ?? "solid",
         roughness: element.roughness ?? 1,
         opacity:
           element.opacity === null || element.opacity === undefined

@@ -16,6 +16,10 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
+    "strokeStyle": "Estilo de traço",
+    "strokeStyle_solid": "Sólido",
+    "strokeStyle_dashed": "Tracejado",
+    "strokeStyle_dotted": "Pontilhado",
     "sloppiness": "Desleixo",
     "opacity": "Opacidade",
     "textAlign": "Alinhamento do texto",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
+    "draw": "Desenho livre",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "freeDraw": "Toque e arraste, solte quando terminar",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
@@ -134,7 +140,7 @@
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
-    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
+    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, você perderá os dados, a menos que os exporte para um arquivo ou um link de partilha.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
     "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   },

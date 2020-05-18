@@ -17,6 +17,7 @@ type ElementConstructorOpts = {
   backgroundColor: ExcalidrawGenericElement["backgroundColor"];
   fillStyle: ExcalidrawGenericElement["fillStyle"];
   strokeWidth: ExcalidrawGenericElement["strokeWidth"];
+  strokeStyle: ExcalidrawGenericElement["strokeStyle"];
   roughness: ExcalidrawGenericElement["roughness"];
   opacity: ExcalidrawGenericElement["opacity"];
   width?: ExcalidrawGenericElement["width"];
@@ -33,6 +34,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     backgroundColor,
     fillStyle,
     strokeWidth,
+    strokeStyle,
     roughness,
     opacity,
     width = 0,
@@ -53,6 +55,7 @@ function _newElementBase<T extends ExcalidrawElement>(
     backgroundColor,
     fillStyle,
     strokeWidth,
+    strokeStyle,
     roughness,
     opacity,
     seed: rest.seed ?? randomInteger(),

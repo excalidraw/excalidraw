@@ -22,6 +22,10 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
+  if (elementType === "draw") {
+    return t("hints.freeDraw");
+  }
+
   const selectedElements = getSelectedElements(elements, appState);
   if (
     isResizing &&

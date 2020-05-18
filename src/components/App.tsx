@@ -3,6 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { simplify, Point } from "points-on-curve";
 import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
@@ -25,6 +26,7 @@ import {
   getElementWithResizeHandler,
   canResizeMutlipleElements,
   getResizeOffsetXY,
+  getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
 } from "../element";
@@ -53,11 +55,7 @@ import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  ResizeArrowFnType,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
@@ -731,6 +729,7 @@ class App extends React.Component<any, AppState> {
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       text: text,
@@ -1359,6 +1358,7 @@ class App extends React.Component<any, AppState> {
             backgroundColor: this.state.currentItemBackgroundColor,
             fillStyle: this.state.currentItemFillStyle,
             strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
             roughness: this.state.currentItemRoughness,
             opacity: this.state.currentItemOpacity,
             text: "",
@@ -1847,6 +1847,7 @@ class App extends React.Component<any, AppState> {
       resizeHandle = nextResizeHandle;
     };
     let resizeOffsetXY: [number, number] = [0, 0];
+    let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1900,6 +1901,16 @@ class App extends React.Component<any, AppState> {
           x,
           y,
         );
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0]) &&
+          selectedElements[0].points.length === 2
+        ) {
+          resizeArrowDirection = getResizeArrowDirection(
+            resizeHandle,
+            selectedElements[0],
+          );
+        }
       }
       if (!isResizingElements) {
         hitElement = getElementAtPosition(
@@ -1973,6 +1984,7 @@ class App extends React.Component<any, AppState> {
       return;
     } else if (
       this.state.elementType === "arrow" ||
+      this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
       if (this.state.multiElement) {
@@ -2027,6 +2039,7 @@ class App extends React.Component<any, AppState> {
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
           strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
         });
@@ -2057,6 +2070,7 @@ class App extends React.Component<any, AppState> {
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
       });
@@ -2078,11 +2092,6 @@ class App extends React.Component<any, AppState> {
         });
       }
     }
-
-    let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
-      resizeArrowFn = fn;
-    };
 
     let selectedElementWasDuplicated = false;
 
@@ -2119,7 +2128,7 @@ class App extends React.Component<any, AppState> {
         window.devicePixelRatio,
       );
 
-      // for arrows, don't start dragging until a given threshold
+      // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
       //  triggering pointermove)
@@ -2142,23 +2151,17 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
-        const resized = resizeElements(
-          resizeHandle,
-          setResizeHandle,
-          selectedElements,
-          resizeArrowFn,
-          setResizeArrowFn,
-          event,
-          x,
-          y,
-          resizeOffsetXY[0],
-          resizeOffsetXY[1],
-          lastX,
-          lastY,
-        );
-        if (resized) {
-          lastX = x;
-          lastY = y;
+        if (
+          resizeElements(
+            resizeHandle,
+            setResizeHandle,
+            selectedElements,
+            resizeArrowDirection,
+            event,
+            x - resizeOffsetXY[0],
+            y - resizeOffsetXY[1],
+          )
+        ) {
           return;
         }
       }
@@ -2252,9 +2255,15 @@ class App extends React.Component<any, AppState> {
         if (points.length === 1) {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
+          if (draggingElement.type === "draw") {
+            mutateElement(draggingElement, {
+              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+            });
+          } else {
+            mutateElement(draggingElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
+            });
+          }
         }
       } else {
         if (getResizeWithSidesSameLengthKey(event)) {
@@ -2328,13 +2337,15 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      resizeArrowFn = null;
-      resizeOffsetXY = [0, 0];
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
 
+      if (draggingElement?.type === "draw") {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();

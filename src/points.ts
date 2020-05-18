@@ -18,20 +18,27 @@ export function rescalePoints(
   const prevMinDimension = Math.min(...prevDimValues);
   const prevDimensionSize = prevMaxDimension - prevMinDimension;
 
-  const dimensionScaleFactor = nextDimensionSize / prevDimensionSize;
+  const dimensionScaleFactor =
+    prevDimensionSize === 0 ? 1 : nextDimensionSize / prevDimensionSize;
 
   let nextMinDimension = Infinity;
 
-  const scaledPoints = prevPoints.map((prevPoint) =>
-    prevPoint.map((value, currentDimension) => {
-      if (currentDimension !== dimension) {
-        return value;
-      }
-      const scaledValue = value * dimensionScaleFactor;
-      nextMinDimension = Math.min(scaledValue, nextMinDimension);
-      return scaledValue;
-    }),
+  const scaledPoints = prevPoints.map(
+    (prevPoint) =>
+      prevPoint.map((value, currentDimension) => {
+        if (currentDimension !== dimension) {
+          return value;
+        }
+        const scaledValue = value * dimensionScaleFactor;
+        nextMinDimension = Math.min(scaledValue, nextMinDimension);
+        return scaledValue;
+      }) as [number, number],
   );
+
+  if (scaledPoints.length === 2) {
+    // we don't tranlate two-point lines
+    return scaledPoints;
+  }
 
   const translation = prevMinDimension - nextMinDimension;
 

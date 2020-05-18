@@ -8,6 +8,7 @@ type _ExcalidrawElementBase = Readonly<{
   backgroundColor: string;
   fillStyle: string;
   strokeWidth: number;
+  strokeStyle: "solid" | "dashed" | "dotted";
   roughness: number;
   opacity: number;
   width: number;
@@ -50,7 +51,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "arrow" | "line";
+    type: "arrow" | "line" | "draw";
     points: Point[];
     lastCommittedPoint?: Point | null;
   }>;
@@ -58,13 +59,3 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type PointerType = "mouse" | "pen" | "touch";
 
 export type TextAlign = "left" | "center" | "right";
-
-export type ResizeArrowFnType = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  pointIndex: number,
-  deltaX: number,
-  deltaY: number,
-  pointerX: number,
-  pointerY: number,
-  perfect: boolean,
-) => void;

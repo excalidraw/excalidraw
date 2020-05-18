@@ -16,6 +16,10 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
+    "strokeStyle": "Strichstil",
+    "strokeStyle_solid": "Durchgezogen",
+    "strokeStyle_dashed": "Gestrichelt",
+    "strokeStyle_dotted": "Gepunktet",
     "sloppiness": "Sauberkeit",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
+    "draw": "Freihand Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
+    "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"

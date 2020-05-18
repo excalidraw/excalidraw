@@ -16,6 +16,10 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "סגנון",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "בחירה",
+    "draw": "",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
+    "freeDraw": "",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב"
@@ -134,7 +140,7 @@
     "button_startSession": "התחל שיתוף",
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
-    "desc_persistenceWarning": "שים לב ששיתוף הלוח נעשה בין המשתתפים ממחשב למחשב באופן ישיר, ולא נשמר בשרתים שלנו. לכן, אם כולכם תתנתקו, המידע יאבד אלא אם כן תייצא אותו לקובץ או באמצעות לינק הניתן לשיתוף.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
     "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תןכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
   },

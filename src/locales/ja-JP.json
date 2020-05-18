@@ -16,6 +16,10 @@
     "background": "背景の色",
     "fill": "塗りつぶし",
     "strokeWidth": "線の幅",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "線のばらつき",
     "opacity": "透明度",
     "textAlign": "テキストの配置",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "選択",
+    "draw": "",
     "rectangle": "矩形",
     "diamond": "ひし形",
     "ellipse": "楕円",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": ""
@@ -134,7 +140,7 @@
     "button_startSession": "セッションを開始する",
     "button_stopSession": "セッションを終了する",
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
-    "desc_persistenceWarning": "P2P通信によりデータは共同編集者だけに共有されており、運営サーバーはデータを保持していません。そのため、エクスポートしておくか共有URLを作成しておかない限り、すべての参加者の接続が切れると描画内容は失われます。",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "下記URLを共同編集したい人に共有してください：",
     "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。"
   },

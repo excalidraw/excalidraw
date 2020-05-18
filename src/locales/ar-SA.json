@@ -16,6 +16,10 @@
     "background": "الخلفية",
     "fill": "التعبئة",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "الإمالة",
     "opacity": "الشفافية",
     "textAlign": "",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
+    "draw": "",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
+    "freeDraw": "",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
@@ -134,7 +140,7 @@
     "button_startSession": "بدء الجلسة",
     "button_stopSession": "إيقاف الجلسة",
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
-    "desc_persistenceWarning": "لاحظ أن بيانات الجلسة يتم تقاسمها عبر المتعاونين بطريقة P2P، ولا تستمر في خادمنا. وبالتالي، إذا قطعت كل اتصال، فستفقد البيانات ما لم تقم بتصديرها إلى ملف أو رابط قابل للمشاركة.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "شارك هذا الرابط مع أي شخص تريده ان يشاركك الجلسة:",
     "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم."
   },

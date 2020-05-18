@@ -165,6 +165,7 @@ function getWatermarkElement(maxX: number, maxY: number) {
     backgroundColor: "transparent",
     fillStyle: "hachure",
     strokeWidth: 1,
+    strokeStyle: "solid",
     roughness: 1,
     opacity: 100,
   });

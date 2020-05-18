@@ -30,6 +30,7 @@ it("clones arrow element", () => {
     backgroundColor: "transparent",
     fillStyle: "hachure",
     strokeWidth: 1,
+    strokeStyle: "solid",
     roughness: 1,
     opacity: 100,
   });
@@ -73,6 +74,7 @@ it("clones text element", () => {
     backgroundColor: "transparent",
     fillStyle: "hachure",
     strokeWidth: 1,
+    strokeStyle: "solid",
     roughness: 1,
     opacity: 100,
     text: "hello",

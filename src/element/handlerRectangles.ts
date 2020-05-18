@@ -187,7 +187,11 @@ export function handlerRectangles(
     pointerType,
   );
 
-  if (element.type === "arrow" || element.type === "line") {
+  if (
+    element.type === "arrow" ||
+    element.type === "line" ||
+    element.type === "draw"
+  ) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;

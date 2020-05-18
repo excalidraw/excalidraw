@@ -16,6 +16,10 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du contour",
+    "strokeStyle": "Style du trait",
+    "strokeStyle_solid": "Plein",
+    "strokeStyle_dashed": "Tirets",
+    "strokeStyle_dotted": "Pointillé",
     "sloppiness": "Style de tracé",
     "opacity": "Opacité",
     "textAlign": "Alignement du texte",
@@ -54,7 +58,7 @@
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans titre",
     "name": "Nom",
-    "yourName": "",
+    "yourName": "Votre nom",
     "madeWithExcalidraw": "Fabriqué avec Excalidraw"
   },
   "buttons": {
@@ -78,7 +82,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer le collaboration en temps réel",
+    "roomDialog": "Démarrer la collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
@@ -96,6 +100,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
+    "draw": "Dessin libre",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",
@@ -111,6 +116,7 @@
   },
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
+    "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
@@ -134,7 +140,7 @@
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
-    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
+    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si vous vous déconnectez tous, vous perdrez les données sauf si vous les exportez vers un fichier ou un lien de partage.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   },
@@ -159,6 +165,6 @@
     "zoomToFit": "Zoomer pour visualiser tous les éléments"
   },
   "encrypted": {
-    "tooltip": "Vos dessins sont cryptés de bout en bout, donc les serveurs d'Excalidraw ne les verront jamais."
+    "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   }
 }
