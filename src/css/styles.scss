@@ -33,16 +33,6 @@
     cursor: text;
   }
 
-  a {
-    font-weight: 500;
-    text-decoration: none;
-    color: $oc-blue-7; /* OC Blue 7 */
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
   canvas {
     touch-action: none;
     user-select: none;
@@ -141,8 +131,6 @@
     outline: transparent;
     box-shadow: 0 0 0 2px $oc-blue-2;
   }
-
-  @import "button.scss";
 
   .active,
   .buttonList label.active {
@@ -461,4 +449,18 @@
   .disable-pointerEvents {
     pointer-events: none !important;
   }
+}
+
+.excalidraw,
+.Modal {
+  a {
+    font-weight: 500;
+    text-decoration: none;
+    color: $oc-blue-7; /* OC Blue 7 */
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  @import "button.scss";
 }

@@ -60,8 +60,6 @@
     right: calc(var(--space-factor) * 5);
     top: calc(var(--space-factor) * 5);
   }
-
-  @import "../css/button.scss";
 }
 
 @keyframes Modal__content_fade-in {

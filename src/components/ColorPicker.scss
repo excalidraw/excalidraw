@@ -52,7 +52,7 @@
   grid-column: 1 / span 5;
 }
 
-.color-picker-swatch {
+.excalidraw .color-picker-swatch {
   position: relative;
   height: 1.875rem;
   width: 1.875rem;
@@ -62,12 +62,12 @@
   box-sizing: border-box;
   border: 1px solid #ddd;
   background-color: currentColor !important;
-}
 
-.color-picker-swatch:focus {
-  /* TODO: only show the border when the color is too light to see as a shadow */
-  box-shadow: 0 0 4px 1px currentColor;
-  border-color: $oc-blue-5;
+  &:focus {
+    /* TODO: only show the border when the color is too light to see as a shadow */
+    box-shadow: 0 0 4px 1px currentColor;
+    border-color: $oc-blue-5;
+  }
 }
 
 .color-picker-transparent {
