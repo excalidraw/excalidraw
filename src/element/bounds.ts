@@ -342,3 +342,17 @@ export const getResizedElementAbsoluteCoords = (
     maxY + element.y,
   ];
 };
+
+export const getElementPointsCoords = (
+  element: ExcalidrawLinearElement,
+  points: readonly (readonly [number, number])[],
+): [number, number, number, number] => {
+  const gen = rough.generator();
+  const curve = gen.curve(
+    points as [number, number][],
+    generateRoughOptions(element),
+  );
+  const ops = getCurvePathOps(curve);
+  const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+  return [minX, minY, maxX, maxY];
+};

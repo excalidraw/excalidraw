@@ -1,6 +1,7 @@
 import { NonDeleted, ExcalidrawLinearElement } from "./types";
-import { distance2d, rotate } from "../math";
+import { distance2d, rotate, adjustXYWithRotation } from "../math";
 import { getElementAbsoluteCoords } from ".";
+import { getElementPointsCoords } from "./bounds";
 import { Point } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -86,26 +87,45 @@ export class LinearElementEditor {
 
     const deltaX = targetPosition[0] - points[pointIndex][0];
     const deltaY = targetPosition[1] - points[pointIndex][1];
+    const nextPoints = points.map((point, idx) => {
+      if (idx === pointIndex) {
+        if (idx === 0) {
+          offsetX = deltaX;
+          offsetY = deltaY;
+          return point;
+        }
+        offsetX = 0;
+        offsetY = 0;
+
+        return [point[0] + deltaX, point[1] + deltaY] as const;
+      }
+      return offsetX || offsetY
+        ? ([point[0] - offsetX, point[1] - offsetY] as const)
+        : point;
+    });
+
+    const nextCoords = getElementPointsCoords(element, nextPoints);
+    const prevCoords = getElementPointsCoords(element, points);
+    const centerX = (prevCoords[0] + prevCoords[2]) / 2;
+    const centerY = (prevCoords[1] + prevCoords[3]) / 2;
+    const side = ((targetPosition[1] < centerY ? "n" : "s") +
+      (targetPosition[0] < centerX ? "w" : "e")) as "nw" | "ne" | "sw" | "se";
+    const adjustedXY = adjustXYWithRotation(
+      side,
+      element.x,
+      element.y,
+      element.angle,
+      (prevCoords[0] - nextCoords[0]) / 2,
+      (prevCoords[1] - nextCoords[1]) / 2,
+      (prevCoords[2] - nextCoords[2]) / 2,
+      (prevCoords[3] - nextCoords[3]) / 2,
+      false,
+    );
 
     mutateElement(element, {
-      points: points.map((point, idx) => {
-        if (idx === pointIndex) {
-          if (idx === 0) {
-            offsetX = deltaX;
-            offsetY = deltaY;
-            return point;
-          }
-          offsetX = 0;
-          offsetY = 0;
-
-          return [point[0] + deltaX, point[1] + deltaY] as const;
-        }
-        return offsetX || offsetY
-          ? ([point[0] - offsetX, point[1] - offsetY] as const)
-          : point;
-      }),
-      x: element.x + (pointIndex === 0 ? deltaX : 0),
-      y: element.y + (pointIndex === 0 ? deltaY : 0),
+      points: nextPoints,
+      x: adjustedXY[0],
+      y: adjustedXY[1],
     });
   }
 }
