@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
-    "desc_exitSession": "Når du avslutter økten, frakobles du fra rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt være i stand til å samarbeide på deres versjon."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "Feil"
