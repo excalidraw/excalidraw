@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
-    "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "Wystąpił błąd"
