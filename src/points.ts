@@ -1,18 +1,18 @@
 import { Point } from "./types";
 
-export function getSizeFromPoints(points: readonly Point[]) {
+export const getSizeFromPoints = (points: readonly Point[]) => {
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   return {
     width: Math.max(...xs) - Math.min(...xs),
     height: Math.max(...ys) - Math.min(...ys),
   };
-}
-export function rescalePoints(
+};
+export const rescalePoints = (
   dimension: 0 | 1,
   nextDimensionSize: number,
   prevPoints: readonly Point[],
-): Point[] {
+): Point[] => {
   const prevDimValues = prevPoints.map((point) => point[dimension]);
   const prevMaxDimension = Math.max(...prevDimValues);
   const prevMinDimension = Math.min(...prevDimValues);
@@ -50,4 +50,4 @@ export function rescalePoints(
   );
 
   return nextPoints;
-}
+};

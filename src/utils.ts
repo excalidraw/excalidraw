@@ -6,9 +6,9 @@ export const SVG_NS = "http://www.w3.org/2000/svg";
 
 let mockDateTime: string | null = null;
 
-export function setDateTimeForTests(dateTime: string) {
+export const setDateTimeForTests = (dateTime: string) => {
   mockDateTime = dateTime;
-}
+};
 
 export const getDateTime = () => {
   if (mockDateTime) {
@@ -25,51 +25,43 @@ export const getDateTime = () => {
   return `${year}-${month}-${day}-${hr}${min}`;
 };
 
-export function capitalizeString(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+export const capitalizeString = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
 
-export function isToolIcon(
+export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement {
-  return target instanceof HTMLElement && target.className.includes("ToolIcon");
-}
+): target is HTMLElement =>
+  target instanceof HTMLElement && target.className.includes("ToolIcon");
 
-export function isInputLike(
+export const isInputLike = (
   target: Element | EventTarget | null,
 ): target is
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement {
-  return (
-    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLBRElement || // newline in wysiwyg
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  );
-}
+  | HTMLDivElement =>
+  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  target instanceof HTMLBRElement || // newline in wysiwyg
+  target instanceof HTMLInputElement ||
+  target instanceof HTMLTextAreaElement ||
+  target instanceof HTMLSelectElement;
 
-export function isWritableElement(
+export const isWritableElement = (
   target: Element | EventTarget | null,
 ): target is
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement {
-  return (
-    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-    target instanceof HTMLBRElement || // newline in wysiwyg
-    target instanceof HTMLTextAreaElement ||
-    (target instanceof HTMLInputElement &&
-      (target.type === "text" || target.type === "number"))
-  );
-}
+  | HTMLDivElement =>
+  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  target instanceof HTMLBRElement || // newline in wysiwyg
+  target instanceof HTMLTextAreaElement ||
+  (target instanceof HTMLInputElement &&
+    (target.type === "text" || target.type === "number"));
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export function measureText(text: string, font: string) {
+export const measureText = (text: string, font: string) => {
   const line = document.createElement("div");
   const body = document.body;
   line.style.position = "absolute";
@@ -93,12 +85,12 @@ export function measureText(text: string, font: string) {
   document.body.removeChild(line);
 
   return { width, height, baseline };
-}
+};
 
-export function debounce<T extends any[]>(
+export const debounce = <T extends any[]>(
   fn: (...args: T) => void,
   timeout: number,
-) {
+) => {
   let handle = 0;
   let lastArgs: T;
   const ret = (...args: T) => {
@@ -111,9 +103,9 @@ export function debounce<T extends any[]>(
     fn(...lastArgs);
   };
   return ret;
-}
+};
 
-export function selectNode(node: Element) {
+export const selectNode = (node: Element) => {
   const selection = window.getSelection();
   if (selection) {
     const range = document.createRange();
@@ -121,30 +113,28 @@ export function selectNode(node: Element) {
     selection.removeAllRanges();
     selection.addRange(range);
   }
-}
+};
 
-export function removeSelection() {
+export const removeSelection = () => {
   const selection = window.getSelection();
   if (selection) {
     selection.removeAllRanges();
   }
-}
+};
 
-export function distance(x: number, y: number) {
-  return Math.abs(x - y);
-}
+export const distance = (x: number, y: number) => Math.abs(x - y);
 
-export function resetCursor() {
+export const resetCursor = () => {
   document.documentElement.style.cursor = "";
-}
+};
 
-export function setCursorForShape(shape: string) {
+export const setCursorForShape = (shape: string) => {
   if (shape === "selection") {
     resetCursor();
   } else {
     document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
-}
+};
 
 export const isFullScreen = () =>
   document.fullscreenElement?.nodeName === "HTML";
@@ -165,7 +155,7 @@ export const getShortcutKey = (shortcut: string): string => {
   }
   return `${shortcut.replace(/CtrlOrCmd/i, "Ctrl")}`;
 };
-export function viewportCoordsToSceneCoords(
+export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
   {
     scrollX,
@@ -178,7 +168,7 @@ export function viewportCoordsToSceneCoords(
   },
   canvas: HTMLCanvasElement | null,
   scale: number,
-) {
+) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
   const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
   const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
@@ -187,9 +177,9 @@ export function viewportCoordsToSceneCoords(
   const y = clientYWithZoom - scrollY;
 
   return { x, y };
-}
+};
 
-export function sceneCoordsToViewportCoords(
+export const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
   {
     scrollX,
@@ -202,7 +192,7 @@ export function sceneCoordsToViewportCoords(
   },
   canvas: HTMLCanvasElement | null,
   scale: number,
-) {
+) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
   const sceneXWithZoomAndScroll =
     zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
@@ -213,10 +203,7 @@ export function sceneCoordsToViewportCoords(
   const y = sceneYWithZoomAndScroll;
 
   return { x, y };
-}
+};
 
-export function getGlobalCSSVariable(name: string) {
-  return getComputedStyle(document.documentElement).getPropertyValue(
-    `--${name}`,
-  );
-}
+export const getGlobalCSSVariable = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);

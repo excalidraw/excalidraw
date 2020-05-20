@@ -6,7 +6,7 @@ interface SectionProps extends React.HTMLProps<HTMLElement> {
   children: React.ReactNode | ((header: React.ReactNode) => React.ReactNode);
 }
 
-export function Section({ heading, children, ...props }: SectionProps) {
+export const Section = ({ heading, children, ...props }: SectionProps) => {
   const header = (
     <h2 className="visually-hidden" id={`${heading}-title`}>
       {t(`headings.${heading}`)}
@@ -24,4 +24,4 @@ export function Section({ heading, children, ...props }: SectionProps) {
       )}
     </section>
   );
-}
+};

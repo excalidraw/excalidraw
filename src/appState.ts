@@ -6,7 +6,7 @@ import { t } from "./i18n";
 export const DEFAULT_FONT = "20px Virgil";
 export const DEFAULT_TEXT_ALIGN = "left";
 
-export function getDefaultAppState(): AppState {
+export const getDefaultAppState = (): AppState => {
   return {
     isLoading: false,
     errorMessage: null,
@@ -49,9 +49,9 @@ export function getDefaultAppState(): AppState {
     showShortcutsDialog: false,
     zenModeEnabled: false,
   };
-}
+};
 
-export function clearAppStateForLocalStorage(appState: AppState) {
+export const clearAppStateForLocalStorage = (appState: AppState) => {
   const {
     draggingElement,
     resizingElement,
@@ -68,11 +68,11 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     ...exportedState
   } = appState;
   return exportedState;
-}
+};
 
-export function clearAppStatePropertiesForHistory(
+export const clearAppStatePropertiesForHistory = (
   appState: AppState,
-): Partial<AppState> {
+): Partial<AppState> => {
   return {
     selectedElementIds: appState.selectedElementIds,
     exportBackground: appState.exportBackground,
@@ -88,10 +88,10 @@ export function clearAppStatePropertiesForHistory(
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };
-}
+};
 
-export function cleanAppStateForExport(appState: AppState) {
+export const cleanAppStateForExport = (appState: AppState) => {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
   };
-}
+};

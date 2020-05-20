@@ -11,7 +11,7 @@ import { t } from "../i18n";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-export function exportToCanvas(
+export const exportToCanvas = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   {
@@ -27,16 +27,13 @@ export function exportToCanvas(
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => any = function (
-    width,
-    height,
-  ) {
+  createCanvas: (width: number, height: number) => any = (width, height) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
     return tempCanvas;
   },
-) {
+) => {
   let sceneElements = elements;
   if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
@@ -78,9 +75,9 @@ export function exportToCanvas(
   );
 
   return tempCanvas;
-}
+};
 
-export function exportToSvg(
+export const exportToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
@@ -93,7 +90,7 @@ export function exportToSvg(
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-): SVGSVGElement {
+): SVGSVGElement => {
   let sceneElements = elements;
   if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
@@ -148,9 +145,9 @@ export function exportToSvg(
   });
 
   return svgRoot;
-}
+};
 
-function getWatermarkElement(maxX: number, maxY: number) {
+const getWatermarkElement = (maxX: number, maxY: number) => {
   const text = t("labels.madeWithExcalidraw");
   const font = "16px Virgil";
   const { width: textWidth } = measureText(text, font);
@@ -169,4 +166,4 @@ function getWatermarkElement(maxX: number, maxY: number) {
     roughness: 1,
     opacity: 100,
   });
-}
+};

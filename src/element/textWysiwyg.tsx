@@ -4,7 +4,7 @@ import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 
-function trimText(text: string) {
+const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
   if (!text.trim()) {
     return "";
@@ -13,7 +13,7 @@ function trimText(text: string) {
   //  box calculation (there's also a bug in FF which inserts trailing newline
   //  for multiline texts)
   return text.replace(/^\n+|\n+$/g, "");
-}
+};
 
 type TextWysiwygParams = {
   id: string;
@@ -31,7 +31,7 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
-export function textWysiwyg({
+export const textWysiwyg = ({
   id,
   initText,
   x,
@@ -45,7 +45,7 @@ export function textWysiwyg({
   textAlign,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams) => {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -126,20 +126,20 @@ export function textWysiwyg({
     }
   };
 
-  function stopEvent(event: Event) {
+  const stopEvent = (event: Event) => {
     event.stopPropagation();
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     if (editable.innerText) {
       onSubmit(trimText(editable.innerText));
     } else {
       onCancel();
     }
     cleanup();
-  }
+  };
 
-  function cleanup() {
+  const cleanup = () => {
     if (isDestroyed) {
       return;
     }
@@ -158,7 +158,7 @@ export function textWysiwyg({
     unbindUpdate();
 
     document.body.removeChild(editable);
-  }
+  };
 
   const rebindBlur = () => {
     window.removeEventListener("pointerup", rebindBlur);
@@ -210,4 +210,4 @@ export function textWysiwyg({
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
-}
+};
