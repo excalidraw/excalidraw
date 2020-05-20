@@ -25,7 +25,7 @@ type ElementConstructorOpts = {
   angle?: ExcalidrawGenericElement["angle"];
 };
 
-function _newElementBase<T extends ExcalidrawElement>(
+const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
   {
     x,
@@ -42,44 +42,41 @@ function _newElementBase<T extends ExcalidrawElement>(
     angle = 0,
     ...rest
   }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
-) {
-  return {
-    id: rest.id || randomId(),
-    type,
-    x,
-    y,
-    width,
-    height,
-    angle,
-    strokeColor,
-    backgroundColor,
-    fillStyle,
-    strokeWidth,
-    strokeStyle,
-    roughness,
-    opacity,
-    seed: rest.seed ?? randomInteger(),
-    version: rest.version || 1,
-    versionNonce: rest.versionNonce ?? 0,
-    isDeleted: false as false,
-  };
-}
+) => ({
+  id: rest.id || randomId(),
+  type,
+  x,
+  y,
+  width,
+  height,
+  angle,
+  strokeColor,
+  backgroundColor,
+  fillStyle,
+  strokeWidth,
+  strokeStyle,
+  roughness,
+  opacity,
+  seed: rest.seed ?? randomInteger(),
+  version: rest.version || 1,
+  versionNonce: rest.versionNonce ?? 0,
+  isDeleted: false as false,
+});
 
-export function newElement(
+export const newElement = (
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawGenericElement> {
-  return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
-}
+): NonDeleted<ExcalidrawGenericElement> =>
+  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-export function newTextElement(
+export const newTextElement = (
   opts: {
     text: string;
     font: string;
     textAlign: TextAlign;
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawTextElement> {
+): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, opts.font);
   const textElement = newElementWith(
     {
@@ -98,26 +95,26 @@ export function newTextElement(
   );
 
   return textElement;
-}
+};
 
-export function newLinearElement(
+export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
     lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawLinearElement> {
+): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
     lastCommittedPoint: opts.lastCommittedPoint || null,
   };
-}
+};
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 //  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
 // Adapted from https://github.com/lukeed/klona
-function _duplicateElement(val: any, depth: number = 0) {
+const _duplicateElement = (val: any, depth: number = 0) => {
   if (val == null || typeof val !== "object") {
     return val;
   }
@@ -149,12 +146,12 @@ function _duplicateElement(val: any, depth: number = 0) {
   }
 
   return val;
-}
+};
 
-export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
+export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   overrides?: Partial<TElement>,
-): TElement {
+): TElement => {
   let copy: TElement = _duplicateElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
@@ -162,4 +159,4 @@ export function duplicateElement<TElement extends Mutable<ExcalidrawElement>>(
     copy = Object.assign(copy, overrides);
   }
   return copy;
-}
+};

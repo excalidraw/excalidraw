@@ -34,7 +34,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
-function colorsForClientId(clientId: string) {
+const colorsForClientId = (clientId: string) => {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
 
@@ -45,9 +45,9 @@ function colorsForClientId(clientId: string) {
     background: backgrounds[sum % backgrounds.length],
     stroke: strokes[sum % strokes.length],
   };
-}
+};
 
-function strokeRectWithRotation(
+const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -57,7 +57,7 @@ function strokeRectWithRotation(
   cy: number,
   angle: number,
   fill?: boolean,
-) {
+) => {
   context.translate(cx, cy);
   context.rotate(angle);
   if (fill) {
@@ -66,27 +66,27 @@ function strokeRectWithRotation(
   context.strokeRect(x - cx, y - cy, width, height);
   context.rotate(-angle);
   context.translate(-cx, -cy);
-}
+};
 
-function strokeCircle(
+const strokeCircle = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
   width: number,
   height: number,
-) {
+) => {
   context.beginPath();
   context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
   context.fill();
   context.stroke();
-}
+};
 
-function renderLinearPointHandles(
+const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
   sceneState: SceneState,
   element: NonDeleted<ExcalidrawLinearElement>,
-) {
+) => {
   context.translate(sceneState.scrollX, sceneState.scrollY);
   const origStrokeStyle = context.strokeStyle;
   const lineWidth = context.lineWidth;
@@ -117,9 +117,9 @@ function renderLinearPointHandles(
   context.lineWidth = lineWidth;
   context.translate(-sceneState.scrollX, -sceneState.scrollY);
   context.strokeStyle = origStrokeStyle;
-}
+};
 
-export function renderScene(
+export const renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   selectionElement: NonDeletedExcalidrawElement | null,
@@ -140,7 +140,7 @@ export function renderScene(
     renderSelection?: boolean;
     renderOptimizations?: boolean;
   } = {},
-) {
+) => {
   if (!canvas) {
     return { atLeastOneVisibleElement: false };
   }
@@ -510,9 +510,9 @@ export function renderScene(
   context.scale(1 / scale, 1 / scale);
 
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
-}
+};
 
-function isVisibleElement(
+const isVisibleElement = (
   element: ExcalidrawElement,
   viewportWidth: number,
   viewportHeight: number,
@@ -525,7 +525,7 @@ function isVisibleElement(
     scrollY: FlooredNumber;
     zoom: number;
   },
-) {
+) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
   // Apply zoom
@@ -541,10 +541,10 @@ function isVisibleElement(
     y2 + scrollY - viewportHeightDiff / 2 >= 0 &&
     y1 + scrollY - viewportHeightDiff / 2 <= viewportHeightWithZoom
   );
-}
+};
 
 // This should be only called for exporting purposes
-export function renderSceneToSvg(
+export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
@@ -555,7 +555,7 @@ export function renderSceneToSvg(
     offsetX?: number;
     offsetY?: number;
   } = {},
-) {
+) => {
   if (!svgRoot) {
     return;
   }
@@ -571,4 +571,4 @@ export function renderSceneToSvg(
       );
     }
   });
-}
+};

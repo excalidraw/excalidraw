@@ -18,10 +18,8 @@ const ICON = (
   </svg>
 );
 
-export function HelpIcon(props: HelpIconProps) {
-  return (
-    <label title={`${props.title} — ?`} className="help-icon">
-      <div onClick={props.onClick}>{ICON}</div>
-    </label>
-  );
-}
+export const HelpIcon = (props: HelpIconProps) => (
+  <label title={`${props.title} — ?`} className="help-icon">
+    <div onClick={props.onClick}>{ICON}</div>
+  </label>
+);

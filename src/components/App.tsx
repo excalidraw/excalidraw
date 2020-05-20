@@ -137,13 +137,14 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 /**
  * @param func handler taking at most single parameter (event).
  */
-function withBatchedUpdates<
+const withBatchedUpdates = <
   TFunction extends ((event: any) => void) | (() => void)
->(func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never) {
-  return ((event) => {
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) =>
+  ((event) => {
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
-}
 
 const { history } = createHistory();
 
@@ -2918,9 +2919,7 @@ if (
       },
     },
     history: {
-      get() {
-        return history;
-      },
+      get: () => history,
     },
   });
 }

@@ -5,11 +5,11 @@ import { cleanAppStateForExport } from "../appState";
 import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 
-export function serializeAsJSON(
+export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-): string {
-  return JSON.stringify(
+): string =>
+  JSON.stringify(
     {
       type: "excalidraw",
       version: 1,
@@ -20,12 +20,11 @@ export function serializeAsJSON(
     null,
     2,
   );
-}
 
-export async function saveAsJSON(
+export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   const serialized = serializeAsJSON(elements, appState);
 
   const name = `${appState.name}.excalidraw`;
@@ -41,12 +40,12 @@ export async function saveAsJSON(
     },
     (window as any).handle,
   );
-}
-export async function loadFromJSON() {
+};
+export const loadFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: ["json", "excalidraw"],
     mimeTypes: ["application/json", "application/vnd.excalidraw+json"],
   });
   return loadFromBlob(blob);
-}
+};

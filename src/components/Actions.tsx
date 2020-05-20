@@ -11,7 +11,7 @@ import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
 
-export function SelectedShapeActions({
+export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
@@ -21,7 +21,7 @@ export function SelectedShapeActions({
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
-}) {
+}) => {
   const targetElements = getTargetElement(
     getNonDeletedElements(elements),
     appState,
@@ -83,65 +83,61 @@ export function SelectedShapeActions({
       )}
     </div>
   );
-}
+};
 
-export function ShapesSwitcher({
+export const ShapesSwitcher = ({
   elementType,
   setAppState,
 }: {
   elementType: ExcalidrawElement["type"];
   setAppState: any;
-}) {
-  return (
-    <>
-      {SHAPES.map(({ value, icon, key }, index) => {
-        const label = t(`toolBar.${value}`);
-        const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
-          index + 1
-        }`;
-        return (
-          <ToolButton
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={elementType === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${shortcut}`}
-            keyBindingLabel={`${index + 1}`}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={`${key} ${index + 1}`}
-            data-testid={value}
-            onChange={() => {
-              setAppState({
-                elementType: value,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              setCursorForShape(value);
-              setAppState({});
-            }}
-          ></ToolButton>
-        );
-      })}
-    </>
-  );
-}
+}) => (
+  <>
+    {SHAPES.map(({ value, icon, key }, index) => {
+      const label = t(`toolBar.${value}`);
+      const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
+        index + 1
+      }`;
+      return (
+        <ToolButton
+          key={value}
+          type="radio"
+          icon={icon}
+          checked={elementType === value}
+          name="editor-current-shape"
+          title={`${capitalizeString(label)} — ${shortcut}`}
+          keyBindingLabel={`${index + 1}`}
+          aria-label={capitalizeString(label)}
+          aria-keyshortcuts={`${key} ${index + 1}`}
+          data-testid={value}
+          onChange={() => {
+            setAppState({
+              elementType: value,
+              multiElement: null,
+              selectedElementIds: {},
+            });
+            setCursorForShape(value);
+            setAppState({});
+          }}
+        ></ToolButton>
+      );
+    })}
+  </>
+);
 
-export function ZoomActions({
+export const ZoomActions = ({
   renderAction,
   zoom,
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: number;
-}) {
-  return (
-    <Stack.Col gap={1}>
-      <Stack.Row gap={1} align="center">
-        {renderAction("zoomIn")}
-        {renderAction("zoomOut")}
-        {renderAction("resetZoom")}
-        <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
-      </Stack.Row>
-    </Stack.Col>
-  );
-}
+}) => (
+  <Stack.Col gap={1}>
+    <Stack.Row gap={1} align="center">
+      {renderAction("zoomIn")}
+      {renderAction("zoomOut")}
+      {renderAction("resetZoom")}
+      <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
+    </Stack.Row>
+  </Stack.Col>
+);

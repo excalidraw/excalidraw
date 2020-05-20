@@ -19,10 +19,10 @@ import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 
-function isElementDraggableFromInside(
+const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
-): boolean {
+): boolean => {
   const dragFromInside =
     element.backgroundColor !== "transparent" ||
     appState.selectedElementIds[element.id];
@@ -30,15 +30,15 @@ function isElementDraggableFromInside(
     return dragFromInside && isPathALoop(element.points);
   }
   return dragFromInside;
-}
+};
 
-export function hitTest(
+export const hitTest = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,
   zoom: number,
-): boolean {
+): boolean => {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / zoom;
@@ -210,7 +210,7 @@ export function hitTest(
     return false;
   }
   throw new Error(`Unimplemented type ${element.type}`);
-}
+};
 
 const pointInBezierEquation = (
   p0: Point,

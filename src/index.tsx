@@ -50,7 +50,7 @@ Sentry.init({
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(
   "touchmove",
-  function (event) {
+  (event) => {
     // @ts-ignore
     if (event.scale !== 1) {
       event.preventDefault();
