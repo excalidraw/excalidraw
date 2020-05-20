@@ -12,9 +12,9 @@ import { rescalePoints } from "../points";
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
-export function getElementAbsoluteCoords(
+export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteCoords(element);
   }
@@ -24,9 +24,9 @@ export function getElementAbsoluteCoords(
     element.x + element.width,
     element.y + element.height,
   ];
-}
+};
 
-export function getDiamondPoints(element: ExcalidrawElement) {
+export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
@@ -39,16 +39,16 @@ export function getDiamondPoints(element: ExcalidrawElement) {
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
-}
+};
 
-export function getCurvePathOps(shape: Drawable): Op[] {
+export const getCurvePathOps = (shape: Drawable): Op[] => {
   for (const set of shape.sets) {
     if (set.type === "path") {
       return set.ops;
     }
   }
   return shape.sets[0].ops;
-}
+};
 
 const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
@@ -150,10 +150,10 @@ const getLinearElementAbsoluteCoords = (
   ];
 };
 
-export function getArrowPoints(
+export const getArrowPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
-) {
+) => {
   const ops = getCurvePathOps(shape[0]);
 
   const data = ops[ops.length - 1].data;
@@ -212,7 +212,7 @@ export function getArrowPoints(
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
 
   return [x2, y2, x3, y3, x4, y4];
-}
+};
 
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,

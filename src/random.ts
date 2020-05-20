@@ -4,15 +4,12 @@ import nanoid from "nanoid";
 let random = new Random(Date.now());
 let testIdBase = 0;
 
-export function randomInteger() {
-  return Math.floor(random.next() * 2 ** 31);
-}
+export const randomInteger = () => Math.floor(random.next() * 2 ** 31);
 
-export function reseed(seed: number) {
+export const reseed = (seed: number) => {
   random = new Random(seed);
   testIdBase = 0;
-}
+};
 
-export function randomId() {
-  return process.env.NODE_ENV === "test" ? `id${testIdBase++}` : nanoid();
-}
+export const randomId = () =>
+  process.env.NODE_ENV === "test" ? `id${testIdBase++}` : nanoid();

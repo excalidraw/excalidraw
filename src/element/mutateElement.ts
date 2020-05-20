@@ -13,10 +13,10 @@ type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 // The version is used to compare updates when more than one user is working in
 // the same drawing. Note: this will trigger the component to update. Make sure you
 // are calling it either from a React event handler or within unstable_batchedUpdates().
-export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
+export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-) {
+) => {
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points } = updates as any;
@@ -45,16 +45,14 @@ export function mutateElement<TElement extends Mutable<ExcalidrawElement>>(
   element.versionNonce = randomInteger();
 
   globalSceneState.informMutation();
-}
+};
 
-export function newElementWith<TElement extends ExcalidrawElement>(
+export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-): TElement {
-  return {
-    ...element,
-    version: element.version + 1,
-    versionNonce: randomInteger(),
-    ...updates,
-  };
-}
+): TElement => ({
+  ...element,
+  version: element.version + 1,
+  versionNonce: randomInteger(),
+  ...updates,
+});

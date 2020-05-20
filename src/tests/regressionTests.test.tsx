@@ -16,20 +16,20 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 let getByToolName: (name: string) => HTMLElement = null!;
 let canvas: HTMLCanvasElement = null!;
 
-function clickTool(toolName: ToolName) {
+const clickTool = (toolName: ToolName) => {
   fireEvent.click(getByToolName(toolName));
-}
+};
 
 let lastClientX = 0;
 let lastClientY = 0;
 let pointerType: "mouse" | "pen" | "touch" = "mouse";
 
-function pointerDown(
+const pointerDown = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerDown(canvas, {
@@ -40,41 +40,41 @@ function pointerDown(
     pointerId: 1,
     pointerType,
   });
-}
+};
 
-function pointer2Down(clientX: number, clientY: number) {
+const pointer2Down = (clientX: number, clientY: number) => {
   fireEvent.pointerDown(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointer2Move(clientX: number, clientY: number) {
+const pointer2Move = (clientX: number, clientY: number) => {
   fireEvent.pointerMove(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointer2Up(clientX: number, clientY: number) {
+const pointer2Up = (clientX: number, clientY: number) => {
   fireEvent.pointerUp(canvas, {
     clientX,
     clientY,
     pointerId: 2,
     pointerType,
   });
-}
+};
 
-function pointerMove(
+const pointerMove = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerMove(canvas, {
@@ -85,72 +85,72 @@ function pointerMove(
     pointerId: 1,
     pointerType,
   });
-}
+};
 
-function pointerUp(
+const pointerUp = (
   clientX: number = lastClientX,
   clientY: number = lastClientY,
   altKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   lastClientX = clientX;
   lastClientY = clientY;
   fireEvent.pointerUp(canvas, { pointerId: 1, pointerType, shiftKey, altKey });
-}
+};
 
-function hotkeyDown(key: Key) {
+const hotkeyDown = (key: Key) => {
   fireEvent.keyDown(document, { key: KEYS[key] });
-}
+};
 
-function hotkeyUp(key: Key) {
+const hotkeyUp = (key: Key) => {
   fireEvent.keyUp(document, {
     key: KEYS[key],
   });
-}
+};
 
-function keyDown(
+const keyDown = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   fireEvent.keyDown(document, { key, ctrlKey, shiftKey });
-}
+};
 
-function keyUp(
+const keyUp = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   fireEvent.keyUp(document, {
     key,
     ctrlKey,
     shiftKey,
   });
-}
+};
 
-function hotkeyPress(key: Key) {
+const hotkeyPress = (key: Key) => {
   hotkeyDown(key);
   hotkeyUp(key);
-}
+};
 
-function keyPress(
+const keyPress = (
   key: string,
   ctrlKey: boolean = false,
   shiftKey: boolean = false,
-) {
+) => {
   keyDown(key, ctrlKey, shiftKey);
   keyUp(key, ctrlKey, shiftKey);
-}
+};
 
-function clickLabeledElement(label: string) {
+const clickLabeledElement = (label: string) => {
   const element = document.querySelector(`[aria-label='${label}']`);
   if (!element) {
     throw new Error(`No labeled element found: ${label}`);
   }
   fireEvent.click(element);
-}
+};
 
-function getSelectedElement(): ExcalidrawElement {
+const getSelectedElement = (): ExcalidrawElement => {
   const selectedElements = h.elements.filter(
     (element) => h.state.selectedElementIds[element.id],
   );
@@ -160,10 +160,10 @@ function getSelectedElement(): ExcalidrawElement {
     );
   }
   return selectedElements[0];
-}
+};
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-function getResizeHandles() {
+const getResizeHandles = () => {
   const rects = handlerRectangles(
     getSelectedElement(),
     h.state.zoom,
@@ -181,14 +181,14 @@ function getResizeHandles() {
   }
 
   return rv;
-}
+};
 
 /**
  * This is always called at the end of your test, so usually you don't need to call it.
  * However, if you have a long test, you might want to call it during the test so it's easier
  * to debug where a test failure came from.
  */
-function checkpoint(name: string) {
+const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
@@ -198,7 +198,7 @@ function checkpoint(name: string) {
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
-}
+};
 
 beforeEach(() => {
   // Unmount ReactDOM from root

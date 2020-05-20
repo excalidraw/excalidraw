@@ -12,13 +12,13 @@ import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
 import { DEFAULT_TEXT_ALIGN } from "../appState";
 
-export function restore(
+export const restore = (
   // we're making the elements mutable for this API because we want to
   //  efficiently remove/tweak properties on them (to migrate old scenes)
   savedElements: readonly Mutable<ExcalidrawElement>[],
   savedState: AppState | null,
   opts?: { scrollToContent: boolean },
-): DataState {
+): DataState => {
   const elements = savedElements
     .filter((el) => {
       // filtering out selection, which is legacy, no longer kept in elements,
@@ -94,4 +94,4 @@ export function restore(
     elements: elements,
     appState: savedState,
   };
-}
+};

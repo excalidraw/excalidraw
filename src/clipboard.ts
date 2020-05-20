@@ -21,10 +21,10 @@ export const probablySupportsClipboardBlob =
   "ClipboardItem" in window &&
   "toBlob" in HTMLCanvasElement.prototype;
 
-export async function copyToAppClipboard(
+export const copyToAppClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
   try {
     // when copying to in-app clipboard, clear system clipboard so that if
@@ -38,11 +38,11 @@ export async function copyToAppClipboard(
     //  we can't be sure of the order of copy operations
     PREFER_APP_CLIPBOARD = true;
   }
-}
+};
 
-export function getAppClipboard(): {
+export const getAppClipboard = (): {
   elements?: readonly ExcalidrawElement[];
-} {
+} => {
   if (!CLIPBOARD) {
     return {};
   }
@@ -62,14 +62,14 @@ export function getAppClipboard(): {
   }
 
   return {};
-}
+};
 
-export async function getClipboardContent(
+export const getClipboardContent = async (
   event: ClipboardEvent | null,
 ): Promise<{
   text?: string;
   elements?: readonly ExcalidrawElement[];
-}> {
+}> => {
   try {
     const text = event
       ? event.clipboardData?.getData("text/plain").trim()
@@ -84,12 +84,12 @@ export async function getClipboardContent(
   }
 
   return getAppClipboard();
-}
+};
 
-export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
-  return new Promise((resolve, reject) => {
+export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
+  new Promise((resolve, reject) => {
     try {
-      canvas.toBlob(async function (blob: any) {
+      canvas.toBlob(async (blob: any) => {
         try {
           await navigator.clipboard.write([
             new window.ClipboardItem({ "image/png": blob }),
@@ -103,17 +103,16 @@ export async function copyCanvasToClipboardAsPng(canvas: HTMLCanvasElement) {
       reject(error);
     }
   });
-}
 
-export async function copyCanvasToClipboardAsSvg(svgroot: SVGSVGElement) {
+export const copyCanvasToClipboardAsSvg = async (svgroot: SVGSVGElement) => {
   try {
     await navigator.clipboard.writeText(svgroot.outerHTML);
   } catch (error) {
     console.error(error);
   }
-}
+};
 
-export async function copyTextToSystemClipboard(text: string | null) {
+export const copyTextToSystemClipboard = async (text: string | null) => {
   let copied = false;
   if (probablySupportsClipboardWriteText) {
     try {
@@ -131,10 +130,10 @@ export async function copyTextToSystemClipboard(text: string | null) {
   if (!copied && !copyTextViaExecCommand(text || " ")) {
     throw new Error("couldn't copy");
   }
-}
+};
 
 // adapted from https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
-function copyTextViaExecCommand(text: string) {
+const copyTextViaExecCommand = (text: string) => {
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const textarea = document.createElement("textarea");
@@ -168,4 +167,4 @@ function copyTextViaExecCommand(text: string) {
   textarea.remove();
 
   return success;
-}
+};
