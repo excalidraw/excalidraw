@@ -1,18 +1,36 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
-import { clearAppStatePropertiesForHistory } from "./appState";
 import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
 
-type Result = {
-  appState: AppState;
+export type ParsedEntry = {
+  appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
   elements: ExcalidrawElement[];
+};
+
+const clearAppStatePropertiesForHistory = (appState: AppState) => {
+  return {
+    selectedElementIds: appState.selectedElementIds,
+    exportBackground: appState.exportBackground,
+    shouldAddWatermark: appState.shouldAddWatermark,
+    currentItemStrokeColor: appState.currentItemStrokeColor,
+    currentItemBackgroundColor: appState.currentItemBackgroundColor,
+    currentItemFillStyle: appState.currentItemFillStyle,
+    currentItemStrokeWidth: appState.currentItemStrokeWidth,
+    currentItemRoughness: appState.currentItemRoughness,
+    currentItemOpacity: appState.currentItemOpacity,
+    currentItemFont: appState.currentItemFont,
+    currentItemTextAlign: appState.currentItemTextAlign,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    name: appState.name,
+  };
 };
 
 export class SceneHistory {
   private recording: boolean = true;
   private stateHistory: string[] = [];
   private redoStack: string[] = [];
+  private lastEntry: ParsedEntry | null = null;
 
   getSnapshotForTest() {
     return {
@@ -70,20 +88,62 @@ export class SceneHistory {
       }, [] as Mutable<typeof elements>),
     });
 
+  shouldCreateEntry(parsedEntry: ParsedEntry): boolean {
+    if (!this.lastEntry) {
+      return true;
+    }
+    const { appState, elements } = parsedEntry;
+    // note: this is safe because ParsedEntry is guaranteed no excess props
+    let key: keyof typeof appState;
+    for (key in appState) {
+      if (key === "selectedElementIds") {
+        continue;
+      }
+      if (appState[key] !== this.lastEntry.appState[key]) {
+        return true;
+      }
+    }
+
+    for (const i in elements) {
+      const prev = elements[i];
+      const next = this.lastEntry.elements[i];
+      if (
+        !prev ||
+        !next ||
+        prev.id !== next.id ||
+        prev.version !== next.version
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
     const newEntry = this.generateEntry(appState, elements);
+
+    // should push entry (first pass)
     if (
       this.stateHistory.length > 0 &&
       this.stateHistory[this.stateHistory.length - 1] === newEntry
     ) {
-      // If the last entry is the same as this one, ignore it
       return;
     }
 
-    this.stateHistory.push(newEntry);
+    const parsedEntry = this.restoreEntry(newEntry);
 
-    // As a new entry was pushed, we invalidate the redo stack
-    this.clearRedoStack();
+    // should push entry (second pass)
+    if (!this.shouldCreateEntry(parsedEntry)) {
+      return;
+    }
+
+    if (parsedEntry) {
+      this.stateHistory.push(newEntry);
+      this.lastEntry = parsedEntry;
+      // As a new entry was pushed, we invalidate the redo stack
+      this.clearRedoStack();
+    }
   }
 
   restoreEntry(entry: string) {
@@ -98,7 +158,7 @@ export class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(): Result | null {
+  redoOnce(): ParsedEntry | null {
     if (this.redoStack.length === 0) {
       return null;
     }
@@ -113,7 +173,7 @@ export class SceneHistory {
     return null;
   }
 
-  undoOnce(): Result | null {
+  undoOnce(): ParsedEntry | null {
     if (this.stateHistory.length === 1) {
       return null;
     }
