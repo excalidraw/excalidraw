@@ -1,9 +1,12 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
 import rough from "roughjs/bin/rough";
-import { Drawable, Op, Options } from "roughjs/bin/core";
+import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
+import {
+  getShapeForElement,
+  generateRoughOptions,
+} from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
@@ -52,7 +55,6 @@ const getMinMaxXYFromCurvePathOps = (
   transformXY?: (x: number, y: number) => [number, number],
 ): [number, number, number, number] => {
   let currentP: Point = [0, 0];
-
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
       // There are only four operation types:
@@ -112,6 +114,7 @@ const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
 ): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
+    // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
         limits.minY = Math.min(limits.minY, y);
@@ -217,6 +220,7 @@ const getLinearElementRotatedBounds = (
   cy: number,
 ): [number, number, number, number] => {
   if (element.points.length < 2 || !getShapeForElement(element)) {
+    // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
       (limits, [x, y]) => {
         [x, y] = rotate(element.x + x, element.y + y, cx, cy, element.angle);
@@ -309,7 +313,7 @@ export const getResizedElementAbsoluteCoords = (
   nextWidth: number,
   nextHeight: number,
 ): [number, number, number, number] => {
-  if (!isLinearElement(element) || element.points.length <= 2) {
+  if (!isLinearElement(element)) {
     return [
       element.x,
       element.y,
@@ -324,13 +328,11 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
-  const options: Options = {
-    strokeWidth: element.strokeWidth,
-    roughness: element.roughness,
-    seed: element.seed,
-  };
   const gen = rough.generator();
-  const curve = gen.curve(points as [number, number][], options);
+  const curve = gen.curve(
+    points as [number, number][],
+    generateRoughOptions(element),
+  );
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [

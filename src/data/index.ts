@@ -111,8 +111,8 @@ export const generateCollaborationLink = async () => {
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
 };
 
-const getImportedKey = async (key: string, usage: string): Promise<CryptoKey> =>
-  await window.crypto.subtle.importKey(
+const getImportedKey = (key: string, usage: string) =>
+  window.crypto.subtle.importKey(
     "jwk",
     {
       alg: "A128GCM",

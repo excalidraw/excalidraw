@@ -3,7 +3,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { isTextElement } from "../element/typeChecks";
+import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
   getArrowPoints,
@@ -20,6 +20,9 @@ import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
 
+const DASHARRAY_DASHED = [12, 8];
+const DASHARRAY_DOTTED = [3, 6];
+
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -35,12 +38,10 @@ const generateElementCanvas = (
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  const isLinear = /\b(arrow|line)\b/.test(element.type);
-
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
-  if (isLinear) {
+  if (isLinearElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
@@ -90,10 +91,11 @@ const drawElementOnCanvas = (
       break;
     }
     case "arrow":
+    case "draw":
     case "line": {
-      (getShapeForElement(element) as Drawable[]).forEach((shape) =>
-        rc.draw(shape),
-      );
+      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+        rc.draw(shape);
+      });
       break;
     }
     default: {
@@ -148,6 +150,70 @@ export const getShapeForElement = (element: ExcalidrawElement) =>
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
+export const generateRoughOptions = (element: ExcalidrawElement): Options => {
+  const options: Options = {
+    seed: element.seed,
+    strokeLineDash:
+      element.strokeStyle === "dashed"
+        ? DASHARRAY_DASHED
+        : element.strokeStyle === "dotted"
+        ? DASHARRAY_DOTTED
+        : undefined,
+    // for non-solid strokes, disable multiStroke because it tends to make
+    //  dashes/dots overlay each other
+    disableMultiStroke: element.strokeStyle !== "solid",
+    // for non-solid strokes, increase the width a bit to make it visually
+    //  similar to solid strokes, because we're also disabling multiStroke
+    strokeWidth:
+      element.strokeStyle !== "solid"
+        ? element.strokeWidth + 0.5
+        : element.strokeWidth,
+    // when increasing strokeWidth, we must explicitly set fillWeight and
+    //  hachureGap because if not specified, roughjs uses strokeWidth to
+    //  calculate them (and we don't want the fills to be modified)
+    fillWeight: element.strokeWidth / 2,
+    hachureGap: element.strokeWidth * 4,
+    roughness: element.roughness,
+    stroke: element.strokeColor,
+  };
+
+  switch (element.type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse": {
+      options.fillStyle = element.fillStyle;
+      options.fill =
+        element.backgroundColor === "transparent"
+          ? undefined
+          : element.backgroundColor;
+      if (element.type === "ellipse") {
+        options.curveFitting = 1;
+      }
+      return options;
+    }
+    case "line":
+    case "draw":
+    case "arrow": {
+      // If shape is a line and is a closed shape,
+      // fill the shape if a color is set.
+      if (element.type === "line" || element.type === "draw") {
+        if (isPathALoop(element.points)) {
+          options.fillStyle = element.fillStyle;
+          options.fill =
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor;
+        }
+      }
+
+      return options;
+    }
+    default: {
+      throw new Error(`Unimplemented type ${element.type}`);
+    }
+  }
+};
+
 const generateElement = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
@@ -156,19 +222,16 @@ const generateElement = (
   let shape = shapeCache.get(element) || null;
   if (!shape) {
     elementWithCanvasCache.delete(element);
+
     switch (element.type) {
       case "rectangle":
-        shape = generator.rectangle(0, 0, element.width, element.height, {
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        });
+        shape = generator.rectangle(
+          0,
+          0,
+          element.width,
+          element.height,
+          generateRoughOptions(element),
+        );
 
         break;
       case "diamond": {
@@ -189,17 +252,7 @@ const generateElement = (
             [bottomX, bottomY],
             [leftX, leftY],
           ],
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
-            seed: element.seed,
-          },
+          generateRoughOptions(element),
         );
         break;
       }
@@ -209,44 +262,17 @@ const generateElement = (
           element.height / 2,
           element.width,
           element.height,
-          {
-            stroke: element.strokeColor,
-            fill:
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor,
-            fillStyle: element.fillStyle,
-            strokeWidth: element.strokeWidth,
-            roughness: element.roughness,
-            seed: element.seed,
-            curveFitting: 1,
-          },
+          generateRoughOptions(element),
         );
         break;
       case "line":
+      case "draw":
       case "arrow": {
-        const options: Options = {
-          stroke: element.strokeColor,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        };
+        const options = generateRoughOptions(element);
 
         // points array can be empty in the beginning, so it is important to add
         // initial position to it
         const points = element.points.length ? element.points : [[0, 0]];
-
-        // If shape is a line and is a closed shape,
-        // fill the shape if a color is set.
-        if (element.type === "line") {
-          if (isPathALoop(element.points)) {
-            options.fillStyle = element.fillStyle;
-            options.fill =
-              element.backgroundColor === "transparent"
-                ? undefined
-                : element.backgroundColor;
-          }
-        }
 
         // curve is always the first element
         // this simplifies finding the curve for an element
@@ -255,6 +281,13 @@ const generateElement = (
         // add lines only in arrow
         if (element.type === "arrow") {
           const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
+          // for dotted arrows caps, reduce gap to make it more legible
+          if (element.strokeStyle === "dotted") {
+            options.strokeLineDash = [3, 4];
+            // for solid/dashed, keep solid arrow cap
+          } else {
+            delete options.strokeLineDash;
+          }
           shape.push(
             ...[
               generator.line(x3, y3, x2, y2, options),
@@ -341,6 +374,7 @@ export const renderElement = (
     case "diamond":
     case "ellipse":
     case "line":
+    case "draw":
     case "arrow":
     case "text": {
       const elementWithCanvas = generateElement(element, generator, sceneState);
@@ -408,6 +442,7 @@ export const renderElementToSvg = (
       break;
     }
     case "line":
+    case "draw":
     case "arrow": {
       generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
@@ -425,7 +460,7 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
         if (
-          element.type === "line" &&
+          (element.type === "line" || element.type === "draw") &&
           isPathALoop(element.points) &&
           element.backgroundColor !== "transparent"
         ) {
@@ -481,6 +516,7 @@ export const renderElementToSvg = (
           text.setAttribute("font-size", fontSize);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
+          text.setAttribute("style", "white-space: pre;");
           node.appendChild(text);
         }
         svgRoot.appendChild(node);

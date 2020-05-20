@@ -267,6 +267,12 @@ button,
   cursor: default;
   pointer-events: none !important;
 
+  &--transition-left {
+    section {
+      width: 185px;
+    }
+  }
+
   section {
     display: flex;
   }
@@ -457,4 +463,24 @@ button,
   :root[dir="rtl"] & {
     left: 0;
   }
+}
+
+.zen-mode-visibility {
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+  width: auto;
+  transition: opacity 0.5s;
+
+  &.zen-mode-visibility--hidden {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    transition: opacity 0.5s;
+  }
+}
+
+.disable-pointerEvents {
+  pointer-events: none !important;
 }

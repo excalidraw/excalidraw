@@ -62,7 +62,9 @@ const LayerUI = ({
 
   const renderEncryptedIcon = () => (
     <a
-      className="encrypted-icon tooltip"
+      className={`encrypted-icon tooltip zen-mode-visibility ${
+        zenModeEnabled ? "zen-mode-visibility--hidden" : ""
+      }`}
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
@@ -204,7 +206,7 @@ const LayerUI = ({
         {
           <div
             className={`App-menu App-menu_bottom zen-mode-transition ${
-              zenModeEnabled && "transition-left disable-pointerEvents"
+              zenModeEnabled && "App-menu_bottom--transition-left"
             }`}
           >
             <Stack.Col gap={2}>

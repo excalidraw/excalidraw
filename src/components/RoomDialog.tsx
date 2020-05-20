@@ -80,7 +80,7 @@ const RoomModal = ({
           </div>
           <div className="RoomDialog-usernameContainer">
             <label className="RoomDialog-usernameLabel" htmlFor="username">
-              {t("labels.name")}
+              {t("labels.yourName")}
             </label>
             <input
               id="username"

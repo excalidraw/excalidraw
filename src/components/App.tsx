@@ -3,6 +3,7 @@ import React from "react";
 import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { simplify, Point } from "points-on-curve";
 import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
@@ -24,6 +25,8 @@ import {
   resizeElements,
   getElementWithResizeHandler,
   canResizeMutlipleElements,
+  getResizeOffsetXY,
+  getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
 } from "../element";
@@ -52,11 +55,7 @@ import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  ResizeArrowFnType,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
@@ -114,7 +113,6 @@ import {
   ENV,
 } from "../constants";
 import {
-  FONT_LOAD_THRESHOLD,
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
 } from "../time_constants";
@@ -132,6 +130,8 @@ import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
+
+import throttle from "lodash.throttle";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -164,11 +164,14 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
+
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal(this);
   lastBroadcastedOrReceivedSceneVersion: number = -1;
+  broadcastedElementVersions: Map<string, number> = new Map();
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
   actionManager: ActionManager;
@@ -299,6 +302,15 @@ class App extends React.Component<any, AppState> {
     event.preventDefault();
   };
 
+  private onFontLoaded = () => {
+    globalSceneState.getElementsIncludingDeleted().forEach((element) => {
+      if (isTextElement(element)) {
+        invalidateShapeForElement(element);
+      }
+    });
+    this.onSceneUpdated();
+  };
+
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -321,23 +333,6 @@ class App extends React.Component<any, AppState> {
       if (scene) {
         this.syncActionResult(scene);
       }
-    }
-
-    // rerender text elements on font load to fix #637
-    try {
-      await Promise.race([
-        document.fonts?.ready?.then(() => {
-          globalSceneState.getElementsIncludingDeleted().forEach((element) => {
-            if (isTextElement(element)) {
-              invalidateShapeForElement(element);
-            }
-          });
-        }),
-        // if fonts don't load in 1s for whatever reason, don't block the UI
-        new Promise((resolve) => setTimeout(resolve, FONT_LOAD_THRESHOLD)),
-      ]);
-    } catch (error) {
-      console.error(error);
     }
 
     if (this.state.isLoading) {
@@ -397,6 +392,9 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
+
+    // rerender text elements on font load to fix #637 && #1553
+    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
 
     // Safari-only desktop pinch zoom
     document.addEventListener(
@@ -474,6 +472,10 @@ class App extends React.Component<any, AppState> {
       event.returnValue = "";
     }
   });
+
+  queueBroadcastAllElements = throttle(() => {
+    this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
+  }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.portal.socket) {
@@ -556,7 +558,8 @@ class App extends React.Component<any, AppState> {
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastScene(SCENE.UPDATE);
+      this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
+      this.queueBroadcastAllElements();
     }
 
     history.record(this.state, globalSceneState.getElementsIncludingDeleted());
@@ -727,6 +730,7 @@ class App extends React.Component<any, AppState> {
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       text: text,
@@ -1021,19 +1025,43 @@ class App extends React.Component<any, AppState> {
   };
 
   // maybe should move to Portal
-  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
+  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE, syncAll: boolean) => {
+    if (sceneType === SCENE.INIT && !syncAll) {
+      throw new Error("syncAll must be true when sending SCENE.INIT");
+    }
+
+    let syncableElements = getSyncableElements(
+      globalSceneState.getElementsIncludingDeleted(),
+    );
+
+    if (!syncAll) {
+      // sync out only the elements we think we need to to save bandwidth.
+      // periodically we'll resync the whole thing to make sure no one diverges
+      // due to a dropped message (server goes down etc).
+      syncableElements = syncableElements.filter(
+        (syncableElement) =>
+          !this.broadcastedElementVersions.has(syncableElement.id) ||
+          syncableElement.version >
+            this.broadcastedElementVersions.get(syncableElement.id)!,
+      );
+    }
+
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
-        elements: getSyncableElements(
-          globalSceneState.getElementsIncludingDeleted(),
-        ),
+        elements: syncableElements,
       },
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
       getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
     );
+    for (const syncableElement of syncableElements) {
+      this.broadcastedElementVersions.set(
+        syncableElement.id,
+        syncableElement.version,
+      );
+    }
     return this.portal._broadcastSocketData(data as SocketUpdateData);
   };
 
@@ -1331,6 +1359,7 @@ class App extends React.Component<any, AppState> {
             backgroundColor: this.state.currentItemBackgroundColor,
             fillStyle: this.state.currentItemFillStyle,
             strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
             roughness: this.state.currentItemRoughness,
             opacity: this.state.currentItemOpacity,
             text: "",
@@ -1818,6 +1847,8 @@ class App extends React.Component<any, AppState> {
     const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
       resizeHandle = nextResizeHandle;
     };
+    let resizeOffsetXY: [number, number] = [0, 0];
+    let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
@@ -1862,6 +1893,24 @@ class App extends React.Component<any, AppState> {
             );
             isResizingElements = true;
           }
+        }
+      }
+      if (isResizingElements) {
+        resizeOffsetXY = getResizeOffsetXY(
+          resizeHandle,
+          selectedElements,
+          x,
+          y,
+        );
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0]) &&
+          selectedElements[0].points.length === 2
+        ) {
+          resizeArrowDirection = getResizeArrowDirection(
+            resizeHandle,
+            selectedElements[0],
+          );
         }
       }
       if (!isResizingElements) {
@@ -1936,6 +1985,7 @@ class App extends React.Component<any, AppState> {
       return;
     } else if (
       this.state.elementType === "arrow" ||
+      this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
       if (this.state.multiElement) {
@@ -1990,6 +2040,7 @@ class App extends React.Component<any, AppState> {
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
           strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
         });
@@ -2020,6 +2071,7 @@ class App extends React.Component<any, AppState> {
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
       });
@@ -2041,11 +2093,6 @@ class App extends React.Component<any, AppState> {
         });
       }
     }
-
-    let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
-      resizeArrowFn = fn;
-    };
 
     let selectedElementWasDuplicated = false;
 
@@ -2082,7 +2129,7 @@ class App extends React.Component<any, AppState> {
         window.devicePixelRatio,
       );
 
-      // for arrows, don't start dragging until a given threshold
+      // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
       //  user clicks mouse in a way that it moves a tiny bit (thus
       //  triggering pointermove)
@@ -2096,25 +2143,28 @@ class App extends React.Component<any, AppState> {
         }
       }
 
-      const resized =
-        isResizingElements &&
-        resizeElements(
-          resizeHandle,
-          setResizeHandle,
+      if (isResizingElements) {
+        const selectedElements = getSelectedElements(
+          globalSceneState.getElements(),
           this.state,
-          this.setAppState,
-          resizeArrowFn,
-          setResizeArrowFn,
-          event,
-          x,
-          y,
-          lastX,
-          lastY,
         );
-      if (resized) {
-        lastX = x;
-        lastY = y;
-        return;
+        this.setState({
+          isResizing: resizeHandle && resizeHandle !== "rotation",
+          isRotating: resizeHandle === "rotation",
+        });
+        if (
+          resizeElements(
+            resizeHandle,
+            setResizeHandle,
+            selectedElements,
+            resizeArrowDirection,
+            event,
+            x - resizeOffsetXY[0],
+            y - resizeOffsetXY[1],
+          )
+        ) {
+          return;
+        }
       }
 
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
@@ -2206,9 +2256,15 @@ class App extends React.Component<any, AppState> {
         if (points.length === 1) {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
+          if (draggingElement.type === "draw") {
+            mutateElement(draggingElement, {
+              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+            });
+          } else {
+            mutateElement(draggingElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
+            });
+          }
         }
       } else {
         if (getResizeWithSidesSameLengthKey(event)) {
@@ -2282,12 +2338,15 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      resizeArrowFn = null;
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
 
+      if (draggingElement?.type === "draw") {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();

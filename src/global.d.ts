@@ -1,6 +1,10 @@
 interface Document {
   fonts?: {
     ready?: Promise<void>;
+    addEventListener?(
+      type: "loading" | "loadingdone" | "loadingerror",
+      listener: (this: Document, ev: Event) => any,
+    ): void;
   };
 }
 

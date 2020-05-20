@@ -12,13 +12,23 @@ export const isTextElement = (
 
 export const isLinearElement = (
   element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement =>
-  element != null && (element.type === "arrow" || element.type === "line");
+): element is ExcalidrawLinearElement => {
+  return (
+    element != null &&
+    (element.type === "arrow" ||
+      element.type === "line" ||
+      element.type === "draw")
+  );
+};
 
-export const isExcalidrawElement = (element: any): boolean =>
-  element?.type === "text" ||
-  element?.type === "diamond" ||
-  element?.type === "rectangle" ||
-  element?.type === "ellipse" ||
-  element?.type === "arrow" ||
-  element?.type === "line";
+export const isExcalidrawElement = (element: any): boolean => {
+  return (
+    element?.type === "text" ||
+    element?.type === "diamond" ||
+    element?.type === "rectangle" ||
+    element?.type === "ellipse" ||
+    element?.type === "arrow" ||
+    element?.type === "draw" ||
+    element?.type === "line"
+  );
+};
