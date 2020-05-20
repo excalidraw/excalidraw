@@ -1,10 +1,10 @@
 {
   "labels": {
-    "paste": "",
-    "selectAll": "",
-    "copy": "",
-    "copyAsPng": "",
-    "copyAsSvg": "",
+    "paste": "Ngjit",
+    "selectAll": "Përzgjidh të gjitha",
+    "copy": "Kopjo",
+    "copyAsPng": "Kopjo në clipboard si PNG",
+    "copyAsSvg": "Kopjo në clipboard si SVG",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
