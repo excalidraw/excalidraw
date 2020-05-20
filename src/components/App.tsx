@@ -156,6 +156,7 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
+let draggingElementPointIndex: number | null = null;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1544,7 +1545,7 @@ class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
-    if (this.state.editingLinearElement) {
+    if (this.state.editingLinearElement && draggingElementPointIndex === null) {
       const { element, lastUncommittedPoint } = this.state.editingLinearElement;
       const { x: rx, y: ry, points } = element;
       const lastPoint = points[points.length - 1];
@@ -2194,7 +2195,7 @@ class App extends React.Component<any, AppState> {
     }
 
     let selectedElementWasDuplicated = false;
-    let draggingElementPointIndex: number | null = null;
+    draggingElementPointIndex = null;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
