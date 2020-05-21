@@ -192,22 +192,20 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       return options;
     }
     case "line":
-    case "draw":
-    case "arrow": {
+    case "draw": {
       // If shape is a line and is a closed shape,
       // fill the shape if a color is set.
-      if (element.type === "line" || element.type === "draw") {
-        if (isPathALoop(element.points)) {
-          options.fillStyle = element.fillStyle;
-          options.fill =
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor;
-        }
+      if (isPathALoop(element.points)) {
+        options.fillStyle = element.fillStyle;
+        options.fill =
+          element.backgroundColor === "transparent"
+            ? undefined
+            : element.backgroundColor;
       }
-
       return options;
     }
+    case "arrow":
+      return options;
     default: {
       throw new Error(`Unimplemented type ${element.type}`);
     }

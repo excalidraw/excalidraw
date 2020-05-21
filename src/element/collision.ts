@@ -23,6 +23,9 @@ const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ): boolean => {
+  if (element.type === "arrow") {
+    return false;
+  }
   const dragFromInside =
     element.backgroundColor !== "transparent" ||
     appState.selectedElementIds[element.id];
