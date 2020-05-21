@@ -13,16 +13,6 @@ type HistoryEntrySerialized = string;
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
     selectedElementIds: appState.selectedElementIds,
-    exportBackground: appState.exportBackground,
-    shouldAddWatermark: appState.shouldAddWatermark,
-    currentItemStrokeColor: appState.currentItemStrokeColor,
-    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-    currentItemFillStyle: appState.currentItemFillStyle,
-    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-    currentItemRoughness: appState.currentItemRoughness,
-    currentItemOpacity: appState.currentItemOpacity,
-    currentItemFont: appState.currentItemFont,
-    currentItemTextAlign: appState.currentItemTextAlign,
     viewBackgroundColor: appState.viewBackgroundColor,
     name: appState.name,
   };
