@@ -141,16 +141,7 @@ export class SceneHistory {
     const newEntrySerialized = this.generateEntry(appState, elements);
     const newEntry: HistoryEntry | null = this.parseEntry(newEntrySerialized);
 
-    // should push entry (first pass)
-    if (
-      this.stateHistory.length > 0 &&
-      this.stateHistory[this.stateHistory.length - 1] === newEntrySerialized
-    ) {
-      return;
-    }
-
     if (newEntry) {
-      // should push entry (second pass)
       if (!this.shouldCreateEntry(newEntry)) {
         return;
       }
