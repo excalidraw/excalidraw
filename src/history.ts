@@ -3,10 +3,12 @@ import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
 
-export type ParsedEntry = {
+export type HistoryEntry = {
   appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
   elements: ExcalidrawElement[];
 };
+
+type HistoryEntrySerialized = string;
 
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
@@ -28,9 +30,9 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
 
 export class SceneHistory {
   private recording: boolean = true;
-  private stateHistory: string[] = [];
-  private redoStack: string[] = [];
-  private lastEntry: ParsedEntry | null = null;
+  private stateHistory: HistoryEntrySerialized[] = [];
+  private redoStack: HistoryEntrySerialized[] = [];
+  private lastEntry: HistoryEntry | null = null;
 
   getSnapshotForTest() {
     return {
@@ -88,7 +90,7 @@ export class SceneHistory {
       }, [] as Mutable<typeof elements>),
     });
 
-  shouldCreateEntry(nextEntry: ParsedEntry): boolean {
+  shouldCreateEntry(nextEntry: HistoryEntry): boolean {
     const { lastEntry } = this;
 
     if (!lastEntry) {
@@ -114,7 +116,7 @@ export class SceneHistory {
       }
     }
 
-    // note: this is safe because ParsedEntry is guaranteed no excess props
+    // note: this is safe because entry's appState is guaranteed no excess props
     let key: keyof typeof nextEntry.appState;
     for (key in nextEntry.appState) {
       if (key === "selectedElementIds") {
@@ -129,34 +131,34 @@ export class SceneHistory {
   }
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    const newEntry = this.generateEntry(appState, elements);
+    const newEntrySerialized = this.generateEntry(appState, elements);
 
     // should push entry (first pass)
     if (
       this.stateHistory.length > 0 &&
-      this.stateHistory[this.stateHistory.length - 1] === newEntry
+      this.stateHistory[this.stateHistory.length - 1] === newEntrySerialized
     ) {
       return;
     }
 
-    const parsedEntry = this.restoreEntry(newEntry);
+    const newEntry = this.restoreEntry(newEntrySerialized);
 
-    // should push entry (second pass)
-    if (!this.shouldCreateEntry(parsedEntry)) {
-      return;
-    }
+    if (newEntry) {
+      // should push entry (second pass)
+      if (!this.shouldCreateEntry(newEntry)) {
+        return;
+      }
 
-    if (parsedEntry) {
-      this.stateHistory.push(newEntry);
-      this.lastEntry = parsedEntry;
+      this.stateHistory.push(newEntrySerialized);
+      this.lastEntry = newEntry;
       // As a new entry was pushed, we invalidate the redo stack
       this.clearRedoStack();
     }
   }
 
-  restoreEntry(entry: string) {
+  restoreEntry(entrySerialized: HistoryEntrySerialized): HistoryEntry | null {
     try {
-      return JSON.parse(entry);
+      return JSON.parse(entrySerialized);
     } catch {
       return null;
     }
@@ -166,7 +168,7 @@ export class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(): ParsedEntry | null {
+  redoOnce(): HistoryEntry | null {
     if (this.redoStack.length === 0) {
       return null;
     }
@@ -181,7 +183,7 @@ export class SceneHistory {
     return null;
   }
 
-  undoOnce(): ParsedEntry | null {
+  undoOnce(): HistoryEntry | null {
     if (this.stateHistory.length === 1) {
       return null;
     }

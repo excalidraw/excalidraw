@@ -3,7 +3,7 @@ import React from "react";
 import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { SceneHistory, ParsedEntry } from "../history";
+import { SceneHistory, HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
@@ -13,7 +13,7 @@ import { newElementWith } from "../element/mutateElement";
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
   appState: AppState,
-  updater: () => ParsedEntry | null,
+  updater: () => HistoryEntry | null,
 ): ActionResult => {
   const commitToHistory = false;
   if (
