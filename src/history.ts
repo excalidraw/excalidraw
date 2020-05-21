@@ -88,31 +88,39 @@ export class SceneHistory {
       }, [] as Mutable<typeof elements>),
     });
 
-  shouldCreateEntry(parsedEntry: ParsedEntry): boolean {
-    if (!this.lastEntry) {
+  shouldCreateEntry(nextEntry: ParsedEntry): boolean {
+    const { lastEntry } = this;
+
+    if (!lastEntry) {
       return true;
     }
-    const { appState, elements } = parsedEntry;
-    // note: this is safe because ParsedEntry is guaranteed no excess props
-    let key: keyof typeof appState;
-    for (key in appState) {
-      if (key === "selectedElementIds") {
-        continue;
-      }
-      if (appState[key] !== this.lastEntry.appState[key]) {
-        return true;
-      }
+
+    if (nextEntry.elements.length !== lastEntry.elements.length) {
+      return true;
     }
 
-    for (const i in elements) {
-      const prev = elements[i];
-      const next = this.lastEntry.elements[i];
+    // loop from right to left as changes are likelier to happen on new elements
+    for (let i = nextEntry.elements.length - 1; i > -1; i--) {
+      const prev = nextEntry.elements[i];
+      const next = lastEntry.elements[i];
       if (
         !prev ||
         !next ||
         prev.id !== next.id ||
-        prev.version !== next.version
+        prev.version !== next.version ||
+        prev.versionNonce !== next.versionNonce
       ) {
+        return true;
+      }
+    }
+
+    // note: this is safe because ParsedEntry is guaranteed no excess props
+    let key: keyof typeof nextEntry.appState;
+    for (key in nextEntry.appState) {
+      if (key === "selectedElementIds") {
+        continue;
+      }
+      if (nextEntry.appState[key] !== lastEntry.appState[key]) {
         return true;
       }
     }
