@@ -74,6 +74,7 @@ export const restore = (
         // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
         version: element.version || 1,
         id: element.id || randomId(),
+        isDeleted: false,
         fillStyle: element.fillStyle || "hachure",
         strokeWidth: element.strokeWidth || 1,
         strokeStyle: element.strokeStyle ?? "solid",
