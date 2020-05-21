@@ -18,15 +18,15 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
-function getElementIndices(
+const getElementIndices = (
   direction: "left" | "right",
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   const selectedIndices: number[] = [];
   let deletedIndicesCache: number[] = [];
 
-  function cb(element: ExcalidrawElement, index: number) {
+  const cb = (element: ExcalidrawElement, index: number) => {
     if (element.isDeleted) {
       // we want to build an array of deleted elements that are preceeding
       //  a selected element so that we move them together
@@ -39,7 +39,7 @@ function getElementIndices(
       //  of selected/deleted elements, of after encountering non-deleted elem
       deletedIndicesCache = [];
     }
-  }
+  };
 
   // sending back → select contiguous deleted elements that are to the left of
   //  selected element(s)
@@ -59,19 +59,19 @@ function getElementIndices(
   }
   // sort in case we were gathering indexes from right to left
   return selectedIndices.sort();
-}
+};
 
-function moveElements(
+const moveElements = (
   func: typeof moveOneLeft,
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   const _elements = elements.slice();
   const direction =
     func === moveOneLeft || func === moveAllLeft ? "left" : "right";
   const indices = getElementIndices(direction, _elements, appState);
   return func(_elements, indices);
-}
+};
 
 export const actionSendBackward = register({
   name: "sendBackward",

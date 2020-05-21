@@ -13,27 +13,24 @@ import { AppState } from "../types";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
-function isInHandlerRect(
+const isInHandlerRect = (
   handler: [number, number, number, number],
   x: number,
   y: number,
-) {
-  return (
-    x >= handler[0] &&
-    x <= handler[0] + handler[2] &&
-    y >= handler[1] &&
-    y <= handler[1] + handler[3]
-  );
-}
+) =>
+  x >= handler[0] &&
+  x <= handler[0] + handler[2] &&
+  y >= handler[1] &&
+  y <= handler[1] + handler[3];
 
-export function resizeTest(
+export const resizeTest = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   x: number,
   y: number,
   zoom: number,
   pointerType: PointerType,
-): HandlerRectanglesRet | false {
+): HandlerRectanglesRet | false => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
   }
@@ -66,30 +63,29 @@ export function resizeTest(
   }
 
   return false;
-}
+};
 
-export function getElementWithResizeHandler(
+export const getElementWithResizeHandler = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   { x, y }: { x: number; y: number },
   zoom: number,
   pointerType: PointerType,
-) {
-  return elements.reduce((result, element) => {
+) =>
+  elements.reduce((result, element) => {
     if (result) {
       return result;
     }
     const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: NonDeletedExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
-}
 
-export function getResizeHandlerFromCoords(
+export const getResizeHandlerFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   { x, y }: { x: number; y: number },
   zoom: number,
   pointerType: PointerType,
-) {
+) => {
   const handlers = handlerRectanglesFromCoords(
     [x1, y1, x2, y2],
     0,
@@ -103,7 +99,7 @@ export function getResizeHandlerFromCoords(
     return handler && isInHandlerRect(handler, x, y);
   });
   return (found || false) as HandlerRectanglesRet;
-}
+};
 
 const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
 const rotateResizeCursor = (cursor: string, angle: number) => {
@@ -118,10 +114,10 @@ const rotateResizeCursor = (cursor: string, angle: number) => {
 /*
  * Returns bi-directional cursor for the element being resized
  */
-export function getCursorForResizingElement(resizingElement: {
+export const getCursorForResizingElement = (resizingElement: {
   element?: ExcalidrawElement;
   resizeHandle: ReturnType<typeof resizeTest>;
-}): string {
+}): string => {
   const { element, resizeHandle } = resizingElement;
   const shouldSwapCursors =
     element && Math.sign(element.height) * Math.sign(element.width) === -1;
@@ -161,12 +157,12 @@ export function getCursorForResizingElement(resizingElement: {
   }
 
   return cursor ? `${cursor}-resize` : "";
-}
+};
 
-export function normalizeResizeHandle(
+export const normalizeResizeHandle = (
   element: ExcalidrawElement,
   resizeHandle: HandlerRectanglesRet,
-): HandlerRectanglesRet {
+): HandlerRectanglesRet => {
   if (element.width >= 0 && element.height >= 0) {
     return resizeHandle;
   }
@@ -215,4 +211,4 @@ export function normalizeResizeHandle(
   }
 
   return resizeHandle;
-}
+};

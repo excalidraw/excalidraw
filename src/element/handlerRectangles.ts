@@ -21,7 +21,7 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   rotation: true,
 };
 
-function generateHandler(
+const generateHandler = (
   x: number,
   y: number,
   width: number,
@@ -29,18 +29,18 @@ function generateHandler(
   cx: number,
   cy: number,
   angle: number,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
-}
+};
 
-export function handlerRectanglesFromCoords(
+export const handlerRectanglesFromCoords = (
   [x1, y1, x2, y2]: [number, number, number, number],
   angle: number,
   zoom: number,
   pointerType: PointerType = "mouse",
   omitSides: { [T in Sides]?: boolean } = {},
-): Partial<{ [T in Sides]: [number, number, number, number] }> {
+): Partial<{ [T in Sides]: [number, number, number, number] }> => {
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;
@@ -173,13 +173,13 @@ export function handlerRectanglesFromCoords(
   }
 
   return handlers;
-}
+};
 
-export function handlerRectangles(
+export const handlerRectangles = (
   element: ExcalidrawElement,
   zoom: number,
   pointerType: PointerType = "mouse",
-) {
+) => {
   const handlers = handlerRectanglesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
@@ -234,4 +234,4 @@ export function handlerRectangles(
   }
 
   return handlers;
-}
+};

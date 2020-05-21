@@ -22,9 +22,9 @@ beforeEach(() => {
 
 const { h } = window;
 
-function populateElements(
+const populateElements = (
   elements: { id: string; isDeleted?: boolean; isSelected?: boolean }[],
-) {
+) => {
   const selectedElementIds: any = {};
 
   h.elements = elements.map(({ id, isDeleted = false, isSelected = false }) => {
@@ -54,7 +54,7 @@ function populateElements(
   });
 
   return selectedElementIds;
-}
+};
 
 type Actions =
   | typeof actionBringForward
@@ -62,20 +62,20 @@ type Actions =
   | typeof actionBringToFront
   | typeof actionSendToBack;
 
-function assertZindex({
+const assertZindex = ({
   elements,
   operations,
 }: {
   elements: { id: string; isDeleted?: true; isSelected?: true }[];
   operations: [Actions, string[]][];
-}) {
+}) => {
   const selectedElementIds = populateElements(elements);
   operations.forEach(([action, expected]) => {
     h.app.actionManager.executeAction(action);
     expect(h.elements.map((element) => element.id)).toEqual(expected);
     expect(h.state.selectedElementIds).toEqual(selectedElementIds);
   });
-}
+};
 
 describe("z-index manipulation", () => {
   it("send back", () => {

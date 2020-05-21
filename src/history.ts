@@ -27,11 +27,11 @@ export class SceneHistory {
     this.redoStack.length = 0;
   }
 
-  private generateEntry(
+  private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
-  ) {
-    return JSON.stringify({
+  ) =>
+    JSON.stringify({
       appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.reduce((elements, element) => {
         if (
@@ -69,7 +69,6 @@ export class SceneHistory {
         return elements;
       }, [] as Mutable<typeof elements>),
     });
-  }
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
     const newEntry = this.generateEntry(appState, elements);
