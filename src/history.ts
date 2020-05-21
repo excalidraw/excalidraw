@@ -47,6 +47,19 @@ export class SceneHistory {
     this.redoStack.length = 0;
   }
 
+  private parseEntry(
+    entrySerialized: HistoryEntrySerialized | undefined,
+  ): HistoryEntry | null {
+    if (entrySerialized === undefined) {
+      return null;
+    }
+    try {
+      return JSON.parse(entrySerialized);
+    } catch {
+      return null;
+    }
+  }
+
   private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
@@ -68,23 +81,17 @@ export class SceneHistory {
             return elements;
           }
 
-          elements.push(
-            newElementWith(element, {
-              // don't store last point if not committed
-              points:
-                element.lastCommittedPoint !==
-                element.points[element.points.length - 1]
-                  ? element.points.slice(0, -1)
-                  : element.points,
-              // don't regenerate versionNonce else this will short-circuit our
-              //  bail-on-no-change logic in pushEntry()
-              versionNonce: element.versionNonce,
-            }),
-          );
+          elements.push({
+            ...element,
+            // don't store last point if not committed
+            points:
+              element.lastCommittedPoint !==
+              element.points[element.points.length - 1]
+                ? element.points.slice(0, -1)
+                : element.points,
+          });
         } else {
-          elements.push(
-            newElementWith(element, { versionNonce: element.versionNonce }),
-          );
+          elements.push(element);
         }
         return elements;
       }, [] as Mutable<typeof elements>),
@@ -132,6 +139,7 @@ export class SceneHistory {
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
     const newEntrySerialized = this.generateEntry(appState, elements);
+    const newEntry: HistoryEntry | null = this.parseEntry(newEntrySerialized);
 
     // should push entry (first pass)
     if (
@@ -140,8 +148,6 @@ export class SceneHistory {
     ) {
       return;
     }
-
-    const newEntry = this.restoreEntry(newEntrySerialized);
 
     if (newEntry) {
       // should push entry (second pass)
@@ -156,12 +162,17 @@ export class SceneHistory {
     }
   }
 
-  restoreEntry(entrySerialized: HistoryEntrySerialized): HistoryEntry | null {
-    try {
-      return JSON.parse(entrySerialized);
-    } catch {
-      return null;
+  private restoreEntry(
+    entrySerialized: HistoryEntrySerialized,
+  ): HistoryEntry | null {
+    const entry = this.parseEntry(entrySerialized);
+    if (entry) {
+      entry.elements = entry.elements.map((element) => {
+        // renew versions
+        return newElementWith(element, {});
+      });
     }
+    return entry;
   }
 
   clearRedoStack() {
