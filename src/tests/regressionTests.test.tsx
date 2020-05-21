@@ -162,6 +162,11 @@ const getSelectedElement = (): ExcalidrawElement => {
   return selectedElements[0];
 };
 
+function getStateHistory() {
+  // @ts-ignore
+  return h.history.stateHistory;
+}
+
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 const getResizeHandles = () => {
   const rects = handlerRectangles(
@@ -567,6 +572,46 @@ describe("regression tests", () => {
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(1);
     keyPress("z", true, true);
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
+  });
+
+  it("noop interaction after undo shouldn't create history entry", () => {
+    // NOTE: this will fail if this test case is run in isolation. There's
+    //  some leaking state or race conditions in initialization/teardown
+    //  (couldn't figure out)
+    expect(getStateHistory().length).toBe(0);
+
+    clickTool("rectangle");
+    pointerDown(10, 10);
+    pointerMove(20, 20);
+    pointerUp();
+
+    clickTool("rectangle");
+    pointerDown(30, 10);
+    pointerMove(40, 20);
+    pointerUp();
+
+    expect(getStateHistory().length).toBe(2);
+
+    keyPress("z", true);
+    expect(getStateHistory().length).toBe(1);
+
+    // clicking an element shouldn't addu to history
+    pointerDown(10, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(1);
+
+    keyPress("z", true, true);
+    expect(getStateHistory().length).toBe(2);
+
+    // clicking an element shouldn't addu to history
+    pointerDown(10, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(2);
+
+    // same for clicking the element just redo-ed
+    pointerDown(30, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(2);
   });
 
   it("zoom hotkeys", () => {

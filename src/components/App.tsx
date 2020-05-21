@@ -276,12 +276,23 @@ class App extends React.Component<any, AppState> {
       if (res.commitToHistory) {
         history.resumeRecording();
       }
-      this.setState((state) => ({
-        ...res.appState,
-        editingElement: editingElement || res.appState?.editingElement || null,
-        isCollaborating: state.isCollaborating,
-        collaborators: state.collaborators,
-      }));
+      this.setState(
+        (state) => ({
+          ...res.appState,
+          editingElement:
+            editingElement || res.appState?.editingElement || null,
+          isCollaborating: state.isCollaborating,
+          collaborators: state.collaborators,
+        }),
+        () => {
+          if (res.syncHistory) {
+            history.setCurrentState(
+              this.state,
+              globalSceneState.getElementsIncludingDeleted(),
+            );
+          }
+        },
+      );
     }
   });
 

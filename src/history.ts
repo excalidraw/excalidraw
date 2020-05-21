@@ -45,6 +45,7 @@ export class SceneHistory {
   clear() {
     this.stateHistory.length = 0;
     this.redoStack.length = 0;
+    this.lastEntry = null;
   }
 
   private parseEntry(
@@ -200,6 +201,19 @@ export class SceneHistory {
     }
 
     return null;
+  }
+
+  /**
+   * Updates history's `lastEntry` to latest app state. This is necessary
+   *  when doing undo/redo which itself doesn't commit to history, but updates
+   *  app state in a way that would break `shouldCreateEntry` which relies on
+   *  `lastEntry` to reflect last comittable history state.
+   * We can't update `lastEntry` from within history when calling undo/redo
+   *  because the action potentially mutates appState/elements before storing
+   *  it.
+   */
+  setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
+    this.lastEntry = this.parseEntry(this.generateEntry(appState, elements));
   }
 
   // Suspicious that this is called so many places. Seems error-prone.
