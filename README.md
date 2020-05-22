@@ -79,7 +79,7 @@ To translate Excalidraw into other languages, please visit [our Crowdin page](ht
 
 - [React](https://reactjs.org)
 - [Rough.js](https://roughjs.com)
-- [TypeScript](https://typescriptlang.org)
+- [TypeScript](https://www.typescriptlang.org)
 - [Vercel](https://vercel.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
