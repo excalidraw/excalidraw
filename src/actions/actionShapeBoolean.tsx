@@ -43,7 +43,10 @@ export const actionShapeDifference = register({
   perform: (elements, appState) => {
     const canvas = document.createElement("canvas");
     const rc = rough.canvas(canvas);
-    const selectedElements = getSelectedElements(elements, appState);
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
 
     const newElement = selectedElements.elements.reduce(
       (acc: ExcalidrawElement, element: ExcalidrawElement) => {

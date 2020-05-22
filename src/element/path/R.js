@@ -1,5 +1,6 @@
-const pathCommand = /([cmz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
+const pathCommand = /([achlmrqstvz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
 const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
+const notcurvepath = /,?([achlqrstvx]),?/i;
 
 function findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
   var t1 = 1 - t;
@@ -63,6 +64,7 @@ function curveDim(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
 
 function bezierBBox(params) {
   var bbox = curveDim(...params);
+
   return {
     x: bbox.min.x,
     y: bbox.min.y,
@@ -244,6 +246,101 @@ function l2c(x1, y1, x2, y2) {
   return [x1, y1, x2, y2, x2, y2];
 }
 
+// function pathToAbsolute(pathArray) {
+//   var pth = paths(pathArray);
+//   if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) { // rough assumption
+//       pathArray = R.parsePathString(pathArray);
+//   }
+//   if (!pathArray || !pathArray.length) {
+//       return [["M", 0, 0]];
+//   }
+//   var res = [],
+//       x = 0,
+//       y = 0,
+//       mx = 0,
+//       my = 0,
+//       start = 0;
+//   if (pathArray[0][0] == "M") {
+//       x = +pathArray[0][1];
+//       y = +pathArray[0][2];
+//       mx = x;
+//       my = y;
+//       start++;
+//       res[0] = ["M", x, y];
+//   }
+//   var crz = pathArray.length == 3 && pathArray[0][0] == "M" && pathArray[1][0].toUpperCase() == "R" && pathArray[2][0].toUpperCase() == "Z";
+//   for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
+//       res.push(r = []);
+//       pa = pathArray[i];
+//       if (pa[0] != upperCase.call(pa[0])) {
+//           r[0] = upperCase.call(pa[0]);
+//           switch (r[0]) {
+//               case "A":
+//                   r[1] = pa[1];
+//                   r[2] = pa[2];
+//                   r[3] = pa[3];
+//                   r[4] = pa[4];
+//                   r[5] = pa[5];
+//                   r[6] = +(pa[6] + x);
+//                   r[7] = +(pa[7] + y);
+//                   break;
+//               case "V":
+//                   r[1] = +pa[1] + y;
+//                   break;
+//               case "H":
+//                   r[1] = +pa[1] + x;
+//                   break;
+//               case "R":
+//                   var dots = [x, y][concat](pa.slice(1));
+//                   for (var j = 2, jj = dots.length; j < jj; j++) {
+//                       dots[j] = +dots[j] + x;
+//                       dots[++j] = +dots[j] + y;
+//                   }
+//                   res.pop();
+//                   res = res[concat](catmullRom2bezier(dots, crz));
+//                   break;
+//               case "M":
+//                   mx = +pa[1] + x;
+//                   my = +pa[2] + y;
+//               default:
+//                   for (j = 1, jj = pa.length; j < jj; j++) {
+//                       r[j] = +pa[j] + ((j % 2) ? x : y);
+//                   }
+//           }
+//       } else if (pa[0] == "R") {
+//           dots = [x, y][concat](pa.slice(1));
+//           res.pop();
+//           res = res[concat](catmullRom2bezier(dots, crz));
+//           r = ["R"][concat](pa.slice(-2));
+//       } else {
+//           for (var k = 0, kk = pa.length; k < kk; k++) {
+//               r[k] = pa[k];
+//           }
+//       }
+//       switch (r[0]) {
+//           case "Z":
+//               x = mx;
+//               y = my;
+//               break;
+//           case "H":
+//               x = r[1];
+//               break;
+//           case "V":
+//               y = r[1];
+//               break;
+//           case "M":
+//               mx = r[r.length - 2];
+//               my = r[r.length - 1];
+//           default:
+//               x = r[r.length - 2];
+//               y = r[r.length - 1];
+//       }
+//   }
+//   res.toString = R._path2string;
+//   pth.abs = pathClone(res);
+//   return res;
+// }
+
 function _path2curve(path) {
   var attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
     processPath = function (path, d) {
@@ -256,6 +353,9 @@ function _path2curve(path) {
         case "M":
           d.X = path[1];
           d.Y = path[2];
+          break;
+        case "L":
+          path = ["C"].concat(l2c(d.x, d.y, path[1], path[2]));
           break;
         case "H":
           path = ["C"].concat(l2c(d.x, d.y, path[1], d.y));
@@ -293,7 +393,55 @@ function _path2curve(path) {
   return path;
 }
 
+function getTatLen(x1, y1, x2, y2, x3, y3, x4, y4, ll) {
+  if (ll < 0 || bezlen(x1, y1, x2, y2, x3, y3, x4, y4) < ll) {
+    return;
+  }
+  var t = 1,
+    step = t / 2,
+    t2 = t - step,
+    l,
+    e = 0.01;
+  l = bezlen(x1, y1, x2, y2, x3, y3, x4, y4, t2);
+  while (Math.abs(l - ll) > e) {
+    step /= 2;
+    t2 += (l < ll ? 1 : -1) * step;
+    l = bezlen(x1, y1, x2, y2, x3, y3, x4, y4, t2);
+  }
+  return t2;
+}
+
+function getPointAtSegmentLength(
+  p1x,
+  p1y,
+  c1x,
+  c1y,
+  c2x,
+  c2y,
+  p2x,
+  p2y,
+  length,
+) {
+  if (length == null) {
+    return bezlen(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y);
+  }
+  return findDotsAtSegment(
+    p1x,
+    p1y,
+    c1x,
+    c1y,
+    c2x,
+    c2y,
+    p2x,
+    p2y,
+    getTatLen(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, length),
+  );
+}
+
 export function pathIntersection(path1, path2) {
+  path1 = normalizePath(path1);
+  path2 = normalizePath(path2);
+
   var x1,
     y1,
     x2,
@@ -352,10 +500,30 @@ export function pathIntersection(path1, path2) {
   return res;
 }
 
+function normalizePath(path) {
+  if (typeof path === "string") {
+    if (notcurvepath.test(path)) {
+      return _path2curve(parsePathString(path));
+    }
+
+    return parsePathString(path);
+  }
+
+  return path;
+}
+
 export function parsePathString(pathString) {
   const paramCounts = {
+    a: 7,
     c: 6,
+    h: 1,
+    l: 2,
     m: 2,
+    r: 4,
+    q: 4,
+    s: 4,
+    t: 2,
+    v: 1,
     z: 0,
   };
   const data = [];
@@ -380,10 +548,6 @@ export function parsePathString(pathString) {
 }
 
 export function isPointInsidePath(path, x, y) {
-  if (typeof path === "string") {
-    path = parsePathString(path);
-  }
-
   var bbox = pathDimensions(path);
 
   return (
@@ -423,6 +587,8 @@ export function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
 }
 
 export function pathDimensions(path) {
+  path = normalizePath(path);
+
   var x = 0,
     y = 0,
     X = [],
@@ -460,4 +626,65 @@ export function pathDimensions(path) {
       cy: ymin + height / 2,
     };
   return bb;
+}
+
+export function getTotalLength(path, length) {
+  var x,
+    y,
+    p,
+    l,
+    len = 0;
+
+  for (var i = 0, ii = path.length; i < ii; i++) {
+    p = path[i];
+    if (p[0] === "M") {
+      x = +p[1];
+      y = +p[2];
+    } else {
+      l = getPointAtSegmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+      len += l;
+      x = +p[5];
+      y = +p[6];
+    }
+  }
+
+  return len;
+}
+export function getPointAtLength(path, length) {
+  var x,
+    y,
+    p,
+    l,
+    point,
+    len = 0;
+  for (var i = 0, ii = path.length; i < ii; i++) {
+    p = path[i];
+    if (p[0] === "M") {
+      x = +p[1];
+      y = +p[2];
+    } else {
+      l = getPointAtSegmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+      if (len + l > length) {
+        point = getPointAtSegmentLength(
+          x,
+          y,
+          p[1],
+          p[2],
+          p[3],
+          p[4],
+          p[5],
+          p[6],
+          length - len,
+        );
+        return { x: point.x, y: point.y, alpha: point.alpha };
+      }
+      len += l;
+      x = +p[5];
+      y = +p[6];
+    }
+  }
+  point = findDotsAtSegment(x, y, p[0], p[1], p[2], p[3], p[4], p[5], 1);
+  point.alpha && (point = { x: point.x, y: point.y, alpha: point.alpha });
+
+  return point;
 }

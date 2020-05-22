@@ -115,11 +115,13 @@ export function newPathElement(
   opts: {
     type: ExcalidrawPathElement["type"];
     d: string;
+    hollow: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawPathElement> {
   return {
     ..._newElementBase<ExcalidrawPathElement>(opts.type, opts),
     d: opts.d || "",
+    hollow: opts.hollow || false,
   };
 }
 

@@ -108,7 +108,17 @@ function operateBool(type, path1, path2) {
   var newParts = buildNewPathParts(type, path1Segs, path2Segs);
   var indexes = buildPartIndexes(newParts);
 
-  return buildNewPath(type, newParts, indexes.inversions, indexes.startIndex);
+  const result = buildNewPath(
+    type,
+    newParts,
+    indexes.inversions,
+    indexes.startIndex,
+  );
+
+  return {
+    isHollow: result.isHollow,
+    path: pathSegsToArr(result.path),
+  };
 }
 
 /**
@@ -118,9 +128,9 @@ function operateBool(type, path1, path2) {
  *
  * @returns string
  */
-var pathArrToStr = function (pathArr) {
+export function pathArrToStr(pathArr) {
   return pathArr.join(",").replace(/,?([achlmqrstvxz]),?/gi, "$1");
-};
+}
 
 /**
  * Shortcut helper
@@ -329,28 +339,26 @@ var invertSeg = function (segCoords) {
  *
  * returns void
  */
-var invertPart = function (part) {
-  const length = part.segments.length;
-  const firstSegment = part.segments[0];
-  const lastSegment = part.segments[length - 1];
+var invertPart = function (segments) {
+  const length = segments.length;
 
-  part.segments.map((segment) => invertSeg(segment.items));
+  segments.map((segment) => invertSeg(segment.items));
 
   //invert order of segments
-  part.segments.reverse();
+  segments.reverse();
+
+  const firstSegment = segments[0];
+  const lastSegment = segments[length - 1];
 
   //switch starting and ending points
-  var oldStartPoint = lastSegment.startPoint;
-  if (firstSegment.endPoint) {
-    firstSegment.startPoint = firstSegment.endPoint;
-  }
+  const oldStartPoint = lastSegment.startPoint;
+  firstSegment.startPoint = firstSegment.endPoint;
+
   if (length > 1) {
     delete firstSegment.endPoint;
   }
 
-  if (oldStartPoint) {
-    lastSegment.endPoint = oldStartPoint;
-  }
+  lastSegment.endPoint = oldStartPoint;
   if (length > 1) {
     delete lastSegment.startPoint;
   }
@@ -363,12 +371,12 @@ var invertPart = function (part) {
  *
  * @returns int dir (1: clockwise, -1: counter clockwise)
  */
-var getPathDirection = function (pathSegArr) {
+function getPathDirection(pathSegArr) {
   var dir = -1;
   var minT, maxT;
 
   //get y of path's starting point
-  var startY = pathSegArr[0][1];
+  var startY = pathSegArr[0].items[1];
 
   //convert path to string
   var path = pathSegsToStr(pathSegArr);
@@ -410,7 +418,7 @@ var getPathDirection = function (pathSegArr) {
   }
 
   return dir;
-};
+}
 
 /**
  * wrapper for RaphaelJS pathIntersection()
@@ -574,8 +582,8 @@ function buildPartIndexes(parts) {
 
   //iterate all parts of the new path and build indices of starting and ending points
   parts.forEach((part, i) => {
-    const firstSegment = part.segments[0];
-    const lastSegment = part.segments[part.segments.length - 1];
+    let firstSegment = part.segments[0];
+    let lastSegment = part.segments[part.segments.length - 1];
 
     //if starting point or ending point id already exists (and there are different) invert the part
     if (firstSegment.startPoint !== lastSegment.endPoint) {
@@ -585,7 +593,10 @@ function buildPartIndexes(parts) {
         typeof endIndex[lastSegment.endPoint] !== "undefined"
       ) {
         //invert the segments
-        invertPart(part);
+        invertPart(part.segments);
+
+        firstSegment = part.segments[0];
+        lastSegment = part.segments[part.segments.length - 1];
 
         //count inversions
         inversions[part.pathNr]++;
@@ -603,7 +614,7 @@ function buildPartIndexes(parts) {
     startIndex: startIndex,
     endIndex: endIndex,
   };
-};
+}
 
 /**
  * the final step: build a new path out of the given parts by putting together the appropriate starting end ending points
@@ -628,7 +639,7 @@ function buildNewPath(type, parts, inversions, startIndex) {
         !part.inverted &&
         part[0].startPoint === part[part.length - 1].endPoint
       ) {
-        invertPart(part);
+        invertPart(part.segments);
       }
     });
   }
@@ -656,7 +667,7 @@ function buildNewPath(type, parts, inversions, startIndex) {
         }
       }
 
-      subPath = subPath.concat(curPart);
+      subPath = subPath.concat(curPart.segments);
       partsAdded++;
       endPointId = lastSegment.endPoint;
       curPart.added = true;
@@ -685,18 +696,19 @@ function buildNewPath(type, parts, inversions, startIndex) {
     for (var i = 0; i < dirCheck.length; i++) {
       //inside which subpath is the subpath that has to be checked
       for (var o = 0; o < newPath.length; o++) {
-        if (dirCheck[i] === o) {
+        const n = dirCheck[i];
+
+        if (n === o) {
           continue;
         }
-        if (
-          isSegInsidePath(newPath[dirCheck[i]][0], pathSegsToStr(newPath[o]))
-        ) {
+
+        if (isSegInsidePath(newPath[n][0].items, pathSegsToStr(newPath[o]))) {
           var pathDirOut = getPathDirection(newPath[o]);
-          var pathDirIn = getPathDirection(newPath[dirCheck[i]]);
+          var pathDirIn = getPathDirection(newPath[n]);
 
           //if both subpaths have the same direction invert the inner path
           if (pathDirIn === pathDirOut) {
-            invertPart(newPath[dirCheck[i]]);
+            invertPart(newPath[n]);
           }
         }
       }
@@ -704,9 +716,12 @@ function buildNewPath(type, parts, inversions, startIndex) {
   }
 
   //flatten new path
-  return newPath.reduce((acc, path) => {
-    return acc.concat(...path.map(({ segments }) => segments));
-  }, []);
+  return {
+    isHollow: !!dirCheck.length,
+    path: newPath.reduce((acc, path) => {
+      return acc.concat(path);
+    }, []),
+  };
 }
 
 /**
@@ -730,7 +745,7 @@ export function union(path1, path2) {
  * @returns string (path string)
  */
 export function difference(path1, path2) {
-  return pathSegsToStr(operateBool("difference", path1, path2));
+  return operateBool("difference", path1, path2);
 }
 
 /**

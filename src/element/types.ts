@@ -60,6 +60,7 @@ export type ExcalidrawPathElement = _ExcalidrawElementBase &
   Readonly<{
     type: "path";
     d: string;
+    hollow: boolean;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

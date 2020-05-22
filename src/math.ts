@@ -1,5 +1,58 @@
 import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
+import Path from "./element/path/Path";
+
+// https://bl.ocks.org/mbostock/8027637
+export function distanceFromPointToPath(d: string, point: Point) {
+  let precision = 8;
+  let bestDistance = Infinity;
+  let bestLength = 0;
+  let p;
+
+  if (!d) {
+    return bestDistance;
+  }
+
+  const path = new Path(d);
+  const pathLength = path.getTotalLength();
+
+  // linear scan for coarse approximation
+  for (let scanLength = 0; scanLength <= pathLength; scanLength += precision) {
+    p = path.getPointAtLength(scanLength);
+    const scanDistance = distance2d(p.x, p.y, point[0], point[1]);
+
+    if (scanDistance < bestDistance) {
+      bestLength = scanLength;
+      bestDistance = scanDistance;
+    }
+  }
+
+  // binary search for precise estimate
+  precision /= 2;
+  while (precision > 0.5) {
+    const beforeLength = bestLength - precision;
+    p = path.getPointAtLength(beforeLength);
+    const beforeDistance = distance2d(p.x, p.y, point[0], point[1]);
+
+    if (beforeLength >= 0 && beforeDistance < bestDistance) {
+      bestLength = beforeLength;
+      bestDistance = beforeDistance;
+    } else {
+      const afterLength = bestLength + precision;
+      p = path.getPointAtLength(afterLength);
+      const afterDistance = distance2d(p.x, p.y, point[0], point[1]);
+
+      if (afterLength <= pathLength && afterDistance < bestDistance) {
+        bestLength = afterLength;
+        bestDistance = afterDistance;
+      } else {
+        precision /= 2;
+      }
+    }
+  }
+
+  return bestDistance;
+}
 
 // https://stackoverflow.com/a/6853926/232122
 export function distanceBetweenPointAndSegment(
