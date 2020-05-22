@@ -388,7 +388,7 @@ export const actionChangeFontFamily = register({
       <ButtonSelect
         group="font-family"
         options={[
-          { value: "Virgil", text: t("labels.handDrawn") },
+          { value: "Virgil, APJapanesefont", text: t("labels.handDrawn") },
           { value: "Helvetica", text: t("labels.normal") },
           { value: "Cascadia", text: t("labels.code") },
         ]}

@@ -3,7 +3,7 @@ import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
 
-export const DEFAULT_FONT = "20px Virgil";
+export const DEFAULT_FONT = "20px Virgil, APJapanesefont";
 export const DEFAULT_TEXT_ALIGN = "left";
 
 export function getDefaultAppState(): AppState {

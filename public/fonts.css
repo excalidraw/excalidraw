@@ -5,6 +5,13 @@
   font-display: swap;
 }
 
+/* http://www8.plala.or.jp/p_dolce/font/ap1.zip */
+@font-face {
+  font-family: "APJapanesefont";
+  src: url("APJapanesefont.ttf");
+  font-display: swap;
+}
+
 /* https://github.com/microsoft/cascadia-code */
 @font-face {
   font-family: "Cascadia";

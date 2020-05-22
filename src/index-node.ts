@@ -49,12 +49,13 @@ const elements = [
     opacity: 100,
     seed: 1683771448,
     text: "test",
-    font: "20px Virgil",
+    font: "20px Virgil, APJapanesefont",
     baseline: 22,
   },
 ];
 
 registerFont("./public/FG_Virgil.ttf", { family: "Virgil" });
+registerFont("./public/APJapanesefont.ttf", { family: "APJapanesefont" });
 registerFont("./public/Cascadia.ttf", { family: "Cascadia" });
 
 const canvas = exportToCanvas(

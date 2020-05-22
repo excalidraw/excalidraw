@@ -123,6 +123,10 @@ export function exportToSvg(
         src: url("https://excalidraw.com/FG_Virgil.woff2");
       }
       @font-face {
+        font-family: "APJapanesefont";
+        src: url("https://excalidraw.com/APJapanesefont.ttf");
+      }
+      @font-face {
         font-family: "Cascadia";
         src: url("https://excalidraw.com/Cascadia.woff2");
       }
