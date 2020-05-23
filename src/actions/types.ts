@@ -6,6 +6,7 @@ export type ActionResult = {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: AppState | null;
   commitToHistory: boolean;
+  syncHistory?: boolean;
 };
 
 type ActionFn = (
