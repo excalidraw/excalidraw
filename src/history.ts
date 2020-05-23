@@ -75,7 +75,9 @@ export class SceneHistory {
           versions.set(element.version, new Map());
         }
         const nonces = versions.get(element.version)!;
-        nonces.set(element.versionNonce, deepCopyElement(element));
+        if (!nonces.has(element.versionNonce)) {
+          nonces.set(element.versionNonce, deepCopyElement(element));
+        }
         return {
           id: element.id,
           version: element.version,
