@@ -914,10 +914,9 @@ class App extends React.Component<any, AppState> {
         }
       };
 
-      const socketIOClientLib: any = await import(
+      const { default: socketIOClient }: any = await import(
         /* webpackChunkName: "socketIoClient.min" */ "socket.io-client"
       );
-      const socketIOClient = socketIOClientLib.default;
 
       this.portal.open(
         socketIOClient(SOCKET_SERVER),
