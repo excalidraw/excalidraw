@@ -60,7 +60,7 @@ export class SceneHistory {
     };
   }
 
-  private dehydratedHistoryEntry({
+  private dehydrateHistoryEntry({
     appState,
     elements,
   }: HistoryEntry): DehydratedHistoryEntry {
@@ -105,21 +105,11 @@ export class SceneHistory {
     this.lastEntry = null;
   }
 
-  private parseEntry(
-    dehydratedHistoryEntry: DehydratedHistoryEntry | undefined,
-  ): HistoryEntry | null {
-    if (dehydratedHistoryEntry === undefined) {
-      return null;
-    }
-
-    return this.hydrateHistoryEntry(dehydratedHistoryEntry);
-  }
-
   private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ): DehydratedHistoryEntry =>
-    this.dehydratedHistoryEntry({
+    this.dehydrateHistoryEntry({
       appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.reduce((elements, element) => {
         if (
@@ -193,25 +183,23 @@ export class SceneHistory {
   }
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    const newEntrySerialized = this.generateEntry(appState, elements);
-    const newEntry: HistoryEntry | null = this.parseEntry(newEntrySerialized);
+    const newEntryDehydrated = this.generateEntry(appState, elements);
+    const newEntry: HistoryEntry = this.hydrateHistoryEntry(newEntryDehydrated);
 
     if (newEntry) {
       if (!this.shouldCreateEntry(newEntry)) {
         return;
       }
 
-      this.stateHistory.push(newEntrySerialized);
+      this.stateHistory.push(newEntryDehydrated);
       this.lastEntry = newEntry;
       // As a new entry was pushed, we invalidate the redo stack
       this.clearRedoStack();
     }
   }
 
-  private restoreEntry(
-    entrySerialized: DehydratedHistoryEntry,
-  ): HistoryEntry | null {
-    const entry = this.parseEntry(entrySerialized);
+  private restoreEntry(entrySerialized: DehydratedHistoryEntry): HistoryEntry {
+    const entry = this.hydrateHistoryEntry(entrySerialized);
     if (entry) {
       entry.elements = entry.elements.map((element) => {
         // renew versions
@@ -267,7 +255,9 @@ export class SceneHistory {
    *  it.
    */
   setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    this.lastEntry = this.parseEntry(this.generateEntry(appState, elements));
+    this.lastEntry = this.hydrateHistoryEntry(
+      this.generateEntry(appState, elements),
+    );
   }
 
   // Suspicious that this is called so many places. Seems error-prone.
