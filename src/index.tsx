@@ -18,7 +18,7 @@ if (
   /\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent) &&
   !matchMedia("(display-mode: standalone)").matches
 ) {
-  import("pwacompat");
+  import(/* webpackChunkName: "pwacompat" */ "pwacompat");
 }
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
