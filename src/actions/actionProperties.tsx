@@ -20,6 +20,7 @@ import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
+import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../appState";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -347,7 +348,8 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && appState.currentItemFontSize,
+          (element) => isTextElement(element) && element.fontSize,
+          appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -394,6 +396,7 @@ export const actionChangeFontFamily = register({
             elements,
             appState,
             (element) => isTextElement(element) && element.fontFamily,
+            appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
         />
