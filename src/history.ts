@@ -29,7 +29,10 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
 };
 
 export class SceneHistory {
-  private elementCache = new Map<string, ExcalidrawElement>();
+  private elementCache = new Map<
+    string,
+    Map<number, Map<number, ExcalidrawElement>>
+  >();
   private recording: boolean = true;
   private stateHistory: DehydratedHistoryEntry[] = [];
   private redoStack: DehydratedHistoryEntry[] = [];
@@ -42,12 +45,13 @@ export class SceneHistory {
     return {
       appState,
       elements: elements.map((dehydratedExcalidrawElement) => {
-        const { id, version, versionNonce } = dehydratedExcalidrawElement;
-        const entryId = `${id}:${version}:${versionNonce}`;
-        const element = this.elementCache.get(entryId);
+        const element = this.elementCache
+          .get(dehydratedExcalidrawElement.id)
+          ?.get(dehydratedExcalidrawElement.version)
+          ?.get(dehydratedExcalidrawElement.versionNonce);
         if (!element) {
           throw new Error(
-            `Element not found: ${id}:${version}:${versionNonce}`,
+            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.version}:${dehydratedExcalidrawElement.versionNonce}`,
           );
         }
 
@@ -63,11 +67,15 @@ export class SceneHistory {
     return {
       appState,
       elements: elements.map((element) => {
-        const { id, version, versionNonce } = element;
-        const entryId = `${id}:${version}:${versionNonce}`;
-        if (!this.elementCache.has(entryId)) {
-          this.elementCache.set(entryId, deepCopyElement(element));
+        if (!this.elementCache.has(element.id)) {
+          this.elementCache.set(element.id, new Map());
         }
+        const versions = this.elementCache.get(element.id)!;
+        if (!versions.has(element.version)) {
+          versions.set(element.version, new Map());
+        }
+        const nonces = versions.get(element.version)!;
+        nonces.set(element.versionNonce, deepCopyElement(element));
         return {
           id: element.id,
           version: element.version,
