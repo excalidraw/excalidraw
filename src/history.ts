@@ -29,10 +29,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
 };
 
 export class SceneHistory {
-  private elementCache = new Map<
-    string,
-    Map<number, Map<number, ExcalidrawElement>>
-  >();
+  private elementCache = new Map<string, ExcalidrawElement>();
   private recording: boolean = true;
   private stateHistory: DehydratedHistoryEntry[] = [];
   private redoStack: DehydratedHistoryEntry[] = [];
@@ -45,13 +42,12 @@ export class SceneHistory {
     return {
       appState,
       elements: elements.map((dehydratedExcalidrawElement) => {
-        const element = this.elementCache
-          .get(dehydratedExcalidrawElement.id)
-          ?.get(dehydratedExcalidrawElement.version)
-          ?.get(dehydratedExcalidrawElement.versionNonce);
+        const { id, version, versionNonce } = dehydratedExcalidrawElement;
+        const entryId = `${id}:${version}:${versionNonce}`;
+        const element = this.elementCache.get(entryId);
         if (!element) {
           throw new Error(
-            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.version}:${dehydratedExcalidrawElement.versionNonce}`,
+            `Element not found: ${id}:${version}:${versionNonce}`,
           );
         }
 
@@ -69,15 +65,10 @@ export class SceneHistory {
       elements: elements.map((element) => {
         // We should be able to avoid deep copying the element if it's already in the cache,
         // however, there is some hidden mutation somewhere that causes tests to break.
-        if (!this.elementCache.has(element.id)) {
-          this.elementCache.set(element.id, new Map());
-        }
-        const versions = this.elementCache.get(element.id)!;
-        if (!versions.has(element.version)) {
-          versions.set(element.version, new Map());
-        }
-        const nonces = versions.get(element.version)!;
-        nonces.set(element.versionNonce, deepCopyElement(element));
+
+        const { id, version, versionNonce } = element;
+        const entryId = `${id}:${version}:${versionNonce}`;
+        this.elementCache.set(entryId, deepCopyElement(element));
         return {
           id: element.id,
           version: element.version,
