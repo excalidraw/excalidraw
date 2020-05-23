@@ -11,7 +11,7 @@ export const GitHubCorner = React.memo(() => (
     className="github-corner rtl-mirror"
   >
     <a
-      href="https://github.com/phonerefer/excalidraw"
+      href="https://github.com/excalidraw/excalidraw"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="GitHub repository"
