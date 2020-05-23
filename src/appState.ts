@@ -2,8 +2,10 @@ import oc from "open-color";
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
+import { FontFamily } from "./element/types";
 
-export const DEFAULT_FONT = "20px Virgil";
+export const DEFAULT_FONT_SIZE = 20;
+export const DEFAULT_FONT_FAMILY: FontFamily = 1;
 export const DEFAULT_TEXT_ALIGN = "left";
 
 export const getDefaultAppState = (): AppState => {
@@ -25,7 +27,8 @@ export const getDefaultAppState = (): AppState => {
     currentItemStrokeStyle: "solid",
     currentItemRoughness: 1,
     currentItemOpacity: 100,
-    currentItemFont: DEFAULT_FONT,
+    currentItemFontSize: DEFAULT_FONT_SIZE,
+    currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,

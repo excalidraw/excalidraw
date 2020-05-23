@@ -1,4 +1,5 @@
 import { Point } from "../types";
+import { FONT_FAMILY } from "../constants";
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -43,7 +44,8 @@ export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
-    font: string;
+    fontSize: number;
+    fontFamily: FontFamily;
     text: string;
     baseline: number;
     textAlign: TextAlign;
@@ -59,3 +61,6 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type PointerType = "mouse" | "pen" | "touch";
 
 export type TextAlign = "left" | "center" | "right";
+
+export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontString = string & { _brand: "fontString" };

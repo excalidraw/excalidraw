@@ -5,6 +5,7 @@ import {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
+  FontFamily,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -34,7 +35,8 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFont: string;
+  currentItemFontFamily: FontFamily;
+  currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   viewBackgroundColor: string;
   scrollX: FlooredNumber;

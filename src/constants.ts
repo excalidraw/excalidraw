@@ -58,3 +58,10 @@ export const BROADCAST = {
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
 };
+
+// 1-based in case we ever do `if(element.fontFamily)`
+export const FONT_FAMILY = {
+  1: "Virgil",
+  2: "Helvetica",
+  3: "Cascadia",
+} as const;
