@@ -78,7 +78,8 @@ it("clones text element", () => {
     roughness: 1,
     opacity: 100,
     text: "hello",
-    font: "Arial 20px",
+    fontSize: 20,
+    fontFamily: 1,
     textAlign: "left",
   });
 
