@@ -2,13 +2,23 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
+import { deepCopyElement } from "./element/newElement";
 
-export type HistoryEntry = {
+export interface HistoryEntry {
   appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
   elements: ExcalidrawElement[];
-};
+}
 
-type HistoryEntrySerialized = string;
+interface DehydratedExcalidrawElement {
+  id: string;
+  version: number;
+  versionNonce: number;
+}
+
+interface DehydratedHistoryEntry {
+  appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
+  elements: DehydratedExcalidrawElement[];
+}
 
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
@@ -19,16 +29,73 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
 };
 
 export class SceneHistory {
+  private elementCache = new Map<
+    string,
+    Map<number, Map<number, ExcalidrawElement>>
+  >();
   private recording: boolean = true;
-  private stateHistory: HistoryEntrySerialized[] = [];
-  private redoStack: HistoryEntrySerialized[] = [];
+  private stateHistory: DehydratedHistoryEntry[] = [];
+  private redoStack: DehydratedHistoryEntry[] = [];
   private lastEntry: HistoryEntry | null = null;
+
+  private hydrateHistoryEntry({
+    appState,
+    elements,
+  }: DehydratedHistoryEntry): HistoryEntry {
+    return {
+      appState,
+      elements: elements.map((dehydratedExcalidrawElement) => {
+        const element = this.elementCache
+          .get(dehydratedExcalidrawElement.id)
+          ?.get(dehydratedExcalidrawElement.version)
+          ?.get(dehydratedExcalidrawElement.versionNonce);
+        if (!element) {
+          throw new Error(
+            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.version}:${dehydratedExcalidrawElement.versionNonce}`,
+          );
+        }
+
+        return element;
+      }),
+    };
+  }
+
+  private dehydrateHistoryEntry({
+    appState,
+    elements,
+  }: HistoryEntry): DehydratedHistoryEntry {
+    return {
+      appState,
+      elements: elements.map((element) => {
+        if (!this.elementCache.has(element.id)) {
+          this.elementCache.set(element.id, new Map());
+        }
+        const versions = this.elementCache.get(element.id)!;
+        if (!versions.has(element.version)) {
+          versions.set(element.version, new Map());
+        }
+        const nonces = versions.get(element.version)!;
+        if (!nonces.has(element.versionNonce)) {
+          nonces.set(element.versionNonce, deepCopyElement(element));
+        }
+        return {
+          id: element.id,
+          version: element.version,
+          versionNonce: element.versionNonce,
+        };
+      }),
+    };
+  }
 
   getSnapshotForTest() {
     return {
       recording: this.recording,
-      stateHistory: this.stateHistory.map((s) => JSON.parse(s)),
-      redoStack: this.redoStack.map((s) => JSON.parse(s)),
+      stateHistory: this.stateHistory.map((dehydratedHistoryEntry) =>
+        this.hydrateHistoryEntry(dehydratedHistoryEntry),
+      ),
+      redoStack: this.redoStack.map((dehydratedHistoryEntry) =>
+        this.hydrateHistoryEntry(dehydratedHistoryEntry),
+      ),
     };
   }
 
@@ -36,26 +103,14 @@ export class SceneHistory {
     this.stateHistory.length = 0;
     this.redoStack.length = 0;
     this.lastEntry = null;
-  }
-
-  private parseEntry(
-    entrySerialized: HistoryEntrySerialized | undefined,
-  ): HistoryEntry | null {
-    if (entrySerialized === undefined) {
-      return null;
-    }
-    try {
-      return JSON.parse(entrySerialized);
-    } catch {
-      return null;
-    }
+    this.elementCache.clear();
   }
 
   private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
-  ) =>
-    JSON.stringify({
+  ): DehydratedHistoryEntry =>
+    this.dehydrateHistoryEntry({
       appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.reduce((elements, element) => {
         if (
@@ -129,25 +184,23 @@ export class SceneHistory {
   }
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    const newEntrySerialized = this.generateEntry(appState, elements);
-    const newEntry: HistoryEntry | null = this.parseEntry(newEntrySerialized);
+    const newEntryDehydrated = this.generateEntry(appState, elements);
+    const newEntry: HistoryEntry = this.hydrateHistoryEntry(newEntryDehydrated);
 
     if (newEntry) {
       if (!this.shouldCreateEntry(newEntry)) {
         return;
       }
 
-      this.stateHistory.push(newEntrySerialized);
+      this.stateHistory.push(newEntryDehydrated);
       this.lastEntry = newEntry;
       // As a new entry was pushed, we invalidate the redo stack
       this.clearRedoStack();
     }
   }
 
-  private restoreEntry(
-    entrySerialized: HistoryEntrySerialized,
-  ): HistoryEntry | null {
-    const entry = this.parseEntry(entrySerialized);
+  private restoreEntry(entrySerialized: DehydratedHistoryEntry): HistoryEntry {
+    const entry = this.hydrateHistoryEntry(entrySerialized);
     if (entry) {
       entry.elements = entry.elements.map((element) => {
         // renew versions
@@ -203,7 +256,9 @@ export class SceneHistory {
    *  it.
    */
   setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    this.lastEntry = this.parseEntry(this.generateEntry(appState, elements));
+    this.lastEntry = this.hydrateHistoryEntry(
+      this.generateEntry(appState, elements),
+    );
   }
 
   // Suspicious that this is called so many places. Seems error-prone.
