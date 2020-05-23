@@ -63,12 +63,11 @@ export class SceneHistory {
     return {
       appState,
       elements: elements.map((element) => {
-        // We should be able to avoid deep copying the element if it's already in the cache,
-        // however, there is some hidden mutation somewhere that causes tests to break.
-
         const { id, version, versionNonce } = element;
         const entryId = `${id}:${version}:${versionNonce}`;
-        this.elementCache.set(entryId, deepCopyElement(element));
+        if (!this.elementCache.has(entryId)) {
+          this.elementCache.set(entryId, deepCopyElement(element));
+        }
         return {
           id: element.id,
           version: element.version,
@@ -94,6 +93,7 @@ export class SceneHistory {
     this.stateHistory.length = 0;
     this.redoStack.length = 0;
     this.lastEntry = null;
+    this.elementCache.clear();
   }
 
   private generateEntry = (
