@@ -85,7 +85,7 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
-    "toggleZenMode": "Cambiar a modo zen",
+    "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
