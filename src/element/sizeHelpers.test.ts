@@ -3,17 +3,17 @@ import * as constants from "../constants";
 
 describe("getPerfectElementSize", () => {
   it("should return height:0 if `elementType` is line and locked angle is 0", () => {
-    const { height, width } = getPerfectElementSize("line", 149, 20);
+    const { height, width } = getPerfectElementSize("line", 149, 10);
     expect(width).toEqual(149);
     expect(height).toEqual(0);
   });
   it("should return width:0 if `elementType` is line and locked angle is 90 deg (Math.PI/2)", () => {
-    const { height, width } = getPerfectElementSize("line", 20, 140);
+    const { height, width } = getPerfectElementSize("line", 10, 140);
     expect(width).toEqual(0);
     expect(height).toEqual(140);
   });
   it("should return height:0 if `elementType` is arrow and locked angle is 0", () => {
-    const { height, width } = getPerfectElementSize("arrow", 200, 30);
+    const { height, width } = getPerfectElementSize("arrow", 200, 20);
     expect(width).toEqual(200);
     expect(height).toEqual(0);
   });
@@ -25,7 +25,7 @@ describe("getPerfectElementSize", () => {
   it("should return adjust height to be width * tan(locked angle)", () => {
     const { height, width } = getPerfectElementSize("arrow", 120, 185);
     expect(width).toEqual(120);
-    expect(height).toEqual(290);
+    expect(height).toEqual(208);
   });
   it("should return height equals to width if locked angle is 45 deg", () => {
     const { height, width } = getPerfectElementSize("arrow", 135, 145);
