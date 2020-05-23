@@ -114,7 +114,7 @@ export const newLinearElement = (
 //  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
 // Adapted from https://github.com/lukeed/klona
-const _duplicateElement = (val: any, depth: number = 0) => {
+export const deepCopyElement = (val: any, depth: number = 0) => {
   if (val == null || typeof val !== "object") {
     return val;
   }
@@ -130,7 +130,7 @@ const _duplicateElement = (val: any, depth: number = 0) => {
         if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
-        tmp[key] = _duplicateElement(val[key], depth + 1);
+        tmp[key] = deepCopyElement(val[key], depth + 1);
       }
     }
     return tmp;
@@ -140,7 +140,7 @@ const _duplicateElement = (val: any, depth: number = 0) => {
     let k = val.length;
     const arr = new Array(k);
     while (k--) {
-      arr[k] = _duplicateElement(val[k], depth + 1);
+      arr[k] = deepCopyElement(val[k], depth + 1);
     }
     return arr;
   }
@@ -152,7 +152,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   overrides?: Partial<TElement>,
 ): TElement => {
-  let copy: TElement = _duplicateElement(element);
+  let copy: TElement = deepCopyElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
   if (overrides) {
