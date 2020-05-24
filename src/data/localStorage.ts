@@ -5,7 +5,8 @@ import { restore } from "./restore";
 import { openDB, IDBPDatabase } from "idb";
 import { isNonDeletedElement } from "../element";
 
-const DB_NAME = "excalidraw";
+const LOCAL_STORAGE_KEY = "excalidraw";
+const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -39,7 +40,7 @@ let dbPromise: Promise<IDBPDatabase<unknown>> | undefined;
 async function getDB(): Promise<IDBPDatabase<unknown>> {
   return (
     dbPromise ||
-    (dbPromise = openDB(DB_NAME, 1, {
+    (dbPromise = openDB(LOCAL_STORAGE_KEY, 1, {
       upgrade(db) {
         db.createObjectStore("elements");
         db.createObjectStore("appState");
@@ -70,6 +71,10 @@ export const restoreFromIndexedDB = async () => {
     return [null, null];
   });
 
+  if (!appState && !elements) {
+    return restoreFromLocalStorage();
+  }
+
   if (appState) {
     try {
       // If we're retrieving from local storage, we should not be collaborating
@@ -81,4 +86,40 @@ export const restoreFromIndexedDB = async () => {
   }
 
   return restore(elements || [], appState);
+};
+
+const restoreFromLocalStorage = () => {
+  let savedElements = null;
+  let savedState = null;
+
+  try {
+    savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
+    savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
+  } catch (error) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+
+  let elements = [];
+  if (savedElements) {
+    try {
+      elements = JSON.parse(savedElements);
+    } catch {
+      // Do nothing because elements array is already empty
+    }
+  }
+
+  let appState = null;
+  if (savedState) {
+    try {
+      appState = JSON.parse(savedState) as AppState;
+      // If we're retrieving from local storage, we should not be collaborating
+      appState.isCollaborating = false;
+      appState.collaborators = new Map();
+    } catch {
+      // Do nothing because appState is already null
+    }
+  }
+
+  return restore(elements, appState);
 };
