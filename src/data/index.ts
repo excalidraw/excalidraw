@@ -18,11 +18,11 @@ import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
-import { restoreFromLocalStorage } from "./localStorage";
+import { restoreFromIndexedDB } from "./localStorage";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
-export { saveToLocalStorage } from "./localStorage";
+export { saveToIndexedDB } from "./localStorage";
 
 const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
 
@@ -369,7 +369,7 @@ export const loadScene = async (id: string | null, privateKey?: string) => {
     data = await importFromBackend(id, privateKey);
     window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {
-    data = restoreFromLocalStorage();
+    data = await restoreFromIndexedDB();
   }
 
   return {

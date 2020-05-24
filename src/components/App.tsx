@@ -44,7 +44,6 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  saveToLocalStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
@@ -129,6 +128,7 @@ import { actionFinalize } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  saveToIndexedDB,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
@@ -2721,10 +2721,7 @@ class App extends React.Component<any, AppState> {
   }, 300);
 
   private saveDebounced = debounce(() => {
-    saveToLocalStorage(
-      globalSceneState.getElementsIncludingDeleted(),
-      this.state,
-    );
+    saveToIndexedDB(globalSceneState.getElementsIncludingDeleted(), this.state);
   }, 300);
 }
 

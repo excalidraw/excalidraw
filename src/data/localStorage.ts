@@ -2,9 +2,10 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
+import { openDB, IDBPDatabase } from "idb";
+import { isNonDeletedElement } from "../element";
 
-const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
+const DB_NAME = "excalidraw";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -33,50 +34,44 @@ export const restoreUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const saveToLocalStorage = (
+let dbPromise: Promise<IDBPDatabase<unknown>> | undefined;
+
+async function getDB(): Promise<IDBPDatabase<unknown>> {
+  return (
+    dbPromise ||
+    (dbPromise = openDB(DB_NAME, 1, {
+      upgrade(db) {
+        db.createObjectStore("elements");
+        db.createObjectStore("appState");
+      },
+    }))
+  );
+}
+
+export const saveToIndexedDB = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  try {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(elements.filter((element) => !element.isDeleted)),
-    );
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
-    );
-  } catch (error) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
+  const db = await getDB();
+  await Promise.all([
+    db.put("appState", clearAppStateForLocalStorage(appState), "appState"),
+    db.put("elements", elements.filter(isNonDeletedElement), "elements"),
+  ]);
 };
 
-export const restoreFromLocalStorage = () => {
-  let savedElements = null;
-  let savedState = null;
+export const restoreFromIndexedDB = async () => {
+  const db = await getDB();
 
-  try {
-    savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-    savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
-  } catch (error) {
-    // Unable to access localStorage
+  const [appState, elements] = await Promise.all([
+    db.get("appState", "appState"),
+    db.get("elements", "elements"),
+  ]).catch((error) => {
     console.error(error);
-  }
+    return [null, null];
+  });
 
-  let elements = [];
-  if (savedElements) {
+  if (appState) {
     try {
-      elements = JSON.parse(savedElements);
-    } catch {
-      // Do nothing because elements array is already empty
-    }
-  }
-
-  let appState = null;
-  if (savedState) {
-    try {
-      appState = JSON.parse(savedState) as AppState;
       // If we're retrieving from local storage, we should not be collaborating
       appState.isCollaborating = false;
       appState.collaborators = new Map();
@@ -85,5 +80,5 @@ export const restoreFromLocalStorage = () => {
     }
   }
 
-  return restore(elements, appState);
+  return restore(elements || [], appState);
 };
