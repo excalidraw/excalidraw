@@ -22,7 +22,7 @@
     "strokeStyle_dotted": "",
     "sloppiness": "Üstün körülük",
     "opacity": "Opaklık",
-    "textAlign": "",
+    "textAlign": "Metin hizala",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -40,9 +40,9 @@
     "crossHatch": "Çapraz-taralı",
     "thin": "İnce",
     "bold": "Kalın",
-    "left": "",
-    "center": "",
-    "right": "",
+    "left": "Sol",
+    "center": "Ortala",
+    "right": "Sağ",
     "extraBold": "Ekstra kalın",
     "architect": "Mimar",
     "artist": "Sanatçı",
@@ -57,9 +57,9 @@
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
     "untitled": "Başlıksız",
-    "name": "",
+    "name": "İsim",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Excalidraw ile yapıldı"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -100,7 +100,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "draw": "",
+    "draw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -160,7 +160,7 @@
     "blog": "Blog'umuzu okuyun",
     "howto": "Rehberimizi takip edin",
     "github": "Bir hata mı buldun? Bildir",
-    "textNewLine": "",
+    "textNewLine": "Yeni satır ekle (text)",
     "textFinish": "",
     "zoomToFit": ""
   },
