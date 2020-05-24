@@ -1,6 +1,5 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
-import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
 
@@ -11,12 +10,11 @@ export interface HistoryEntry {
 
 interface DehydratedExcalidrawElement {
   id: string;
-  version: number;
   versionNonce: number;
 }
 
 interface DehydratedHistoryEntry {
-  appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
+  appState: string;
   elements: DehydratedExcalidrawElement[];
 }
 
@@ -29,10 +27,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
 };
 
 export class SceneHistory {
-  private elementCache = new Map<
-    string,
-    Map<number, Map<number, ExcalidrawElement>>
-  >();
+  private elementCache = new Map<string, Map<number, ExcalidrawElement>>();
   private recording: boolean = true;
   private stateHistory: DehydratedHistoryEntry[] = [];
   private redoStack: DehydratedHistoryEntry[] = [];
@@ -43,18 +38,16 @@ export class SceneHistory {
     elements,
   }: DehydratedHistoryEntry): HistoryEntry {
     return {
-      appState,
+      appState: JSON.parse(appState),
       elements: elements.map((dehydratedExcalidrawElement) => {
         const element = this.elementCache
           .get(dehydratedExcalidrawElement.id)
-          ?.get(dehydratedExcalidrawElement.version)
           ?.get(dehydratedExcalidrawElement.versionNonce);
         if (!element) {
           throw new Error(
-            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.version}:${dehydratedExcalidrawElement.versionNonce}`,
+            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.versionNonce}`,
           );
         }
-
         return element;
       }),
     };
@@ -65,22 +58,17 @@ export class SceneHistory {
     elements,
   }: HistoryEntry): DehydratedHistoryEntry {
     return {
-      appState,
-      elements: elements.map((element) => {
+      appState: JSON.stringify(appState),
+      elements: elements.map((element: ExcalidrawElement) => {
         if (!this.elementCache.has(element.id)) {
           this.elementCache.set(element.id, new Map());
         }
-        const versions = this.elementCache.get(element.id)!;
-        if (!versions.has(element.version)) {
-          versions.set(element.version, new Map());
-        }
-        const nonces = versions.get(element.version)!;
+        const nonces = this.elementCache.get(element.id)!;
         if (!nonces.has(element.versionNonce)) {
           nonces.set(element.versionNonce, deepCopyElement(element));
         }
         return {
           id: element.id,
-          version: element.version,
           versionNonce: element.versionNonce,
         };
       }),
@@ -162,7 +150,6 @@ export class SceneHistory {
         !prev ||
         !next ||
         prev.id !== next.id ||
-        prev.version !== next.version ||
         prev.versionNonce !== next.versionNonce
       ) {
         return true;
