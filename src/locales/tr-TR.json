@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler."
   },
   "errorDialog": {
     "title": "Hata"
@@ -152,7 +152,7 @@
     "shapes": "Şekiller",
     "or": "veya",
     "click": "tıkla",
-    "drag": "",
+    "drag": "sürükle",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "editor": "Düzenleyici",
