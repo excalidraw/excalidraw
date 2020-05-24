@@ -52,7 +52,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   updates: ElementUpdate<TElement>,
 ): TElement => ({
   ...element,
+  ...updates,
   version: element.version + 1,
   versionNonce: randomInteger(),
-  ...updates,
 });

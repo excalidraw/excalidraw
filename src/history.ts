@@ -199,17 +199,6 @@ export class SceneHistory {
     }
   }
 
-  private restoreEntry(entrySerialized: DehydratedHistoryEntry): HistoryEntry {
-    const entry = this.hydrateHistoryEntry(entrySerialized);
-    if (entry) {
-      entry.elements = entry.elements.map((element) => {
-        // renew versions
-        return newElementWith(element, {});
-      });
-    }
-    return entry;
-  }
-
   clearRedoStack() {
     this.redoStack.splice(0, this.redoStack.length);
   }
@@ -223,7 +212,7 @@ export class SceneHistory {
 
     if (entryToRestore !== undefined) {
       this.stateHistory.push(entryToRestore);
-      return this.restoreEntry(entryToRestore);
+      return this.hydrateHistoryEntry(entryToRestore);
     }
 
     return null;
@@ -240,7 +229,7 @@ export class SceneHistory {
 
     if (currentEntry !== undefined) {
       this.redoStack.push(currentEntry);
-      return this.restoreEntry(entryToRestore);
+      return this.hydrateHistoryEntry(entryToRestore);
     }
 
     return null;
