@@ -625,12 +625,8 @@ describe("regression tests", () => {
   });
 
   it("rerenders UI on language change", () => {
-    // create & select element to show properties menu
+    // select rectangle tool to show properties menu
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
-
     // english lang should display `hachure` label
     expect(screen.queryByText(/hachure/i)).not.toBeNull();
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
