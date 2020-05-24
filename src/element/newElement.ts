@@ -41,7 +41,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     ...rest
-  }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
+  }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => ({
   id: rest.id || randomId(),
   type,
