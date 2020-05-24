@@ -63,9 +63,9 @@ export class SceneHistory {
         if (!this.elementCache.has(element.id)) {
           this.elementCache.set(element.id, new Map());
         }
-        const nonces = this.elementCache.get(element.id)!;
-        if (!nonces.has(element.versionNonce)) {
-          nonces.set(element.versionNonce, deepCopyElement(element));
+        const versions = this.elementCache.get(element.id)!;
+        if (!versions.has(element.versionNonce)) {
+          versions.set(element.versionNonce, deepCopyElement(element));
         }
         return {
           id: element.id,
