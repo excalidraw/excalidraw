@@ -1,6 +1,21 @@
 import { difference, pathArrToStr } from "./path-boolop";
 import { parsePathString, getTotalLength, getPointAtLength } from "./R";
 
+function isHollow(path: (string | number)[][]) {
+  const index = path.findIndex(
+    ([c], i) => i > 0 && (c as string).toLowerCase() === "m",
+  );
+
+  const head = path[0];
+  const tail = path[index - 1];
+
+  return (
+    tail &&
+    tail[tail.length - 1] === head[head.length - 1] &&
+    tail[tail.length - 2] === head[head.length - 2]
+  );
+}
+
 export default class Path {
   path: (string | number)[][];
   isHollow: boolean = false;
@@ -33,10 +48,8 @@ export default class Path {
    * @returns string (path string)
    */
   difference(path: Path) {
-    const result = difference(this.path, path.path);
-
-    this.path = result.path;
-    this.isHollow = result.isHollow;
+    this.path = difference(this.path, path.path);
+    this.isHollow = isHollow(this.path);
   }
 
   getTotalLength(): number {

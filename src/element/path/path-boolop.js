@@ -115,10 +115,7 @@ function operateBool(type, path1, path2) {
     indexes.startIndex,
   );
 
-  return {
-    isHollow: result.isHollow,
-    path: pathSegsToArr(result.path),
-  };
+  return pathSegsToArr(result);
 }
 
 /**
@@ -716,12 +713,9 @@ function buildNewPath(type, parts, inversions, startIndex) {
   }
 
   //flatten new path
-  return {
-    isHollow: !!dirCheck.length,
-    path: newPath.reduce((acc, path) => {
-      return acc.concat(path);
-    }, []),
-  };
+  return newPath.reduce((acc, path) => {
+    return acc.concat(path);
+  }, []);
 }
 
 /**

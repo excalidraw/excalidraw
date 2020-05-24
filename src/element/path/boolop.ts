@@ -57,10 +57,18 @@ function objectToPath(
     } as NonDeletedExcalidrawElement,
     rc.generator,
   ) as Drawable;
-  const normalizedShape = normalizeShape(shape);
-  const [p] = rc.generator.toPaths(normalizedShape);
+  let pathData = "";
 
-  const path = new Path(p.d);
+  if (element.type !== "path") {
+    const normalizedShape = normalizeShape(shape);
+    const [p] = rc.generator.toPaths(normalizedShape);
+
+    pathData = p.d;
+  } else {
+    pathData = element.d;
+  }
+
+  const path = new Path(pathData);
   if (options.position) {
     path.position(options.position);
   }
@@ -90,7 +98,6 @@ export function differenceElement(
 
   const element = newPathElement({
     ...element1,
-    type: "path",
     d: path1.toPathString(),
     hollow: path1.isHollow,
   });
