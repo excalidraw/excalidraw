@@ -83,6 +83,7 @@ export const restore = (
             (element as Mutable<
               ExcalidrawTextElement
             >).fontFamily = getFontFamilyByName(fontFamily);
+            delete (element as any).font;
           }
           if (!element.textAlign) {
             element.textAlign = DEFAULT_TEXT_ALIGN;
