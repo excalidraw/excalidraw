@@ -55,6 +55,7 @@ export const actionGroup = register({
       commitToHistory: true,
     };
   },
+  contextMenuOrder: 4,
   contextItemLabel: "labels.group",
   keyTest: (event) => {
     return (
@@ -89,7 +90,6 @@ export const actionUngroup = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.ungroup",
   keyTest: (event) => {
     return (
       event.shiftKey &&
@@ -98,4 +98,6 @@ export const actionUngroup = register({
       event.keyCode === 71
     );
   },
+  contextMenuOrder: 5,
+  contextItemLabel: "labels.ungroup",
 });
