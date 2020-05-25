@@ -207,16 +207,15 @@ export const renderScene = (
       const groupElements = elements.filter((element) =>
         element.groupIds.includes(groupId),
       );
+      const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
+        groupElements,
+      );
       selections.push({
         angle: 0,
-        elementX1: Math.min(...groupElements.map((element) => element.x)),
-        elementY1: Math.min(...groupElements.map((element) => element.y)),
-        elementX2: Math.max(
-          ...groupElements.map((element) => element.x + element.width),
-        ),
-        elementY2: Math.max(
-          ...groupElements.map((element) => element.y + element.height),
-        ),
+        elementX1,
+        elementX2,
+        elementY1,
+        elementY2,
         selectionColors: [oc.black],
       });
     }
