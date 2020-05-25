@@ -10,6 +10,7 @@ export const actionSelectAll = register({
       appState: selectGroupsForSelectedElements(
         {
           ...appState,
+          editingGroupId: null,
           selectedElementIds: elements.reduce((map, element) => {
             if (!element.isDeleted) {
               map[element.id] = true;

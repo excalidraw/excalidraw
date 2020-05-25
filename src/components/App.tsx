@@ -2006,23 +2006,42 @@ class App extends React.Component<any, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            this.setState((prevState) => {
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    ...prevState.selectedElementIds,
-                    [hitElement!.id]: true,
+            // if we are currently editing a group, treat all selections outside of the group
+            // as exiting editing mode.
+            if (
+              this.state.editingGroupId &&
+              !hitElement.groupIds.includes(this.state.editingGroupId)
+            ) {
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: { [hitElement!.id]: true },
+                    selectedGroupIds: {},
+                    editingGroupId: null,
                   },
-                },
-                globalSceneState.getElements(),
+                  globalSceneState.getElements(),
+                ),
               );
-            });
-            // TODO: this is strange...
-            globalSceneState.replaceAllElements(
-              globalSceneState.getElementsIncludingDeleted(),
-            );
-            hitElementWasAddedToSelection = true;
+            } else {
+              this.setState((prevState) => {
+                return selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [hitElement!.id]: true,
+                    },
+                  },
+                  globalSceneState.getElements(),
+                );
+              });
+              // TODO: this is strange...
+              globalSceneState.replaceAllElements(
+                globalSceneState.getElementsIncludingDeleted(),
+              );
+              hitElementWasAddedToSelection = true;
+            }
           }
         }
       }
