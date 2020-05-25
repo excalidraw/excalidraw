@@ -47,8 +47,19 @@ export const actionGroup = register({
       if (!appState.selectedElementIds[element.id]) {
         return element;
       }
+      // insert before the editingGroupId, or push to the end.
+      const groupIds = [...element.groupIds];
+      const positionOfEditingGroupId = appState.editingGroupId
+        ? groupIds.indexOf(appState.editingGroupId)
+        : -1;
+      const positionToInsert =
+        positionOfEditingGroupId > -1
+          ? positionOfEditingGroupId
+          : groupIds.length;
+      groupIds.splice(positionToInsert, 0, newGroupId);
+
       return newElementWith(element, {
-        groupIds: [...element.groupIds, newGroupId],
+        groupIds,
       });
     });
     return {
