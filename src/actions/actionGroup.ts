@@ -7,6 +7,9 @@ import {
   getSelectedGroupIds,
   selectGroup,
   selectGroupsForSelectedElements,
+  getElementsInGroup,
+  addToGroup,
+  removeFromSelectedGroups,
 } from "../groups";
 import { getNonDeletedElements } from "../element";
 
@@ -26,9 +29,9 @@ export const actionGroup = register({
     if (selectedGroupIds.length === 1) {
       const selectedGroupId = selectedGroupIds[0];
       const elementIdsInGroup = new Set(
-        elements
-          .filter((element) => element.groupIds.includes(selectedGroupId))
-          .map((element) => element.id),
+        getElementsInGroup(elements, selectedGroupId).map(
+          (element) => element.id,
+        ),
       );
       const selectedElementIds = new Set(
         selectedElements.map((element) => element.id),
@@ -47,19 +50,12 @@ export const actionGroup = register({
       if (!appState.selectedElementIds[element.id]) {
         return element;
       }
-      // insert before the editingGroupId, or push to the end.
-      const groupIds = [...element.groupIds];
-      const positionOfEditingGroupId = appState.editingGroupId
-        ? groupIds.indexOf(appState.editingGroupId)
-        : -1;
-      const positionToInsert =
-        positionOfEditingGroupId > -1
-          ? positionOfEditingGroupId
-          : groupIds.length;
-      groupIds.splice(positionToInsert, 0, newGroupId);
-
       return newElementWith(element, {
-        groupIds,
+        groupIds: addToGroup(
+          element.groupIds,
+          newGroupId,
+          appState.editingGroupId,
+        ),
       });
     });
     return {
@@ -91,14 +87,15 @@ export const actionUngroup = register({
       return { appState, elements, commitToHistory: false };
     }
     const nextElements = elements.map((element) => {
-      const filteredGroupIds = element.groupIds.filter(
-        (groupId) => !appState.selectedGroupIds[groupId],
+      const nextGroupIds = removeFromSelectedGroups(
+        element.groupIds,
+        appState.selectedGroupIds,
       );
-      if (filteredGroupIds.length === element.groupIds.length) {
+      if (nextGroupIds.length === element.groupIds.length) {
         return element;
       }
       return newElementWith(element, {
-        groupIds: filteredGroupIds,
+        groupIds: nextGroupIds,
       });
     });
     return {

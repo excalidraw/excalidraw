@@ -28,7 +28,11 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
-import { isSelectedViaGroup, getSelectedGroupIds } from "../groups";
+import {
+  isSelectedViaGroup,
+  getSelectedGroupIds,
+  getElementsInGroup,
+} from "../groups";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -204,9 +208,7 @@ export const renderScene = (
     }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
 
     function addSelectionForGroupId(groupId: GroupId) {
-      const groupElements = elements.filter((element) =>
-        element.groupIds.includes(groupId),
-      );
+      const groupElements = getElementsInGroup(elements, groupId);
       const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
         groupElements,
       );

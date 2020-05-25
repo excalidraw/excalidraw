@@ -135,6 +135,8 @@ import throttle from "lodash.throttle";
 import {
   getSelectedGroupIds,
   selectGroupsForSelectedElements,
+  isElementInGroup,
+  getSelectedGroupIdForElement,
 } from "../groups";
 
 /**
@@ -1493,9 +1495,8 @@ class App extends React.Component<any, AppState> {
 
       const selectedGroupId =
         hitElement &&
-        hitElement.groupIds.find(
-          (groupId) => this.state.selectedGroupIds[groupId],
-        );
+        getSelectedGroupIdForElement(hitElement, this.state.selectedGroupIds);
+
       if (selectedGroupId) {
         this.setState((prevState) =>
           selectGroupsForSelectedElements(
@@ -1993,7 +1994,8 @@ class App extends React.Component<any, AppState> {
             selectedGroupIds: {},
             editingGroupId:
               prevState.editingGroupId &&
-              hitElement?.groupIds.includes(prevState.editingGroupId)
+              hitElement &&
+              isElementInGroup(hitElement, prevState.editingGroupId)
                 ? prevState.editingGroupId
                 : null,
           }));
@@ -2010,7 +2012,7 @@ class App extends React.Component<any, AppState> {
             // as exiting editing mode.
             if (
               this.state.editingGroupId &&
-              !hitElement.groupIds.includes(this.state.editingGroupId)
+              !isElementInGroup(hitElement, this.state.editingGroupId)
             ) {
               this.setState({
                 selectedElementIds: {},

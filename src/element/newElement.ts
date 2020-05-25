@@ -11,6 +11,7 @@ import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import nanoid from "nanoid";
+import { getNewGroupIdsForDuplication } from "../groups";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -174,20 +175,16 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   let copy: TElement = deepCopyElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
-  const positionOfEditingGroupId = editingGroupId
-    ? copy.groupIds.indexOf(editingGroupId)
-    : -1;
-  const endIndex =
-    positionOfEditingGroupId > -1
-      ? positionOfEditingGroupId
-      : copy.groupIds.length;
-  for (let i = 0; i < endIndex; i++) {
-    const groupId = copy.groupIds[i];
-    if (!groupIdMapForOperation.has(groupId)) {
-      groupIdMapForOperation.set(groupId, nanoid());
-    }
-    copy.groupIds[i] = groupIdMapForOperation.get(groupId)!;
-  }
+  copy.groupIds = getNewGroupIdsForDuplication(
+    copy.groupIds,
+    editingGroupId,
+    (groupId) => {
+      if (!groupIdMapForOperation.has(groupId)) {
+        groupIdMapForOperation.set(groupId, nanoid());
+      }
+      return groupIdMapForOperation.get(groupId)!;
+    },
+  );
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }

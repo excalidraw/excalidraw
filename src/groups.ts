@@ -69,3 +69,62 @@ export function selectGroupsForSelectedElements(
 
   return nextAppState;
 }
+
+export function isElementInGroup(element: ExcalidrawElement, groupId: string) {
+  return element.groupIds.includes(groupId);
+}
+
+export function getElementsInGroup(
+  elements: readonly ExcalidrawElement[],
+  groupId: string,
+) {
+  return elements.filter((element) => isElementInGroup(element, groupId));
+}
+
+export function getSelectedGroupIdForElement(
+  element: ExcalidrawElement,
+  selectedGroupIds: { [groupId: string]: boolean },
+) {
+  return element.groupIds.find((groupId) => selectedGroupIds[groupId]);
+}
+
+export function getNewGroupIdsForDuplication(
+  groupIds: GroupId[],
+  editingGroupId: GroupId | null,
+  mapper: (groupId: GroupId) => GroupId,
+) {
+  const copy = [...groupIds];
+  const positionOfEditingGroupId = editingGroupId
+    ? groupIds.indexOf(editingGroupId)
+    : -1;
+  const endIndex =
+    positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
+  for (let i = 0; i < endIndex; i++) {
+    copy[i] = mapper(copy[i]);
+  }
+
+  return copy;
+}
+
+export function addToGroup(
+  prevGroupIds: GroupId[],
+  newGroupId: GroupId,
+  editingGroupId: GroupId | null,
+) {
+  // insert before the editingGroupId, or push to the end.
+  const groupIds = [...prevGroupIds];
+  const positionOfEditingGroupId = editingGroupId
+    ? groupIds.indexOf(editingGroupId)
+    : -1;
+  const positionToInsert =
+    positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
+  groupIds.splice(positionToInsert, 0, newGroupId);
+  return groupIds;
+}
+
+export function removeFromSelectedGroups(
+  groupIds: GroupId[],
+  selectedGroupIds: { [groupId: string]: boolean },
+) {
+  return groupIds.filter((groupId) => !selectedGroupIds[groupId]);
+}
