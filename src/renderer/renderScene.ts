@@ -256,7 +256,7 @@ export const renderScene = (
               handler[2],
               handler[3],
             );
-          } else if (locallySelectedElements[0].type !== "text") {
+          } else {
             strokeRectWithRotation(
               context,
               handler[0],

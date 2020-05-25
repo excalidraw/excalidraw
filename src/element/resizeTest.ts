@@ -45,11 +45,6 @@ export const resizeTest = (
     return "rotation" as HandlerRectanglesRet;
   }
 
-  if (element.type === "text") {
-    // can't resize text elements
-    return false;
-  }
-
   const filter = Object.keys(handlers).filter((key) => {
     const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
     if (!handler) {

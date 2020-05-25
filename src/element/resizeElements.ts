@@ -4,6 +4,7 @@ import { rescalePoints } from "../points";
 import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
 import {
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "./types";
@@ -12,6 +13,7 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { parseTextFont } from "./textElement";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
@@ -24,6 +26,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
 } from "../keys";
+import { measureText } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -52,6 +55,20 @@ export const resizeElements = (
         element,
         resizeArrowDirection,
         event.shiftKey,
+        pointerX,
+        pointerY,
+      );
+    } else if (
+      element.type === "text" &&
+      (resizeHandle === "nw" ||
+        resizeHandle === "ne" ||
+        resizeHandle === "sw" ||
+        resizeHandle === "se")
+    ) {
+      resizeSingleTextElement(
+        element,
+        resizeHandle,
+        getResizeCenterPointKey(event),
         pointerX,
         pointerY,
       );
@@ -187,6 +204,89 @@ const rescalePointsInElement = (
         ),
       }
     : {};
+
+const resizeSingleTextElement = (
+  element: NonDeleted<ExcalidrawTextElement>,
+  resizeHandle: "nw" | "ne" | "sw" | "se",
+  isResizeFromCenter: boolean,
+  pointerX: number,
+  pointerY: number,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // rotation pointer with reverse angle
+  const [rotatedX, rotatedY] = rotate(
+    pointerX,
+    pointerY,
+    cx,
+    cy,
+    -element.angle,
+  );
+  const { fontSize, fontFamily } = parseTextFont(element);
+  let scale;
+  switch (resizeHandle) {
+    case "se":
+      scale = Math.max(
+        (rotatedX - x1) / (x2 - x1),
+        (rotatedY - y1) / (y2 - y1),
+      );
+      break;
+    case "nw":
+      scale = Math.max(
+        (x2 - rotatedX) / (x2 - x1),
+        (y2 - rotatedY) / (y2 - y1),
+      );
+      break;
+    case "ne":
+      scale = Math.max(
+        (rotatedX - x1) / (x2 - x1),
+        (y2 - rotatedY) / (y2 - y1),
+      );
+      break;
+    case "sw":
+      scale = Math.max(
+        (x2 - rotatedX) / (x2 - x1),
+        (rotatedY - y1) / (y2 - y1),
+      );
+      break;
+  }
+  if (scale > 0) {
+    const newFont = `${Math.max(
+      Number(fontSize.slice(0, -2)) * scale,
+      10,
+    )}px ${fontFamily}`;
+    const metrics = measureText(element.text, newFont);
+    const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
+      element,
+      metrics.width,
+      metrics.height,
+    );
+    const deltaX1 = (x1 - nextX1) / 2;
+    const deltaY1 = (y1 - nextY1) / 2;
+    const deltaX2 = (x2 - nextX2) / 2;
+    const deltaY2 = (y2 - nextY2) / 2;
+    const [nextElementX, nextElementY] = adjustXYWithRotation(
+      resizeHandle,
+      element.x,
+      element.y,
+      element.angle,
+      deltaX1,
+      deltaY1,
+      deltaX2,
+      deltaY2,
+      isResizeFromCenter,
+    );
+    mutateElement(element, {
+      font: newFont,
+      width: metrics.width,
+      height: metrics.height,
+      baseline: metrics.baseline,
+      x: nextElementX,
+      y: nextElementY,
+    });
+  }
+};
 
 const resizeSingleElement = (
   element: NonDeletedExcalidrawElement,

@@ -10,3 +10,14 @@ export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
     baseline: metrics.baseline,
   });
 };
+
+export const parseTextFont = (element: ExcalidrawTextElement) => {
+  const fontSplit = element.font.split(" ").filter((d) => !!d.trim());
+  let fontFamily = fontSplit[0];
+  let fontSize = "20px";
+  if (fontSplit.length > 1) {
+    fontFamily = fontSplit[1];
+    fontSize = fontSplit[0];
+  }
+  return { fontSize, fontFamily };
+};

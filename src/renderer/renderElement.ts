@@ -9,6 +9,7 @@ import {
   getArrowPoints,
   getElementAbsoluteCoords,
 } from "../element/bounds";
+import { parseTextFont } from "../element/textElement";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
@@ -492,13 +493,7 @@ export const renderElementToSvg = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        const fontSplit = element.font.split(" ").filter((d) => !!d.trim());
-        let fontFamily = fontSplit[0];
-        let fontSize = "20px";
-        if (fontSplit.length > 1) {
-          fontFamily = fontSplit[1];
-          fontSize = fontSplit[0];
-        }
+        const { fontSize, fontFamily } = parseTextFont(element);
         const textAnchor =
           element.textAlign === "center"
             ? "middle"

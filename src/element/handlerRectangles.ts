@@ -21,6 +21,33 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   rotation: true,
 };
 
+const OMIT_SIDES_FOR_TEXT_ELEMENT = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+};
+
+const OMIT_SIDES_FOR_LINE_SLASH = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  nw: true,
+  se: true,
+  rotation: true,
+};
+
+const OMIT_SIDES_FOR_LINE_BACKSLASH = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  ne: true,
+  sw: true,
+  rotation: true,
+};
+
 const generateHandler = (
   x: number,
   y: number,
@@ -180,13 +207,7 @@ export const handlerRectangles = (
   zoom: number,
   pointerType: PointerType = "mouse",
 ) => {
-  const handlers = handlerRectanglesFromCoords(
-    getElementAbsoluteCoords(element),
-    element.angle,
-    zoom,
-    pointerType,
-  );
-
+  let omitSides: { [T in Sides]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||
@@ -195,43 +216,27 @@ export const handlerRectangles = (
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;
-
       if (p1[0] === 0 || p1[1] === 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
-      }
-
-      if (p1[0] > 0 && p1[1] < 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
-      }
-
-      if (p1[0] > 0 && p1[1] > 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
-      }
-
-      if (p1[0] < 0 && p1[1] > 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
-      }
-
-      if (p1[0] < 0 && p1[1] < 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
+      } else if (p1[0] > 0 && p1[1] < 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_SLASH;
+      } else if (p1[0] > 0 && p1[1] > 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
+      } else if (p1[0] < 0 && p1[1] > 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_SLASH;
+      } else if (p1[0] < 0 && p1[1] < 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       }
     }
+  } else if (element.type === "text") {
+    omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
 
-  return handlers;
+  return handlerRectanglesFromCoords(
+    getElementAbsoluteCoords(element),
+    element.angle,
+    zoom,
+    pointerType,
+    omitSides,
+  );
 };
