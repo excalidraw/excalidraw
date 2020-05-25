@@ -151,7 +151,7 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
 };
 
 function createDerivativeId(id: string) {
-  return id + "_1";
+  return `${id}_1`;
 }
 
 export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(

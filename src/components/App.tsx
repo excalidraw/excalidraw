@@ -135,7 +135,7 @@ import throttle from "lodash.throttle";
 import {
   getSelectedGroupIds,
   selectGroupsForSelectedElements,
-} from "../actions/actionGroup";
+} from "../groups";
 
 /**
  * @param func handler taking at most single parameter (event).

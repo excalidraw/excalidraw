@@ -1,38 +1,10 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
 import nanoid from "nanoid";
-import { GroupId, ExcalidrawElement, NonDeleted } from "../element/types";
-import { AppState } from "../types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { newElementWith } from "../element/mutateElement";
-import { getSelectedElements, globalSceneState } from "../scene";
-
-export function isSelectedViaGroup(
-  appState: AppState,
-  element: ExcalidrawElement,
-) {
-  return !!element.groupIds
-    .filter((groupId) => groupId !== appState.editingGroupId)
-    .find((groupId) => appState.selectedGroupIds[groupId]);
-}
-
-function selectGroup(
-  groupId: GroupId,
-  appState: AppState,
-  elements: readonly ExcalidrawElement[],
-): AppState {
-  return {
-    ...appState,
-    selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: true },
-    selectedElementIds: {
-      ...appState.selectedElementIds,
-      ...Object.fromEntries(
-        elements
-          .filter((element) => element.groupIds.includes(groupId))
-          .map((element) => [element.id, true]),
-      ),
-    },
-  };
-}
+import { getSelectedElements } from "../scene";
+import { getSelectedGroupIds, selectGroup } from "../groups";
 
 export const actionGroup = register({
   name: "group",
@@ -94,12 +66,6 @@ export const actionGroup = register({
   },
 });
 
-export function getSelectedGroupIds(appState: AppState): GroupId[] {
-  return Object.entries(appState.selectedGroupIds)
-    .filter(([groupId, isSelected]) => isSelected)
-    .map(([groupId, isSelected]) => groupId);
-}
-
 export const actionUngroup = register({
   name: "ungroup",
   perform: (elements, appState) => {
@@ -133,33 +99,3 @@ export const actionUngroup = register({
     );
   },
 });
-
-export function selectGroupsForSelectedElements(appState: AppState): AppState {
-  let nextAppState = { ...appState };
-
-  const selectedElements = getSelectedElements(
-    globalSceneState.getElements(),
-    appState,
-  );
-
-  for (const selectedElement of selectedElements) {
-    let groupIds = selectedElement.groupIds;
-    if (appState.editingGroupId) {
-      // handle the case where a group is nested within a group
-      const indexOfEditingGroup = groupIds.indexOf(appState.editingGroupId);
-      if (indexOfEditingGroup > -1) {
-        groupIds = groupIds.slice(0, indexOfEditingGroup);
-      }
-    }
-    if (groupIds.length > 0) {
-      const groupId = groupIds[groupIds.length - 1];
-      nextAppState = selectGroup(
-        groupId,
-        nextAppState,
-        globalSceneState.getElementsIncludingDeleted(),
-      );
-    }
-  }
-
-  return nextAppState;
-}

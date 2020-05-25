@@ -28,10 +28,7 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
-import {
-  isSelectedViaGroup,
-  getSelectedGroupIds,
-} from "../actions/actionGroup";
+import { isSelectedViaGroup, getSelectedGroupIds } from "../groups";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
