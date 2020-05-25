@@ -10,6 +10,7 @@ import {
 import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
+import nanoid from "nanoid";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -150,12 +151,23 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
   return val;
 };
 
-function createDerivativeId(id: string) {
-  return `${id}_1`;
-}
-
+/**
+ * Duplicate an element, often used in the alt-drag operation.
+ * Note that this method has gotten a bit complicated since the
+ * introduction of gruoping/ungrouping elements.
+ * @param editingGroupId The current group being edited. The new
+ *                       element will inherit this group and its
+ *                       parents.
+ * @param groupIdMapForOperation A Map that maps old group IDs to
+ *                               duplicated ones. If you are duplicating
+ *                               multiple elements at once, share this map
+ *                               amongst all of them
+ * @param element Element to duplicate
+ * @param overrides Any element properties to override
+ */
 export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   editingGroupId: GroupId | null,
+  groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   overrides?: Partial<TElement>,
 ): TElement => {
@@ -170,7 +182,11 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
       ? positionOfEditingGroupId
       : copy.groupIds.length;
   for (let i = 0; i < endIndex; i++) {
-    copy.groupIds[i] = createDerivativeId(copy.groupIds[i]);
+    const groupId = copy.groupIds[i];
+    if (!groupIdMapForOperation.has(groupId)) {
+      groupIdMapForOperation.set(groupId, nanoid());
+    }
+    copy.groupIds[i] = groupIdMapForOperation.get(groupId)!;
   }
   if (overrides) {
     copy = Object.assign(copy, overrides);

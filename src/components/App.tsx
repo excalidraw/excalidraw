@@ -709,9 +709,10 @@ class App extends React.Component<any, AppState> {
 
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
+    const groupIdMap = new Map();
 
     const newElements = clipboardElements.map((element) =>
-      duplicateElement(this.state.editingGroupId, element, {
+      duplicateElement(this.state.editingGroupId, groupIdMap, element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
       }),
@@ -2282,6 +2283,7 @@ class App extends React.Component<any, AppState> {
 
             const nextElements = [];
             const elementsToAppend = [];
+            const groupIdMap = new Map();
             for (const element of globalSceneState.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
@@ -2291,6 +2293,7 @@ class App extends React.Component<any, AppState> {
               ) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
+                  groupIdMap,
                   element,
                 );
                 mutateElement(duplicatedElement, {

@@ -12,6 +12,7 @@ import { getShortcutKey } from "../utils";
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   perform: (elements, appState) => {
+    const groupIdMap = new Map();
     return {
       appState,
       elements: elements.reduce(
@@ -19,6 +20,7 @@ export const actionDuplicateSelection = register({
           if (appState.selectedElementIds[element.id]) {
             const newElement = duplicateElement(
               appState.editingGroupId,
+              groupIdMap,
               element,
               {
                 x: element.x + 10,
