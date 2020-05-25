@@ -44,7 +44,7 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  saveToLocalStorage,
+  saveToStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
@@ -127,9 +127,9 @@ import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
 import { actionFinalize } from "../actions";
 import {
-  restoreUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
+  restoreUsernameFromStorage,
+  saveUsernameToStorage,
+} from "../data/storage";
 
 import throttle from "lodash.throttle";
 
@@ -215,8 +215,8 @@ class App extends React.Component<any, AppState> {
           elements={globalSceneState.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
-          onUsernameChange={(username) => {
-            saveUsernameToLocalStorage(username);
+          onUsernameChange={async (username) => {
+            await saveUsernameToStorage(username);
             this.setState({
               username,
             });
@@ -1087,8 +1087,8 @@ class App extends React.Component<any, AppState> {
     },
   );
 
-  restoreUserName() {
-    const username = restoreUsernameFromLocalStorage();
+  async restoreUserName() {
+    const username = await restoreUsernameFromStorage();
 
     if (username !== null) {
       this.setState({
@@ -2720,8 +2720,8 @@ class App extends React.Component<any, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
   }, 300);
 
-  private saveDebounced = debounce(() => {
-    saveToLocalStorage(
+  private saveDebounced = debounce(async () => {
+    await saveToStorage(
       globalSceneState.getElementsIncludingDeleted(),
       this.state,
     );
