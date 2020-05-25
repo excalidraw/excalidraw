@@ -1987,11 +1987,15 @@ class App extends React.Component<any, AppState> {
           !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
           !event.shiftKey
         ) {
-          this.setState({
+          this.setState((prevState) => ({
             selectedElementIds: {},
             selectedGroupIds: {},
-            editingGroupId: null,
-          });
+            editingGroupId:
+              prevState.editingGroupId &&
+              hitElement?.groupIds.includes(prevState.editingGroupId)
+                ? prevState.editingGroupId
+                : null,
+          }));
         }
 
         // If we click on something
@@ -2001,20 +2005,18 @@ class App extends React.Component<any, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            const { editingGroupId } = this.state;
-            this.setState((prevState) =>
-              selectGroupsForSelectedElements(
+            this.setState((prevState) => {
+              return selectGroupsForSelectedElements(
                 {
                   ...prevState,
-                  editingGroupId,
                   selectedElementIds: {
                     ...prevState.selectedElementIds,
                     [hitElement!.id]: true,
                   },
                 },
                 globalSceneState.getElements(),
-              ),
-            );
+              );
+            });
             // TODO: this is strange...
             globalSceneState.replaceAllElements(
               globalSceneState.getElementsIncludingDeleted(),
