@@ -78,8 +78,7 @@ export const actionGroup = register({
     return (
       !event.shiftKey &&
       event[KEYS.CTRL_OR_CMD] &&
-      event.altKey &&
-      event.keyCode === 71
+      event.keyCode === KEYS.G_KEY_CODE
     );
   },
 });
@@ -115,8 +114,7 @@ export const actionUngroup = register({
     return (
       event.shiftKey &&
       event[KEYS.CTRL_OR_CMD] &&
-      event.altKey &&
-      event.keyCode === 71
+      event.keyCode === KEYS.G_KEY_CODE
     );
   },
   contextMenuOrder: 5,
