@@ -15,39 +15,65 @@ const STORAGE_KEY_COLLAB = "excalidraw-collab";
  */
 export class WebStorageProvider {
   private supportsIDB: boolean;
-  private indexedDBStore: idb.Store | null;
+  private IDBStore: idb.Store | null;
 
   constructor() {
     this.supportsIDB = "indexedDB" in window && process.env.NODE_ENV !== "test";
-    this.indexedDBStore = this.supportsIDB
+    this.IDBStore = this.supportsIDB
       ? new idb.Store(`${STORAGE_NAME}-db`, `${STORAGE_NAME}-store`)
       : null;
   }
 
+  // moves existing localStorage data-items to IDB.
+  async migrate() {
+    if (this.supportsIDB) {
+      const keysToMigrate: string[] = [
+        STORAGE_KEY_ELEMENTS,
+        STORAGE_KEY_STATE,
+        STORAGE_KEY_COLLAB,
+      ];
+
+      const runMigration = async (key: string): Promise<void> => {
+        const item: string | null = localStorage.getItem(key);
+        if (item) {
+          await this.set(key, item);
+          const isMigrationSuccessful = !!(await this.get(key));
+          // remove existing key only if IDB has the migrated values.
+          if (isMigrationSuccessful) {
+            localStorage.removeItem(key);
+          }
+        }
+      };
+
+      const migrations = keysToMigrate.map(runMigration);
+      await Promise.all(migrations);
+    }
+  }
+
   async clear(): Promise<void> {
-    if (this.supportsIDB && this.indexedDBStore) {
-      return await idb.clear(this.indexedDBStore);
+    if (this.supportsIDB && this.IDBStore) {
+      return await idb.clear(this.IDBStore);
     }
     return localStorage.clear();
   }
 
   async delete(key: string): Promise<void> {
-    if (this.supportsIDB && this.indexedDBStore) {
-      return await idb.del(key, this.indexedDBStore);
+    if (this.supportsIDB && this.IDBStore) {
+      return await idb.del(key, this.IDBStore);
     }
     return localStorage.removeItem(key);
   }
 
   async get(key: string): Promise<string | null> {
-    if (this.supportsIDB && this.indexedDBStore) {
-      return await idb.get(key, this.indexedDBStore);
+    if (this.supportsIDB && this.IDBStore) {
+      return await idb.get(key, this.IDBStore);
     }
     return localStorage.getItem(key);
   }
 
   async set(key: string, value: string): Promise<void> {
-    if (this.supportsIDB && this.indexedDBStore) {
-      return await idb.set(key, value, this.indexedDBStore);
+    if (this.supportsIDB && this.IDBStore) {
+      return await idb.set(key, value, this.IDBStore);
     }
     return localStorage.setItem(key, value);
   }
@@ -99,6 +125,14 @@ export const restoreFromStorage = async () => {
   let savedState = null;
 
   try {
+    if (localStorage && localStorage.length) {
+      const elementsToMigrate = localStorage.getItem(STORAGE_KEY_ELEMENTS);
+      // migrate all existing data-items only if there are elements.
+      if (elementsToMigrate && elementsToMigrate.length) {
+        await storage.migrate();
+      }
+    }
+
     savedElements = await storage.get(STORAGE_KEY_ELEMENTS);
     savedState = await storage.get(STORAGE_KEY_STATE);
   } catch (error) {
