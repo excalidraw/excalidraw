@@ -18,7 +18,9 @@ export class WebStorageProvider {
 
   constructor() {
     this.supportsIDB = "indexedDB" in window && process.env.NODE_ENV !== "test";
-    this.indexedDBStore = this.supportsIDB ? new idb.Store(STORAGE_KEY) : null;
+    this.indexedDBStore = this.supportsIDB
+      ? new idb.Store(`${STORAGE_KEY}-db`, STORAGE_KEY)
+      : null;
   }
 
   async clear(): Promise<void> {
@@ -115,7 +117,7 @@ export const restoreFromStorage = async () => {
   if (savedState) {
     try {
       appState = JSON.parse(savedState) as AppState;
-      // If we're retrieving from local storage, we should not be collaborating
+      // If we're retrieving from storage, we should not be collaborating
       appState.isCollaborating = false;
       appState.collaborators = new Map();
     } catch {
