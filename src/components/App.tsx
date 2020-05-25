@@ -2012,36 +2012,30 @@ class App extends React.Component<any, AppState> {
               this.state.editingGroupId &&
               !hitElement.groupIds.includes(this.state.editingGroupId)
             ) {
-              this.setState((prevState) =>
-                selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: { [hitElement!.id]: true },
-                    selectedGroupIds: {},
-                    editingGroupId: null,
-                  },
-                  globalSceneState.getElements(),
-                ),
-              );
-            } else {
-              this.setState((prevState) => {
-                return selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: {
-                      ...prevState.selectedElementIds,
-                      [hitElement!.id]: true,
-                    },
-                  },
-                  globalSceneState.getElements(),
-                );
+              this.setState({
+                selectedElementIds: {},
+                selectedGroupIds: {},
+                editingGroupId: null,
               });
-              // TODO: this is strange...
-              globalSceneState.replaceAllElements(
-                globalSceneState.getElementsIncludingDeleted(),
-              );
-              hitElementWasAddedToSelection = true;
+              return;
             }
+            this.setState((prevState) => {
+              return selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    ...prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
+                },
+                globalSceneState.getElements(),
+              );
+            });
+            // TODO: this is strange...
+            globalSceneState.replaceAllElements(
+              globalSceneState.getElementsIncludingDeleted(),
+            );
+            hitElementWasAddedToSelection = true;
           }
         }
       }
