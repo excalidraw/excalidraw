@@ -17,10 +17,14 @@ export const actionDuplicateSelection = register({
       elements: elements.reduce(
         (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
           if (appState.selectedElementIds[element.id]) {
-            const newElement = duplicateElement(element, {
-              x: element.x + 10,
-              y: element.y + 10,
-            });
+            const newElement = duplicateElement(
+              appState.editingGroupId,
+              element,
+              {
+                x: element.x + 10,
+                y: element.y + 10,
+              },
+            );
             appState.selectedElementIds[newElement.id] = true;
             delete appState.selectedElementIds[element.id];
             return acc.concat([element, newElement]);

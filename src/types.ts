@@ -5,6 +5,7 @@ import {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
+  GroupId,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -67,6 +68,10 @@ export type AppState = {
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
+
+  // groups
+  selectedGroupIds: { [groupId: string]: boolean };
+  editingGroupId: GroupId | null;
 };
 
 export type PointerCoords = Readonly<{

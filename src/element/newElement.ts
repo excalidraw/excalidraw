@@ -5,6 +5,7 @@ import {
   ExcalidrawGenericElement,
   NonDeleted,
   TextAlign,
+  GroupId,
 } from "../element/types";
 import { measureText } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -61,6 +62,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   version: rest.version || 1,
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
+  groupIds: [],
 });
 
 export const newElement = (
@@ -148,13 +150,28 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
   return val;
 };
 
+function createDerivativeId(id: string) {
+  return id + "_1";
+}
+
 export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
+  editingGroupId: GroupId | null,
   element: TElement,
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
+  const positionOfEditingGroupId = editingGroupId
+    ? copy.groupIds.indexOf(editingGroupId)
+    : -1;
+  const endIndex =
+    positionOfEditingGroupId > -1
+      ? positionOfEditingGroupId
+      : copy.groupIds.length;
+  for (let i = 0; i < endIndex; i++) {
+    copy.groupIds[i] = createDerivativeId(copy.groupIds[i]);
+  }
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }
