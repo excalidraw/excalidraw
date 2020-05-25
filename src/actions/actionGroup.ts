@@ -1,18 +1,20 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
 import nanoid from "nanoid";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements } from "../scene";
-import { getSelectedGroupIds, selectGroup } from "../groups";
+import {
+  getSelectedGroupIds,
+  selectGroup,
+  selectGroupsForSelectedElements,
+} from "../groups";
+import { getNonDeletedElements } from "../element";
 
 export const actionGroup = register({
   name: "group",
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
-      elements.filter((element) => !element.isDeleted) as NonDeleted<
-        ExcalidrawElement
-      >[],
+      getNonDeletedElements(elements),
       appState,
     );
     if (selectedElements.length < 2) {
@@ -50,7 +52,11 @@ export const actionGroup = register({
       });
     });
     return {
-      appState: selectGroup(newGroupId, appState, updatedElements),
+      appState: selectGroup(
+        newGroupId,
+        { ...appState, selectedGroupIds: {} },
+        getNonDeletedElements(updatedElements),
+      ),
       elements: updatedElements,
       commitToHistory: true,
     };
@@ -74,19 +80,23 @@ export const actionUngroup = register({
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
+    const nextElements = elements.map((element) => {
+      const filteredGroupIds = element.groupIds.filter(
+        (groupId) => !appState.selectedGroupIds[groupId],
+      );
+      if (filteredGroupIds.length === element.groupIds.length) {
+        return element;
+      }
+      return newElementWith(element, {
+        groupIds: filteredGroupIds,
+      });
+    });
     return {
-      appState: { ...appState, selectedGroupIds: {} },
-      elements: elements.map((element) => {
-        const filteredGroupIds = element.groupIds.filter(
-          (groupId) => !appState.selectedGroupIds[groupId],
-        );
-        if (filteredGroupIds.length === element.groupIds.length) {
-          return element;
-        }
-        return newElementWith(element, {
-          groupIds: filteredGroupIds,
-        });
-      }),
+      appState: selectGroupsForSelectedElements(
+        { ...appState, selectedGroupIds: {} },
+        getNonDeletedElements(nextElements),
+      ),
+      elements: nextElements,
       commitToHistory: true,
     };
   },

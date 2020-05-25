@@ -1497,12 +1497,15 @@ class App extends React.Component<any, AppState> {
         );
       if (selectedGroupId) {
         this.setState((prevState) =>
-          selectGroupsForSelectedElements({
-            ...prevState,
-            editingGroupId: selectedGroupId,
-            selectedElementIds: { [hitElement!.id]: true },
-            selectedGroupIds: {},
-          }),
+          selectGroupsForSelectedElements(
+            {
+              ...prevState,
+              editingGroupId: selectedGroupId,
+              selectedElementIds: { [hitElement!.id]: true },
+              selectedGroupIds: {},
+            },
+            globalSceneState.getElements(),
+          ),
         );
         return;
       }
@@ -2000,14 +2003,17 @@ class App extends React.Component<any, AppState> {
           if (!this.state.selectedElementIds[hitElement.id]) {
             const { editingGroupId } = this.state;
             this.setState((prevState) =>
-              selectGroupsForSelectedElements({
-                ...prevState,
-                editingGroupId,
-                selectedElementIds: {
-                  ...prevState.selectedElementIds,
-                  [hitElement!.id]: true,
+              selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  editingGroupId,
+                  selectedElementIds: {
+                    ...prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
                 },
-              }),
+                globalSceneState.getElements(),
+              ),
             );
             // TODO: this is strange...
             globalSceneState.replaceAllElements(
@@ -2386,16 +2392,19 @@ class App extends React.Component<any, AppState> {
           draggingElement,
         );
         this.setState((prevState) =>
-          selectGroupsForSelectedElements({
-            ...prevState,
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              ...elementsWithinSelection.reduce((map, element) => {
-                map[element.id] = true;
-                return map;
-              }, {} as any),
+          selectGroupsForSelectedElements(
+            {
+              ...prevState,
+              selectedElementIds: {
+                ...prevState.selectedElementIds,
+                ...elementsWithinSelection.reduce((map, element) => {
+                  map[element.id] = true;
+                  return map;
+                }, {} as any),
+              },
             },
-          }),
+            globalSceneState.getElements(),
+          ),
         );
       }
     });

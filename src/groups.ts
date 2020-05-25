@@ -1,11 +1,11 @@
-import { GroupId, ExcalidrawElement } from "./element/types";
+import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
-import { getSelectedElements, globalSceneState } from "./scene";
+import { getSelectedElements } from "./scene";
 
 export function selectGroup(
   groupId: GroupId,
   appState: AppState,
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeleted<ExcalidrawElement>[],
 ): AppState {
   return {
     ...appState,
@@ -44,13 +44,13 @@ export function getSelectedGroupIds(appState: AppState): GroupId[] {
  * When you select an element, you often want to actually select the whole group it's in, unless
  * you're currently editing that group.
  */
-export function selectGroupsForSelectedElements(appState: AppState): AppState {
+export function selectGroupsForSelectedElements(
+  appState: AppState,
+  elements: readonly NonDeleted<ExcalidrawElement>[],
+): AppState {
   let nextAppState = { ...appState };
 
-  const selectedElements = getSelectedElements(
-    globalSceneState.getElements(),
-    appState,
-  );
+  const selectedElements = getSelectedElements(elements, appState);
 
   for (const selectedElement of selectedElements) {
     let groupIds = selectedElement.groupIds;
@@ -63,11 +63,7 @@ export function selectGroupsForSelectedElements(appState: AppState): AppState {
     }
     if (groupIds.length > 0) {
       const groupId = groupIds[groupIds.length - 1];
-      nextAppState = selectGroup(
-        groupId,
-        nextAppState,
-        globalSceneState.getElementsIncludingDeleted(),
-      );
+      nextAppState = selectGroup(groupId, nextAppState, elements);
     }
   }
 
