@@ -9,6 +9,7 @@ export {
   newElement,
   newTextElement,
   newLinearElement,
+  newImageElement,
   duplicateElement,
 } from "./newElement";
 export {

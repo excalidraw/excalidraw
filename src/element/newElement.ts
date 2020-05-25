@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
@@ -109,6 +110,15 @@ export const newLinearElement = (
     lastCommittedPoint: opts.lastCommittedPoint || null,
   };
 };
+
+export function newImageElement(
+  opts: ElementConstructorOpts,
+): NonDeleted<ExcalidrawImageElement> {
+  return {
+    ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    imageData: "",
+  };
+}
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 //  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)

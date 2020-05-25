@@ -28,6 +28,7 @@ const isElementDraggableFromInside = (
   }
   const dragFromInside =
     element.backgroundColor !== "transparent" ||
+    element.type === "image" ||
     appState.selectedElementIds[element.id];
   if (element.type === "line" || element.type === "draw") {
     return dragFromInside && isPathALoop(element.points);
@@ -92,7 +93,7 @@ export const hitTest = (
       );
     }
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
-  } else if (element.type === "rectangle") {
+  } else if (element.type === "rectangle" || element.type === "image") {
     if (isElementDraggableFromInside(element, appState)) {
       return (
         x > x1 - lineThreshold &&
