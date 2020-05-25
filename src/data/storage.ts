@@ -4,7 +4,8 @@ import { AppState } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
 
-const STORAGE_KEY = "excalidraw";
+const STORAGE_NAME = "excalidraw";
+const STORAGE_KEY_ELEMENTS = "excalidraw";
 const STORAGE_KEY_STATE = "excalidraw-state";
 const STORAGE_KEY_COLLAB = "excalidraw-collab";
 
@@ -19,7 +20,7 @@ export class WebStorageProvider {
   constructor() {
     this.supportsIDB = "indexedDB" in window && process.env.NODE_ENV !== "test";
     this.indexedDBStore = this.supportsIDB
-      ? new idb.Store(`${STORAGE_KEY}-db`, STORAGE_KEY)
+      ? new idb.Store(`${STORAGE_NAME}-db`, `${STORAGE_NAME}-store`)
       : null;
   }
 
@@ -81,7 +82,7 @@ export const saveToStorage = async (
 ) => {
   try {
     await storage.set(
-      STORAGE_KEY,
+      STORAGE_KEY_ELEMENTS,
       JSON.stringify(elements.filter((element) => !element.isDeleted)),
     );
     await storage.set(
@@ -98,7 +99,7 @@ export const restoreFromStorage = async () => {
   let savedState = null;
 
   try {
-    savedElements = await storage.get(STORAGE_KEY);
+    savedElements = await storage.get(STORAGE_KEY_ELEMENTS);
     savedState = await storage.get(STORAGE_KEY_STATE);
   } catch (error) {
     console.error(error);
