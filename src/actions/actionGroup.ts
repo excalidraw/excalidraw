@@ -10,6 +10,7 @@ import {
   getElementsInGroup,
   addToGroup,
   removeFromSelectedGroups,
+  isElementInGroup,
 } from "../groups";
 import { getNonDeletedElements } from "../element";
 
@@ -58,13 +59,32 @@ export const actionGroup = register({
         ),
       });
     });
+    // keep the z order within the group the same, but move them
+    // to the z order of the highest element in the layer stack
+    const elementsInGroup = getElementsInGroup(updatedElements, newGroupId);
+    const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
+    const lastGroupElementIndex = updatedElements.lastIndexOf(
+      lastElementInGroup,
+    );
+    const elementsAfterGroup = updatedElements.slice(lastGroupElementIndex + 1);
+    const elementsBeforeGroup = updatedElements
+      .slice(0, lastGroupElementIndex)
+      .filter(
+        (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
+      );
+    const updatedElementsInOrder = [
+      ...elementsBeforeGroup,
+      ...elementsInGroup,
+      ...elementsAfterGroup,
+    ];
+
     return {
       appState: selectGroup(
         newGroupId,
         { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(updatedElements),
+        getNonDeletedElements(updatedElementsInOrder),
       ),
-      elements: updatedElements,
+      elements: updatedElementsInOrder,
       commitToHistory: true,
     };
   },
