@@ -59,7 +59,9 @@
     "untitled": "Sem título",
     "name": "Nome",
     "yourName": "Seu nome",
-    "madeWithExcalidraw": "Feito com Excalidraw"
+    "madeWithExcalidraw": "Feito com Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
