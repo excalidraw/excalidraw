@@ -257,6 +257,13 @@ const resizeSingleTextElement = (
       10,
     )}px ${fontFamily}`;
     const metrics = measureText(element.text, newFont);
+    if (
+      Math.abs(metrics.width - element.width) <= 1 ||
+      Math.abs(metrics.height - element.height) <= 1
+    ) {
+      // we ignore 1px change to avoid janky behavior
+      return;
+    }
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
       element,
       metrics.width,
