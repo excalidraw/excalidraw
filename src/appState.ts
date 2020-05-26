@@ -48,6 +48,8 @@ export const getDefaultAppState = (): AppState => {
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
     zenModeEnabled: false,
+    editingGroupId: null,
+    selectedGroupIds: {},
   };
 };
 

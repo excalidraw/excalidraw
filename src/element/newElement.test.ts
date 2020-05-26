@@ -45,7 +45,7 @@ it("clones arrow element", () => {
     ],
   });
 
-  const copy = duplicateElement(element);
+  const copy = duplicateElement(null, new Map(), element);
 
   assertCloneObjects(element, copy);
 
@@ -82,7 +82,7 @@ it("clones text element", () => {
     textAlign: "left",
   });
 
-  const copy = duplicateElement(element);
+  const copy = duplicateElement(null, new Map(), element);
 
   assertCloneObjects(element, copy);
 
