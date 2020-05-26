@@ -71,7 +71,8 @@ export const restore = (
 
       return {
         ...element,
-        // all elements must have version > 0 so getDrawingVersion() will pick up newly added elements
+        // all elements must have version > 0 so getDrawingVersion() will pick
+        //  up newly added elements
         version: element.version || 1,
         id: element.id || randomId(),
         isDeleted: false,
@@ -84,6 +85,7 @@ export const restore = (
             ? 100
             : element.opacity,
         angle: element.angle ?? 0,
+        groupIds: element.groupIds || [],
       };
     });
 
