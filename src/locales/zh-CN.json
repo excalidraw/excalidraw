@@ -59,7 +59,9 @@
     "untitled": "无标题",
     "name": "名字",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "重置画布",
