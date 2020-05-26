@@ -22,7 +22,7 @@
     "strokeStyle_dotted": "",
     "sloppiness": "Üstün körülük",
     "opacity": "Opaklık",
-    "textAlign": "",
+    "textAlign": "Metin hizala",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -40,9 +40,9 @@
     "crossHatch": "Çapraz-taralı",
     "thin": "İnce",
     "bold": "Kalın",
-    "left": "",
-    "center": "",
-    "right": "",
+    "left": "Sol",
+    "center": "Ortala",
+    "right": "Sağ",
     "extraBold": "Ekstra kalın",
     "architect": "Mimar",
     "artist": "Sanatçı",
@@ -57,9 +57,9 @@
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
     "untitled": "Başlıksız",
-    "name": "",
+    "name": "İsim",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "Excalidraw ile yapıldı"
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",
@@ -100,7 +100,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "draw": "",
+    "draw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
-    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecektirler."
+    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler."
   },
   "errorDialog": {
     "title": "Hata"
@@ -152,7 +152,7 @@
     "shapes": "Şekiller",
     "or": "veya",
     "click": "tıkla",
-    "drag": "",
+    "drag": "sürükle",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "editor": "Düzenleyici",
@@ -160,7 +160,7 @@
     "blog": "Blog'umuzu okuyun",
     "howto": "Rehberimizi takip edin",
     "github": "Bir hata mı buldun? Bildir",
-    "textNewLine": "",
+    "textNewLine": "Yeni satır ekle (text)",
     "textFinish": "",
     "zoomToFit": ""
   },
