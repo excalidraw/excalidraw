@@ -71,7 +71,11 @@ export const actionGroup = register({
   contextMenuOrder: 4,
   contextItemLabel: "labels.group",
   keyTest: (event) => {
-    return !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === "g";
+    return (
+      !event.shiftKey &&
+      event[KEYS.CTRL_OR_CMD] &&
+      event.keyCode === KEYS.G_KEY_CODE
+    );
   },
 });
 
@@ -104,7 +108,11 @@ export const actionUngroup = register({
     };
   },
   keyTest: (event) => {
-    return event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === "G";
+    return (
+      event.shiftKey &&
+      event[KEYS.CTRL_OR_CMD] &&
+      event.keyCode === KEYS.G_KEY_CODE
+    );
   },
   contextMenuOrder: 5,
   contextItemLabel: "labels.ungroup",
