@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "实时协作会议正在进行。",
     "desc_persistenceWarning": "",
     "desc_shareLink": "分享此链接给你要协作的用户",
-    "desc_exitSession": "停止会话将中断你在会议室的连接，但你依然可以在本地继续使用画布. 注意，这不会影响到其他用户, 他们仍可以在自己的版本上继续协作。"
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "错误"

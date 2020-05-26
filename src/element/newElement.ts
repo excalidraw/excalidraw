@@ -6,10 +6,13 @@ import {
   NonDeleted,
   TextAlign,
   FontFamily,
+  GroupId,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
+import nanoid from "nanoid";
+import { getNewGroupIdsForDuplication } from "../groups";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -42,7 +45,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     ...rest
-  }: ElementConstructorOpts & Partial<ExcalidrawGenericElement>,
+  }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => ({
   id: rest.id || randomId(),
   type,
@@ -62,6 +65,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   version: rest.version || 1,
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
+  groupIds: [],
 });
 
 export const newElement = (
@@ -151,13 +155,39 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
   return val;
 };
 
+/**
+ * Duplicate an element, often used in the alt-drag operation.
+ * Note that this method has gotten a bit complicated since the
+ * introduction of gruoping/ungrouping elements.
+ * @param editingGroupId The current group being edited. The new
+ *                       element will inherit this group and its
+ *                       parents.
+ * @param groupIdMapForOperation A Map that maps old group IDs to
+ *                               duplicated ones. If you are duplicating
+ *                               multiple elements at once, share this map
+ *                               amongst all of them
+ * @param element Element to duplicate
+ * @param overrides Any element properties to override
+ */
 export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
+  editingGroupId: GroupId | null,
+  groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
   copy.id = randomId();
   copy.seed = randomInteger();
+  copy.groupIds = getNewGroupIdsForDuplication(
+    copy.groupIds,
+    editingGroupId,
+    (groupId) => {
+      if (!groupIdMapForOperation.has(groupId)) {
+        groupIdMapForOperation.set(groupId, nanoid());
+      }
+      return groupIdMapForOperation.get(groupId)!;
+    },
+  );
   if (overrides) {
     copy = Object.assign(copy, overrides);
   }

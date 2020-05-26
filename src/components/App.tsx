@@ -1,6 +1,5 @@
 import React from "react";
 
-import socketIOClient from "socket.io-client";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
@@ -132,6 +131,12 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
+import {
+  getSelectedGroupIds,
+  selectGroupsForSelectedElements,
+  isElementInGroup,
+  getSelectedGroupIdForElement,
+} from "../groups";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -705,9 +710,10 @@ class App extends React.Component<any, AppState> {
 
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
+    const groupIdMap = new Map();
 
     const newElements = clipboardElements.map((element) =>
-      duplicateElement(element, {
+      duplicateElement(this.state.editingGroupId, groupIdMap, element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
       }),
@@ -805,7 +811,9 @@ class App extends React.Component<any, AppState> {
     this.portal.close();
   };
 
-  private initializeSocketClient = (opts: { showLoadingState: boolean }) => {
+  private initializeSocketClient = async (opts: {
+    showLoadingState: boolean;
+  }) => {
     if (this.portal.socket) {
       return;
     }
@@ -925,6 +933,10 @@ class App extends React.Component<any, AppState> {
           initialize();
         }
       };
+
+      const { default: socketIOClient }: any = await import(
+        /* webpackChunkName: "socketIoClient" */ "socket.io-client"
+      );
 
       this.portal.open(
         socketIOClient(SOCKET_SERVER),
@@ -1208,7 +1220,11 @@ class App extends React.Component<any, AppState> {
         resetCursor();
       } else {
         setCursorForShape(this.state.elementType);
-        this.setState({ selectedElementIds: {} });
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+          editingGroupId: null,
+        });
       }
       isHoldingSpace = false;
     }
@@ -1222,7 +1238,12 @@ class App extends React.Component<any, AppState> {
       document.activeElement.blur();
     }
     if (elementType !== "selection") {
-      this.setState({ elementType, selectedElementIds: {} });
+      this.setState({
+        elementType,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
     } else {
       this.setState({ elementType });
     }
@@ -1334,7 +1355,11 @@ class App extends React.Component<any, AppState> {
       }),
     });
     // deselect all other elements when inserting text
-    this.setState({ selectedElementIds: {} });
+    this.setState({
+      selectedElementIds: {},
+      selectedGroupIds: {},
+      editingGroupId: null,
+    });
 
     // do an initial update to re-initialize element position since we were
     //  modifying element's x/y for sake of editor (case: syncing to remote)
@@ -1457,14 +1482,46 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
-    resetCursor();
-
     const { x, y } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
+
+    const selectedGroupIds = getSelectedGroupIds(this.state);
+
+    if (selectedGroupIds.length > 0) {
+      const elements = globalSceneState.getElements();
+      const hitElement = getElementAtPosition(
+        elements,
+        this.state,
+        x,
+        y,
+        this.state.zoom,
+      );
+
+      const selectedGroupId =
+        hitElement &&
+        getSelectedGroupIdForElement(hitElement, this.state.selectedGroupIds);
+
+      if (selectedGroupId) {
+        this.setState((prevState) =>
+          selectGroupsForSelectedElements(
+            {
+              ...prevState,
+              editingGroupId: selectedGroupId,
+              selectedElementIds: { [hitElement!.id]: true },
+              selectedGroupIds: {},
+            },
+            globalSceneState.getElements(),
+          ),
+        );
+        return;
+      }
+    }
+
+    resetCursor();
 
     this.startTextEditing({
       x: x,
@@ -1940,7 +1997,16 @@ class App extends React.Component<any, AppState> {
           !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
           !event.shiftKey
         ) {
-          this.setState({ selectedElementIds: {} });
+          this.setState((prevState) => ({
+            selectedElementIds: {},
+            selectedGroupIds: {},
+            editingGroupId:
+              prevState.editingGroupId &&
+              hitElement &&
+              isElementInGroup(hitElement, prevState.editingGroupId)
+                ? prevState.editingGroupId
+                : null,
+          }));
         }
 
         // If we click on something
@@ -1950,12 +2016,32 @@ class App extends React.Component<any, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            this.setState((prevState) => ({
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [hitElement!.id]: true,
-              },
-            }));
+            // if we are currently editing a group, treat all selections outside of the group
+            // as exiting editing mode.
+            if (
+              this.state.editingGroupId &&
+              !isElementInGroup(hitElement, this.state.editingGroupId)
+            ) {
+              this.setState({
+                selectedElementIds: {},
+                selectedGroupIds: {},
+                editingGroupId: null,
+              });
+              return;
+            }
+            this.setState((prevState) => {
+              return selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    ...prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
+                },
+                globalSceneState.getElements(),
+              );
+            });
+            // TODO: this is strange...
             globalSceneState.replaceAllElements(
               globalSceneState.getElementsIncludingDeleted(),
             );
@@ -1964,7 +2050,11 @@ class App extends React.Component<any, AppState> {
         }
       }
     } else {
-      this.setState({ selectedElementIds: {} });
+      this.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
     }
 
     if (this.state.elementType === "text") {
@@ -2216,6 +2306,7 @@ class App extends React.Component<any, AppState> {
 
             const nextElements = [];
             const elementsToAppend = [];
+            const groupIdMap = new Map();
             for (const element of globalSceneState.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
@@ -2223,7 +2314,11 @@ class App extends React.Component<any, AppState> {
                 //  updated yet by the time this mousemove event is fired
                 (element.id === hitElement.id && hitElementWasAddedToSelection)
               ) {
-                const duplicatedElement = duplicateElement(element);
+                const duplicatedElement = duplicateElement(
+                  this.state.editingGroupId,
+                  groupIdMap,
+                  element,
+                );
                 mutateElement(duplicatedElement, {
                   x: duplicatedElement.x + (originX - lastX),
                   y: duplicatedElement.y + (originY - lastY),
@@ -2314,21 +2409,31 @@ class App extends React.Component<any, AppState> {
       if (this.state.elementType === "selection") {
         const elements = globalSceneState.getElements();
         if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
-          this.setState({ selectedElementIds: {} });
+          this.setState({
+            selectedElementIds: {},
+            selectedGroupIds: {},
+            editingGroupId: null,
+          });
         }
         const elementsWithinSelection = getElementsWithinSelection(
           elements,
           draggingElement,
         );
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            ...elementsWithinSelection.reduce((map, element) => {
-              map[element.id] = true;
-              return map;
-            }, {} as any),
-          },
-        }));
+        this.setState((prevState) =>
+          selectGroupsForSelectedElements(
+            {
+              ...prevState,
+              selectedElementIds: {
+                ...prevState.selectedElementIds,
+                ...elementsWithinSelection.reduce((map, element) => {
+                  map[element.id] = true;
+                  return map;
+                }, {} as any),
+              },
+            },
+            globalSceneState.getElements(),
+          ),
+        );
       }
     });
 
@@ -2443,7 +2548,12 @@ class App extends React.Component<any, AppState> {
       // If click occurred and elements were dragged or some element
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
-      if (hitElement && !draggingOccurred && !hitElementWasAddedToSelection) {
+      if (
+        getSelectedGroupIds(this.state).length === 0 &&
+        hitElement &&
+        !draggingOccurred &&
+        !hitElementWasAddedToSelection
+      ) {
         if (childEvent.shiftKey) {
           this.setState((prevState) => ({
             selectedElementIds: {
@@ -2460,7 +2570,11 @@ class App extends React.Component<any, AppState> {
 
       if (draggingElement === null) {
         // if no element is clicked, clear the selection and redraw
-        this.setState({ selectedElementIds: {} });
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+          editingGroupId: null,
+        });
         return;
       }
 
