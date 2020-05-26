@@ -1,5 +1,7 @@
 import { Point } from "../types";
 
+export type GroupId = string;
+
 type _ExcalidrawElementBase = Readonly<{
   id: string;
   x: number;
@@ -18,8 +20,12 @@ type _ExcalidrawElementBase = Readonly<{
   version: number;
   versionNonce: number;
   isDeleted: boolean;
+  groupIds: GroupId[];
 }>;
 
+/**
+ * These are elements that don't have any additional properties.
+ */
 export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
   type: "selection" | "rectangle" | "diamond" | "ellipse";
 };
