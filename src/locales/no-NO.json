@@ -59,7 +59,9 @@
     "untitled": "Uten navn",
     "name": "Navn",
     "yourName": "Ditt navn",
-    "madeWithExcalidraw": "Laget med Excalidraw"
+    "madeWithExcalidraw": "Laget med Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
