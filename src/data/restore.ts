@@ -20,7 +20,7 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   return DEFAULT_FONT_FAMILY;
 };
 
-function migrateElement<T extends ExcalidrawElement>(
+function migrateElementWithProperties<T extends ExcalidrawElement>(
   element: T,
   extra: Omit<T, keyof ExcalidrawElement>,
 ): T {
@@ -55,7 +55,7 @@ function migrateElement<T extends ExcalidrawElement>(
   } as T;
 }
 
-const migrateElements = (
+const migrateElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element => {
   switch (element.type) {
@@ -70,7 +70,7 @@ const migrateElements = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      return migrateElement(element, {
+      return migrateElementWithProperties(element, {
         fontSize,
         fontFamily,
         text: element.text ?? "",
@@ -80,7 +80,7 @@ const migrateElements = (
     case "draw":
     case "line":
     case "arrow": {
-      return migrateElement(element, {
+      return migrateElementWithProperties(element, {
         points:
           // migrate old arrow model to new one
           !Array.isArray(element.points) || element.points.length < 2
@@ -95,7 +95,7 @@ const migrateElements = (
     case "ellipse":
     case "rectangle":
     case "diamond":
-      return migrateElement(element, {});
+      return migrateElementWithProperties(element, {});
 
     // don't use default case so as to catch a missing an element type case
     //  (we also don't want to throw, but instead return void so we
@@ -112,7 +112,7 @@ export const restore = (
     // filtering out selection, which is legacy, no longer kept in elements,
     //  and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      const migratedElement = migrateElements(element);
+      const migratedElement = migrateElement(element);
       if (migratedElement) {
         elements.push(migratedElement);
       }
