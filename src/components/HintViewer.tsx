@@ -6,6 +6,7 @@ import { getSelectedElements } from "../scene";
 import "./HintViewer.scss";
 import { AppState } from "../types";
 import { isLinearElement } from "../element/typeChecks";
+import { getShortcutKey } from "../utils";
 
 interface Hint {
   appState: AppState;
@@ -56,13 +57,15 @@ const getHints = ({ appState, elements }: Hint) => {
 };
 
 export const HintViewer = ({ appState, elements }: Hint) => {
-  const hint = getHints({
+  let hint = getHints({
     appState,
     elements,
   });
   if (!hint) {
     return null;
   }
+
+  hint = getShortcutKey(hint);
 
   return (
     <div className="HintViewer">
