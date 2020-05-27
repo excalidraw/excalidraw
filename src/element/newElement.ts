@@ -5,9 +5,10 @@ import {
   ExcalidrawGenericElement,
   NonDeleted,
   TextAlign,
+  FontFamily,
   GroupId,
 } from "../element/types";
-import { measureText } from "../utils";
+import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import nanoid from "nanoid";
@@ -77,16 +78,18 @@ export const newElement = (
 export const newTextElement = (
   opts: {
     text: string;
-    font: string;
+    fontSize: number;
+    fontFamily: FontFamily;
     textAlign: TextAlign;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureText(opts.text, opts.font);
+  const metrics = measureText(opts.text, getFontString(opts));
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text: opts.text,
-      font: opts.font,
+      fontSize: opts.fontSize,
+      fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
       // Center the text
       x: opts.x - metrics.width / 2,

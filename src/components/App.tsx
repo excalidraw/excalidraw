@@ -751,7 +751,8 @@ class App extends React.Component<any, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       text: text,
-      font: this.state.currentItemFont,
+      fontSize: this.state.currentItemFontSize,
+      fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
     });
 
@@ -1319,7 +1320,8 @@ class App extends React.Component<any, AppState> {
       initText: element.text,
       strokeColor: element.strokeColor,
       opacity: element.opacity,
-      font: element.font,
+      fontSize: element.fontSize,
+      fontFamily: element.fontFamily,
       angle: element.angle,
       textAlign: element.textAlign,
       zoom: this.state.zoom,
@@ -1399,7 +1401,8 @@ class App extends React.Component<any, AppState> {
             roughness: this.state.currentItemRoughness,
             opacity: this.state.currentItemOpacity,
             text: "",
-            font: this.state.currentItemFont,
+            fontSize: this.state.currentItemFontSize,
+            fontFamily: this.state.currentItemFontFamily,
             textAlign: this.state.currentItemTextAlign,
           });
 

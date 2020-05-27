@@ -1,8 +1,9 @@
 import { KEYS } from "../keys";
-import { selectNode, isWritableElement } from "../utils";
+import { selectNode, isWritableElement, getFontString } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
+import { FontFamily } from "./types";
 
 const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -21,7 +22,8 @@ type TextWysiwygParams = {
   x: number;
   y: number;
   strokeColor: string;
-  font: string;
+  fontSize: number;
+  fontFamily: FontFamily;
   opacity: number;
   zoom: number;
   angle: number;
@@ -37,7 +39,8 @@ export const textWysiwyg = ({
   x,
   y,
   strokeColor,
-  font,
+  fontSize,
+  fontFamily,
   opacity,
   zoom,
   angle,
@@ -68,7 +71,7 @@ export const textWysiwyg = ({
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
     textAlign: textAlign,
     display: "inline-block",
-    font: font,
+    font: getFontString({ fontSize, fontFamily }),
     padding: "4px",
     // This needs to have "1px solid" otherwise the carret doesn't show up
     // the first time on Safari and Chrome!
@@ -193,7 +196,7 @@ export const textWysiwyg = ({
       .find((element) => element.id === id);
     if (editingElement && isTextElement(editingElement)) {
       Object.assign(editable.style, {
-        font: editingElement.font,
+        font: getFontString(editingElement),
         textAlign: editingElement.textAlign,
         color: editingElement.strokeColor,
         opacity: editingElement.opacity / 100,

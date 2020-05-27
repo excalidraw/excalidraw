@@ -5,6 +5,7 @@ import {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
+  FontFamily,
   GroupId,
 } from "./element/types";
 import { SHAPES } from "./shapes";
@@ -35,7 +36,8 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFont: string;
+  currentItemFontFamily: FontFamily;
+  currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   viewBackgroundColor: string;
   scrollX: FlooredNumber;

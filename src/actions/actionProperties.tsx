@@ -3,6 +3,7 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   TextAlign,
+  FontFamily,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
@@ -17,9 +18,9 @@ import {
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
-import { DEFAULT_FONT } from "../appState";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
+import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../appState";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -318,7 +319,7 @@ export const actionChangeFontSize = register({
       elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = newElementWith(el, {
-            font: `${value}px ${el.font.split("px ")[1]}`,
+            fontSize: value,
           });
           redrawTextBoundingBox(element);
           return element;
@@ -328,9 +329,7 @@ export const actionChangeFontSize = register({
       }),
       appState: {
         ...appState,
-        currentItemFont: `${value}px ${
-          appState.currentItemFont.split("px ")[1]
-        }`,
+        currentItemFontSize: value,
       },
       commitToHistory: true,
     };
@@ -349,8 +348,8 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && +element.font.split("px ")[0],
-          +(appState.currentItemFont || DEFAULT_FONT).split("px ")[0],
+          (element) => isTextElement(element) && element.fontSize,
+          appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -365,7 +364,7 @@ export const actionChangeFontFamily = register({
       elements: changeProperty(elements, appState, (el) => {
         if (isTextElement(el)) {
           const element: ExcalidrawTextElement = newElementWith(el, {
-            font: `${el.font.split("px ")[0]}px ${value}`,
+            fontFamily: value,
           });
           redrawTextBoundingBox(element);
           return element;
@@ -375,33 +374,35 @@ export const actionChangeFontFamily = register({
       }),
       appState: {
         ...appState,
-        currentItemFont: `${
-          appState.currentItemFont.split("px ")[0]
-        }px ${value}`,
+        currentItemFontFamily: appState.currentItemFontFamily,
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.fontFamily")}</legend>
-      <ButtonSelect
-        group="font-family"
-        options={[
-          { value: "Virgil", text: t("labels.handDrawn") },
-          { value: "Helvetica", text: t("labels.normal") },
-          { value: "Cascadia", text: t("labels.code") },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => isTextElement(element) && element.font.split("px ")[1],
-          (appState.currentItemFont || DEFAULT_FONT).split("px ")[1],
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const options: { value: FontFamily; text: string }[] = [
+      { value: 1, text: t("labels.handDrawn") },
+      { value: 2, text: t("labels.normal") },
+      { value: 3, text: t("labels.code") },
+    ];
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fontFamily")}</legend>
+        <ButtonSelect<FontFamily | false>
+          group="font-family"
+          options={options}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => isTextElement(element) && element.fontFamily,
+            appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeTextAlign = register({
