@@ -60,8 +60,8 @@
     "name": "Nimi",
     "yourName": "Nimesi",
     "madeWithExcalidraw": "Tehty Excalidrawilla",
-    "group": "",
-    "ungroup": ""
+    "group": "Ryhmitä valinta",
+    "ungroup": "Pura valittu ryhmä"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
