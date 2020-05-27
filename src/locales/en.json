@@ -59,7 +59,9 @@
     "untitled": "Untitled",
     "name": "Name",
     "yourName": "Your name",
-    "madeWithExcalidraw": "Made with Excalidraw"
+    "madeWithExcalidraw": "Made with Excalidraw",
+    "group": "Group selection",
+    "ungroup": "Ungroup selection"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

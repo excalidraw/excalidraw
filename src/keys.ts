@@ -16,6 +16,7 @@ export const KEYS = {
   F_KEY_CODE: 70,
   ALT_KEY_CODE: 18,
   Z_KEY_CODE: 90,
+  G_KEY_CODE: 71,
 } as const;
 
 export type Key = keyof typeof KEYS;

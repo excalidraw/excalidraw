@@ -13,6 +13,7 @@ export interface SceneStateCallbackRemover {
 }
 
 class GlobalScene {
+  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private callbacks: Set<SceneStateCallback> = new Set();
 
   constructor(private _elements: readonly ExcalidrawElement[] = []) {}
@@ -22,11 +23,12 @@ class GlobalScene {
   }
 
   getElements(): readonly NonDeletedExcalidrawElement[] {
-    return getNonDeletedElements(this._elements);
+    return this.nonDeletedElements;
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this._elements = nextElements;
+    this.nonDeletedElements = getNonDeletedElements(this._elements);
     this.informMutation();
   }
 

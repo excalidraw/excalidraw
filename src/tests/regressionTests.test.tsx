@@ -2,7 +2,7 @@ import { reseed } from "../random";
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
-import { render, fireEvent } from "./test-utils";
+import { render, screen, fireEvent } from "./test-utils";
 import App from "../components/App";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
@@ -161,6 +161,11 @@ const getSelectedElement = (): ExcalidrawElement => {
   }
   return selectedElements[0];
 };
+
+function getStateHistory() {
+  // @ts-ignore
+  return h.history.stateHistory;
+}
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 const getResizeHandles = () => {
@@ -569,6 +574,46 @@ describe("regression tests", () => {
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
   });
 
+  it("noop interaction after undo shouldn't create history entry", () => {
+    // NOTE: this will fail if this test case is run in isolation. There's
+    //  some leaking state or race conditions in initialization/teardown
+    //  (couldn't figure out)
+    expect(getStateHistory().length).toBe(0);
+
+    clickTool("rectangle");
+    pointerDown(10, 10);
+    pointerMove(20, 20);
+    pointerUp();
+
+    clickTool("rectangle");
+    pointerDown(30, 10);
+    pointerMove(40, 20);
+    pointerUp();
+
+    expect(getStateHistory().length).toBe(2);
+
+    keyPress("z", true);
+    expect(getStateHistory().length).toBe(1);
+
+    // clicking an element shouldn't addu to history
+    pointerDown(10, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(1);
+
+    keyPress("z", true, true);
+    expect(getStateHistory().length).toBe(2);
+
+    // clicking an element shouldn't addu to history
+    pointerDown(10, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(2);
+
+    // same for clicking the element just redo-ed
+    pointerDown(30, 10);
+    pointerUp();
+    expect(getStateHistory().length).toBe(2);
+  });
+
   it("zoom hotkeys", () => {
     expect(h.state.zoom).toBe(1);
     fireEvent.keyDown(document, { code: "Equal", ctrlKey: true });
@@ -577,5 +622,17 @@ describe("regression tests", () => {
     fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
     expect(h.state.zoom).toBe(1);
+  });
+
+  it("rerenders UI on language change", () => {
+    // select rectangle tool to show properties menu
+    clickTool("rectangle");
+    // english lang should display `hachure` label
+    expect(screen.queryByText(/hachure/i)).not.toBeNull();
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "de-DE" },
+    });
+    // switching to german, `hachure` label should no longer exist
+    expect(screen.queryByText(/hachure/i)).toBeNull();
   });
 });
