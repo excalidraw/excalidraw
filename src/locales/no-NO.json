@@ -60,8 +60,8 @@
     "name": "Navn",
     "yourName": "Ditt navn",
     "madeWithExcalidraw": "Laget med Excalidraw",
-    "group": "Grupper utvalg",
-    "ungroup": ""
+    "group": "Gruppér utvalg",
+    "ungroup": "Avgruppér utvalg"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
