@@ -328,9 +328,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   return (
     prev.lng === next.lng &&
     prev.elements === next.elements &&
-    keys.every((key) => {
-      return prevAppState[key] === nextAppState[key];
-    })
+    keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };
 
