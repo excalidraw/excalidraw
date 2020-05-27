@@ -5,7 +5,7 @@ import {
 } from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
-import { isInvisiblySmallElement, normalizeDimensions } from "../element";
+import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
 import { DEFAULT_TEXT_ALIGN, DEFAULT_FONT_FAMILY } from "../appState";
@@ -48,11 +48,9 @@ function migrateElement<T extends ExcalidrawElement>(
     groupIds: element.groupIds || [],
   };
 
-  // FIXME this needs to replaced with pure function
-  normalizeDimensions(element);
-
   return {
     ...base,
+    ...getNormalizedDimensions(base),
     ...extra,
   } as T;
 }

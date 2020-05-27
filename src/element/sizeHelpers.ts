@@ -81,31 +81,32 @@ export const resizePerfectLineForNWHandler = (
   }
 };
 
-/**
- * @returns {boolean} whether element was normalized
- */
-export const normalizeDimensions = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawElement => {
-  if (!element || (element.width >= 0 && element.height >= 0)) {
-    return false;
-  }
+export const getNormalizedDimensions = (
+  element: Pick<ExcalidrawElement, "width" | "height" | "x" | "y">,
+): {
+  width: ExcalidrawElement["width"];
+  height: ExcalidrawElement["height"];
+  x: ExcalidrawElement["x"];
+  y: ExcalidrawElement["y"];
+} => {
+  const ret = {
+    width: element.width,
+    height: element.height,
+    x: element.x,
+    y: element.y,
+  };
 
   if (element.width < 0) {
     const nextWidth = Math.abs(element.width);
-    mutateElement(element, {
-      width: nextWidth,
-      x: element.x - nextWidth,
-    });
+    ret.width = nextWidth;
+    ret.x = element.x - nextWidth;
   }
 
   if (element.height < 0) {
     const nextHeight = Math.abs(element.height);
-    mutateElement(element, {
-      height: nextHeight,
-      y: element.y - nextHeight,
-    });
+    ret.height = nextHeight;
+    ret.y = element.y - nextHeight;
   }
 
-  return true;
+  return ret;
 };
