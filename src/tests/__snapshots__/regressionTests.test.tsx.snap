@@ -4038,6 +4038,66 @@ exports[`regression tests pinch-to-zoom works: [end of test] number of elements 
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `8`;
 
+exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "elementLocked": false,
+  "elementType": "rectangle",
+  "errorMessage": null,
+  "exportBackground": true,
+  "isCollaborating": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "openMenu": null,
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {},
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests rerenders UI on language change: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [],
+}
+`;
+
+exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
+
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `4`;
+
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
