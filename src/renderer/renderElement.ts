@@ -9,13 +9,12 @@ import {
   getArrowPoints,
   getElementAbsoluteCoords,
 } from "../element/bounds";
-import { parseTextFont } from "../element/textElement";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance } from "../utils";
+import { SVG_NS, distance, getFontString, getFontFamilyString } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
@@ -102,7 +101,7 @@ const drawElementOnCanvas = (
     default: {
       if (isTextElement(element)) {
         const font = context.font;
-        context.font = element.font;
+        context.font = getFontString(element);
         const fillStyle = context.fillStyle;
         context.fillStyle = element.strokeColor;
         const textAlign = context.textAlign;
@@ -493,7 +492,6 @@ export const renderElementToSvg = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        const { fontSize, fontFamily } = parseTextFont(element);
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
@@ -505,8 +503,8 @@ export const renderElementToSvg = (
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
-          text.setAttribute("font-family", fontFamily);
-          text.setAttribute("font-size", fontSize);
+          text.setAttribute("font-family", getFontFamilyString(element));
+          text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");

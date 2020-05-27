@@ -1,6 +1,7 @@
 import { FlooredNumber } from "./types";
 import { getZoomOrigin } from "./scene";
-import { CURSOR_TYPE } from "./constants";
+import { CURSOR_TYPE, FONT_FAMILY } from "./constants";
+import { FontFamily, FontString } from "./element/types";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -60,8 +61,27 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" || target.type === "number"));
 
+export const getFontFamilyString = ({
+  fontFamily,
+}: {
+  fontFamily: FontFamily;
+}) => {
+  return FONT_FAMILY[fontFamily];
+};
+
+/** returns fontSize+fontFamily string for assignment to DOM elements */
+export const getFontString = ({
+  fontSize,
+  fontFamily,
+}: {
+  fontSize: number;
+  fontFamily: FontFamily;
+}) => {
+  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+};
+
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (text: string, font: string) => {
+export const measureText = (text: string, font: FontString) => {
   const line = document.createElement("div");
   const body = document.body;
   line.style.position = "absolute";

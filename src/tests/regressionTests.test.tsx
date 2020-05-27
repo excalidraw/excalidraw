@@ -2,7 +2,7 @@ import { reseed } from "../random";
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
-import { render, fireEvent } from "./test-utils";
+import { render, screen, fireEvent } from "./test-utils";
 import App from "../components/App";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
@@ -622,5 +622,17 @@ describe("regression tests", () => {
     fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
     expect(h.state.zoom).toBe(1);
+  });
+
+  it("rerenders UI on language change", () => {
+    // select rectangle tool to show properties menu
+    clickTool("rectangle");
+    // english lang should display `hachure` label
+    expect(screen.queryByText(/hachure/i)).not.toBeNull();
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "de-DE" },
+    });
+    // switching to german, `hachure` label should no longer exist
+    expect(screen.queryByText(/hachure/i)).toBeNull();
   });
 });

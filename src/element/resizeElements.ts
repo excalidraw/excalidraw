@@ -13,7 +13,6 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { parseTextFont } from "./textElement";
 import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
@@ -26,7 +25,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
 } from "../keys";
-import { measureText } from "../utils";
+import { measureText, getFontString } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -223,7 +222,6 @@ const resizeSingleTextElement = (
     cy,
     -element.angle,
   );
-  const { fontSize, fontFamily } = parseTextFont(element);
   let scale;
   switch (resizeHandle) {
     case "se":
@@ -252,11 +250,11 @@ const resizeSingleTextElement = (
       break;
   }
   if (scale > 0) {
-    const newFont = `${Math.max(
-      Number(fontSize.slice(0, -2)) * scale,
-      10,
-    )}px ${fontFamily}`;
-    const metrics = measureText(element.text, newFont);
+    const newFontSize = Math.max(element.fontSize * scale, 10);
+    const metrics = measureText(
+      element.text,
+      getFontString({ fontSize: newFontSize, fontFamily: element.fontFamily }),
+    );
     if (
       Math.abs(metrics.width - element.width) <= 1 ||
       Math.abs(metrics.height - element.height) <= 1
@@ -285,7 +283,7 @@ const resizeSingleTextElement = (
       isResizeFromCenter,
     );
     mutateElement(element, {
-      font: newFont,
+      fontSize: newFontSize,
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
