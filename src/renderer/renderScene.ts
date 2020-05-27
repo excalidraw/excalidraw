@@ -6,6 +6,7 @@ import { FlooredNumber, AppState } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  GroupId,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -27,6 +28,11 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
+import {
+  isSelectedViaGroup,
+  getSelectedGroupIds,
+  getElementsInGroup,
+} from "../groups";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -167,7 +173,10 @@ export const renderScene = (
     const selections = elements.reduce((acc, element) => {
       const selectionColors = [];
       // local user
-      if (appState.selectedElementIds[element.id]) {
+      if (
+        appState.selectedElementIds[element.id] &&
+        !isSelectedViaGroup(appState, element)
+      ) {
         selectionColors.push(oc.black);
       }
       // remote users
@@ -180,57 +189,96 @@ export const renderScene = (
         );
       }
       if (selectionColors.length) {
-        acc.push({ element, selectionColors });
+        const [
+          elementX1,
+          elementY1,
+          elementX2,
+          elementY2,
+        ] = getElementAbsoluteCoords(element);
+        acc.push({
+          angle: element.angle,
+          elementX1,
+          elementY1,
+          elementX2,
+          elementY2,
+          selectionColors,
+        });
       }
       return acc;
-    }, [] as { element: ExcalidrawElement; selectionColors: string[] }[]);
+    }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
 
-    selections.forEach(({ element, selectionColors }) => {
-      const [
+    function addSelectionForGroupId(groupId: GroupId) {
+      const groupElements = getElementsInGroup(elements, groupId);
+      const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
+        groupElements,
+      );
+      selections.push({
+        angle: 0,
+        elementX1,
+        elementX2,
+        elementY1,
+        elementY2,
+        selectionColors: [oc.black],
+      });
+    }
+
+    for (const groupId of getSelectedGroupIds(appState)) {
+      // TODO: support multiplayer selected group IDs
+      addSelectionForGroupId(groupId);
+    }
+
+    if (appState.editingGroupId) {
+      addSelectionForGroupId(appState.editingGroupId);
+    }
+
+    selections.forEach(
+      ({
+        angle,
         elementX1,
         elementY1,
         elementX2,
         elementY2,
-      ] = getElementAbsoluteCoords(element);
+        selectionColors,
+      }) => {
+        const elementWidth = elementX2 - elementX1;
+        const elementHeight = elementY2 - elementY1;
 
-      const elementWidth = elementX2 - elementX1;
-      const elementHeight = elementY2 - elementY1;
+        const initialLineDash = context.getLineDash();
+        const lineWidth = context.lineWidth;
+        const lineDashOffset = context.lineDashOffset;
+        const strokeStyle = context.strokeStyle;
 
-      const initialLineDash = context.getLineDash();
-      const lineWidth = context.lineWidth;
-      const lineDashOffset = context.lineDashOffset;
-      const strokeStyle = context.strokeStyle;
+        const dashedLinePadding = 4 / sceneState.zoom;
+        const dashWidth = 8 / sceneState.zoom;
+        const spaceWidth = 4 / sceneState.zoom;
 
-      const dashedLinePadding = 4 / sceneState.zoom;
-      const dashWidth = 8 / sceneState.zoom;
-      const spaceWidth = 4 / sceneState.zoom;
+        context.lineWidth = 1 / sceneState.zoom;
 
-      context.lineWidth = 1 / sceneState.zoom;
-
-      const count = selectionColors.length;
-      for (var i = 0; i < count; ++i) {
-        context.strokeStyle = selectionColors[i];
-        context.setLineDash([
-          dashWidth,
-          spaceWidth + (dashWidth + spaceWidth) * (count - 1),
-        ]);
-        context.lineDashOffset = (dashWidth + spaceWidth) * i;
-        strokeRectWithRotation(
-          context,
-          elementX1 - dashedLinePadding,
-          elementY1 - dashedLinePadding,
-          elementWidth + dashedLinePadding * 2,
-          elementHeight + dashedLinePadding * 2,
-          elementX1 + elementWidth / 2,
-          elementY1 + elementHeight / 2,
-          element.angle,
-        );
-      }
-      context.lineDashOffset = lineDashOffset;
-      context.strokeStyle = strokeStyle;
-      context.lineWidth = lineWidth;
-      context.setLineDash(initialLineDash);
-    });
+        const count = selectionColors.length;
+        for (var i = 0; i < count; ++i) {
+          context.strokeStyle = selectionColors[i];
+          context.setLineDash([
+            dashWidth,
+            spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+          ]);
+          context.lineDashOffset = (dashWidth + spaceWidth) * i;
+          strokeRectWithRotation(
+            context,
+            elementX1 - dashedLinePadding,
+            elementY1 - dashedLinePadding,
+            elementWidth + dashedLinePadding * 2,
+            elementHeight + dashedLinePadding * 2,
+            elementX1 + elementWidth / 2,
+            elementY1 + elementHeight / 2,
+            angle,
+          );
+        }
+        context.lineDashOffset = lineDashOffset;
+        context.strokeStyle = strokeStyle;
+        context.lineWidth = lineWidth;
+        context.setLineDash(initialLineDash);
+      },
+    );
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     const locallySelectedElements = getSelectedElements(elements, appState);

@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "即時協作會議正在進行中。",
     "desc_persistenceWarning": "",
     "desc_shareLink": "與要協作的任何人分享此連結：",
-    "desc_exitSession": "停止會議將會中斷你與會議室的連線，但你可以繼續在本機端繼續處理工作。注意，這不會影響到其他人，他們仍然可以在他們自己的版本上繼續協作。"
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": ""

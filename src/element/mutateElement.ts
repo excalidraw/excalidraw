@@ -6,7 +6,7 @@ import { randomInteger } from "../random";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
-  "id" | "seed"
+  "id" | "seed" | "version" | "versionNonce"
 >;
 
 // This function tracks updates of text elements for the purposes for collaboration.
@@ -52,7 +52,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   updates: ElementUpdate<TElement>,
 ): TElement => ({
   ...element,
+  ...updates,
   version: element.version + 1,
   versionNonce: randomInteger(),
-  ...updates,
 });

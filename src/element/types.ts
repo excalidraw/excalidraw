@@ -1,4 +1,7 @@
 import { Point } from "../types";
+import { FONT_FAMILY } from "../constants";
+
+export type GroupId = string;
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -18,8 +21,12 @@ type _ExcalidrawElementBase = Readonly<{
   version: number;
   versionNonce: number;
   isDeleted: boolean;
+  groupIds: GroupId[];
 }>;
 
+/**
+ * These are elements that don't have any additional properties.
+ */
 export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
   type: "selection" | "rectangle" | "diamond" | "ellipse";
 };
@@ -43,7 +50,8 @@ export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
-    font: string;
+    fontSize: number;
+    fontFamily: FontFamily;
     text: string;
     baseline: number;
     textAlign: TextAlign;
@@ -59,3 +67,6 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type PointerType = "mouse" | "pen" | "touch";
 
 export type TextAlign = "left" | "center" | "right";
+
+export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontString = string & { _brand: "fontString" };
