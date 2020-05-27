@@ -32,14 +32,13 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
       if (
-        (updates as any)[key] === value &&
-        value !== null &&
+        (element as any)[key] === value &&
         // if object, always update in case its deep prop was mutated
-        typeof value !== "object"
+        (typeof value !== "object" || value === null)
       ) {
         continue;
       }
-      (updates as any)[key] = value;
+      (element as any)[key] = value;
       didChange = true;
     }
   }
