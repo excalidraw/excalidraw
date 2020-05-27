@@ -4,10 +4,11 @@ import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS, measureText } from "../utils";
+import { distance, SVG_NS, measureText, getFontString } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
+import { DEFAULT_FONT_FAMILY } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -149,12 +150,17 @@ export const exportToSvg = (
 
 const getWatermarkElement = (maxX: number, maxY: number) => {
   const text = t("labels.madeWithExcalidraw");
-  const font = "16px Virgil";
-  const { width: textWidth } = measureText(text, font);
+  const fontSize = 16;
+  const fontFamily = DEFAULT_FONT_FAMILY;
+  const { width: textWidth } = measureText(
+    text,
+    getFontString({ fontSize, fontFamily }),
+  );
 
   return newTextElement({
     text,
-    font,
+    fontSize,
+    fontFamily,
     textAlign: "center",
     x: maxX - textWidth / 2,
     y: maxY + 16,

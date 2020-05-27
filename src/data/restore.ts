@@ -1,6 +1,10 @@
 import { Point } from "../types";
 
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontFamily,
+} from "../element/types";
 import { AppState } from "../types";
 import { DataState } from "./types";
 import {
@@ -10,7 +14,17 @@ import {
 } from "../element";
 import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
-import { DEFAULT_TEXT_ALIGN } from "../appState";
+import { DEFAULT_TEXT_ALIGN, DEFAULT_FONT_FAMILY } from "../appState";
+import { FONT_FAMILY } from "../constants";
+
+const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
+  for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
+    if (fontFamilyString.includes(fontFamilyName)) {
+      return parseInt(id) as FontFamily;
+    }
+  }
+  return DEFAULT_FONT_FAMILY;
+};
 
 export const restore = (
   // we're making the elements mutable for this API because we want to
@@ -57,6 +71,20 @@ export const restore = (
         element.points = points;
       } else {
         if (isTextElement(element)) {
+          if ("font" in element) {
+            const [fontPx, fontFamily]: [
+              string,
+              string,
+            ] = (element as any).font.split(" ");
+            (element as Mutable<ExcalidrawTextElement>).fontSize = parseInt(
+              fontPx,
+              10,
+            );
+            (element as Mutable<
+              ExcalidrawTextElement
+            >).fontFamily = getFontFamilyByName(fontFamily);
+            delete (element as any).font;
+          }
           if (!element.textAlign) {
             element.textAlign = DEFAULT_TEXT_ALIGN;
           }
