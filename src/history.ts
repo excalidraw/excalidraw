@@ -22,6 +22,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
     selectedElementIds: appState.selectedElementIds,
     viewBackgroundColor: appState.viewBackgroundColor,
+    editingLinearElement: appState.editingLinearElement,
     name: appState.name,
   };
 };
@@ -159,6 +160,14 @@ export class SceneHistory {
     // note: this is safe because entry's appState is guaranteed no excess props
     let key: keyof typeof nextEntry.appState;
     for (key in nextEntry.appState) {
+      if (key === "editingLinearElement") {
+        if (
+          nextEntry.appState[key]?.element.id ===
+          lastEntry.appState[key]?.element.id
+        ) {
+          continue;
+        }
+      }
       if (key === "selectedElementIds") {
         continue;
       }

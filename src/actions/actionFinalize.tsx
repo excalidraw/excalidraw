@@ -24,7 +24,7 @@ export const actionFinalize = register({
           ...appState,
           editingLinearElement: null,
         },
-        commitToHistory: false,
+        commitToHistory: true,
       };
     }
 

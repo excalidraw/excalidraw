@@ -4,7 +4,11 @@ import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { SceneHistory, HistoryEntry } from "../history";
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeleted,
+  ExcalidrawLinearElement,
+} from "../element/types";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
 import { getElementMap } from "../element";
@@ -30,23 +34,41 @@ const writeData = (
     const prevElementMap = getElementMap(prevElements);
     const nextElements = data.elements;
     const nextElementMap = getElementMap(nextElements);
-    return {
-      elements: nextElements
-        .map((nextElement) =>
-          newElementWith(
-            prevElementMap[nextElement.id] || nextElement,
-            nextElement,
-          ),
-        )
-        .concat(
-          prevElements
-            .filter(
-              (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
-            )
-            .map((prevElement) =>
-              newElementWith(prevElement, { isDeleted: true }),
-            ),
+
+    const elements = nextElements
+      .map((nextElement) =>
+        newElementWith(
+          prevElementMap[nextElement.id] || nextElement,
+          nextElement,
         ),
+      )
+      .concat(
+        prevElements
+          .filter(
+            (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
+          )
+          .map((prevElement) =>
+            newElementWith(prevElement, { isDeleted: true }),
+          ),
+      );
+
+    // ensure the restored editingLinearElement.element reference isn't stale
+    if (data.appState.editingLinearElement) {
+      const { id } = data.appState.editingLinearElement.element;
+      const element = elements.find(
+        (element): element is NonDeleted<ExcalidrawLinearElement> =>
+          element.id === id,
+      );
+      data.appState.editingLinearElement = element
+        ? {
+            ...data.appState.editingLinearElement,
+            element: element,
+          }
+        : null;
+    }
+
+    return {
+      elements,
       appState: { ...appState, ...data.appState },
       commitToHistory,
       syncHistory: true,

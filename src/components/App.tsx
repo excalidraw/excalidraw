@@ -505,7 +505,10 @@ class App extends React.Component<any, AppState> {
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.element.id]
     ) {
-      this.actionManager.executeAction(actionFinalize);
+      // defer so that the commitToHistory flag isn't reset via current update
+      setTimeout(() => {
+        this.actionManager.executeAction(actionFinalize);
+      });
     }
 
     const cursorButton: {
@@ -1195,9 +1198,15 @@ class App extends React.Component<any, AppState> {
         selectedElements.length === 1 &&
         isLinearElement(selectedElements[0])
       ) {
-        this.setState({
-          editingLinearElement: new LinearElementEditor(selectedElements[0]),
-        });
+        if (
+          !this.state.editingLinearElement ||
+          this.state.editingLinearElement.element.id !== selectedElements[0].id
+        ) {
+          history.resumeRecording();
+          this.setState({
+            editingLinearElement: new LinearElementEditor(selectedElements[0]),
+          });
+        }
       } else if (
         selectedElements.length === 1 &&
         !isLinearElement(selectedElements[0])
@@ -1505,9 +1514,15 @@ class App extends React.Component<any, AppState> {
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-      this.setState({
-        editingLinearElement: new LinearElementEditor(selectedElements[0]),
-      });
+      if (
+        !this.state.editingLinearElement ||
+        this.state.editingLinearElement.element.id !== selectedElements[0].id
+      ) {
+        history.resumeRecording();
+        this.setState({
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+        });
+      }
       return;
     }
 
@@ -2081,6 +2096,9 @@ class App extends React.Component<any, AppState> {
                   ),
                 ],
               });
+            }
+            if (this.state.editingLinearElement.lastUncommittedPoint !== null) {
+              history.resumeRecording();
             }
             this.setState({
               editingLinearElement: {
