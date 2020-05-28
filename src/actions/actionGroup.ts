@@ -1,6 +1,5 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
-import nanoid from "nanoid";
 import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements } from "../scene";
 import {
@@ -13,6 +12,7 @@ import {
   isElementInGroup,
 } from "../groups";
 import { getNonDeletedElements } from "../element";
+import { randomId } from "../random";
 
 export const actionGroup = register({
   name: "group",
@@ -46,7 +46,7 @@ export const actionGroup = register({
         return { appState, elements, commitToHistory: false };
       }
     }
-    const newGroupId = nanoid();
+    const newGroupId = randomId();
     const updatedElements = elements.map((element) => {
       if (!appState.selectedElementIds[element.id]) {
         return element;
