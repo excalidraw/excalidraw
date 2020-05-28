@@ -2099,6 +2099,12 @@ class App extends React.Component<any, AppState> {
             y,
           );
 
+          // if we clicked on a point, set the element as hitElement otherwise
+          //  it would get deselected if the point is outside the hitbox area
+          if (clickedPointIndex > -1) {
+            hitElement = this.state.editingLinearElement.element;
+          }
+
           this.setState({
             editingLinearElement: {
               ...this.state.editingLinearElement,
@@ -2108,13 +2114,11 @@ class App extends React.Component<any, AppState> {
           });
         }
 
-        hitElement = getElementAtPosition(
-          elements,
-          this.state,
-          x,
-          y,
-          this.state.zoom,
-        );
+        // hitElement may already be set above, so check first
+        hitElement =
+          hitElement ||
+          getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+
         // clear selection if shift is not clicked
         if (
           !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
