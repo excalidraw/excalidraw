@@ -61,6 +61,25 @@ export class LinearElementEditor {
     return -1;
   }
 
+  static createPointAt(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    pointerX: number,
+    pointerY: number,
+  ): Point {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const [rotatedX, rotatedY] = rotate(
+      pointerX,
+      pointerY,
+      cx,
+      cy,
+      -element.angle,
+    );
+
+    return [rotatedX - element.x, rotatedY - element.y];
+  }
+
   // element-mutating methods
   // ---------------------------------------------------------------------------
 

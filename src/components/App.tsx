@@ -1621,7 +1621,7 @@ class App extends React.Component<any, AppState> {
 
     if (this.state.editingLinearElement && draggingElementPointIndex === null) {
       const { element, lastUncommittedPoint } = this.state.editingLinearElement;
-      const { x: rx, y: ry, points } = element;
+      const { points } = element;
       const lastPoint = points[points.length - 1];
 
       if (!event[KEYS.CTRL_OR_CMD]) {
@@ -1633,13 +1633,25 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
+      const { x: pointerX, y: pointerY } = viewportCoordsToSceneCoords(
+        event,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
+      const newPoint = LinearElementEditor.createPointAt(
+        element,
+        pointerX,
+        pointerY,
+      );
+
       if (lastPoint === lastUncommittedPoint) {
         mutateElement(element, {
-          points: [...points.slice(0, -1), [x - rx, y - ry]],
+          points: [...points.slice(0, -1), newPoint],
         });
       } else {
         mutateElement(element, {
-          points: [...points, [x - rx, y - ry]],
+          points: [...points, newPoint],
         });
       }
       this.setState({
@@ -2053,14 +2065,21 @@ class App extends React.Component<any, AppState> {
           if (event[KEYS.CTRL_OR_CMD]) {
             const { element } = this.state.editingLinearElement;
             if (!this.state.editingLinearElement.lastUncommittedPoint) {
-              const { x, y } = viewportCoordsToSceneCoords(
+              const { x: pointerX, y: pointerY } = viewportCoordsToSceneCoords(
                 event,
                 this.state,
                 this.canvas,
                 window.devicePixelRatio,
               );
               mutateElement(element, {
-                points: [...element.points, [x - element.x, y - element.y]],
+                points: [
+                  ...element.points,
+                  LinearElementEditor.createPointAt(
+                    element,
+                    pointerX,
+                    pointerY,
+                  ),
+                ],
               });
             }
             this.setState({
