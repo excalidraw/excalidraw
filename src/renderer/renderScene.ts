@@ -100,22 +100,19 @@ const renderLinearPointHandles = (
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
-      if (appState.editingLinearElement?.activePointIndex === idx) {
-        context.strokeStyle = "red";
-        context.fillStyle = "rgba(255,0,0,.2)";
-        context.setLineDash([]);
-      } else {
-        context.setLineDash([4, 4]);
-        context.fillStyle = "rgba(255,255,255,.5)";
-        context.strokeStyle = "black";
-      }
+      context.strokeStyle = "red";
+      context.setLineDash([]);
+      context.fillStyle =
+        appState.editingLinearElement?.activePointIndex === idx
+          ? "rgba(255, 127, 127, 0.9)"
+          : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
       strokeCircle(
         context,
-        point[0] - POINT_HANDLE_SIZE / 2,
-        point[1] - POINT_HANDLE_SIZE / 2,
-        POINT_HANDLE_SIZE,
-        POINT_HANDLE_SIZE,
+        point[0] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
+        point[1] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
+        POINT_HANDLE_SIZE / sceneState.zoom,
+        POINT_HANDLE_SIZE / sceneState.zoom,
       );
     },
   );

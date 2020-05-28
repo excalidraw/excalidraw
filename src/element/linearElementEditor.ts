@@ -2,7 +2,7 @@ import { NonDeleted, ExcalidrawLinearElement } from "./types";
 import { distance2d, rotate, adjustXYWithRotation } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
-import { Point } from "../types";
+import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
 export class LinearElementEditor {
@@ -39,13 +39,26 @@ export class LinearElementEditor {
 
   static getPointIndexUnderCursor(
     element: NonDeleted<ExcalidrawLinearElement>,
+    zoom: AppState["zoom"],
     x: number,
     y: number,
   ) {
     const pointHandles = this.getPointsGlobalCoordinates(element);
-    return pointHandles.findIndex((point) => {
-      return distance2d(x, y, point[0], point[1]) < this.POINT_HANDLE_SIZE / 2;
-    });
+    let idx = pointHandles.length;
+    // loop from right to left because points on the right are rendered over
+    //  points on the left, thus should take precedence when clicking, if they
+    //  overlap
+    while (--idx > -1) {
+      const point = pointHandles[idx];
+      if (
+        distance2d(x, y, point[0], point[1]) * zoom <
+        // +1px to account for outline stroke
+        this.POINT_HANDLE_SIZE / 2 + 1
+      ) {
+        return idx;
+      }
+    }
+    return -1;
   }
 
   // element-mutating methods

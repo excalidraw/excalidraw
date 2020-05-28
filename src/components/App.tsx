@@ -2075,6 +2075,7 @@ class App extends React.Component<any, AppState> {
 
           const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
             this.state.editingLinearElement.element,
+            this.state.zoom,
             x,
             y,
           );
@@ -2380,6 +2381,7 @@ class App extends React.Component<any, AppState> {
           draggingElementPointIndex ??
           LinearElementEditor.getPointIndexUnderCursor(
             this.state.editingLinearElement.element,
+            this.state.zoom,
             x,
             y,
           );
