@@ -204,7 +204,7 @@ export const renderScene = (
     }
   });
 
-  // Pain selection element
+  // Paint selection element
   if (selectionElement) {
     renderElement(
       selectionElement,
@@ -216,7 +216,7 @@ export const renderScene = (
   }
 
   // Paint selected elements
-  if (renderSelection) {
+  if (renderSelection && !appState.multiElement) {
     context.translate(sceneState.scrollX, sceneState.scrollY);
 
     const selections = elements.reduce((acc, element) => {
