@@ -19,6 +19,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -138,6 +139,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -170,6 +172,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -223,6 +226,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -297,6 +301,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -403,6 +408,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -490,6 +496,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -522,6 +529,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -601,6 +609,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -663,6 +672,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -720,6 +730,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -782,6 +793,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -814,6 +826,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -846,6 +859,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -878,6 +892,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -910,6 +925,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -967,6 +983,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1030,6 +1047,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1062,6 +1080,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1120,6 +1139,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1184,6 +1204,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1216,6 +1237,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1249,6 +1271,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1308,6 +1331,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1395,6 +1419,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1427,6 +1452,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -1505,6 +1531,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1617,6 +1644,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1649,6 +1677,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -1702,6 +1731,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -1801,6 +1831,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": "id3",
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -1917,6 +1948,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1949,6 +1981,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -2002,6 +2035,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -2076,6 +2110,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -2183,6 +2218,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -2482,6 +2518,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -2490,6 +2527,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -2522,6 +2560,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -2575,6 +2614,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -2649,6 +2689,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id3": true,
@@ -2755,6 +2796,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id4": true,
@@ -2893,6 +2935,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id5": true,
@@ -3066,6 +3109,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id5": true,
@@ -3243,6 +3287,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id6": true,
@@ -3455,6 +3500,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id6": true,
@@ -3671,6 +3717,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id7": true,
@@ -3944,6 +3991,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4006,6 +4054,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4063,6 +4112,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4125,6 +4175,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4182,6 +4233,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4244,6 +4296,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4301,6 +4354,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4374,6 +4428,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4442,6 +4497,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4515,6 +4571,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4583,6 +4640,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4656,6 +4714,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4724,6 +4783,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4797,6 +4857,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4865,6 +4926,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -4927,6 +4989,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4984,6 +5047,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -5046,6 +5110,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5103,6 +5168,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -5176,6 +5242,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5244,6 +5311,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -5306,6 +5374,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5363,6 +5432,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -5436,6 +5506,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5504,6 +5575,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -5704,6 +5776,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5736,6 +5809,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -5789,6 +5863,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -5863,6 +5938,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5946,6 +6022,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6124,6 +6201,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -6211,6 +6289,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6243,6 +6322,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -6321,6 +6401,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -6383,6 +6464,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "rectangle",
   "errorMessage": null,
@@ -6443,6 +6525,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -6521,6 +6604,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6553,6 +6637,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6586,6 +6671,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6620,6 +6706,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6655,6 +6742,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6691,6 +6779,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6728,6 +6817,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6766,6 +6856,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6805,6 +6896,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6845,6 +6937,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6886,6 +6979,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6928,6 +7022,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6971,6 +7066,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7015,6 +7111,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7060,6 +7157,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7106,6 +7204,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7153,6 +7252,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7226,6 +7326,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -7295,6 +7396,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7327,6 +7429,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7360,6 +7463,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7394,6 +7498,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7429,6 +7534,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7465,6 +7571,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7502,6 +7609,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7540,6 +7648,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7604,6 +7713,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -7671,6 +7781,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7703,6 +7814,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7736,6 +7848,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7770,6 +7883,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7805,6 +7919,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7841,6 +7956,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7903,6 +8019,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -7968,6 +8085,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8000,6 +8118,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8033,6 +8152,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8067,6 +8187,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8127,6 +8248,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -8190,6 +8312,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8222,6 +8345,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8280,6 +8404,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -8357,6 +8482,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8389,6 +8515,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8422,6 +8549,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8456,6 +8584,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8491,6 +8620,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8527,6 +8657,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8564,6 +8695,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8602,6 +8734,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8641,6 +8774,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8681,6 +8815,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8722,6 +8857,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8764,6 +8900,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8807,6 +8944,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8851,6 +8989,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8896,6 +9035,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8942,6 +9082,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9014,6 +9155,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -9089,6 +9231,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9121,6 +9264,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9154,6 +9298,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9188,6 +9333,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9223,6 +9369,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9259,6 +9406,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9296,6 +9444,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9334,6 +9483,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9373,6 +9523,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9413,6 +9564,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9454,6 +9606,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9496,6 +9649,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9539,6 +9693,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9583,6 +9738,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9653,6 +9809,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -9726,6 +9883,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9758,6 +9916,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9791,6 +9950,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9825,6 +9985,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9860,6 +10021,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9896,6 +10058,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9933,6 +10096,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9971,6 +10135,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10010,6 +10175,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10050,6 +10216,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10091,6 +10258,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10133,6 +10301,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10201,6 +10370,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -10272,6 +10442,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10304,6 +10475,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10337,6 +10509,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10371,6 +10544,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10406,6 +10580,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10442,6 +10617,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10479,6 +10655,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10517,6 +10694,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10556,6 +10734,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10596,6 +10775,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10662,6 +10842,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -10732,6 +10913,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10764,6 +10946,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10797,6 +10980,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10831,6 +11015,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10866,6 +11051,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10902,6 +11088,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10939,6 +11126,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10977,6 +11165,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11016,6 +11205,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11081,6 +11271,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -11149,6 +11340,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11181,6 +11373,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11214,6 +11407,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11248,6 +11442,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11283,6 +11478,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11319,6 +11515,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11356,6 +11553,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11419,6 +11617,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -11485,6 +11684,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11517,6 +11717,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11550,6 +11751,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11584,6 +11786,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11619,6 +11822,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11680,6 +11884,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -11744,6 +11949,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11776,6 +11982,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11809,6 +12016,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11868,6 +12076,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -11946,6 +12155,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11978,6 +12188,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12011,6 +12222,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12045,6 +12257,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12080,6 +12293,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12116,6 +12330,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12153,6 +12368,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12191,6 +12407,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12230,6 +12447,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12270,6 +12488,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12311,6 +12530,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12353,6 +12573,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12396,6 +12617,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12440,6 +12662,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12485,6 +12708,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12531,6 +12755,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12578,6 +12803,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12651,6 +12877,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -12727,6 +12954,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12759,6 +12987,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12792,6 +13021,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12826,6 +13056,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12861,6 +13092,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12897,6 +13129,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12934,6 +13167,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12972,6 +13206,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13011,6 +13246,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13051,6 +13287,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13092,6 +13329,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13134,6 +13372,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13177,6 +13416,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13221,6 +13461,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13266,6 +13507,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13337,6 +13579,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -13411,6 +13654,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13443,6 +13687,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13476,6 +13721,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13510,6 +13756,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13545,6 +13792,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13581,6 +13829,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13618,6 +13867,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13656,6 +13906,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13695,6 +13946,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13735,6 +13987,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13776,6 +14029,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13818,6 +14072,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13861,6 +14116,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13930,6 +14186,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -14002,6 +14259,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14034,6 +14292,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14067,6 +14326,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14101,6 +14361,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14136,6 +14397,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14172,6 +14434,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14209,6 +14472,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14247,6 +14511,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14286,6 +14551,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14326,6 +14592,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14367,6 +14634,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14434,6 +14702,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -14524,6 +14793,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14556,6 +14826,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -14609,6 +14880,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14691,6 +14963,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -14751,6 +15024,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": "id3",
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -14869,6 +15143,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14901,6 +15176,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -14954,6 +15230,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15028,6 +15305,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -15110,6 +15388,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -15219,6 +15498,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -15281,6 +15561,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -15404,6 +15685,7 @@ Object {
   "redoStack": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15496,6 +15778,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15586,6 +15869,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -15618,6 +15902,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -15696,6 +15981,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
