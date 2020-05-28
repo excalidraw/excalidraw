@@ -71,6 +71,7 @@ export const clearAppStateForLocalStorage = (appState: AppState) => {
     isLoading,
     errorMessage,
     showShortcutsDialog,
+    editingLinearElement,
     ...exportedState
   } = appState;
   return exportedState;
