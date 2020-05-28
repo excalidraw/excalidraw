@@ -3,6 +3,7 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { globalSceneState } from "../scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
+import { Point } from "../types";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -24,7 +25,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   const { points } = updates as any;
 
   if (typeof points !== "undefined") {
-    didChange = true;
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 
@@ -38,6 +38,30 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       ) {
         continue;
       }
+
+      if (key === "points") {
+        const prevPoints = (element as any)[key];
+        const nextPoints = value;
+        if (prevPoints.length === nextPoints.length) {
+          let didChangePoints = false;
+          let i = prevPoints.length;
+          while (--i) {
+            const prevPoint: Point = prevPoints[i];
+            const nextPoint: Point = nextPoints[i];
+            if (
+              prevPoint[0] !== nextPoint[0] ||
+              prevPoint[1] !== nextPoint[1]
+            ) {
+              didChangePoints = true;
+              break;
+            }
+          }
+          if (!didChangePoints) {
+            continue;
+          }
+        }
+      }
+
       (element as any)[key] = value;
       didChange = true;
     }
