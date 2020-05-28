@@ -24,12 +24,17 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: GroupId[];
 }>;
 
+export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
+  type: "selection";
+};
 /**
  * These are elements that don't have any additional properties.
  */
-export type ExcalidrawGenericElement = _ExcalidrawElementBase & {
-  type: "selection" | "rectangle" | "diamond" | "ellipse";
-};
+export type ExcalidrawGenericElement =
+  | ExcalidrawSelectionElement
+  | (_ExcalidrawElementBase & {
+      type: "rectangle" | "diamond" | "ellipse";
+    });
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain

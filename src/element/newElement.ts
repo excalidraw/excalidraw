@@ -11,7 +11,6 @@ import {
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
-import nanoid from "nanoid";
 import { getNewGroupIdsForDuplication } from "../groups";
 
 type ElementConstructorOpts = {
@@ -183,7 +182,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
     editingGroupId,
     (groupId) => {
       if (!groupIdMapForOperation.has(groupId)) {
-        groupIdMapForOperation.set(groupId, nanoid());
+        groupIdMapForOperation.set(groupId, randomId());
       }
       return groupIdMapForOperation.get(groupId)!;
     },

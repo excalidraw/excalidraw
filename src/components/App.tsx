@@ -16,7 +16,7 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
-  normalizeDimensions,
+  getNormalizedDimensions,
   getElementMap,
   getDrawingVersion,
   getSyncableElements,
@@ -2700,7 +2700,12 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
-      normalizeDimensions(draggingElement);
+      if (draggingElement) {
+        mutateElement(
+          draggingElement,
+          getNormalizedDimensions(draggingElement),
+        );
+      }
 
       if (resizingElement) {
         history.resumeRecording();
