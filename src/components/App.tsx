@@ -2528,13 +2528,10 @@ class App extends React.Component<any, AppState> {
       }
 
       if (draggingElement) {
-        const normalizedDimensions = getNormalizedDimensions(draggingElement);
-        if (
-          normalizedDimensions.width !== draggingElement.width ||
-          normalizedDimensions.height !== draggingElement.height
-        ) {
-          mutateElement(draggingElement, normalizedDimensions);
-        }
+        mutateElement(
+          draggingElement,
+          getNormalizedDimensions(draggingElement),
+        );
       }
 
       if (resizingElement) {
