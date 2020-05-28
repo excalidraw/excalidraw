@@ -87,7 +87,7 @@ import { actions } from "../actions/register";
 
 import { ActionResult } from "../actions/types";
 import { getDefaultAppState } from "../appState";
-import { t } from "../i18n";
+import { t, getLanguage } from "../i18n";
 
 import {
   copyToAppClipboard,
@@ -229,6 +229,7 @@ class App extends React.Component<any, AppState> {
           onLockToggle={this.toggleLock}
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
+          lng={getLanguage().lng}
         />
         <main>
           <canvas
