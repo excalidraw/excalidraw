@@ -27,6 +27,7 @@ type MobileMenuProps = {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  canvas: HTMLCanvasElement | null;
 };
 
 export const MobileMenu = ({
@@ -39,6 +40,7 @@ export const MobileMenu = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
+  canvas,
 }: MobileMenuProps) => (
   <>
     {appState.isLoading && <LoadingMessage />}
@@ -130,8 +132,14 @@ export const MobileMenu = ({
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
-              onClick={() => {
-                setAppState({ ...calculateScrollCenter(elements) });
+              onClick={(event) => {
+                setAppState({
+                  ...calculateScrollCenter(elements, {
+                    event,
+                    appState,
+                    canvas,
+                  }),
+                });
               }}
             >
               {t("buttons.scrollBackToContent")}

@@ -1,5 +1,5 @@
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
-import { rotate } from "../math";
+import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -341,4 +341,28 @@ export const getResizedElementAbsoluteCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
+};
+
+export const getClosestElementBounds = (
+  elements: readonly ExcalidrawElement[],
+  from: { x: number; y: number },
+): [number, number, number, number] => {
+  if (!elements.length) {
+    return [0, 0, 0, 0];
+  }
+
+  let minDistance = Infinity;
+  let closestElement = elements[0];
+
+  elements.forEach((element) => {
+    const [x1, y1, x2, y2] = getElementBounds(element);
+    const distance = distance2d((x1 + x2) / 2, (y1 + y2) / 2, from.x, from.y);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestElement = element;
+    }
+  });
+
+  return getElementBounds(closestElement);
 };
