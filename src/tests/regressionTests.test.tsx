@@ -20,111 +20,66 @@ const clickTool = (toolName: ToolName) => {
   fireEvent.click(getByToolName(toolName));
 };
 
-let lastClientX = 0;
-let lastClientY = 0;
-let pointerType: "mouse" | "pen" | "touch" = "mouse";
+let altKey = false;
+let shiftKey = false;
+let ctrlKey = false;
 
-const pointerDown = (
-  clientX: number = lastClientX,
-  clientY: number = lastClientY,
-  altKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
-  lastClientX = clientX;
-  lastClientY = clientY;
-  fireEvent.pointerDown(canvas, {
-    clientX,
-    clientY,
-    altKey,
+function withModifierKeys(
+  modifiers: { alt?: boolean; shift?: boolean; ctrl?: boolean },
+  cb: () => void,
+) {
+  const prevAltKey = altKey;
+  const prevShiftKey = shiftKey;
+  const prevCtrlKey = ctrlKey;
+
+  altKey = !!modifiers.alt;
+  shiftKey = !!modifiers.shift;
+  ctrlKey = !!modifiers.ctrl;
+
+  try {
+    cb();
+  } finally {
+    altKey = prevAltKey;
+    shiftKey = prevShiftKey;
+    ctrlKey = prevCtrlKey;
+  }
+}
+
+const hotkeyDown = (hotkey: Key) => {
+  const key = KEYS[hotkey];
+  if (typeof key !== "string") {
+    throw new Error("must provide a hotkey, not a key code");
+  }
+  keyDown(key);
+};
+
+const hotkeyUp = (hotkey: Key) => {
+  const key = KEYS[hotkey];
+  if (typeof key !== "string") {
+    throw new Error("must provide a hotkey, not a key code");
+  }
+  keyUp(key);
+};
+
+const keyDown = (key: string) => {
+  fireEvent.keyDown(document, {
+    key,
+    ctrlKey,
     shiftKey,
-    pointerId: 1,
-    pointerType,
-  });
-};
-
-const pointer2Down = (clientX: number, clientY: number) => {
-  fireEvent.pointerDown(canvas, {
-    clientX,
-    clientY,
-    pointerId: 2,
-    pointerType,
-  });
-};
-
-const pointer2Move = (clientX: number, clientY: number) => {
-  fireEvent.pointerMove(canvas, {
-    clientX,
-    clientY,
-    pointerId: 2,
-    pointerType,
-  });
-};
-
-const pointer2Up = (clientX: number, clientY: number) => {
-  fireEvent.pointerUp(canvas, {
-    clientX,
-    clientY,
-    pointerId: 2,
-    pointerType,
-  });
-};
-
-const pointerMove = (
-  clientX: number = lastClientX,
-  clientY: number = lastClientY,
-  altKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
-  lastClientX = clientX;
-  lastClientY = clientY;
-  fireEvent.pointerMove(canvas, {
-    clientX,
-    clientY,
     altKey,
-    shiftKey,
-    pointerId: 1,
-    pointerType,
+    keyCode: key.toUpperCase().charCodeAt(0),
+    which: key.toUpperCase().charCodeAt(0),
   });
 };
 
-const pointerUp = (
-  clientX: number = lastClientX,
-  clientY: number = lastClientY,
-  altKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
-  lastClientX = clientX;
-  lastClientY = clientY;
-  fireEvent.pointerUp(canvas, { pointerId: 1, pointerType, shiftKey, altKey });
-};
-
-const hotkeyDown = (key: Key) => {
-  fireEvent.keyDown(document, { key: KEYS[key] });
-};
-
-const hotkeyUp = (key: Key) => {
-  fireEvent.keyUp(document, {
-    key: KEYS[key],
-  });
-};
-
-const keyDown = (
-  key: string,
-  ctrlKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
-  fireEvent.keyDown(document, { key, ctrlKey, shiftKey });
-};
-
-const keyUp = (
-  key: string,
-  ctrlKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
+const keyUp = (key: string) => {
   fireEvent.keyUp(document, {
     key,
     ctrlKey,
     shiftKey,
+    altKey,
+    keyCode: key.toUpperCase().charCodeAt(0),
+    which: key.toUpperCase().charCodeAt(0),
   });
 };
 
@@ -133,14 +88,79 @@ const hotkeyPress = (key: Key) => {
   hotkeyUp(key);
 };
 
-const keyPress = (
-  key: string,
-  ctrlKey: boolean = false,
-  shiftKey: boolean = false,
-) => {
-  keyDown(key, ctrlKey, shiftKey);
-  keyUp(key, ctrlKey, shiftKey);
+const keyPress = (key: string) => {
+  keyDown(key);
+  keyUp(key);
 };
+
+class Pointer {
+  private clientX = 0;
+  private clientY = 0;
+
+  constructor(
+    private readonly pointerType: "mouse" | "touch" | "pen",
+    private readonly pointerId = 1,
+  ) {}
+
+  reset() {
+    this.clientX = 0;
+    this.clientY = 0;
+  }
+
+  getPosition() {
+    return [this.clientX, this.clientY];
+  }
+
+  restorePosition(x = 0, y = 0) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerMove(canvas, this.getEvent());
+  }
+
+  private getEvent() {
+    return {
+      clientX: this.clientX,
+      clientY: this.clientY,
+      pointerType: this.pointerType,
+      pointerId: this.pointerId,
+      altKey,
+      shiftKey,
+      ctrlKey,
+    };
+  }
+
+  move(dx: number, dy: number) {
+    if (dx !== 0 || dy !== 0) {
+      this.clientX += dx;
+      this.clientY += dy;
+      fireEvent.pointerMove(canvas, this.getEvent());
+    }
+  }
+
+  down(dx = 0, dy = 0) {
+    this.move(dx, dy);
+    fireEvent.pointerDown(canvas, this.getEvent());
+  }
+
+  up(dx = 0, dy = 0) {
+    this.move(dx, dy);
+    fireEvent.pointerUp(canvas, this.getEvent());
+  }
+
+  click(dx = 0, dy = 0) {
+    this.down(dx, dy);
+    this.up();
+  }
+
+  doubleClick(dx = 0, dy = 0) {
+    this.move(dx, dy);
+    fireEvent.doubleClick(canvas, this.getEvent());
+  }
+}
+
+const mouse = new Pointer("mouse");
+const finger1 = new Pointer("touch", 1);
+const finger2 = new Pointer("touch", 2);
 
 const clickLabeledElement = (label: string) => {
   const element = document.querySelector(`[aria-label='${label}']`);
@@ -150,10 +170,12 @@ const clickLabeledElement = (label: string) => {
   fireEvent.click(element);
 };
 
+const getSelectedElements = (): ExcalidrawElement[] => {
+  return h.elements.filter((element) => h.state.selectedElementIds[element.id]);
+};
+
 const getSelectedElement = (): ExcalidrawElement => {
-  const selectedElements = h.elements.filter(
-    (element) => h.state.selectedElementIds[element.id],
-  );
+  const selectedElements = getSelectedElements();
   if (selectedElements.length !== 1) {
     throw new Error(
       `expected 1 selected element; got ${selectedElements.length}`,
@@ -168,7 +190,7 @@ function getStateHistory() {
 }
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-const getResizeHandles = () => {
+const getResizeHandles = (pointerType: "mouse" | "touch" | "pen") => {
   const rects = handlerRectangles(
     getSelectedElement(),
     h.state.zoom,
@@ -214,7 +236,11 @@ beforeEach(() => {
   h.history.clear();
   reseed(7);
   setDateTimeForTests("201933152653");
-  pointerType = "mouse";
+
+  mouse.reset();
+  finger1.reset();
+  finger2.reset();
+  altKey = ctrlKey = shiftKey = false;
 
   const renderResult = render(<App />);
 
@@ -229,68 +255,68 @@ afterEach(() => {
 describe("regression tests", () => {
   it("draw every type of shape", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     clickTool("diamond");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     clickTool("ellipse");
-    pointerDown(50, 10);
-    pointerMove(60, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     clickTool("arrow");
-    pointerDown(70, 10);
-    pointerMove(80, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     clickTool("line");
-    pointerDown(90, 10);
-    pointerMove(100, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     clickTool("arrow");
-    pointerDown(10, 30);
-    pointerUp();
-    pointerMove(20, 40);
-    pointerUp();
-    pointerMove(10, 50);
-    pointerUp();
+    mouse.click(10, -10);
+    mouse.click(10, 10);
+    mouse.click(-10, 10);
     hotkeyPress("ENTER");
 
     clickTool("line");
-    pointerDown(30, 30);
-    pointerUp();
-    pointerMove(40, 40);
-    pointerUp();
-    pointerMove(30, 50);
-    pointerUp();
+    mouse.click(10, -20);
+    mouse.click(10, 10);
+    mouse.click(-10, 10);
     hotkeyPress("ENTER");
 
     clickTool("draw");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -20);
+    mouse.up(10, 10);
+
+    expect(h.elements.map((element) => element.type)).toEqual([
+      "rectangle",
+      "diamond",
+      "ellipse",
+      "arrow",
+      "line",
+      "arrow",
+      "line",
+      "draw",
+    ]);
   });
 
   it("click to select a shape", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    const firstRectPos = mouse.getPosition();
 
     clickTool("rectangle");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     const prevSelectedId = getSelectedElement().id;
-    pointerDown(10, 10);
-    pointerUp();
+    mouse.restorePosition(...firstRectPos);
+    mouse.click();
+
     expect(getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
@@ -306,9 +332,8 @@ describe("regression tests", () => {
       it(`hotkey ${key} selects ${shape} tool`, () => {
         keyPress(key);
 
-        pointerDown(10, 10);
-        pointerMove(20, 20);
-        pointerUp();
+        mouse.down(10, 10);
+        mouse.up(10, 10);
 
         expect(getSelectedElement().type).toBe(shape);
       });
@@ -317,9 +342,8 @@ describe("regression tests", () => {
 
   it("change the properties of a shape", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     clickLabeledElement("Background");
     clickLabeledElement("#fa5252");
@@ -331,18 +355,18 @@ describe("regression tests", () => {
 
   it("resize an element, trying every resize handle", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
-    const resizeHandles = getResizeHandles();
+    const resizeHandles = getResizeHandles("mouse");
     delete resizeHandles.rotation; // exclude rotation handle
     for (const handlePos in resizeHandles) {
       const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
-      pointerDown(x, y);
-      pointerMove(x - 5, y - 5);
-      pointerUp();
+      mouse.restorePosition(x, y);
+      mouse.down();
+      mouse.up(-5, -5);
+
       const {
         width: nextWidthNegative,
         height: nextHeightNegative,
@@ -352,17 +376,18 @@ describe("regression tests", () => {
       ).toBeTruthy();
       checkpoint(`resize handle ${handlePos} (-5, -5)`);
 
-      pointerDown();
-      pointerMove(x, y);
-      pointerUp();
+      mouse.down();
+      mouse.up(5, 5);
+
       const { width, height } = getSelectedElement();
       expect(width).toBe(prevWidth);
       expect(height).toBe(prevHeight);
       checkpoint(`unresize handle ${handlePos} (-5, -5)`);
 
-      pointerDown(x, y);
-      pointerMove(x + 5, y + 5);
-      pointerUp();
+      mouse.restorePosition(x, y);
+      mouse.down();
+      mouse.up(5, 5);
+
       const {
         width: nextWidthPositive,
         height: nextHeightPositive,
@@ -372,9 +397,9 @@ describe("regression tests", () => {
       ).toBeTruthy();
       checkpoint(`resize handle ${handlePos} (+5, +5)`);
 
-      pointerDown();
-      pointerMove(x, y);
-      pointerUp();
+      mouse.down();
+      mouse.up(-5, -5);
+
       const { width: finalWidth, height: finalHeight } = getSelectedElement();
       expect(finalWidth).toBe(prevWidth);
       expect(finalHeight).toBe(prevHeight);
@@ -385,14 +410,12 @@ describe("regression tests", () => {
 
   it("click on an element and drag it", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = getSelectedElement();
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(-10, -10);
+    mouse.up(10, 10);
 
     const { x: nextX, y: nextY } = getSelectedElement();
     expect(nextX).toBeGreaterThan(prevX);
@@ -400,9 +423,8 @@ describe("regression tests", () => {
 
     checkpoint("dragged");
 
-    pointerDown();
-    pointerMove(10, 10);
-    pointerUp();
+    mouse.down();
+    mouse.up(-10, -10);
 
     const { x, y } = getSelectedElement();
     expect(x).toBe(prevX);
@@ -411,16 +433,18 @@ describe("regression tests", () => {
 
   it("alt-drag duplicates an element", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(1);
-    pointerDown(10, 10, true);
-    pointerMove(20, 20, true);
-    pointerUp(20, 20, true);
+
+    withModifierKeys({ alt: true }, () => {
+      mouse.down(-10, -10);
+      mouse.up(10, 10);
+    });
+
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(2);
@@ -428,23 +452,23 @@ describe("regression tests", () => {
 
   it("click-drag to select a group", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     clickTool("rectangle");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    const finalPosition = mouse.getPosition();
 
     clickTool("rectangle");
-    pointerDown(50, 10);
-    pointerMove(60, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
-    pointerDown(0, 0);
-    pointerMove(45, 25);
-    pointerUp();
+    mouse.restorePosition(0, 0);
+    mouse.down();
+    mouse.restorePosition(...finalPosition);
+    mouse.up(5, 5);
 
     expect(
       h.elements.filter((element) => h.state.selectedElementIds[element.id])
@@ -452,27 +476,28 @@ describe("regression tests", () => {
     ).toBe(2);
   });
 
-  it("shift-click to select a group, then drag", () => {
+  it("shift-click to multiselect, then drag", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     clickTool("rectangle");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     const prevRectsXY = h.elements
       .filter((element) => element.type === "rectangle")
       .map((element) => ({ x: element.x, y: element.y }));
-    pointerDown(10, 10);
-    pointerUp();
-    pointerDown(30, 10, false, true);
-    pointerUp();
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+
+    mouse.reset();
+    mouse.click(10, 10);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(20, 0);
+    });
+
+    mouse.down();
+    mouse.up(10, 10);
+
     h.elements
       .filter((element) => element.type === "rectangle")
       .forEach((element, i) => {
@@ -483,46 +508,41 @@ describe("regression tests", () => {
 
   it("pinch-to-zoom works", () => {
     expect(h.state.zoom).toBe(1);
-    pointerType = "touch";
-    pointerDown(50, 50);
-    pointer2Down(60, 50);
-    pointerMove(40, 50);
-    pointer2Move(60, 50);
+    finger1.down(50, 50);
+    finger2.down(60, 50);
+    finger1.move(-10, 0);
     expect(h.state.zoom).toBeGreaterThan(1);
     const zoomed = h.state.zoom;
-    pointerMove(45, 50);
-    pointer2Move(55, 50);
+    finger1.move(5, 0);
+    finger2.move(-5, 0);
     expect(h.state.zoom).toBeLessThan(zoomed);
-    pointerUp(45, 50);
-    pointer2Up(55, 50);
   });
 
   it("two-finger scroll works", () => {
     const startScrollY = h.state.scrollY;
-    pointerDown(50, 50);
-    pointer2Down(60, 50);
-    pointerMove(50, 40);
-    pointer2Move(60, 40);
-    pointerUp(50, 40);
-    pointer2Up(60, 40);
+    finger1.down(50, 50);
+    finger2.down(60, 50);
+
+    finger1.up(0, -10);
+    finger2.up(0, -10);
     expect(h.state.scrollY).toBeLessThan(startScrollY);
 
     const startScrollX = h.state.scrollX;
-    pointerDown(50, 50);
-    pointer2Down(50, 60);
-    pointerMove(60, 50);
-    pointer2Move(60, 60);
-    pointerUp(60, 50);
-    pointer2Up(60, 60);
+
+    finger1.restorePosition(50, 50);
+    finger2.restorePosition(50, 60);
+    finger1.down();
+    finger2.down();
+    finger1.up(10, 0);
+    finger2.up(10, 0);
     expect(h.state.scrollX).toBeGreaterThan(startScrollX);
   });
 
   it("spacebar + drag scrolls the canvas", () => {
     const { scrollX: startScrollX, scrollY: startScrollY } = h.state;
     hotkeyDown("SPACE");
-    pointerDown(50, 50);
-    pointerMove(60, 60);
-    pointerUp();
+    mouse.down(50, 50);
+    mouse.up(60, 60);
     hotkeyUp("SPACE");
     const { scrollX, scrollY } = h.state;
     expect(scrollX).not.toEqual(startScrollX);
@@ -531,46 +551,46 @@ describe("regression tests", () => {
 
   it("arrow keys", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
     hotkeyPress("ARROW_LEFT");
     hotkeyPress("ARROW_LEFT");
     hotkeyPress("ARROW_RIGHT");
     hotkeyPress("ARROW_UP");
     hotkeyPress("ARROW_UP");
     hotkeyPress("ARROW_DOWN");
+    expect(h.elements[0].x).toBe(9);
+    expect(h.elements[0].y).toBe(9);
   });
 
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
 
     clickTool("rectangle");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
 
     clickTool("arrow");
-    pointerDown(10, 30);
-    pointerUp();
-    pointerMove(20, 40);
-    pointerDown(20, 40);
-    pointerUp();
-    pointerMove(10, 50);
-    pointerDown(10, 50);
-    pointerUp();
+    mouse.click(10, -10);
+    mouse.click(10, 10);
+    mouse.click(-10, 10);
     hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
-    keyPress("z", true); // press twice for multi arrow
-    keyPress("z", true);
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("z");
+      keyPress("z");
+    });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
-    keyPress("z", true);
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("z");
+    });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(1);
-    keyPress("z", true, true);
+    withModifierKeys({ ctrl: true, shift: true }, () => {
+      keyPress("z");
+    });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
   });
 
@@ -581,37 +601,48 @@ describe("regression tests", () => {
     expect(getStateHistory().length).toBe(0);
 
     clickTool("rectangle");
-    pointerDown(10, 10);
-    pointerMove(20, 20);
-    pointerUp();
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    const firstElementEndPoint = mouse.getPosition();
 
     clickTool("rectangle");
-    pointerDown(30, 10);
-    pointerMove(40, 20);
-    pointerUp();
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    const secondElementEndPoint = mouse.getPosition();
 
     expect(getStateHistory().length).toBe(2);
 
-    keyPress("z", true);
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("z");
+    });
+
     expect(getStateHistory().length).toBe(1);
 
-    // clicking an element shouldn't addu to history
-    pointerDown(10, 10);
-    pointerUp();
+    // clicking an element shouldn't add to history
+    mouse.restorePosition(...firstElementEndPoint);
+    mouse.click();
     expect(getStateHistory().length).toBe(1);
 
-    keyPress("z", true, true);
+    withModifierKeys({ shift: true, ctrl: true }, () => {
+      keyPress("z");
+    });
+
     expect(getStateHistory().length).toBe(2);
 
-    // clicking an element shouldn't addu to history
-    pointerDown(10, 10);
-    pointerUp();
+    // clicking an element shouldn't add to history
+    mouse.click();
     expect(getStateHistory().length).toBe(2);
+
+    const firstSelectedElementId = getSelectedElement().id;
 
     // same for clicking the element just redo-ed
-    pointerDown(30, 10);
-    pointerUp();
+    mouse.restorePosition(...secondElementEndPoint);
+    mouse.click();
     expect(getStateHistory().length).toBe(2);
+
+    expect(getSelectedElement().id).not.toEqual(firstSelectedElementId);
   });
 
   it("zoom hotkeys", () => {
@@ -634,5 +665,179 @@ describe("regression tests", () => {
     });
     // switching to german, `hachure` label should no longer exist
     expect(screen.queryByText(/hachure/i)).toBeNull();
+  });
+
+  it("make a group and duplicate it", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    const end = mouse.getPosition();
+
+    mouse.reset();
+    mouse.down();
+    mouse.restorePosition(...end);
+    mouse.up();
+
+    expect(h.elements.length).toBe(3);
+    for (const element of h.elements) {
+      expect(element.groupIds.length).toBe(0);
+      expect(h.state.selectedElementIds[element.id]).toBe(true);
+    }
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    for (const element of h.elements) {
+      expect(element.groupIds.length).toBe(1);
+    }
+
+    withModifierKeys({ alt: true }, () => {
+      mouse.restorePosition(...end);
+      mouse.down();
+      mouse.up(10, 10);
+    });
+
+    expect(h.elements.length).toBe(6);
+    const groups = new Set();
+    for (const element of h.elements) {
+      for (const groupId of element.groupIds) {
+        groups.add(groupId);
+      }
+    }
+
+    expect(groups.size).toBe(2);
+  });
+
+  it("double click to edit a group", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("a");
+      keyPress("g");
+    });
+
+    expect(getSelectedElements().length).toBe(3);
+    expect(h.state.editingGroupId).toBe(null);
+    mouse.doubleClick();
+    expect(getSelectedElements().length).toBe(1);
+    expect(h.state.editingGroupId).not.toBe(null);
+  });
+
+  it("adjusts z order when grouping", () => {
+    const positions = [];
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    const ids = h.elements.map((element) => element.id);
+
+    mouse.restorePosition(...positions[0]);
+    mouse.click();
+    mouse.restorePosition(...positions[2]);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    expect(h.elements.map((element) => element.id)).toEqual([
+      ids[1],
+      ids[0],
+      ids[2],
+    ]);
+  });
+
+  it("supports nested groups", () => {
+    const positions: number[][] = [];
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    positions.push(mouse.getPosition());
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("a");
+      keyPress("g");
+    });
+
+    mouse.doubleClick();
+    withModifierKeys({ shift: true }, () => {
+      mouse.restorePosition(...positions[0]);
+      mouse.click();
+    });
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    const groupIds = h.elements[2].groupIds;
+    expect(groupIds.length).toBe(2);
+    expect(h.elements[1].groupIds).toEqual(groupIds);
+    expect(h.elements[0].groupIds).toEqual(groupIds.slice(1));
+
+    mouse.click(50, 50);
+    expect(getSelectedElements().length).toBe(0);
+    mouse.restorePosition(...positions[0]);
+    mouse.click();
+    expect(getSelectedElements().length).toBe(3);
+    expect(h.state.editingGroupId).toBe(null);
+
+    mouse.doubleClick();
+    expect(getSelectedElements().length).toBe(2);
+    expect(h.state.editingGroupId).toBe(groupIds[1]);
+
+    mouse.doubleClick();
+    expect(getSelectedElements().length).toBe(1);
+    expect(h.state.editingGroupId).toBe(groupIds[0]);
+
+    // click out of the group
+    mouse.restorePosition(...positions[1]);
+    mouse.click();
+    expect(getSelectedElements().length).toBe(0);
+    mouse.click();
+    expect(getSelectedElements().length).toBe(3);
+    mouse.doubleClick();
+    expect(getSelectedElements().length).toBe(1);
   });
 });
