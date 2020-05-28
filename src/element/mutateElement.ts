@@ -17,20 +17,34 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ) => {
+  let didChange = false;
+
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points } = updates as any;
 
   if (typeof points !== "undefined") {
+    didChange = true;
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
-      // @ts-ignore
-      element[key] = value;
+      if (
+        (element as any)[key] === value &&
+        // if object, always update in case its deep prop was mutated
+        (typeof value !== "object" || value === null)
+      ) {
+        continue;
+      }
+      (element as any)[key] = value;
+      didChange = true;
     }
+  }
+
+  if (!didChange) {
+    return;
   }
 
   if (
