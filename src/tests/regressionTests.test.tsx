@@ -840,4 +840,11 @@ describe("regression tests", () => {
     mouse.doubleClick();
     expect(getSelectedElements().length).toBe(1);
   });
+
+  it("updates fontSize & fontFamily appState", () => {
+    clickTool("text");
+    expect(h.state.currentItemFontFamily).toEqual(1); // Virgil
+    fireEvent.click(screen.getByText(/code/i));
+    expect(h.state.currentItemFontFamily).toEqual(3); // Cascadia
+  });
 });
