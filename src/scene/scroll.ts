@@ -12,7 +12,6 @@ export const normalizeScroll = (pos: number) =>
 
 function isOutsideViewPort(
   from: {
-    event: React.MouseEvent<HTMLButtonElement>;
     appState: AppState;
     canvas: HTMLCanvasElement | null;
   },
@@ -41,7 +40,6 @@ function isOutsideViewPort(
 export const calculateScrollCenter = (
   elements: readonly ExcalidrawElement[],
   from?: {
-    event: React.MouseEvent<HTMLButtonElement>;
     appState: AppState;
     canvas: HTMLCanvasElement | null;
   },
@@ -55,10 +53,15 @@ export const calculateScrollCenter = (
   const scale = window.devicePixelRatio;
   let [x1, y1, x2, y2] = getCommonBounds(elements);
   if (from && isOutsideViewPort(from, [x1, y1, x2, y2])) {
-    const { event, appState, canvas } = from;
+    const { appState, canvas } = from;
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
-      viewportCoordsToSceneCoords(event, appState, canvas, scale),
+      viewportCoordsToSceneCoords(
+        { clientX: appState.scrollX, clientY: appState.scrollY },
+        appState,
+        canvas,
+        scale,
+      ),
     );
   }
 

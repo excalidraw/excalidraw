@@ -257,7 +257,6 @@ const LayerUI = ({
           onClick={(event) => {
             setAppState({
               ...calculateScrollCenter(elements, {
-                event,
                 appState,
                 canvas,
               }),

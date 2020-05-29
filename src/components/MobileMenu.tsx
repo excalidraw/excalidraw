@@ -135,7 +135,6 @@ export const MobileMenu = ({
               onClick={(event) => {
                 setAppState({
                   ...calculateScrollCenter(elements, {
-                    event,
                     appState,
                     canvas,
                   }),
