@@ -30,7 +30,6 @@ import {
   isNonDeletedElement,
 } from "../element";
 import {
-  deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
   getElementAtPosition,
@@ -124,7 +123,7 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
-import { actionFinalize } from "../actions";
+import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
@@ -589,13 +588,7 @@ class App extends React.Component<any, AppState> {
       return;
     }
     this.copyAll();
-    const { elements: nextElements, appState } = deleteSelectedElements(
-      globalSceneState.getElementsIncludingDeleted(),
-      this.state,
-    );
-    globalSceneState.replaceAllElements(nextElements);
-    history.resumeRecording();
-    this.setState({ ...appState });
+    this.actionManager.executeAction(actionDeleteSelected);
     event.preventDefault();
   });
 
