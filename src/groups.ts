@@ -34,7 +34,9 @@ export function isSelectedViaGroup(
     .find((groupId) => appState.selectedGroupIds[groupId]);
 }
 
-export function getSelectedGroupIds(appState: AppState): GroupId[] {
+export function getSelectedGroupIds(
+  appState: AppState,
+): ExcalidrawElement["groupIds"] {
   return Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
@@ -89,8 +91,8 @@ export function getSelectedGroupIdForElement(
 }
 
 export function getNewGroupIdsForDuplication(
-  groupIds: GroupId[],
-  editingGroupId: GroupId | null,
+  groupIds: ExcalidrawElement["groupIds"],
+  editingGroupId: AppState["editingGroupId"],
   mapper: (groupId: GroupId) => GroupId,
 ) {
   const copy = [...groupIds];
@@ -107,9 +109,9 @@ export function getNewGroupIdsForDuplication(
 }
 
 export function addToGroup(
-  prevGroupIds: GroupId[],
+  prevGroupIds: ExcalidrawElement["groupIds"],
   newGroupId: GroupId,
-  editingGroupId: GroupId | null,
+  editingGroupId: AppState["editingGroupId"],
 ) {
   // insert before the editingGroupId, or push to the end.
   const groupIds = [...prevGroupIds];
@@ -123,7 +125,7 @@ export function addToGroup(
 }
 
 export function removeFromSelectedGroups(
-  groupIds: GroupId[],
+  groupIds: ExcalidrawElement["groupIds"],
   selectedGroupIds: { [groupId: string]: boolean },
 ) {
   return groupIds.filter((groupId) => !selectedGroupIds[groupId]);
