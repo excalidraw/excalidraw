@@ -132,7 +132,7 @@ export const MobileMenu = ({
           {appState.scrolledOutside && (
             <button
               className="scroll-back-to-content"
-              onClick={(event) => {
+              onClick={() => {
                 setAppState({
                   ...calculateScrollCenter(elements, {
                     appState,
