@@ -1,5 +1,5 @@
 import { NonDeleted, ExcalidrawLinearElement } from "./types";
-import { distance2d, rotate, adjustXYWithRotation } from "../math";
+import { distance2d, rotate, adjustXYWithRotation, isPathALoop } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
@@ -9,6 +9,7 @@ import { KEYS } from "../keys";
 export class LinearElementEditor {
   public element: NonDeleted<ExcalidrawLinearElement>;
   public activePointIndex: number | null;
+  public draggingElementPointIndex: number | null;
   public lastUncommittedPoint: Point | null;
 
   constructor(element: LinearElementEditor["element"]) {
@@ -17,6 +18,7 @@ export class LinearElementEditor {
     this.element = element;
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
+    this.draggingElementPointIndex = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -24,6 +26,90 @@ export class LinearElementEditor {
   // ---------------------------------------------------------------------------
 
   static POINT_HANDLE_SIZE = 20;
+
+  /** @returns whether point was dragged */
+  static handlePointDragging(
+    appState: AppState,
+    setState: React.Component<any, AppState>["setState"],
+    scenePointerX: number,
+    scenePointerY: number,
+    lastX: number,
+    lastY: number,
+  ): boolean {
+    if (!appState.editingLinearElement) {
+      return false;
+    }
+    const { editingLinearElement } = appState;
+    let { draggingElementPointIndex, element } = editingLinearElement;
+
+    const clickedPointIndex =
+      draggingElementPointIndex ??
+      LinearElementEditor.getPointIndexUnderCursor(
+        editingLinearElement.element,
+        appState.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+
+    draggingElementPointIndex = draggingElementPointIndex ?? clickedPointIndex;
+    if (draggingElementPointIndex > -1) {
+      if (
+        editingLinearElement.draggingElementPointIndex !==
+          draggingElementPointIndex ||
+        editingLinearElement.activePointIndex !== clickedPointIndex
+      ) {
+        setState({
+          editingLinearElement: {
+            ...editingLinearElement,
+            draggingElementPointIndex,
+            activePointIndex: clickedPointIndex,
+          },
+        });
+      }
+
+      const [deltaX, deltaY] = rotate(
+        scenePointerX - lastX,
+        scenePointerY - lastY,
+        0,
+        0,
+        -element.angle,
+      );
+      const targetPoint = element.points[clickedPointIndex];
+      LinearElementEditor.movePoint(element, clickedPointIndex, [
+        targetPoint[0] + deltaX,
+        targetPoint[1] + deltaY,
+      ]);
+      return true;
+    }
+    return false;
+  }
+
+  static handlePointerUp(
+    editingLinearElement: LinearElementEditor,
+  ): LinearElementEditor {
+    const { element, draggingElementPointIndex } = editingLinearElement;
+    if (
+      draggingElementPointIndex !== null &&
+      (draggingElementPointIndex === 0 ||
+        draggingElementPointIndex === element.points.length - 1) &&
+      isPathALoop(element.points)
+    ) {
+      LinearElementEditor.movePoint(
+        element,
+        draggingElementPointIndex,
+        draggingElementPointIndex === 0
+          ? element.points[element.points.length - 1]
+          : element.points[0],
+      );
+    }
+    if (draggingElementPointIndex !== null) {
+      return {
+        ...editingLinearElement,
+        draggingElementPointIndex: null,
+      };
+    }
+    return editingLinearElement;
+  }
 
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,

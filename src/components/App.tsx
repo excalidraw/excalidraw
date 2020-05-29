@@ -56,7 +56,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop, rotate } from "../math";
+import { distance2d, isPathALoop } from "../math";
 
 import {
   isWritableElement,
@@ -161,7 +161,6 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
-let draggingElementPointIndex: number | null = null;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1634,7 +1633,10 @@ class App extends React.Component<any, AppState> {
       window.devicePixelRatio,
     );
 
-    if (this.state.editingLinearElement && draggingElementPointIndex === null) {
+    if (
+      this.state.editingLinearElement &&
+      this.state.editingLinearElement.draggingElementPointIndex === null
+    ) {
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
         scenePointerX,
@@ -2323,7 +2325,6 @@ class App extends React.Component<any, AppState> {
     }
 
     let selectedElementWasDuplicated = false;
-    draggingElementPointIndex = null;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
@@ -2397,49 +2398,16 @@ class App extends React.Component<any, AppState> {
       }
 
       if (this.state.editingLinearElement) {
-        const clickedPointIndex =
-          draggingElementPointIndex ??
-          LinearElementEditor.getPointIndexUnderCursor(
-            this.state.editingLinearElement.element,
-            this.state.zoom,
-            x,
-            y,
-          );
+        const didDrag = LinearElementEditor.handlePointDragging(
+          this.state,
+          (appState) => this.setState(appState),
+          x,
+          y,
+          lastX,
+          lastY,
+        );
 
-        if (clickedPointIndex > -1) {
-          draggingElementPointIndex =
-            draggingElementPointIndex ?? clickedPointIndex;
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-
-          const { element, activePointIndex } = this.state.editingLinearElement;
-
-          if (activePointIndex === null) {
-            this.setState({
-              editingLinearElement: {
-                ...this.state.editingLinearElement,
-                activePointIndex: clickedPointIndex,
-              },
-            });
-          }
-
-          const [deltaX, deltaY] = rotate(
-            x - lastX,
-            y - lastY,
-            0,
-            0,
-            -element.angle,
-          );
-          const targetPoint = element.points[clickedPointIndex];
-          LinearElementEditor.movePoint(element, clickedPointIndex, [
-            targetPoint[0] + deltaX,
-            targetPoint[1] + deltaY,
-          ]);
-
+        if (didDrag) {
           lastX = x;
           lastY = y;
           return;
@@ -2635,25 +2603,15 @@ class App extends React.Component<any, AppState> {
       // if moving start/end point towards start/end point within threshold,
       //  close the loop
       if (this.state.editingLinearElement) {
-        const { element } = this.state.editingLinearElement;
-        if (
-          draggingElementPointIndex !== null &&
-          (draggingElementPointIndex === 0 ||
-            draggingElementPointIndex === element.points.length - 1) &&
-          isPathALoop(element.points)
-        ) {
-          LinearElementEditor.movePoint(
-            element,
-            draggingElementPointIndex,
-            draggingElementPointIndex === 0
-              ? element.points[element.points.length - 1]
-              : element.points[0],
-          );
+        const editingLinearElement = LinearElementEditor.handlePointerUp(
+          this.state.editingLinearElement,
+        );
+        if (editingLinearElement !== this.state.editingLinearElement) {
+          this.setState({ editingLinearElement });
         }
       }
 
       lastPointerUp = null;
-      draggingElementPointIndex = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
