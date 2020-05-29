@@ -374,7 +374,7 @@ export const actionChangeFontFamily = register({
       }),
       appState: {
         ...appState,
-        currentItemFontFamily: appState.currentItemFontFamily,
+        currentItemFontFamily: value,
       },
       commitToHistory: true,
     };
