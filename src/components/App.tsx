@@ -1627,7 +1627,7 @@ class App extends React.Component<any, AppState> {
       }
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
@@ -1635,47 +1635,15 @@ class App extends React.Component<any, AppState> {
     );
 
     if (this.state.editingLinearElement && draggingElementPointIndex === null) {
-      const { element, lastUncommittedPoint } = this.state.editingLinearElement;
-      const { points } = element;
-      const lastPoint = points[points.length - 1];
-
-      if (!event[KEYS.CTRL_OR_CMD]) {
-        if (lastPoint === lastUncommittedPoint) {
-          mutateElement(element, {
-            points: points.slice(0, -1),
-          });
-        }
-        return;
-      }
-
-      const { x: pointerX, y: pointerY } = viewportCoordsToSceneCoords(
+      const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
+        scenePointerX,
+        scenePointerY,
+        this.state.editingLinearElement,
       );
-      const newPoint = LinearElementEditor.createPointAt(
-        element,
-        pointerX,
-        pointerY,
-      );
-
-      if (lastPoint === lastUncommittedPoint) {
-        mutateElement(element, {
-          points: [...points.slice(0, -1), newPoint],
-        });
-      } else {
-        mutateElement(element, {
-          points: [...points, newPoint],
-        });
+      if (editingLinearElement !== this.state.editingLinearElement) {
+        this.setState({ editingLinearElement });
       }
-      this.setState({
-        editingLinearElement: {
-          ...this.state.editingLinearElement,
-          lastUncommittedPoint: element.points[element.points.length - 1],
-        },
-      });
-      return;
     }
 
     if (this.state.multiElement) {
@@ -1691,11 +1659,15 @@ class App extends React.Component<any, AppState> {
         // if we haven't yet created a temp point and we're beyond commit-zone
         //  threshold, add a point
         if (
-          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          LINE_CONFIRM_THRESHOLD
+          distance2d(
+            scenePointerX - rx,
+            scenePointerY - ry,
+            lastPoint[0],
+            lastPoint[1],
+          ) >= LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
-            points: [...points, [x - rx, y - ry]],
+            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
           });
         } else {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
@@ -1709,8 +1681,8 @@ class App extends React.Component<any, AppState> {
           points.length > 2 &&
           lastCommittedPoint &&
           distance2d(
-            x - rx,
-            y - ry,
+            scenePointerX - rx,
+            scenePointerY - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
@@ -1725,7 +1697,10 @@ class App extends React.Component<any, AppState> {
           }
           // update last uncommitted point
           mutateElement(multiElement, {
-            points: [...points.slice(0, -1), [x - rx, y - ry]],
+            points: [
+              ...points.slice(0, -1),
+              [scenePointerX - rx, scenePointerY - ry],
+            ],
           });
         }
       }
@@ -1748,7 +1723,8 @@ class App extends React.Component<any, AppState> {
       const elementWithResizeHandler = getElementWithResizeHandler(
         elements,
         this.state,
-        { x, y },
+        scenePointerX,
+        scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
@@ -1762,7 +1738,8 @@ class App extends React.Component<any, AppState> {
       if (canResizeMutlipleElements(selectedElements)) {
         const resizeHandle = getResizeHandlerFromCoords(
           getCommonBounds(selectedElements),
-          { x, y },
+          scenePointerX,
+          scenePointerY,
           this.state.zoom,
           event.pointerType,
         );
@@ -1777,8 +1754,8 @@ class App extends React.Component<any, AppState> {
     const hitElement = getElementAtPosition(
       elements,
       this.state,
-      x,
-      y,
+      scenePointerX,
+      scenePointerY,
       this.state.zoom,
     );
     if (this.state.elementType === "text") {
@@ -2023,7 +2000,8 @@ class App extends React.Component<any, AppState> {
         const elementWithResizeHandler = getElementWithResizeHandler(
           elements,
           this.state,
-          { x, y },
+          x,
+          y,
           this.state.zoom,
           event.pointerType,
         );
@@ -2043,7 +2021,8 @@ class App extends React.Component<any, AppState> {
         if (canResizeMutlipleElements(selectedElements)) {
           resizeHandle = getResizeHandlerFromCoords(
             getCommonBounds(selectedElements),
-            { x, y },
+            x,
+            y,
             this.state.zoom,
             event.pointerType,
           );

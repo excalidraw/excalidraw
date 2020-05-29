@@ -4,6 +4,7 @@ import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
+import { KEYS } from "../keys";
 
 export class LinearElementEditor {
   public element: NonDeleted<ExcalidrawLinearElement>;
@@ -23,6 +24,47 @@ export class LinearElementEditor {
   // ---------------------------------------------------------------------------
 
   static POINT_HANDLE_SIZE = 20;
+
+  static handlePointerMove(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    scenePointerX: number,
+    scenePointerY: number,
+    editingLinearElement: LinearElementEditor,
+  ): LinearElementEditor {
+    const { element, lastUncommittedPoint } = editingLinearElement;
+    const { points } = element;
+    const lastPoint = points[points.length - 1];
+
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      if (lastPoint === lastUncommittedPoint) {
+        mutateElement(element, {
+          points: points.slice(0, -1),
+        });
+      }
+      return editingLinearElement;
+    }
+
+    const newPoint = LinearElementEditor.createPointAt(
+      element,
+      scenePointerX,
+      scenePointerY,
+    );
+
+    if (lastPoint === lastUncommittedPoint) {
+      mutateElement(element, {
+        points: [...points.slice(0, -1), newPoint],
+      });
+    } else {
+      mutateElement(element, {
+        points: [...points, newPoint],
+      });
+    }
+
+    return {
+      ...editingLinearElement,
+      lastUncommittedPoint: element.points[element.points.length - 1],
+    };
+  }
 
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
