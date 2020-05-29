@@ -1,10 +1,15 @@
-import { NonDeleted, ExcalidrawLinearElement } from "./types";
+import {
+  NonDeleted,
+  ExcalidrawLinearElement,
+  ExcalidrawElement,
+} from "./types";
 import { distance2d, rotate, adjustXYWithRotation, isPathALoop } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { KEYS } from "../keys";
+import { SceneHistory } from "../history";
 
 export class LinearElementEditor {
   public element: NonDeleted<ExcalidrawLinearElement>;
@@ -111,6 +116,76 @@ export class LinearElementEditor {
     return editingLinearElement;
   }
 
+  static handlePointerDown(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    appState: AppState,
+    setState: React.Component<any, AppState>["setState"],
+    history: SceneHistory,
+    scenePointerX: number,
+    scenePointerY: number,
+  ) {
+    const ret: {
+      didAddPoint: boolean;
+      hitElement: ExcalidrawElement | null;
+    } = {
+      didAddPoint: false,
+      hitElement: null,
+    };
+
+    if (!appState.editingLinearElement) {
+      return ret;
+    }
+
+    if (event[KEYS.CTRL_OR_CMD]) {
+      const { element } = appState.editingLinearElement;
+      if (!appState.editingLinearElement.lastUncommittedPoint) {
+        mutateElement(element, {
+          points: [
+            ...element.points,
+            LinearElementEditor.createPointAt(
+              element,
+              scenePointerX,
+              scenePointerY,
+            ),
+          ],
+        });
+      }
+      if (appState.editingLinearElement.lastUncommittedPoint !== null) {
+        history.resumeRecording();
+      }
+      setState({
+        editingLinearElement: {
+          ...appState.editingLinearElement,
+          activePointIndex: element.points.length - 1,
+          lastUncommittedPoint: null,
+        },
+      });
+      ret.didAddPoint = true;
+      return ret;
+    }
+
+    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+      appState.editingLinearElement.element,
+      appState.zoom,
+      scenePointerX,
+      scenePointerY,
+    );
+
+    // if we clicked on a point, set the element as hitElement otherwise
+    //  it would get deselected if the point is outside the hitbox area
+    if (clickedPointIndex > -1) {
+      ret.hitElement = appState.editingLinearElement.element;
+    }
+
+    setState({
+      editingLinearElement: {
+        ...appState.editingLinearElement,
+        activePointIndex: clickedPointIndex > -1 ? clickedPointIndex : null,
+      },
+    });
+    return ret;
+  }
+
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
@@ -191,15 +266,15 @@ export class LinearElementEditor {
 
   static createPointAt(
     element: NonDeleted<ExcalidrawLinearElement>,
-    pointerX: number,
-    pointerY: number,
+    scenePointerX: number,
+    scenePointerY: number,
   ): Point {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     const [rotatedX, rotatedY] = rotate(
-      pointerX,
-      pointerY,
+      scenePointerX,
+      scenePointerY,
       cx,
       cy,
       -element.angle,

@@ -2058,59 +2058,20 @@ class App extends React.Component<any, AppState> {
       }
       if (!isResizingElements) {
         if (this.state.editingLinearElement) {
-          if (event[KEYS.CTRL_OR_CMD]) {
-            const { element } = this.state.editingLinearElement;
-            if (!this.state.editingLinearElement.lastUncommittedPoint) {
-              const { x: pointerX, y: pointerY } = viewportCoordsToSceneCoords(
-                event,
-                this.state,
-                this.canvas,
-                window.devicePixelRatio,
-              );
-              mutateElement(element, {
-                points: [
-                  ...element.points,
-                  LinearElementEditor.createPointAt(
-                    element,
-                    pointerX,
-                    pointerY,
-                  ),
-                ],
-              });
-            }
-            if (this.state.editingLinearElement.lastUncommittedPoint !== null) {
-              history.resumeRecording();
-            }
-            this.setState({
-              editingLinearElement: {
-                ...this.state.editingLinearElement,
-                activePointIndex: element.points.length - 1,
-                lastUncommittedPoint: null,
-              },
-            });
-            return;
-          }
-
-          const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-            this.state.editingLinearElement.element,
-            this.state.zoom,
+          const ret = LinearElementEditor.handlePointerDown(
+            event,
+            this.state,
+            (appState) => this.setState(appState),
+            history,
             x,
             y,
           );
-
-          // if we clicked on a point, set the element as hitElement otherwise
-          //  it would get deselected if the point is outside the hitbox area
-          if (clickedPointIndex > -1) {
-            hitElement = this.state.editingLinearElement.element;
+          if (ret.hitElement) {
+            hitElement = ret.hitElement;
           }
-
-          this.setState({
-            editingLinearElement: {
-              ...this.state.editingLinearElement,
-              activePointIndex:
-                clickedPointIndex > -1 ? clickedPointIndex : null,
-            },
-          });
+          if (ret.didAddPoint) {
+            return;
+          }
         }
 
         // hitElement may already be set above, so check first
