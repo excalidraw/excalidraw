@@ -7,15 +7,31 @@ export function selectGroup(
   appState: AppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
 ): AppState {
+  const elementsInGroup = elements.filter((element) =>
+    element.groupIds.includes(groupId),
+  );
+
+  if (elementsInGroup.length < 2) {
+    if (
+      appState.selectedGroupIds[groupId] ||
+      appState.editingGroupId === groupId
+    ) {
+      return {
+        ...appState,
+        selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: false },
+        editingGroupId: null,
+      };
+    }
+    return appState;
+  }
+
   return {
     ...appState,
     selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: true },
     selectedElementIds: {
       ...appState.selectedElementIds,
       ...Object.fromEntries(
-        elements
-          .filter((element) => element.groupIds.includes(groupId))
-          .map((element) => [element.id, true]),
+        elementsInGroup.map((element) => [element.id, true]),
       ),
     },
   };
