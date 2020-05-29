@@ -57,18 +57,24 @@ function objectToPath(
     } as NonDeletedExcalidrawElement,
     rc.generator,
   ) as Drawable;
-  let pathData = "";
+  let path = null;
 
   if (element.type !== "path") {
-    const normalizedShape = normalizeShape(shape);
-    const [p] = rc.generator.toPaths(normalizedShape);
+    switch (element.type) {
+      case "ellipse":
+        path = new Path(element);
+        break;
 
-    pathData = p.d;
+      default:
+        const normalizedShape = normalizeShape(shape);
+        const [p] = rc.generator.toPaths(normalizedShape);
+
+        path = new Path(p.d);
+    }
   } else {
-    pathData = element.d;
+    path = new Path(element.d);
   }
 
-  const path = new Path(pathData);
   if (options.position) {
     path.position(options.position);
   }

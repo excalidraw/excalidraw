@@ -360,6 +360,9 @@ function _path2curve(path) {
         case "H":
           path = ["C"].concat(l2c(d.x, d.y, path[1], d.y));
           break;
+        case "Z":
+          path = ["C"].concat(l2c(d.x, d.y, d.X, d.Y));
+          break;
         default:
       }
       return path;
@@ -500,7 +503,7 @@ export function pathIntersection(path1, path2) {
   return res;
 }
 
-function normalizePath(path) {
+export function normalizePath(path) {
   if (typeof path === "string") {
     if (notcurvepath.test(path)) {
       return _path2curve(parsePathString(path));

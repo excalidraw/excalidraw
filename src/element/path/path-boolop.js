@@ -398,14 +398,14 @@ function getPathDirection(pathSegArr) {
 
   //decide, if path is clockwise (1) or counter clockwise (-1)
   if (
-    (startY < lineY && inters[minT].segment2 >= inters[maxT].segment2) ||
-    (startY > lineY && inters[minT].segment2 <= inters[maxT].segment2)
+    (startY <= lineY && inters[minT].segment2 >= inters[maxT].segment2) ||
+    (startY >= lineY && inters[minT].segment2 <= inters[maxT].segment2)
   ) {
     //for path with only one segment compare t
     if (inters[minT].segment2 === inters[maxT].segment2) {
       if (
-        (startY < lineY && inters[minT].t2 >= inters[maxT].t2) ||
-        (startY > lineY && inters[minT].t2 <= inters[maxT].t2)
+        (startY <= lineY && inters[minT].t2 >= inters[maxT].t2) ||
+        (startY >= lineY && inters[minT].t2 <= inters[maxT].t2)
       ) {
         dir = 1;
       }
