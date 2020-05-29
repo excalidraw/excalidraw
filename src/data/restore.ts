@@ -91,6 +91,7 @@ export const restore = (
     savedState = {
       ...savedState,
       ...calculateScrollCenter(elements, {
+        // @ts-ignore
         appState: { scrollX: 0, scrollY: 0, zoom: 1, ...savedState },
         canvas: null,
       }),
