@@ -14,7 +14,13 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance, getFontString, getFontFamilyString } from "../utils";
+import {
+  SVG_NS,
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
@@ -106,6 +112,11 @@ const drawElementOnCanvas = (
         context.fillStyle = element.strokeColor;
         const textAlign = context.textAlign;
         context.textAlign = element.textAlign as CanvasTextAlign;
+
+        const direction = context.direction;
+        if (isRTL(element.text)) {
+          context.direction = "rtl";
+        }
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
@@ -119,13 +130,14 @@ const drawElementOnCanvas = (
         for (let i = 0; i < lines.length; i++) {
           context.fillText(
             lines[i],
-            0 + horizontalOffset,
+            horizontalOffset,
             (i + 1) * lineHeight - verticalOffset,
           );
         }
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;
+        context.direction = direction;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
