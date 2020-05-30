@@ -44,6 +44,11 @@ const generateElementCanvas = (
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
+  // to be able to draw a nested element with rtl, we have to append it to the DOM
+  canvas.style.display = "none";
+  canvas.id = "nested-canvas-element";
+  document.body.appendChild(canvas);
+
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
@@ -106,6 +111,7 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        context.canvas.setAttribute("dir", isRTL(element.text) ? "rtl" : "ltr");
         const font = context.font;
         context.font = getFontString(element);
         const fillStyle = context.fillStyle;
@@ -113,10 +119,6 @@ const drawElementOnCanvas = (
         const textAlign = context.textAlign;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
-        const direction = context.direction;
-        if (isRTL(element.text)) {
-          context.direction = "rtl";
-        }
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
@@ -137,7 +139,6 @@ const drawElementOnCanvas = (
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;
-        context.direction = direction;
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
@@ -354,6 +355,12 @@ const drawElementFromCanvas = (
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  // clear the nested element we appended to the dom
+  const node = document.querySelector("#nested-canvas-element");
+  if (node && node.parentNode) {
+    node.parentNode.removeChild(node);
+  }
 };
 
 export const renderElement = (
