@@ -90,10 +90,7 @@ export const restore = (
   if (opts?.scrollToContent && savedState) {
     savedState = {
       ...savedState,
-      ...calculateScrollCenter(elements, {
-        appState: savedState,
-        canvas: null,
-      }),
+      ...calculateScrollCenter(elements, savedState, null),
     };
   }
 

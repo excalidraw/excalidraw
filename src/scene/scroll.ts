@@ -11,14 +11,11 @@ export const normalizeScroll = (pos: number) =>
   Math.floor(pos) as FlooredNumber;
 
 function isOutsideViewPort(
-  from: {
-    appState: AppState;
-    canvas: HTMLCanvasElement | null;
-  },
+  appState: AppState,
+  canvas: HTMLCanvasElement | null,
   cords: Array<number>,
 ) {
   const [x1, y1, x2, y2] = cords;
-  const { appState, canvas } = from;
   const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
     { sceneX: x1, sceneY: y1 },
     appState,
@@ -39,10 +36,8 @@ function isOutsideViewPort(
 
 export const calculateScrollCenter = (
   elements: readonly ExcalidrawElement[],
-  from?: {
-    appState: AppState;
-    canvas: HTMLCanvasElement | null;
-  },
+  appState: AppState,
+  canvas: HTMLCanvasElement | null,
 ): { scrollX: FlooredNumber; scrollY: FlooredNumber } => {
   if (!elements.length) {
     return {
@@ -52,8 +47,7 @@ export const calculateScrollCenter = (
   }
   const scale = window.devicePixelRatio;
   let [x1, y1, x2, y2] = getCommonBounds(elements);
-  if (from && isOutsideViewPort(from, [x1, y1, x2, y2])) {
-    const { appState, canvas } = from;
+  if (isOutsideViewPort(appState, canvas, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
       viewportCoordsToSceneCoords(
