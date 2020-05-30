@@ -4,7 +4,7 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom, calculateScrollCenter } from "../scene";
+import { getNormalizedZoom, normalizeScroll } from "../scene";
 import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
@@ -202,15 +202,22 @@ export const actionZoomToFit = register({
   name: "zoomToFit",
   perform: (elements, appState) => {
     const nonDeletedElements = elements.filter((element) => !element.isDeleted);
-    const scrollCenter = calculateScrollCenter(nonDeletedElements);
     const commonBounds = getCommonBounds(nonDeletedElements);
-    const zoom = calculateZoom(commonBounds, appState.zoom, scrollCenter);
+    const [x1, y1, x2, y2] = commonBounds;
+    const centerX = (x1 + x2) / 2;
+    const centerY = (y1 + y2) / 2;
+    const scrollX = normalizeScroll(window.innerWidth / 2 - centerX);
+    const scrollY = normalizeScroll(window.innerHeight / 2 - centerY);
+    const zoom = calculateZoom(commonBounds, appState.zoom, {
+      scrollX,
+      scrollY,
+    });
 
     return {
       appState: {
         ...appState,
-        scrollX: scrollCenter.scrollX,
-        scrollY: scrollCenter.scrollY,
+        scrollX,
+        scrollY,
         zoom,
       },
       commitToHistory: false,

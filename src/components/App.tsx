@@ -847,6 +847,8 @@ class App extends React.Component<any, AppState> {
               remoteElements.filter((element: { isDeleted: boolean }) => {
                 return !element.isDeleted;
               }),
+              this.state,
+              this.canvas,
             ),
           });
         }
