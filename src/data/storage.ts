@@ -64,11 +64,11 @@ export class WebStorageProvider {
     return localStorage.removeItem(key);
   }
 
-  async get(key: string): Promise<string | null> {
+  async get(key: string | IDBValidKey): Promise<string | null> {
     if (this.supportsIDB && this.IDBStore) {
       return await idb.get(key, this.IDBStore);
     }
-    return localStorage.getItem(key);
+    return localStorage.getItem(key as string);
   }
 
   async set(key: string, value: string): Promise<void> {
@@ -77,9 +77,21 @@ export class WebStorageProvider {
     }
     return localStorage.setItem(key, value);
   }
+
+  async getAll() {
+    if (this.supportsIDB && this.IDBStore) {
+      const allItems: { [key: string]: string | null } = {};
+      const keys = await idb.keys(this.IDBStore);
+      for (const key of keys) {
+        allItems[key as string] = await this.get(key);
+      }
+      return allItems;
+    }
+    return localStorage;
+  }
 }
 
-const storage = new WebStorageProvider();
+export const storage = new WebStorageProvider();
 
 export const saveUsernameToStorage = async (username: string) => {
   try {
