@@ -121,7 +121,10 @@ export const restore = (
   }, [] as ExcalidrawElement[]);
 
   if (opts?.scrollToContent && savedState) {
-    savedState = { ...savedState, ...calculateScrollCenter(elements) };
+    savedState = {
+      ...savedState,
+      ...calculateScrollCenter(elements, savedState, null),
+    };
   }
 
   return {

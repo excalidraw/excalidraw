@@ -271,7 +271,7 @@ export const importFromBackend = async (
     }
 
     elements = data.elements || elements;
-    appState = data.appState || appState;
+    appState = { ...appState, ...data.appState };
   } catch (error) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
