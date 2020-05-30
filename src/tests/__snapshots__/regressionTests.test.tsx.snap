@@ -16138,6 +16138,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",
