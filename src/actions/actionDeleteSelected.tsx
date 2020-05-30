@@ -9,6 +9,7 @@ import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
+import { getElementsInGroup } from "../groups";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -37,15 +38,14 @@ export const actionDeleteSelected = register({
     } = deleteSelectedElements(elements, appState);
 
     if (appState.editingGroupId) {
-      const siblingElement = nextElements.find(
-        (element) =>
-          !element.isDeleted &&
-          element.groupIds.includes(appState.editingGroupId!),
+      const siblingElements = getElementsInGroup(
+        getNonDeletedElements(nextElements),
+        appState.editingGroupId!,
       );
-      if (siblingElement) {
+      if (siblingElements.length) {
         nextAppState = {
           ...nextAppState,
-          selectedElementIds: { [siblingElement.id]: true },
+          selectedElementIds: { [siblingElements[0].id]: true },
         };
       }
     }
