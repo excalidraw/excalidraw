@@ -55,13 +55,13 @@
     "actions": "",
     "language": "語系",
     "createRoom": "分享即時協作會議",
-    "duplicateSelection": "",
-    "untitled": "",
+    "duplicateSelection": "複製",
+    "untitled": "無標題",
     "name": "",
     "yourName": "",
     "madeWithExcalidraw": "",
-    "group": "",
-    "ungroup": ""
+    "group": "群組",
+    "ungroup": "取消群組"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -86,9 +86,9 @@
     "redo": "重做",
     "roomDialog": "分享即時協作會議",
     "createNewRoom": "建立新的會議室",
-    "toggleFullScreen": "",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleFullScreen": "切換全螢幕",
+    "toggleZenMode": "切換 Zen 模式",
+    "exitZenMode": "離開 Zen 模式"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -102,7 +102,7 @@
   },
   "toolBar": {
     "selection": "選擇",
-    "draw": "",
+    "draw": "自由書寫",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
@@ -147,15 +147,15 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "錯誤"
   },
   "shortcutsDialog": {
-    "title": "",
+    "title": "鍵盤快速鍵",
     "shapes": "",
     "or": "",
     "click": "",
     "drag": "",
-    "curvedArrow": "",
+    "curvedArrow": "曲線",
     "curvedLine": "",
     "editor": "",
     "view": "",
