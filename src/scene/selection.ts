@@ -4,7 +4,6 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -29,24 +28,6 @@ export const getElementsWithinSelection = (
       selectionY2 >= elementY2
     );
   });
-};
-
-export const deleteSelectedElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  return {
-    elements: elements.map((el) => {
-      if (appState.selectedElementIds[el.id]) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      return el;
-    }),
-    appState: {
-      ...appState,
-      selectedElementIds: {},
-    },
-  };
 };
 
 export const isSomeElementSelected = (

@@ -138,6 +138,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -170,6 +171,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -223,6 +225,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -297,6 +300,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -490,6 +494,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -522,6 +527,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -663,6 +669,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -782,6 +789,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -814,6 +822,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -846,6 +855,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -878,6 +888,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -910,6 +921,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1030,6 +1042,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1062,6 +1075,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1184,6 +1198,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1216,6 +1231,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1249,6 +1265,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1395,6 +1412,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1427,6 +1445,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -1617,6 +1636,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1649,6 +1669,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -1702,6 +1723,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -1917,6 +1939,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -1949,6 +1972,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -2002,6 +2026,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -2076,6 +2101,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -2482,6 +2508,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -2490,6 +2517,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -2522,6 +2550,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -2575,6 +2604,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -2649,6 +2679,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id3": true,
@@ -2755,6 +2786,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id4": true,
@@ -2893,6 +2925,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id5": true,
@@ -3066,6 +3099,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id5": true,
@@ -3243,6 +3277,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id6": true,
@@ -3455,6 +3490,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id6": true,
@@ -3671,6 +3707,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id7": true,
@@ -4006,6 +4043,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4125,6 +4163,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4244,6 +4283,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4374,6 +4414,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4515,6 +4556,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4656,6 +4698,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4797,6 +4840,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -4927,6 +4971,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5046,6 +5091,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5176,6 +5222,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5306,6 +5353,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5436,6 +5484,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5704,6 +5753,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5736,6 +5786,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -5789,6 +5840,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -5863,6 +5915,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -5946,6 +5999,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6211,6 +6265,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6243,6 +6298,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -6521,6 +6577,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6553,6 +6610,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6586,6 +6644,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6620,6 +6679,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6655,6 +6715,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6691,6 +6752,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6728,6 +6790,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6766,6 +6829,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6805,6 +6869,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6845,6 +6910,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6886,6 +6952,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6928,6 +6995,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -6971,6 +7039,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7015,6 +7084,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7060,6 +7130,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7106,6 +7177,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7153,6 +7225,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7295,6 +7368,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7327,6 +7401,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7360,6 +7435,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7394,6 +7470,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7429,6 +7506,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7465,6 +7543,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7502,6 +7581,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7540,6 +7620,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7671,6 +7752,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7703,6 +7785,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7736,6 +7819,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7770,6 +7854,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7805,6 +7890,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7841,6 +7927,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -7968,6 +8055,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8000,6 +8088,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8033,6 +8122,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8067,6 +8157,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8190,6 +8281,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8222,6 +8314,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8357,6 +8450,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8389,6 +8483,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8422,6 +8517,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8456,6 +8552,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8491,6 +8588,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8527,6 +8625,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8564,6 +8663,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8602,6 +8702,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8641,6 +8742,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8681,6 +8783,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8722,6 +8825,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8764,6 +8868,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8807,6 +8912,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8851,6 +8957,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8896,6 +9003,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -8942,6 +9050,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9089,6 +9198,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9121,6 +9231,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9154,6 +9265,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9188,6 +9300,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9223,6 +9336,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9259,6 +9373,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9296,6 +9411,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9334,6 +9450,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9373,6 +9490,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9413,6 +9531,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9454,6 +9573,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9496,6 +9616,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9539,6 +9660,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9583,6 +9705,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9726,6 +9849,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9758,6 +9882,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9791,6 +9916,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9825,6 +9951,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9860,6 +9987,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9896,6 +10024,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9933,6 +10062,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -9971,6 +10101,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10010,6 +10141,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10050,6 +10182,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10091,6 +10224,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10133,6 +10267,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10272,6 +10407,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10304,6 +10440,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10337,6 +10474,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10371,6 +10509,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10406,6 +10545,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10442,6 +10582,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10479,6 +10620,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10517,6 +10659,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10556,6 +10699,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10596,6 +10740,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10732,6 +10877,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10764,6 +10910,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10797,6 +10944,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10831,6 +10979,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10866,6 +11015,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10902,6 +11052,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10939,6 +11090,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -10977,6 +11129,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11016,6 +11169,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11149,6 +11303,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11181,6 +11336,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11214,6 +11370,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11248,6 +11405,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11283,6 +11441,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11319,6 +11478,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11356,6 +11516,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11485,6 +11646,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11517,6 +11679,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11550,6 +11713,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11584,6 +11748,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11619,6 +11784,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11744,6 +11910,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11776,6 +11943,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11809,6 +11977,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11946,6 +12115,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -11978,6 +12148,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12011,6 +12182,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12045,6 +12217,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12080,6 +12253,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12116,6 +12290,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12153,6 +12328,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12191,6 +12367,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12230,6 +12407,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12270,6 +12448,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12311,6 +12490,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12353,6 +12533,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12396,6 +12577,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12440,6 +12622,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12485,6 +12668,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12531,6 +12715,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12578,6 +12763,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12727,6 +12913,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12759,6 +12946,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12792,6 +12980,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12826,6 +13015,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12861,6 +13051,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12897,6 +13088,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12934,6 +13126,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -12972,6 +13165,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13011,6 +13205,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13051,6 +13246,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13092,6 +13288,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13134,6 +13331,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13177,6 +13375,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13221,6 +13420,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13266,6 +13466,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13411,6 +13612,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13443,6 +13645,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13476,6 +13679,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13510,6 +13714,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13545,6 +13750,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13581,6 +13787,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13618,6 +13825,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13656,6 +13864,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13695,6 +13904,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13735,6 +13945,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13776,6 +13987,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13818,6 +14030,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -13861,6 +14074,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14002,6 +14216,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14034,6 +14249,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14067,6 +14283,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14101,6 +14318,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14136,6 +14354,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14172,6 +14391,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14209,6 +14429,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14247,6 +14468,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14286,6 +14508,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14326,6 +14549,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14367,6 +14591,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14524,6 +14749,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14556,6 +14782,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -14609,6 +14836,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14869,6 +15097,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -14901,6 +15130,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -14954,6 +15184,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15028,6 +15259,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -15110,11 +15342,181 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": "id3",
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
           "id4": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1150084233,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1116226695,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": "id3",
+        "name": "Unbenannt-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+          "id4": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1116226695,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id5",
+            "id3",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 4,
+          "versionNonce": 400692809,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id5",
+            "id3",
+          ],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 4,
+          "versionNonce": 1604849351,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "name": "Unbenannt-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id7": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -15404,6 +15806,7 @@ Object {
   "redoStack": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15496,6 +15899,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id2": true,
@@ -15586,6 +15990,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
@@ -15618,6 +16023,7 @@ Object {
     },
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
@@ -15732,6 +16138,7 @@ Object {
   "stateHistory": Array [
     Object {
       "appState": Object {
+        "editingGroupId": null,
         "name": "Unbenannt-201933152653",
         "selectedElementIds": Object {},
         "viewBackgroundColor": "#ffffff",

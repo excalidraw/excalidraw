@@ -71,8 +71,10 @@ export type AppState = {
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
 
-  // groups
+  /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
+  /** group being edited when you drill down to its constituent element
+    (e.g. when you double-click on a group's element) */
   editingGroupId: GroupId | null;
 };
 
