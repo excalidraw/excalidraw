@@ -58,3 +58,5 @@ export const BROADCAST = {
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
 };
+
+export const CANVAS_ONLY_ACTIONS = ["selectAll"];
