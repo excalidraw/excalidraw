@@ -17,6 +17,7 @@ export {
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
+  getClosestElementBounds,
 } from "./bounds";
 
 export {
@@ -45,7 +46,7 @@ export {
   getPerfectElementSize,
   isInvisiblySmallElement,
   resizePerfectLineForNWHandler,
-  normalizeDimensions,
+  getNormalizedDimensions,
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
 

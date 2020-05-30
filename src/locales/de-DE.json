@@ -16,7 +16,7 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeStyle": "Strichstil",
+    "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
     "strokeStyle_dotted": "Gepunktet",
@@ -100,7 +100,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
-    "draw": "Freihand Zeichnen",
+    "draw": "Freies Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
