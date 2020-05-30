@@ -151,20 +151,20 @@
   },
   "shortcutsDialog": {
     "title": "鍵盤快速鍵",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "曲線",
-    "curvedLine": "",
-    "editor": "",
+    "shapes": "形狀",
+    "or": "或",
+    "click": "點擊",
+    "drag": "拖曳",
+    "curvedArrow": "箭頭曲線",
+    "curvedLine": "曲線",
+    "editor": "編輯器",
     "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": ""
+    "blog": "閱讀部落格",
+    "howto": "官方指南",
+    "github": "發現問題？發個 PR",
+    "textNewLine": "換行",
+    "textFinish": "編輯完成",
+    "zoomToFit": "回到完整畫面"
   },
   "encrypted": {
     "tooltip": ""
