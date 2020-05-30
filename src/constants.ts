@@ -65,3 +65,5 @@ export const FONT_FAMILY = {
   2: "Helvetica",
   3: "Cascadia",
 } as const;
+
+export const CANVAS_ONLY_ACTIONS = ["selectAll"];
