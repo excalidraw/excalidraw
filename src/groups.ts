@@ -50,9 +50,7 @@ export function isSelectedViaGroup(
     .find((groupId) => appState.selectedGroupIds[groupId]);
 }
 
-export function getSelectedGroupIds(
-  appState: AppState,
-): ExcalidrawElement["groupIds"] {
+export function getSelectedGroupIds(appState: AppState): GroupId[] {
   return Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
