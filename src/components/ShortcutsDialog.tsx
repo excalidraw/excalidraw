@@ -318,6 +318,14 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("buttons.redo")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Z")]}
               />
+              <Shortcut
+                label={t("labels.group")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+G")]}
+              />
+              <Shortcut
+                label={t("labels.ungroup")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
+              />
             </ShortcutIsland>
           </Column>
         </Columns>

@@ -1,11 +1,11 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "selectAll": "",
+    "selectAll": "Összes kijelölése",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
-    "copyAsSvg": "",
-    "bringForward": "",
+    "copyAsSvg": "Vágólapra másolás mint SVG",
+    "bringForward": "Előrébb hozás",
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
@@ -142,7 +142,7 @@
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": ""

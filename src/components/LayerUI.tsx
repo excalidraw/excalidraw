@@ -43,6 +43,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
+  lng: string;
 }
 
 const LayerUI = ({
@@ -325,6 +326,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
+    prev.lng === next.lng &&
     prev.elements === next.elements &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );

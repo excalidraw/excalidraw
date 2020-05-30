@@ -4,7 +4,11 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { KEYS } from "../keys";
-import { DEFAULT_FONT, DEFAULT_TEXT_ALIGN } from "../appState";
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+} from "../appState";
 import { register } from "./register";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 
@@ -47,7 +51,8 @@ export const actionPasteStyles = register({
           });
           if (isTextElement(newElement)) {
             mutateElement(newElement, {
-              font: pastedElement?.font || DEFAULT_FONT,
+              fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
+              fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
             });
             redrawTextBoundingBox(newElement);

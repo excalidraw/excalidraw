@@ -45,7 +45,7 @@ export {
   getPerfectElementSize,
   isInvisiblySmallElement,
   resizePerfectLineForNWHandler,
-  normalizeDimensions,
+  getNormalizedDimensions,
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
 
