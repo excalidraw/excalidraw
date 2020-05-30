@@ -1,12 +1,13 @@
 import React from "react";
 import * as Sentry from "@sentry/browser";
+import { storage } from "../data/storage";
 import { resetCursor } from "../utils";
 import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
   hasError: boolean;
   sentryEventId: string;
-  localStorage: string;
+  storage: string;
 }
 
 export class TopErrorBoundary extends React.Component<
@@ -16,21 +17,21 @@ export class TopErrorBoundary extends React.Component<
   state: TopErrorBoundaryState = {
     hasError: false,
     sentryEventId: "",
-    localStorage: "",
+    storage: "",
   };
 
   render() {
     return this.state.hasError ? this.errorSplash() : this.props.children;
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  async componentDidCatch(error: Error, errorInfo: any) {
     resetCursor();
-    const _localStorage: any = {};
-    for (const [key, value] of Object.entries({ ...localStorage })) {
+    const _storage: any = {};
+    for (const [key, value] of Object.entries(await storage.getAll())) {
       try {
-        _localStorage[key] = JSON.parse(value);
+        _storage[key] = JSON.parse(value);
       } catch (error) {
-        _localStorage[key] = value;
+        _storage[key] = value;
       }
     }
 
@@ -41,7 +42,7 @@ export class TopErrorBoundary extends React.Component<
       this.setState((state) => ({
         hasError: true,
         sentryEventId: eventId,
-        localStorage: JSON.stringify(_localStorage),
+        storage: JSON.stringify(_storage),
       }));
     });
   }
@@ -80,9 +81,9 @@ export class TopErrorBoundary extends React.Component<
           <div className="ErrorSplash-paragraph align-center">
             {t("errorSplash.clearCanvasMessage")}
             <button
-              onClick={() => {
+              onClick={async () => {
                 try {
-                  localStorage.clear();
+                  await storage.clear();
                   window.location.reload();
                 } catch (error) {
                   console.error(error);
@@ -122,7 +123,7 @@ export class TopErrorBoundary extends React.Component<
                   rows={5}
                   onPointerDown={this.selectTextArea}
                   readOnly={true}
-                  value={this.state.localStorage}
+                  value={this.state.storage}
                 />
               </div>
             </div>
