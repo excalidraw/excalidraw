@@ -8,6 +8,7 @@ const toolMap = {
   arrow: "arrow",
   line: "line",
   draw: "draw",
+  text: "text",
 };
 
 export type ToolName = keyof typeof toolMap;
