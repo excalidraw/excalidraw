@@ -12,6 +12,7 @@ import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
+import { AppState } from "../types";
 
 type ElementConstructorOpts = {
   x: ExcalidrawGenericElement["x"];
@@ -169,7 +170,7 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
  * @param overrides Any element properties to override
  */
 export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
-  editingGroupId: GroupId | null,
+  editingGroupId: AppState["editingGroupId"],
   groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   overrides?: Partial<TElement>,
