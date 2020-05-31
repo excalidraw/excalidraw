@@ -3,7 +3,11 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "../element/types";
-import { getNonDeletedElements, isNonDeletedElement } from "../element";
+import {
+  getNonDeletedElements,
+  isNonDeletedElement,
+  getElementMap,
+} from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -14,13 +18,16 @@ export interface SceneStateCallbackRemover {
 }
 
 class GlobalScene {
-  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  constructor(private _elements: readonly ExcalidrawElement[] = []) {}
+  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
+  private elements: readonly ExcalidrawElement[] = [];
+  private elementsMap: {
+    [id: string]: ExcalidrawElement;
+  } = {};
 
   getElementsIncludingDeleted() {
-    return this._elements;
+    return this.elements;
   }
 
   getElements(): readonly NonDeletedExcalidrawElement[] {
@@ -28,7 +35,7 @@ class GlobalScene {
   }
 
   getElement(id: ExcalidrawElement["id"]): ExcalidrawElement | null {
-    return this._elements.find((element) => element.id === id) || null;
+    return this.elementsMap[id] || null;
   }
 
   getNonDeletedElement(
@@ -42,8 +49,9 @@ class GlobalScene {
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
-    this._elements = nextElements;
-    this.nonDeletedElements = getNonDeletedElements(this._elements);
+    this.elements = nextElements;
+    this.elementsMap = getElementMap(nextElements);
+    this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();
   }
 
