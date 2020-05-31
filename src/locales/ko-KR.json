@@ -59,7 +59,9 @@
     "untitled": "제목 없음",
     "name": "",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",

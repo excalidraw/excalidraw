@@ -59,7 +59,9 @@
     "untitled": "Sem título",
     "name": "Nome",
     "yourName": "Seu nome",
-    "madeWithExcalidraw": "Feito com Excalidraw"
+    "madeWithExcalidraw": "Feito com Excalidraw",
+    "group": "Agrupar seleção",
+    "ungroup": "Desagrupar seleção"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -84,14 +86,14 @@
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
-    "toggleFullScreen": "Alterar tela cheia",
+    "toggleFullScreen": "Alternar tela cheia",
     "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
-    "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
-    "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo",
+    "couldNotCreateShareableLink": "Não foi possível criar um link de compartilhamento.",
+    "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
@@ -125,7 +127,7 @@
     "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
-    "clearCanvasMessage_button": "limpar a tela.",
+    "clearCanvasMessage_button": "limpando a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
     "trackedToSentry_pre": "O erro com o identificador ",
     "trackedToSentry_post": " foi rastreado no nosso sistema.",

@@ -59,7 +59,9 @@
     "untitled": "",
     "name": "",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",

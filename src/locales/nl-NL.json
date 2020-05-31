@@ -59,7 +59,9 @@
     "untitled": "Naamloos",
     "name": "Naam",
     "yourName": "Jouw naam",
-    "madeWithExcalidraw": "Gemaakt met Excalidraw"
+    "madeWithExcalidraw": "Gemaakt met Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",

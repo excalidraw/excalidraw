@@ -59,7 +59,9 @@
     "untitled": "Неозаглавено",
     "name": "Име",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",

@@ -59,7 +59,9 @@
     "untitled": "Untitled",
     "name": "名前",
     "yourName": "",
-    "madeWithExcalidraw": "Excalidrawで作成"
+    "madeWithExcalidraw": "Excalidrawで作成",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",

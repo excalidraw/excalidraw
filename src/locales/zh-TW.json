@@ -55,11 +55,13 @@
     "actions": "",
     "language": "語系",
     "createRoom": "分享即時協作會議",
-    "duplicateSelection": "",
-    "untitled": "",
+    "duplicateSelection": "複製",
+    "untitled": "無標題",
     "name": "",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "群組",
+    "ungroup": "取消群組"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -84,9 +86,9 @@
     "redo": "重做",
     "roomDialog": "分享即時協作會議",
     "createNewRoom": "建立新的會議室",
-    "toggleFullScreen": "",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleFullScreen": "切換全螢幕",
+    "toggleZenMode": "切換 Zen 模式",
+    "exitZenMode": "離開 Zen 模式"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -100,7 +102,7 @@
   },
   "toolBar": {
     "selection": "選擇",
-    "draw": "",
+    "draw": "自由書寫",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
@@ -145,24 +147,24 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "錯誤"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "editor": "",
+    "title": "鍵盤快速鍵",
+    "shapes": "形狀",
+    "or": "或",
+    "click": "點擊",
+    "drag": "拖曳",
+    "curvedArrow": "箭頭曲線",
+    "curvedLine": "曲線",
+    "editor": "編輯器",
     "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": ""
+    "blog": "閱讀部落格",
+    "howto": "官方指南",
+    "github": "發現問題？發個 PR",
+    "textNewLine": "換行",
+    "textFinish": "編輯完成",
+    "zoomToFit": "回到完整畫面"
   },
   "encrypted": {
     "tooltip": ""
