@@ -330,7 +330,6 @@ export const exportCanvas = async (
     shouldAddWatermark,
   });
   tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
 
   if (type === "png") {
     const fileName = `${name}.png`;
