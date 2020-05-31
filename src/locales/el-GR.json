@@ -59,7 +59,9 @@
     "untitled": "Χωρίς τίτλο",
     "name": "Όνομα",
     "yourName": "Το όνομά σου",
-    "madeWithExcalidraw": "Φτιαγμένο με Excalidraw"
+    "madeWithExcalidraw": "Φτιαγμένο με Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",

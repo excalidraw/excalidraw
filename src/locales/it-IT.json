@@ -59,7 +59,9 @@
     "untitled": "Senza titolo",
     "name": "Nome",
     "yourName": "Il vostro nome",
-    "madeWithExcalidraw": "Creato con Excalidraw"
+    "madeWithExcalidraw": "Creato con Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",

@@ -59,7 +59,9 @@
     "untitled": "Tanpa judul",
     "name": "Nama",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",

@@ -59,7 +59,9 @@
     "untitled": "Sense títol",
     "name": "Nom",
     "yourName": "El teu nom",
-    "madeWithExcalidraw": "Fet amb Excalidraw"
+    "madeWithExcalidraw": "Fet amb Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",

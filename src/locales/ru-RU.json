@@ -59,7 +59,9 @@
     "untitled": "Без названия",
     "name": "Имя",
     "yourName": "Ваше имя",
-    "madeWithExcalidraw": "Сделано в Excalidraw"
+    "madeWithExcalidraw": "Сделано в Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",

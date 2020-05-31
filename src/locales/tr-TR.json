@@ -59,7 +59,9 @@
     "untitled": "Başlıksız",
     "name": "İsim",
     "yourName": "",
-    "madeWithExcalidraw": "Excalidraw ile yapıldı"
+    "madeWithExcalidraw": "Excalidraw ile yapıldı",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Canvas'ı sıfırla",

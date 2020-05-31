@@ -59,7 +59,9 @@
     "untitled": "ללא כותרת",
     "name": "שם",
     "yourName": "שם",
-    "madeWithExcalidraw": "נוצר באמצעות Excalidraw"
+    "madeWithExcalidraw": "נוצר באמצעות Excalidraw",
+    "group": "אחד לקבוצה",
+    "ungroup": "פרק קבוצה"
   },
   "buttons": {
     "clearReset": "אפס את הלוח",

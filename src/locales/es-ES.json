@@ -59,7 +59,9 @@
     "untitled": "Sin título",
     "name": "Nombre",
     "yourName": "Tu nombre",
-    "madeWithExcalidraw": "Hecho con Excalidraw"
+    "madeWithExcalidraw": "Hecho con Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

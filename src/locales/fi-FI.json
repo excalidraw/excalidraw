@@ -59,7 +59,9 @@
     "untitled": "Nimetön",
     "name": "Nimi",
     "yourName": "Nimesi",
-    "madeWithExcalidraw": "Tehty Excalidrawilla"
+    "madeWithExcalidraw": "Tehty Excalidrawilla",
+    "group": "Ryhmitä valinta",
+    "ungroup": "Pura valittu ryhmä"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
