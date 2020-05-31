@@ -34,7 +34,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       if (
         (element as any)[key] === value &&
         // if object, always update in case its deep prop was mutated
-        (typeof value !== "object" || value === null)
+        (typeof value !== "object" || value === null || key === "groupIds")
       ) {
         continue;
       }

@@ -30,7 +30,6 @@ import {
   isNonDeletedElement,
 } from "../element";
 import {
-  deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
   getElementAtPosition,
@@ -110,10 +109,12 @@ import {
   SCENE,
   EVENT,
   ENV,
+  CANVAS_ONLY_ACTIONS,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -124,7 +125,7 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
-import { actionFinalize } from "../actions";
+import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
@@ -170,8 +171,6 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
-
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -179,9 +178,8 @@ class App extends React.Component<any, AppState> {
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   broadcastedElementVersions: Map<string, number> = new Map();
   removeSceneCallback: SceneStateCallbackRemover | null = null;
-
+  unmounted: boolean = false;
   actionManager: ActionManager;
-  canvasOnlyActions = ["selectAll"];
 
   public state: AppState = {
     ...getDefaultAppState(),
@@ -363,12 +361,10 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  private unmounted = false;
-
   public async componentDidMount() {
     if (
-      process.env.NODE_ENV === "test" ||
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === ENV.TEST ||
+      process.env.NODE_ENV === ENV.DEVELOPMENT
     ) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -395,6 +391,60 @@ class App extends React.Component<any, AppState> {
       this.onSceneUpdated,
     );
 
+    this.addEventListeners();
+    this.initializeScene();
+  }
+
+  public componentWillUnmount() {
+    this.unmounted = true;
+    this.removeSceneCallback!();
+    this.removeEventListeners();
+  }
+
+  private onResize = withBatchedUpdates(() => {
+    globalSceneState
+      .getElementsIncludingDeleted()
+      .forEach((element) => invalidateShapeForElement(element));
+    this.setState({});
+  });
+
+  private removeEventListeners() {
+    document.removeEventListener(EVENT.COPY, this.onCopy);
+    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.removeEventListener(EVENT.CUT, this.onCut);
+
+    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    document.removeEventListener(
+      EVENT.MOUSE_MOVE,
+      this.updateCurrentCursorPosition,
+      false,
+    );
+    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
+    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
+    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
+    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+
+    document.removeEventListener(
+      EVENT.GESTURE_START,
+      this.onGestureStart as any,
+      false,
+    );
+    document.removeEventListener(
+      EVENT.GESTURE_CHANGE,
+      this.onGestureChange as any,
+      false,
+    );
+    document.removeEventListener(
+      EVENT.GESTURE_END,
+      this.onGestureEnd as any,
+      false,
+    );
+    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+  }
+
+  private addEventListeners() {
     document.addEventListener(EVENT.COPY, this.onCopy);
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
@@ -431,54 +481,7 @@ class App extends React.Component<any, AppState> {
       false,
     );
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-
-    this.initializeScene();
   }
-
-  public componentWillUnmount() {
-    this.unmounted = true;
-    this.removeSceneCallback!();
-
-    document.removeEventListener(EVENT.COPY, this.onCopy);
-    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.removeEventListener(EVENT.CUT, this.onCut);
-
-    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
-    document.removeEventListener(
-      EVENT.MOUSE_MOVE,
-      this.updateCurrentCursorPosition,
-      false,
-    );
-    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
-    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
-    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
-
-    document.removeEventListener(
-      EVENT.GESTURE_START,
-      this.onGestureStart as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_CHANGE,
-      this.onGestureChange as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_END,
-      this.onGestureEnd as any,
-      false,
-    );
-    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-  }
-  private onResize = withBatchedUpdates(() => {
-    globalSceneState
-      .getElementsIncludingDeleted()
-      .forEach((element) => invalidateShapeForElement(element));
-    this.setState({});
-  });
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
@@ -600,13 +603,7 @@ class App extends React.Component<any, AppState> {
       return;
     }
     this.copyAll();
-    const { elements: nextElements, appState } = deleteSelectedElements(
-      globalSceneState.getElementsIncludingDeleted(),
-      this.state,
-    );
-    globalSceneState.replaceAllElements(nextElements);
-    history.resumeRecording();
-    this.setState({ ...appState });
+    this.actionManager.executeAction(actionDeleteSelected);
     event.preventDefault();
   });
 
@@ -651,7 +648,7 @@ class App extends React.Component<any, AppState> {
     );
   };
 
-  private resetTapTwice() {
+  private static resetTapTwice() {
     didTapTwice = false;
   }
 
@@ -660,7 +657,7 @@ class App extends React.Component<any, AppState> {
       didTapTwice = true;
       clearTimeout(tappedTwiceTimer);
       tappedTwiceTimer = window.setTimeout(
-        this.resetTapTwice,
+        App.resetTapTwice,
         TAP_TWICE_TIMEOUT,
       );
       return;
@@ -858,6 +855,8 @@ class App extends React.Component<any, AppState> {
               remoteElements.filter((element: { isDeleted: boolean }) => {
                 return !element.isDeleted;
               }),
+              this.state,
+              this.canvas,
             ),
           });
         }
@@ -941,7 +940,7 @@ class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.portal.socketInitialized === false) {
+        if (!this.portal.socketInitialized) {
           initialize();
         }
       };
@@ -2816,7 +2815,7 @@ class App extends React.Component<any, AppState> {
               action: this.copyToClipboardAsSvg,
             },
           ...this.actionManager.getContextMenuItems((action) =>
-            this.canvasOnlyActions.includes(action.name),
+            CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
         ],
         top: event.clientY,
@@ -2848,7 +2847,7 @@ class App extends React.Component<any, AppState> {
           action: this.copyToClipboardAsSvg,
         },
         ...this.actionManager.getContextMenuItems(
-          (action) => !this.canvasOnlyActions.includes(action.name),
+          (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),
       ],
       top: event.clientY,
