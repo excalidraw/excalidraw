@@ -8,7 +8,7 @@ import { register } from "./register";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { newElementWith, mutateElement } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -74,27 +74,11 @@ export const actionDeleteSelected = register({
           };
         }
 
-        let points = element.points.slice();
-        points.splice(appState.editingLinearElement.activePointIndex, 1);
-        let offsetX = 0;
-        let offsetY = 0;
-        // if deleting first point, make the next to be [0,0] and recalculate
-        //  positions of the rest with respect to it
-        if (appState.editingLinearElement.activePointIndex === 0) {
-          offsetX = points[0][0];
-          offsetY = points[0][1];
-          points = points.map((point, idx) => {
-            if (idx === 0) {
-              return [0, 0];
-            }
-            return [point[0] - offsetX, point[1] - offsetY];
-          });
-        }
-        mutateElement(element, {
-          points,
-          x: element.x + offsetX,
-          y: element.y + offsetY,
-        });
+        LinearElementEditor.movePoint(
+          element,
+          appState.editingLinearElement.activePointIndex,
+          "delete",
+        );
 
         return {
           elements: elements,

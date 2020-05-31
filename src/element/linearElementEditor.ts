@@ -227,9 +227,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        mutateElement(element, {
-          points: points.slice(0, -1),
-        });
+        LinearElementEditor.movePoint(element, points.length - 1, "delete");
       }
       return editingLinearElement;
     }
@@ -247,9 +245,7 @@ export class LinearElementEditor {
         newPoint,
       );
     } else {
-      mutateElement(element, {
-        points: [...points, newPoint],
-      });
+      LinearElementEditor.movePoint(element, "new", newPoint);
     }
 
     return {
@@ -338,8 +334,8 @@ export class LinearElementEditor {
 
   static movePoint(
     element: NonDeleted<ExcalidrawLinearElement>,
-    pointIndex: number,
-    targetPosition: Point,
+    pointIndex: number | "new",
+    targetPosition: Point | "delete",
   ) {
     const { points } = element;
 
@@ -351,24 +347,48 @@ export class LinearElementEditor {
     let offsetX = 0;
     let offsetY = 0;
 
-    const deltaX = targetPosition[0] - points[pointIndex][0];
-    const deltaY = targetPosition[1] - points[pointIndex][1];
-    const nextPoints = points.map((point, idx) => {
-      if (idx === pointIndex) {
-        if (idx === 0) {
-          offsetX = deltaX;
-          offsetY = deltaY;
-          return point;
-        }
-        offsetX = 0;
-        offsetY = 0;
-
-        return [point[0] + deltaX, point[1] + deltaY] as const;
+    let nextPoints: (readonly [number, number])[];
+    if (targetPosition === "delete") {
+      // remove point
+      if (pointIndex === "new") {
+        throw new Error("invalid args in movePoint");
       }
-      return offsetX || offsetY
-        ? ([point[0] - offsetX, point[1] - offsetY] as const)
-        : point;
-    });
+      nextPoints = points.slice();
+      nextPoints.splice(pointIndex, 1);
+      if (pointIndex === 0) {
+        // if deleting first point, make the next to be [0,0] and recalculate
+        //  positions of the rest with respect to it
+        offsetX = nextPoints[0][0];
+        offsetY = nextPoints[0][1];
+        nextPoints = nextPoints.map((point, idx) => {
+          if (idx === 0) {
+            return [0, 0];
+          }
+          return [point[0] - offsetX, point[1] - offsetY];
+        });
+      }
+    } else if (pointIndex === "new") {
+      nextPoints = [...points, targetPosition];
+    } else {
+      const deltaX = targetPosition[0] - points[pointIndex][0];
+      const deltaY = targetPosition[1] - points[pointIndex][1];
+      nextPoints = points.map((point, idx) => {
+        if (idx === pointIndex) {
+          if (idx === 0) {
+            offsetX = deltaX;
+            offsetY = deltaY;
+            return point;
+          }
+          offsetX = 0;
+          offsetY = 0;
+
+          return [point[0] + deltaX, point[1] + deltaY] as const;
+        }
+        return offsetX || offsetY
+          ? ([point[0] - offsetX, point[1] - offsetY] as const)
+          : point;
+      });
+    }
 
     const nextCoords = getElementPointsCoords(element, nextPoints);
     const prevCoords = getElementPointsCoords(element, points);
