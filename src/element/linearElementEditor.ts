@@ -10,17 +10,18 @@ import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { KEYS } from "../keys";
 import { SceneHistory } from "../history";
+import { globalSceneState } from "../scene";
 
 export class LinearElementEditor {
-  public element: NonDeleted<ExcalidrawLinearElement>;
+  public elementId: ExcalidrawElement["id"];
   public activePointIndex: number | null;
   public draggingElementPointIndex: number | null;
   public lastUncommittedPoint: Point | null;
 
-  constructor(element: LinearElementEditor["element"]) {
+  constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     LinearElementEditor.normalizePoints(element);
 
-    this.element = element;
+    this.elementId = element.id;
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
     this.draggingElementPointIndex = null;
@@ -31,6 +32,14 @@ export class LinearElementEditor {
   // ---------------------------------------------------------------------------
 
   static POINT_HANDLE_SIZE = 20;
+
+  static getElement(id: ExcalidrawElement["id"]) {
+    const element = globalSceneState.getNonDeletedElement(id);
+    if (element) {
+      return element as NonDeleted<ExcalidrawLinearElement>;
+    }
+    return null;
+  }
 
   /** @returns whether point was dragged */
   static handlePointDragging(
@@ -45,12 +54,17 @@ export class LinearElementEditor {
       return false;
     }
     const { editingLinearElement } = appState;
-    let { draggingElementPointIndex, element } = editingLinearElement;
+    let { draggingElementPointIndex, elementId } = editingLinearElement;
+
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return false;
+    }
 
     const clickedPointIndex =
       draggingElementPointIndex ??
       LinearElementEditor.getPointIndexUnderCursor(
-        editingLinearElement.element,
+        element,
         appState.zoom,
         scenePointerX,
         scenePointerY,
@@ -92,7 +106,12 @@ export class LinearElementEditor {
   static handlePointerUp(
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { element, draggingElementPointIndex } = editingLinearElement;
+    const { elementId, draggingElementPointIndex } = editingLinearElement;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return editingLinearElement;
+    }
+
     if (
       draggingElementPointIndex !== null &&
       (draggingElementPointIndex === 0 ||
@@ -123,11 +142,11 @@ export class LinearElementEditor {
     history: SceneHistory,
     scenePointerX: number,
     scenePointerY: number,
-  ) {
-    const ret: {
-      didAddPoint: boolean;
-      hitElement: ExcalidrawElement | null;
-    } = {
+  ): {
+    didAddPoint: boolean;
+    hitElement: ExcalidrawElement | null;
+  } {
+    const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
     };
@@ -136,8 +155,14 @@ export class LinearElementEditor {
       return ret;
     }
 
+    const { elementId } = appState.editingLinearElement;
+    const element = LinearElementEditor.getElement(elementId);
+
+    if (!element) {
+      return ret;
+    }
+
     if (event[KEYS.CTRL_OR_CMD]) {
-      const { element } = appState.editingLinearElement;
       if (!appState.editingLinearElement.lastUncommittedPoint) {
         mutateElement(element, {
           points: [
@@ -165,7 +190,7 @@ export class LinearElementEditor {
     }
 
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-      appState.editingLinearElement.element,
+      element,
       appState.zoom,
       scenePointerX,
       scenePointerY,
@@ -174,7 +199,7 @@ export class LinearElementEditor {
     // if we clicked on a point, set the element as hitElement otherwise
     //  it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex > -1) {
-      ret.hitElement = appState.editingLinearElement.element;
+      ret.hitElement = element;
     }
 
     setState({
@@ -192,7 +217,12 @@ export class LinearElementEditor {
     scenePointerY: number,
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { element, lastUncommittedPoint } = editingLinearElement;
+    const { elementId, lastUncommittedPoint } = editingLinearElement;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return editingLinearElement;
+    }
+
     const { points } = element;
     const lastPoint = points[points.length - 1];
 

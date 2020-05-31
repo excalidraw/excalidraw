@@ -195,7 +195,7 @@ export const renderScene = (
     if (
       isLinearElement(element) &&
       appState.editingLinearElement &&
-      appState.editingLinearElement.element === element
+      appState.editingLinearElement.elementId === element.id
     ) {
       renderLinearPointHandles(context, appState, sceneState, element);
     }

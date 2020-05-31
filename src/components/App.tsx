@@ -505,7 +505,7 @@ class App extends React.Component<any, AppState> {
 
     if (
       this.state.editingLinearElement &&
-      !this.state.selectedElementIds[this.state.editingLinearElement.element.id]
+      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
@@ -1198,7 +1198,7 @@ class App extends React.Component<any, AppState> {
       ) {
         if (
           !this.state.editingLinearElement ||
-          this.state.editingLinearElement.element.id !== selectedElements[0].id
+          this.state.editingLinearElement.elementId !== selectedElements[0].id
         ) {
           history.resumeRecording();
           this.setState({
@@ -1514,7 +1514,7 @@ class App extends React.Component<any, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         !this.state.editingLinearElement ||
-        this.state.editingLinearElement.element.id !== selectedElements[0].id
+        this.state.editingLinearElement.elementId !== selectedElements[0].id
       ) {
         history.resumeRecording();
         this.setState({

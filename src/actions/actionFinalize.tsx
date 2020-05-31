@@ -8,24 +8,28 @@ import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
-      const { element } = appState.editingLinearElement;
+      const { elementId } = appState.editingLinearElement;
+      const element = LinearElementEditor.getElement(elementId);
 
-      return {
-        elements:
-          element.points.length < 2 || isInvisiblySmallElement(element)
-            ? elements.filter((el) => el.id !== element.id)
-            : undefined,
-        appState: {
-          ...appState,
-          editingLinearElement: null,
-        },
-        commitToHistory: true,
-      };
+      if (element) {
+        return {
+          elements:
+            element.points.length < 2 || isInvisiblySmallElement(element)
+              ? elements.filter((el) => el.id !== element.id)
+              : undefined,
+          appState: {
+            ...appState,
+            editingLinearElement: null,
+          },
+          commitToHistory: true,
+        };
+      }
     }
 
     let newElements = elements;

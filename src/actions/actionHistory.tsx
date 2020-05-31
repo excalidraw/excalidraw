@@ -4,11 +4,7 @@ import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { SceneHistory, HistoryEntry } from "../history";
-import {
-  ExcalidrawElement,
-  NonDeleted,
-  ExcalidrawLinearElement,
-} from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
 import { getElementMap } from "../element";
@@ -51,21 +47,6 @@ const writeData = (
             newElementWith(prevElement, { isDeleted: true }),
           ),
       );
-
-    // ensure the restored editingLinearElement.element reference isn't stale
-    if (data.appState.editingLinearElement) {
-      const { id } = data.appState.editingLinearElement.element;
-      const element = elements.find(
-        (element): element is NonDeleted<ExcalidrawLinearElement> =>
-          element.id === id,
-      );
-      data.appState.editingLinearElement = element
-        ? {
-            ...data.appState.editingLinearElement,
-            element: element,
-          }
-        : null;
-    }
 
     return {
       elements,

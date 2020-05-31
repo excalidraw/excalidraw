@@ -1,8 +1,9 @@
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  NonDeleted,
 } from "../element/types";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isNonDeletedElement } from "../element";
 
 export interface SceneStateCallback {
   (): void;
@@ -24,6 +25,20 @@ class GlobalScene {
 
   getElements(): readonly NonDeletedExcalidrawElement[] {
     return this.nonDeletedElements;
+  }
+
+  getElement(id: ExcalidrawElement["id"]): ExcalidrawElement | null {
+    return this._elements.find((element) => element.id === id) || null;
+  }
+
+  getNonDeletedElement(
+    id: ExcalidrawElement["id"],
+  ): NonDeleted<ExcalidrawElement> | null {
+    const element = this.getElement(id);
+    if (element && isNonDeletedElement(element)) {
+      return element;
+    }
+    return null;
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
