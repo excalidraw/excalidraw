@@ -394,9 +394,12 @@ export const renderElement = (
     case "draw":
     case "arrow":
     case "text": {
-      const elementWithCanvas = generateElement(element, generator, sceneState);
-
       if (renderOptimizations) {
+        const elementWithCanvas = generateElement(
+          element,
+          generator,
+          sceneState,
+        );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -506,17 +509,14 @@ export const renderElementToSvg = (
         const lineHeight = element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
+          element.textAlign === "center" ? element.width / 2 : element.width;
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
             : element.textAlign === "right"
             ? "end"
             : "start";
+        const direction = isRTL(element.text) ? "rtl" : "ltr";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
@@ -527,6 +527,7 @@ export const renderElementToSvg = (
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
+          text.setAttribute("direction", direction);
           node.appendChild(text);
         }
         svgRoot.appendChild(node);
