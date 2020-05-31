@@ -356,7 +356,7 @@ const drawElementFromCanvas = (
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-  // clear the nested element we appended to the dom
+  // Clear the nested element we appended to the DOM
   const node = document.querySelector("#nested-canvas-element");
   if (node && node.parentNode) {
     node.parentNode.removeChild(node);
