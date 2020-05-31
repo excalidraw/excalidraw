@@ -45,10 +45,10 @@
     "right": "",
     "extraBold": "",
     "architect": "Архітектор",
-    "artist": "",
-    "cartoonist": "",
-    "fileTitle": "",
-    "colorPicker": "",
+    "artist": "Художник",
+    "cartoonist": "Карикатурист",
+    "fileTitle": "Назва файла",
+    "colorPicker": "Палітра кольорів",
     "canvasBackground": "",
     "drawingCanvas": "",
     "layers": "",
@@ -79,10 +79,10 @@
     "zoomIn": "",
     "zoomOut": "",
     "resetZoom": "",
-    "menu": "",
-    "done": "",
-    "edit": "",
-    "undo": "",
+    "menu": "Меню",
+    "done": "Готово",
+    "edit": "Редагувати",
+    "undo": "Відмінити",
     "redo": "",
     "roomDialog": "",
     "createNewRoom": "",
@@ -147,7 +147,7 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Помилка"
   },
   "shortcutsDialog": {
     "title": "",
@@ -157,7 +157,7 @@
     "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
-    "editor": "",
+    "editor": "Редактор",
     "view": "",
     "blog": "",
     "howto": "",
