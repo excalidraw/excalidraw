@@ -8,7 +8,6 @@ import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
-import { KEYS } from "../keys";
 import { SceneHistory } from "../history";
 import { globalSceneState } from "../scene";
 
@@ -162,7 +161,7 @@ export class LinearElementEditor {
       return ret;
     }
 
-    if (event[KEYS.CTRL_OR_CMD]) {
+    if (event.altKey) {
       if (!appState.editingLinearElement.lastUncommittedPoint) {
         mutateElement(element, {
           points: [
@@ -226,7 +225,7 @@ export class LinearElementEditor {
     const { points } = element;
     const lastPoint = points[points.length - 1];
 
-    if (!event[KEYS.CTRL_OR_CMD]) {
+    if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
         mutateElement(element, {
           points: points.slice(0, -1),

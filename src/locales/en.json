@@ -124,7 +124,7 @@
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point or drag to move",
-    "lineEditor_nothingSelected": "Select a point to move or remove, or hold CtrlOrCmd and click to add new points"
+    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
   "errorSplash": {
     "headingMain_pre": "Encountered an error. Try ",
