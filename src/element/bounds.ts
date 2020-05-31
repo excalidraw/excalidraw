@@ -347,6 +347,8 @@ export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
 ): [number, number, number, number] => {
+  /*
+  // This might be computationally heavey
   const gen = rough.generator();
   const curve = gen.curve(
     points as [number, number][],
@@ -354,5 +356,24 @@ export const getElementPointsCoords = (
   );
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-  return [minX, minY, maxX, maxY];
+  */
+  // This doesn't take into account curves with roughjs
+  const { minX, minY, maxX, maxY } = points.reduce(
+    (limits, [x, y]) => {
+      limits.minY = Math.min(limits.minY, y);
+      limits.minX = Math.min(limits.minX, x);
+
+      limits.maxX = Math.max(limits.maxX, x);
+      limits.maxY = Math.max(limits.maxY, y);
+
+      return limits;
+    },
+    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+  );
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
 };

@@ -3,7 +3,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawElement,
 } from "./types";
-import { distance2d, rotate, adjustXYWithRotation, isPathALoop } from "../math";
+import { distance2d, rotate, isPathALoop } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
@@ -212,9 +212,11 @@ export class LinearElementEditor {
     );
 
     if (lastPoint === lastUncommittedPoint) {
-      mutateElement(element, {
-        points: [...points.slice(0, -1), newPoint],
-      });
+      LinearElementEditor.movePoint(
+        element,
+        element.points.length - 1,
+        newPoint,
+      );
     } else {
       mutateElement(element, {
         points: [...points, newPoint],
@@ -297,7 +299,7 @@ export class LinearElementEditor {
     const offsetY = points[0][1];
 
     mutateElement(element, {
-      points: points.map((point, idx) => {
+      points: points.map((point, _idx) => {
         return [point[0] - offsetX, point[1] - offsetY] as const;
       }),
       x: element.x + offsetX,
@@ -341,26 +343,18 @@ export class LinearElementEditor {
 
     const nextCoords = getElementPointsCoords(element, nextPoints);
     const prevCoords = getElementPointsCoords(element, points);
-    const centerX = (prevCoords[0] + prevCoords[2]) / 2;
-    const centerY = (prevCoords[1] + prevCoords[3]) / 2;
-    const side = ((targetPosition[1] < centerY ? "n" : "s") +
-      (targetPosition[0] < centerX ? "w" : "e")) as "nw" | "ne" | "sw" | "se";
-    const adjustedXY = adjustXYWithRotation(
-      side,
-      element.x,
-      element.y,
-      element.angle,
-      (prevCoords[0] - nextCoords[0]) / 2,
-      (prevCoords[1] - nextCoords[1]) / 2,
-      (prevCoords[2] - nextCoords[2]) / 2,
-      (prevCoords[3] - nextCoords[3]) / 2,
-      false,
-    );
+    const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
+    const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
+    const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
+    const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
+    const dX = prevCenterX - nextCenterX;
+    const dY = prevCenterY - nextCenterY;
+    const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
 
     mutateElement(element, {
       points: nextPoints,
-      x: adjustedXY[0],
-      y: adjustedXY[1],
+      x: element.x + rotated[0],
+      y: element.y + rotated[1],
     });
   }
 }
