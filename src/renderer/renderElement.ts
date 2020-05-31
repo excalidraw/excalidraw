@@ -44,7 +44,7 @@ const generateElementCanvas = (
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  // to be able to draw a nested element with rtl, we have to append it to the DOM
+  // To be able to draw a nested element with RTL, we have to append it to the DOM
   canvas.style.display = "none";
   canvas.id = "nested-canvas-element";
   document.body.appendChild(canvas);
