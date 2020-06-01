@@ -121,7 +121,10 @@
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
-    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
