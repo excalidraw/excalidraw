@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размеров,\nудерживайте ALT чтобы изменить размер из центра",
-    "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения"
+    "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Возникла ошибка. Попробуйте ",

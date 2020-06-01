@@ -121,7 +121,10 @@
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
-    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)"
+    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "S'ha produït un error. Intentar ",

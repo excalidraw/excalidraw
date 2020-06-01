@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
-    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
+    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",

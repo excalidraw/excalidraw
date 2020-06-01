@@ -121,7 +121,10 @@
     "freeDraw": "Toque e arraste, solte quando terminar",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
-    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
+    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",

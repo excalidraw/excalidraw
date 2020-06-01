@@ -121,7 +121,10 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
-    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
+    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",

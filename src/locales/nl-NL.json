@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
     "resize": "",
-    "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait"
+    "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Fout opgetreden. Probeer ",
