@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
-    "rotate": ""
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "",

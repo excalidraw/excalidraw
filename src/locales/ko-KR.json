@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
     "resize": "",
-    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다."
+    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "",

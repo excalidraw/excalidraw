@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "",
-    "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz"
+    "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",

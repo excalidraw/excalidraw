@@ -60,8 +60,8 @@
     "name": "Nom",
     "yourName": "Votre nom",
     "madeWithExcalidraw": "Fabriqué avec Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Grouper la sélection",
+    "ungroup": "Dégrouper la sélection"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -121,7 +121,10 @@
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
-    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
+    "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
+    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point ou glissez pour déplacer",
+    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
@@ -144,7 +147,7 @@
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
     "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si vous vous déconnectez tous, vous perdrez les données sauf si vous les exportez vers un fichier ou un lien de partage.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
-    "desc_exitSession": ""
+    "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   },
   "errorDialog": {
     "title": "Erreur"

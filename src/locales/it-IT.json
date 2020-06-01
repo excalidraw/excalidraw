@@ -121,7 +121,10 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
-    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
+    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",

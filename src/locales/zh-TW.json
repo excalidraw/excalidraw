@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "按下 Escape 或 Enter 來完成",
     "resize": "",
-    "rotate": ""
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "遭遇錯誤，嘗試 ",
