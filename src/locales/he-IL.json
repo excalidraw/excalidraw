@@ -121,7 +121,10 @@
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
-    "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב"
+    "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
