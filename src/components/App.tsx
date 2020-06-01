@@ -2780,12 +2780,11 @@ class App extends React.Component<any, AppState> {
         passive: false,
       });
       this.canvas.addEventListener(EVENT.TOUCH_START, this.onTapStart);
-      this.canvas.addEventListener("touchstart", this.onTapStart);
-      this.canvas.addEventListener("touchend", this.onTapEnd);
+      this.canvas.addEventListener(EVENT.TOUCH_END, this.onTapEnd);
     } else {
       this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
       this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
-      this.canvas?.removeEventListener("touchend", this.onTapEnd);
+      this.canvas?.removeEventListener(EVENT.TOUCH_END, this.onTapEnd);
     }
   };
 
