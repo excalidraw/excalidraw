@@ -847,4 +847,48 @@ describe("regression tests", () => {
     fireEvent.click(screen.getByText(/code/i));
     expect(h.state.currentItemFontFamily).toEqual(3); // Cascadia
   });
+
+  it("shows context menu for canvas", () => {
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "en" },
+    });
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = ["Select all"];
+
+    expect(contextMenu).not.toBeNull();
+    expect(options?.length).toBe(1);
+    expect(options?.item(0).textContent).toBe(expectedOptions[0]);
+  });
+
+  it("shows context menu for element", () => {
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "en" },
+    });
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = [
+      "Copy styles",
+      "Paste styles",
+      "Delete",
+      "Group selection",
+      "Ungroup selection",
+      "Send backward",
+      "Bring forward",
+      "Send to back",
+      "Bring to front",
+      "Duplicate",
+    ];
+
+    expect(contextMenu).not.toBeNull();
+    expect(contextMenu?.children.length).toBe(10);
+    options?.forEach((opt, i) => {
+      expect(opt.textContent).toBe(expectedOptions[i]);
+    });
+  });
 });
