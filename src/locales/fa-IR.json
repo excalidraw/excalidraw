@@ -130,11 +130,11 @@
     "clearCanvasMessage_button": "در حال تمیز کردن بوم",
     "clearCanvasCaveat": " این باعث میشود کارهای شما از بین برود ",
     "trackedToSentry_pre": "خطا در شناسه ",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "trackedToSentry_post": " در سیستم ما رهگیری شد.",
+    "openIssueMessage_pre": "ما خیلی محتاط هستیم که اطلاعات شما را در خطا قرار ندهیم. با این حال اگر اطلاعات شما خصوصی نیست لطفا پیگیری کنید ",
+    "openIssueMessage_button": "پیگیری اشکالات.",
+    "openIssueMessage_post": " لطفا اطلاعات زیر را با کپی کردن در صفحه مشکلات GitHub بگذارید.",
+    "sceneContent": "محتوای صحنه:"
   },
   "roomDialog": {
     "desc_intro": "",
