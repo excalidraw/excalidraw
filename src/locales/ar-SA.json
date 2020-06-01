@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "",
-    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
+    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
