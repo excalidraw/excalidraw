@@ -109,21 +109,21 @@
     "arrow": "Стрілка",
     "line": "Лінія",
     "text": "Текст",
-    "lock": ""
+    "lock": "Залишити обраний інструмент після креслення"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "Дії з полотном",
+    "selectedShapeActions": "Вибрані дії з фігурою",
+    "shapes": "Фігури"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
-    "linearElementMulti": "",
-    "resize": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "linearElement": "Натисніть щоб додати кілька точок, перетягніть щоб намалювати одну лінію",
+    "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
+    "linearElementMulti": "Натисніть на останню точку, клацніть Esc або Enter щоб завершити",
+    "resize": "Ви можете зберегти пропорції, утримуючи SHIFT під час зміни розміру,\nутримуйте ALT для змінення розміру від центру",
+    "rotate": "Ви можете обмежити кути, утримуючи SHIFT під час обертання",
+    "lineEditor_info": "Двічі клацніть або натисніть Enter щоб редагувати точки",
+    "lineEditor_pointSelected": "Натисніть Delete щоб видалити точку або потягніть, щоб перемістити",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
