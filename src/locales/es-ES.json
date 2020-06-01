@@ -121,7 +121,10 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
-    "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
+    "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
