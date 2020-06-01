@@ -6,6 +6,8 @@ import { FlooredNumber, AppState } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
   GroupId,
 } from "../element/types";
 import {
@@ -28,6 +30,8 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import colors from "../colors";
+import { isLinearElement } from "../element/typeChecks";
+import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
@@ -81,6 +85,41 @@ const strokeCircle = (
   context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
   context.fill();
   context.stroke();
+};
+
+const renderLinearPointHandles = (
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  sceneState: SceneState,
+  element: NonDeleted<ExcalidrawLinearElement>,
+) => {
+  context.translate(sceneState.scrollX, sceneState.scrollY);
+  const origStrokeStyle = context.strokeStyle;
+  const lineWidth = context.lineWidth;
+  context.lineWidth = 1 / sceneState.zoom;
+
+  LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
+    (point, idx) => {
+      context.strokeStyle = "red";
+      context.setLineDash([]);
+      context.fillStyle =
+        appState.editingLinearElement?.activePointIndex === idx
+          ? "rgba(255, 127, 127, 0.9)"
+          : "rgba(255, 255, 255, 0.9)";
+      const { POINT_HANDLE_SIZE } = LinearElementEditor;
+      strokeCircle(
+        context,
+        point[0] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
+        point[1] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
+        POINT_HANDLE_SIZE / sceneState.zoom,
+        POINT_HANDLE_SIZE / sceneState.zoom,
+      );
+    },
+  );
+  context.setLineDash([]);
+  context.lineWidth = lineWidth;
+  context.translate(-sceneState.scrollX, -sceneState.scrollY);
+  context.strokeStyle = origStrokeStyle;
 };
 
 export const renderScene = (
@@ -153,9 +192,16 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
+    if (
+      isLinearElement(element) &&
+      appState.editingLinearElement &&
+      appState.editingLinearElement.elementId === element.id
+    ) {
+      renderLinearPointHandles(context, appState, sceneState, element);
+    }
   });
 
-  // Pain selection element
+  // Paint selection element
   if (selectionElement) {
     renderElement(
       selectionElement,
@@ -167,7 +213,11 @@ export const renderScene = (
   }
 
   // Paint selected elements
-  if (renderSelection) {
+  if (
+    renderSelection &&
+    !appState.multiElement &&
+    !appState.editingLinearElement
+  ) {
     context.translate(sceneState.scrollX, sceneState.scrollY);
 
     const selections = elements.reduce((acc, element) => {

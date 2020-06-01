@@ -63,21 +63,31 @@ export const resizeTest = (
 export const getElementWithResizeHandler = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  { x, y }: { x: number; y: number },
+  scenePointerX: number,
+  scenePointerY: number,
   zoom: number,
   pointerType: PointerType,
-) =>
-  elements.reduce((result, element) => {
+) => {
+  return elements.reduce((result, element) => {
     if (result) {
       return result;
     }
-    const resizeHandle = resizeTest(element, appState, x, y, zoom, pointerType);
+    const resizeHandle = resizeTest(
+      element,
+      appState,
+      scenePointerX,
+      scenePointerY,
+      zoom,
+      pointerType,
+    );
     return resizeHandle ? { element, resizeHandle } : null;
   }, null as { element: NonDeletedExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+};
 
 export const getResizeHandlerFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
-  { x, y }: { x: number; y: number },
+  scenePointerX: number,
+  scenePointerY: number,
   zoom: number,
   pointerType: PointerType,
 ) => {
@@ -91,7 +101,7 @@ export const getResizeHandlerFromCoords = (
 
   const found = Object.keys(handlers).find((key) => {
     const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
-    return handler && isInHandlerRect(handler, x, y);
+    return handler && isInHandlerRect(handler, scenePointerX, scenePointerY);
   });
   return (found || false) as HandlerRectanglesRet;
 };

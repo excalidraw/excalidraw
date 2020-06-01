@@ -132,6 +132,7 @@ import {
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
+import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getSelectedGroupIds,
   selectGroupsForSelectedElements,
@@ -500,6 +501,16 @@ class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
+    }
+
+    if (
+      this.state.editingLinearElement &&
+      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
+    ) {
+      // defer so that the commitToHistory flag isn't reset via current update
+      setTimeout(() => {
+        this.actionManager.executeAction(actionFinalize);
+      });
     }
 
     const cursorButton: {
@@ -1183,6 +1194,19 @@ class App extends React.Component<any, AppState> {
 
       if (
         selectedElements.length === 1 &&
+        isLinearElement(selectedElements[0])
+      ) {
+        if (
+          !this.state.editingLinearElement ||
+          this.state.editingLinearElement.elementId !== selectedElements[0].id
+        ) {
+          history.resumeRecording();
+          this.setState({
+            editingLinearElement: new LinearElementEditor(selectedElements[0]),
+          });
+        }
+      } else if (
+        selectedElements.length === 1 &&
         !isLinearElement(selectedElements[0])
       ) {
         const selectedElement = selectedElements[0];
@@ -1482,6 +1506,26 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
+    const selectedElements = getSelectedElements(
+      globalSceneState.getElements(),
+      this.state,
+    );
+
+    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      if (
+        !this.state.editingLinearElement ||
+        this.state.editingLinearElement.elementId !== selectedElements[0].id
+      ) {
+        history.resumeRecording();
+        this.setState({
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+        });
+      }
+      return;
+    }
+
+    resetCursor();
+
     const { x, y } = viewportCoordsToSceneCoords(
       event,
       this.state,
@@ -1581,12 +1625,28 @@ class App extends React.Component<any, AppState> {
       }
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
+
+    if (
+      this.state.editingLinearElement &&
+      this.state.editingLinearElement.draggingElementPointIndex === null
+    ) {
+      const editingLinearElement = LinearElementEditor.handlePointerMove(
+        event,
+        scenePointerX,
+        scenePointerY,
+        this.state.editingLinearElement,
+      );
+      if (editingLinearElement !== this.state.editingLinearElement) {
+        this.setState({ editingLinearElement });
+      }
+    }
+
     if (this.state.multiElement) {
       const { multiElement } = this.state;
       const { x: rx, y: ry } = multiElement;
@@ -1600,11 +1660,15 @@ class App extends React.Component<any, AppState> {
         // if we haven't yet created a temp point and we're beyond commit-zone
         //  threshold, add a point
         if (
-          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          LINE_CONFIRM_THRESHOLD
+          distance2d(
+            scenePointerX - rx,
+            scenePointerY - ry,
+            lastPoint[0],
+            lastPoint[1],
+          ) >= LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
-            points: [...points, [x - rx, y - ry]],
+            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
           });
         } else {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
@@ -1618,8 +1682,8 @@ class App extends React.Component<any, AppState> {
           points.length > 2 &&
           lastCommittedPoint &&
           distance2d(
-            x - rx,
-            y - ry,
+            scenePointerX - rx,
+            scenePointerY - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
@@ -1634,7 +1698,10 @@ class App extends React.Component<any, AppState> {
           }
           // update last uncommitted point
           mutateElement(multiElement, {
-            points: [...points.slice(0, -1), [x - rx, y - ry]],
+            points: [
+              ...points.slice(0, -1),
+              [scenePointerX - rx, scenePointerY - ry],
+            ],
           });
         }
       }
@@ -1653,11 +1720,16 @@ class App extends React.Component<any, AppState> {
     const elements = globalSceneState.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
-    if (selectedElements.length === 1 && !isOverScrollBar) {
+    if (
+      selectedElements.length === 1 &&
+      !isOverScrollBar &&
+      !this.state.editingLinearElement
+    ) {
       const elementWithResizeHandler = getElementWithResizeHandler(
         elements,
         this.state,
-        { x, y },
+        scenePointerX,
+        scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
@@ -1671,7 +1743,8 @@ class App extends React.Component<any, AppState> {
       if (canResizeMutlipleElements(selectedElements)) {
         const resizeHandle = getResizeHandlerFromCoords(
           getCommonBounds(selectedElements),
-          { x, y },
+          scenePointerX,
+          scenePointerY,
           this.state.zoom,
           event.pointerType,
         );
@@ -1686,8 +1759,8 @@ class App extends React.Component<any, AppState> {
     const hitElement = getElementAtPosition(
       elements,
       this.state,
-      x,
-      y,
+      scenePointerX,
+      scenePointerY,
       this.state.zoom,
     );
     if (this.state.elementType === "text") {
@@ -1928,11 +2001,12 @@ class App extends React.Component<any, AppState> {
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
-      if (selectedElements.length === 1) {
+      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithResizeHandler = getElementWithResizeHandler(
           elements,
           this.state,
-          { x, y },
+          x,
+          y,
           this.state.zoom,
           event.pointerType,
         );
@@ -1952,7 +2026,8 @@ class App extends React.Component<any, AppState> {
         if (canResizeMutlipleElements(selectedElements)) {
           resizeHandle = getResizeHandlerFromCoords(
             getCommonBounds(selectedElements),
-            { x, y },
+            x,
+            y,
             this.state.zoom,
             event.pointerType,
           );
@@ -1985,13 +2060,28 @@ class App extends React.Component<any, AppState> {
         }
       }
       if (!isResizingElements) {
-        hitElement = getElementAtPosition(
-          elements,
-          this.state,
-          x,
-          y,
-          this.state.zoom,
-        );
+        if (this.state.editingLinearElement) {
+          const ret = LinearElementEditor.handlePointerDown(
+            event,
+            this.state,
+            (appState) => this.setState(appState),
+            history,
+            x,
+            y,
+          );
+          if (ret.hitElement) {
+            hitElement = ret.hitElement;
+          }
+          if (ret.didAddPoint) {
+            return;
+          }
+        }
+
+        // hitElement may already be set above, so check first
+        hitElement =
+          hitElement ||
+          getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+
         // clear selection if shift is not clicked
         if (
           !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
@@ -2271,6 +2361,23 @@ class App extends React.Component<any, AppState> {
         }
       }
 
+      if (this.state.editingLinearElement) {
+        const didDrag = LinearElementEditor.handlePointDragging(
+          this.state,
+          (appState) => this.setState(appState),
+          x,
+          y,
+          lastX,
+          lastY,
+        );
+
+        if (didDrag) {
+          lastX = x;
+          lastY = y;
+          return;
+        }
+      }
+
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -2456,6 +2563,17 @@ class App extends React.Component<any, AppState> {
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
+      // if moving start/end point towards start/end point within threshold,
+      //  close the loop
+      if (this.state.editingLinearElement) {
+        const editingLinearElement = LinearElementEditor.handlePointerUp(
+          this.state.editingLinearElement,
+        );
+        if (editingLinearElement !== this.state.editingLinearElement) {
+          this.setState({ editingLinearElement });
+        }
+      }
 
       lastPointerUp = null;
 

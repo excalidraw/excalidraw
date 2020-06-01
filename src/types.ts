@@ -11,6 +11,7 @@ import {
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { SocketUpdateDataSource } from "./data";
+import { LinearElementEditor } from "./element/linearElementEditor";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -25,6 +26,7 @@ export type AppState = {
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
+  editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
