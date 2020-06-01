@@ -1720,7 +1720,11 @@ class App extends React.Component<any, AppState> {
     const elements = globalSceneState.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
-    if (selectedElements.length === 1 && !isOverScrollBar) {
+    if (
+      selectedElements.length === 1 &&
+      !isOverScrollBar &&
+      !this.state.editingLinearElement
+    ) {
       const elementWithResizeHandler = getElementWithResizeHandler(
         elements,
         this.state,
@@ -1997,7 +2001,7 @@ class App extends React.Component<any, AppState> {
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
-      if (selectedElements.length === 1) {
+      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithResizeHandler = getElementWithResizeHandler(
           elements,
           this.state,

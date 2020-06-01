@@ -213,7 +213,11 @@ export const renderScene = (
   }
 
   // Paint selected elements
-  if (renderSelection && !appState.multiElement) {
+  if (
+    renderSelection &&
+    !appState.multiElement &&
+    !appState.editingLinearElement
+  ) {
     context.translate(sceneState.scrollX, sceneState.scrollY);
 
     const selections = elements.reduce((acc, element) => {
