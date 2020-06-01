@@ -122,9 +122,9 @@
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
+    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen tai vedä liikuttaaksesi pistettä",
+    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",
