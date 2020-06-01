@@ -121,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "resize": "",
-    "rotate": "旋转时可以按住 Shift 来约束角度"
+    "rotate": "旋转时可以按住 Shift 来约束角度",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试 ",
