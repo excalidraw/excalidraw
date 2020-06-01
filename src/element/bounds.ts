@@ -343,6 +343,26 @@ export const getResizedElementAbsoluteCoords = (
   ];
 };
 
+export const getElementPointsCoords = (
+  element: ExcalidrawLinearElement,
+  points: readonly (readonly [number, number])[],
+): [number, number, number, number] => {
+  // This might be computationally heavey
+  const gen = rough.generator();
+  const curve = gen.curve(
+    points as [number, number][],
+    generateRoughOptions(element),
+  );
+  const ops = getCurvePathOps(curve);
+  const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
+};
+
 export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
   from: { x: number; y: number },

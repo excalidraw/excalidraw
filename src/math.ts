@@ -1,5 +1,6 @@
 import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
+import { ExcalidrawLinearElement } from "./element/types";
 
 // https://stackoverflow.com/a/6853926/232122
 export const distanceBetweenPointAndSegment = (
@@ -240,7 +241,9 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
 
 // Checks if the first and last point are close enough
 // to be considered a loop
-export const isPathALoop = (points: Point[]): boolean => {
+export const isPathALoop = (
+  points: ExcalidrawLinearElement["points"],
+): boolean => {
   if (points.length >= 3) {
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
     return (
