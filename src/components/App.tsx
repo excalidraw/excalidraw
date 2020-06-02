@@ -675,6 +675,22 @@ class App extends React.Component<any, AppState> {
       clearTimeout(tappedTwiceTimer);
     }
     event.preventDefault();
+    if (event.touches.length === 2) {
+      this.setState({
+        selectedElementIds: {},
+      });
+    }
+  };
+
+  private onTapEnd = (event: TouchEvent) => {
+    event.preventDefault();
+    if (event.touches.length > 0) {
+      const { previousSelectedElementIds } = this.state;
+      this.setState({
+        previousSelectedElementIds: {},
+        selectedElementIds: previousSelectedElementIds,
+      });
+    }
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -1275,6 +1291,9 @@ class App extends React.Component<any, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      selectedElementIds: {},
+    });
     gesture.initialScale = this.state.zoom;
   });
 
@@ -1288,6 +1307,11 @@ class App extends React.Component<any, AppState> {
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    const { previousSelectedElementIds } = this.state;
+    this.setState({
+      previousSelectedElementIds: {},
+      selectedElementIds: previousSelectedElementIds,
+    });
     gesture.initialScale = null;
   });
 
@@ -2097,6 +2121,11 @@ class App extends React.Component<any, AppState> {
                 ? prevState.editingGroupId
                 : null,
           }));
+          const { selectedElementIds } = this.state;
+          this.setState({
+            selectedElementIds: {},
+            previousSelectedElementIds: selectedElementIds,
+          });
         }
 
         // If we click on something
@@ -2138,6 +2167,11 @@ class App extends React.Component<any, AppState> {
             hitElementWasAddedToSelection = true;
           }
         }
+
+        const { selectedElementIds } = this.state;
+        this.setState({
+          previousSelectedElementIds: selectedElementIds,
+        });
       }
     } else {
       this.setState({
@@ -2746,9 +2780,11 @@ class App extends React.Component<any, AppState> {
         passive: false,
       });
       this.canvas.addEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas.addEventListener(EVENT.TOUCH_END, this.onTapEnd);
     } else {
       this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
       this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas?.removeEventListener(EVENT.TOUCH_END, this.onTapEnd);
     }
   };
 
@@ -2862,6 +2898,7 @@ class App extends React.Component<any, AppState> {
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
     const { deltaX, deltaY } = event;
+    const { selectedElementIds, previousSelectedElementIds } = this.state;
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
@@ -2872,8 +2909,21 @@ class App extends React.Component<any, AppState> {
         delta = MAX_STEP;
       }
       delta *= sign;
+      if (Object.keys(previousSelectedElementIds).length !== 0) {
+        setTimeout(() => {
+          this.setState({
+            selectedElementIds: previousSelectedElementIds,
+            previousSelectedElementIds: {},
+          });
+        }, 1000);
+      }
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+        selectedElementIds: {},
+        previousSelectedElementIds:
+          Object.keys(selectedElementIds).length !== 0
+            ? selectedElementIds
+            : previousSelectedElementIds,
       }));
       return;
     }
