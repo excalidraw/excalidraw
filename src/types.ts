@@ -57,6 +57,7 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
+  previousSelectedElementIds: { [id: string]: boolean };
   collaborators: Map<
     string,
     {
