@@ -43,6 +43,7 @@ export enum EVENT {
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
+  TOUCH_END = "touchend",
 }
 
 export const ENV = {

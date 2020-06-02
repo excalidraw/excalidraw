@@ -48,6 +48,7 @@ export const getDefaultAppState = (): AppState => {
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
+    previousSelectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
