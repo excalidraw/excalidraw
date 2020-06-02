@@ -15262,6 +15262,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -15274,6 +15275,7 @@ Object {
   "multiElement": null,
   "name": "Unbenannt-201933152653",
   "openMenu": null,
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15322,6 +15324,7 @@ Object {
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
+  "editingLinearElement": null,
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
@@ -15334,6 +15337,7 @@ Object {
   "multiElement": null,
   "name": "Untitled-201933152653",
   "openMenu": null,
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15385,6 +15389,7 @@ Object {
     Object {
       "appState": Object {
         "editingGroupId": null,
+        "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
