@@ -14,13 +14,7 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import {
-  SVG_NS,
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-} from "../utils";
+import { SVG_NS, distance, getFontString, getFontFamilyString } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
@@ -43,11 +37,6 @@ const generateElementCanvas = (
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
-
-  // To be able to draw a nested element with RTL, we have to append it to the DOM
-  canvas.style.display = "none";
-  canvas.id = "nested-canvas-element";
-  document.body.appendChild(canvas);
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
@@ -111,14 +100,12 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        context.canvas.setAttribute("dir", isRTL(element.text) ? "rtl" : "ltr");
         const font = context.font;
         context.font = getFontString(element);
         const fillStyle = context.fillStyle;
         context.fillStyle = element.strokeColor;
         const textAlign = context.textAlign;
         context.textAlign = element.textAlign as CanvasTextAlign;
-
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
@@ -132,7 +119,7 @@ const drawElementOnCanvas = (
         for (let i = 0; i < lines.length; i++) {
           context.fillText(
             lines[i],
-            horizontalOffset,
+            0 + horizontalOffset,
             (i + 1) * lineHeight - verticalOffset,
           );
         }
@@ -355,12 +342,6 @@ const drawElementFromCanvas = (
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-  // Clear the nested element we appended to the DOM
-  const node = document.querySelector("#nested-canvas-element");
-  if (node && node.parentNode) {
-    node.parentNode.removeChild(node);
-  }
 };
 
 export const renderElement = (
@@ -394,12 +375,9 @@ export const renderElement = (
     case "draw":
     case "arrow":
     case "text": {
+      const elementWithCanvas = generateElement(element, generator, sceneState);
+
       if (renderOptimizations) {
-        const elementWithCanvas = generateElement(
-          element,
-          generator,
-          sceneState,
-        );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -509,14 +487,17 @@ export const renderElementToSvg = (
         const lineHeight = element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
-          element.textAlign === "center" ? element.width / 2 : element.width;
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
             : element.textAlign === "right"
             ? "end"
             : "start";
-        const direction = isRTL(element.text) ? "rtl" : "ltr";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
@@ -527,7 +508,6 @@ export const renderElementToSvg = (
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
-          text.setAttribute("direction", direction);
           node.appendChild(text);
         }
         svgRoot.appendChild(node);
