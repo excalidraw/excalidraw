@@ -17,7 +17,7 @@ export const actionDuplicateSelection = register({
     // duplicate point if selected while editing multi-point element
     if (appState.editingLinearElement) {
       const { activePointIndex, elementId } = appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
+      const { element } = appState.editingLinearElement;
       if (!element || activePointIndex === null) {
         return false;
       }

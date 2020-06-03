@@ -39,7 +39,8 @@ import {
   getElementContainingPosition,
   getNormalizedZoom,
   getSelectedElements,
-  globalSceneState,
+  GlobalScene,
+  localSceneMap,
   isSomeElementSelected,
   calculateScrollCenter,
 } from "../scene";
@@ -247,6 +248,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
+  private localScene: GlobalScene;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -266,11 +268,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...this.getCanvasOffsets(),
     };
 
+    this.localScene = new GlobalScene();
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
-      () => globalSceneState.getElementsIncludingDeleted(),
+      () => this.localScene.getElementsIncludingDeleted(),
     );
     this.actionManager.registerAll(actions);
 
@@ -308,7 +311,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
-          elements={globalSceneState.getElements()}
+          elements={this.localScene.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
@@ -368,7 +371,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement = element;
           }
         });
-        globalSceneState.replaceAllElements(actionResult.elements);
+        this.localScene.replaceAllElements(actionResult.elements);
         if (actionResult.commitToHistory) {
           history.resumeRecording();
         }
@@ -394,7 +397,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             if (actionResult.syncHistory) {
               history.setCurrentState(
                 this.state,
-                globalSceneState.getElementsIncludingDeleted(),
+                this.localScene.getElementsIncludingDeleted(),
               );
             }
           },
@@ -421,7 +424,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    globalSceneState.getElementsIncludingDeleted().forEach((element) => {
+    this.localScene.getElementsIncludingDeleted().forEach((element) => {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
       }
@@ -562,9 +565,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    this.removeSceneCallback = globalSceneState.addCallback(
-      this.onSceneUpdated,
-    );
+    this.removeSceneCallback = this.localScene.addCallback(this.onSceneUpdated);
 
     this.addEventListeners();
     this.setState(this.getCanvasOffsets(), () => {
@@ -581,7 +582,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private onResize = withBatchedUpdates(() => {
-    globalSceneState
+    this.localScene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
     this.setState({});
@@ -684,7 +685,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (
       this.state.isCollaborating &&
-      globalSceneState.getElements().length > 0
+      this.localScene.getElements().length > 0
     ) {
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
@@ -713,7 +714,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (
       this.state.editingLinearElement &&
-      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
+      !this.state.selectedElementIds[this.state.editingLinearElement.element.id]
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
@@ -753,7 +754,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
       cursorButton[socketID] = user.button;
     });
-    const elements = globalSceneState.getElements();
+    const elements = this.localScene.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements.filter((element) => {
         // don't render text element that's being currently edited (it's
@@ -798,14 +799,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.saveDebounced();
 
     if (
-      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()) >
+      getDrawingVersion(this.localScene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
       this.queueBroadcastAllElements();
     }
 
-    history.record(this.state, globalSceneState.getElementsIncludingDeleted());
+    history.record(this.state, this.localScene.getElementsIncludingDeleted());
   }
 
   // Copy/paste
@@ -828,11 +829,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private copyAll = () => {
-    copyToAppClipboard(globalSceneState.getElements(), this.state);
+    copyToAppClipboard(this.localScene.getElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
-    const elements = globalSceneState.getElements();
+    const elements = this.localScene.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
     exportCanvas(
@@ -846,14 +847,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private copyToClipboardAsSvg = () => {
     const selectedElements = getSelectedElements(
-      globalSceneState.getElements(),
+      this.localScene.getElements(),
       this.state,
     );
     exportCanvas(
       "clipboard-svg",
       selectedElements.length
         ? selectedElements
-        : globalSceneState.getElements(),
+        : this.localScene.getElements(),
       this.state,
       this.canvas!,
       this.state,
@@ -958,15 +959,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const dy = y - elementsCenterY;
     const groupIdMap = new Map();
 
-    const newElements = clipboardElements.map((element) =>
-      duplicateElement(this.state.editingGroupId, groupIdMap, element, {
+    const newElements = clipboardElements.map((element) => {
+      localSceneMap.set(element, this.localScene);
+      return duplicateElement(this.state.editingGroupId, groupIdMap, element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
-      }),
-    );
+      });
+    });
 
-    globalSceneState.replaceAllElements([
-      ...globalSceneState.getElementsIncludingDeleted(),
+    this.localScene.replaceAllElements([
+      ...this.localScene.getElementsIncludingDeleted(),
       ...newElements,
     ]);
     history.resumeRecording();
@@ -1004,8 +1006,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
     });
 
-    globalSceneState.replaceAllElements([
-      ...globalSceneState.getElementsIncludingDeleted(),
+    localSceneMap.set(element, this.localScene);
+    this.localScene.replaceAllElements([
+      ...this.localScene.getElementsIncludingDeleted(),
       element,
     ]);
     this.setState({ selectedElementIds: { [element.id]: true } });
@@ -1116,15 +1119,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // elements with more staler versions than ours, ignore them
         // and keep ours.
         if (
-          globalSceneState.getElementsIncludingDeleted() == null ||
-          globalSceneState.getElementsIncludingDeleted().length === 0
+          this.localScene.getElementsIncludingDeleted() == null ||
+          this.localScene.getElementsIncludingDeleted().length === 0
         ) {
-          globalSceneState.replaceAllElements(remoteElements);
+          this.localScene.replaceAllElements(remoteElements);
         } else {
           // create a map of ids so we don't have to iterate
           // over the array more than once.
           const localElementMap = getElementMap(
-            globalSceneState.getElementsIncludingDeleted(),
+            this.localScene.getElementsIncludingDeleted(),
           );
 
           // Reconcile
@@ -1183,7 +1186,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             newElements,
           );
 
-          globalSceneState.replaceAllElements(newElements);
+          this.localScene.replaceAllElements(newElements);
         }
 
         // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
@@ -1317,7 +1320,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     let syncableElements = getSyncableElements(
-      globalSceneState.getElementsIncludingDeleted(),
+      this.localScene.getElementsIncludingDeleted(),
     );
 
     if (!syncAll) {
@@ -1340,7 +1343,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(globalSceneState.getElementsIncludingDeleted()),
+      getDrawingVersion(this.localScene.getElementsIncludingDeleted()),
     );
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
@@ -1427,8 +1430,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         (event.shiftKey
           ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
           : ELEMENT_TRANSLATE_AMOUNT);
-      globalSceneState.replaceAllElements(
-        globalSceneState.getElementsIncludingDeleted().map((el) => {
+      this.localScene.replaceAllElements(
+        this.localScene.getElementsIncludingDeleted().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
             const update: { x?: number; y?: number } = {};
             if (event.key === KEYS.ARROW_LEFT) {
@@ -1448,7 +1451,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
-        globalSceneState.getElements(),
+        this.localScene.getElements(),
         this.state,
       );
 
@@ -1458,7 +1461,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         if (
           !this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !== selectedElements[0].id
+          this.state.editingLinearElement.element.id !== selectedElements[0].id
         ) {
           history.resumeRecording();
           this.setState({
@@ -1558,7 +1561,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private setElements = (elements: readonly ExcalidrawElement[]) => {
-    globalSceneState.replaceAllElements(elements);
+    this.localScene.replaceAllElements(elements);
   };
 
   private handleTextWysiwyg(
@@ -1569,9 +1572,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
+    localSceneMap.set(element, this.localScene);
     const updateElement = (text: string, isDeleted = false) => {
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
+      this.localScene.replaceAllElements([
+        ...this.localScene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(_element, {
               text,
@@ -1624,6 +1628,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setCursorForShape(this.state.elementType);
         }
       }),
+      element,
     });
     // deselect all other elements when inserting text
     this.setState({
@@ -1642,7 +1647,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
     const element = getElementAtPosition(
-      globalSceneState.getElements(),
+      this.localScene.getElements(),
       this.state,
       x,
       y,
@@ -1715,8 +1720,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
       }
     } else {
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getElementsIncludingDeleted(),
+      this.localScene.replaceAllElements([
+        ...this.localScene.getElementsIncludingDeleted(),
         element,
       ]);
 
@@ -1752,14 +1757,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     const selectedElements = getSelectedElements(
-      globalSceneState.getElements(),
+      this.localScene.getElements(),
       this.state,
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         !this.state.editingLinearElement ||
-        this.state.editingLinearElement.elementId !== selectedElements[0].id
+        this.state.editingLinearElement.element.id !== selectedElements[0].id
       ) {
         history.resumeRecording();
         this.setState({
@@ -1781,7 +1786,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
     if (selectedGroupIds.length > 0) {
-      const elements = globalSceneState.getElements();
+      const elements = this.localScene.getElements();
       const hitElement = getElementAtPosition(
         elements,
         this.state,
@@ -1803,7 +1808,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               selectedElementIds: { [hitElement!.id]: true },
               selectedGroupIds: {},
             },
-            globalSceneState.getElements(),
+            this.localScene.getElements(),
           ),
         );
         return;
@@ -1960,7 +1965,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    const elements = globalSceneState.getElements();
+    const elements = this.localScene.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
     if (
@@ -2262,7 +2267,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       window.devicePixelRatio,
     );
     const selectedElements = getSelectedElements(
-      globalSceneState.getElements(),
+      this.localScene.getElements(),
       this.state,
     );
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
@@ -2377,7 +2382,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (this.state.elementType === "selection") {
-      const elements = globalSceneState.getElements();
+      const elements = this.localScene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithResizeHandler = getElementWithResizeHandler(
@@ -2491,12 +2496,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                     [hitElement!.id]: true,
                   },
                 },
-                globalSceneState.getElements(),
+                this.localScene.getElements(),
               );
             });
             // TODO: this is strange...
-            globalSceneState.replaceAllElements(
-              globalSceneState.getElementsIncludingDeleted(),
+            this.localScene.replaceAllElements(
+              this.localScene.getElementsIncludingDeleted(),
             );
             pointerDownState.hit.wasAddedToSelection = true;
           }
@@ -2601,6 +2606,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
       });
+      localSceneMap.set(element, this.localScene);
+
       this.setState((prevState) => ({
         selectedElementIds: {
           ...prevState.selectedElementIds,
@@ -2610,8 +2617,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getElementsIncludingDeleted(),
+      this.localScene.replaceAllElements([
+        ...this.localScene.getElementsIncludingDeleted(),
         element,
       ]);
       this.setState({
@@ -2643,14 +2650,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       opacity: this.state.currentItemOpacity,
     });
 
+    localSceneMap.set(element, this.localScene);
+
+
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
         draggingElement: element,
       });
     } else {
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getElementsIncludingDeleted(),
+      this.localScene.replaceAllElements([
+        ...this.localScene.getElementsIncludingDeleted(),
         element,
       ]);
       this.setState({
@@ -2672,7 +2682,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (pointerDownState.drag.offset === null) {
         pointerDownState.drag.offset = tupleToCoors(
           getDragOffsetXY(
-            getSelectedElements(globalSceneState.getElements(), this.state),
+            getSelectedElements(this.localScene.getElements(), this.state),
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
@@ -2735,7 +2745,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (pointerDownState.resize.isResizing) {
         const selectedElements = getSelectedElements(
-          globalSceneState.getElements(),
+          this.localScene.getElements(),
           this.state,
         );
         const resizeHandle = pointerDownState.resize.handle;
@@ -2796,7 +2806,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
         const selectedElements = getSelectedElements(
-          globalSceneState.getElements(),
+          this.localScene.getElements(),
           this.state,
         );
         if (selectedElements.length > 0) {
@@ -2818,7 +2828,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             const nextElements = [];
             const elementsToAppend = [];
             const groupIdMap = new Map();
-            for (const element of globalSceneState.getElementsIncludingDeleted()) {
+            for (const element of this.localScene.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
@@ -2846,7 +2856,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 nextElements.push(element);
               }
             }
-            globalSceneState.replaceAllElements([
+            this.localScene.replaceAllElements([
               ...nextElements,
               ...elementsToAppend,
             ]);
@@ -2925,7 +2935,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (this.state.elementType === "selection") {
-        const elements = globalSceneState.getElements();
+        const elements = this.localScene.getElements();
         if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
           this.setState({
             selectedElementIds: {},
@@ -2949,7 +2959,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 }, {} as any),
               },
             },
-            globalSceneState.getElements(),
+            this.localScene.getElements(),
           ),
         );
       }
@@ -3065,8 +3075,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isInvisiblySmallElement(draggingElement)
       ) {
         // remove invisible element which was added in onPointerDown
-        globalSceneState.replaceAllElements(
-          globalSceneState.getElementsIncludingDeleted().slice(0, -1),
+        this.localScene.replaceAllElements(
+          this.localScene.getElementsIncludingDeleted().slice(0, -1),
         );
         this.setState({
           draggingElement: null,
@@ -3086,8 +3096,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        globalSceneState.replaceAllElements(
-          globalSceneState
+        this.localScene.replaceAllElements(
+          this.localScene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
         );
@@ -3143,7 +3153,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (
         elementType !== "selection" ||
-        isSomeElementSelected(globalSceneState.getElements(), this.state)
+        isSomeElementSelected(this.localScene.getElements(), this.state)
       ) {
         history.resumeRecording();
       }
@@ -3283,7 +3293,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       window.devicePixelRatio,
     );
 
-    const elements = globalSceneState.getElements();
+    const elements = this.localScene.getElements();
     const element = getElementAtPosition(
       elements,
       this.state,
@@ -3409,8 +3419,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     scale: number,
   ) {
     const elementClickedInside = getElementContainingPosition(
-      globalSceneState
-        .getElementsIncludingDeleted()
+      this.localScene.getElementsIncludingDeleted()
         .filter((element) => !isTextElement(element)),
       x,
       y,
@@ -3468,7 +3477,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private saveDebounced = debounce(() => {
     saveToLocalStorage(
-      globalSceneState.getElementsIncludingDeleted(),
+      this.localScene.getElementsIncludingDeleted(),
       this.state,
     );
   }, 300);
@@ -3515,10 +3524,10 @@ if (
   Object.defineProperties(window.h, {
     elements: {
       get() {
-        return globalSceneState.getElementsIncludingDeleted();
+        return this.localScene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return globalSceneState.replaceAllElements(elements);
+        return this.localScene.replaceAllElements(elements);
       },
     },
     history: {

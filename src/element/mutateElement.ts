@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
-import { globalSceneState } from "../scene";
+import { localSceneMap } from "../scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
@@ -81,8 +81,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   element.version++;
   element.versionNonce = randomInteger();
-
-  globalSceneState.informMutation();
+  localSceneMap.get(element)?.informMutation();
 };
 
 export const newElementWith = <TElement extends ExcalidrawElement>(

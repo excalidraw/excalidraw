@@ -9,7 +9,6 @@ import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { SceneHistory } from "../history";
-import { globalSceneState } from "../scene";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
@@ -18,6 +17,7 @@ export class LinearElementEditor {
   public activePointIndex: number | null;
   public draggingElementPointIndex: number | null;
   public lastUncommittedPoint: Point | null;
+  public element: NonDeleted<ExcalidrawLinearElement>;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     LinearElementEditor.normalizePoints(element);
@@ -25,6 +25,7 @@ export class LinearElementEditor {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
+    this.element = element;
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
     this.draggingElementPointIndex = null;
@@ -40,13 +41,13 @@ export class LinearElementEditor {
    * @param id the `elementId` from the instance of this class (so that we can
    *  statically guarantee this method returns an ExcalidrawLinearElement)
    */
-  static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
-    const element = globalSceneState.getNonDeletedElement(id);
-    if (element) {
-      return element as NonDeleted<ExcalidrawLinearElement>;
-    }
-    return null;
-  }
+  // static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
+  //   const element = globalSceneState.getNonDeletedElement(id);
+  //   if (element) {
+  //     return element as NonDeleted<ExcalidrawLinearElement>;
+  //   }
+  //   return null;
+  // }
 
   /** @returns whether point was dragged */
   static handlePointDragging(
@@ -61,9 +62,7 @@ export class LinearElementEditor {
       return false;
     }
     const { editingLinearElement } = appState;
-    let { draggingElementPointIndex, elementId } = editingLinearElement;
-
-    const element = LinearElementEditor.getElement(elementId);
+    let { draggingElementPointIndex, element } = editingLinearElement;
     if (!element) {
       return false;
     }
@@ -113,8 +112,7 @@ export class LinearElementEditor {
   static handlePointerUp(
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { elementId, draggingElementPointIndex } = editingLinearElement;
-    const element = LinearElementEditor.getElement(elementId);
+    const { element, draggingElementPointIndex } = editingLinearElement;
     if (!element) {
       return editingLinearElement;
     }
@@ -162,8 +160,7 @@ export class LinearElementEditor {
       return ret;
     }
 
-    const { elementId } = appState.editingLinearElement;
-    const element = LinearElementEditor.getElement(elementId);
+    const { element } = appState.editingLinearElement;
 
     if (!element) {
       return ret;
@@ -222,8 +219,7 @@ export class LinearElementEditor {
     scenePointerY: number,
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { elementId, lastUncommittedPoint } = editingLinearElement;
-    const element = LinearElementEditor.getElement(elementId);
+    const { element, lastUncommittedPoint } = editingLinearElement;
     if (!element) {
       return editingLinearElement;
     }
