@@ -71,6 +71,7 @@
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Save",
+    "saveAs": "Save as",
     "load": "Load",
     "getShareableLink": "Get shareable link",
     "close": "Close",

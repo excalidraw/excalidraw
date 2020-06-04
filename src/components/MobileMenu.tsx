@@ -84,6 +84,7 @@ export const MobileMenu = ({
               <Stack.Col gap={4}>
                 {actionManager.renderAction("loadScene")}
                 {actionManager.renderAction("saveScene")}
+                {actionManager.renderAction("saveAsScene")}
                 {exportButton}
                 {actionManager.renderAction("clearCanvas")}
                 <RoomDialog
