@@ -665,6 +665,10 @@ describe("regression tests", () => {
     });
     // switching to german, `hachure` label should no longer exist
     expect(screen.queryByText(/hachure/i)).toBeNull();
+    // reset language
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "en" },
+    });
   });
 
   it("make a group and duplicate it", () => {
