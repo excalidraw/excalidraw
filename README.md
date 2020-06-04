@@ -9,6 +9,7 @@
     </a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
+      <img src="https://img.shields.io/docker/pulls/getexcalidraw/excalidraw.svg">
     </a>
   </p>
 </div>
