@@ -707,8 +707,15 @@ class App extends React.Component<any, AppState> {
       ) {
         return;
       }
-      const data = await getClipboardContent(event);
-      if (data.elements) {
+      const data = await getClipboardContent(
+        this.state,
+        cursorX,
+        cursorY,
+        event,
+      );
+      if (data.error) {
+        alert(data.error);
+      } else if (data.elements) {
         this.addElementsFromPaste(data.elements);
       } else if (data.text) {
         this.addTextFromPaste(data.text);
