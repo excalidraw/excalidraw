@@ -122,7 +122,7 @@
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHITH, przytrzymaj ALT by zmienać rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "",
+    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },

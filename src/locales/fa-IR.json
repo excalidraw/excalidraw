@@ -68,8 +68,8 @@
     "export": "تبدیل",
     "exportToPng": "تبدیل به PNG",
     "exportToSvg": "تبدیل به SVG",
-    "copyToClipboard": "کپی در حافطه موقت",
-    "copyPngToClipboard": "کپی PNG در حافطه موقت",
+    "copyToClipboard": "کپی در حافظه موقت",
+    "copyPngToClipboard": "کپی PNG در حافظه موقت",
     "save": "ذخیره",
     "load": "بارگذاری",
     "getShareableLink": "دریافت لینک قابل اشتراک",
@@ -93,19 +93,19 @@
   "alerts": {
     "clearReset": "با این کار کل بوم پاک می شود. آیا مطمئنید؟",
     "couldNotCreateShareableLink": "عدم توانایی در ساخت یک لینک قابل اشتراک.",
-    "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نا معتبر",
+    "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
-    "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
-    "uploadedSecurly": ""
+    "couldNotCopyToClipboard": "کپی نشد. از مرورگر Chrome استفاده کنید.",
+    "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
+    "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند."
   },
   "toolBar": {
-    "selection": "",
-    "draw": "",
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
+    "selection": "گزینش",
+    "draw": "طراحی آزاد",
+    "rectangle": "مستطیل",
+    "diamond": "لوزی",
+    "ellipse": "بیضی",
     "arrow": "پیکان",
     "line": "خط",
     "text": "متن",
@@ -122,9 +122,9 @@
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
+    "lineEditor_pointSelected": "برای حذف نقطه کلید Delete را بزنید یا برای جابجایی بکشید",
+    "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید"
   },
   "errorSplash": {
     "headingMain_pre": "با مشکلی مواجه شدیم. این را امتحان کنید ",
@@ -140,36 +140,36 @@
     "sceneContent": "محتوای صحنه:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_persistenceWarning": "",
-    "desc_shareLink": "",
-    "desc_exitSession": ""
+    "desc_intro": "می توانید افرادی را به صحنه فعلی خود دعوت کنید تا با شما همکاری کنند.",
+    "desc_privacy": "نگران نباشید، این جلسه از رمزگذاری دوطرفه استفاده می کند، پس هر چیزی بکشید خصوصی خواهد ماند. حتی سرور ما نمیتواند ببیند چیزی که شما طراحی میکنید.",
+    "button_startSession": "شروع جلسه",
+    "button_stopSession": "پایان جلسه",
+    "desc_inProgressIntro": "جلسه همکاری آنلاین در حال انجام است.",
+    "desc_persistenceWarning": "توجه داشته باشید که داده های روی بوم به صورت P2P بین همکاران به اشتراک گذاشته می شوند و در سرور ما همچنان نمی ماند. پس، اگر ارتباط شما قطع شود، داده ها را از دست خواهید داد مگر اینکه آنها را به یک فایل یا یک لینک قابل اشتراک تبدیل کنید.",
+    "desc_shareLink": "این لینک را با هر کسی که می خواهید با او همکاری کنید به اشتراک بگذارید:",
+    "desc_exitSession": "با پایان دادن جلسه، شما از اتاق حذف میکند، اما می توانید به صورت محلی کار خود را با بوم ادامه دهید. توجه داشته باشید که این مورد بر سایر افراد تأثیر نمی گذارد و همچنان می توانند در نسخه خود همکاری کنند."
   },
   "errorDialog": {
-    "title": ""
+    "title": "خطا"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": ""
+    "title": "میانبرهای صفحه کلید",
+    "shapes": "شکل‌ها",
+    "or": "یا",
+    "click": "کلیک",
+    "drag": "کشیدن",
+    "curvedArrow": "فلش خمیده",
+    "curvedLine": "منحنی",
+    "editor": "ویرایشگر",
+    "view": "نمایش",
+    "blog": "بلاگ ما را بخوانید",
+    "howto": "راهنمای ما را دنبال کنید",
+    "github": "اشکالی می بینید؟ گزارش دهید",
+    "textNewLine": "یک خط جدید اضافه کنید (متن)",
+    "textFinish": "پایان ویرایش (متن)",
+    "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
   }
 }
