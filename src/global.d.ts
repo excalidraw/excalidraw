@@ -26,4 +26,5 @@ type ResolutionType<T extends (...args: any) => any> = T extends (
   ? R
   : any;
 
+// https://github.com/krzkaczor/ts-essentials
 type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
