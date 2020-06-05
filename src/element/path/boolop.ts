@@ -5,6 +5,7 @@ import { newPathElement } from "../index";
 import { ExcalidrawElement, NonDeletedExcalidrawElement } from "../types";
 import { generateShape } from "../../renderer/renderElement";
 import { getCommonBounds } from "../bounds";
+import { radianToDegree } from "../../math";
 
 import Path from "./Path";
 
@@ -46,9 +47,10 @@ function normalizeShape(shape: Drawable) {
 function objectToPath(
   rc: RoughCanvas,
   element: ExcalidrawElement,
-  options: {
-    position?: number[];
-  } = {},
+  transform?: {
+    translate?: number[];
+    rotate?: number;
+  },
 ) {
   const shape = generateShape(
     {
@@ -75,9 +77,7 @@ function objectToPath(
     path = new Path(element.d);
   }
 
-  if (options.position) {
-    path.position(options.position);
-  }
+  path.transform(transform);
 
   return path;
 }
@@ -90,20 +90,45 @@ export function differenceElement(
   const [offsetX, offsetY] = getCommonBounds([element1, element2]);
   const p1 = [element1.x - offsetX, element1.y - offsetY];
   const p2 = [element2.x - offsetX, element2.y - offsetY];
+  const d1 = radianToDegree(element1.angle);
+  const d2 = radianToDegree(element2.angle);
 
   const path1 = objectToPath(rc, element1, {
-    position: p1,
+    translate: p1,
+    rotate: d1,
   });
   const path2 = objectToPath(rc, element2, {
-    position: p2,
+    translate: p2,
+    rotate: d2,
   });
+
+  const [cx0, cy0] = path1.getCenterPoint();
+  const box0 = path1.getBoundingBox();
 
   path1.difference(path2);
 
-  path1.position(p1.map((c) => -c));
+  path1.transform({
+    rotate: -d1,
+  });
+
+  const [cx1, cy1] = path1.getCenterPoint();
+
+  path1.transform({
+    translate: [-p1[0] - (cx1 - cx0), -p1[1] - (cy1 - cy0)],
+  });
+
+  const box1 = path1.getBoundingBox();
+
+  path1.transform({
+    translate: [-box1.x, -box1.y],
+  });
 
   const element = newPathElement({
     ...element1,
+    // x: element1.x + (box1.x - box0.x),
+    // y: element1.y + (box1.y - box0.y),
+    width: box1.width,
+    height: box1.height,
     d: path1.toPathString(),
     hollow: path1.isHollow,
   });
