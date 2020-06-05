@@ -27,7 +27,6 @@ export type ExportCB = (
 const ExportModal = ({
   elements,
   appState,
-  exportPadding = 10,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -36,7 +35,6 @@ const ExportModal = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
-  exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
@@ -67,7 +65,6 @@ const ExportModal = ({
     const canvas = exportToCanvas(exportedElements, appState, {
       exportBackground,
       viewBackgroundColor,
-      exportPadding,
       scale,
       shouldAddWatermark,
     });
@@ -79,7 +76,6 @@ const ExportModal = ({
     appState,
     exportedElements,
     exportBackground,
-    exportPadding,
     viewBackgroundColor,
     scale,
     shouldAddWatermark,
@@ -165,7 +161,6 @@ const ExportModal = ({
 export const ExportDialog = ({
   elements,
   appState,
-  exportPadding = 10,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -174,7 +169,6 @@ export const ExportDialog = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
-  exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
@@ -209,7 +203,6 @@ export const ExportDialog = ({
           <ExportModal
             elements={elements}
             appState={appState}
-            exportPadding={exportPadding}
             actionManager={actionManager}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}

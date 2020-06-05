@@ -12,18 +12,20 @@ import { DEFAULT_FONT_FAMILY } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
+const getExportPadding = (width: number, height: number) => {
+  return Math.max(10, Math.floor(Math.max(width, height) * 0.05));
+};
+
 export const exportToCanvas = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   {
     exportBackground,
-    exportPadding = 10,
     viewBackgroundColor,
     scale = 1,
     shouldAddWatermark,
   }: {
     exportBackground: boolean;
-    exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
@@ -43,6 +45,7 @@ export const exportToCanvas = (
 
   // calculate smallest area to fit the contents in
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
+  const exportPadding = getExportPadding(maxX - minX, maxY - minY);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
     distance(minY, maxY) +
@@ -82,12 +85,10 @@ export const exportToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
-    exportPadding = 10,
     viewBackgroundColor,
     shouldAddWatermark,
   }: {
     exportBackground: boolean;
-    exportPadding?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
@@ -100,6 +101,7 @@ export const exportToSvg = (
 
   // calculate canvas dimensions
   const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
+  const exportPadding = getExportPadding(maxX - minX, maxY - minY);
   const width = distance(minX, maxX) + exportPadding * 2;
   const height =
     distance(minY, maxY) +

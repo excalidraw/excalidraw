@@ -287,14 +287,12 @@ export const exportCanvas = async (
   canvas: HTMLCanvasElement,
   {
     exportBackground,
-    exportPadding = 10,
     viewBackgroundColor,
     name,
     scale = 1,
     shouldAddWatermark,
   }: {
     exportBackground: boolean;
-    exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
@@ -308,7 +306,6 @@ export const exportCanvas = async (
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
-      exportPadding,
       shouldAddWatermark,
     });
     if (type === "svg") {
@@ -325,7 +322,6 @@ export const exportCanvas = async (
   const tempCanvas = exportToCanvas(elements, appState, {
     exportBackground,
     viewBackgroundColor,
-    exportPadding,
     scale,
     shouldAddWatermark,
   });
