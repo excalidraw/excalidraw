@@ -16,10 +16,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
-    "strokeStyle": "",
-    "strokeStyle_solid": "",
-    "strokeStyle_dashed": "",
-    "strokeStyle_dotted": "",
+    "strokeStyle": "笔廓风格(_Y)",
+    "strokeStyle_solid": "实线",
+    "strokeStyle_dashed": "虚线",
+    "strokeStyle_dotted": "加点",
     "sloppiness": "边框",
     "opacity": "透明度",
     "textAlign": "文本对齐",
@@ -27,7 +27,7 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "添加背景",
-    "addWatermark": "",
+    "addWatermark": "添加“使用 Excalidraw”等字",
     "handDrawn": "手写",
     "normal": "正常",
     "code": "代码",
@@ -58,10 +58,10 @@
     "duplicateSelection": "复制所有已选择的元素",
     "untitled": "无标题",
     "name": "名字",
-    "yourName": "",
-    "madeWithExcalidraw": "",
-    "group": "",
-    "ungroup": ""
+    "yourName": "您的姓名",
+    "madeWithExcalidraw": "添加“使用 Excalidraw”等字",
+    "group": "组选",
+    "ungroup": "取消组选"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -87,8 +87,8 @@
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "切换禅模式",
+    "exitZenMode": "退出禅模式"
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -102,7 +102,7 @@
   },
   "toolBar": {
     "selection": "选择",
-    "draw": "",
+    "draw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -118,12 +118,12 @@
   },
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
-    "freeDraw": "",
+    "freeDraw": "单击并拖动，完成后发布",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
-    "resize": "",
+    "resize": "您可以在调整大小时按住SHIFT来限制比例，\n按住ALT来从中心调整大小",
     "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_info": "双击或按回车键编辑",
+    "lineEditor_pointSelected": "点击删除键以删除或拖动到回收站",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
@@ -157,7 +157,7 @@
     "shapes": "形状",
     "or": "或者",
     "click": "点击",
-    "drag": "",
+    "drag": "拖动",
     "curvedArrow": "曲线（带有箭头）",
     "curvedLine": "曲线（无箭头）",
     "editor": "编辑器",
@@ -167,9 +167,9 @@
     "github": "发现问题？提交",
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
-    "zoomToFit": ""
+    "zoomToFit": "缩放以适应所有元素"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "您的绘图是从端到端加密的，因此Excalidraw的服务器永远不会看到。"
   }
 }
