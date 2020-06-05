@@ -15,10 +15,11 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import { SVG_NS, distance } from "../utils";
-import { isPathALoop } from "../math";
+import { isPathALoop, radianToDegree } from "../math";
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
+const rM = /(?<=.{1})(?=M)/g; // excludes first matching
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -143,6 +144,42 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
+function fixPath(d: string): string {
+  return `${d.replace(rM, "M0,0")}M0,0`;
+}
+
+function fixShape(shape: Drawable): Drawable {
+  const indies: { i: number; point: number[] }[] = [];
+  const ops = shape.sets[0].ops;
+
+  ops.splice(ops.length - 2, 2);
+
+  const length = ops.length - 2;
+
+  for (let i = 1; i < length; i++) {
+    if (ops[i].data[0] < 4) {
+      const { data: p1 } = ops[i + 1];
+      const { data: p2 } = ops[i + 2];
+
+      if (p1[0] < 4 && p2[0] > 4) {
+        indies.unshift({
+          i,
+          point: p2,
+        });
+      }
+    }
+  }
+
+  indies.forEach(({ i, point }) => {
+    ops.splice(i, 2, {
+      data: point,
+      op: "move",
+    });
+  });
+
+  return shape;
+}
+
 export function getShapeForElement(element: ExcalidrawElement) {
   return shapeCache.get(element);
 }
@@ -266,7 +303,9 @@ export function generateShape(
       break;
     }
     case "path": {
-      shape = generator.path(element.d, {
+      const fixedPath = fixPath(element.d);
+
+      shape = generator.path(fixedPath, {
         stroke: element.strokeColor,
         fill:
           element.backgroundColor === "transparent"
@@ -278,6 +317,10 @@ export function generateShape(
         seed: element.seed,
         combineNestedSvgPaths: element.hollow,
       });
+
+      if (element.roughness > 0 && element.fillStyle === "solid") {
+        shape = fixShape(shape);
+      }
 
       break;
     }
@@ -414,7 +457,7 @@ export function renderElementToSvg(
 
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
-  const degree = (180 * element.angle) / Math.PI;
+  const degree = radianToDegree(element.angle);
   const generator = rsvg.generator;
   switch (element.type) {
     case "selection": {

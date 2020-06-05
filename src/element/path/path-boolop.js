@@ -430,7 +430,7 @@ function getPathDirection(pathSegArr) {
  * @returns array validInters (filtered path intersections calculated by Raphael.pathIntersections())
  */
 function getIntersections(path1, path2) {
-  const d = 0.1; //min. deviation to assume point as different from another
+  const d = 0.05; //min. deviation to assume point as different from another
   const inters = R.pathIntersection(path1, path2);
   const validInters = [];
   let valid = true;

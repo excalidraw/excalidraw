@@ -5,7 +5,10 @@ import {
   getTotalLength,
   getPointAtLength,
   normalizePath,
+  pathDimensions,
 } from "./R";
+import Matrix from "./Matrix";
+import { Point } from "roughjs/bin/geometry";
 
 function isHollow(path: (string | number)[][]) {
   const index = path.findIndex(
@@ -15,7 +18,7 @@ function isHollow(path: (string | number)[][]) {
   const head = path[0];
   const tail = path[index - 1];
 
-  return (
+  return !!(
     tail &&
     tail[tail.length - 1] === head[head.length - 1] &&
     tail[tail.length - 2] === head[head.length - 2]
@@ -30,15 +33,41 @@ export default class Path {
     this.path = typeof d === "string" ? parsePathString(d) : this.toPath(d);
   }
 
-  position([x, y]: number[]) {
+  mapPath(matrix: Matrix) {
     this.path.forEach((path) => {
       for (let i = 1; i < path.length; i += 2) {
-        const newX = x + (path[i] as number);
-        const newY = y + (path[i + 1] as number);
+        const n1 = path[i] as number;
+        const n2 = path[i + 1] as number;
+        const newX = matrix.x(n1, n2);
+        const newY = matrix.y(n1, n2);
         path[i] = newX;
         path[i + 1] = newY;
       }
     });
+  }
+
+  getBoundingBox() {
+    return pathDimensions(this.path);
+  }
+
+  getCenterPoint(): Point {
+    const box = this.getBoundingBox();
+
+    return [box.x + box.width / 2, box.y + box.height / 2];
+  }
+
+  transform(transform: { translate?: number[]; rotate?: number } = {}) {
+    const matrix = new Matrix();
+
+    if (transform.translate) {
+      matrix.translate(...(transform.translate as [number, number]));
+    }
+
+    if (transform.rotate) {
+      matrix.rotate(transform.rotate as number, ...this.getCenterPoint());
+    }
+
+    this.mapPath(matrix);
   }
 
   toPathString() {

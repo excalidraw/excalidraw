@@ -2,18 +2,24 @@ import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import Path from "./element/path/Path";
 
+export function radianToDegree(radian: number) {
+  return (180 * radian) / Math.PI;
+}
+
 // https://bl.ocks.org/mbostock/8027637
-export function distanceFromPointToPath(d: string, point: Point) {
+export function distanceFromPointToPath(path: string | Path, point: Point) {
   let precision = 8;
   let bestDistance = Infinity;
   let bestLength = 0;
   let p;
 
-  if (!d) {
+  if (!path) {
     return bestDistance;
   }
 
-  const path = new Path(d);
+  if (typeof path === "string") {
+    path = new Path(path);
+  }
   const pathLength = path.getTotalLength();
 
   // linear scan for coarse approximation
