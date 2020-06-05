@@ -25,3 +25,5 @@ type ResolutionType<T extends (...args: any) => any> = T extends (
 ) => Promise<infer R>
   ? R
   : any;
+
+type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
