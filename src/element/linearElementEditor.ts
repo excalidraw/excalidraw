@@ -174,9 +174,7 @@ export class LinearElementEditor {
           ],
         });
       }
-      if (appState.editingLinearElement.lastUncommittedPoint !== null) {
-        history.resumeRecording();
-      }
+      history.resumeRecording();
       setState({
         editingLinearElement: {
           ...appState.editingLinearElement,
