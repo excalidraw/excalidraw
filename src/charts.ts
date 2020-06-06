@@ -213,7 +213,7 @@ export function renderSpreadsheet(
       const labelX =
         i * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING + BAR_SPACING;
       const labelY = BAR_HEIGHT + BAR_SPACING;
-      const textElement = newTextElement({
+      return newTextElement({
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + labelX,
         y: y + labelY,
@@ -228,9 +228,8 @@ export function renderSpreadsheet(
         fontFamily: appState.currentItemFontFamily,
         textAlign: "center",
         width: BAR_WIDTH,
+        angle: ANGLE,
       });
-      mutateElement(textElement, { angle: ANGLE });
-      return textElement;
     }) || [];
 
   const yAxisLabel = spreadsheet.yAxisLabel
