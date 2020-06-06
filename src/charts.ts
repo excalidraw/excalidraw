@@ -21,7 +21,7 @@ type ParseSpreadsheetResult =
     };
 
 function tryParseNumber(s: string): number | null {
-  const match = /([0-9]+(\.[0-9]+)?)%?$/.exec(s);
+  const match = /^[$€£¥₩]?([0-9]+(\.[0-9]+)?)$/.exec(s);
   if (!match) {
     return null;
   }
