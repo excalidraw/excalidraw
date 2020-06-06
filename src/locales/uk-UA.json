@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "Ваші малюнки захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }
