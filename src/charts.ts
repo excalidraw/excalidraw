@@ -1,7 +1,6 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElement, newTextElement } from "./element";
 import { AppState } from "./types";
-import { mutateElement } from "./element/mutateElement";
 import { t } from "./i18n";
 
 interface Spreadsheet {
