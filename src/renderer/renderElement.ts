@@ -44,11 +44,6 @@ const generateElementCanvas = (
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
-  // To be able to draw a nested element with RTL, we have to append it to the DOM
-  canvas.style.display = "none";
-  canvas.id = "nested-canvas-element";
-  document.body.appendChild(canvas);
-
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
@@ -111,7 +106,14 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        context.canvas.setAttribute("dir", isRTL(element.text) ? "rtl" : "ltr");
+        const rtl = isRTL(element.text);
+        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+        if (shouldTemporarilyAttach) {
+          // to correctly render RTL text mixed with LTR, we have to append it
+          //  to the DOM
+          document.body.appendChild(context.canvas);
+        }
+        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         const font = context.font;
         context.font = getFontString(element);
         const fillStyle = context.fillStyle;
@@ -139,6 +141,9 @@ const drawElementOnCanvas = (
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;
+        if (shouldTemporarilyAttach) {
+          context.canvas.remove();
+        }
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
@@ -357,10 +362,6 @@ const drawElementFromCanvas = (
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
   // Clear the nested element we appended to the DOM
-  const node = document.querySelector("#nested-canvas-element");
-  if (node && node.parentNode) {
-    node.parentNode.removeChild(node);
-  }
 };
 
 export const renderElement = (

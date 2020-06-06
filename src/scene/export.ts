@@ -32,8 +32,6 @@ export const exportToCanvas = (
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
-    // We append the canvas before drawing it to it for RTL to work
-    document.body.appendChild(tempCanvas);
     return tempCanvas;
   },
 ) => {
