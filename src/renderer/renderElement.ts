@@ -509,7 +509,11 @@ export const renderElementToSvg = (
         const lineHeight = element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
-          element.textAlign === "center" ? element.width / 2 : element.width;
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
