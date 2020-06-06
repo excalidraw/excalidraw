@@ -43,6 +43,7 @@ export enum EVENT {
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
+  TOUCH_END = "touchend",
 }
 
 export const ENV = {
@@ -65,3 +66,5 @@ export const FONT_FAMILY = {
   2: "Helvetica",
   3: "Cascadia",
 } as const;
+
+export const CANVAS_ONLY_ACTIONS = ["selectAll"];

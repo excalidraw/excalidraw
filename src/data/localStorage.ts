@@ -84,6 +84,5 @@ export const restoreFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
-
   return restore(elements, appState);
 };

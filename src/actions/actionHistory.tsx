@@ -30,23 +30,26 @@ const writeData = (
     const prevElementMap = getElementMap(prevElements);
     const nextElements = data.elements;
     const nextElementMap = getElementMap(nextElements);
-    return {
-      elements: nextElements
-        .map((nextElement) =>
-          newElementWith(
-            prevElementMap[nextElement.id] || nextElement,
-            nextElement,
-          ),
-        )
-        .concat(
-          prevElements
-            .filter(
-              (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
-            )
-            .map((prevElement) =>
-              newElementWith(prevElement, { isDeleted: true }),
-            ),
+
+    const elements = nextElements
+      .map((nextElement) =>
+        newElementWith(
+          prevElementMap[nextElement.id] || nextElement,
+          nextElement,
         ),
+      )
+      .concat(
+        prevElements
+          .filter(
+            (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
+          )
+          .map((prevElement) =>
+            newElementWith(prevElement, { isDeleted: true }),
+          ),
+      );
+
+    return {
+      elements,
       appState: { ...appState, ...data.appState },
       commitToHistory,
       syncHistory: true,

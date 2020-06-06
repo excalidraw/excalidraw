@@ -16,6 +16,7 @@ export const getDefaultAppState = (): AppState => {
     resizingElement: null,
     multiElement: null,
     editingElement: null,
+    editingLinearElement: null,
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
@@ -47,6 +48,7 @@ export const getDefaultAppState = (): AppState => {
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
+    previousSelectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
@@ -70,6 +72,7 @@ export const clearAppStateForLocalStorage = (appState: AppState) => {
     isLoading,
     errorMessage,
     showShortcutsDialog,
+    editingLinearElement,
     ...exportedState
   } = appState;
   return exportedState;

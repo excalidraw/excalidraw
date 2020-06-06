@@ -256,7 +256,9 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
-            setAppState({ ...calculateScrollCenter(elements) });
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
           }}
         >
           {t("buttons.scrollBackToContent")}
@@ -276,6 +278,7 @@ const LayerUI = ({
       onRoomCreate={onRoomCreate}
       onRoomDestroy={onRoomDestroy}
       onLockToggle={onLockToggle}
+      canvas={canvas}
     />
   ) : (
     <div className="layer-ui__wrapper">

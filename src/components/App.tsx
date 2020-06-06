@@ -30,7 +30,6 @@ import {
   isNonDeletedElement,
 } from "../element";
 import {
-  deleteSelectedElements,
   getElementsWithinSelection,
   isOverScrollBars,
   getElementAtPosition,
@@ -110,10 +109,12 @@ import {
   SCENE,
   EVENT,
   ENV,
+  CANVAS_ONLY_ACTIONS,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -124,13 +125,14 @@ import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import { SceneStateCallbackRemover } from "../scene/globalScene";
 import { isLinearElement } from "../element/typeChecks";
-import { actionFinalize } from "../actions";
+import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
+import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getSelectedGroupIds,
   selectGroupsForSelectedElements,
@@ -169,8 +171,6 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
-
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -178,9 +178,8 @@ class App extends React.Component<any, AppState> {
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   broadcastedElementVersions: Map<string, number> = new Map();
   removeSceneCallback: SceneStateCallbackRemover | null = null;
-
+  unmounted: boolean = false;
   actionManager: ActionManager;
-  canvasOnlyActions = ["selectAll"];
 
   public state: AppState = {
     ...getDefaultAppState(),
@@ -362,12 +361,10 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  private unmounted = false;
-
   public async componentDidMount() {
     if (
-      process.env.NODE_ENV === "test" ||
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === ENV.TEST ||
+      process.env.NODE_ENV === ENV.DEVELOPMENT
     ) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -394,6 +391,60 @@ class App extends React.Component<any, AppState> {
       this.onSceneUpdated,
     );
 
+    this.addEventListeners();
+    this.initializeScene();
+  }
+
+  public componentWillUnmount() {
+    this.unmounted = true;
+    this.removeSceneCallback!();
+    this.removeEventListeners();
+  }
+
+  private onResize = withBatchedUpdates(() => {
+    globalSceneState
+      .getElementsIncludingDeleted()
+      .forEach((element) => invalidateShapeForElement(element));
+    this.setState({});
+  });
+
+  private removeEventListeners() {
+    document.removeEventListener(EVENT.COPY, this.onCopy);
+    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.removeEventListener(EVENT.CUT, this.onCut);
+
+    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    document.removeEventListener(
+      EVENT.MOUSE_MOVE,
+      this.updateCurrentCursorPosition,
+      false,
+    );
+    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
+    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
+    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
+    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+
+    document.removeEventListener(
+      EVENT.GESTURE_START,
+      this.onGestureStart as any,
+      false,
+    );
+    document.removeEventListener(
+      EVENT.GESTURE_CHANGE,
+      this.onGestureChange as any,
+      false,
+    );
+    document.removeEventListener(
+      EVENT.GESTURE_END,
+      this.onGestureEnd as any,
+      false,
+    );
+    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+  }
+
+  private addEventListeners() {
     document.addEventListener(EVENT.COPY, this.onCopy);
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
@@ -430,54 +481,7 @@ class App extends React.Component<any, AppState> {
       false,
     );
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-
-    this.initializeScene();
   }
-
-  public componentWillUnmount() {
-    this.unmounted = true;
-    this.removeSceneCallback!();
-
-    document.removeEventListener(EVENT.COPY, this.onCopy);
-    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.removeEventListener(EVENT.CUT, this.onCut);
-
-    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
-    document.removeEventListener(
-      EVENT.MOUSE_MOVE,
-      this.updateCurrentCursorPosition,
-      false,
-    );
-    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
-    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
-    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
-
-    document.removeEventListener(
-      EVENT.GESTURE_START,
-      this.onGestureStart as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_CHANGE,
-      this.onGestureChange as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_END,
-      this.onGestureEnd as any,
-      false,
-    );
-    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-  }
-  private onResize = withBatchedUpdates(() => {
-    globalSceneState
-      .getElementsIncludingDeleted()
-      .forEach((element) => invalidateShapeForElement(element));
-    this.setState({});
-  });
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
@@ -497,6 +501,16 @@ class App extends React.Component<any, AppState> {
   componentDidUpdate() {
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
+    }
+
+    if (
+      this.state.editingLinearElement &&
+      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
+    ) {
+      // defer so that the commitToHistory flag isn't reset via current update
+      setTimeout(() => {
+        this.actionManager.executeAction(actionFinalize);
+      });
     }
 
     const cursorButton: {
@@ -589,13 +603,7 @@ class App extends React.Component<any, AppState> {
       return;
     }
     this.copyAll();
-    const { elements: nextElements, appState } = deleteSelectedElements(
-      globalSceneState.getElementsIncludingDeleted(),
-      this.state,
-    );
-    globalSceneState.replaceAllElements(nextElements);
-    history.resumeRecording();
-    this.setState({ ...appState });
+    this.actionManager.executeAction(actionDeleteSelected);
     event.preventDefault();
   });
 
@@ -640,7 +648,7 @@ class App extends React.Component<any, AppState> {
     );
   };
 
-  private resetTapTwice() {
+  private static resetTapTwice() {
     didTapTwice = false;
   }
 
@@ -649,7 +657,7 @@ class App extends React.Component<any, AppState> {
       didTapTwice = true;
       clearTimeout(tappedTwiceTimer);
       tappedTwiceTimer = window.setTimeout(
-        this.resetTapTwice,
+        App.resetTapTwice,
         TAP_TWICE_TIMEOUT,
       );
       return;
@@ -667,6 +675,22 @@ class App extends React.Component<any, AppState> {
       clearTimeout(tappedTwiceTimer);
     }
     event.preventDefault();
+    if (event.touches.length === 2) {
+      this.setState({
+        selectedElementIds: {},
+      });
+    }
+  };
+
+  private onTapEnd = (event: TouchEvent) => {
+    event.preventDefault();
+    if (event.touches.length > 0) {
+      const { previousSelectedElementIds } = this.state;
+      this.setState({
+        previousSelectedElementIds: {},
+        selectedElementIds: previousSelectedElementIds,
+      });
+    }
   };
 
   private pasteFromClipboard = withBatchedUpdates(
@@ -847,6 +871,8 @@ class App extends React.Component<any, AppState> {
               remoteElements.filter((element: { isDeleted: boolean }) => {
                 return !element.isDeleted;
               }),
+              this.state,
+              this.canvas,
             ),
           });
         }
@@ -930,7 +956,7 @@ class App extends React.Component<any, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (this.portal.socketInitialized === false) {
+        if (!this.portal.socketInitialized) {
           initialize();
         }
       };
@@ -1184,6 +1210,19 @@ class App extends React.Component<any, AppState> {
 
       if (
         selectedElements.length === 1 &&
+        isLinearElement(selectedElements[0])
+      ) {
+        if (
+          !this.state.editingLinearElement ||
+          this.state.editingLinearElement.elementId !== selectedElements[0].id
+        ) {
+          history.resumeRecording();
+          this.setState({
+            editingLinearElement: new LinearElementEditor(selectedElements[0]),
+          });
+        }
+      } else if (
+        selectedElements.length === 1 &&
         !isLinearElement(selectedElements[0])
       ) {
         const selectedElement = selectedElements[0];
@@ -1252,6 +1291,9 @@ class App extends React.Component<any, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      selectedElementIds: {},
+    });
     gesture.initialScale = this.state.zoom;
   });
 
@@ -1265,6 +1307,11 @@ class App extends React.Component<any, AppState> {
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    const { previousSelectedElementIds } = this.state;
+    this.setState({
+      previousSelectedElementIds: {},
+      selectedElementIds: previousSelectedElementIds,
+    });
     gesture.initialScale = null;
   });
 
@@ -1483,6 +1530,26 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
+    const selectedElements = getSelectedElements(
+      globalSceneState.getElements(),
+      this.state,
+    );
+
+    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      if (
+        !this.state.editingLinearElement ||
+        this.state.editingLinearElement.elementId !== selectedElements[0].id
+      ) {
+        history.resumeRecording();
+        this.setState({
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+        });
+      }
+      return;
+    }
+
+    resetCursor();
+
     const { x, y } = viewportCoordsToSceneCoords(
       event,
       this.state,
@@ -1582,12 +1649,28 @@ class App extends React.Component<any, AppState> {
       }
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
+
+    if (
+      this.state.editingLinearElement &&
+      this.state.editingLinearElement.draggingElementPointIndex === null
+    ) {
+      const editingLinearElement = LinearElementEditor.handlePointerMove(
+        event,
+        scenePointerX,
+        scenePointerY,
+        this.state.editingLinearElement,
+      );
+      if (editingLinearElement !== this.state.editingLinearElement) {
+        this.setState({ editingLinearElement });
+      }
+    }
+
     if (this.state.multiElement) {
       const { multiElement } = this.state;
       const { x: rx, y: ry } = multiElement;
@@ -1601,11 +1684,15 @@ class App extends React.Component<any, AppState> {
         // if we haven't yet created a temp point and we're beyond commit-zone
         //  threshold, add a point
         if (
-          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
-          LINE_CONFIRM_THRESHOLD
+          distance2d(
+            scenePointerX - rx,
+            scenePointerY - ry,
+            lastPoint[0],
+            lastPoint[1],
+          ) >= LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
-            points: [...points, [x - rx, y - ry]],
+            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
           });
         } else {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
@@ -1619,8 +1706,8 @@ class App extends React.Component<any, AppState> {
           points.length > 2 &&
           lastCommittedPoint &&
           distance2d(
-            x - rx,
-            y - ry,
+            scenePointerX - rx,
+            scenePointerY - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
@@ -1635,7 +1722,10 @@ class App extends React.Component<any, AppState> {
           }
           // update last uncommitted point
           mutateElement(multiElement, {
-            points: [...points.slice(0, -1), [x - rx, y - ry]],
+            points: [
+              ...points.slice(0, -1),
+              [scenePointerX - rx, scenePointerY - ry],
+            ],
           });
         }
       }
@@ -1654,11 +1744,16 @@ class App extends React.Component<any, AppState> {
     const elements = globalSceneState.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
-    if (selectedElements.length === 1 && !isOverScrollBar) {
+    if (
+      selectedElements.length === 1 &&
+      !isOverScrollBar &&
+      !this.state.editingLinearElement
+    ) {
       const elementWithResizeHandler = getElementWithResizeHandler(
         elements,
         this.state,
-        { x, y },
+        scenePointerX,
+        scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
@@ -1672,7 +1767,8 @@ class App extends React.Component<any, AppState> {
       if (canResizeMutlipleElements(selectedElements)) {
         const resizeHandle = getResizeHandlerFromCoords(
           getCommonBounds(selectedElements),
-          { x, y },
+          scenePointerX,
+          scenePointerY,
           this.state.zoom,
           event.pointerType,
         );
@@ -1687,8 +1783,8 @@ class App extends React.Component<any, AppState> {
     const hitElement = getElementAtPosition(
       elements,
       this.state,
-      x,
-      y,
+      scenePointerX,
+      scenePointerY,
       this.state.zoom,
     );
     if (this.state.elementType === "text") {
@@ -1929,11 +2025,12 @@ class App extends React.Component<any, AppState> {
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
-      if (selectedElements.length === 1) {
+      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithResizeHandler = getElementWithResizeHandler(
           elements,
           this.state,
-          { x, y },
+          x,
+          y,
           this.state.zoom,
           event.pointerType,
         );
@@ -1953,7 +2050,8 @@ class App extends React.Component<any, AppState> {
         if (canResizeMutlipleElements(selectedElements)) {
           resizeHandle = getResizeHandlerFromCoords(
             getCommonBounds(selectedElements),
-            { x, y },
+            x,
+            y,
             this.state.zoom,
             event.pointerType,
           );
@@ -1986,13 +2084,28 @@ class App extends React.Component<any, AppState> {
         }
       }
       if (!isResizingElements) {
-        hitElement = getElementAtPosition(
-          elements,
-          this.state,
-          x,
-          y,
-          this.state.zoom,
-        );
+        if (this.state.editingLinearElement) {
+          const ret = LinearElementEditor.handlePointerDown(
+            event,
+            this.state,
+            (appState) => this.setState(appState),
+            history,
+            x,
+            y,
+          );
+          if (ret.hitElement) {
+            hitElement = ret.hitElement;
+          }
+          if (ret.didAddPoint) {
+            return;
+          }
+        }
+
+        // hitElement may already be set above, so check first
+        hitElement =
+          hitElement ||
+          getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+
         // clear selection if shift is not clicked
         if (
           !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
@@ -2008,6 +2121,11 @@ class App extends React.Component<any, AppState> {
                 ? prevState.editingGroupId
                 : null,
           }));
+          const { selectedElementIds } = this.state;
+          this.setState({
+            selectedElementIds: {},
+            previousSelectedElementIds: selectedElementIds,
+          });
         }
 
         // If we click on something
@@ -2049,6 +2167,11 @@ class App extends React.Component<any, AppState> {
             hitElementWasAddedToSelection = true;
           }
         }
+
+        const { selectedElementIds } = this.state;
+        this.setState({
+          previousSelectedElementIds: selectedElementIds,
+        });
       }
     } else {
       this.setState({
@@ -2272,6 +2395,23 @@ class App extends React.Component<any, AppState> {
         }
       }
 
+      if (this.state.editingLinearElement) {
+        const didDrag = LinearElementEditor.handlePointDragging(
+          this.state,
+          (appState) => this.setState(appState),
+          x,
+          y,
+          lastX,
+          lastY,
+        );
+
+        if (didDrag) {
+          lastX = x;
+          lastY = y;
+          return;
+        }
+      }
+
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -2458,6 +2598,17 @@ class App extends React.Component<any, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
+      // if moving start/end point towards start/end point within threshold,
+      //  close the loop
+      if (this.state.editingLinearElement) {
+        const editingLinearElement = LinearElementEditor.handlePointerUp(
+          this.state.editingLinearElement,
+        );
+        if (editingLinearElement !== this.state.editingLinearElement) {
+          this.setState({ editingLinearElement });
+        }
+      }
+
       lastPointerUp = null;
 
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
@@ -2629,9 +2780,11 @@ class App extends React.Component<any, AppState> {
         passive: false,
       });
       this.canvas.addEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas.addEventListener(EVENT.TOUCH_END, this.onTapEnd);
     } else {
       this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
       this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
+      this.canvas?.removeEventListener(EVENT.TOUCH_END, this.onTapEnd);
     }
   };
 
@@ -2702,7 +2855,7 @@ class App extends React.Component<any, AppState> {
               action: this.copyToClipboardAsSvg,
             },
           ...this.actionManager.getContextMenuItems((action) =>
-            this.canvasOnlyActions.includes(action.name),
+            CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
         ],
         top: event.clientY,
@@ -2734,7 +2887,7 @@ class App extends React.Component<any, AppState> {
           action: this.copyToClipboardAsSvg,
         },
         ...this.actionManager.getContextMenuItems(
-          (action) => !this.canvasOnlyActions.includes(action.name),
+          (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),
       ],
       top: event.clientY,
@@ -2745,6 +2898,7 @@ class App extends React.Component<any, AppState> {
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
     const { deltaX, deltaY } = event;
+    const { selectedElementIds, previousSelectedElementIds } = this.state;
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
@@ -2755,8 +2909,21 @@ class App extends React.Component<any, AppState> {
         delta = MAX_STEP;
       }
       delta *= sign;
+      if (Object.keys(previousSelectedElementIds).length !== 0) {
+        setTimeout(() => {
+          this.setState({
+            selectedElementIds: previousSelectedElementIds,
+            previousSelectedElementIds: {},
+          });
+        }, 1000);
+      }
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+        selectedElementIds: {},
+        previousSelectedElementIds:
+          Object.keys(selectedElementIds).length !== 0
+            ? selectedElementIds
+            : previousSelectedElementIds,
       }));
       return;
     }

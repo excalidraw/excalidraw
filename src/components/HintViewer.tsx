@@ -6,6 +6,7 @@ import { getSelectedElements } from "../scene";
 import "./HintViewer.scss";
 import { AppState } from "../types";
 import { isLinearElement } from "../element/typeChecks";
+import { getShortcutKey } from "../utils";
 
 interface Hint {
   appState: AppState;
@@ -43,17 +44,28 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.rotate");
   }
 
+  if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+    if (appState.editingLinearElement) {
+      return appState.editingLinearElement.activePointIndex
+        ? t("hints.lineEditor_pointSelected")
+        : t("hints.lineEditor_nothingSelected");
+    }
+    return t("hints.lineEditor_info");
+  }
+
   return null;
 };
 
 export const HintViewer = ({ appState, elements }: Hint) => {
-  const hint = getHints({
+  let hint = getHints({
     appState,
     elements,
   });
   if (!hint) {
     return null;
   }
+
+  hint = getShortcutKey(hint);
 
   return (
     <div className="HintViewer">

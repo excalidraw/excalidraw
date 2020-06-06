@@ -21,7 +21,7 @@ type _ExcalidrawElementBase = Readonly<{
   version: number;
   versionNonce: number;
   isDeleted: boolean;
-  groupIds: GroupId[];
+  groupIds: readonly GroupId[];
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -65,7 +65,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "arrow" | "line" | "draw";
-    points: Point[];
+    points: readonly Point[];
     lastCommittedPoint?: Point | null;
   }>;
 
