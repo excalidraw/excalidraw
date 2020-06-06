@@ -5,6 +5,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
+import { tryParseSpreadsheet, renderSpreadsheet } from "./charts";
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -65,10 +66,14 @@ export const getAppClipboard = (): {
 };
 
 export const getClipboardContent = async (
+  appState: AppState,
+  cursorX: number,
+  cursorY: number,
   event: ClipboardEvent | null,
 ): Promise<{
   text?: string;
   elements?: readonly ExcalidrawElement[];
+  error?: string;
 }> => {
   try {
     const text = event
@@ -77,6 +82,19 @@ export const getClipboardContent = async (
         (await navigator.clipboard.readText());
 
     if (text && !PREFER_APP_CLIPBOARD && !text.includes(SVG_EXPORT_TAG)) {
+      const result = tryParseSpreadsheet(text);
+      if (result.type === "spreadsheet") {
+        return {
+          elements: renderSpreadsheet(
+            appState,
+            result.spreadsheet,
+            cursorX,
+            cursorY,
+          ),
+        };
+      } else if (result.type === "malformed spreadsheet") {
+        return { error: result.error };
+      }
       return { text };
     }
   } catch (error) {
