@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }
