@@ -427,8 +427,8 @@ const resizeMultipleElements = (
   let scale: number;
   let getNextXY: (
     element: NonDeletedExcalidrawElement,
-    origCoords: [number, number, number, number],
-    finalCoords: [number, number, number, number],
+    origCoords: readonly [number, number, number, number],
+    finalCoords: readonly [number, number, number, number],
   ) => { x: number; y: number };
   switch (resizeHandle) {
     case "se":
