@@ -232,7 +232,6 @@ const measureFontSizeFromWH = (
   if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
     return { size: nextFontSize, baseline: metrics.baseline };
   }
-  // console.log("invalid font size", metrics, { nextWidth, nextHeight });
   return null;
 };
 
