@@ -515,13 +515,13 @@ export const renderElementToSvg = (
             : element.textAlign === "right"
             ? element.width
             : 0;
+        const direction = isRTL(element.text) ? "rtl" : "ltr";
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
-            : element.textAlign === "right"
+            : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
-        const direction = isRTL(element.text) ? "rtl" : "ltr";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
