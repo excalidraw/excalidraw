@@ -227,3 +227,18 @@ export const sceneCoordsToViewportCoords = (
 
 export const getGlobalCSSVariable = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
+
+const RS_LTR_CHARS =
+  "A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF" +
+  "\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF";
+const RS_RTL_CHARS = "\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC";
+const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
+/**
+ * Checks whether first directional character is RTL. Meaning whether it starts
+ *  with RTL characters, or indeterminate (numbers etc.) characters followed by
+ *  RTL.
+ * See https://github.com/excalidraw/excalidraw/pull/1722#discussion_r436340171
+ */
+export const isRTL = (text: string) => {
+  return RE_RTL_CHECK.test(text);
+};
