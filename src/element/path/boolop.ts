@@ -4,7 +4,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { newPathElement } from "../index";
 import { ExcalidrawElement, NonDeletedExcalidrawElement } from "../types";
 import { generateShape } from "../../renderer/renderElement";
-import { getCommonBounds } from "../bounds";
+import { getCommonBounds, getElementBounds } from "../bounds";
 import { radianToDegree } from "../../math";
 
 import Path from "./Path";
@@ -102,36 +102,34 @@ export function differenceElement(
     rotate: d2,
   });
 
-  const [cx0, cy0] = path1.getCenterPoint();
-  const box0 = path1.getBoundingBox();
-
   path1.difference(path2);
 
   path1.transform({
     rotate: -d1,
   });
 
-  const [cx1, cy1] = path1.getCenterPoint();
+  const box = path1.getBoundingBox();
 
   path1.transform({
-    translate: [-p1[0] - (cx1 - cx0), -p1[1] - (cy1 - cy0)],
-  });
-
-  const box1 = path1.getBoundingBox();
-
-  path1.transform({
-    translate: [-box1.x, -box1.y],
+    translate: [-box.x, -box.y],
   });
 
   const element = newPathElement({
     ...element1,
-    // x: element1.x + (box1.x - box0.x),
-    // y: element1.y + (box1.y - box0.y),
-    width: box1.width,
-    height: box1.height,
+    width: box.width,
+    height: box.height,
     d: path1.toPathString(),
     hollow: path1.isHollow,
   });
+
+  // const [x0, y0, x1, y1] = getElementBounds(element1);
+  // const [x2, y2, x3, y3] = getElementBounds(elem);
+
+  // const element = newPathElement({
+  //   ...elem,
+  //   x: element1.x + (x2 - x0),
+  //   y: element1.y + (y2 - y0),
+  // });
 
   return element;
 }
