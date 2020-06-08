@@ -1,0 +1,28 @@
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; /* added line */
+}
+
+.LoadingMessage {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.LoadingMessage span {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  padding: 0.8em 1.2em;
+  font-size: 1.3em;
+}
