@@ -61,6 +61,8 @@
     <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
+
     <link
       rel="preload"
       href="FG_Virgil.woff2"
@@ -88,35 +90,6 @@
       style="--pwacompat-splash-font: 24px Virgil;"
     />
 
-    <style>
-      .LoadingMessage {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-      }
-      .LoadingMessage span {
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 5px;
-        padding: 0.8em 1.2em;
-        font-size: 1.3em;
-      }
-      .visually-hidden {
-        position: absolute !important;
-        height: 1px;
-        width: 1px;
-        overflow: hidden;
-        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-        clip: rect(1px, 1px, 1px, 1px);
-        white-space: nowrap; /* added line */
-      }
-    </style>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
