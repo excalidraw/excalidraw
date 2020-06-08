@@ -209,7 +209,7 @@ class App extends React.Component<any, AppState> {
     const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
-      <div className="container">
+      <div className="excalidraw">
         <LayerUI
           canvas={this.canvas}
           appState={this.state}
