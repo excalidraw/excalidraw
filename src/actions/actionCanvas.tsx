@@ -58,9 +58,7 @@ export const actionClearCanvas = register({
       showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
-          // TODO: Defined globally, since file handles aren't yet serializable.
-          // Once `FileSystemFileHandle` can be serialized, make this
-          // part of `AppState`.
+          // TODO: Make this part of `AppState`.
           (window as any).handle = null;
           updateData(null);
         }
