@@ -22,13 +22,7 @@
     {
       "action": "/",
       "accept": {
-        "application/json": [".json"]
-      }
-    },
-    {
-      "action": "/",
-      "accept": {
-        "application/vnd.excalidraw+json": [".excalidraw", ".json"]
+        "application/vnd.excalidraw+json": [".excalidraw"]
       }
     }
   ]
