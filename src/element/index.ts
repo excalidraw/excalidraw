@@ -35,7 +35,6 @@ export {
 } from "./resizeTest";
 export {
   resizeElements,
-  canResizeMutlipleElements,
   getResizeOffsetXY,
   getResizeArrowDirection,
 } from "./resizeElements";
