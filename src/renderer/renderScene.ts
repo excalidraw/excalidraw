@@ -28,7 +28,7 @@ import {
 import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
-import colors from "../colors";
+import { getClientColors } from "../clients";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -38,19 +38,6 @@ import {
 } from "../groups";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-
-const colorsForClientId = (clientId: string) => {
-  // Naive way of getting an integer out of the clientId
-  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
-
-  // Skip transparent background.
-  const backgrounds = colors.elementBackground.slice(1);
-  const strokes = colors.elementStroke.slice(1);
-  return {
-    background: backgrounds[sum % backgrounds.length],
-    stroke: strokes[sum % strokes.length],
-  };
-};
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -232,7 +219,7 @@ export const renderScene = (
       if (sceneState.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
           ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = colorsForClientId(socketId);
+            const { background } = getClientColors(socketId);
             return background;
           }),
         );
@@ -444,7 +431,7 @@ export const renderScene = (
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { background, stroke } = colorsForClientId(clientId);
+    const { background, stroke } = getClientColors(clientId);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
