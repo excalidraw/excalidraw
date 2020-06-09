@@ -183,9 +183,8 @@ const LayerUI = ({
                 console.log("client", client);
                 const { background } = getClientColors(clientId);
                 // @TODO: If no name? unknown? Username generation on session join like Google? 'Funky Penguin'
-                const shortName = client.username
-                  ? getClientShortName(client.username)
-                  : "?";
+                const shortName = getClientShortName(client.username || "?");
+
                 console.log("shortName", shortName);
                 return (
                   <Avatar name="foo" color={background} key={clientId}>
