@@ -188,7 +188,7 @@ const LayerUI = ({
                   : "";
                 console.log("shortName", shortName);
                 return (
-                  <Avatar name="foo" color={background}>
+                  <Avatar name="foo" color={background} key={clientId}>
                     {shortName}
                   </Avatar>
                 );
