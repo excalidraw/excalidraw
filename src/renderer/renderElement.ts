@@ -323,7 +323,7 @@ const generateElementShape = (
   }
 };
 
-const generateElement = (
+const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
@@ -403,7 +403,10 @@ export const renderElement = (
     case "text": {
       generateElementShape(element, generator);
       if (renderOptimizations) {
-        const elementWithCanvas = generateElement(element, sceneState);
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          sceneState,
+        );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
