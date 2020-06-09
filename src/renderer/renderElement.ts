@@ -162,9 +162,8 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
-export const getShapeForElement = (element: ExcalidrawElement) => {
-  return shapeCache.get(element);
-};
+export const getShapeForElement = (element: ExcalidrawElement) =>
+  shapeCache.get(element);
 
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
@@ -471,9 +470,9 @@ export const renderElementToSvg = (
     case "line":
     case "draw":
     case "arrow": {
+      generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
-      generateElementShape(element, generator);
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
         if (opacity !== 1) {
