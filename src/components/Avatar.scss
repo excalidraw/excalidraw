@@ -1,0 +1,12 @@
+@import "../css/_variables";
+
+.Avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 1.25rem;
+  background: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $oc-white;
+}
