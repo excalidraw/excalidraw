@@ -1,0 +1,12 @@
+.FixedUserList {
+  --margin: 0.25rem;
+  position: fixed;
+  pointer-events: none;
+  top: var(--margin);
+  right: var(--margin);
+  z-index: 2;
+}
+
+.FixedUserList > * {
+  pointer-events: all;
+}
