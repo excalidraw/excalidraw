@@ -10,6 +10,8 @@ import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
+import { FixedUserList } from "./FixedUserList";
+import { Avatar } from "./Avatar";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
 import { LanguageList } from "./LanguageList";
@@ -28,6 +30,7 @@ import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
+import { getClientColors, getClientShortName } from "../clients";
 
 import "./LayerUI.scss";
 
@@ -163,6 +166,39 @@ const LayerUI = ({
     </Section>
   );
 
+  const renderFixedUserList = () => {
+    console.log("appState", appState);
+    return (
+      <FixedUserList
+        className={`zen-mode-transition ${
+          zenModeEnabled && "transition-right"
+        }`}
+      >
+        <Stack.Col gap={4}>
+          <Stack.Row gap={1} justifyContent="space-between">
+            {Array.from(appState.collaborators)
+              // Collaborator is either not initialized or is actually the current user.
+              .filter(([_, client]) => Object.keys(client).length !== 0)
+              .map(([clientId, client]) => {
+                console.log("client", client);
+                const { background } = getClientColors(clientId);
+                // @TODO: If no name? unknown? Username generation on session join like Google? 'Funky Penguin'
+                const shortName = client.username
+                  ? getClientShortName(client.username)
+                  : "";
+                console.log("shortName", shortName);
+                return (
+                  <Avatar name="foo" color={background}>
+                    {shortName}
+                  </Avatar>
+                );
+              })}
+          </Stack.Row>
+        </Stack.Col>
+      </FixedUserList>
+    );
+  };
+
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
@@ -295,6 +331,7 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
+      {renderFixedUserList()}
       {
         <aside
           className={`layer-ui__wrapper__github-corner zen-mode-transition ${
