@@ -162,8 +162,9 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
-export const getShapeForElement = (element: ExcalidrawElement) =>
-  shapeCache.get(element);
+export const getShapeForElement = (element: ExcalidrawElement) => {
+  return shapeCache.get(element);
+};
 
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
@@ -230,10 +231,9 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
-const generateElement = (
+const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
-  sceneState?: SceneState,
 ) => {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
@@ -321,6 +321,12 @@ const generateElement = (
     }
     shapeCache.set(element, shape);
   }
+};
+
+const generateElement = (
+  element: NonDeletedExcalidrawElement,
+  sceneState?: SceneState,
+) => {
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
@@ -395,12 +401,9 @@ export const renderElement = (
     case "draw":
     case "arrow":
     case "text": {
+      generateElementShape(element, generator);
       if (renderOptimizations) {
-        const elementWithCanvas = generateElement(
-          element,
-          generator,
-          sceneState,
-        );
+        const elementWithCanvas = generateElement(element, sceneState);
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -446,7 +449,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElement(element, generator);
+      generateElementShape(element, generator);
       const node = rsvg.draw(getShapeForElement(element) as Drawable);
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
@@ -465,9 +468,9 @@ export const renderElementToSvg = (
     case "line":
     case "draw":
     case "arrow": {
-      generateElement(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
+      generateElementShape(element, generator);
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
         if (opacity !== 1) {
