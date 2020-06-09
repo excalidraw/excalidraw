@@ -230,10 +230,9 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
-const generateElement = (
+const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
-  sceneState?: SceneState,
 ) => {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
@@ -321,6 +320,12 @@ const generateElement = (
     }
     shapeCache.set(element, shape);
   }
+};
+
+const generateElementWithCanvas = (
+  element: NonDeletedExcalidrawElement,
+  sceneState?: SceneState,
+) => {
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
@@ -395,10 +400,10 @@ export const renderElement = (
     case "draw":
     case "arrow":
     case "text": {
+      generateElementShape(element, generator);
       if (renderOptimizations) {
-        const elementWithCanvas = generateElement(
+        const elementWithCanvas = generateElementWithCanvas(
           element,
-          generator,
           sceneState,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
@@ -446,7 +451,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElement(element, generator);
+      generateElementShape(element, generator);
       const node = rsvg.draw(getShapeForElement(element) as Drawable);
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
@@ -465,7 +470,7 @@ export const renderElementToSvg = (
     case "line":
     case "draw":
     case "arrow": {
-      generateElement(element, generator);
+      generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
