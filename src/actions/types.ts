@@ -57,7 +57,8 @@ export type ActionName =
   | "toggleFullScreen"
   | "toggleShortcuts"
   | "group"
-  | "ungroup";
+  | "ungroup"
+  | "goToCollaborator";
 
 export interface Action {
   name: ActionName;
