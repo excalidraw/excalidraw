@@ -11,7 +11,6 @@ import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { FixedUserList } from "./FixedUserList";
-import { Avatar } from "./Avatar";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
 import { LanguageList } from "./LanguageList";
@@ -30,7 +29,6 @@ import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
-import { getClientColors, getClientShortName } from "../clients";
 
 import "./LayerUI.scss";
 
@@ -180,16 +178,10 @@ const LayerUI = ({
               // Collaborator is either not initialized or is actually the current user.
               .filter(([_, client]) => Object.keys(client).length !== 0)
               .map(([clientId, client]) => {
-                console.log("client", client);
-                const { background } = getClientColors(clientId);
-                // @TODO: If no name? unknown? Username generation on session join like Google? 'Funky Penguin'
-                const shortName = getClientShortName(client.username || "?");
-
-                console.log("shortName", shortName);
                 return (
-                  <Avatar name="foo" color={background} key={clientId}>
-                    {shortName}
-                  </Avatar>
+                  <React.Fragment key={clientId}>
+                    {actionManager.renderAction("goToCollaborator", clientId)}
+                  </React.Fragment>
                 );
               })}
           </Stack.Row>
