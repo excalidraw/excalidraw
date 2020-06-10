@@ -3,7 +3,8 @@
   position: fixed;
   pointer-events: none;
   top: var(--margin);
-  right: var(--margin);
+  /*github corner*/
+  right: calc(var(--margin) + 40px);
   z-index: 2;
 }
 
