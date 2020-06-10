@@ -111,7 +111,7 @@ import {
   CANVAS_ONLY_ACTIONS,
 } from "../constants";
 import {
-  INITAL_SCENE_UPDATE_TIMEOUT,
+  INITIAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../time_constants";
@@ -861,7 +861,7 @@ class App extends React.Component<any, AppState> {
       //  initial SCENE_UPDATE message
       const initializationTimer = setTimeout(
         initialize,
-        INITAL_SCENE_UPDATE_TIMEOUT,
+        INITIAL_SCENE_UPDATE_TIMEOUT,
       );
 
       const updateScene = (
