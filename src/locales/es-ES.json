@@ -60,8 +60,8 @@
     "name": "Nombre",
     "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Selección de grupo",
+    "ungroup": "Desagrupar selección"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -122,9 +122,9 @@
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
+    "lineEditor_pointSelected": "Pulse Borrar para eliminar el punto o arrastre para mover",
+    "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
+  },
+  "charts": {
+    "noNumericColumn": "Pegaste una hoja de cálculo sin una columna numérica.",
+    "tooManyColumns": "Pegaste una hoja de cálculo con más de dos columnas."
   }
 }
