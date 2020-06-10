@@ -165,7 +165,6 @@ const LayerUI = ({
   );
 
   const renderFixedUserList = () => {
-    console.log("appState", appState);
     return (
       <FixedUserList
         className={`zen-mode-transition ${
