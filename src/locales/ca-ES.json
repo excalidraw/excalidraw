@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

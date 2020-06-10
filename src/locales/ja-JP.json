@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

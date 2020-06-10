@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

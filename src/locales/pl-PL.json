@@ -60,8 +60,8 @@
     "name": "Nazwa",
     "yourName": "Twoje imię",
     "madeWithExcalidraw": "Zrobione w Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Zgrupuj wybrane",
+    "ungroup": "Rozgrupuj wybrane"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -118,13 +118,13 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "freeDraw": "Kliknij i przeciągnij, zwolnij kiedy skończysz",
+    "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHITH, przytrzymaj ALT by zmienać rozmiar względem środka",
+    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienać rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_pointSelected": "Naciśnij Delete by usunąć punkt albo przeciągnij by zmienić jego pozycje",
+    "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
@@ -156,7 +156,7 @@
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
     "or": "lub",
-    "click": "kliknięcie",
+    "click": "klik",
     "drag": "przeciągnij",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
+  },
+  "charts": {
+    "noNumericColumn": "Wklejono arkusz kalkulacyjny bez kolumny numerycznej.",
+    "tooManyColumns": "Wklejono arkusz kalkulacyjny z więcej niż dwoma kolumnami."
   }
 }
