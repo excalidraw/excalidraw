@@ -65,6 +65,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData?: any) => void;
+    id?: string;
   }>;
   perform: ActionFn;
   keyPriority?: number;
