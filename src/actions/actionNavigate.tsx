@@ -2,7 +2,7 @@ import React from "react";
 import { Avatar } from "../components/Avatar";
 import { register } from "./register";
 import { getClientColors, getClientShortName } from "../clients";
-import { Collaborator, FlooredNumber } from "../types";
+import { Collaborator } from "../types";
 import { normalizeScroll } from "../scene";
 
 export const actionGoToCollaborator = register({
