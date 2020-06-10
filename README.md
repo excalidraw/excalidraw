@@ -61,8 +61,7 @@ docker-compose up --build -d
 #### Native Docker
 
 ```sh
-docker build -t excalidraw/excalidraw .
-docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
+docker run --rm -dit --name excalidraw -p 5000:80 getexcalidraw/excalidraw:latest
 ```
 
 After building the image and running the container, open <http://localhost:5000> to see the application.
