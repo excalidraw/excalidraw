@@ -18,7 +18,8 @@
   font-size: 0.7rem;
   line-height: 1.5;
   top: calc(100% + var(--arrow-size) + 3px);
-  left: calc(-50% + var(--arrow-size) / 2);
+  // extra pixel offset for unknown reasons
+  left: calc(-50% + var(--arrow-size) / 2 - 1px);
   word-wrap: break-word;
 
   &::after {
