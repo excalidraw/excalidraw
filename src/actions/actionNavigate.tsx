@@ -38,7 +38,6 @@ export const actionGoToCollaborator = register({
     }
 
     const { background } = getClientColors(clientId);
-    // @TODO: If no name? unknown? Username generation on session join like Google? 'Funky Penguin'
     const shortName = getClientInitials(collaborator.username);
 
     return (
