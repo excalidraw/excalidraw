@@ -26,13 +26,14 @@ describe("getClientInitials", () => {
     expect(result).toBe("Q");
   });
 
-  it('returns "?" if empty string', () => {
-    const result = getClientInitials("");
+  it('returns "?" if falsey value provided', () => {
+    let result = getClientInitials("");
     expect(result).toBe("?");
-  });
 
-  it('returns "?" if undefined', () => {
-    const result = getClientInitials(undefined);
-    expect(result).toBe("Q");
+    result = getClientInitials(undefined);
+    expect(result).toBe("?");
+
+    result = getClientInitials(null);
+    expect(result).toBe("?");
   });
 });
