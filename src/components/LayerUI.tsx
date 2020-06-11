@@ -10,7 +10,7 @@ import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { FixedUserList } from "./FixedUserList";
+import { UserList } from "./UserList";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
 import { LanguageList } from "./LanguageList";
@@ -203,7 +203,7 @@ const LayerUI = ({
               </Stack.Col>
             )}
           </Section>
-          <FixedUserList
+          <UserList
             className={`zen-mode-transition ${
               zenModeEnabled && "transition-right"
             }`}
@@ -218,7 +218,7 @@ const LayerUI = ({
                   </React.Fragment>
                 );
               })}
-          </FixedUserList>
+          </UserList>
         </div>
         {
           <div

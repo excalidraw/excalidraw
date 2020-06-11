@@ -1,4 +1,4 @@
-.FixedUserList {
+.UserList {
   pointer-events: none;
   /*github corner*/
   padding: var(--space-factor) 40px var(--space-factor) var(--space-factor);
@@ -7,7 +7,7 @@
   justify-content: flex-end;
 }
 
-.FixedUserList > * {
+.UserList > * {
   pointer-events: all;
   margin: 0 0 var(--space-factor) var(--space-factor);
 }
