@@ -13,7 +13,18 @@ export const getClientColors = (clientId: string) => {
   };
 };
 
-// @TODO: This is terrible for i18n. Also we probably want to get initials if words len > 1?
-export const getClientShortName = (username: string) => {
-  return username.substring(0, 2);
+export const getClientShortName = (username?: string) => {
+  if (!username) {
+    return "?";
+  }
+  const names = username.trim().split(" ");
+
+  if (names.length < 2) {
+    return names[0].substring(0, 2).toUpperCase();
+  }
+
+  const firstName = names[0];
+  const lastName = names[names.length - 1];
+
+  return (firstName[0] + lastName[0]).toUpperCase();
 };
