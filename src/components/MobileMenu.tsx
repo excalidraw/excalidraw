@@ -105,19 +105,22 @@ export const MobileMenu = ({
                     }}
                   />
                 </fieldset>
-                <UserList mobile>
-                  {Array.from(appState.collaborators)
-                    // Collaborator is either not initialized or is actually the current user.
-                    .filter(([_, client]) => Object.keys(client).length !== 0)
-                    .map(([clientId, client]) => (
-                      <React.Fragment key={clientId}>
-                        {actionManager.renderAction(
-                          "goToCollaborator",
-                          clientId,
-                        )}
-                      </React.Fragment>
-                    ))}
-                </UserList>
+                <fieldset>
+                  <legend>{t("labels.collaborators")}</legend>
+                  <UserList mobile>
+                    {Array.from(appState.collaborators)
+                      // Collaborator is either not initialized or is actually the current user.
+                      .filter(([_, client]) => Object.keys(client).length !== 0)
+                      .map(([clientId, client]) => (
+                        <React.Fragment key={clientId}>
+                          {actionManager.renderAction(
+                            "goToCollaborator",
+                            clientId,
+                          )}
+                        </React.Fragment>
+                      ))}
+                  </UserList>
+                </fieldset>
               </Stack.Col>
             </div>
           </Section>
