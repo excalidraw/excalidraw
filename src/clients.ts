@@ -13,7 +13,7 @@ export const getClientColors = (clientId: string) => {
   };
 };
 
-export const getClientShortName = (username?: string) => {
+export const getClientInitials = (username?: string | null) => {
   if (!username) {
     return "?";
   }

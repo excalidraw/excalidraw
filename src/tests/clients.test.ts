@@ -1,38 +1,38 @@
-import { getClientShortName } from "../clients";
+import { getClientInitials } from "../clients";
 
-describe("getClientShortName", () => {
+describe("getClientInitials", () => {
   it("returns substring if one name provided", () => {
-    const result = getClientShortName("Alan");
+    const result = getClientInitials("Alan");
     expect(result).toBe("AL");
   });
 
   it("returns initials", () => {
-    const result = getClientShortName("John Doe");
+    const result = getClientInitials("John Doe");
     expect(result).toBe("JD");
   });
 
   it("returns correct initials if many names provided", () => {
-    const result = getClientShortName("John Alan Doe");
+    const result = getClientInitials("John Alan Doe");
     expect(result).toBe("JD");
   });
 
   it("returns single initial if 1 letter provided", () => {
-    const result = getClientShortName("z");
+    const result = getClientInitials("z");
     expect(result).toBe("Z");
   });
 
   it("trims trailing whitespace", () => {
-    const result = getClientShortName("  q    ");
+    const result = getClientInitials("  q    ");
     expect(result).toBe("Q");
   });
 
   it('returns "?" if empty string', () => {
-    const result = getClientShortName("");
+    const result = getClientInitials("");
     expect(result).toBe("?");
   });
 
   it('returns "?" if undefined', () => {
-    const result = getClientShortName(undefined);
+    const result = getClientInitials(undefined);
     expect(result).toBe("Q");
   });
 });

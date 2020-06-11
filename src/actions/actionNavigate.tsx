@@ -1,7 +1,7 @@
 import React from "react";
 import { Avatar } from "../components/Avatar";
 import { register } from "./register";
-import { getClientColors, getClientShortName } from "../clients";
+import { getClientColors, getClientInitials } from "../clients";
 import { Collaborator } from "../types";
 import { normalizeScroll } from "../scene";
 
@@ -37,7 +37,7 @@ export const actionGoToCollaborator = register({
 
     const { background } = getClientColors(clientId);
     // @TODO: If no name? unknown? Username generation on session join like Google? 'Funky Penguin'
-    const shortName = getClientShortName(collaborator.username);
+    const shortName = getClientInitials(collaborator.username);
 
     return (
       <Avatar
