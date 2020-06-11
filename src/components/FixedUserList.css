@@ -1,13 +1,13 @@
 .FixedUserList {
-  --margin: 0.25rem;
-  position: fixed;
   pointer-events: none;
-  top: var(--margin);
   /*github corner*/
-  right: calc(var(--margin) + 40px);
-  z-index: 2;
+  padding: var(--space-factor) 40px var(--space-factor) var(--space-factor);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .FixedUserList > * {
   pointer-events: all;
+  margin: 0 0 var(--space-factor) var(--space-factor);
 }

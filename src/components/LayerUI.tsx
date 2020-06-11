@@ -164,31 +164,6 @@ const LayerUI = ({
     </Section>
   );
 
-  const renderFixedUserList = () => {
-    return (
-      <FixedUserList
-        className={`zen-mode-transition ${
-          zenModeEnabled && "transition-right"
-        }`}
-      >
-        <Stack.Col gap={4}>
-          <Stack.Row gap={1} justifyContent="space-between">
-            {Array.from(appState.collaborators)
-              // Collaborator is either not initialized or is actually the current user.
-              .filter(([_, client]) => Object.keys(client).length !== 0)
-              .map(([clientId, client]) => {
-                return (
-                  <React.Fragment key={clientId}>
-                    {actionManager.renderAction("goToCollaborator", clientId)}
-                  </React.Fragment>
-                );
-              })}
-          </Stack.Row>
-        </Stack.Col>
-      </FixedUserList>
-    );
-  };
-
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
@@ -228,7 +203,22 @@ const LayerUI = ({
               </Stack.Col>
             )}
           </Section>
-          <div />
+          <FixedUserList
+            className={`zen-mode-transition ${
+              zenModeEnabled && "transition-right"
+            }`}
+          >
+            {Array.from(appState.collaborators)
+              // Collaborator is either not initialized or is actually the current user.
+              .filter(([_, client]) => Object.keys(client).length !== 0)
+              .map(([clientId, client]) => {
+                return (
+                  <React.Fragment key={clientId}>
+                    {actionManager.renderAction("goToCollaborator", clientId)}
+                  </React.Fragment>
+                );
+              })}
+          </FixedUserList>
         </div>
         {
           <div
@@ -321,7 +311,6 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      {renderFixedUserList()}
       {
         <aside
           className={`layer-ui__wrapper__github-corner zen-mode-transition ${
