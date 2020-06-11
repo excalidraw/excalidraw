@@ -457,6 +457,7 @@ button,
 .github-corner {
   position: fixed;
   top: 0;
+  z-index: 2;
   :root[dir="ltr"] & {
     right: 0;
   }
