@@ -29,6 +29,7 @@ import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
+import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 
@@ -212,9 +213,12 @@ const LayerUI = ({
               // Collaborator is either not initialized or is actually the current user.
               .filter(([_, client]) => Object.keys(client).length !== 0)
               .map(([clientId, client]) => (
-                <React.Fragment key={clientId}>
+                <Tooltip
+                  label={client.username || "Unknown user"}
+                  key={clientId}
+                >
                   {actionManager.renderAction("goToCollaborator", clientId)}
-                </React.Fragment>
+                </Tooltip>
               ))}
           </UserList>
         </div>
