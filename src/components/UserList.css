@@ -11,3 +11,12 @@
   pointer-events: all;
   margin: 0 0 var(--space-factor) var(--space-factor);
 }
+
+.UserList_mobile {
+  padding: 0;
+  justify-content: normal;
+}
+
+.UserList_mobile > * {
+  margin: 0 var(--space-factor) var(--space-factor) 0;
+}
