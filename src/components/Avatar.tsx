@@ -3,7 +3,7 @@ import "./Avatar.scss";
 import React from "react";
 
 type AvatarProps = {
-  children: React.ReactNode;
+  children: string;
   className?: string;
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   color: string;
