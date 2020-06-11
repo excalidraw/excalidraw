@@ -18,6 +18,8 @@ export const actionGoToCollaborator = register({
         ...appState,
         scrollX: normalizeScroll(window.innerWidth / 2 - point.x),
         scrollY: normalizeScroll(window.innerHeight / 2 - point.y),
+        // Close mobile menu
+        openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
       commitToHistory: false,
     };
