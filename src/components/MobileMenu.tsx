@@ -16,6 +16,7 @@ import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
+import { UserList } from "./UserList";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -104,6 +105,21 @@ export const MobileMenu = ({
                     }}
                   />
                 </fieldset>
+                <UserList mobile>
+                  {Array.from(appState.collaborators)
+                    // Collaborator is either not initialized or is actually the current user.
+                    .filter(([_, client]) => Object.keys(client).length !== 0)
+                    .map(([clientId, client]) => {
+                      return (
+                        <React.Fragment key={clientId}>
+                          {actionManager.renderAction(
+                            "goToCollaborator",
+                            clientId,
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </UserList>
               </Stack.Col>
             </div>
           </Section>
