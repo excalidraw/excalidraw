@@ -63,6 +63,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
+  // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
       className={`encrypted-icon tooltip zen-mode-visibility ${
