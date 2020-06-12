@@ -71,6 +71,7 @@
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
     "save": "Αποθήκευση",
+    "saveAs": "",
     "load": "Άνοιγμα",
     "getShareableLink": "Δημόσιος σύνδεσμος",
     "close": "Κλείσιμο",
