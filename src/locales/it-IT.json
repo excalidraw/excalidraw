@@ -60,8 +60,8 @@
     "name": "Nome",
     "yourName": "Il vostro nome",
     "madeWithExcalidraw": "Creato con Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Raggruppa selezione",
+    "ungroup": "Separa selezione"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -71,7 +71,7 @@
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "save": "Salva",
-    "saveAs": "",
+    "saveAs": "Salva con nome",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
@@ -123,7 +123,7 @@
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "",
+    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
