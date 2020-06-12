@@ -71,6 +71,7 @@
     "copyToClipboard": "کپی در حافظه موقت",
     "copyPngToClipboard": "کپی PNG در حافظه موقت",
     "save": "ذخیره",
+    "saveAs": "",
     "load": "بارگذاری",
     "getShareableLink": "دریافت لینک قابل اشتراک",
     "close": "بستن",
