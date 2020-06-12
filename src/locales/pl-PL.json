@@ -71,6 +71,7 @@
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "save": "Zapisz",
+    "saveAs": "",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
