@@ -101,6 +101,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
+      hidden={!("chooseFileSystemEntries" in window)}
       onClick={() => updateData(null)}
     />
   ),
