@@ -5,9 +5,14 @@ import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
 
 const STORAGE_NAME = "excalidraw";
-const STORAGE_KEY_ELEMENTS = "excalidraw";
-const STORAGE_KEY_STATE = "excalidraw-state";
-const STORAGE_KEY_COLLAB = "excalidraw-collab";
+
+const STORAGE_KEYS = {
+  ELEMENTS: "excalidraw",
+  STATE: "excalidraw-state",
+  COLLAB: "excalidraw-collab",
+} as const;
+
+type VALID_STORAGE_KEYS = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS];
 
 /**
  * Uses indexedDB as key-value storage.
@@ -28,13 +33,7 @@ export class WebStorageProvider {
     migrated successfully, otherwise throws. */
   async migrate() {
     if (this.supportsIDB) {
-      const keysToMigrate = [
-        STORAGE_KEY_ELEMENTS,
-        STORAGE_KEY_STATE,
-        STORAGE_KEY_COLLAB,
-      ];
-
-      const runMigration = async (key: string): Promise<void> => {
+      for (const key of Object.values(STORAGE_KEYS)) {
         const item = localStorage.getItem(key);
         if (item) {
           await this.set(key, item);
@@ -44,14 +43,12 @@ export class WebStorageProvider {
             throw new Error(`couldn't migrate "${key}" from localStorage`);
           }
         }
-      };
-
-      await Promise.all(keysToMigrate.map(runMigration));
+      }
 
       // after successfully migrating all keys, remove them from localStorage
-      keysToMigrate.forEach((key) => {
+      for (const key of Object.values(STORAGE_KEYS)) {
         localStorage.removeItem(key);
-      });
+      }
     }
   }
 
@@ -76,7 +73,7 @@ export class WebStorageProvider {
     return localStorage.getItem(key as string);
   }
 
-  async set(key: string, value: string): Promise<void> {
+  async set(key: VALID_STORAGE_KEYS, value: string): Promise<void> {
     if (this.supportsIDB && this.IDBStore) {
       return await idb.set(key, value, this.IDBStore);
     }
@@ -85,11 +82,14 @@ export class WebStorageProvider {
 
   async getAll() {
     if (this.supportsIDB && this.IDBStore) {
-      const allItems: { [key: string]: string | null } = {};
-      const keys = await idb.keys(this.IDBStore);
-      for (const key of keys) {
-        allItems[key as string] = await this.get(key);
+      const allItems = {} as {
+        [K in VALID_STORAGE_KEYS]: string | null;
+      };
+
+      for (const key of Object.values(STORAGE_KEYS)) {
+        allItems[key] = await this.get(key);
       }
+
       return allItems;
     }
     return localStorage;
@@ -100,7 +100,7 @@ export const storage = new WebStorageProvider();
 
 export const saveUsernameToStorage = async (username: string) => {
   try {
-    await storage.set(STORAGE_KEY_COLLAB, JSON.stringify({ username }));
+    await storage.set(STORAGE_KEYS.COLLAB, JSON.stringify({ username }));
   } catch (error) {
     console.error(error);
   }
@@ -108,7 +108,7 @@ export const saveUsernameToStorage = async (username: string) => {
 
 export const restoreUsernameFromStorage = async (): Promise<string | null> => {
   try {
-    const data = await storage.get(STORAGE_KEY_COLLAB);
+    const data = await storage.get(STORAGE_KEYS.COLLAB);
     if (data) {
       return JSON.parse(data).username;
     }
@@ -125,11 +125,11 @@ export const saveToStorage = async (
 ) => {
   try {
     await storage.set(
-      STORAGE_KEY_ELEMENTS,
+      STORAGE_KEYS.ELEMENTS,
       JSON.stringify(elements.filter((element) => !element.isDeleted)),
     );
     await storage.set(
-      STORAGE_KEY_STATE,
+      STORAGE_KEYS.STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
   } catch (error) {
@@ -146,9 +146,9 @@ export const restoreFromStorage = async () => {
       storage.supportsIDB &&
       localStorage &&
       localStorage.length &&
-      // presence of STORAGE_KEY_ELEMENTS key suggests localStorage was still
+      // presence of ELEMENTS key suggests localStorage was still
       //  not migrated (this key is always present regardless of scene state)
-      localStorage.getItem(STORAGE_KEY_ELEMENTS) !== null
+      localStorage.getItem(STORAGE_KEYS.ELEMENTS) !== null
     ) {
       try {
         await storage.migrate();
@@ -157,8 +157,8 @@ export const restoreFromStorage = async () => {
       }
     }
 
-    savedElements = await storage.get(STORAGE_KEY_ELEMENTS);
-    savedState = await storage.get(STORAGE_KEY_STATE);
+    savedElements = await storage.get(STORAGE_KEYS.ELEMENTS);
+    savedState = await storage.get(STORAGE_KEYS.STATE);
   } catch (error) {
     console.error(error);
   }
