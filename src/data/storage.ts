@@ -71,7 +71,7 @@ export class WebStorageProvider {
 
   async get(key: string | IDBValidKey): Promise<string | null> {
     if (this.supportsIDB && this.IDBStore) {
-      return await idb.get(key, this.IDBStore);
+      return (await idb.get<string>(key, this.IDBStore)) || null;
     }
     return localStorage.getItem(key as string);
   }
