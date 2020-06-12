@@ -224,26 +224,29 @@ const LayerUI = ({
               ))}
           </UserList>
         </div>
-        {
-          <div
-            className={`App-menu App-menu_bottom zen-mode-transition ${
-              zenModeEnabled && "App-menu_bottom--transition-left"
-            }`}
-          >
-            <Stack.Col gap={2}>
-              <Section heading="canvasActions">
-                <Island padding={1}>
-                  <ZoomActions
-                    renderAction={actionManager.renderAction}
-                    zoom={appState.zoom}
-                  />
-                </Island>
-                {renderEncryptedIcon()}
-              </Section>
-            </Stack.Col>
-          </div>
-        }
       </FixedSideContainer>
+    );
+  };
+
+  const renderBottomAppMenu = () => {
+    return (
+      <div
+        className={`App-menu App-menu_bottom zen-mode-transition ${
+          zenModeEnabled && "App-menu_bottom--transition-left"
+        }`}
+      >
+        <Stack.Col gap={2}>
+          <Section heading="canvasActions">
+            <Island padding={1}>
+              <ZoomActions
+                renderAction={actionManager.renderAction}
+                zoom={appState.zoom}
+              />
+            </Island>
+            {renderEncryptedIcon()}
+          </Section>
+        </Stack.Col>
+      </div>
     );
   };
 
@@ -315,6 +318,7 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
+      {renderBottomAppMenu()}
       {
         <aside
           className={`layer-ui__wrapper__github-corner zen-mode-transition ${
