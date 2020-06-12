@@ -71,6 +71,7 @@
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "save": "Mentés",
+    "saveAs": "",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
