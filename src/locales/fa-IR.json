@@ -92,7 +92,7 @@
     "exitZenMode": "خروج از حالت تمرکز"
   },
   "alerts": {
-    "clearReset": "با این کار کل بوم پاک می شود. آیا مطمئنید؟",
+    "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
     "couldNotCreateShareableLink": "عدم توانایی در ساخت یک لینک قابل اشتراک.",
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
