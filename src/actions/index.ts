@@ -34,6 +34,7 @@ export {
   actionChangeProjectName,
   actionChangeExportBackground,
   actionSaveScene,
+  actionSaveAsScene,
   actionLoadScene,
 } from "./actionExport";
 

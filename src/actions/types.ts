@@ -43,6 +43,7 @@ export type ActionName =
   | "changeExportBackground"
   | "changeShouldAddWatermark"
   | "saveScene"
+  | "saveAsScene"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
