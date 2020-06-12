@@ -71,6 +71,7 @@
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "save": "שמור",
+    "saveAs": "",
     "load": "טען",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",
