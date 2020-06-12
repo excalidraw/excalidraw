@@ -14,20 +14,16 @@ import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 
-type ElementConstructorOpts = {
-  x: ExcalidrawGenericElement["x"];
-  y: ExcalidrawGenericElement["y"];
-  strokeColor: ExcalidrawGenericElement["strokeColor"];
-  backgroundColor: ExcalidrawGenericElement["backgroundColor"];
-  fillStyle: ExcalidrawGenericElement["fillStyle"];
-  strokeWidth: ExcalidrawGenericElement["strokeWidth"];
-  strokeStyle: ExcalidrawGenericElement["strokeStyle"];
-  roughness: ExcalidrawGenericElement["roughness"];
-  opacity: ExcalidrawGenericElement["opacity"];
-  width?: ExcalidrawGenericElement["width"];
-  height?: ExcalidrawGenericElement["height"];
-  angle?: ExcalidrawGenericElement["angle"];
-};
+type ElementConstructorOpts = MarkOptional<
+  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
+  | "width"
+  | "height"
+  | "angle"
+  | "groupIds"
+  | "seed"
+  | "version"
+  | "versionNonce"
+>;
 
 const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
@@ -44,6 +40,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     width = 0,
     height = 0,
     angle = 0,
+    groupIds = [],
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => ({
@@ -61,11 +58,11 @@ const _newElementBase = <T extends ExcalidrawElement>(
   strokeStyle,
   roughness,
   opacity,
+  groupIds,
   seed: rest.seed ?? randomInteger(),
   version: rest.version || 1,
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
-  groupIds: [],
 });
 
 export const newElement = (

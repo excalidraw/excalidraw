@@ -171,5 +171,9 @@
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

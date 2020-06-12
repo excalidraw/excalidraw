@@ -23,7 +23,6 @@ import {
   newLinearElement,
   resizeElements,
   getElementWithResizeHandler,
-  canResizeMutlipleElements,
   getResizeOffsetXY,
   getResizeArrowDirection,
   getResizeHandlerFromCoords,
@@ -210,7 +209,7 @@ class App extends React.Component<any, AppState> {
     const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
-      <div className="container">
+      <div className="excalidraw">
         <LayerUI
           canvas={this.canvas}
           appState={this.state}
@@ -707,8 +706,15 @@ class App extends React.Component<any, AppState> {
       ) {
         return;
       }
-      const data = await getClipboardContent(event);
-      if (data.elements) {
+      const data = await getClipboardContent(
+        this.state,
+        cursorX,
+        cursorY,
+        event,
+      );
+      if (data.error) {
+        alert(data.error);
+      } else if (data.elements) {
         this.addElementsFromPaste(data.elements);
       } else if (data.text) {
         this.addTextFromPaste(data.text);
@@ -1764,20 +1770,18 @@ class App extends React.Component<any, AppState> {
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      if (canResizeMutlipleElements(selectedElements)) {
-        const resizeHandle = getResizeHandlerFromCoords(
-          getCommonBounds(selectedElements),
-          scenePointerX,
-          scenePointerY,
-          this.state.zoom,
-          event.pointerType,
-        );
-        if (resizeHandle) {
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            resizeHandle,
-          });
-          return;
-        }
+      const resizeHandle = getResizeHandlerFromCoords(
+        getCommonBounds(selectedElements),
+        scenePointerX,
+        scenePointerY,
+        this.state.zoom,
+        event.pointerType,
+      );
+      if (resizeHandle) {
+        document.documentElement.style.cursor = getCursorForResizingElement({
+          resizeHandle,
+        });
+        return;
       }
     }
     const hitElement = getElementAtPosition(
@@ -2047,22 +2051,18 @@ class App extends React.Component<any, AppState> {
           isResizingElements = true;
         }
       } else if (selectedElements.length > 1) {
-        if (canResizeMutlipleElements(selectedElements)) {
-          resizeHandle = getResizeHandlerFromCoords(
-            getCommonBounds(selectedElements),
-            x,
-            y,
-            this.state.zoom,
-            event.pointerType,
-          );
-          if (resizeHandle) {
-            document.documentElement.style.cursor = getCursorForResizingElement(
-              {
-                resizeHandle,
-              },
-            );
-            isResizingElements = true;
-          }
+        resizeHandle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          x,
+          y,
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (resizeHandle) {
+          document.documentElement.style.cursor = getCursorForResizingElement({
+            resizeHandle,
+          });
+          isResizingElements = true;
         }
       }
       if (isResizingElements) {

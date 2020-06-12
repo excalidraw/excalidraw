@@ -14,7 +14,13 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance, getFontString, getFontFamilyString } from "../utils";
+import {
+  SVG_NS,
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 
@@ -100,12 +106,21 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        const rtl = isRTL(element.text);
+        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+        if (shouldTemporarilyAttach) {
+          // to correctly render RTL text mixed with LTR, we have to append it
+          //  to the DOM
+          document.body.appendChild(context.canvas);
+        }
+        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         const font = context.font;
         context.font = getFontString(element);
         const fillStyle = context.fillStyle;
         context.fillStyle = element.strokeColor;
         const textAlign = context.textAlign;
         context.textAlign = element.textAlign as CanvasTextAlign;
+
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
@@ -119,13 +134,16 @@ const drawElementOnCanvas = (
         for (let i = 0; i < lines.length; i++) {
           context.fillText(
             lines[i],
-            0 + horizontalOffset,
+            horizontalOffset,
             (i + 1) * lineHeight - verticalOffset,
           );
         }
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;
+        if (shouldTemporarilyAttach) {
+          context.canvas.remove();
+        }
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
@@ -212,10 +230,9 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
-const generateElement = (
+const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
-  sceneState?: SceneState,
 ) => {
   let shape = shapeCache.get(element) || null;
   if (!shape) {
@@ -303,6 +320,12 @@ const generateElement = (
     }
     shapeCache.set(element, shape);
   }
+};
+
+const generateElementWithCanvas = (
+  element: NonDeletedExcalidrawElement,
+  sceneState?: SceneState,
+) => {
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
@@ -342,6 +365,8 @@ const drawElementFromCanvas = (
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  // Clear the nested element we appended to the DOM
 };
 
 export const renderElement = (
@@ -375,9 +400,12 @@ export const renderElement = (
     case "draw":
     case "arrow":
     case "text": {
-      const elementWithCanvas = generateElement(element, generator, sceneState);
-
+      generateElementShape(element, generator);
       if (renderOptimizations) {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          sceneState,
+        );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -423,7 +451,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElement(element, generator);
+      generateElementShape(element, generator);
       const node = rsvg.draw(getShapeForElement(element) as Drawable);
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
@@ -442,7 +470,7 @@ export const renderElementToSvg = (
     case "line":
     case "draw":
     case "arrow": {
-      generateElement(element, generator);
+      generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
@@ -492,10 +520,11 @@ export const renderElementToSvg = (
             : element.textAlign === "right"
             ? element.width
             : 0;
+        const direction = isRTL(element.text) ? "rtl" : "ltr";
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
-            : element.textAlign === "right"
+            : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
         for (let i = 0; i < lines.length; i++) {
@@ -508,6 +537,7 @@ export const renderElementToSvg = (
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
+          text.setAttribute("direction", direction);
           node.appendChild(text);
         }
         svgRoot.appendChild(node);
