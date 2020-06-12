@@ -14,7 +14,7 @@ const STORAGE_KEY_COLLAB = "excalidraw-collab";
  * Fallsback to localStorage on older browsers without IDB (or) while running tests.
  */
 export class WebStorageProvider {
-  private supportsIDB: boolean;
+  public supportsIDB: boolean;
   private IDBStore: idb.Store | null;
 
   constructor() {
@@ -24,10 +24,11 @@ export class WebStorageProvider {
       : null;
   }
 
-  // moves existing localStorage data-items to IDB.
+  /** Moves existing localStorage data to IDB. Succeeds only if all items are
+    migrated successfully, otherwise throws. */
   async migrate() {
     if (this.supportsIDB) {
-      const keysToMigrate: string[] = [
+      const keysToMigrate = [
         STORAGE_KEY_ELEMENTS,
         STORAGE_KEY_STATE,
         STORAGE_KEY_COLLAB,
@@ -37,16 +38,20 @@ export class WebStorageProvider {
         const item: string | null = localStorage.getItem(key);
         if (item) {
           await this.set(key, item);
-          const isMigrationSuccessful = !!(await this.get(key));
-          // remove existing key only if IDB has the migrated values.
-          if (isMigrationSuccessful) {
-            localStorage.removeItem(key);
+          const isMigrationSuccessful = (await this.get(key)) === item;
+
+          if (!isMigrationSuccessful) {
+            throw new Error(`couldn't migrate "${key}" from localStorage`);
           }
         }
       };
 
-      const migrations = keysToMigrate.map(runMigration);
-      await Promise.all(migrations);
+      await Promise.all(keysToMigrate.map(runMigration));
+
+      // after successfully migrating all keys, remove them from localStorage
+      keysToMigrate.forEach((key) => {
+        localStorage.removeItem(key);
+      });
     }
   }
 
@@ -137,11 +142,18 @@ export const restoreFromStorage = async () => {
   let savedState = null;
 
   try {
-    if (localStorage && localStorage.length) {
-      const elementsToMigrate = localStorage.getItem(STORAGE_KEY_ELEMENTS);
-      // migrate all existing data-items only if there are elements.
-      if (elementsToMigrate && elementsToMigrate.length) {
+    if (
+      storage.supportsIDB &&
+      localStorage &&
+      localStorage.length &&
+      // presence of STORAGE_KEY_ELEMENTS key suggests localStorage was still
+      //  not migrated (this key is always present regardless of scene state)
+      localStorage.getItem(STORAGE_KEY_ELEMENTS) !== null
+    ) {
+      try {
         await storage.migrate();
+      } catch (error) {
+        console.error(error);
       }
     }
 
