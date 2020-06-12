@@ -71,6 +71,7 @@
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
+    "saveAs": "",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
     "close": "Cerrar",
