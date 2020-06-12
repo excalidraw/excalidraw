@@ -16,6 +16,7 @@ type ToolButtonBaseProps = {
   size?: ToolIconSize;
   keyBindingLabel?: string;
   showAriaLabel?: boolean;
+  hidden?: boolean;
   visible?: boolean;
   selected?: boolean;
   className?: string;
@@ -44,13 +45,16 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   if (props.type === "button") {
     return (
       <button
-        className={`ToolIcon_type_button ToolIcon ${sizeCn}${
-          props.selected ? " ToolIcon--selected" : ""
-        } ${props.className} ${
-          props.visible
+        className={`ToolIcon_type_button ${
+          !props.hidden ? "ToolIcon" : ""
+        } ${sizeCn}${props.selected ? " ToolIcon--selected" : ""} ${
+          props.className
+        } ${
+          props.visible && !props.hidden
             ? "ToolIcon_type_button--show"
             : "ToolIcon_type_button--hide"
         }`}
+        hidden={props.hidden}
         title={props.title}
         aria-label={props["aria-label"]}
         type="button"
