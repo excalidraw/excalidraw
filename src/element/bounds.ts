@@ -2,7 +2,7 @@ import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 import { rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op, Options } from "roughjs/bin/core";
-import { Point } from "../types";
+import { Point, BoundingPoints } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
@@ -241,6 +241,54 @@ const getLinearElementRotatedBounds = (
   return getMinMaxXYFromCurvePathOps(ops, transformXY);
 };
 
+export function getElementBoudingPoints(
+  element: ExcalidrawElement,
+): BoundingPoints {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+
+  let x11: number = Infinity;
+  let y11: number = Infinity;
+  let x12: number = Infinity;
+  let y12: number = Infinity;
+  let x22: number = Infinity;
+  let y22: number = Infinity;
+  let x21: number = Infinity;
+  let y21: number = Infinity;
+
+  if (element.type === "diamond") {
+    [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
+    [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
+    [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
+    [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
+  } else if (element.type === "ellipse") {
+    const w = (x2 - x1) / 2;
+    const h = (y2 - y1) / 2;
+    const cos = Math.cos(element.angle);
+    const sin = Math.sin(element.angle);
+    const ww = Math.hypot(w * cos, h * sin);
+    const hh = Math.hypot(h * cos, w * sin);
+
+    x11 = x21 = cx - ww;
+    y11 = y12 = cy - hh;
+    x12 = x22 = cx + ww;
+    y21 = y22 = cy + hh;
+  } else {
+    [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+    [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+    [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+    [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+  }
+
+  return {
+    nw: [x11, y11],
+    ne: [x12, y12],
+    sw: [x21, y21],
+    se: [x22, y22],
+  };
+}
+
 export const getElementBounds = (
   element: ExcalidrawElement,
 ): [number, number, number, number] => {
@@ -250,34 +298,13 @@ export const getElementBounds = (
   if (isLinearElement(element)) {
     return getLinearElementRotatedBounds(element, cx, cy);
   }
-  if (element.type === "diamond") {
-    const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
-    const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
-    const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
-    const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
-    const minX = Math.min(x11, x12, x22, x21);
-    const minY = Math.min(y11, y12, y22, y21);
-    const maxX = Math.max(x11, x12, x22, x21);
-    const maxY = Math.max(y11, y12, y22, y21);
-    return [minX, minY, maxX, maxY];
-  }
-  if (element.type === "ellipse") {
-    const w = (x2 - x1) / 2;
-    const h = (y2 - y1) / 2;
-    const cos = Math.cos(element.angle);
-    const sin = Math.sin(element.angle);
-    const ww = Math.hypot(w * cos, h * sin);
-    const hh = Math.hypot(h * cos, w * sin);
-    return [cx - ww, cy - hh, cx + ww, cy + hh];
-  }
-  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
-  const minX = Math.min(x11, x12, x22, x21);
-  const minY = Math.min(y11, y12, y22, y21);
-  const maxX = Math.max(x11, x12, x22, x21);
-  const maxY = Math.max(y11, y12, y22, y21);
+  const { nw, ne, sw, se } = getElementBoudingPoints(element);
+
+  const minX = Math.min(nw[0], ne[0], sw[0], se[0]);
+  const minY = Math.min(nw[1], ne[1], sw[1], se[1]);
+  const maxX = Math.max(nw[0], ne[0], sw[0], se[0]);
+  const maxY = Math.max(nw[1], ne[1], sw[1], se[1]);
+
   return [minX, minY, maxX, maxY];
 };
 

@@ -556,7 +556,7 @@ export function isPointInsidePath(path, x, y) {
   return (
     isPointInsideBBox(bbox, x, y) &&
     // eslint-disable-next-line
-    pathIntersection(path, _path2curve([["M", x, y], ["H", bbox.x2 + 10]])).length % 2 === 1
+    pathIntersection(path, _path2curve([["M", x, y], ["L", bbox.x2 + 10, bbox.y2 + 10]])).length % 2 === 1
   );
 }
 
