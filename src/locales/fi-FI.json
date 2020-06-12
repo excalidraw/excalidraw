@@ -71,6 +71,7 @@
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
     "save": "Tallenna",
+    "saveAs": "",
     "load": "Avaa",
     "getShareableLink": "Hae jaettava linkki",
     "close": "Sulje",
