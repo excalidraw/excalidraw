@@ -71,6 +71,7 @@
     "copyToClipboard": "نسخ إلى الحافظة",
     "copyPngToClipboard": "نسخ الـ PNG الى الحافظة",
     "save": "حفظ",
+    "saveAs": "",
     "load": "تحميل",
     "getShareableLink": "احصل على رابط المشاركة",
     "close": "إغلاق",
