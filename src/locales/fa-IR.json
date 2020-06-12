@@ -61,7 +61,7 @@
     "yourName": "نام شما",
     "madeWithExcalidraw": "ساخته شده با Excalidraw",
     "group": "گروهبندی انتخابها",
-    "ungroup": "حذف گروه بندی"
+    "ungroup": "حذف گروهبندی انتخابها"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -75,12 +75,12 @@
     "load": "بارگذاری",
     "getShareableLink": "دریافت لینک قابل اشتراک",
     "close": "بستن",
-    "selectLanguage": "زبان را انتخاب کنید",
+    "selectLanguage": "انتخاب زبان",
     "scrollBackToContent": "به محتوا بروید",
     "zoomIn": "بزرگ نمایی",
     "zoomOut": "کوچک نمایی",
     "resetZoom": "اندازه اصلی",
-    "menu": "منو",
+    "menu": "فهرست",
     "done": "انجام شد",
     "edit": "ویرایش",
     "undo": "بازگرد",
@@ -88,8 +88,8 @@
     "roomDialog": "همکاری آنلاین را شروع کنید",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
-    "toggleZenMode": "تغییر به حالت zen",
-    "exitZenMode": "خروج از حالت zen"
+    "toggleZenMode": "تغییر به حالت تمرکز",
+    "exitZenMode": "خروج از حالت تمرکز"
   },
   "alerts": {
     "clearReset": "با این کار کل بوم پاک می شود. آیا مطمئنید؟",
