@@ -35,7 +35,7 @@ export class WebStorageProvider {
       ];
 
       const runMigration = async (key: string): Promise<void> => {
-        const item: string | null = localStorage.getItem(key);
+        const item = localStorage.getItem(key);
         if (item) {
           await this.set(key, item);
           const isMigrationSuccessful = (await this.get(key)) === item;
