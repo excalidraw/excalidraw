@@ -71,6 +71,7 @@
     "copyToClipboard": "複製到剪貼板",
     "copyPngToClipboard": "複製 PNG 到剪貼板",
     "save": "儲存",
+    "saveAs": "",
     "load": "載入",
     "getShareableLink": "取得共享連結",
     "close": "關閉",
