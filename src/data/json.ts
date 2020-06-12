@@ -38,6 +38,7 @@ export const saveAsJSON = async (
       {
         fileName: name,
         description: "Excalidraw file",
+        extensions: ["excalidraw"],
       },
       fileHandle,
     );
