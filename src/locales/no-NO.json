@@ -71,6 +71,7 @@
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",
+    "saveAs": "",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
