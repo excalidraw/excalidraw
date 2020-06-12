@@ -54,13 +54,13 @@
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "createRoom": "یه جلسه آنلاین برای همکاری به اشتراک بگذارید",
+    "createRoom": "اشتراک گذاری جلسه همکاری زنده",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
     "yourName": "نام شما",
-    "madeWithExcalidraw": "\"ساخته شده با Excalidraw",
-    "group": "گروهبندی",
+    "madeWithExcalidraw": "ساخته شده با Excalidraw",
+    "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروه بندی"
   },
   "buttons": {
