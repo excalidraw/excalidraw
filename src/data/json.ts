@@ -33,16 +33,15 @@ export const saveAsJSON = async (
   // Either "Save as" or non-supporting browser
   if (!fileHandle) {
     const name = `${appState.name}.excalidraw`;
-    const handle = await fileSave(
+    const newFileHandle = await fileSave(
       blob,
       {
         fileName: name,
         description: "Excalidraw file",
         extensions: ["excalidraw"],
       },
-      fileHandle,
     );
-    (window as any).handle = handle;
+    (window as any).handle = newFileHandle;
     return;
   }
   // "Save"
