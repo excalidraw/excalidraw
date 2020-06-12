@@ -71,6 +71,7 @@
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "save": "Salva",
+    "saveAs": "",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
