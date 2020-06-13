@@ -29,6 +29,12 @@ export class WebStorageProvider {
       : null;
   }
 
+  // TODO remove after we're certain IDB migrations work correctly (i.e. we're
+  //  not getting any errors on Sentry)
+  isIDBSafeToUse(): boolean {
+    return false;
+  }
+
   /** Moves existing localStorage data to IDB. Succeeds only if all items are
     migrated successfully, otherwise throws. */
   async migrate() {
@@ -46,42 +52,60 @@ export class WebStorageProvider {
       }
 
       // after successfully migrating all keys, remove them from localStorage
-      for (const key of Object.values(STORAGE_KEYS)) {
-        localStorage.removeItem(key);
+      if (this.isIDBSafeToUse()) {
+        for (const key of Object.values(STORAGE_KEYS)) {
+          localStorage.removeItem(key);
+        }
       }
     }
   }
 
   async clear(): Promise<void> {
     if (this.supportsIDB && this.IDBStore) {
-      return await idb.clear(this.IDBStore);
+      await idb.clear(this.IDBStore);
+      if (this.isIDBSafeToUse()) {
+        return;
+      }
     }
     return localStorage.clear();
   }
 
   async delete(key: string): Promise<void> {
     if (this.supportsIDB && this.IDBStore) {
-      return await idb.del(key, this.IDBStore);
+      await idb.del(key, this.IDBStore);
+      if (this.isIDBSafeToUse()) {
+        return;
+      }
     }
     return localStorage.removeItem(key);
   }
 
-  async get(key: string | IDBValidKey): Promise<string | null> {
-    if (this.supportsIDB && this.IDBStore) {
-      return (await idb.get<string>(key, this.IDBStore)) || null;
+  async get(
+    key: string | IDBValidKey,
+    // NOTE used for debugging. Remove this once we're sure IDB works correctly.
+    storage: "localStorage" | "IDB" = "IDB",
+  ): Promise<string | null> {
+    if (storage === "IDB") {
+      if (this.supportsIDB && this.IDBStore) {
+        return (await idb.get<string>(key, this.IDBStore)) || null;
+      }
+      return null;
     }
     return localStorage.getItem(key as string);
   }
 
   async set(key: VALID_STORAGE_KEYS, value: string): Promise<void> {
     if (this.supportsIDB && this.IDBStore) {
-      return await idb.set(key, value, this.IDBStore);
+      await idb.set(key, value, this.IDBStore);
+      if (this.isIDBSafeToUse()) {
+        return;
+      }
     }
     return localStorage.setItem(key, value);
   }
 
   async getAll() {
-    if (this.supportsIDB && this.IDBStore) {
+    if (this.isIDBSafeToUse() && this.supportsIDB && this.IDBStore) {
       const allItems = {} as {
         [K in VALID_STORAGE_KEYS]: string | null;
       };
@@ -157,8 +181,14 @@ export const restoreFromStorage = async () => {
       }
     }
 
-    savedElements = await storage.get(STORAGE_KEYS.ELEMENTS);
-    savedState = await storage.get(STORAGE_KEYS.STATE);
+    savedElements = await storage.get(
+      STORAGE_KEYS.ELEMENTS,
+      storage.isIDBSafeToUse() ? "IDB" : "localStorage",
+    );
+    savedState = await storage.get(
+      STORAGE_KEYS.STATE,
+      storage.isIDBSafeToUse() ? "IDB" : "localStorage",
+    );
   } catch (error) {
     console.error(error);
   }
