@@ -59,7 +59,9 @@
     "untitled": "",
     "name": "",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -119,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "",
-    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
+    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
@@ -142,7 +147,7 @@
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "شارك هذا الرابط مع أي شخص تريده ان يشاركك الجلسة:",
-    "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "خطأ"

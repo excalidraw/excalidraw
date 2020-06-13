@@ -59,7 +59,9 @@
     "untitled": "Sense títol",
     "name": "Nom",
     "yourName": "El teu nom",
-    "madeWithExcalidraw": "Fet amb Excalidraw"
+    "madeWithExcalidraw": "Fet amb Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -119,7 +121,10 @@
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
-    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)"
+    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "S'ha produït un error. Intentar ",
@@ -142,7 +147,7 @@
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_persistenceWarning": "Tingues en compte que les dades de l'escena es comparteixen entre col·laboradors de manera P2P i no es desen al nostre servidor. Així, si tots us desconnecteu, perdreu les dades, tret que els exporteu a un fitxer o a un enllaç per a compartir.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
-    "desc_exitSession": "Si atures la sessió, et desconectaras de la sala, però podrás continuar treballant amb l'escena localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "Error"

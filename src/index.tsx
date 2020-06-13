@@ -10,6 +10,7 @@ import App from "./components/App";
 import { register as registerServiceWorker } from "./serviceWorker";
 
 import "./css/styles.scss";
+import { loadFromBlob } from "./data";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -18,7 +19,7 @@ if (
   /\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent) &&
   !matchMedia("(display-mode: standalone)").matches
 ) {
-  import("pwacompat");
+  import(/* webpackChunkName: "pwacompat" */ "pwacompat");
 }
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
@@ -50,7 +51,7 @@ Sentry.init({
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(
   "touchmove",
-  function (event) {
+  (event) => {
     // @ts-ignore
     if (event.scale !== 1) {
       event.preventDefault();
@@ -88,3 +89,16 @@ registerServiceWorker({
     }
   },
 });
+
+if ("launchQueue" in window && "LaunchParams" in window) {
+  (window as any).launchQueue.setConsumer(
+    async (launchParams: { files: any[] }) => {
+      if (!launchParams.files.length) {
+        return;
+      }
+      const fileHandle = launchParams.files[0];
+      const blob = await fileHandle.getFile();
+      loadFromBlob(blob);
+    },
+  );
+}

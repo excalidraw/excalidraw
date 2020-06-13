@@ -59,7 +59,9 @@
     "untitled": "Senza titolo",
     "name": "Nome",
     "yourName": "Il vostro nome",
-    "madeWithExcalidraw": "Creato con Excalidraw"
+    "madeWithExcalidraw": "Creato con Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -119,7 +121,10 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
-    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
+    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
@@ -142,7 +147,7 @@
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
     "desc_persistenceWarning": "Tieni presente che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Pertanto, se vi disconnettere tutti, perderete i dati a meno che non li esportiate in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
-    "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "Errore"

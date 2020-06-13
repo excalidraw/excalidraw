@@ -20,6 +20,7 @@ export const languages = [
   { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
   { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
   { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
+  { lng: "uk-UA", label: "Українська", data: require("./locales/uk-UA.json") },
   { lng: "fi-FI", label: "Suomi", data: require("./locales/fi-FI.json") },
   { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
   { lng: "ja-JP", label: "日本語", data: require("./locales/ja-JP.json") },
@@ -43,20 +44,18 @@ export const languages = [
 let currentLanguage = languages[0];
 const fallbackLanguage = languages[0];
 
-export function setLanguage(newLng: string | undefined) {
+export const setLanguage = (newLng: string | undefined) => {
   currentLanguage =
     languages.find((language) => language.lng === newLng) || fallbackLanguage;
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
-}
+};
 
-export function getLanguage() {
-  return currentLanguage;
-}
+export const getLanguage = () => currentLanguage;
 
-function findPartsForData(data: any, parts: string[]) {
+const findPartsForData = (data: any, parts: string[]) => {
   for (var i = 0; i < parts.length; ++i) {
     const part = parts[i];
     if (data[part] === undefined) {
@@ -68,9 +67,9 @@ function findPartsForData(data: any, parts: string[]) {
     return undefined;
   }
   return data;
-}
+};
 
-export function t(path: string, replacement?: { [key: string]: string }) {
+export const t = (path: string, replacement?: { [key: string]: string }) => {
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLanguage.data, parts) ||
@@ -85,14 +84,12 @@ export function t(path: string, replacement?: { [key: string]: string }) {
     }
   }
   return translation;
-}
+};
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
-    formatLanguageCode: function (lng: string) {
-      return lng;
-    },
+    formatLanguageCode: (lng: string) => lng,
     isWhitelisted: () => true,
   },
   checkWhitelist: false,

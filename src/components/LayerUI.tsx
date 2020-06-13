@@ -43,6 +43,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
+  lng: string;
 }
 
 const LayerUI = ({
@@ -255,7 +256,9 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
-            setAppState({ ...calculateScrollCenter(elements) });
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
           }}
         >
           {t("buttons.scrollBackToContent")}
@@ -275,6 +278,7 @@ const LayerUI = ({
       onRoomCreate={onRoomCreate}
       onRoomDestroy={onRoomDestroy}
       onLockToggle={onLockToggle}
+      canvas={canvas}
     />
   ) : (
     <div className="layer-ui__wrapper">
@@ -325,6 +329,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
+    prev.lng === next.lng &&
     prev.elements === next.elements &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );

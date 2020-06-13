@@ -1,10 +1,11 @@
 import { KEYS } from "../keys";
-import { selectNode, isWritableElement } from "../utils";
+import { selectNode, isWritableElement, getFontString } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
+import { FontFamily } from "./types";
 
-function trimText(text: string) {
+const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
   if (!text.trim()) {
     return "";
@@ -13,7 +14,7 @@ function trimText(text: string) {
   //  box calculation (there's also a bug in FF which inserts trailing newline
   //  for multiline texts)
   return text.replace(/^\n+|\n+$/g, "");
-}
+};
 
 type TextWysiwygParams = {
   id: string;
@@ -21,7 +22,8 @@ type TextWysiwygParams = {
   x: number;
   y: number;
   strokeColor: string;
-  font: string;
+  fontSize: number;
+  fontFamily: FontFamily;
   opacity: number;
   zoom: number;
   angle: number;
@@ -31,13 +33,14 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
-export function textWysiwyg({
+export const textWysiwyg = ({
   id,
   initText,
   x,
   y,
   strokeColor,
-  font,
+  fontSize,
+  fontFamily,
   opacity,
   zoom,
   angle,
@@ -45,7 +48,7 @@ export function textWysiwyg({
   textAlign,
   onSubmit,
   onCancel,
-}: TextWysiwygParams) {
+}: TextWysiwygParams) => {
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -68,7 +71,7 @@ export function textWysiwyg({
     transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
     textAlign: textAlign,
     display: "inline-block",
-    font: font,
+    font: getFontString({ fontSize, fontFamily }),
     padding: "4px",
     // This needs to have "1px solid" otherwise the carret doesn't show up
     // the first time on Safari and Chrome!
@@ -126,20 +129,20 @@ export function textWysiwyg({
     }
   };
 
-  function stopEvent(event: Event) {
+  const stopEvent = (event: Event) => {
     event.stopPropagation();
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     if (editable.innerText) {
       onSubmit(trimText(editable.innerText));
     } else {
       onCancel();
     }
     cleanup();
-  }
+  };
 
-  function cleanup() {
+  const cleanup = () => {
     if (isDestroyed) {
       return;
     }
@@ -158,7 +161,7 @@ export function textWysiwyg({
     unbindUpdate();
 
     document.body.removeChild(editable);
-  }
+  };
 
   const rebindBlur = () => {
     window.removeEventListener("pointerup", rebindBlur);
@@ -193,7 +196,7 @@ export function textWysiwyg({
       .find((element) => element.id === id);
     if (editingElement && isTextElement(editingElement)) {
       Object.assign(editable.style, {
-        font: editingElement.font,
+        font: getFontString(editingElement),
         textAlign: editingElement.textAlign,
         color: editingElement.strokeColor,
         opacity: editingElement.opacity / 100,
@@ -210,4 +213,4 @@ export function textWysiwyg({
   document.body.appendChild(editable);
   editable.focus();
   selectNode(editable);
-}
+};

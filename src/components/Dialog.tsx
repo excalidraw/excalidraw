@@ -8,13 +8,13 @@ import { KEYS } from "../keys";
 
 import "./Dialog.scss";
 
-export function Dialog(props: {
+export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
   maxWidth?: number;
   onCloseRequest(): void;
   title: React.ReactNode;
-}) {
+}) => {
   const islandRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function Dialog(props: {
       return;
     }
 
-    function handleKeyDown(event: KeyboardEvent) {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.TAB) {
         const focusableElements = queryFocusableElements();
         const { activeElement } = document;
@@ -50,7 +50,7 @@ export function Dialog(props: {
           event.preventDefault();
         }
       }
-    }
+    };
 
     const node = islandRef.current;
     node.addEventListener("keydown", handleKeyDown);
@@ -58,13 +58,13 @@ export function Dialog(props: {
     return () => node.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  function queryFocusableElements() {
+  const queryFocusableElements = () => {
     const focusableElements = islandRef.current?.querySelectorAll<HTMLElement>(
       "button, a, input, select, textarea, div[tabindex]",
     );
 
     return focusableElements ? Array.from(focusableElements) : [];
-  }
+  };
 
   return (
     <Modal
@@ -88,4 +88,4 @@ export function Dialog(props: {
       </Island>
     </Modal>
   );
-}
+};

@@ -40,7 +40,7 @@ const ICONS = {
   ),
 };
 
-export function LockIcon(props: LockIconProps) {
+export const LockIcon = (props: LockIconProps) => {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   return (
@@ -64,4 +64,4 @@ export function LockIcon(props: LockIconProps) {
       </div>
     </label>
   );
-}
+};

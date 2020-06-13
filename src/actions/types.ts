@@ -6,6 +6,7 @@ export type ActionResult = {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: AppState | null;
   commitToHistory: boolean;
+  syncHistory?: boolean;
 };
 
 type ActionFn = (
@@ -54,7 +55,9 @@ export type ActionName =
   | "changeFontFamily"
   | "changeTextAlign"
   | "toggleFullScreen"
-  | "toggleShortcuts";
+  | "toggleShortcuts"
+  | "group"
+  | "ungroup";
 
 export interface Action {
   name: ActionName;

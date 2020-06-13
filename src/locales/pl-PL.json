@@ -16,10 +16,10 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
-    "strokeStyle": "",
-    "strokeStyle_solid": "",
-    "strokeStyle_dashed": "",
-    "strokeStyle_dotted": "",
+    "strokeStyle": "Styl obrysu",
+    "strokeStyle_solid": "Pełny",
+    "strokeStyle_dashed": "Kreskowany",
+    "strokeStyle_dotted": "Kropkowany",
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
@@ -58,8 +58,10 @@
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
-    "yourName": "",
-    "madeWithExcalidraw": "Zrobione w Excalidraw"
+    "yourName": "Twoje imię",
+    "madeWithExcalidraw": "Zrobione w Excalidraw",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -85,8 +87,8 @@
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Włącz tryb Zen",
+    "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -100,7 +102,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "draw": "",
+    "draw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
@@ -116,10 +118,13 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "freeDraw": "",
+    "freeDraw": "Kliknij i przeciągnij, zwolnij kiedy skończysz",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHITH, przytrzymaj ALT by zmienać rozmiar względem środka",
-    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
+    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
+    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
@@ -140,7 +145,7 @@
     "button_startSession": "Rozpocznij sesję",
     "button_stopSession": "Zakończ sesję",
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
-    "desc_persistenceWarning": "",
+    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
     "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
     "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   },

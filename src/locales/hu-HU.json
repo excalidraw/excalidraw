@@ -1,11 +1,11 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "selectAll": "",
+    "selectAll": "Összes kijelölése",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
-    "copyAsSvg": "",
-    "bringForward": "",
+    "copyAsSvg": "Vágólapra másolás mint SVG",
+    "bringForward": "Előrébb hozás",
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
@@ -59,7 +59,9 @@
     "untitled": "",
     "name": "",
     "yourName": "",
-    "madeWithExcalidraw": ""
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -119,7 +121,10 @@
     "freeDraw": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
-    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
+    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
@@ -142,7 +147,7 @@
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_persistenceWarning": "",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": ""

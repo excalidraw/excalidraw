@@ -464,3 +464,11 @@
   }
   @import "button.scss";
 }
+
+@media print {
+  .App-bottom-bar,
+  .FixedSideContainer,
+  .layer-ui__wrapper {
+    display: none;
+  }
+}

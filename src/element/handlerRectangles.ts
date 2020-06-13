@@ -21,7 +21,34 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   rotation: true,
 };
 
-function generateHandler(
+const OMIT_SIDES_FOR_TEXT_ELEMENT = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+};
+
+const OMIT_SIDES_FOR_LINE_SLASH = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  nw: true,
+  se: true,
+  rotation: true,
+};
+
+const OMIT_SIDES_FOR_LINE_BACKSLASH = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  ne: true,
+  sw: true,
+  rotation: true,
+};
+
+const generateHandler = (
   x: number,
   y: number,
   width: number,
@@ -29,18 +56,18 @@ function generateHandler(
   cx: number,
   cy: number,
   angle: number,
-): [number, number, number, number] {
+): [number, number, number, number] => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
-}
+};
 
-export function handlerRectanglesFromCoords(
+export const handlerRectanglesFromCoords = (
   [x1, y1, x2, y2]: [number, number, number, number],
   angle: number,
   zoom: number,
   pointerType: PointerType = "mouse",
   omitSides: { [T in Sides]?: boolean } = {},
-): Partial<{ [T in Sides]: [number, number, number, number] }> {
+): Partial<{ [T in Sides]: [number, number, number, number] }> => {
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;
@@ -173,20 +200,14 @@ export function handlerRectanglesFromCoords(
   }
 
   return handlers;
-}
+};
 
-export function handlerRectangles(
+export const handlerRectangles = (
   element: ExcalidrawElement,
   zoom: number,
   pointerType: PointerType = "mouse",
-) {
-  const handlers = handlerRectanglesFromCoords(
-    getElementAbsoluteCoords(element),
-    element.angle,
-    zoom,
-    pointerType,
-  );
-
+) => {
+  let omitSides: { [T in Sides]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||
@@ -195,43 +216,27 @@ export function handlerRectangles(
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;
-
       if (p1[0] === 0 || p1[1] === 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
-      }
-
-      if (p1[0] > 0 && p1[1] < 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
-      }
-
-      if (p1[0] > 0 && p1[1] > 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
-      }
-
-      if (p1[0] < 0 && p1[1] > 0) {
-        return {
-          ne: handlers.ne,
-          sw: handlers.sw,
-        } as typeof handlers;
-      }
-
-      if (p1[0] < 0 && p1[1] < 0) {
-        return {
-          nw: handlers.nw,
-          se: handlers.se,
-        } as typeof handlers;
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
+      } else if (p1[0] > 0 && p1[1] < 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_SLASH;
+      } else if (p1[0] > 0 && p1[1] > 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
+      } else if (p1[0] < 0 && p1[1] > 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_SLASH;
+      } else if (p1[0] < 0 && p1[1] < 0) {
+        omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       }
     }
+  } else if (element.type === "text") {
+    omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
 
-  return handlers;
-}
+  return handlerRectanglesFromCoords(
+    getElementAbsoluteCoords(element),
+    element.angle,
+    zoom,
+    pointerType,
+    omitSides,
+  );
+};

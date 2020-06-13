@@ -4,6 +4,7 @@ import { rescalePoints } from "../points";
 import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
 import {
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "./types";
@@ -24,6 +25,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
 } from "../keys";
+import { measureText, getFontString } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -52,6 +54,20 @@ export const resizeElements = (
         element,
         resizeArrowDirection,
         event.shiftKey,
+        pointerX,
+        pointerY,
+      );
+    } else if (
+      element.type === "text" &&
+      (resizeHandle === "nw" ||
+        resizeHandle === "ne" ||
+        resizeHandle === "sw" ||
+        resizeHandle === "se")
+    ) {
+      resizeSingleTextElement(
+        element,
+        resizeHandle,
+        getResizeCenterPointKey(event),
         pointerX,
         pointerY,
       );
@@ -188,6 +204,120 @@ const rescalePointsInElement = (
       }
     : {};
 
+// This is not computationally ideal, but can't be helped.
+const measureFontSizeFromWH = (
+  element: NonDeleted<ExcalidrawTextElement>,
+  nextWidth: number,
+  nextHeight: number,
+): { size: number; baseline: number } | null => {
+  let scale = Math.min(nextWidth / element.width, nextHeight / element.height);
+  let nextFontSize = element.fontSize * scale;
+  let metrics = measureText(
+    element.text,
+    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  );
+  if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
+    return { size: nextFontSize, baseline: metrics.baseline };
+  }
+  // second measurement
+  scale = Math.min(
+    Math.min(nextWidth, metrics.width) / element.width,
+    Math.min(nextHeight, metrics.height) / element.height,
+  );
+  nextFontSize = element.fontSize * scale;
+  metrics = measureText(
+    element.text,
+    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  );
+  if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
+    return { size: nextFontSize, baseline: metrics.baseline };
+  }
+  return null;
+};
+
+const resizeSingleTextElement = (
+  element: NonDeleted<ExcalidrawTextElement>,
+  resizeHandle: "nw" | "ne" | "sw" | "se",
+  isResizeFromCenter: boolean,
+  pointerX: number,
+  pointerY: number,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // rotation pointer with reverse angle
+  const [rotatedX, rotatedY] = rotate(
+    pointerX,
+    pointerY,
+    cx,
+    cy,
+    -element.angle,
+  );
+  let scale;
+  switch (resizeHandle) {
+    case "se":
+      scale = Math.max(
+        (rotatedX - x1) / (x2 - x1),
+        (rotatedY - y1) / (y2 - y1),
+      );
+      break;
+    case "nw":
+      scale = Math.max(
+        (x2 - rotatedX) / (x2 - x1),
+        (y2 - rotatedY) / (y2 - y1),
+      );
+      break;
+    case "ne":
+      scale = Math.max(
+        (rotatedX - x1) / (x2 - x1),
+        (y2 - rotatedY) / (y2 - y1),
+      );
+      break;
+    case "sw":
+      scale = Math.max(
+        (x2 - rotatedX) / (x2 - x1),
+        (rotatedY - y1) / (y2 - y1),
+      );
+      break;
+  }
+  if (scale > 0) {
+    const nextWidth = element.width * scale;
+    const nextHeight = element.height * scale;
+    const nextFont = measureFontSizeFromWH(element, nextWidth, nextHeight);
+    if (nextFont === null) {
+      return;
+    }
+    const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
+      element,
+      nextWidth,
+      nextHeight,
+    );
+    const deltaX1 = (x1 - nextX1) / 2;
+    const deltaY1 = (y1 - nextY1) / 2;
+    const deltaX2 = (x2 - nextX2) / 2;
+    const deltaY2 = (y2 - nextY2) / 2;
+    const [nextElementX, nextElementY] = adjustXYWithRotation(
+      resizeHandle,
+      element.x,
+      element.y,
+      element.angle,
+      deltaX1,
+      deltaY1,
+      deltaX2,
+      deltaY2,
+      isResizeFromCenter,
+    );
+    mutateElement(element, {
+      fontSize: nextFont.size,
+      width: nextWidth,
+      height: nextHeight,
+      baseline: nextFont.baseline,
+      x: nextElementX,
+      y: nextElementY,
+    });
+  }
+};
+
 const resizeSingleElement = (
   element: NonDeletedExcalidrawElement,
   resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
@@ -293,122 +423,105 @@ const resizeMultipleElements = (
   pointerY: number,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
+  let scale: number;
+  let getNextXY: (
+    element: NonDeletedExcalidrawElement,
+    origCoords: readonly [number, number, number, number],
+    finalCoords: readonly [number, number, number, number],
+  ) => { x: number; y: number };
   switch (resizeHandle) {
-    case "se": {
-      const scale = Math.max(
+    case "se":
+      scale = Math.max(
         (pointerX - x1) / (x2 - x1),
         (pointerY - y1) / (y2 - y1),
       );
-      if (scale > 0) {
-        elements.forEach((element) => {
-          const width = element.width * scale;
-          const height = element.height * scale;
-          const [origX1, origY1] = getElementAbsoluteCoords(element);
-          const rescaledPoints = rescalePointsInElement(element, width, height);
-          const [finalX1, finalY1] = getResizedElementAbsoluteCoords(
-            {
-              ...element,
-              ...rescaledPoints,
-            },
-            width,
-            height,
-          );
-          const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-          const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
-          mutateElement(element, { width, height, x, y, ...rescaledPoints });
-        });
-      }
+      getNextXY = (element, [origX1, origY1], [finalX1, finalY1]) => {
+        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
+        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+        return { x, y };
+      };
       break;
-    }
-    case "nw": {
-      const scale = Math.max(
+    case "nw":
+      scale = Math.max(
         (x2 - pointerX) / (x2 - x1),
         (y2 - pointerY) / (y2 - y1),
       );
-      if (scale > 0) {
-        elements.forEach((element) => {
-          const width = element.width * scale;
-          const height = element.height * scale;
-          const [, , origX2, origY2] = getElementAbsoluteCoords(element);
-          const rescaledPoints = rescalePointsInElement(element, width, height);
-          const [, , finalX2, finalY2] = getResizedElementAbsoluteCoords(
-            {
-              ...element,
-              ...rescaledPoints,
-            },
-            width,
-            height,
-          );
-          const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-          const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
-          mutateElement(element, { width, height, x, y, ...rescaledPoints });
-        });
-      }
+      getNextXY = (element, [, , origX2, origY2], [, , finalX2, finalY2]) => {
+        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
+        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+        return { x, y };
+      };
       break;
-    }
-    case "ne": {
-      const scale = Math.max(
+    case "ne":
+      scale = Math.max(
         (pointerX - x1) / (x2 - x1),
         (y2 - pointerY) / (y2 - y1),
       );
-      if (scale > 0) {
-        elements.forEach((element) => {
-          const width = element.width * scale;
-          const height = element.height * scale;
-          const [origX1, , , origY2] = getElementAbsoluteCoords(element);
-          const rescaledPoints = rescalePointsInElement(element, width, height);
-          const [finalX1, , , finalY2] = getResizedElementAbsoluteCoords(
-            {
-              ...element,
-              ...rescaledPoints,
-            },
-            width,
-            height,
-          );
-          const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-          const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
-          mutateElement(element, { width, height, x, y, ...rescaledPoints });
-        });
-      }
+      getNextXY = (element, [origX1, , , origY2], [finalX1, , , finalY2]) => {
+        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
+        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+        return { x, y };
+      };
       break;
-    }
-    case "sw": {
-      const scale = Math.max(
+    case "sw":
+      scale = Math.max(
         (x2 - pointerX) / (x2 - x1),
         (pointerY - y1) / (y2 - y1),
       );
-      if (scale > 0) {
-        elements.forEach((element) => {
-          const width = element.width * scale;
-          const height = element.height * scale;
-          const [, origY1, origX2] = getElementAbsoluteCoords(element);
-          const rescaledPoints = rescalePointsInElement(element, width, height);
-          const [, finalY1, finalX2] = getResizedElementAbsoluteCoords(
-            {
-              ...element,
-              ...rescaledPoints,
-            },
-            width,
-            height,
-          );
-          const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-          const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
-          mutateElement(element, { width, height, x, y, ...rescaledPoints });
-        });
-      }
+      getNextXY = (element, [, origY1, origX2], [, finalY1, finalX2]) => {
+        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
+        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+        return { x, y };
+      };
       break;
+  }
+  if (scale > 0) {
+    const updates = elements.reduce(
+      (prev, element) => {
+        if (!prev) {
+          return prev;
+        }
+        const width = element.width * scale;
+        const height = element.height * scale;
+        let font: { fontSize?: number; baseline?: number } = {};
+        if (element.type === "text") {
+          const nextFont = measureFontSizeFromWH(element, width, height);
+          if (nextFont === null) {
+            return null;
+          }
+          font = { fontSize: nextFont.size, baseline: nextFont.baseline };
+        }
+        const origCoords = getElementAbsoluteCoords(element);
+        const rescaledPoints = rescalePointsInElement(element, width, height);
+        const finalCoords = getResizedElementAbsoluteCoords(
+          {
+            ...element,
+            ...rescaledPoints,
+          },
+          width,
+          height,
+        );
+        const { x, y } = getNextXY(element, origCoords, finalCoords);
+        return [...prev, { width, height, x, y, ...rescaledPoints, ...font }];
+      },
+      [] as
+        | {
+            width: number;
+            height: number;
+            x: number;
+            y: number;
+            points?: (readonly [number, number])[];
+            fontSize?: number;
+            baseline?: number;
+          }[]
+        | null,
+    );
+    if (updates) {
+      elements.forEach((element, index) => {
+        mutateElement(element, updates[index]);
+      });
     }
   }
-};
-
-export const canResizeMutlipleElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
-) => {
-  return elements.every(
-    (element) =>
-      ["rectangle", "diamond", "ellipse"].includes(element.type) ||
-      isLinearElement(element),
-  );
 };
 
 export const getResizeOffsetXY = (

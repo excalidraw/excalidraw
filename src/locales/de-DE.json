@@ -16,7 +16,7 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeStyle": "Strichstil",
+    "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
     "strokeStyle_dotted": "Gepunktet",
@@ -59,7 +59,9 @@
     "untitled": "Unbenannt",
     "name": "Name",
     "yourName": "Dein Name",
-    "madeWithExcalidraw": "Made with Excalidraw"
+    "madeWithExcalidraw": "Made with Excalidraw",
+    "group": "Auswahl gruppieren",
+    "ungroup": "Gruppierung aufheben"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -100,7 +102,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
-    "draw": "Freihand Zeichnen",
+    "draw": "Freies Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
@@ -119,7 +121,10 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
-    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
+    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
+    "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
+    "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen oder ziehe, um ihn zu verschieben",
+    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
   "errorSplash": {
     "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
