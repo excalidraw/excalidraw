@@ -1,3 +1,4 @@
+import "fake-indexeddb/auto";
 import { reseed } from "../random";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -227,11 +228,11 @@ const checkpoint = (name: string) => {
   );
 };
 
-beforeEach(() => {
+beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-  localStorage.clear();
+  await h.storage.clear();
   renderScene.mockClear();
   h.history.clear();
   reseed(7);

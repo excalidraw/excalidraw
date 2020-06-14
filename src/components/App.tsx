@@ -128,6 +128,7 @@ import { actionFinalize } from "../actions";
 import {
   restoreUsernameFromStorage,
   saveUsernameToStorage,
+  storage,
 } from "../data/storage";
 
 import throttle from "lodash.throttle";
@@ -2865,6 +2866,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
+      storage: typeof storage;
     };
   }
 }
@@ -2886,6 +2888,9 @@ if (
     },
     history: {
       get: () => history,
+    },
+    storage: {
+      value: storage,
     },
   });
 }

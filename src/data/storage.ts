@@ -23,7 +23,7 @@ export class WebStorageProvider {
   private IDBStore: idb.Store | null;
 
   constructor() {
-    this.supportsIDB = "indexedDB" in window && process.env.NODE_ENV !== "test";
+    this.supportsIDB = "indexedDB" in window;
     this.IDBStore = this.supportsIDB
       ? new idb.Store(`${STORAGE_NAME}-db`, `${STORAGE_NAME}-store`)
       : null;
@@ -32,7 +32,7 @@ export class WebStorageProvider {
   // TODO remove after we're certain IDB migrations work correctly (i.e. we're
   //  not getting any errors on Sentry)
   isIDBSafeToUse(): boolean {
-    return false;
+    return process.env.NODE_ENV === "test";
   }
 
   /** Moves existing localStorage data to IDB. Succeeds only if all items are
