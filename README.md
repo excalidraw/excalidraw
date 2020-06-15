@@ -68,9 +68,9 @@ docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
 
 The Docker image is free of analytics and other tracking libraries.
 
-**Keep in mind that it will still use our backend server to store your shared excalidraw files.**
+**At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
 
-You can browse through the [source code of the backend server](https://github.com/excalidraw/excalidraw-json) and you can also read more about how Exclidraw [encrypts end to end all of your data](https://blog.excalidraw.com/end-to-end-encryption/).
+We are working towards providing a full-fledged solution for self hosting your own Excalidraw.
 
 ## Contributing
 
