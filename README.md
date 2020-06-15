@@ -10,7 +10,7 @@
     <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
-    <img src="https://img.shields.io/docker/pulls/getexcalidraw/excalidraw.svg">
+    <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
   </p>
 </div>
 
@@ -59,7 +59,7 @@ docker-compose up --build -d
 
 ## Self hosting
 
-We publish a Docker image with the excalidraw client at excalidraw/excalidraw on Docker Hub registry. You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
 
 ```sh
 docker build -t excalidraw/excalidraw .
