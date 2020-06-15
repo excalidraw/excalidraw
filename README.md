@@ -10,6 +10,7 @@
     <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
+    <img src="https://img.shields.io/docker/pulls/getexcalidraw/excalidraw.svg">
   </p>
 </div>
 
@@ -50,9 +51,26 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 #### Docker Compose
 
+You can use docker-compose to work on excalidraw locally if you don't want to setup a Node.js env.
+
 ```sh
 docker-compose up --build -d
 ```
+
+## Self hosting
+
+We publish a Docker image with the excalidraw client at excalidraw/excalidraw on Docker Hub registry. You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+
+```sh
+docker build -t excalidraw/excalidraw .
+docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
+```
+
+The Docker image is free of analytics and other tracking libraries.
+
+**Keep in mind that it will still use our backend server to store your shared excalidraw files.**
+
+You can browse through the [source code of the backend server](https://github.com/excalidraw/excalidraw-json) and you can also read more about how Exclidraw [encrypts end to end all of your data](https://blog.excalidraw.com/end-to-end-encryption/).
 
 ## Contributing
 
@@ -110,3 +128,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/excalidraw/organization/7/website"><img src="https://opencollective.com/excalidraw/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/excalidraw/organization/8/website"><img src="https://opencollective.com/excalidraw/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/excalidraw/organization/9/website"><img src="https://opencollective.com/excalidraw/organization/9/avatar.svg"></a>
+
+```
+
+```
