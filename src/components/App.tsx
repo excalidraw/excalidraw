@@ -403,7 +403,7 @@ class App extends React.Component<any, AppState> {
     try {
       document.createEvent("TouchEvent");
     } catch (e) {
-      this.setState({ touchAvailable: true });
+      this.setState({ touchAvailable: false });
     }
   }
 
