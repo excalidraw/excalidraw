@@ -398,13 +398,6 @@ class App extends React.Component<any, AppState> {
 
     this.addEventListeners();
     this.initializeScene();
-
-    // add touch context menu if available
-    try {
-      document.createEvent("TouchEvent");
-    } catch (e) {
-      this.setState({ touchAvailable: false });
-    }
   }
 
   public componentWillUnmount() {
@@ -2968,15 +2961,13 @@ class App extends React.Component<any, AppState> {
   });
 
   private handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!this.state.touchAvailable) {
-      return;
-    }
-
-    event.persist();
+    event.persist(); // prevent SyntheticEvent nullification, see https://reactjs.org/docs/events.html#event-pooling
     event.preventDefault();
 
     touchMoving = false;
 
+    // open the context menu with the first touch's clientX and clientY
+    // if the touch is not moving
     touchTimeout = window.setTimeout(() => {
       if (touchMoving === false) {
         this.openContextMenu({
@@ -2987,6 +2978,7 @@ class App extends React.Component<any, AppState> {
     }, 500);
   };
 
+  // clear touch handlers on touchEnd and touchCancel
   private handleTouchEnd = (event: React.TouchEvent<HTMLCanvasElement>) => {
     if (touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2994,6 +2986,7 @@ class App extends React.Component<any, AppState> {
     }
   };
 
+  // set touch moving when the touch is moving
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     touchMoving = true;
   };
