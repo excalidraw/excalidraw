@@ -55,7 +55,6 @@ export const getDefaultAppState = (): AppState => {
     zenModeEnabled: false,
     editingGroupId: null,
     selectedGroupIds: {},
-    touchAvailable: true,
   };
 };
 
