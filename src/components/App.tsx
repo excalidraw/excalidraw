@@ -161,6 +161,8 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
+let touchTimeout = 0;
+let touchMoving = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -246,6 +248,10 @@ class App extends React.Component<any, AppState> {
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
             onDrop={this.handleCanvasOnDrop}
+            onTouchStart={this.handleTouchStart}
+            onTouchEnd={this.handleTouchEnd}
+            onTouchMove={this.handleTouchMove}
+            onTouchCancel={this.handleTouchEnd}
           >
             {t("labels.drawingCanvas")}
           </canvas>
@@ -392,12 +398,21 @@ class App extends React.Component<any, AppState> {
 
     this.addEventListeners();
     this.initializeScene();
+
+    // add touch context menu if available
+    try {
+      document.createEvent("TouchEvent");
+    } catch (e) {
+      this.setState({ touchAvailable: true });
+    }
   }
 
   public componentWillUnmount() {
     this.unmounted = true;
     this.removeSceneCallback!();
     this.removeEventListeners();
+
+    clearTimeout(touchTimeout);
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -2821,9 +2836,18 @@ class App extends React.Component<any, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
+    this.openContextMenu(event);
+  };
 
+  private openContextMenu = ({
+    clientX,
+    clientY,
+  }: {
+    clientX: number;
+    clientY: number;
+  }) => {
     const { x, y } = viewportCoordsToSceneCoords(
-      event,
+      { clientX, clientY },
       this.state,
       this.canvas,
       window.devicePixelRatio,
@@ -2858,8 +2882,8 @@ class App extends React.Component<any, AppState> {
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
         ],
-        top: event.clientY,
-        left: event.clientX,
+        top: clientY,
+        left: clientX,
       });
       return;
     }
@@ -2890,8 +2914,8 @@ class App extends React.Component<any, AppState> {
           (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),
       ],
-      top: event.clientY,
-      left: event.clientX,
+      top: clientY,
+      left: clientX,
     });
   };
 
@@ -2942,6 +2966,33 @@ class App extends React.Component<any, AppState> {
       scrollY: normalizeScroll(scrollY - deltaY / zoom),
     }));
   });
+
+  private handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    event.persist();
+    event.preventDefault();
+
+    touchMoving = false;
+
+    touchTimeout = window.setTimeout(() => {
+      if (touchMoving === false) {
+        this.openContextMenu({
+          clientX: event.touches[0].clientX,
+          clientY: event.touches[0].clientY,
+        });
+      }
+    }, 500);
+  };
+
+  private handleTouchEnd = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    if (touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchMoving = false;
+    }
+  };
+
+  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    touchMoving = true;
+  };
 
   private getTextWysiwygSnappedToCenterPosition(
     x: number,
