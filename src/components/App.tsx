@@ -2968,6 +2968,10 @@ class App extends React.Component<any, AppState> {
   });
 
   private handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!this.state.touchAvailable) {
+      return;
+    }
+
     event.persist();
     event.preventDefault();
 
