@@ -29,7 +29,7 @@
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
     "browser-nativefs": "0.8.2",
-    "i18next-browser-languagedetector": "4.2.0",
+    "i18next-browser-languagedetector": "4.3.0",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
     "node-sass": "4.14.1",
