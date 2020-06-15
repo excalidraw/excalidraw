@@ -1,14 +1,14 @@
 import { moveOneLeft, moveOneRight, moveAllLeft, moveAllRight } from "./zindex";
 
-function expectMove<T>(
+const expectMove = <T>(
   fn: (elements: T[], indicesToMove: number[]) => void,
   elems: T[],
   indices: number[],
   equal: T[],
-) {
+) => {
   fn(elems, indices);
   expect(elems).toEqual(equal);
-}
+};
 
 it("should moveOneLeft", () => {
   expectMove(moveOneLeft, ["a", "b", "c", "d"], [1, 2], ["b", "c", "a", "d"]);

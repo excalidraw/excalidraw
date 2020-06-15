@@ -1,56 +1,124 @@
 import React from "react";
 import { Popover } from "./Popover";
 
-import "./ColorPicker.css";
+import "./ColorPicker.scss";
 import { KEYS } from "../keys";
-import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import { t, getLanguage } from "../i18n";
+import { isWritableElement } from "../utils";
+import colors from "../colors";
+
+const isValidColor = (color: string) => {
+  const style = new Option().style;
+  style.color = color;
+  return !!style.color;
+};
+
+const getColor = (color: string): string | null => {
+  if (color === "transparent") {
+    return color;
+  }
+
+  return isValidColor(color)
+    ? color
+    : isValidColor(`#${color}`)
+    ? `#${color}`
+    : null;
+};
 
 // This is a narrow reimplementation of the awesome react-color Twitter component
 // https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
 
-const Picker = function({
+// Unfortunately, we can't detect keyboard layout in the browser. So this will
+// only work well for QWERTY but not AZERTY or others...
+const keyBindings = [
+  ["1", "2", "3", "4", "5"],
+  ["q", "w", "e", "r", "t"],
+  ["a", "s", "d", "f", "g"],
+].flat();
+
+const Picker = ({
   colors,
   color,
   onChange,
   onClose,
   label,
-  t,
+  showInput = true,
 }: {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
   label: string;
-  t: TFunction;
-}) {
+  showInput: boolean;
+}) => {
   const firstItem = React.useRef<HTMLButtonElement>();
+  const activeItem = React.useRef<HTMLButtonElement>();
+  const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
     // After the component is first mounted
     // focus on first input
-    if (firstItem.current) firstItem.current.focus();
+    if (activeItem.current) {
+      activeItem.current.focus();
+    } else if (colorInput.current) {
+      colorInput.current.focus();
+    }
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === KEYS.TAB) {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEYS.TAB) {
       const { activeElement } = document;
-      if (e.shiftKey) {
+      if (event.shiftKey) {
         if (activeElement === firstItem.current) {
           colorInput.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       } else {
         if (activeElement === colorInput.current) {
           firstItem.current?.focus();
-          e.preventDefault();
+          event.preventDefault();
         }
       }
-    } else if (e.key === KEYS.ESCAPE) {
+    } else if (
+      event.key === KEYS.ARROW_RIGHT ||
+      event.key === KEYS.ARROW_LEFT ||
+      event.key === KEYS.ARROW_UP ||
+      event.key === KEYS.ARROW_DOWN
+    ) {
+      const { activeElement } = document;
+      const isRTL = getLanguage().rtl;
+      const index = Array.prototype.indexOf.call(
+        gallery!.current!.children,
+        activeElement,
+      );
+      if (index !== -1) {
+        const length = gallery!.current!.children.length - (showInput ? 1 : 0);
+        const nextIndex =
+          event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
+            ? (index + 1) % length
+            : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
+            ? (length + index - 1) % length
+            : event.key === KEYS.ARROW_DOWN
+            ? (index + 5) % length
+            : event.key === KEYS.ARROW_UP
+            ? (length + index - 5) % length
+            : index;
+        (gallery!.current!.children![nextIndex] as any).focus();
+      }
+      event.preventDefault();
+    } else if (
+      keyBindings.includes(event.key.toLowerCase()) &&
+      !isWritableElement(event.target)
+    ) {
+      const index = keyBindings.indexOf(event.key.toLowerCase());
+      (gallery!.current!.children![index] as any).focus();
+      event.preventDefault();
+    } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+      event.preventDefault();
       onClose();
-      e.nativeEvent.stopImmediatePropagation();
     }
+    event.nativeEvent.stopImmediatePropagation();
   };
 
   return (
@@ -61,40 +129,56 @@ const Picker = function({
       aria-label={t("labels.colorPicker")}
       onKeyDown={handleKeyDown}
     >
-      <div className="color-picker-triangle-shadow"></div>
+      <div className="color-picker-triangle color-picker-triangle-shadow"></div>
       <div className="color-picker-triangle"></div>
-      <div className="color-picker-content">
-        <div className="colors-gallery">
-          {colors.map((color, i) => (
-            <button
-              className="color-picker-swatch"
-              onClick={() => {
-                onChange(color);
-              }}
-              title={color}
-              aria-label={color}
-              style={{ backgroundColor: color }}
-              key={color}
-              ref={el => {
-                if (i === 0 && el) firstItem.current = el;
-              }}
-            >
-              {color === "transparent" ? (
-                <div className="color-picker-transparent"></div>
-              ) : (
-                undefined
-              )}
-            </button>
-          ))}
-        </div>
-        <ColorInput
-          color={color}
-          label={label}
-          onChange={color => {
-            onChange(color);
-          }}
-          ref={colorInput}
-        />
+      <div
+        className="color-picker-content"
+        ref={(el) => {
+          if (el) {
+            gallery.current = el;
+          }
+        }}
+      >
+        {colors.map((_color, i) => (
+          <button
+            className="color-picker-swatch"
+            onClick={(event) => {
+              (event.currentTarget as HTMLButtonElement).focus();
+              onChange(_color);
+            }}
+            title={`${_color} — ${keyBindings[i].toUpperCase()}`}
+            aria-label={_color}
+            aria-keyshortcuts={keyBindings[i]}
+            style={{ color: _color }}
+            key={_color}
+            ref={(el) => {
+              if (el && i === 0) {
+                firstItem.current = el;
+              }
+              if (el && _color === color) {
+                activeItem.current = el;
+              }
+            }}
+            onFocus={() => {
+              onChange(_color);
+            }}
+          >
+            {_color === "transparent" ? (
+              <div className="color-picker-transparent"></div>
+            ) : undefined}
+            <span className="color-picker-keybinding">{keyBindings[i]}</span>
+          </button>
+        ))}
+        {showInput && (
+          <ColorInput
+            color={color}
+            label={label}
+            onChange={(color) => {
+              onChange(color);
+            }}
+            ref={colorInput}
+          />
+        )}
       </div>
     </div>
   );
@@ -113,7 +197,6 @@ const ColorInput = React.forwardRef(
     },
     ref,
   ) => {
-    const colorRegex = /^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8}|transparent)$/;
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
 
@@ -123,31 +206,36 @@ const ColorInput = React.forwardRef(
 
     React.useImperativeHandle(ref, () => inputRef.current);
 
+    const changeColor = React.useCallback(
+      (inputValue: string) => {
+        const value = inputValue.toLowerCase();
+        const color = getColor(value);
+        if (color) {
+          onChange(color);
+        }
+        setInnerValue(value);
+      },
+      [onChange],
+    );
+
     return (
-      <div className="color-input-container">
+      <label className="color-input-container">
         <div className="color-picker-hash">#</div>
         <input
           spellCheck={false}
           className="color-picker-input"
           aria-label={label}
-          onChange={e => {
-            const value = e.target.value;
-            if (value.match(colorRegex)) {
-              onChange(value === "transparent" ? "transparent" : "#" + value);
-            }
-            setInnerValue(value);
-          }}
+          onChange={(event) => changeColor(event.target.value)}
           value={(innerValue || "").replace(/^#/, "")}
-          onPaste={e => onChange(e.clipboardData.getData("text"))}
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
-      </div>
+      </label>
     );
   },
 );
 
-export function ColorPicker({
+export const ColorPicker = ({
   type,
   color,
   onChange,
@@ -157,9 +245,7 @@ export function ColorPicker({
   color: string | null;
   onChange: (color: string) => void;
   label: string;
-}) {
-  const { t } = useTranslation();
-
+}) => {
   const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -169,25 +255,33 @@ export function ColorPicker({
         <button
           className="color-picker-label-swatch"
           aria-label={label}
-          style={color ? { backgroundColor: color } : undefined}
+          style={
+            color
+              ? ({ "--swatch-color": color } as React.CSSProperties)
+              : undefined
+          }
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
         />
         <ColorInput
           color={color}
           label={label}
-          onChange={color => {
+          onChange={(color) => {
             onChange(color);
           }}
         />
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover onCloseRequest={() => setActive(false)}>
+          <Popover
+            onCloseRequest={(event) =>
+              event.target !== pickerButton.current && setActive(false)
+            }
+          >
             <Picker
               colors={colors[type]}
               color={color || null}
-              onChange={changedColor => {
+              onChange={(changedColor) => {
                 onChange(changedColor);
               }}
               onClose={() => {
@@ -195,69 +289,11 @@ export function ColorPicker({
                 pickerButton.current?.focus();
               }}
               label={label}
-              t={t}
+              showInput={false}
             />
           </Popover>
         ) : null}
       </React.Suspense>
     </div>
   );
-}
-
-// https://yeun.github.io/open-color/
-const colors = {
-  // Shade 0
-  canvasBackground: [
-    "#ffffff",
-    "#f8f9fa",
-    "#f1f3f5",
-    "#fff5f5",
-    "#fff0f6",
-    "#f8f0fc",
-    "#f3f0ff",
-    "#edf2ff",
-    "#e7f5ff",
-    "#e3fafc",
-    "#e6fcf5",
-    "#ebfbee",
-    "#f4fce3",
-    "#fff9db",
-    "#fff4e6",
-  ],
-  // Shade 6
-  elementBackground: [
-    "transparent",
-    "#ced4da",
-    "#868e96",
-    "#fa5252",
-    "#e64980",
-    "#be4bdb",
-    "#7950f2",
-    "#4c6ef5",
-    "#228be6",
-    "#15aabf",
-    "#12b886",
-    "#40c057",
-    "#82c91e",
-    "#fab005",
-    "#fd7e14",
-  ],
-  // Shade 9
-  elementStroke: [
-    "#000000",
-    "#343a40",
-    "#495057",
-    "#c92a2a",
-    "#a61e4d",
-    "#862e9c",
-    "#5f3dc4",
-    "#364fc7",
-    "#1864ab",
-    "#0b7285",
-    "#087f5b",
-    "#2b8a3e",
-    "#5c940d",
-    "#e67700",
-    "#d9480f",
-  ],
 };

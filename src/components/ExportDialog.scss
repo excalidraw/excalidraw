@@ -1,0 +1,57 @@
+@import "../css/_variables";
+
+.ExportDialog__preview {
+  --preview-padding: calc(var(--space-factor) * 4);
+
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+    left center;
+  text-align: center;
+  padding: var(--preview-padding);
+  margin-bottom: calc(var(--space-factor) * 3);
+}
+
+.ExportDialog__preview canvas {
+  max-width: calc(100% - var(--preview-padding) * 2);
+  max-height: 25rem;
+}
+
+.ExportDialog__actions {
+  width: 100%;
+  display: flex;
+  grid-gap: calc(var(--space-factor) * 2);
+  align-items: top;
+  justify-content: space-between;
+}
+
+.ExportDialog__name {
+  grid-column: project-name;
+  margin: auto;
+}
+
+@media (max-width: 550px) {
+  .ExportDialog {
+    display: flex;
+    flex-direction: column;
+  }
+  .ExportDialog__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .ExportDialog__actions > * {
+    margin-bottom: calc(var(--space-factor) * 3);
+  }
+}
+
+@media #{$media-query} {
+  .ExportDialog__preview canvas {
+    max-height: 30vh;
+  }
+  .ExportDialog__dialog,
+  .ExportDialog__dialog .Island {
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .ExportDialog__dialog .Island {
+    overflow-y: auto;
+  }
+}

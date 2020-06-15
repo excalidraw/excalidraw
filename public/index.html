@@ -2,24 +2,29 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Excalidraw</title>
+    <title>Excalidraw | Hand-drawn look & feel • Collaborative • Secure</title>
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
     />
-    <meta name="theme-color" content="#000000" />
-    <!-- prettier-ignore -->
+    <meta name="referrer" content="origin" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta name="theme-color" content="#000" />
+
+    <!-- Origin Trial token for the Native File System API v2 https://developers.chrome.com/origintrials/#/view_trial/4019462667428167681 (Chrome 83–85) -->
     <meta
       http-equiv="origin-trial"
-      content="AvB+3K1LqGdVR+XcHhjpdM0yl5/RtR/v7MIO/nbgNnLZHJ5yMYos9kZAQiuc0EEZne4d9CzHhF2sk2fUPOylcgUAAABceyJvcmlnaW4iOiJodHRwczovL3d3dy5leGNhbGlkcmF3LmNvbTo0NDMiLCJmZWF0dXJlIjoiTmF0aXZlRmlsZVN5c3RlbSIsImV4cGlyeSI6MTU4Mjg3ODU4NH0="
+      content="Ag2afDDmKkXbWBa0WWEivwM9B4oGemwawLxOF39ysoRt8fagTYAfEOGlKr0QV4EIX3N4RWSASp2q/YGKFlmG9AgAAABZeyJvcmlnaW4iOiJodHRwczovL2V4Y2FsaWRyYXcuY29tOjQ0MyIsImZlYXR1cmUiOiJOYXRpdmVGaWxlU3lzdGVtMiIsImV4cGlyeSI6MTU5NDA0NDQ1Nn0="
     />
 
     <!-- General tags -->
     <meta
       name="description"
-      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta name="image" content="https://excalidraw.com/og-image.png" />
+    <meta name="image" content="og-image.png" />
 
     <!-- OpenGraph tags -->
     <meta property="og:url" content="https://excalidraw.com" />
@@ -30,13 +35,20 @@
       property="og:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
+    <!-- OG tags require an absolute url for images -->
     <meta
       property="og:image"
       name="twitter:image"
       content="https://excalidraw.com/og-image.png"
     />
+    <meta
+      property="og:image:secure_url"
+      name="twitter:image"
+      content="https://excalidraw.com/og-image.png"
+    />
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="669" />
+    <meta property="og:image:alt" content="Excalidraw logo with byline." />
 
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -45,22 +57,37 @@
       name="twitter:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
+    <!-- OG tags require absolute url for images -->
     <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
 
-    <link rel="icon" href="%PUBLIC_URL%/logo.png" />
     <link
       rel="preload"
-      href="/FG_Virgil.ttf"
+      href="FG_Virgil.woff2"
       as="font"
-      type="font/ttf"
+      type="font/woff2"
       crossorigin="anonymous"
     />
     <link
       rel="preload"
-      href="/Cascadia.ttf"
+      href="Cascadia.woff2"
       as="font"
-      type="font/ttf"
+      type="font/woff2"
       crossorigin="anonymous"
+    />
+
+    <link
+      href="https://excalidraw-socket.herokuapp.com/socket.io"
+      rel="preconnect"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="manifest"
+      href="manifest.json"
+      style="--pwacompat-splash-font: 24px Virgil;"
     />
 
     <script
@@ -84,35 +111,10 @@
     <header>
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
-    <div id="root"></div>
-    <aside>
-      <!-- https://github.com/tholman/github-corners -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        viewBox="0 0 250 250"
-        style="position: absolute; top: 0; right: 0"
-      >
-        <a
-          href="https://github.com/excalidraw/excalidraw"
-          target="_blank"
-          aria-label="GitHub repository"
-        >
-          <path d="M0 0l115 115h15l12 27 108 108V0z" fill="#6c6c6c" />
-          <path
-            class="octo-arm"
-            d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16"
-            style="transform-origin: 130px 106px"
-            fill="#fff"
-          />
-          <path
-            class="octo-body"
-            d="M115 115s4 2 5 0l14-14c3-2 6-3 8-3-8-11-15-24 2-41 5-5 10-7 16-7 1-2 3-7 12-11 0 0 5 3 7 16 4 2 8 5 12 9s7 8 9 12c14 3 17 7 17 7-4 8-9 11-11 11 0 6-2 11-7 16-16 16-30 10-41 2 0 3-1 7-5 11l-12 11c-1 1 1 5 1 5z"
-            fill="#fff"
-          />
-        </a>
-      </svg>
-    </aside>
+    <div id="root">
+      <div class="LoadingMessage">
+        <span>Loading scene...</span>
+      </div>
+    </div>
   </body>
 </html>

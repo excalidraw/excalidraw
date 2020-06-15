@@ -1,0 +1,133 @@
+@import "open-color/open-color";
+
+.layer-ui__wrapper {
+  .encrypted-icon {
+    position: relative;
+    margin-inline-start: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--space-factor);
+    color: $oc-green-9;
+
+    svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+
+    &.tooltip .tooltip-text {
+      visibility: hidden;
+      width: 20rem;
+      bottom: calc(50% + 0.8rem + 6px);
+      :root[dir="ltr"] & {
+        left: -5px;
+      }
+      :root[dir="rtl"] & {
+        right: -5px;
+      }
+      background-color: $oc-black;
+      color: $oc-white;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 10;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+
+      &::after {
+        --size: 6px;
+        content: "";
+        border: var(--size) solid transparent;
+        border-top-color: $oc-black;
+        position: absolute;
+        bottom: calc(-2 * var(--size));
+        :root[dir="ltr"] & {
+          left: calc(5px + var(--size) / 2);
+        }
+        :root[dir="rtl"] & {
+          right: calc(5px + var(--size) / 2);
+        }
+      }
+    }
+
+    // the following 3 rules ensure that the tooltip doesn't show (nor affect
+    // the cursor) when you drag over when you draw on canvas, but at the same
+    // time it still works when clicking on the link/shield
+
+    body:active &.tooltip:not(:hover) {
+      pointer-events: none;
+    }
+    body:not(:active) &.tooltip:hover .tooltip-text {
+      visibility: visible;
+    }
+    .tooltip-text:hover {
+      visibility: visible;
+    }
+  }
+
+  &__github-corner {
+    top: 0;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
+    position: absolute;
+    width: 40px;
+  }
+
+  &__footer {
+    position: absolute;
+    bottom: 0px;
+    :root[dir="ltr"] & {
+      right: 0;
+    }
+    :root[dir="rtl"] & {
+      left: 0;
+    }
+    width: 190px;
+  }
+
+  .zen-mode-transition {
+    transition: transform 0.5s ease-in-out;
+    :root[dir="ltr"] &.transition-left {
+      transform: translate(-999px, 0);
+    }
+    :root[dir="ltr"] &.transition-right {
+      transform: translate(999px, 0px);
+    }
+    :root[dir="rtl"] &.transition-left {
+      transform: translate(999px, 0);
+    }
+    :root[dir="rtl"] &.transition-right {
+      transform: translate(-999px, 0);
+    }
+
+    &.App-menu_bottom--transition-left {
+      transform: translate(-92px, 0);
+    }
+  }
+
+  .disable-zen-mode {
+    height: 30px;
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 10px;
+    padding: 10px;
+    font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0s linear 0s, opacity 0.5s;
+
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+      transition: visibility 0s linear 300ms, opacity 0.5s;
+      transition-delay: 0.8s;
+    }
+  }
+}

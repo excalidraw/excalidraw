@@ -1,51 +1,71 @@
-import { Action } from "./types";
-import { isTextElement, redrawTextBoundingBox } from "../element";
+import {
+  isTextElement,
+  isExcalidrawElement,
+  redrawTextBoundingBox,
+} from "../element";
 import { KEYS } from "../keys";
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+} from "../appState";
+import { register } from "./register";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 let copiedStyles: string = "{}";
 
-export const actionCopyStyles: Action = {
+export const actionCopyStyles = register({
   name: "copyStyles",
-  perform: elements => {
-    const element = elements.find(el => el.isSelected);
+  perform: (elements, appState) => {
+    const element = elements.find((el) => appState.selectedElementIds[el.id]);
     if (element) {
       copiedStyles = JSON.stringify(element);
     }
-    return {};
+    return {
+      commitToHistory: false,
+    };
   },
   contextItemLabel: "labels.copyStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyC",
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C",
   contextMenuOrder: 0,
-};
+});
 
-export const actionPasteStyles: Action = {
+export const actionPasteStyles = register({
   name: "pasteStyles",
-  perform: elements => {
+  perform: (elements, appState) => {
     const pastedElement = JSON.parse(copiedStyles);
+    if (!isExcalidrawElement(pastedElement)) {
+      return { elements, commitToHistory: false };
+    }
     return {
-      elements: elements.map(element => {
-        if (element.isSelected) {
-          const newElement = {
-            ...element,
-            shape: null,
+      elements: elements.map((element) => {
+        if (appState.selectedElementIds[element.id]) {
+          const newElement = newElementWith(element, {
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
             fillStyle: pastedElement?.fillStyle,
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
-          };
+          });
           if (isTextElement(newElement)) {
-            newElement.font = pastedElement?.font;
+            mutateElement(newElement, {
+              fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
+              fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
+              textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
+            });
             redrawTextBoundingBox(newElement);
           }
           return newElement;
         }
         return element;
       }),
+      commitToHistory: true,
     };
   },
   contextItemLabel: "labels.pasteStyles",
-  keyTest: event => event[KEYS.META] && event.shiftKey && event.code === "KeyV",
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "V",
   contextMenuOrder: 1,
-};
+});

@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`resize element rectangle 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 401146281,
+  "width": 30,
+  "x": 29,
+  "y": 47,
+}
+`;
+
+exports[`resize element with aspect ratio when SHIFT is clicked rectangle 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 401146281,
+  "width": 30,
+  "x": 29,
+  "y": 47,
+}
+`;

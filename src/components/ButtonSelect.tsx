@@ -1,6 +1,6 @@
 import React from "react";
 
-export function ButtonSelect<T>({
+export const ButtonSelect = <T extends Object>({
   options,
   value,
   onChange,
@@ -10,23 +10,21 @@ export function ButtonSelect<T>({
   value: T | null;
   onChange: (value: T) => void;
   group: string;
-}) {
-  return (
-    <div className="buttonList">
-      {options.map(option => (
-        <label
-          key={option.text}
-          className={value === option.value ? "active" : ""}
-        >
-          <input
-            type="radio"
-            name={group}
-            onChange={() => onChange(option.value)}
-            checked={value === option.value ? true : false}
-          />
-          {option.text}
-        </label>
-      ))}
-    </div>
-  );
-}
+}) => (
+  <div className="buttonList">
+    {options.map((option) => (
+      <label
+        key={option.text}
+        className={value === option.value ? "active" : ""}
+      >
+        <input
+          type="radio"
+          name={group}
+          onChange={() => onChange(option.value)}
+          checked={value === option.value ? true : false}
+        />
+        {option.text}
+      </label>
+    ))}
+  </div>
+);

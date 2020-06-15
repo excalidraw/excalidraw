@@ -1,0 +1,494 @@
+@import "./_variables";
+@import "./theme";
+
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --text-color-primary: #{$oc-gray-8};
+  --bg-color-main: #{$oc-white};
+  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --border-radius-m: 4px;
+  --space-factor: 0.25rem;
+}
+
+body {
+  margin: 0;
+  --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font);
+  color: var(--text-color-primary);
+  -webkit-text-size-adjust: 100%;
+  user-select: none;
+  width: 100vw;
+  height: 100vh;
+}
+[contenteditable] {
+  user-select: auto;
+  cursor: text;
+}
+
+a {
+  font-weight: 500;
+  text-decoration: none;
+  color: $oc-blue-7; /* OC Blue 7 */
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+canvas {
+  touch-action: none;
+  user-select: none;
+
+  // following props improve blurriness at certain devicePixelRatios.
+  // AFAIK it doesn't affect export (in fact, export seems sharp either way).
+
+  image-rendering: pixelated; // chromium
+  // NOTE: must be declared *after* the above
+  image-rendering: -moz-crisp-edges; // FF
+}
+
+.excalidraw {
+  display: flex;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.FixedSideContainer {
+  padding-top: var(--sat, 0px);
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
+}
+
+.panelRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.panelColumn {
+  display: flex;
+  flex-direction: column;
+
+  h3,
+  legend,
+  .control-label {
+    margin-top: 0.333rem;
+    margin-bottom: 0.333rem;
+    font-size: 0.75rem;
+    color: var(--text-color-primary);
+    font-weight: bold;
+    display: block;
+  }
+
+  .control-label input {
+    display: block;
+    width: 100%;
+  }
+
+  h3:first-child,
+  legend:first-child,
+  .control-label:first-child {
+    margin-top: 0;
+  }
+
+  legend {
+    padding: 0;
+  }
+
+  .buttonList {
+    flex-wrap: wrap;
+
+    label {
+      margin-right: 0.25rem;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+
+    input[type="radio"] {
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .ToolIcon {
+      margin: 0 5px;
+    }
+
+    .ToolIcon__icon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  fieldset {
+    margin: 0;
+    margin-top: 0.333rem;
+    padding: 0;
+    border: none;
+  }
+}
+
+.divider {
+  width: 1px;
+  background-color: $oc-gray-2;
+  margin: 1px;
+}
+
+.buttonList label:focus-within,
+input:focus {
+  outline: transparent;
+  box-shadow: 0 0 0 2px $oc-blue-2;
+}
+
+button,
+.buttonList label {
+  user-select: none;
+  background-color: $oc-gray-2;
+  border: 0;
+  border-radius: 4px;
+  margin: 0.125rem 0;
+  padding: 0.25rem;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  &:focus {
+    outline: transparent;
+    box-shadow: 0 0 0 2px $oc-blue-2;
+  }
+
+  &:hover {
+    background-color: $oc-gray-4;
+  }
+
+  &:active {
+    background-color: $oc-gray-5;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.active,
+.buttonList label.active {
+  background-color: $oc-gray-4;
+  &:hover {
+    background-color: $oc-gray-4;
+  }
+  &:active {
+    background-color: $oc-gray-5;
+  }
+}
+
+.App-bottom-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  --bar-padding: calc(4 * var(--space-factor));
+  padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
+  padding-right: var(--sar, 0px);
+  padding-bottom: var(--sab, 0px);
+  padding-left: var(--sal, 0px);
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+
+  > .Island {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    pointer-events: initial;
+  }
+}
+
+.App-toolbar {
+  width: 100%;
+
+  box-sizing: border-box;
+}
+.App-toolbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.App-mobile-menu {
+  width: 100%;
+  overflow-x: visible;
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin-bottom: var(--bar-padding);
+}
+
+.App-menu {
+  display: grid;
+}
+
+.App-menu_top {
+  grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
+  align-items: flex-start;
+  cursor: default;
+  pointer-events: none !important;
+}
+
+.App-menu_top > * {
+  pointer-events: all;
+}
+
+.App-menu_top > *:first-child {
+  justify-self: flex-start;
+}
+
+.App-menu_top > *:last-child {
+  justify-self: flex-end;
+}
+
+.App-menu_bottom {
+  position: fixed;
+  bottom: 0;
+  grid-template-columns: 1fr auto 1fr;
+  grid-gap: 4px;
+  align-items: flex-start;
+  cursor: default;
+  pointer-events: none !important;
+
+  &--transition-left {
+    section {
+      width: 185px;
+    }
+  }
+
+  section {
+    display: flex;
+  }
+}
+
+.App-menu_bottom > * {
+  pointer-events: all;
+}
+
+.App-menu_bottom > *:first-child {
+  justify-self: flex-start;
+}
+
+.App-menu_bottom > *:last-child {
+  justify-self: flex-end;
+}
+
+.App-menu_left {
+  grid-template-rows: 1fr auto 1fr;
+  height: 100%;
+}
+
+.App-menu_right {
+  grid-template-rows: 1fr;
+  height: 100%;
+}
+
+.App-menu__left {
+  overflow-y: auto;
+  max-height: calc(100vh - 236px);
+}
+
+.ErrorSplash {
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: text;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background-color: $oc-red-1;
+    border: 3px solid $oc-red-9;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    max-width: 600px;
+
+    &.align-center {
+      text-align: center;
+    }
+  }
+
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+      font-family: "Cascadia";
+      font-size: 0.8em;
+    }
+  }
+}
+
+.dropdown-select {
+  height: 1.5rem;
+  padding: 0;
+  padding-inline-start: 0.5rem;
+  padding-inline-end: 1.5rem;
+  background-color: $oc-gray-2;
+  border-radius: var(--space-factor);
+  border: 1px solid $oc-gray-4;
+  font-size: 0.8rem;
+  outline: none;
+  appearance: none;
+  background-image: url("https://free-use.s3-us-west-2.amazonaws.com/up-sort.svg");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem top 50%, 0 0;
+  :root[dir="rtl"] & {
+    background-position: left 0.7rem top 50%, 0 0;
+  }
+  background-size: 0.65em auto, 100%;
+
+  &:focus {
+    box-shadow: 0 0 0 2px $oc-blue-2;
+  }
+
+  &:hover {
+    background-color: $oc-gray-4;
+  }
+
+  &:active {
+    background-color: $oc-gray-4;
+  }
+  &.dropdown-select--floating {
+    position: absolute;
+    margin: 0.5em;
+  }
+}
+
+.dropdown-select__language.dropdown-select--floating {
+  position: fixed;
+  bottom: 10px;
+  :root[dir="ltr"] & {
+    right: 44px;
+  }
+  :root[dir="rtl"] & {
+    left: 44px;
+  }
+}
+
+.zIndexButton {
+  margin: 0 5px;
+  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.scroll-back-to-content {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+}
+
+.help-icon {
+  position: fixed;
+  cursor: pointer;
+  fill: $oc-gray-6;
+  bottom: 14px;
+  :root[dir="ltr"] & {
+    right: 14px;
+  }
+  :root[dir="rtl"] & {
+    left: 14px;
+  }
+}
+
+@media #{$media-query} {
+  aside {
+    display: none;
+  }
+  .scroll-back-to-content {
+    bottom: calc(80px + var(--sab, 0px));
+    z-index: -1;
+  }
+}
+
+.rtl-mirror {
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+}
+
+.github-corner {
+  position: fixed;
+  top: 0;
+  :root[dir="ltr"] & {
+    right: 0;
+  }
+  :root[dir="rtl"] & {
+    left: 0;
+  }
+}
+
+.zen-mode-visibility {
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+  width: auto;
+  transition: opacity 0.5s;
+
+  &.zen-mode-visibility--hidden {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    transition: opacity 0.5s;
+  }
+}
+
+.disable-pointerEvents {
+  pointer-events: none !important;
+}
+
+@media print {
+  .App-bottom-bar,
+  .FixedSideContainer,
+  .layer-ui__wrapper {
+    display: none;
+  }
+}

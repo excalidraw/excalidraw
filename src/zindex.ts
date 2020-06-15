@@ -1,10 +1,10 @@
-function swap<T>(elements: T[], indexA: number, indexB: number) {
+const swap = <T>(elements: T[], indexA: number, indexB: number) => {
   const element = elements[indexA];
   elements[indexA] = elements[indexB];
   elements[indexB] = element;
-}
+};
 
-export function moveOneLeft<T>(elements: T[], indicesToMove: number[]) {
+export const moveOneLeft = <T>(elements: T[], indicesToMove: number[]) => {
   indicesToMove.sort((a: number, b: number) => a - b);
   let isSorted = true;
   // We go from left to right to avoid overriding the wrong elements
@@ -19,9 +19,9 @@ export function moveOneLeft<T>(elements: T[], indicesToMove: number[]) {
   });
 
   return elements;
-}
+};
 
-export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
+export const moveOneRight = <T>(elements: T[], indicesToMove: number[]) => {
   const reversedIndicesToMove = indicesToMove.sort(
     (a: number, b: number) => b - a,
   );
@@ -38,7 +38,7 @@ export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
     swap(elements, index + 1, index);
   });
   return elements;
-}
+};
 
 // Let's go through an example
 //        |        |
@@ -86,11 +86,11 @@ export function moveOneRight<T>(elements: T[], indicesToMove: number[]) {
 // [c, f, a, b, d, e, g]
 //
 // And we are done!
-export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
+export const moveAllLeft = <T>(elements: T[], indicesToMove: number[]) => {
   indicesToMove.sort((a: number, b: number) => a - b);
 
   // Copy the elements to move
-  const leftMostElements = indicesToMove.map(index => elements[index]);
+  const leftMostElements = indicesToMove.map((index) => elements[index]);
 
   const reversedIndicesToMove = indicesToMove
     // We go from right to left to avoid overriding elements.
@@ -117,7 +117,7 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
   });
 
   return elements;
-}
+};
 
 // Let's go through an example
 //        |        |
@@ -164,13 +164,15 @@ export function moveAllLeft<T>(elements: T[], indicesToMove: number[]) {
 // [a, b, d, e, g, c, f]
 //
 // And we are done!
-export function moveAllRight<T>(elements: T[], indicesToMove: number[]) {
+export const moveAllRight = <T>(elements: T[], indicesToMove: number[]) => {
   const reversedIndicesToMove = indicesToMove.sort(
     (a: number, b: number) => b - a,
   );
 
   // Copy the elements to move
-  const rightMostElements = reversedIndicesToMove.map(index => elements[index]);
+  const rightMostElements = reversedIndicesToMove.map(
+    (index) => elements[index],
+  );
 
   indicesToMove = reversedIndicesToMove
     // We go from left to right to avoid overriding elements.
@@ -197,4 +199,4 @@ export function moveAllRight<T>(elements: T[], indicesToMove: number[]) {
   });
 
   return elements;
-}
+};

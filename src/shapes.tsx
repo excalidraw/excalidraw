@@ -1,15 +1,17 @@
 import React from "react";
+import oc from "open-color";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library
 export const SHAPES = [
   {
     icon: (
       // fa-mouse-pointer
-      <svg viewBox="0 0 320 512">
+      <svg viewBox="0 0 320 512" className="">
         <path d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z" />
       </svg>
     ),
     value: "selection",
+    key: "s",
   },
   {
     icon: (
@@ -19,6 +21,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "rectangle",
+    key: "r",
   },
   {
     icon: (
@@ -28,6 +31,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
+    key: "d",
   },
   {
     icon: (
@@ -37,24 +41,47 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
+    key: "e",
   },
   {
     icon: (
       // fa-long-arrow-alt-right
-      <svg viewBox="0 0 448 512">
+      <svg viewBox="0 0 448 512" className="rtl-mirror">
         <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
       </svg>
     ),
     value: "arrow",
+    key: "a",
   },
   {
     icon: (
       // custom
       <svg viewBox="0 0 6 6">
-        <line x1="0" y1="3" x2="6" y2="3" stroke="#000" strokeLinecap="round" />
+        <line
+          x1="0"
+          y1="3"
+          x2="6"
+          y2="3"
+          stroke={oc.black}
+          strokeLinecap="round"
+        />
       </svg>
     ),
     value: "line",
+    key: "l",
+  },
+  {
+    icon: (
+      // fa-pencil
+      <svg viewBox="0 0 512 512">
+        <path
+          fill="currentColor"
+          d="M290.74 93.24l128.02 128.02-277.99 277.99-114.14 12.6C11.35 513.54-1.56 500.62.14 485.34l12.7-114.22 277.9-277.88zm207.2-19.06l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.76 18.75-49.16 0-67.91z"
+        ></path>
+      </svg>
+    ),
+    value: "draw",
+    key: "x",
   },
   {
     icon: (
@@ -64,20 +91,16 @@ export const SHAPES = [
       </svg>
     ),
     value: "text",
+    key: "t",
   },
-];
+] as const;
 
 export const shapesShortcutKeys = SHAPES.map((shape, index) => [
-  shape.value[0],
+  shape.key,
   (index + 1).toString(),
 ]).flat(1);
 
-export function findShapeByKey(key: string) {
-  const defaultElement = "selection";
-  return SHAPES.reduce((element, shape, index) => {
-    if (shape.value[0] !== key && key !== (index + 1).toString())
-      return element;
-
-    return shape.value;
-  }, defaultElement);
-}
+export const findShapeByKey = (key: string) =>
+  SHAPES.find((shape, index) => {
+    return shape.key === key.toLowerCase() || key === (index + 1).toString();
+  })?.value || "selection";

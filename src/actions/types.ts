@@ -1,11 +1,12 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { TFunction } from "i18next";
 
 export type ActionResult = {
-  elements?: ExcalidrawElement[];
-  appState?: AppState;
+  elements?: readonly ExcalidrawElement[] | null;
+  appState?: AppState | null;
+  commitToHistory: boolean;
+  syncHistory?: boolean;
 };
 
 type ActionFn = (
@@ -14,23 +15,64 @@ type ActionFn = (
   formData: any,
 ) => ActionResult;
 
-export type UpdaterFn = (res: ActionResult) => void;
+export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
 export type ActionFilterFn = (action: Action) => void;
 
+export type ActionName =
+  | "sendBackward"
+  | "bringForward"
+  | "sendToBack"
+  | "bringToFront"
+  | "copyStyles"
+  | "selectAll"
+  | "pasteStyles"
+  | "changeStrokeColor"
+  | "changeBackgroundColor"
+  | "changeFillStyle"
+  | "changeStrokeWidth"
+  | "changeSloppiness"
+  | "changeStrokeStyle"
+  | "changeOpacity"
+  | "changeFontSize"
+  | "toggleCanvasMenu"
+  | "toggleEditMenu"
+  | "undo"
+  | "redo"
+  | "finalize"
+  | "changeProjectName"
+  | "changeExportBackground"
+  | "changeShouldAddWatermark"
+  | "saveScene"
+  | "saveAsScene"
+  | "loadScene"
+  | "duplicateSelection"
+  | "deleteSelectedElements"
+  | "changeViewBackgroundColor"
+  | "clearCanvas"
+  | "zoomIn"
+  | "zoomOut"
+  | "resetZoom"
+  | "zoomToFit"
+  | "changeFontFamily"
+  | "changeTextAlign"
+  | "toggleFullScreen"
+  | "toggleShortcuts"
+  | "group"
+  | "ungroup";
+
 export interface Action {
-  name: string;
+  name: ActionName;
   PanelComponent?: React.FC<{
     elements: readonly ExcalidrawElement[];
     appState: AppState;
-    updateData: (formData: any) => void;
-    t: TFunction;
+    updateData: (formData?: any) => void;
   }>;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
     event: KeyboardEvent,
-    elements?: readonly ExcalidrawElement[],
-    appState?: AppState,
+    appState: AppState,
+    elements: readonly ExcalidrawElement[],
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
@@ -38,25 +80,12 @@ export interface Action {
 
 export interface ActionsManagerInterface {
   actions: {
-    [keyProp: string]: Action;
+    [actionName in ActionName]: Action;
   };
   registerAction: (action: Action) => void;
-  handleKeyDown: (
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => ActionResult | {};
+  handleKeyDown: (event: KeyboardEvent) => boolean;
   getContextMenuItems: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
     actionFilter: ActionFilterFn,
   ) => { label: string; action: () => void }[];
-  renderAction: (
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-    t: TFunction,
-  ) => React.ReactElement | null;
+  renderAction: (name: ActionName) => React.ReactElement | null;
 }

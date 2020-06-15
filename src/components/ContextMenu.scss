@@ -1,0 +1,36 @@
+@import "open-color/open-color.scss";
+
+.context-menu {
+  position: relative;
+  border-radius: 4px;
+  box-shadow: 0px 3px 10px transparentize($oc-black, 0.8);
+  padding: 0;
+  list-style: none;
+  user-select: none;
+  margin: -0.25rem 0 0 0.125rem;
+  padding: 0.25rem 0;
+  background-color: $oc-gray-1;
+  border: 1px solid $oc-gray-5;
+}
+
+.context-menu-option {
+  position: relative;
+  width: 100%;
+  min-width: 9.5rem;
+  margin: 0;
+  padding: 0.25rem 1rem 0.25rem 1.25rem;
+  text-align: start;
+  border-radius: 0;
+  background-color: transparent;
+  border: none;
+  white-space: nowrap;
+}
+
+.context-menu-option:hover {
+  color: $oc-white;
+  background-color: $oc-blue-5;
+}
+
+.context-menu-option:focus {
+  z-index: 1;
+}

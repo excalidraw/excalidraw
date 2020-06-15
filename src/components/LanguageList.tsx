@@ -1,31 +1,31 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import * as i18n from "../i18n";
 
-export function LanguageList<T>({
-  onClick,
-  languages,
-  currentLanguage,
+export const LanguageList = ({
+  onChange,
+  languages = i18n.languages,
+  currentLanguage = i18n.getLanguage().lng,
+  floating,
 }: {
-  languages: { lng: string; label: string }[];
-  onClick: (value: string) => void;
-  currentLanguage: string;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <React.Fragment>
-      <select
-        className="language-select"
-        onChange={({ target }) => onClick(target.value)}
-        value={currentLanguage}
-        aria-label={t("buttons.selectLanguage")}
-      >
-        {languages.map(language => (
-          <option key={language.lng} value={language.lng}>
-            {language.label}
-          </option>
-        ))}
-      </select>
-    </React.Fragment>
-  );
-}
+  languages?: { lng: string; label: string }[];
+  onChange: (value: string) => void;
+  currentLanguage?: string;
+  floating?: boolean;
+}) => (
+  <React.Fragment>
+    <select
+      className={`dropdown-select dropdown-select__language${
+        floating ? " dropdown-select--floating" : ""
+      }`}
+      onChange={({ target }) => onChange(target.value)}
+      value={currentLanguage}
+      aria-label={i18n.t("buttons.selectLanguage")}
+    >
+      {languages.map((language) => (
+        <option key={language.lng} value={language.lng}>
+          {language.label}
+        </option>
+      ))}
+    </select>
+  </React.Fragment>
+);

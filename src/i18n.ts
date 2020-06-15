@@ -1,35 +1,98 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-
-import Backend from "i18next-xhr-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-export const fallbackLng = "en";
-
-export function parseDetectedLang(lng: string | undefined): string {
-  if (lng) {
-    const [lang] = i18n.language.split("-");
-    return lang;
-  }
-  return fallbackLng;
-}
-
 export const languages = [
-  { lng: "de", label: "Deutsch" },
-  { lng: "en", label: "English" },
-  { lng: "es", label: "Español" },
-  { lng: "fr", label: "Français" },
-  { lng: "pt", label: "Português" },
+  { lng: "en", label: "English", data: require("./locales/en.json") },
+  { lng: "bg-BG", label: "Български", data: require("./locales/bg-BG.json") },
+  { lng: "de-DE", label: "Deutsch", data: require("./locales/de-DE.json") },
+  { lng: "es-ES", label: "Español", data: require("./locales/es-ES.json") },
+  { lng: "ca-ES", label: "Catalan", data: require("./locales/ca-ES.json") },
+  { lng: "el-GR", label: "Ελληνικά", data: require("./locales/el-GR.json") },
+  { lng: "fr-FR", label: "Français", data: require("./locales/fr-FR.json") },
+  {
+    lng: "id-ID",
+    label: "Bahasa Indonesia",
+    data: require("./locales/id-ID.json"),
+  },
+  { lng: "it-IT", label: "Italiano", data: require("./locales/it-IT.json") },
+  { lng: "hu-HU", label: "Magyar", data: require("./locales/hu-HU.json") },
+  { lng: "nl-NL", label: "Nederlands", data: require("./locales/nl-NL.json") },
+  { lng: "no-No", label: "Norsk", data: require("./locales/no-NO.json") },
+  { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
+  { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
+  { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
+  { lng: "uk-UA", label: "Українська", data: require("./locales/uk-UA.json") },
+  { lng: "fi-FI", label: "Suomi", data: require("./locales/fi-FI.json") },
+  { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
+  { lng: "ja-JP", label: "日本語", data: require("./locales/ja-JP.json") },
+  { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
+  { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
+  { lng: "zh-CN", label: "简体中文", data: require("./locales/zh-CN.json") },
+  {
+    lng: "ar-SA",
+    label: "العربية",
+    data: require("./locales/ar-SA.json"),
+    rtl: true,
+  },
+  {
+    lng: "he-IL",
+    label: "עברית",
+    data: require("./locales/he-IL.json"),
+    rtl: true,
+  },
 ];
 
-i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng,
-    react: { useSuspense: false },
-    load: "languageOnly",
-  });
+let currentLanguage = languages[0];
+const fallbackLanguage = languages[0];
 
-export default i18n;
+export const setLanguage = (newLng: string | undefined) => {
+  currentLanguage =
+    languages.find((language) => language.lng === newLng) || fallbackLanguage;
+
+  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
+
+  languageDetector.cacheUserLanguage(currentLanguage.lng);
+};
+
+export const getLanguage = () => currentLanguage;
+
+const findPartsForData = (data: any, parts: string[]) => {
+  for (var i = 0; i < parts.length; ++i) {
+    const part = parts[i];
+    if (data[part] === undefined) {
+      return undefined;
+    }
+    data = data[part];
+  }
+  if (typeof data !== "string") {
+    return undefined;
+  }
+  return data;
+};
+
+export const t = (path: string, replacement?: { [key: string]: string }) => {
+  const parts = path.split(".");
+  let translation =
+    findPartsForData(currentLanguage.data, parts) ||
+    findPartsForData(fallbackLanguage.data, parts);
+  if (translation === undefined) {
+    throw new Error(`Can't find translation for ${path}`);
+  }
+
+  if (replacement) {
+    for (var key in replacement) {
+      translation = translation.replace(`{{${key}}}`, replacement[key]);
+    }
+  }
+  return translation;
+};
+
+const languageDetector = new LanguageDetector();
+languageDetector.init({
+  languageUtils: {
+    formatLanguageCode: (lng: string) => lng,
+    isWhitelisted: () => true,
+  },
+  checkWhitelist: false,
+});
+
+setLanguage(languageDetector.detect());

@@ -1,0 +1,84 @@
+@import "../css/_variables";
+
+.Modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: calc(var(--space-factor) * 10);
+}
+
+.Modal__background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background-color: transparentize($oc-black, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.Modal__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-width);
+
+  opacity: 0;
+  transform: translateY(10px);
+  animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
+  position: relative;
+
+  // for modals, reset blurry bg
+  background: #fff;
+  backdrop-filter: none;
+
+  @media #{$media-query} {
+    max-width: 100%;
+  }
+}
+
+@keyframes Modal__content_fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.Modal__close {
+  width: calc(var(--space-factor) * 7);
+  height: calc(var(--space-factor) * 7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    height: calc(var(--space-factor) * 5);
+  }
+}
+.Modal__close--floating {
+  position: absolute;
+  right: calc(var(--space-factor) * 5);
+  top: calc(var(--space-factor) * 5);
+}
+
+@media #{$media-query} {
+  .Modal {
+    padding: 0;
+  }
+  .Modal__content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}

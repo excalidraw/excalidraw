@@ -1,6 +1,10 @@
-name: Node CI
+name: Lint
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   lint:
@@ -17,6 +21,8 @@ jobs:
       - name: Install and lint
         run: |
           npm ci
+          npm run test:other
           npm run test:code
+          npm run test:typecheck
         env:
           CI: true

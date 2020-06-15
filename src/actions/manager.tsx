@@ -4,95 +4,126 @@ import {
   ActionsManagerInterface,
   UpdaterFn,
   ActionFilterFn,
+  ActionName,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { TFunction } from "i18next";
+import { t } from "../i18n";
+import { globalSceneState } from "../scene";
 
 export class ActionManager implements ActionsManagerInterface {
-  actions: { [keyProp: string]: Action } = {};
+  actions = {} as ActionsManagerInterface["actions"];
 
-  updater:
-    | ((elements: ExcalidrawElement[], appState: AppState) => void)
-    | null = null;
+  updater: UpdaterFn;
 
-  setUpdater(
-    updater: (elements: ExcalidrawElement[], appState: AppState) => void,
+  getAppState: () => AppState;
+
+  getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
+
+  constructor(
+    updater: UpdaterFn,
+    getAppState: () => AppState,
+    getElementsIncludingDeleted: () => ReturnType<
+      typeof globalSceneState["getElementsIncludingDeleted"]
+    >,
   ) {
     this.updater = updater;
+    this.getAppState = getAppState;
+    this.getElementsIncludingDeleted = getElementsIncludingDeleted;
   }
 
   registerAction(action: Action) {
     this.actions[action.name] = action;
   }
 
-  handleKeyDown(
-    event: KeyboardEvent,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) {
+  registerAll(actions: readonly Action[]) {
+    actions.forEach((action) => this.registerAction(action));
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
-        action => action.keyTest && action.keyTest(event, elements, appState),
+        (action) =>
+          action.keyTest &&
+          action.keyTest(
+            event,
+            this.getAppState(),
+            this.getElementsIncludingDeleted(),
+          ),
       );
 
-    if (data.length === 0) return {};
+    if (data.length === 0) {
+      return false;
+    }
 
     event.preventDefault();
-    return data[0].perform(elements, appState, null);
+    this.updater(
+      data[0].perform(
+        this.getElementsIncludingDeleted(),
+        this.getAppState(),
+        null,
+      ),
+    );
+    return true;
   }
 
-  getContextMenuItems(
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-    actionFilter: ActionFilterFn = action => action,
-    t?: TFunction,
-  ) {
+  executeAction(action: Action) {
+    this.updater(
+      action.perform(
+        this.getElementsIncludingDeleted(),
+        this.getAppState(),
+        null,
+      ),
+    );
+  }
+
+  getContextMenuItems(actionFilter: ActionFilterFn = (action) => action) {
     return Object.values(this.actions)
       .filter(actionFilter)
-      .filter(action => "contextItemLabel" in action)
+      .filter((action) => "contextItemLabel" in action)
       .sort(
         (a, b) =>
           (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -
           (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
       )
-      .map(action => ({
-        label:
-          t && action.contextItemLabel
-            ? t(action.contextItemLabel)
-            : action.contextItemLabel!,
+      .map((action) => ({
+        label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
-          updater(action.perform(elements, appState, null));
+          this.updater(
+            action.perform(
+              this.getElementsIncludingDeleted(),
+              this.getAppState(),
+              null,
+            ),
+          );
         },
       }));
   }
 
-  renderAction(
-    name: string,
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    updater: UpdaterFn,
-    t: TFunction,
-  ) {
+  renderAction = (name: ActionName) => {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
-      const updateData = (formState: any) => {
-        updater(action.perform(elements, appState, formState));
+      const updateData = (formState?: any) => {
+        this.updater(
+          action.perform(
+            this.getElementsIncludingDeleted(),
+            this.getAppState(),
+            formState,
+          ),
+        );
       };
 
       return (
         <PanelComponent
-          elements={elements}
-          appState={appState}
+          elements={this.getElementsIncludingDeleted()}
+          appState={this.getAppState()}
           updateData={updateData}
-          t={t}
         />
       );
     }
 
     return null;
-  }
+  };
 }

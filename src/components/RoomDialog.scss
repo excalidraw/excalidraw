@@ -1,0 +1,68 @@
+@import "../css/_variables";
+
+.RoomDialog-modalButton.is-collaborating {
+  background-color: $oc-green-0;
+  color: $oc-green-9;
+}
+
+.RoomDialog-modalButton-collaborators {
+  min-width: 1em;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  padding: 3px;
+  border-radius: 50%;
+  background-color: $oc-green-6;
+  color: $oc-white;
+  font-size: 0.7em;
+  font-family: var(--ui-font);
+}
+
+.RoomDialog-linkContainer {
+  display: flex;
+  margin: 1.5em 0;
+}
+
+.RoomDialog-link {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin-left: 1em;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--space-factor);
+  background-color: var(--button-gray-1);
+}
+
+.RoomDialog-usernameContainer {
+  display: flex;
+  margin: 1.5em 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RoomDialog-username {
+  appearance: none;
+  min-width: 0;
+  flex: 1 1 auto;
+  margin-left: 1em;
+  height: 2.5rem;
+  font-size: 1em;
+  line-height: 1.5;
+  padding: 0 0.5rem;
+}
+
+.RoomDialog-sessionStartButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.RoomDialog-stopSession {
+  background-color: $oc-red-1;
+  color: $oc-red-9;
+}

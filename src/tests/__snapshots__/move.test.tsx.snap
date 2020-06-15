@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`duplicate element on move when ALT is clicked rectangle 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id2",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 401146281,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 4,
+  "versionNonce": 2019559783,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;
+
+exports[`duplicate element on move when ALT is clicked rectangle 2`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 4,
+  "versionNonce": 1150084233,
+  "width": 30,
+  "x": -10,
+  "y": 60,
+}
+`;
+
+exports[`move element rectangle 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 453191,
+  "width": 30,
+  "x": 0,
+  "y": 40,
+}
+`;

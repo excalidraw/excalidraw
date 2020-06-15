@@ -1,0 +1,24 @@
+@import "../css/_variables";
+
+.HintViewer {
+  color: $oc-gray-6;
+  font-size: 0.8rem;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 54px;
+  transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
+  white-space: pre;
+  text-align: center;
+  @media #{$media-query} {
+    position: static;
+    transform: none;
+    margin-top: 0.5rem;
+  }
+
+  > span {
+    background-color: transparentize($oc-white, 0.12);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+  }
+}

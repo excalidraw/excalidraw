@@ -1,13 +1,11 @@
-export default `
-### Stack trace
+export default (sentryErrorId) => `
+### Scene content
 
 \`\`\`
-// paste stack trace here
+Paste scene content here
 \`\`\`
 
-### localStorage
+### Sentry Error ID
 
-\`\`\`
-// paste localStorage content here (if it doesn't contain sensitive data)
-\`\`\`
+${sentryErrorId}
 `;
