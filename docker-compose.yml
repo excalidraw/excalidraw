@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.8"
 
 services:
   excalidraw:
@@ -6,7 +6,7 @@ services:
       context: .
       args:
         - NODE_ENV=development
-      target: build
+      target: deps
     container_name: excalidraw
     ports:
       - "3000:3000"
