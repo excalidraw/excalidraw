@@ -71,6 +71,7 @@
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "save": "保存",
+    "saveAs": "",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",

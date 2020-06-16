@@ -71,6 +71,7 @@
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
     "save": "Kaydet",
+    "saveAs": "",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
     "close": "Kapat",

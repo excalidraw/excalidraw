@@ -71,6 +71,7 @@
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
     "save": "Opslaan",
+    "saveAs": "",
     "load": "Open",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",

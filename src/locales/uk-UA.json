@@ -71,6 +71,7 @@
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "save": "Зберегти",
+    "saveAs": "",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
     "close": "Закрити",

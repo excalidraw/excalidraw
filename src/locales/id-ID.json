@@ -71,6 +71,7 @@
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke Papan Klip",
     "save": "Simpan",
+    "saveAs": "",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
     "close": "Tutup",

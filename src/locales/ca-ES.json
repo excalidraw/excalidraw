@@ -71,6 +71,7 @@
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "save": "Desar",
+    "saveAs": "",
     "load": "Carregar",
     "getShareableLink": "Obtenir enllaç per compartir",
     "close": "Tancar",
