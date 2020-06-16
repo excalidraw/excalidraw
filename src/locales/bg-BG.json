@@ -71,6 +71,7 @@
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "save": "Запази",
+    "saveAs": "",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",

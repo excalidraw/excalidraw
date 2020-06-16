@@ -71,6 +71,7 @@
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
     "save": "Tallenna",
+    "saveAs": "Tallenna nimellä",
     "load": "Avaa",
     "getShareableLink": "Hae jaettava linkki",
     "close": "Sulje",
@@ -173,7 +174,7 @@
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Liitit taulukon ilman lukuja sisältävää saraketta.",
+    "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
   }
 }

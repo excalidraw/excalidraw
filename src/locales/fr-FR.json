@@ -71,6 +71,7 @@
     "copyToClipboard": "Copier dans le presse-papier",
     "copyPngToClipboard": "Copier le PNG dans le presse-papier",
     "save": "Sauvegarder",
+    "saveAs": "Enregistrer sous",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",

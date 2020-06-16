@@ -71,6 +71,7 @@
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "save": "저장",
+    "saveAs": "",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",

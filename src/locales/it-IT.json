@@ -60,8 +60,8 @@
     "name": "Nome",
     "yourName": "Il vostro nome",
     "madeWithExcalidraw": "Creato con Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Crea gruppo da selezione",
+    "ungroup": "Dividi gruppo da selezione"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -71,6 +71,7 @@
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "save": "Salva",
+    "saveAs": "Salva con nome",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
@@ -122,8 +123,8 @@
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
+    "lineEditor_pointSelected": "Premi il tasto cancella per rimuovere il punto o trascina per spostare",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
@@ -147,7 +148,7 @@
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
     "desc_persistenceWarning": "Tieni presente che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Pertanto, se vi disconnettere tutti, perderete i dati a meno che non li esportiate in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   },
   "errorDialog": {
     "title": "Errore"
@@ -173,7 +174,7 @@
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
+    "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
   }
 }
