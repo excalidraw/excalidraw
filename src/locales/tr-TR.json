@@ -58,7 +58,7 @@
     "duplicateSelection": "Kopyala",
     "untitled": "Başlıksız",
     "name": "İsim",
-    "yourName": "",
+    "yourName": "Adınız",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "",
     "ungroup": ""
@@ -71,7 +71,7 @@
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
     "save": "Kaydet",
-    "saveAs": "",
+    "saveAs": "Farklı kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
     "close": "Kapat",
