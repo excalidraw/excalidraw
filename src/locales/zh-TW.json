@@ -114,18 +114,18 @@
   },
   "headings": {
     "canvasActions": "canvas 動作",
-    "selectedShapeActions": "",
+    "selectedShapeActions": "選取圖形動作",
     "shapes": "形狀"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
+    "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
+    "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "linearElementMulti": "按下 Escape 或 Enter 來完成",
-    "resize": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
+    "rotate": "旋轉時按住 Shift 可限制旋轉角度",
+    "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
+    "lineEditor_pointSelected": "按下 Delete 可刪除控制點；亦可拖曳移動控制點",
+    "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點"
   },
   "errorSplash": {
     "headingMain_pre": "遭遇錯誤，嘗試 ",
@@ -133,11 +133,11 @@
     "clearCanvasMessage": "如果重載還是無法解決，嘗試 ",
     "clearCanvasMessage_button": "清理畫布",
     "clearCanvasCaveat": " 這會導致目前的進度遺失 ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
+    "trackedToSentry_pre": "此錯誤與其識別碼",
+    "trackedToSentry_post": "將由系統記錄。",
+    "openIssueMessage_pre": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": "請將下列資訊複製貼上至 GitHub issue 中。",
     "sceneContent": "場景內容"
   },
   "roomDialog": {
@@ -146,9 +146,9 @@
     "button_startSession": "啟動會議",
     "button_stopSession": "暫停會議",
     "desc_inProgressIntro": "即時協作會議正在進行中。",
-    "desc_persistenceWarning": "",
+    "desc_persistenceWarning": "請注意此作品的資料是以 P2P 的方式分享給所有參與者，並未儲存於我們的伺服器。故若所有參加者皆斷線，未輸出或建立分享連結的內容將會遺失。",
     "desc_shareLink": "與要協作的任何人分享此連結：",
-    "desc_exitSession": ""
+    "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。"
   },
   "errorDialog": {
     "title": "錯誤"
@@ -162,7 +162,7 @@
     "curvedArrow": "箭頭曲線",
     "curvedLine": "曲線",
     "editor": "編輯器",
-    "view": "",
+    "view": "檢視",
     "blog": "閱讀部落格",
     "howto": "官方指南",
     "github": "發現問題？發個 PR",
@@ -171,10 +171,10 @@
     "zoomToFit": "回到完整畫面"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "你貼上的 spreadsheet 沒有數字欄。",
+    "tooManyColumns": "你貼上的 spreadsheet 超過兩欄。"
   }
 }
