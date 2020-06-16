@@ -19,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "5.15.5",
+    "@sentry/browser": "5.17.0",
     "@sentry/integrations": "5.15.5",
     "@testing-library/jest-dom": "5.10.1",
     "@testing-library/react": "10.2.1",
