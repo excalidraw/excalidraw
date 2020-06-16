@@ -60,8 +60,8 @@
     "name": "Όνομα",
     "yourName": "Το όνομά σου",
     "madeWithExcalidraw": "Φτιαγμένο με Excalidraw",
-    "group": "",
-    "ungroup": ""
+    "group": "Δημιουργία ομάδας από επιλογή",
+    "ungroup": "Κατάργηση ομάδας από επιλογή"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
