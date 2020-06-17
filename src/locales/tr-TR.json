@@ -3,7 +3,7 @@
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
     "copy": "Kopyala",
-    "copyAsPng": "PNG olarak kopyala",
+    "copyAsPng": "Panoya PNG olarak kopyala",
     "copyAsSvg": "Panoya SVG olarak kopyala",
     "bringForward": "Bir öne getir",
     "sendToBack": "Arkaya gönder",
@@ -52,13 +52,13 @@
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
-    "actions": "İşlemler",
+    "actions": "Eylemler",
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Kopyala",
     "untitled": "Başlıksız",
     "name": "İsim",
-    "yourName": "Adınız",
+    "yourName": "İsminiz",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "Grup seçimi",
     "ungroup": "Grubu dağıtma seçimi"
@@ -84,12 +84,12 @@
     "done": "Tamam",
     "edit": "Düzenle",
     "undo": "Geri Al",
-    "redo": "İleri Al",
+    "redo": "Yeniden yap",
     "roomDialog": "Ortak Çalışma Ortamı Yarat",
-    "createNewRoom": "Yeni Oda Oluştur",
+    "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Zen modunu aç/kapa",
+    "exitZenMode": "Zen modundan çık"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -123,8 +123,8 @@
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_info": "Noktaları değiştirmek için Çift-tıklayın veya Enter tuşuna basın",
+    "lineEditor_pointSelected": "Noktayı kaldırmak için Delete tuşuna basın veya taşımak için sürükleyin",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
@@ -137,8 +137,8 @@
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununu kopyalayarak ve yapıştırarak bilgi veriniz.",
-    "sceneContent": "Çalışma alanı:"
+    "openIssueMessage_post": "",
+    "sceneContent": "Sahne içeriği:"
   },
   "roomDialog": {
     "desc_intro": "Çalışma alanınıza, sizinle birlikte çalışabilmeleri için başkalarını da ekleyebilirsiniz.",
@@ -168,10 +168,10 @@
     "github": "Bir hata mı buldun? Bildir",
     "textNewLine": "Yeni satır ekle (text)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
-    "zoomToFit": ""
+    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Çizimleriniz sonuna kadar şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
   "charts": {
     "noNumericColumn": "",
