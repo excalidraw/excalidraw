@@ -174,7 +174,7 @@
     "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Vous avez collé une feuille de calcul sans données numérique.",
+    "tooManyColumns": "Vous avez collé une feuille de calcul avec plus de deux colonnes."
   }
 }
