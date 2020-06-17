@@ -2,6 +2,8 @@ name: Publish Docker
 
 on:
   push:
+    branches:
+      - master
 
 jobs:
   publish-docker:
