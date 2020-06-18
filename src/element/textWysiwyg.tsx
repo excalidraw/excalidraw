@@ -64,15 +64,12 @@ export const textWysiwyg = ({
 
   const degree = (180 * angle) / Math.PI;
 
-  const EDITOR_PADDING = 4;
-
   Object.assign(editable.style, {
     color: strokeColor,
     position: "fixed",
     opacity: opacity / 100,
-    top: verticalAlign === "middle" ? `${y}px` : `${y - EDITOR_PADDING}px`,
-    [textAlign === "right" ? "right" : "left"]:
-      textAlign === "center" ? `${x}px` : `${x - EDITOR_PADDING}px`,
+    top: `${y}px`,
+    [textAlign === "right" ? "right" : "left"]: `${x}px`,
     transform:
       textAlign === "center"
         ? verticalAlign === "middle"
@@ -82,7 +79,6 @@ export const textWysiwyg = ({
     textAlign: textAlign,
     display: "inline-block",
     font: getFontString({ fontSize, fontFamily }),
-    padding: `${EDITOR_PADDING}px`,
     // This needs to have "1px solid" otherwise the carret doesn't show up
     // the first time on Safari and Chrome!
     outline: "1px solid transparent",
