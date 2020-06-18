@@ -79,13 +79,13 @@
     "scrollBackToContent": "İçeriğe geri dön",
     "zoomIn": "Yakınlaştır",
     "zoomOut": "Uzaklaştır",
-    "resetZoom": "Zoom'u Sıfırla",
+    "resetZoom": "Yakınlaştırmayı sıfırla",
     "menu": "Menü",
     "done": "Tamam",
     "edit": "Düzenle",
     "undo": "Geri Al",
     "redo": "Yeniden yap",
-    "roomDialog": "Ortak Çalışma Ortamı Yarat",
+    "roomDialog": "Ortak çalışma ortamı yarat",
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
     "toggleZenMode": "Zen modunu aç/kapa",
@@ -125,7 +125,7 @@
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları değiştirmek için Çift-tıklayın veya Enter tuşuna basın",
     "lineEditor_pointSelected": "Noktayı kaldırmak için Delete tuşuna basın veya taşımak için sürükleyin",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut"
   },
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",
