@@ -1,16 +1,31 @@
-FROM node:14-alpine AS build
+FROM node:14-alpine AS deps
 
-WORKDIR /usr/src/app
+ARG REACT_APP_INCLUDE_GTAG=false
+
+RUN mkdir /opt/node_app && chown node:node /opt/node_app
+WORKDIR /opt/node_app
+
+USER node
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --no-optional && npm cache clean --force
+ENV PATH /opt/node_app/node_modules/.bin:$PATH
 
+WORKDIR /opt/node_app
 COPY . .
-ENV NODE_ENV=production
+
+FROM node:14-alpine AS build
+
+ARG NODE_ENV=production
+ARG REACT_APP_INCLUDE_GTAG=false
+
+WORKDIR /opt/node_app
+COPY --from=deps /opt/node_app .
+RUN ls
 RUN npm run build:app
 
 FROM nginx:1.17-alpine
 
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
+COPY --from=build /opt/node_app/build /usr/share/nginx/html
 
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
