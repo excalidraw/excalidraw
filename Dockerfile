@@ -17,12 +17,10 @@ COPY . .
 FROM node:14-alpine AS build
 
 ARG NODE_ENV=production
-ARG REACT_APP_INCLUDE_GTAG=false
 
 WORKDIR /opt/node_app
 COPY --from=deps /opt/node_app .
-RUN ls
-RUN npm run build:app
+RUN npm run build:app:docker
 
 FROM nginx:1.17-alpine
 
