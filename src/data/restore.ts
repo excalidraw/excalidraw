@@ -8,8 +8,12 @@ import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
-import { DEFAULT_TEXT_ALIGN, DEFAULT_FONT_FAMILY } from "../appState";
-import { FONT_FAMILY } from "../constants";
+import {
+  FONT_FAMILY,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+} from "../constants";
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
@@ -75,7 +79,8 @@ const migrateElement = (
         fontFamily,
         text: element.text ?? "",
         baseline: element.baseline,
-        textAlign: element.textAlign ?? DEFAULT_TEXT_ALIGN,
+        textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
+        verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
     case "draw":
     case "line":

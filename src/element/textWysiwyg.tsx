@@ -3,7 +3,7 @@ import { selectNode, isWritableElement, getFontString } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { FontFamily } from "./types";
+import { FontFamily, TextAlign, VerticalAlign } from "./types";
 
 const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -27,7 +27,8 @@ type TextWysiwygParams = {
   opacity: number;
   zoom: number;
   angle: number;
-  textAlign: string;
+  textAlign: TextAlign;
+  verticalAlign: VerticalAlign;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   onCancel: () => void;
@@ -46,6 +47,7 @@ export const textWysiwyg = ({
   angle,
   onChange,
   textAlign,
+  verticalAlign,
   onSubmit,
   onCancel,
 }: TextWysiwygParams) => {
@@ -62,17 +64,25 @@ export const textWysiwyg = ({
 
   const degree = (180 * angle) / Math.PI;
 
+  const EDITOR_PADDING = 4;
+
   Object.assign(editable.style, {
     color: strokeColor,
     position: "fixed",
     opacity: opacity / 100,
-    top: `${y}px`,
-    left: `${x}px`,
-    transform: `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`,
+    top: verticalAlign === "middle" ? `${y}px` : `${y - EDITOR_PADDING}px`,
+    [textAlign === "right" ? "right" : "left"]:
+      textAlign === "center" ? `${x}px` : `${x - EDITOR_PADDING}px`,
+    transform:
+      textAlign === "center"
+        ? verticalAlign === "middle"
+          ? `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`
+          : `translateX(-50%) scale(${zoom}) rotate(${degree}deg)`
+        : `scale(${zoom}) rotate(${degree}deg)`,
     textAlign: textAlign,
     display: "inline-block",
     font: getFontString({ fontSize, fontFamily }),
-    padding: "4px",
+    padding: `${EDITOR_PADDING}px`,
     // This needs to have "1px solid" otherwise the carret doesn't show up
     // the first time on Safari and Chrome!
     outline: "1px solid transparent",

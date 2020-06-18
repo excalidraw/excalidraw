@@ -27,6 +27,7 @@ import {
   getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
+  updateTextElement,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -52,7 +53,11 @@ import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
 
@@ -109,6 +114,7 @@ import {
   EVENT,
   ENV,
   CANVAS_ONLY_ACTIONS,
+  DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
@@ -785,6 +791,7 @@ class App extends React.Component<any, AppState> {
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
+      verticalAlign: DEFAULT_VERTICAL_ALIGN,
     });
 
     globalSceneState.replaceAllElements([
@@ -1331,7 +1338,11 @@ class App extends React.Component<any, AppState> {
       x,
       y,
       isExistingElement = false,
-    }: { x: number; y: number; isExistingElement?: boolean },
+    }: {
+      x: number;
+      y: number;
+      isExistingElement?: boolean;
+    },
   ) {
     const resetSelection = () => {
       this.setState({
@@ -1354,11 +1365,8 @@ class App extends React.Component<any, AppState> {
     const updateElement = (text: string) => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id) {
-            return newTextElement({
-              ...(_element as ExcalidrawTextElement),
-              x: element.x,
-              y: element.y,
+          if (_element.id === element.id && isTextElement(_element)) {
+            return updateTextElement(_element, {
               text,
             });
           }
@@ -1378,6 +1386,7 @@ class App extends React.Component<any, AppState> {
       fontFamily: element.fontFamily,
       angle: element.angle,
       textAlign: element.textAlign,
+      verticalAlign: element.verticalAlign,
       zoom: this.state.zoom,
       onChange: withBatchedUpdates((text) => {
         if (text) {
@@ -1420,20 +1429,11 @@ class App extends React.Component<any, AppState> {
     updateElement(element.text);
   }
 
-  private startTextEditing = ({
-    x,
-    y,
-    clientX,
-    clientY,
-    centerIfPossible = true,
-  }: {
-    x: number;
-    y: number;
-    clientX?: number;
-    clientY?: number;
-    centerIfPossible?: boolean;
-  }) => {
-    const elementAtPosition = getElementAtPosition(
+  private getTextElementAtPosition(
+    x: number,
+    y: number,
+  ): NonDeleted<ExcalidrawTextElement> | null {
+    const element = getElementAtPosition(
       globalSceneState.getElements(),
       this.state,
       x,
@@ -1441,79 +1441,99 @@ class App extends React.Component<any, AppState> {
       this.state.zoom,
     );
 
-    const element =
-      elementAtPosition && isTextElement(elementAtPosition)
-        ? elementAtPosition
-        : newTextElement({
-            x: x,
-            y: y,
-            strokeColor: this.state.currentItemStrokeColor,
-            backgroundColor: this.state.currentItemBackgroundColor,
-            fillStyle: this.state.currentItemFillStyle,
-            strokeWidth: this.state.currentItemStrokeWidth,
-            strokeStyle: this.state.currentItemStrokeStyle,
-            roughness: this.state.currentItemRoughness,
-            opacity: this.state.currentItemOpacity,
-            text: "",
-            fontSize: this.state.currentItemFontSize,
-            fontFamily: this.state.currentItemFontFamily,
-            textAlign: this.state.currentItemTextAlign,
-          });
+    if (element && isTextElement(element) && !element.isDeleted) {
+      return element;
+    }
+    return null;
+  }
 
-    this.setState({ editingElement: element });
+  private startTextEditing = ({
+    x,
+    y,
+    clientX,
+    clientY,
+    insertAtParentCenter = true,
+  }: {
+    x: number;
+    y: number;
+    clientX?: number;
+    clientY?: number;
+    /* whether to attempt to insert at element center if applicable */
+    insertAtParentCenter?: boolean;
+  }) => {
+    const existingTextElement = this.getTextElementAtPosition(x, y);
 
-    let textX = clientX || x;
-    let textY = clientY || y;
-
-    let isExistingTextElement = false;
-
-    if (elementAtPosition && isTextElement(elementAtPosition)) {
-      isExistingTextElement = true;
-      const centerElementX = elementAtPosition.x + elementAtPosition.width / 2;
-      const centerElementY = elementAtPosition.y + elementAtPosition.height / 2;
-
-      const {
-        x: centerElementXInViewport,
-        y: centerElementYInViewport,
-      } = sceneCoordsToViewportCoords(
-        { sceneX: centerElementX, sceneY: centerElementY },
+    const parentCenterPosition =
+      insertAtParentCenter &&
+      this.getTextWysiwygSnappedToCenterPosition(
+        x,
+        y,
         this.state,
         this.canvas,
         window.devicePixelRatio,
       );
 
-      textX = centerElementXInViewport;
-      textY = centerElementYInViewport;
+    const element = existingTextElement
+      ? existingTextElement
+      : newTextElement({
+          x: parentCenterPosition ? parentCenterPosition.elementCenterX : x,
+          y: parentCenterPosition ? parentCenterPosition.elementCenterY : y,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          text: "",
+          fontSize: this.state.currentItemFontSize,
+          fontFamily: this.state.currentItemFontFamily,
+          textAlign: parentCenterPosition
+            ? "center"
+            : this.state.currentItemTextAlign,
+          verticalAlign: parentCenterPosition
+            ? "middle"
+            : DEFAULT_VERTICAL_ALIGN,
+        });
 
-      // x and y will change after calling newTextElement function
-      mutateElement(element, {
-        x: centerElementX,
-        y: centerElementY,
-      });
+    this.setState({ editingElement: element });
+
+    let wysiwygX = clientX || x;
+    let wysiwygY = clientY || y;
+
+    if (existingTextElement) {
+      // if text element is no longer centered to a container, reset
+      //  verticalAlign to default because it's currently internal-only
+      if (!parentCenterPosition || element.textAlign !== "center") {
+        mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
+      }
+
+      const elementX =
+        element.textAlign === "center"
+          ? existingTextElement.x + existingTextElement.width / 2
+          : existingTextElement.x;
+      const elementY =
+        element.verticalAlign === "middle"
+          ? existingTextElement.y + existingTextElement.height / 2
+          : existingTextElement.y;
+
+      const {
+        x: elementViewportX,
+        y: elementViewportY,
+      } = sceneCoordsToViewportCoords(
+        { sceneX: elementX, sceneY: elementY },
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
+
+      wysiwygX = elementViewportX;
+      wysiwygY = elementViewportY;
     } else {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted(),
         element,
       ]);
-
-      if (centerIfPossible) {
-        const snappedToCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
-          x,
-          y,
-          this.state,
-          this.canvas,
-          window.devicePixelRatio,
-        );
-
-        if (snappedToCenterPosition) {
-          mutateElement(element, {
-            x: snappedToCenterPosition.elementCenterX,
-            y: snappedToCenterPosition.elementCenterY,
-          });
-          textX = snappedToCenterPosition.wysiwygX;
-          textY = snappedToCenterPosition.wysiwygY;
-        }
-      }
     }
 
     this.setState({
@@ -1521,9 +1541,17 @@ class App extends React.Component<any, AppState> {
     });
 
     this.handleTextWysiwyg(element, {
-      x: textX,
-      y: textY,
-      isExistingElement: isExistingTextElement,
+      x:
+        !existingTextElement && parentCenterPosition
+          ? parentCenterPosition.wysiwygX
+          : element.textAlign === "right"
+          ? window.innerWidth - wysiwygX - element.width
+          : wysiwygX,
+      y:
+        !existingTextElement && parentCenterPosition
+          ? parentCenterPosition.wysiwygY
+          : wysiwygY,
+      isExistingElement: !!existingTextElement,
     });
   };
 
@@ -1602,7 +1630,7 @@ class App extends React.Component<any, AppState> {
       y: y,
       clientX: event.clientX,
       clientY: event.clientY,
-      centerIfPossible: !event.altKey,
+      insertAtParentCenter: !event.altKey,
     });
   };
 
@@ -2201,7 +2229,7 @@ class App extends React.Component<any, AppState> {
         y: y,
         clientX: event.clientX,
         clientY: event.clientY,
-        centerIfPossible: !event.altKey,
+        insertAtParentCenter: !event.altKey,
       });
 
       resetCursor();

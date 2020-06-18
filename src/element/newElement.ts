@@ -7,6 +7,7 @@ import {
   TextAlign,
   FontFamily,
   GroupId,
+  VerticalAlign,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -72,15 +73,36 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+/** computes element x/y offset based on textAlign/verticalAlign */
+function getTextElementPositionOffsets(
+  opts: {
+    textAlign: ExcalidrawTextElement["textAlign"];
+    verticalAlign: ExcalidrawTextElement["verticalAlign"];
+  },
+  metrics: ReturnType<typeof measureText>,
+) {
+  return {
+    x:
+      opts.textAlign === "center"
+        ? metrics.width / 2
+        : opts.textAlign === "right"
+        ? metrics.width
+        : 0,
+    y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+  };
+}
+
 export const newTextElement = (
   opts: {
     text: string;
     fontSize: number;
     fontFamily: FontFamily;
     textAlign: TextAlign;
+    verticalAlign: VerticalAlign;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
+  const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
@@ -88,9 +110,9 @@ export const newTextElement = (
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
-      // Center the text
-      x: opts.x - metrics.width / 2,
-      y: opts.y - metrics.height / 2,
+      verticalAlign: opts.verticalAlign,
+      x: opts.x - offsets.x,
+      y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
@@ -99,6 +121,20 @@ export const newTextElement = (
   );
 
   return textElement;
+};
+
+export const updateTextElement = (
+  element: ExcalidrawTextElement,
+  { text }: { text: string },
+): NonDeleted<ExcalidrawElement> => {
+  const metrics = measureText(element.text, getFontString(element));
+  const offsets = getTextElementPositionOffsets(element, metrics);
+  return newTextElement({
+    ...element,
+    x: element.x + offsets.x,
+    y: element.y + offsets.y,
+    text,
+  });
 };
 
 export const newLinearElement = (
