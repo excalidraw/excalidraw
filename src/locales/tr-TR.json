@@ -137,7 +137,7 @@
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Lütfen aşağıya Github sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
   },
   "roomDialog": {
