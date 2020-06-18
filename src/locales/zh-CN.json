@@ -71,6 +71,7 @@
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",
+    "saveAs": "",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
     "close": "关闭",
@@ -171,5 +172,9 @@
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

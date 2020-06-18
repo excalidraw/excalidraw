@@ -27,12 +27,14 @@ const SentryEnvHostnameMap: { [key: string]: string } = {
   "now.sh": "staging",
 };
 
-const onlineEnv = Object.keys(SentryEnvHostnameMap).find(
-  (item) => window.location.hostname.indexOf(item) >= 0,
-);
+// Disable Sentry locally or inside the Docker to avoid noise/respect privacy
+const onlineEnv =
+  process.env.REACT_APP_DISABLE_SENTRY !== "true" &&
+  Object.keys(SentryEnvHostnameMap).find(
+    (item) => window.location.hostname.indexOf(item) >= 0,
+  );
 
 Sentry.init({
-  // Disable Sentry locally to avoid noise
   dsn: onlineEnv
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,

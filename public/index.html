@@ -90,6 +90,7 @@
       style="--pwacompat-splash-font: 24px Virgil;"
     />
 
+    <% if (process.env.REACT_APP_INCLUDE_GTAG === 'true') { %>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
@@ -102,6 +103,7 @@
       gtag("js", new Date());
       gtag("config", "UA-387204-13");
     </script>
+    <% } %>
   </head>
 
   <body>

@@ -71,6 +71,7 @@
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "save": "Desar",
+    "saveAs": "",
     "load": "Carregar",
     "getShareableLink": "Obtenir enllaç per compartir",
     "close": "Tancar",
@@ -171,5 +172,9 @@
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

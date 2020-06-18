@@ -71,6 +71,7 @@
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "save": "保存",
+    "saveAs": "",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",
@@ -171,5 +172,9 @@
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

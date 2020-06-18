@@ -24,28 +24,29 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  fileHandle: any,
 ) => {
   const serialized = serializeAsJSON(elements, appState);
-
+  const blob = new Blob([serialized], {
+    type: "application/json",
+  });
   const name = `${appState.name}.excalidraw`;
-  await fileSave(
-    new Blob([serialized], {
-      type: /\b(iPad|iPhone|iPod)\b/.test(navigator.userAgent)
-        ? "application/json"
-        : "application/vnd.excalidraw+json",
-    }),
+  (window as any).handle = await fileSave(
+    blob,
     {
       fileName: name,
       description: "Excalidraw file",
+      extensions: ["excalidraw"],
     },
-    (window as any).handle,
+    fileHandle || null,
   );
 };
+
 export const loadFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: ["json", "excalidraw"],
-    mimeTypes: ["application/json", "application/vnd.excalidraw+json"],
+    mimeTypes: ["application/json"],
   });
   return loadFromBlob(blob);
 };
