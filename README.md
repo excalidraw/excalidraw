@@ -10,6 +10,7 @@
     <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
+    <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
   </p>
 </div>
 
@@ -50,9 +51,26 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 #### Docker Compose
 
+You can use docker-compose to work on excalidraw locally if you don't want to setup a Node.js env.
+
 ```sh
 docker-compose up --build -d
 ```
+
+## Self hosting
+
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+
+```sh
+docker build -t excalidraw/excalidraw .
+docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
+```
+
+The Docker image is free of analytics and other tracking libraries.
+
+**At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
+
+We are working towards providing a full-fledged solution for self hosting your own Excalidraw.
 
 ## Contributing
 
