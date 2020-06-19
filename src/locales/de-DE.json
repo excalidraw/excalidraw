@@ -61,7 +61,8 @@
     "yourName": "Dein Name",
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
-    "ungroup": "Gruppierung aufheben"
+    "ungroup": "Gruppierung aufheben",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
