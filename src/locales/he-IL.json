@@ -61,7 +61,8 @@
     "yourName": "שם",
     "madeWithExcalidraw": "נוצר באמצעות Excalidraw",
     "group": "אחד לקבוצה",
-    "ungroup": "פרק קבוצה"
+    "ungroup": "פרק קבוצה",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
