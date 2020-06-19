@@ -1243,12 +1243,9 @@ class App extends React.Component<any, AppState> {
         !isLinearElement(selectedElements[0])
       ) {
         const selectedElement = selectedElements[0];
-        const x = selectedElement.x + selectedElement.width / 2;
-        const y = selectedElement.y + selectedElement.height / 2;
-
         this.startTextEditing({
-          x: x,
-          y: y,
+          sceneX: selectedElement.x + selectedElement.width / 2,
+          sceneY: selectedElement.y + selectedElement.height / 2,
         });
         event.preventDefault();
         return;
@@ -1339,12 +1336,14 @@ class App extends React.Component<any, AppState> {
   private handleTextWysiwyg(
     element: ExcalidrawTextElement,
     {
-      x,
-      y,
+      viewportX,
+      viewportY,
       isExistingElement = false,
     }: {
-      x: number;
-      y: number;
+      /** position override, else element.x is used */
+      viewportX: number | null;
+      /** position override, else elemeny.y is used */
+      viewportY: number | null;
       isExistingElement?: boolean;
     },
   ) {
@@ -1379,19 +1378,19 @@ class App extends React.Component<any, AppState> {
       ]);
     };
 
-    textWysiwyg({
-      id: element.id,
-      x,
-      y,
-      initText: element.text,
-      strokeColor: element.strokeColor,
-      opacity: element.opacity,
-      fontSize: element.fontSize,
-      fontFamily: element.fontFamily,
-      angle: element.angle,
-      textAlign: element.textAlign,
-      verticalAlign: element.verticalAlign,
+    textWysiwyg(element, {
+      viewportX,
+      viewportY,
       zoom: this.state.zoom,
+      getViewportCoords: (x, y) => {
+        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+          { sceneX: x, sceneY: y },
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+        return [viewportX, viewportY];
+      },
       onChange: withBatchedUpdates((text) => {
         if (text) {
           updateElement(text);
@@ -1452,26 +1451,24 @@ class App extends React.Component<any, AppState> {
   }
 
   private startTextEditing = ({
-    x,
-    y,
-    clientX,
-    clientY,
+    sceneX,
+    sceneY,
     insertAtParentCenter = true,
   }: {
-    x: number;
-    y: number;
-    clientX?: number;
-    clientY?: number;
-    /* whether to attempt to insert at element center if applicable */
+    /** X position to insert text at */
+    sceneX: number;
+    /** Y position to insert text at */
+    sceneY: number;
+    /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const existingTextElement = this.getTextElementAtPosition(x, y);
+    const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
 
     const parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
-        x,
-        y,
+        sceneX,
+        sceneY,
         this.state,
         this.canvas,
         window.devicePixelRatio,
@@ -1480,8 +1477,12 @@ class App extends React.Component<any, AppState> {
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
-          x: parentCenterPosition ? parentCenterPosition.elementCenterX : x,
-          y: parentCenterPosition ? parentCenterPosition.elementCenterY : y,
+          x: parentCenterPosition
+            ? parentCenterPosition.elementCenterX
+            : sceneX,
+          y: parentCenterPosition
+            ? parentCenterPosition.elementCenterY
+            : sceneY,
           strokeColor: this.state.currentItemStrokeColor,
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
@@ -1502,37 +1503,12 @@ class App extends React.Component<any, AppState> {
 
     this.setState({ editingElement: element });
 
-    let wysiwygX = clientX || x;
-    let wysiwygY = clientY || y;
-
     if (existingTextElement) {
       // if text element is no longer centered to a container, reset
       //  verticalAlign to default because it's currently internal-only
       if (!parentCenterPosition || element.textAlign !== "center") {
         mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
       }
-
-      const elementX =
-        element.textAlign === "center"
-          ? existingTextElement.x + existingTextElement.width / 2
-          : existingTextElement.x;
-      const elementY =
-        element.verticalAlign === "middle"
-          ? existingTextElement.y + existingTextElement.height / 2
-          : existingTextElement.y;
-
-      const {
-        x: elementViewportX,
-        y: elementViewportY,
-      } = sceneCoordsToViewportCoords(
-        { sceneX: elementX, sceneY: elementY },
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
-
-      wysiwygX = elementViewportX;
-      wysiwygY = elementViewportY;
     } else {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted(),
@@ -1542,8 +1518,6 @@ class App extends React.Component<any, AppState> {
       // case: creating new text not centered to parent elemenent → offset Y
       //  so that the text is centered to cursor position
       if (!parentCenterPosition) {
-        wysiwygY -= (element.baseline / 2) * this.state.zoom;
-
         mutateElement(element, {
           y: element.y - element.baseline / 2,
         });
@@ -1555,16 +1529,14 @@ class App extends React.Component<any, AppState> {
     });
 
     this.handleTextWysiwyg(element, {
-      x:
+      viewportX:
         !existingTextElement && parentCenterPosition
-          ? parentCenterPosition.wysiwygX
-          : element.textAlign === "right"
-          ? window.innerWidth - wysiwygX - element.width * this.state.zoom
-          : wysiwygX,
-      y:
+          ? parentCenterPosition.viewportX
+          : null,
+      viewportY:
         !existingTextElement && parentCenterPosition
-          ? parentCenterPosition.wysiwygY
-          : wysiwygY,
+          ? parentCenterPosition.viewportY
+          : null,
       isExistingElement: !!existingTextElement,
     });
   };
@@ -1598,7 +1570,7 @@ class App extends React.Component<any, AppState> {
 
     resetCursor();
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
@@ -1612,8 +1584,8 @@ class App extends React.Component<any, AppState> {
       const hitElement = getElementAtPosition(
         elements,
         this.state,
-        x,
-        y,
+        sceneX,
+        sceneY,
         this.state.zoom,
       );
 
@@ -1640,10 +1612,8 @@ class App extends React.Component<any, AppState> {
     resetCursor();
 
     this.startTextEditing({
-      x: x,
-      y: y,
-      clientX: event.clientX,
-      clientY: event.clientY,
+      sceneX,
+      sceneY,
       insertAtParentCenter: !event.altKey,
     });
   };
@@ -2231,18 +2201,9 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
-      const { x, y } = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
-
       this.startTextEditing({
-        x: x,
-        y: y,
-        clientX: event.clientX,
-        clientY: event.clientY,
+        sceneX: x,
+        sceneY: y,
         insertAtParentCenter: !event.altKey,
       });
 
@@ -3013,13 +2974,13 @@ class App extends React.Component<any, AppState> {
       const isSnappedToCenter =
         distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
       if (isSnappedToCenter) {
-        const { x: wysiwygX, y: wysiwygY } = sceneCoordsToViewportCoords(
+        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           { sceneX: elementCenterX, sceneY: elementCenterY },
           state,
           canvas,
           scale,
         );
-        return { wysiwygX, wysiwygY, elementCenterX, elementCenterY };
+        return { viewportX, viewportY, elementCenterX, elementCenterY };
       }
     }
   }

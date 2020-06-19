@@ -3,7 +3,7 @@ import { selectNode, isWritableElement, getFontString } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { FontFamily, TextAlign, VerticalAlign } from "./types";
+import { TextAlign, VerticalAlign, ExcalidrawTextElement } from "./types";
 
 const trimText = (text: string) => {
   // whitespace only → trim all because we'd end up inserting invisible element
@@ -16,24 +16,6 @@ const trimText = (text: string) => {
   return text.replace(/^\n+|\n+$/g, "");
 };
 
-type TextWysiwygParams = {
-  id: string;
-  initText: string;
-  x: number;
-  y: number;
-  strokeColor: string;
-  fontSize: number;
-  fontFamily: FontFamily;
-  opacity: number;
-  zoom: number;
-  angle: number;
-  textAlign: TextAlign;
-  verticalAlign: VerticalAlign;
-  onChange?: (text: string) => void;
-  onSubmit: (text: string) => void;
-  onCancel: () => void;
-};
-
 function getTransformOrigin(
   textAlign: TextAlign,
   verticalAlign: VerticalAlign,
@@ -44,23 +26,102 @@ function getTransformOrigin(
   return `${x} ${y}`;
 }
 
-export const textWysiwyg = ({
-  id,
-  initText,
-  x,
-  y,
-  strokeColor,
-  fontSize,
-  fontFamily,
-  opacity,
-  zoom,
-  angle,
-  onChange,
-  textAlign,
-  verticalAlign,
-  onSubmit,
-  onCancel,
-}: TextWysiwygParams) => {
+function getTransform(
+  textAlign: TextAlign,
+  verticalAlign: VerticalAlign,
+  angle: number,
+  zoom: number,
+) {
+  const degree = (180 * angle) / Math.PI;
+
+  return textAlign === "center"
+    ? verticalAlign === "middle"
+      ? `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`
+      : `translateX(-50%) scale(${zoom}) rotate(${degree}deg)`
+    : `scale(${zoom}) rotate(${degree}deg)`;
+}
+
+export const textWysiwyg = (
+  element: ExcalidrawTextElement,
+  {
+    viewportX,
+    viewportY,
+    zoom,
+    onChange,
+    onSubmit,
+    onCancel,
+    getViewportCoords,
+  }: {
+    /** position override, else element.x is used */
+    viewportX: number | null;
+    /** position override, else elemeny.y is used */
+    viewportY: number | null;
+    zoom: number;
+    onChange?: (text: string) => void;
+    onSubmit: (text: string) => void;
+    onCancel: () => void;
+    getViewportCoords: (x: number, y: number) => [number, number];
+  },
+) => {
+  const {
+    id,
+    x,
+    y,
+    text,
+    width,
+    height,
+    strokeColor,
+    fontSize,
+    fontFamily,
+    opacity,
+    angle,
+    textAlign,
+    verticalAlign,
+  } = element;
+
+  function getPositions(element: {
+    width: number;
+    x: number;
+    y: number;
+    textAlign: TextAlign;
+  }): { left: string; right: string; top: string } {
+    if (viewportX != null && viewportY != null) {
+      return {
+        left: `${viewportX}px`,
+        right: "auto",
+        top: `${viewportY}px`,
+      };
+      // eslint-disable-next-line no-else-return
+    } else {
+      const [viewportX, viewportY] = getViewportCoords(element.x, element.y);
+
+      const top =
+        verticalAlign === "middle"
+          ? `${viewportY + (height / 2) * zoom}px`
+          : `${viewportY}px`;
+
+      if (element.textAlign === "left") {
+        return {
+          top,
+          left: `${viewportX}px`,
+          right: "auto",
+        };
+      } else if (element.textAlign === "right") {
+        return {
+          top,
+          left: "auto",
+          right: `${window.innerWidth - viewportX - element.width * zoom}px`,
+        };
+      }
+
+      return {
+        top,
+        left: `${viewportX + (element.width / 2) * zoom}px`,
+        right: "auto",
+      };
+    }
+  }
+
   const editable = document.createElement("div");
   try {
     editable.contentEditable = "plaintext-only";
@@ -69,23 +130,19 @@ export const textWysiwyg = ({
   }
   editable.dir = "auto";
   editable.tabIndex = 0;
-  editable.innerText = initText;
+  editable.innerText = text;
   editable.dataset.type = "wysiwyg";
 
-  const degree = (180 * angle) / Math.PI;
+  const { left, right, top } = getPositions({ textAlign, x, y, width });
 
   Object.assign(editable.style, {
     color: strokeColor,
     position: "fixed",
     opacity: opacity / 100,
-    top: `${y}px`,
-    [textAlign === "right" ? "right" : "left"]: `${x}px`,
-    transform:
-      textAlign === "center"
-        ? verticalAlign === "middle"
-          ? `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`
-          : `translateX(-50%) scale(${zoom}) rotate(${degree}deg)`
-        : `scale(${zoom}) rotate(${degree}deg)`,
+    top,
+    left,
+    right,
+    transform: getTransform(textAlign, verticalAlign, angle, zoom),
     transformOrigin: getTransformOrigin(textAlign, verticalAlign),
     textAlign: textAlign,
     display: "inline-block",
@@ -212,9 +269,15 @@ export const textWysiwyg = ({
       .getElementsIncludingDeleted()
       .find((element) => element.id === id);
     if (editingElement && isTextElement(editingElement)) {
+      const { right, left } = getPositions(editingElement);
+      const { textAlign, verticalAlign, angle } = editingElement;
       Object.assign(editable.style, {
         font: getFontString(editingElement),
-        textAlign: editingElement.textAlign,
+        right,
+        left,
+        transformOrigin: getTransformOrigin(textAlign, verticalAlign),
+        transform: getTransform(textAlign, verticalAlign, angle, zoom),
+        textAlign: textAlign,
         color: editingElement.strokeColor,
         opacity: editingElement.opacity / 100,
       });
