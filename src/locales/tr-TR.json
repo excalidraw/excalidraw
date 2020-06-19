@@ -62,7 +62,7 @@
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
-    "collaborators": ""
+    "collaborators": "Ortaklar"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -135,7 +135,7 @@
     "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
     "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ortaya çıktı ",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " sistemimize yakalandı.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
     "openIssueMessage_post": " Lütfen aşağıya Github sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
