@@ -256,6 +256,12 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
               />
               <Shortcut
+                label={t("labels.moveVisibleArea")}
+                shortcuts={[
+                  getShortcutKey(`Space+${t("shortcutsDialog.drag")}`),
+                ]}
+              />
+              <Shortcut
                 label={t("labels.copy")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+C")]}
               />
