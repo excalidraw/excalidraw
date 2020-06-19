@@ -61,7 +61,8 @@
     "yourName": "Votre nom",
     "madeWithExcalidraw": "Fabriqué avec Excalidraw",
     "group": "Grouper la sélection",
-    "ungroup": "Dégrouper la sélection"
+    "ungroup": "Dégrouper la sélection",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
