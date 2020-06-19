@@ -1538,7 +1538,7 @@ class App extends React.Component<any, AppState> {
       // case: creating new text not centered to parent elemenent → offset Y
       //  so that the text is centered to cursor position
       if (!parentCenterPosition) {
-        wysiwygY -= element.baseline / 2;
+        wysiwygY -= (element.baseline / 2) * this.state.zoom;
 
         mutateElement(element, {
           y: element.y - element.baseline / 2,
@@ -1555,7 +1555,7 @@ class App extends React.Component<any, AppState> {
         !existingTextElement && parentCenterPosition
           ? parentCenterPosition.wysiwygX
           : element.textAlign === "right"
-          ? window.innerWidth - wysiwygX - element.width
+          ? window.innerWidth - wysiwygX - element.width * this.state.zoom
           : wysiwygX,
       y:
         !existingTextElement && parentCenterPosition

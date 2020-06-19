@@ -34,6 +34,16 @@ type TextWysiwygParams = {
   onCancel: () => void;
 };
 
+function getTransformOrigin(
+  textAlign: TextAlign,
+  verticalAlign: VerticalAlign,
+) {
+  const x =
+    textAlign === "center" ? "50%" : textAlign === "right" ? "100%" : "0%";
+  const y = verticalAlign === "middle" ? "50%" : "0%";
+  return `${x} ${y}`;
+}
+
 export const textWysiwyg = ({
   id,
   initText,
@@ -76,9 +86,7 @@ export const textWysiwyg = ({
           ? `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`
           : `translateX(-50%) scale(${zoom}) rotate(${degree}deg)`
         : `scale(${zoom}) rotate(${degree}deg)`,
-    transformOrigin: `${textAlign === "center" ? "50%" : "0"} ${
-      verticalAlign === "middle" ? "50%" : "0"
-    }`,
+    transformOrigin: getTransformOrigin(textAlign, verticalAlign),
     textAlign: textAlign,
     display: "inline-block",
     font: getFontString({ fontSize, fontFamily }),
