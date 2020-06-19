@@ -10,6 +10,7 @@ import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
+import { UserList } from "./UserList";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
 import { LanguageList } from "./LanguageList";
@@ -28,6 +29,7 @@ import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
+import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 
@@ -61,6 +63,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
+  // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
       className={`encrypted-icon tooltip zen-mode-visibility ${
@@ -203,7 +206,23 @@ const LayerUI = ({
               </Stack.Col>
             )}
           </Section>
-          <div />
+          <UserList
+            className={`zen-mode-transition ${
+              zenModeEnabled && "transition-right"
+            }`}
+          >
+            {Array.from(appState.collaborators)
+              // Collaborator is either not initialized or is actually the current user.
+              .filter(([_, client]) => Object.keys(client).length !== 0)
+              .map(([clientId, client]) => (
+                <Tooltip
+                  label={client.username || "Unknown user"}
+                  key={clientId}
+                >
+                  {actionManager.renderAction("goToCollaborator", clientId)}
+                </Tooltip>
+              ))}
+          </UserList>
         </div>
         {
           <div

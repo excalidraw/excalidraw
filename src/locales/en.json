@@ -61,7 +61,8 @@
     "yourName": "Your name",
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
-    "ungroup": "Ungroup selection"
+    "ungroup": "Ungroup selection",
+    "collaborators": "Collaborators"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
