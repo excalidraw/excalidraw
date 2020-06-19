@@ -1,9 +1,14 @@
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 import { rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op, Options } from "roughjs/bin/core";
+import { RoughCanvas } from "roughjs/bin/canvas";
 import { Point, BoundingPoints } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
+import { getShapeForElement, generateShape } from "../renderer/renderElement";
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
@@ -106,6 +111,96 @@ const getMinMaxXYFromCurvePathOps = (
   );
 
   return [minX, minY, maxX, maxY];
+};
+
+const getBoundingPointsFromCurvePathOps = (
+  ops: Op[],
+  transformXY?: (x: number, y: number) => [number, number],
+): BoundingPoints => {
+  let currentP: Point = [0, 0];
+  let pmin1: Point = [Infinity, Infinity];
+  let pmin2: Point = [Infinity, Infinity];
+  let pmax1: Point = [Infinity, Infinity];
+  let pmax2: Point = [Infinity, Infinity];
+
+  ops.reduce(
+    (limits, { op, data }) => {
+      // There are only four operation types:
+      // move, bcurveTo, lineTo, and curveTo
+      if (op === "move") {
+        // change starting point
+        currentP = (data as unknown) as Point;
+        // move operation does not draw anything; so, it always
+        // returns false
+      } else if (op === "bcurveTo") {
+        // create points from bezier curve
+        // bezier curve stores data as a flattened array of three positions
+        // [x1, y1, x2, y2, x3, y3]
+        const p1 = [data[0], data[1]] as Point;
+        const p2 = [data[2], data[3]] as Point;
+        const p3 = [data[4], data[5]] as Point;
+
+        const p0 = currentP;
+        currentP = p3;
+
+        const equation = (t: number, idx: number) =>
+          Math.pow(1 - t, 3) * p3[idx] +
+          3 * t * Math.pow(1 - t, 2) * p2[idx] +
+          3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+          p0[idx] * Math.pow(t, 3);
+
+        let t = 0;
+        while (t <= 1.0) {
+          let x = equation(t, 0);
+          let y = equation(t, 1);
+          if (transformXY) {
+            [x, y] = transformXY(x, y);
+          }
+
+          if (limits.minX > x) {
+            limits.minX = x;
+            pmin1 = [limits.minX, y];
+          } else if (limits.minY > y) {
+            limits.minY = y;
+            pmin2 = [x, limits.minY];
+          } else if (limits.maxX < x) {
+            limits.maxX = x;
+            pmax1 = [limits.maxX, y];
+          } else if (limits.maxY < y) {
+            limits.maxY = y;
+            pmax2 = [x, limits.maxY];
+          }
+
+          t += 0.1;
+        }
+      } else if (op === "lineTo") {
+        // TODO: Implement this
+      } else if (op === "qcurveTo") {
+        // TODO: Implement this
+      }
+      return limits;
+    },
+    { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+  );
+
+  const [w1, w2, e1, e2] = [pmin1, pmin2, pmax1, pmax2].sort(([x1], [x2]) =>
+    x1 > x2 ? 1 : -1,
+  );
+
+  const [nw, sw] = [w1, w2].sort(([, y1], [, y2]) => {
+    return y1 > y2 ? 1 : -1;
+  });
+
+  const [ne, se] = [e1, e2].sort(([, y1], [, y2]) => {
+    return y1 > y2 ? 1 : -1;
+  });
+
+  return {
+    nw,
+    ne,
+    sw,
+    se,
+  };
 };
 
 const getLinearElementAbsoluteCoords = (
@@ -243,6 +338,7 @@ const getLinearElementRotatedBounds = (
 
 export function getElementBoudingPoints(
   element: ExcalidrawElement,
+  rc?: RoughCanvas,
 ): BoundingPoints {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
@@ -257,6 +353,23 @@ export function getElementBoudingPoints(
   let x21: number = Infinity;
   let y21: number = Infinity;
 
+  if (element.type === "path" && rc) {
+    const shape = generateShape(
+      {
+        ...element,
+        roughness: 0,
+      } as NonDeletedExcalidrawElement,
+      rc.generator,
+    ) as Drawable;
+
+    // first element is always the curve
+    const ops = getCurvePathOps(shape);
+
+    const transformXY = (x: number, y: number) =>
+      rotate(element.x + x, element.y + y, cx, cy, element.angle);
+    return getBoundingPointsFromCurvePathOps(ops, transformXY);
+  }
+
   if (element.type === "diamond") {
     [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
     [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
@@ -270,10 +383,14 @@ export function getElementBoudingPoints(
     const ww = Math.hypot(w * cos, h * sin);
     const hh = Math.hypot(h * cos, w * sin);
 
-    x11 = x21 = cx - ww;
-    y11 = y12 = cy - hh;
-    x12 = x22 = cx + ww;
-    y21 = y22 = cy + hh;
+    x11 = cx;
+    y11 = cy - hh;
+    x21 = cx + ww;
+    y21 = cy;
+    x12 = cx - ww;
+    y12 = cy;
+    x22 = cx;
+    y22 = cy + hh;
   } else {
     [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
     [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
@@ -283,8 +400,8 @@ export function getElementBoudingPoints(
 
   return {
     nw: [x11, y11],
-    ne: [x12, y12],
-    sw: [x21, y21],
+    ne: [x21, y21],
+    sw: [x12, y12],
     se: [x22, y22],
   };
 }
@@ -298,6 +415,7 @@ export const getElementBounds = (
   if (isLinearElement(element)) {
     return getLinearElementRotatedBounds(element, cx, cy);
   }
+
   const { nw, ne, sw, se } = getElementBoudingPoints(element);
 
   const minX = Math.min(nw[0], ne[0], sw[0], se[0]);

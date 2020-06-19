@@ -139,7 +139,7 @@ export function differenceElement(
 
   const bp1 = getElementBoudingPoints(element1);
 
-  const excludedPoints = getExcludedBoundingPoints(path2, [cx, cy], bp1);
+  const excludedPoints = getExcludedBoundingPoints(path2, [offsetX, offsetY], bp1);
   const keys = Object.keys(excludedPoints);
 
   path1.difference(path2);
@@ -163,7 +163,7 @@ export function differenceElement(
   });
 
   const key = keys[0];
-  const bpt = getElementBoudingPoints(temp);
+  const bpt = getElementBoudingPoints(temp, rc);
 
   const element = newPathElement({
     ...temp,
