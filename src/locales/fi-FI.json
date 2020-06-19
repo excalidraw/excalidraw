@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Liitä",
     "selectAll": "Valitse kaikki",
+    "moveCanvas": "",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
