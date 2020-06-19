@@ -61,7 +61,8 @@
     "yourName": "你的名稱",
     "madeWithExcalidraw": "以 Excalidraw 製作",
     "group": "建立群組",
-    "ungroup": "取消群組"
+    "ungroup": "取消群組",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
