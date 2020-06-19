@@ -61,7 +61,8 @@
     "yourName": "Ваше ім’я",
     "madeWithExcalidraw": "Накреслене в Excalidraw",
     "group": "Групувати виділене",
-    "ungroup": "Розгрупувати виділене"
+    "ungroup": "Розгрупувати виділене",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
