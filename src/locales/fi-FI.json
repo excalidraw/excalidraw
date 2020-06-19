@@ -61,7 +61,8 @@
     "yourName": "Nimesi",
     "madeWithExcalidraw": "Tehty Excalidrawilla",
     "group": "Ryhmitä valinta",
-    "ungroup": "Pura valittu ryhmä"
+    "ungroup": "Pura valittu ryhmä",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
