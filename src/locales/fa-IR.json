@@ -61,7 +61,8 @@
     "yourName": "نام شما",
     "madeWithExcalidraw": "ساخته شده با Excalidraw",
     "group": "گروهبندی انتخابها",
-    "ungroup": "حذف گروهبندی انتخابها"
+    "ungroup": "حذف گروهبندی انتخابها",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
