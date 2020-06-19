@@ -61,7 +61,8 @@
     "yourName": "您的姓名",
     "madeWithExcalidraw": "使用 Excalidraw 创建",
     "group": "组选",
-    "ungroup": "取消组选"
+    "ungroup": "取消组选",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "重置画布",
