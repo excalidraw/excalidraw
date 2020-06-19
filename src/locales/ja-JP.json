@@ -2,6 +2,7 @@
   "labels": {
     "paste": "貼り付け",
     "selectAll": "すべて選択",
+    "moveCanvas": "",
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
