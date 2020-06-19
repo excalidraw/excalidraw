@@ -61,7 +61,8 @@
     "yourName": "",
     "madeWithExcalidraw": "Excalidrawで作成",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
