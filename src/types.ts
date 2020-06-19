@@ -81,6 +81,9 @@ export type AppState = {
   editingGroupId: GroupId | null;
   width: number;
   height: number;
+
+  isLibraryOpen: boolean;
+  library: NonDeleted<ExcalidrawElement>[][];
 };
 
 export type PointerCoords = Readonly<{

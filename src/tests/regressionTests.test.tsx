@@ -886,6 +886,7 @@ describe("regression tests", () => {
       "Delete",
       "Group selection",
       "Ungroup selection",
+      "Add to library",
       "Send backward",
       "Bring forward",
       "Send to back",
@@ -894,7 +895,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(11);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });

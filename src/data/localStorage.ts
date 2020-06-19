@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { AppState } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
@@ -6,6 +6,33 @@ import { restore } from "./restore";
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
+const LOCAL_STORAGE_KEY_LIBRARY = "excalidraw-library";
+
+export const loadLibrary = () => {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
+    if (!data) {
+      return [];
+    }
+
+    const library: ExcalidrawElement[][] = JSON.parse(data);
+
+    return library.map(
+      (elements) => restore(elements, null).elements,
+    ) as NonDeleted<ExcalidrawElement>[][];
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+export const saveLibrary = (library: readonly ExcalidrawElement[][]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, JSON.stringify(library));
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -82,6 +109,8 @@ export const restoreFromLocalStorage = () => {
       appState.collaborators = new Map();
       delete appState.width;
       delete appState.height;
+      // Always favor the saved library
+      appState.library = loadLibrary();
     } catch {
       // Do nothing because appState is already null
     }

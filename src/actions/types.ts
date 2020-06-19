@@ -62,7 +62,8 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
-  | "goToCollaborator";
+  | "goToCollaborator"
+  | "addToLibrary";
 
 export interface Action {
   name: ActionName;

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useRef, RefObject, useEffect, useCallback } from "react";
 import { showSelectedShapeActions } from "../element";
-import { calculateScrollCenter } from "../scene";
+import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
 import { AppState } from "../types";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  NonDeletedExcalidrawElement,
+  ExcalidrawElement,
+  NonDeleted,
+} from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -32,6 +36,7 @@ import { GitHubCorner } from "./GitHubCorner";
 import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
+import { LibraryUnit } from "./LibraryUnit";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -43,10 +48,106 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
 }
+
+function useOnClickOutside(
+  ref: RefObject<HTMLElement>,
+  cb: (event: MouseEvent) => void,
+) {
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current) {
+        return;
+      }
+
+      if (
+        event.target instanceof Element &&
+        (ref.current.contains(event.target) ||
+          !document.body.contains(event.target))
+      ) {
+        return;
+      }
+
+      cb(event);
+    };
+    document.addEventListener("click", listener, false);
+
+    return () => {
+      document.removeEventListener("click", listener);
+    };
+  }, [ref, cb]);
+}
+
+const LibraryMenu = ({
+  library,
+  onClickOutside,
+  onRemoveFromLibrary,
+  onAddToLibrary,
+  onInsertShape,
+  pendingElements,
+}: {
+  library: readonly NonDeleted<ExcalidrawElement>[][];
+  pendingElements: NonDeleted<ExcalidrawElement>[];
+  onClickOutside: (event: MouseEvent) => void;
+  onRemoveFromLibrary: (index: number) => void;
+  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
+}) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useOnClickOutside(ref, onClickOutside);
+
+  const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
+  const CELLS_PER_ROW = 3;
+  const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
+  const rows = [];
+  let addedPendingElements = false;
+
+  for (let row = 0; row < numRows; row++) {
+    const i = CELLS_PER_ROW * row;
+    const children = [];
+    for (let j = 0; j < 3; j++) {
+      const shouldAddPendingElements: boolean =
+        pendingElements.length > 0 &&
+        !addedPendingElements &&
+        i + j >= library.length;
+      addedPendingElements = addedPendingElements || shouldAddPendingElements;
+
+      children.push(
+        <Stack.Col key={j}>
+          <LibraryUnit
+            elements={library[i + j]}
+            pendingElements={
+              shouldAddPendingElements ? pendingElements : undefined
+            }
+            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, i + j)}
+            onClick={
+              shouldAddPendingElements
+                ? onAddToLibrary.bind(null, pendingElements)
+                : onInsertShape.bind(null, library[i + j])
+            }
+          />
+        </Stack.Col>,
+      );
+    }
+    rows.push(
+      <Stack.Row align="center" gap={1} key={row}>
+        {children}
+      </Stack.Row>,
+    );
+  }
+
+  return (
+    <Island padding={1} ref={ref}>
+      <Stack.Col align="center" gap={1} className="layer-ui__librarymenu">
+        {rows}
+      </Stack.Col>
+    </Island>
+  );
+};
 
 const LayerUI = ({
   actionManager,
@@ -58,6 +159,7 @@ const LayerUI = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
+  onInsertShape,
   zenModeEnabled,
   toggleZenMode,
 }: LayerUIProps) => {
@@ -167,11 +269,47 @@ const LayerUI = ({
     </Section>
   );
 
+  const closeLibrary = useCallback(
+    (event) => {
+      setAppState({ isLibraryOpen: false });
+    },
+    [setAppState],
+  );
+
+  const removeFromLibrary = useCallback(
+    (indexToRemove) => {
+      setAppState({
+        library: appState.library.filter((_, index) => index !== indexToRemove),
+      });
+    },
+    [appState, setAppState],
+  );
+
+  const addToLibrary = useCallback(
+    (elements: NonDeleted<ExcalidrawElement>[]) => {
+      setAppState({
+        library: [...appState.library, elements],
+        selectedElementIds: {},
+      });
+    },
+    [appState, setAppState],
+  );
+
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
       elements,
     );
+    const libraryMenu = appState.isLibraryOpen ? (
+      <LibraryMenu
+        library={appState.library}
+        pendingElements={getSelectedElements(elements, appState)}
+        onClickOutside={closeLibrary}
+        onRemoveFromLibrary={removeFromLibrary}
+        onInsertShape={onInsertShape}
+        onAddToLibrary={addToLibrary}
+      />
+    ) : null;
     return (
       <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
@@ -193,6 +331,7 @@ const LayerUI = ({
                       <ShapesSwitcher
                         elementType={appState.elementType}
                         setAppState={setAppState}
+                        isLibraryOpen={appState.isLibraryOpen}
                       />
                     </Stack.Row>
                   </Island>
@@ -203,6 +342,7 @@ const LayerUI = ({
                     title={t("toolBar.lock")}
                   />
                 </Stack.Row>
+                {libraryMenu}
               </Stack.Col>
             )}
           </Section>

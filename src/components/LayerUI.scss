@@ -1,5 +1,10 @@
 @import "open-color/open-color";
 
+.layer-ui__librarymenu {
+  max-height: 50vh;
+  overflow: auto;
+}
+
 .layer-ui__wrapper {
   .encrypted-icon {
     position: relative;
