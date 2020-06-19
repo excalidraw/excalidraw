@@ -131,10 +131,10 @@
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",
     "headingMain_button": "sayfayı yenilemeyi deneyin.",
-    "clearCanvasMessage": "Yenilemeden sonra sorun hâlâ devam ediyorsa şunu deneyin ",
+    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
     "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ortaya çıktı ",
+    "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ",
     "trackedToSentry_post": " sistemimize yakalandı.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
@@ -144,8 +144,8 @@
   "roomDialog": {
     "desc_intro": "Çalışma alanınıza, sizinle birlikte çalışabilmeleri için başkalarını da ekleyebilirsiniz.",
     "desc_privacy": "Çalışma ortamında yaptıklarınız ve çizimleriniz uçtan uca şifrelemeyle saklanmaktadır. Sunucularımız dahi bu verileri şifrelenmemiş haliyle göremez.",
-    "button_startSession": "Çalışma Ortamı Oluştur",
-    "button_stopSession": "Çalışma Ortamını Sonlandır",
+    "button_startSession": "Oturumu başlat",
+    "button_stopSession": "Oturumu durdur",
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
     "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız sadece ortama katılmış diğer kişiler ile paylaşılmaktadır. Bundan dolayı, hepinizin bağlantısı kesilirse ve bir dosyaya veya paylaşılabilir link'e dışa aktarmamışsanız tüm verilerinizi kaybedebilirsiniz.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
