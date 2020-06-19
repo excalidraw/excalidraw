@@ -61,7 +61,8 @@
     "yourName": "Il vostro nome",
     "madeWithExcalidraw": "Creato con Excalidraw",
     "group": "Crea gruppo da selezione",
-    "ungroup": "Dividi gruppo da selezione"
+    "ungroup": "Dividi gruppo da selezione",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
