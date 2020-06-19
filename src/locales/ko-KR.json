@@ -61,7 +61,8 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
