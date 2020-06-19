@@ -61,7 +61,8 @@
     "yourName": "Jouw naam",
     "madeWithExcalidraw": "Gemaakt met Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
