@@ -62,7 +62,7 @@
     "madeWithExcalidraw": "Laget med Excalidraw",
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
-    "collaborators": ""
+    "collaborators": "Samarbeidspartnere"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -72,7 +72,7 @@
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",
-    "saveAs": "",
+    "saveAs": "Lagre som",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
