@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Enganxar",
     "selectAll": "Seleccionar tot",
+    "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al porta-retalls com a PNG",
     "copyAsSvg": "Copiar al porta-retalls com a SVG",
