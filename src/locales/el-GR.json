@@ -61,7 +61,8 @@
     "yourName": "Το όνομά σου",
     "madeWithExcalidraw": "Φτιαγμένο με Excalidraw",
     "group": "Δημιουργία ομάδας από επιλογή",
-    "ungroup": "Κατάργηση ομάδας από επιλογή"
+    "ungroup": "Κατάργηση ομάδας από επιλογή",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
