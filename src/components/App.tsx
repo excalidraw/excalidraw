@@ -584,7 +584,11 @@ class App extends React.Component<any, AppState> {
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
-    const scrolledOutside = !atLeastOneVisibleElement && elements.length > 0;
+    const scrolledOutside =
+      // hide when editing text
+      this.state.editingElement?.type === "text"
+        ? false
+        : !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
