@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Beillesztés",
     "selectAll": "Összes kijelölése",
+    "moveCanvas": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
