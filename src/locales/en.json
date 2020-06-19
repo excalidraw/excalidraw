@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
-    "moveVisibleArea": "Move visible area",
+    "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
