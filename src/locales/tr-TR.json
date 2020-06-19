@@ -61,7 +61,8 @@
     "yourName": "İsminiz",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "Seçimi grup yap",
-    "ungroup": "Seçilen grubu dağıt"
+    "ungroup": "Seçilen grubu dağıt",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
