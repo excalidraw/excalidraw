@@ -76,6 +76,9 @@ export const textWysiwyg = ({
           ? `translate(-50%, -50%) scale(${zoom}) rotate(${degree}deg)`
           : `translateX(-50%) scale(${zoom}) rotate(${degree}deg)`
         : `scale(${zoom}) rotate(${degree}deg)`,
+    transformOrigin: `${textAlign === "center" ? "50%" : "0"} ${
+      verticalAlign === "middle" ? "50%" : "0"
+    }`,
     textAlign: textAlign,
     display: "inline-block",
     font: getFontString({ fontSize, fontFamily }),
