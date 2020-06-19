@@ -61,7 +61,8 @@
     "yourName": "आपका नाम",
     "madeWithExcalidraw": "मेड विथ एक्सकैलिडराव",
     "group": "समूह चयन",
-    "ungroup": "समूह चयन असमूहीकृत करें"
+    "ungroup": "समूह चयन असमूहीकृत करें",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
