@@ -58,7 +58,8 @@ export type ActionName =
   | "toggleFullScreen"
   | "toggleShortcuts"
   | "group"
-  | "ungroup";
+  | "ungroup"
+  | "goToCollaborator";
 
 export interface Action {
   name: ActionName;
@@ -66,6 +67,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData?: any) => void;
+    id?: string;
   }>;
   perform: ActionFn;
   keyPriority?: number;
