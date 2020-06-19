@@ -97,28 +97,28 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
-    "uploadedSecurly": ""
+    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका। Chrome ब्राउज़र का उपयोग करने का प्रयास करें।",
+    "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
+    "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।"
   },
   "toolBar": {
-    "selection": "",
-    "draw": "",
+    "selection": "चयन",
+    "draw": "मुफ्त ड्रा",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
     "text": "पाठ",
-    "lock": ""
+    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "कैनवास क्रिया",
+    "selectedShapeActions": "चयनित आकृति क्रियाएं",
+    "shapes": "आकृतियाँ"
   },
   "hints": {
-    "linearElement": "",
+    "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
