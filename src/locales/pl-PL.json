@@ -61,7 +61,8 @@
     "yourName": "Twoje imię",
     "madeWithExcalidraw": "Zrobione w Excalidraw",
     "group": "Zgrupuj wybrane",
-    "ungroup": "Rozgrupuj wybrane"
+    "ungroup": "Rozgrupuj wybrane",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
