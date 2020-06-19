@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
+    "moveCanvas": "",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
