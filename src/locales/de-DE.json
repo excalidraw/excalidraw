@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
+    "moveCanvas": "",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
