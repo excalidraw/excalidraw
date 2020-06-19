@@ -61,7 +61,8 @@
     "yourName": "El teu nom",
     "madeWithExcalidraw": "Fet amb Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
