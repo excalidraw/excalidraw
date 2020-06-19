@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставити",
     "selectAll": "Вибрати все",
+    "moveCanvas": "",
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
