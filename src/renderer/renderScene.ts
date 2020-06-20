@@ -73,6 +73,32 @@ const strokeCircle = (
   context.stroke();
 };
 
+export const GRID_SIZE = 10; // FIXME configurable?
+
+const renderGrid = (
+  context: CanvasRenderingContext2D,
+  offsetX: number,
+  offsetY: number,
+  width: number,
+  height: number,
+) => {
+  const origStrokeStyle = context.strokeStyle;
+  context.strokeStyle = "rgba(0,0,0,0.1)";
+  for (let x = offsetX; x < offsetX + width; x += GRID_SIZE) {
+    context.beginPath();
+    context.moveTo(x, offsetY - GRID_SIZE);
+    context.lineTo(x, offsetY + height + GRID_SIZE);
+    context.stroke();
+  }
+  for (let y = offsetY; y < offsetY + height; y += GRID_SIZE) {
+    context.beginPath();
+    context.moveTo(offsetX - GRID_SIZE, y);
+    context.lineTo(offsetX + width + GRID_SIZE, y);
+    context.stroke();
+  }
+  context.strokeStyle = origStrokeStyle;
+};
+
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
@@ -165,6 +191,17 @@ export const renderScene = (
     (-normalizedCanvasHeight * (sceneState.zoom - 1)) / 2;
   context.translate(zoomTranslationX, zoomTranslationY);
   context.scale(sceneState.zoom, sceneState.zoom);
+
+  // Grid
+  renderGrid(
+    context,
+    -Math.ceil(zoomTranslationX / sceneState.zoom / GRID_SIZE) * GRID_SIZE +
+      (sceneState.scrollX % GRID_SIZE),
+    -Math.ceil(zoomTranslationY / sceneState.zoom / GRID_SIZE) * GRID_SIZE +
+      (sceneState.scrollY % GRID_SIZE),
+    normalizedCanvasWidth / sceneState.zoom,
+    normalizedCanvasHeight / sceneState.zoom,
+  );
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>

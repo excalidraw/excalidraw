@@ -26,6 +26,7 @@ import {
   getResizeWithSidesSameLengthKey,
 } from "../keys";
 import { measureText, getFontString } from "../utils";
+import { GRID_SIZE } from "../renderer/renderScene"; // FIXME
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -39,6 +40,8 @@ export const resizeElements = (
   pointerY: number,
 ) => {
   if (selectedElements.length === 1) {
+    pointerX = Math.round(pointerX / GRID_SIZE) * GRID_SIZE;
+    pointerY = Math.round(pointerY / GRID_SIZE) * GRID_SIZE;
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
       rotateSingleElement(element, pointerX, pointerY, event.shiftKey);
