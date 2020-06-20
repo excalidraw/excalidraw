@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Вставити",
     "selectAll": "Вибрати все",
-    "moveCanvas": "",
+    "moveCanvas": "Перемістити полотно",
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
@@ -63,7 +63,7 @@
     "madeWithExcalidraw": "Накреслене в Excalidraw",
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
-    "collaborators": ""
+    "collaborators": "Співавтори"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -73,7 +73,7 @@
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "save": "Зберегти",
-    "saveAs": "",
+    "saveAs": "Зберегти як",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
     "close": "Закрити",
