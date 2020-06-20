@@ -22,7 +22,7 @@ Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://how
 
 ## Run the code
 
-### Code Sandbox
+### Code Sandbox (Test from Codesandbox)
 
 - Go to https://codesandbox.io/s/github/excalidraw/excalidraw
   - You may need to sign in with Github and reload the page
