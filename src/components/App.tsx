@@ -27,6 +27,8 @@ import {
   getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
+  dragElements,
+  getDragOffsetXY,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -2023,6 +2025,7 @@ class App extends React.Component<any, AppState> {
     let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
+    let dragOffsetXY: [number, number] = [0, 0];
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
 
@@ -2105,6 +2108,20 @@ class App extends React.Component<any, AppState> {
         hitElement =
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+
+        if (hitElement && isNonDeletedElement(hitElement)) {
+          if (this.state.selectedElementIds[hitElement.id]) {
+            dragOffsetXY = getDragOffsetXY(selectedElements, x, y);
+          } else if (event.shiftKey) {
+            dragOffsetXY = getDragOffsetXY(
+              [...selectedElements, hitElement],
+              x,
+              y,
+            );
+          } else {
+            dragOffsetXY = getDragOffsetXY([hitElement], x, y);
+          }
+        }
 
         // clear selection if shift is not clicked
         if (
@@ -2421,21 +2438,11 @@ class App extends React.Component<any, AppState> {
           this.state,
         );
         if (selectedElements.length > 0) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
+          dragElements(
+            selectedElements,
+            x - dragOffsetXY[0],
+            y - dragOffsetXY[1],
           );
-
-          selectedElements.forEach((element) => {
-            mutateElement(element, {
-              x: element.x + x - lastX,
-              y: element.y + y - lastY,
-            });
-          });
-          lastX = x;
-          lastY = y;
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !selectedElementWasDuplicated) {

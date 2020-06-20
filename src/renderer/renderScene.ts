@@ -73,7 +73,7 @@ const strokeCircle = (
   context.stroke();
 };
 
-export const GRID_SIZE = 10; // FIXME configurable?
+export const GRID_SIZE = 20; // FIXME configurable?
 
 const renderGrid = (
   context: CanvasRenderingContext2D,

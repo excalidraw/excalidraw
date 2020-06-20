@@ -39,9 +39,11 @@ export const resizeElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-  if (selectedElements.length === 1) {
+  if (GRID_SIZE) {
     pointerX = Math.round(pointerX / GRID_SIZE) * GRID_SIZE;
     pointerY = Math.round(pointerY / GRID_SIZE) * GRID_SIZE;
+  }
+  if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
       rotateSingleElement(element, pointerX, pointerY, event.shiftKey);
