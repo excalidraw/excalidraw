@@ -75,6 +75,7 @@ import {
   isArrowKey,
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
+  getRotateWithDiscreteAngleKey,
 } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
@@ -2428,7 +2429,9 @@ class App extends React.Component<any, AppState> {
             setResizeHandle,
             selectedElements,
             resizeArrowDirection,
-            event,
+            getRotateWithDiscreteAngleKey(event),
+            getResizeWithSidesSameLengthKey(event),
+            getResizeCenterPointKey(event),
             resizeX,
             resizeY,
           )
@@ -2533,7 +2536,7 @@ class App extends React.Component<any, AppState> {
         let dx = x - draggingElement.x;
         let dy = y - draggingElement.y;
 
-        if (event.shiftKey && points.length === 2) {
+        if (getRotateWithDiscreteAngleKey(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
             this.state.elementType,
             dx,

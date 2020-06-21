@@ -21,10 +21,6 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
-import {
-  getResizeCenterPointKey,
-  getResizeWithSidesSameLengthKey,
-} from "../keys";
 import { measureText, getFontString } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
@@ -34,14 +30,21 @@ export const resizeElements = (
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
   selectedElements: NonDeletedExcalidrawElement[],
   resizeArrowDirection: "origin" | "end",
-  event: PointerEvent, // XXX we want to make it independent?
+  isRotateWithDiscreteAngle: boolean,
+  isResizeWithSidesSameLength: boolean,
+  isResizeCenterPoint: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
-      rotateSingleElement(element, pointerX, pointerY, event.shiftKey);
+      rotateSingleElement(
+        element,
+        pointerX,
+        pointerY,
+        isRotateWithDiscreteAngle,
+      );
     } else if (
       isLinearElement(element) &&
       element.points.length === 2 &&
@@ -53,7 +56,7 @@ export const resizeElements = (
       resizeSingleTwoPointElement(
         element,
         resizeArrowDirection,
-        event.shiftKey,
+        isRotateWithDiscreteAngle,
         pointerX,
         pointerY,
       );
@@ -67,7 +70,7 @@ export const resizeElements = (
       resizeSingleTextElement(
         element,
         resizeHandle,
-        getResizeCenterPointKey(event),
+        isResizeCenterPoint,
         pointerX,
         pointerY,
       );
@@ -75,8 +78,8 @@ export const resizeElements = (
       resizeSingleElement(
         element,
         resizeHandle,
-        getResizeWithSidesSameLengthKey(event),
-        getResizeCenterPointKey(event),
+        isResizeWithSidesSameLength,
+        isResizeCenterPoint,
         pointerX,
         pointerY,
       );
@@ -114,13 +117,13 @@ const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
   pointerX: number,
   pointerY: number,
-  isAngleLocking: boolean,
+  isRotateWithDiscreteAngle: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   let angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
-  if (isAngleLocking) {
+  if (isRotateWithDiscreteAngle) {
     angle += SHIFT_LOCKING_ANGLE / 2;
     angle -= angle % SHIFT_LOCKING_ANGLE;
   }
@@ -133,14 +136,14 @@ const rotateSingleElement = (
 const resizeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
-  isAngleLocking: boolean,
+  isRotateWithDiscreteAngle: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
   const pointOrigin = element.points[0]; // can assume always [0, 0]?
   const pointEnd = element.points[1];
   if (resizeArrowDirection === "end") {
-    if (isAngleLocking) {
+    if (isRotateWithDiscreteAngle) {
       const { width, height } = getPerfectElementSize(
         element.type,
         pointerX - element.x,
@@ -162,7 +165,7 @@ const resizeSingleTwoPointElement = (
     }
   } else {
     // resizeArrowDirection === "origin"
-    if (isAngleLocking) {
+    if (isRotateWithDiscreteAngle) {
       const { width, height } = getPerfectElementSize(
         element.type,
         element.x + pointEnd[0] - pointOrigin[0] - pointerX,

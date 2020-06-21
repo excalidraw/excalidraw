@@ -33,3 +33,6 @@ export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
 
 export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
   event.shiftKey;
+
+export const getRotateWithDiscreteAngleKey = (event: MouseEvent) =>
+  event.shiftKey;
