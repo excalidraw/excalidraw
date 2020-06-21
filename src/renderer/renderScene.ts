@@ -15,6 +15,7 @@ import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   handlerRectanglesFromCoords,
   handlerRectangles,
+  getElementBounds,
   getCommonBounds,
 } from "../element";
 
@@ -559,7 +560,7 @@ const isVisibleElement = (
     zoom: number;
   },
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementBounds(element);
 
   // Apply zoom
   const viewportWidthWithZoom = viewportWidth / zoom;
