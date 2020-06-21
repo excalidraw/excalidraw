@@ -2553,6 +2553,35 @@ class App extends React.Component<any, AppState> {
             });
           }
         }
+      } else if (draggingElement.type === "selection") {
+        if (getResizeWithSidesSameLengthKey(event)) {
+          ({ width, height } = getPerfectElementSize(
+            this.state.elementType,
+            width,
+            y < originY ? -height : height,
+          ));
+
+          if (height < 0) {
+            height = -height;
+          }
+        }
+
+        let newX = x < originX ? originX - width : originX;
+        let newY = y < originY ? originY - height : originY;
+
+        if (getResizeCenterPointKey(event)) {
+          width += width;
+          height += height;
+          newX = originX - width / 2;
+          newY = originY - height / 2;
+        }
+
+        mutateElement(draggingElement, {
+          x: newX,
+          y: newY,
+          width: width,
+          height: height,
+        });
       } else {
         width = distance(originGridX, gridX);
         height = distance(originGridY, gridY);
