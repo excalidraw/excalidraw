@@ -57,7 +57,6 @@ import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
 import { distance2d, isPathALoop, pointOnGrids } from "../math";
-import { GRID_SIZE } from "../renderer/renderScene"; // FIXME
 
 import {
   isWritableElement,
@@ -837,6 +836,12 @@ class App extends React.Component<any, AppState> {
     });
   };
 
+  toggleGridMode = () => {
+    this.setState({
+      gridSize: this.state.gridSize ? null : 20, // TODO configurable size
+    });
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1176,6 +1181,10 @@ class App extends React.Component<any, AppState> {
       this.toggleZenMode();
     }
 
+    if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
+      this.toggleGridMode();
+    }
+
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
@@ -1190,8 +1199,8 @@ class App extends React.Component<any, AppState> {
 
     if (isArrowKey(event.key)) {
       const step =
-        (GRID_SIZE &&
-          (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : GRID_SIZE)) ||
+        (this.state.gridSize &&
+          (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
         (event.shiftKey
           ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
           : ELEMENT_TRANSLATE_AMOUNT);
@@ -2401,6 +2410,11 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
+        const [pointerX, pointerY] = pointOnGrids(
+          x - resizeOffsetXY[0],
+          y - resizeOffsetXY[1],
+          this.state.gridSize,
+        );
         if (
           resizeElements(
             resizeHandle,
@@ -2408,8 +2422,8 @@ class App extends React.Component<any, AppState> {
             selectedElements,
             resizeArrowDirection,
             event,
-            x - resizeOffsetXY[0],
-            y - resizeOffsetXY[1],
+            pointerX,
+            pointerY,
           )
         ) {
           return;
@@ -2442,11 +2456,12 @@ class App extends React.Component<any, AppState> {
           this.state,
         );
         if (selectedElements.length > 0) {
-          dragElements(
-            selectedElements,
+          const [pointerX, pointerY] = pointOnGrids(
             x - dragOffsetXY[0],
             y - dragOffsetXY[1],
+            this.state.gridSize,
           );
+          dragElements(selectedElements, pointerX, pointerY);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !selectedElementWasDuplicated) {
@@ -2529,8 +2544,12 @@ class App extends React.Component<any, AppState> {
         }
       } else {
         // TODO we need to improve this later
-        const [origX, origY] = pointOnGrids(originX, originY, GRID_SIZE);
-        const [pointerX, pointerY] = pointOnGrids(x, y, GRID_SIZE);
+        const [origX, origY] = pointOnGrids(
+          originX,
+          originY,
+          this.state.gridSize,
+        );
+        const [pointerX, pointerY] = pointOnGrids(x, y, this.state.gridSize);
         width = distance(origX, pointerX);
         height = distance(origY, pointerY);
         if (getResizeWithSidesSameLengthKey(event)) {

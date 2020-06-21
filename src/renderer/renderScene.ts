@@ -73,10 +73,9 @@ const strokeCircle = (
   context.stroke();
 };
 
-export const GRID_SIZE = 20; // FIXME configurable?
-
 const renderGrid = (
   context: CanvasRenderingContext2D,
+  gridSize: number,
   offsetX: number,
   offsetY: number,
   width: number,
@@ -84,16 +83,16 @@ const renderGrid = (
 ) => {
   const origStrokeStyle = context.strokeStyle;
   context.strokeStyle = "rgba(0,0,0,0.1)";
-  for (let x = offsetX; x < offsetX + width + GRID_SIZE; x += GRID_SIZE) {
+  for (let x = offsetX; x < offsetX + width + gridSize; x += gridSize) {
     context.beginPath();
-    context.moveTo(x, offsetY - GRID_SIZE);
-    context.lineTo(x, offsetY + height + GRID_SIZE);
+    context.moveTo(x, offsetY - gridSize);
+    context.lineTo(x, offsetY + height + gridSize);
     context.stroke();
   }
-  for (let y = offsetY; y < offsetY + height + GRID_SIZE; y += GRID_SIZE) {
+  for (let y = offsetY; y < offsetY + height + gridSize; y += gridSize) {
     context.beginPath();
-    context.moveTo(offsetX - GRID_SIZE, y);
-    context.lineTo(offsetX + width + GRID_SIZE, y);
+    context.moveTo(offsetX - gridSize, y);
+    context.lineTo(offsetX + width + gridSize, y);
     context.stroke();
   }
   context.strokeStyle = origStrokeStyle;
@@ -193,15 +192,20 @@ export const renderScene = (
   context.scale(sceneState.zoom, sceneState.zoom);
 
   // Grid
-  renderGrid(
-    context,
-    -Math.ceil(zoomTranslationX / sceneState.zoom / GRID_SIZE) * GRID_SIZE +
-      (sceneState.scrollX % GRID_SIZE),
-    -Math.ceil(zoomTranslationY / sceneState.zoom / GRID_SIZE) * GRID_SIZE +
-      (sceneState.scrollY % GRID_SIZE),
-    normalizedCanvasWidth / sceneState.zoom,
-    normalizedCanvasHeight / sceneState.zoom,
-  );
+  if (appState.gridSize) {
+    renderGrid(
+      context,
+      appState.gridSize,
+      -Math.ceil(zoomTranslationX / sceneState.zoom / appState.gridSize) *
+        appState.gridSize +
+        (sceneState.scrollX % appState.gridSize),
+      -Math.ceil(zoomTranslationY / sceneState.zoom / appState.gridSize) *
+        appState.gridSize +
+        (sceneState.scrollY % appState.gridSize),
+      normalizedCanvasWidth / sceneState.zoom,
+      normalizedCanvasHeight / sceneState.zoom,
+    );
+  }
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>

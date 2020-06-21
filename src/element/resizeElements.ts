@@ -1,12 +1,7 @@
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import {
-  rotate,
-  adjustXYWithRotation,
-  getFlipAdjustment,
-  pointOnGrids,
-} from "../math";
+import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -31,7 +26,6 @@ import {
   getResizeWithSidesSameLengthKey,
 } from "../keys";
 import { measureText, getFontString } from "../utils";
-import { GRID_SIZE } from "../renderer/renderScene"; // FIXME
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -44,7 +38,6 @@ export const resizeElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-  [pointerX, pointerY] = pointOnGrids(pointerX, pointerY, GRID_SIZE);
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
