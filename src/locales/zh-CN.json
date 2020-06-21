@@ -63,7 +63,7 @@
     "madeWithExcalidraw": "使用 Excalidraw 创建",
     "group": "组选",
     "ungroup": "取消组选",
-    "collaborators": ""
+    "collaborators": "协作者"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -73,7 +73,7 @@
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",
-    "saveAs": "",
+    "saveAs": "保存为",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
     "close": "关闭",
@@ -176,7 +176,7 @@
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "您粘贴了一个没有数字列的表格。",
+    "tooManyColumns": "您粘贴了两列以上的表格。"
   }
 }
