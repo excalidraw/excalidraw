@@ -232,6 +232,16 @@ const measureFontSizeFromWH = (
   if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
     return { size: nextFontSize, baseline: metrics.baseline };
   }
+  // third measurement
+  scale *= 0.99; // just heuristics
+  nextFontSize = element.fontSize * scale;
+  metrics = measureText(
+    element.text,
+    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  );
+  if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
+    return { size: nextFontSize, baseline: metrics.baseline };
+  }
   return null;
 };
 
