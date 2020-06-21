@@ -56,7 +56,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop, pointOnGrids } from "../math";
+import { distance2d, isPathALoop, pointOnGrid } from "../math";
 
 import {
   isWritableElement,
@@ -2028,7 +2028,7 @@ class App extends React.Component<any, AppState> {
 
     const originX = x;
     const originY = y;
-    const [originXOnGrids, originYOnGrids] = pointOnGrids(
+    const [originXOnGrid, originYOnGrid] = pointOnGrid(
       originX,
       originY,
       this.state.gridSize,
@@ -2391,7 +2391,7 @@ class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
-      const [xOnGrids, yOnGrids] = pointOnGrids(x, y, this.state.gridSize);
+      const [xOnGrid, yOnGrid] = pointOnGrid(x, y, this.state.gridSize);
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2416,7 +2416,7 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
-        const [pointerX, pointerY] = pointOnGrids(
+        const [pointerX, pointerY] = pointOnGrid(
           x - resizeOffsetXY[0],
           y - resizeOffsetXY[1],
           this.state.gridSize,
@@ -2462,7 +2462,7 @@ class App extends React.Component<any, AppState> {
           this.state,
         );
         if (selectedElements.length > 0) {
-          const [pointerX, pointerY] = pointOnGrids(
+          const [pointerX, pointerY] = pointOnGrid(
             x - dragOffsetXY[0],
             y - dragOffsetXY[1],
             this.state.gridSize,
@@ -2492,7 +2492,7 @@ class App extends React.Component<any, AppState> {
                   groupIdMap,
                   element,
                 );
-                const [originPointerX, originPointerY] = pointOnGrids(
+                const [originPointerX, originPointerY] = pointOnGrid(
                   originX - dragOffsetXY[0],
                   originY - dragOffsetXY[1],
                   this.state.gridSize,
@@ -2554,8 +2554,8 @@ class App extends React.Component<any, AppState> {
           }
         }
       } else {
-        width = distance(originXOnGrids, xOnGrids);
-        height = distance(originYOnGrids, yOnGrids);
+        width = distance(originXOnGrid, xOnGrid);
+        height = distance(originYOnGrid, yOnGrid);
         if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
@@ -2569,15 +2569,15 @@ class App extends React.Component<any, AppState> {
         }
 
         let newX =
-          xOnGrids < originXOnGrids ? originXOnGrids - width : originXOnGrids;
+          xOnGrid < originXOnGrid ? originXOnGrid - width : originXOnGrid;
         let newY =
-          yOnGrids < originYOnGrids ? originYOnGrids - height : originYOnGrids;
+          yOnGrid < originYOnGrid ? originYOnGrid - height : originYOnGrid;
 
         if (getResizeCenterPointKey(event)) {
           width += width;
           height += height;
-          newX = originXOnGrids - width / 2;
-          newY = originYOnGrids - height / 2;
+          newX = originXOnGrid - width / 2;
+          newY = originYOnGrid - height / 2;
         }
 
         if (width !== 0 && height !== 0) {

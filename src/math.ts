@@ -341,7 +341,7 @@ const doIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   return false;
 };
 
-export const pointOnGrids = (
+export const pointOnGrid = (
   x: number,
   y: number,
   gridSize: number | null,
