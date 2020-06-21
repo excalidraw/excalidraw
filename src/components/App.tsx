@@ -56,7 +56,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop, pointOnGrid } from "../math";
+import { distance2d, isPathALoop, getGridPoint } from "../math";
 
 import {
   isWritableElement,
@@ -2028,7 +2028,7 @@ class App extends React.Component<any, AppState> {
 
     const originX = x;
     const originY = y;
-    const [originXOnGrid, originYOnGrid] = pointOnGrid(
+    const [originGridX, originGridY] = getGridPoint(
       originX,
       originY,
       this.state.gridSize,
@@ -2391,7 +2391,7 @@ class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
-      const [xOnGrid, yOnGrid] = pointOnGrid(x, y, this.state.gridSize);
+      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2416,7 +2416,7 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
-        const [pointerX, pointerY] = pointOnGrid(
+        const [resizeX, resizeY] = getGridPoint(
           x - resizeOffsetXY[0],
           y - resizeOffsetXY[1],
           this.state.gridSize,
@@ -2428,8 +2428,8 @@ class App extends React.Component<any, AppState> {
             selectedElements,
             resizeArrowDirection,
             event,
-            pointerX,
-            pointerY,
+            resizeX,
+            resizeY,
           )
         ) {
           return;
@@ -2462,12 +2462,12 @@ class App extends React.Component<any, AppState> {
           this.state,
         );
         if (selectedElements.length > 0) {
-          const [pointerX, pointerY] = pointOnGrid(
+          const [dragX, dragY] = getGridPoint(
             x - dragOffsetXY[0],
             y - dragOffsetXY[1],
             this.state.gridSize,
           );
-          dragElements(selectedElements, pointerX, pointerY);
+          dragElements(selectedElements, dragX, dragY);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !selectedElementWasDuplicated) {
@@ -2492,14 +2492,14 @@ class App extends React.Component<any, AppState> {
                   groupIdMap,
                   element,
                 );
-                const [originPointerX, originPointerY] = pointOnGrid(
+                const [originDragX, originDragY] = getGridPoint(
                   originX - dragOffsetXY[0],
                   originY - dragOffsetXY[1],
                   this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
-                  x: duplicatedElement.x + (originPointerX - pointerX),
-                  y: duplicatedElement.y + (originPointerY - pointerY),
+                  x: duplicatedElement.x + (originDragX - dragX),
+                  y: duplicatedElement.y + (originDragY - dragY),
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
@@ -2554,8 +2554,8 @@ class App extends React.Component<any, AppState> {
           }
         }
       } else {
-        width = distance(originXOnGrid, xOnGrid);
-        height = distance(originYOnGrid, yOnGrid);
+        width = distance(originGridX, gridX);
+        height = distance(originGridY, gridY);
         if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
@@ -2568,16 +2568,14 @@ class App extends React.Component<any, AppState> {
           }
         }
 
-        let newX =
-          xOnGrid < originXOnGrid ? originXOnGrid - width : originXOnGrid;
-        let newY =
-          yOnGrid < originYOnGrid ? originYOnGrid - height : originYOnGrid;
+        let newX = gridX < originGridX ? originGridX - width : originGridX;
+        let newY = gridY < originGridY ? originGridY - height : originGridY;
 
         if (getResizeCenterPointKey(event)) {
           width += width;
           height += height;
-          newX = originXOnGrid - width / 2;
-          newY = originYOnGrid - height / 2;
+          newX = originGridX - width / 2;
+          newY = originGridY - height / 2;
         }
 
         if (width !== 0 && height !== 0) {
