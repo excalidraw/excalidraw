@@ -2028,6 +2028,11 @@ class App extends React.Component<any, AppState> {
 
     const originX = x;
     const originY = y;
+    const [originXOnGrids, originYOnGrids] = pointOnGrids(
+      originX,
+      originY,
+      this.state.gridSize,
+    );
 
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
@@ -2386,6 +2391,7 @@ class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+      const [xOnGrids, yOnGrids] = pointOnGrids(x, y, this.state.gridSize);
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2486,9 +2492,14 @@ class App extends React.Component<any, AppState> {
                   groupIdMap,
                   element,
                 );
+                const [originPointerX, originPointerY] = pointOnGrids(
+                  originX - dragOffsetXY[0],
+                  originY - dragOffsetXY[1],
+                  this.state.gridSize,
+                );
                 mutateElement(duplicatedElement, {
-                  x: duplicatedElement.x + (originX - lastX),
-                  y: duplicatedElement.y + (originY - lastY),
+                  x: duplicatedElement.x + (originPointerX - pointerX),
+                  y: duplicatedElement.y + (originPointerY - pointerY),
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
@@ -2543,15 +2554,8 @@ class App extends React.Component<any, AppState> {
           }
         }
       } else {
-        // TODO we need to improve this later
-        const [origX, origY] = pointOnGrids(
-          originX,
-          originY,
-          this.state.gridSize,
-        );
-        const [pointerX, pointerY] = pointOnGrids(x, y, this.state.gridSize);
-        width = distance(origX, pointerX);
-        height = distance(origY, pointerY);
+        width = distance(originXOnGrids, xOnGrids);
+        height = distance(originYOnGrids, yOnGrids);
         if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
@@ -2564,14 +2568,16 @@ class App extends React.Component<any, AppState> {
           }
         }
 
-        let newX = pointerX < origX ? origX - width : origX;
-        let newY = pointerY < origY ? origY - height : origY;
+        let newX =
+          xOnGrids < originXOnGrids ? originXOnGrids - width : originXOnGrids;
+        let newY =
+          yOnGrids < originYOnGrids ? originYOnGrids - height : originYOnGrids;
 
         if (getResizeCenterPointKey(event)) {
           width += width;
           height += height;
-          newX = origX - width / 2;
-          newY = origY - height / 2;
+          newX = originXOnGrids - width / 2;
+          newY = originYOnGrids - height / 2;
         }
 
         if (width !== 0 && height !== 0) {
