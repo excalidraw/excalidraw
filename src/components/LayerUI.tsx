@@ -255,8 +255,8 @@ const LayerUI = ({
         }`}
       >
         <LanguageList
-          onChange={(lng) => {
-            setLanguage(lng);
+          onChange={async (lng) => {
+            await setLanguage(lng);
             setAppState({});
           }}
           languages={languages}

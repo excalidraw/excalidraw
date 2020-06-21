@@ -5,6 +5,7 @@ import * as SentryIntegrations from "@sentry/integrations";
 
 import { EVENT } from "./constants";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import { InitializeApp } from "./components/InitializeApp";
 import { IsMobileProvider } from "./is-mobile";
 import App from "./components/App";
 import { register as registerServiceWorker } from "./serviceWorker";
@@ -67,7 +68,9 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(
   <TopErrorBoundary>
     <IsMobileProvider>
-      <App />
+      <InitializeApp>
+        <App />
+      </InitializeApp>
     </IsMobileProvider>
   </TopErrorBoundary>,
   rootElement,

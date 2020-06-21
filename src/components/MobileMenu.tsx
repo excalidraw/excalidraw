@@ -100,8 +100,8 @@ export const MobileMenu = ({
                 <fieldset>
                   <legend>{t("labels.language")}</legend>
                   <LanguageList
-                    onChange={(lng) => {
-                      setLanguage(lng);
+                    onChange={async (lng) => {
+                      await setLanguage(lng);
                       setAppState({});
                     }}
                   />
