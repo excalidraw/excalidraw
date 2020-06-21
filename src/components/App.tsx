@@ -27,8 +27,9 @@ import {
   getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
-  dragElements,
+  dragSelectedElements,
   getDragOffsetXY,
+  dragNewElement,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -2467,7 +2468,7 @@ class App extends React.Component<any, AppState> {
             y - dragOffsetXY[1],
             this.state.gridSize,
           );
-          dragElements(selectedElements, dragX, dragY);
+          dragSelectedElements(selectedElements, dragX, dragY);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !selectedElementWasDuplicated) {
@@ -2523,8 +2524,8 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
-      let width = distance(originX, x);
-      let height = distance(originY, y);
+      const width = distance(originX, x);
+      const height = distance(originY, y);
 
       if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
@@ -2554,67 +2555,31 @@ class App extends React.Component<any, AppState> {
           }
         }
       } else if (draggingElement.type === "selection") {
-        if (getResizeWithSidesSameLengthKey(event)) {
-          ({ width, height } = getPerfectElementSize(
-            this.state.elementType,
-            width,
-            y < originY ? -height : height,
-          ));
-
-          if (height < 0) {
-            height = -height;
-          }
-        }
-
-        let newX = x < originX ? originX - width : originX;
-        let newY = y < originY ? originY - height : originY;
-
-        if (getResizeCenterPointKey(event)) {
-          width += width;
-          height += height;
-          newX = originX - width / 2;
-          newY = originY - height / 2;
-        }
-
-        mutateElement(draggingElement, {
-          x: newX,
-          y: newY,
-          width: width,
-          height: height,
-        });
+        dragNewElement(
+          draggingElement,
+          this.state.elementType,
+          originX,
+          originY,
+          x,
+          y,
+          width,
+          height,
+          getResizeWithSidesSameLengthKey(event),
+          getResizeCenterPointKey(event),
+        );
       } else {
-        width = distance(originGridX, gridX);
-        height = distance(originGridY, gridY);
-        if (getResizeWithSidesSameLengthKey(event)) {
-          ({ width, height } = getPerfectElementSize(
-            this.state.elementType,
-            width,
-            y < originY ? -height : height,
-          ));
-
-          if (height < 0) {
-            height = -height;
-          }
-        }
-
-        let newX = gridX < originGridX ? originGridX - width : originGridX;
-        let newY = gridY < originGridY ? originGridY - height : originGridY;
-
-        if (getResizeCenterPointKey(event)) {
-          width += width;
-          height += height;
-          newX = originGridX - width / 2;
-          newY = originGridY - height / 2;
-        }
-
-        if (width !== 0 && height !== 0) {
-          mutateElement(draggingElement, {
-            x: newX,
-            y: newY,
-            width: width,
-            height: height,
-          });
-        }
+        dragNewElement(
+          draggingElement,
+          this.state.elementType,
+          originGridX,
+          originGridY,
+          gridX,
+          gridY,
+          distance(originGridX, gridX),
+          distance(originGridY, gridY),
+          getResizeWithSidesSameLengthKey(event),
+          getResizeCenterPointKey(event),
+        );
       }
 
       if (this.state.elementType === "selection") {
