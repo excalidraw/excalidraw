@@ -1,7 +1,12 @@
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
+import {
+  rotate,
+  adjustXYWithRotation,
+  getFlipAdjustment,
+  pointOnGrids,
+} from "../math";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -39,10 +44,7 @@ export const resizeElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-  if (GRID_SIZE) {
-    pointerX = Math.round(pointerX / GRID_SIZE) * GRID_SIZE;
-    pointerY = Math.round(pointerY / GRID_SIZE) * GRID_SIZE;
-  }
+  [pointerX, pointerY] = pointOnGrids(pointerX, pointerY, GRID_SIZE);
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {

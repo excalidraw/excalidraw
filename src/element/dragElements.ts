@@ -1,6 +1,7 @@
 import { NonDeletedExcalidrawElement } from "./types";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
+import { pointOnGrids } from "../math";
 import { GRID_SIZE } from "../renderer/renderScene"; // FIXME
 
 export const dragElements = (
@@ -8,10 +9,7 @@ export const dragElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-  if (GRID_SIZE) {
-    pointerX = Math.round(pointerX / GRID_SIZE) * GRID_SIZE;
-    pointerY = Math.round(pointerY / GRID_SIZE) * GRID_SIZE;
-  }
+  [pointerX, pointerY] = pointOnGrids(pointerX, pointerY, GRID_SIZE);
   const [x1, y1] = getCommonBounds(selectedElements);
   selectedElements.forEach((element) => {
     mutateElement(element, {

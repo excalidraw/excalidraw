@@ -84,13 +84,13 @@ const renderGrid = (
 ) => {
   const origStrokeStyle = context.strokeStyle;
   context.strokeStyle = "rgba(0,0,0,0.1)";
-  for (let x = offsetX; x <= offsetX + width; x += GRID_SIZE) {
+  for (let x = offsetX; x < offsetX + width + GRID_SIZE; x += GRID_SIZE) {
     context.beginPath();
     context.moveTo(x, offsetY - GRID_SIZE);
     context.lineTo(x, offsetY + height + GRID_SIZE);
     context.stroke();
   }
-  for (let y = offsetY; y <= offsetY + height; y += GRID_SIZE) {
+  for (let y = offsetY; y < offsetY + height + GRID_SIZE; y += GRID_SIZE) {
     context.beginPath();
     context.moveTo(offsetX - GRID_SIZE, y);
     context.lineTo(offsetX + width + GRID_SIZE, y);

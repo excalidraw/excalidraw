@@ -56,7 +56,8 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop } from "../math";
+import { distance2d, isPathALoop, pointOnGrids } from "../math";
+import { GRID_SIZE } from "../renderer/renderScene"; // FIXME
 
 import {
   isWritableElement,
@@ -1188,9 +1189,12 @@ class App extends React.Component<any, AppState> {
     const shape = findShapeByKey(event.key);
 
     if (isArrowKey(event.key)) {
-      const step = event.shiftKey
-        ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-        : ELEMENT_TRANSLATE_AMOUNT;
+      const step =
+        (GRID_SIZE &&
+          (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : GRID_SIZE)) ||
+        (event.shiftKey
+          ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+          : ELEMENT_TRANSLATE_AMOUNT);
       globalSceneState.replaceAllElements(
         globalSceneState.getElementsIncludingDeleted().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
@@ -2524,6 +2528,11 @@ class App extends React.Component<any, AppState> {
           }
         }
       } else {
+        // TODO we need to improve this later
+        const [origX, origY] = pointOnGrids(originX, originY, GRID_SIZE);
+        const [pointerX, pointerY] = pointOnGrids(x, y, GRID_SIZE);
+        width = distance(origX, pointerX);
+        height = distance(origY, pointerY);
         if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
@@ -2536,22 +2545,24 @@ class App extends React.Component<any, AppState> {
           }
         }
 
-        let newX = x < originX ? originX - width : originX;
-        let newY = y < originY ? originY - height : originY;
+        let newX = pointerX < origX ? origX - width : origX;
+        let newY = pointerY < origY ? origY - height : origY;
 
         if (getResizeCenterPointKey(event)) {
           width += width;
           height += height;
-          newX = originX - width / 2;
-          newY = originY - height / 2;
+          newX = origX - width / 2;
+          newY = origY - height / 2;
         }
 
-        mutateElement(draggingElement, {
-          x: newX,
-          y: newY,
-          width: width,
-          height: height,
-        });
+        if (width !== 0 && height !== 0) {
+          mutateElement(draggingElement, {
+            x: newX,
+            y: newY,
+            width: width,
+            height: height,
+          });
+        }
       }
 
       if (this.state.elementType === "selection") {
