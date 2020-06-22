@@ -5,19 +5,29 @@ import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { TextAlign, VerticalAlign, ExcalidrawTextElement } from "./types";
 
-function getTransform(
+const normalizeText = (text: string) => {
+  return (
+    text
+      // replace tabs with spaces so they render and measure correctly
+      .replace(/\t/g, "        ")
+      // normalize newlines
+      .replace(/\r?\n|\r/g, "\n")
+  );
+};
+
+const getTransform = (
   width: number,
   height: number,
   textAlign: TextAlign,
   verticalAlign: VerticalAlign,
   angle: number,
   zoom: number,
-) {
+) => {
   const degree = (180 * angle) / Math.PI;
   return `translate(${(width * (zoom - 1)) / 2}px, ${
     (height * (zoom - 1)) / 2
   }px) scale(${zoom}) rotate(${degree}deg)`;
-}
+};
 
 export const textWysiwyg = (
   element: ExcalidrawTextElement,
@@ -110,7 +120,7 @@ export const textWysiwyg = (
 
   if (onChange) {
     editable.oninput = () => {
-      onChange(editable.value);
+      onChange(normalizeText(editable.value));
     };
   }
 
@@ -135,7 +145,7 @@ export const textWysiwyg = (
 
   const handleSubmit = () => {
     if (editable.value) {
-      onSubmit(editable.value);
+      onSubmit(normalizeText(editable.value));
     } else {
       onCancel();
     }
@@ -196,6 +206,8 @@ export const textWysiwyg = (
     if (editingElement && isTextElement(editingElement)) {
       const { left, top } = getPositions(editingElement);
       const { textAlign, verticalAlign, angle } = editingElement;
+
+      editable.value = editingElement.text;
 
       Object.assign(editable.style, {
         font: getFontString(editingElement),
