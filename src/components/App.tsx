@@ -1336,14 +1336,8 @@ class App extends React.Component<any, AppState> {
   private handleTextWysiwyg(
     element: ExcalidrawTextElement,
     {
-      viewportX,
-      viewportY,
       isExistingElement = false,
     }: {
-      /** position override, else element.x is used */
-      viewportX: number | null;
-      /** position override, else elemeny.y is used */
-      viewportY: number | null;
       isExistingElement?: boolean;
     },
   ) {
@@ -1354,23 +1348,13 @@ class App extends React.Component<any, AppState> {
       });
     };
 
-    const deleteElement = () => {
-      globalSceneState.replaceAllElements([
-        ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id) {
-            return newElementWith(_element, { isDeleted: true });
-          }
-          return _element;
-        }),
-      ]);
-    };
-
     const updateElement = (text: string) => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(_element, {
               text,
+              isDeleted: !text.trim(),
             });
           }
           return _element;
@@ -1379,8 +1363,6 @@ class App extends React.Component<any, AppState> {
     };
 
     textWysiwyg(element, {
-      viewportX,
-      viewportY,
       zoom: this.state.zoom,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
@@ -1392,11 +1374,7 @@ class App extends React.Component<any, AppState> {
         return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
-        if (text) {
-          updateElement(text);
-        } else {
-          deleteElement();
-        }
+        updateElement(text);
       }),
       onSubmit: withBatchedUpdates((text) => {
         updateElement(text);
@@ -1413,7 +1391,7 @@ class App extends React.Component<any, AppState> {
         resetSelection();
       }),
       onCancel: withBatchedUpdates(() => {
-        deleteElement();
+        updateElement("");
         if (isExistingElement) {
           history.resumeRecording();
         }
@@ -1529,14 +1507,6 @@ class App extends React.Component<any, AppState> {
     });
 
     this.handleTextWysiwyg(element, {
-      viewportX:
-        !existingTextElement && parentCenterPosition
-          ? parentCenterPosition.viewportX
-          : null,
-      viewportY:
-        !existingTextElement && parentCenterPosition
-          ? parentCenterPosition.viewportY
-          : null,
       isExistingElement: !!existingTextElement,
     });
   };
@@ -2958,7 +2928,9 @@ class App extends React.Component<any, AppState> {
     scale: number,
   ) {
     const elementClickedInside = getElementContainingPosition(
-      globalSceneState.getElementsIncludingDeleted(),
+      globalSceneState
+        .getElementsIncludingDeleted()
+        .filter((element) => !isTextElement(element)),
       x,
       y,
     );

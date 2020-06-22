@@ -14,6 +14,9 @@ import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
+import { getElementAbsoluteCoords } from ".";
+import { adjustXYWithRotation } from "../math";
+import { getResizedElementAbsoluteCoords } from "./bounds";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
@@ -79,7 +82,10 @@ function getTextElementPositionOffsets(
     textAlign: ExcalidrawTextElement["textAlign"];
     verticalAlign: ExcalidrawTextElement["verticalAlign"];
   },
-  metrics: ReturnType<typeof measureText>,
+  metrics: {
+    width: number;
+    height: number;
+  },
 ) {
   return {
     x:
@@ -123,17 +129,95 @@ export const newTextElement = (
   return textElement;
 };
 
+const getAdjustedDimensions = (
+  element: ExcalidrawTextElement,
+  nextText: string,
+): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  baseline: number;
+} => {
+  const {
+    width: nextWidth,
+    height: nextHeight,
+    baseline: nextBaseline,
+  } = measureText(nextText, getFontString(element));
+
+  const { textAlign, verticalAlign } = element;
+
+  let x, y;
+
+  if (textAlign === "center" && verticalAlign === "middle") {
+    const prevMetrics = measureText(element.text, getFontString(element));
+    const offsets = getTextElementPositionOffsets(element, {
+      width: nextWidth - prevMetrics.width,
+      height: nextHeight - prevMetrics.height,
+    });
+
+    x = element.x - offsets.x;
+    y = element.y - offsets.y;
+  } else {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
+      element,
+      nextWidth,
+      nextHeight,
+    );
+    const deltaX1 = (x1 - nextX1) / 2;
+    const deltaY1 = (y1 - nextY1) / 2;
+    const deltaX2 = (x2 - nextX2) / 2;
+    const deltaY2 = (y2 - nextY2) / 2;
+
+    if (textAlign === "center") {
+      x = element.x;
+      y = element.y;
+
+      const cos = Math.cos(element.angle);
+      const sin = Math.sin(element.angle);
+
+      // x-axis
+      x += deltaX1 + deltaX2;
+
+      // y-axis
+      x += deltaY1 * -sin;
+      y += deltaY1 * (1 + cos);
+      x += deltaY2 * sin;
+      y += deltaY2 * (1 - cos);
+    } else {
+      [x, y] = adjustXYWithRotation(
+        textAlign === "left" ? "se" : "sw",
+        element.x,
+        element.y,
+        element.angle,
+        deltaX1,
+        deltaY1,
+        deltaX2,
+        deltaY2,
+        false,
+      );
+    }
+  }
+
+  return {
+    width: nextWidth,
+    height: nextHeight,
+    x: Number.isFinite(x) ? x : element.x,
+    y: Number.isFinite(y) ? y : element.y,
+    baseline: nextBaseline,
+  };
+};
+
 export const updateTextElement = (
   element: ExcalidrawTextElement,
-  { text }: { text: string },
-): NonDeleted<ExcalidrawElement> => {
-  const metrics = measureText(element.text, getFontString(element));
-  const offsets = getTextElementPositionOffsets(element, metrics);
-  return newTextElement({
-    ...element,
-    x: element.x + offsets.x,
-    y: element.y + offsets.y,
+  { text, isDeleted }: { text: string; isDeleted?: boolean },
+): ExcalidrawTextElement => {
+  return newElementWith(element, {
     text,
+    isDeleted: isDeleted ?? element.isDeleted,
+    ...getAdjustedDimensions(element, text),
   });
 };
 

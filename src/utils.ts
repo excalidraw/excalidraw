@@ -89,7 +89,10 @@ export const measureText = (text: string, font: FontString) => {
   line.style.font = font;
   body.appendChild(line);
   // Now we can measure width and height of the letter
-  line.innerText = text;
+  line.innerText = text
+    .split("\n")
+    .map((x) => x || "@")
+    .join("\n");
   const width = line.offsetWidth;
   const height = line.offsetHeight;
   // Now creating 1px sized item that will be aligned to baseline
