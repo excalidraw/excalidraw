@@ -68,7 +68,6 @@
     "export": "Eksporter",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
-    "exportToPdf": "Eksporter til PDF",
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",

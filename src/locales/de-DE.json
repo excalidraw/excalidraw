@@ -68,7 +68,6 @@
     "export": "Exportieren",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
-    "exportToPdf": "Als PDF exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "save": "Speichern",

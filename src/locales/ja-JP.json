@@ -67,7 +67,7 @@
     "clearReset": "キャンバスのリセット",
     "export": "エクスポート",
     "exportToPng": "PNG にエクスポート",
-    "exportToPdf": "PDF にエクスポート",
+    "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "save": "保存",

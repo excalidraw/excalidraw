@@ -68,7 +68,6 @@
     "export": "輸出",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
-    "exportToPdf": "輸出成 PDF",
     "copyToClipboard": "複製至剪貼簿",
     "copyPngToClipboard": "複製 PNG 至剪貼簿",
     "save": "儲存",

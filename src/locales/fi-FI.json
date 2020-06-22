@@ -68,7 +68,6 @@
     "export": "Vie",
     "exportToPng": "Vie PNG-tiedostona",
     "exportToSvg": "Vie SVG-tiedostona",
-    "exportToPdf": "Vie PDF-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
     "save": "Tallenna",

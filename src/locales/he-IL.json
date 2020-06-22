@@ -68,7 +68,6 @@
     "export": "ייצא",
     "exportToPng": "יצא ל PNG",
     "exportToSvg": "יצא ל SVG",
-    "exportToPdf": "יצא ל PDF",
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "save": "שמור",

@@ -68,7 +68,6 @@
     "export": "내보내기",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
-    "exportToPdf": "PDF로 내보내기",
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "save": "저장",
