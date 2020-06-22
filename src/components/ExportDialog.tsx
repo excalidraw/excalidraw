@@ -3,7 +3,7 @@ import "./ExportDialog.scss";
 import React, { useState, useEffect, useRef } from "react";
 
 import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportFile, link, print } from "./icons";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { exportToCanvas } from "../scene/export";
@@ -32,6 +32,7 @@ const ExportModal = ({
   onExportToPng,
   onExportToSvg,
   onExportToPdf,
+  onExportToPrint,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -42,6 +43,7 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToPdf: ExportCB;
+  onExportToPrint: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
@@ -110,9 +112,16 @@ const ExportModal = ({
             <ToolButton
               type="button"
               label="PDF"
-              title={t("buttons.exportToSvg")}
-              aria-label={t("buttons.exportToSvg")}
+              title={t("buttons.exportToPdf")}
+              aria-label={t("buttons.exportToPdf")}
               onClick={() => onExportToPdf(exportedElements, scale)}
+            />
+            <ToolButton
+              type="button"
+              icon={print}
+              title={t("buttons.exportToPrint")}
+              aria-label={t("buttons.exportToPrint")}
+              onClick={() => onExportToPrint(exportedElements, scale)}
             />
             {probablySupportsClipboardBlob && (
               <ToolButton
@@ -179,6 +188,7 @@ export const ExportDialog = ({
   onExportToPng,
   onExportToSvg,
   onExportToPdf,
+  onExportToPrint,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -189,6 +199,7 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToPdf: ExportCB;
+  onExportToPrint: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) => {
@@ -225,6 +236,7 @@ export const ExportDialog = ({
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToPdf={onExportToPdf}
+            onExportToPrint={onExportToPrint}
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}

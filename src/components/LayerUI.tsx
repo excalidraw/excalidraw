@@ -103,6 +103,7 @@ const LayerUI = ({
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToPdf={createExporter("pdf")}
+        onExportToPrint={createExporter("print")}
         onExportToClipboard={createExporter("clipboard")}
         onExportToBackend={(exportedElements) => {
           if (canvas) {

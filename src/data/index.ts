@@ -334,6 +334,27 @@ export const exportCanvas = async (
     });
     return;
   }
+  if (type === "print") {
+    const tempSvg = exportToSvg(elements, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+      shouldAddWatermark,
+    });
+
+    const fr = document.createElement("iframe");
+    document.body.appendChild(fr);
+
+    var win = fr.contentWindow;
+
+    win?.focus();
+    win?.document.write(tempSvg.outerHTML);
+    win?.document.close();
+
+    win?.print();
+
+    return;
+  }
 
   const tempCanvas = exportToCanvas(elements, appState, {
     exportBackground,
