@@ -76,11 +76,6 @@ export const actionClearCanvas = register({
 export const actionNewScene = register({
   name: "newScene",
   perform: (elements, appState, value) => {
-    // saveAsJSON(elements, appState, (window as any).handle).catch((error) =>
-    //   console.error(error),
-    // );
-    // return { commitToHistory: false };
-    // return { commitToHistory: false };
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
@@ -102,9 +97,8 @@ export const actionNewScene = register({
       title={t("buttons.new")}
       aria-label={t("buttons.new")}
       showAriaLabel={useIsMobile()}
-      // onClick={() => updateData(null)}
       onClick={() => {
-        if (window.confirm(t("alerts.clearReset"))) {
+        if (window.confirm(t("alerts.newDocument"))) {
           // TODO: Make this part of `AppState`.
           (window as any).handle = null;
           updateData(null);

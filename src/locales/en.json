@@ -95,6 +95,7 @@
     "exitZenMode": "Exit zen mode"
   },
   "alerts": {
+    "newDocument": "This will create a new document, and unsaved data will be lost! Are you sure?",
     "clearReset": "This will clear the whole canvas. Are you sure?",
     "couldNotCreateShareableLink": "Couldn't create shareable link.",
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
