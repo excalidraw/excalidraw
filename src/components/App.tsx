@@ -2527,9 +2527,6 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
-      const width = distance(originX, x);
-      const height = distance(originY, y);
-
       if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
         const points = draggingElement.points;
@@ -2565,8 +2562,8 @@ class App extends React.Component<any, AppState> {
           originY,
           x,
           y,
-          width,
-          height,
+          distance(originX, x),
+          distance(originY, y),
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
