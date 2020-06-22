@@ -68,6 +68,7 @@
     "export": "导出",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
+    "exportToPdf": "导出为 PDF",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",

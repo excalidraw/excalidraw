@@ -68,6 +68,7 @@
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SNG",
+    "exportToPdf": "Exportar a PDF",
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "save": "Desar",

@@ -68,6 +68,7 @@
     "export": "تصدير",
     "exportToPng": "تصدير كـ PNG",
     "exportToSvg": "تصدير كـ SVG",
+    "exportToPdf": "تصدير كـ PDF",
     "copyToClipboard": "نسخ إلى الحافظة",
     "copyPngToClipboard": "نسخ الـ PNG الى الحافظة",
     "save": "حفظ",

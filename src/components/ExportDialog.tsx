@@ -31,6 +31,7 @@ const ExportModal = ({
   actionManager,
   onExportToPng,
   onExportToSvg,
+  onExportToPdf,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -40,6 +41,7 @@ const ExportModal = ({
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
+  onExportToPdf: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
   onCloseRequest: () => void;
@@ -105,6 +107,13 @@ const ExportModal = ({
               aria-label={t("buttons.exportToSvg")}
               onClick={() => onExportToSvg(exportedElements, scale)}
             />
+            <ToolButton
+              type="button"
+              label="PDF"
+              title={t("buttons.exportToSvg")}
+              aria-label={t("buttons.exportToSvg")}
+              onClick={() => onExportToPdf(exportedElements, scale)}
+            />
             {probablySupportsClipboardBlob && (
               <ToolButton
                 type="button"
@@ -169,6 +178,7 @@ export const ExportDialog = ({
   actionManager,
   onExportToPng,
   onExportToSvg,
+  onExportToPdf,
   onExportToClipboard,
   onExportToBackend,
 }: {
@@ -178,6 +188,7 @@ export const ExportDialog = ({
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
+  onExportToPdf: ExportCB;
   onExportToClipboard: ExportCB;
   onExportToBackend: ExportCB;
 }) => {
@@ -213,6 +224,7 @@ export const ExportDialog = ({
             actionManager={actionManager}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
+            onExportToPdf={onExportToPdf}
             onExportToClipboard={onExportToClipboard}
             onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}

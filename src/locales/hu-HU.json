@@ -68,6 +68,7 @@
     "export": "Exportálás",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
+    "exportToPdf": "Exportálás PDF-be",
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "save": "Mentés",

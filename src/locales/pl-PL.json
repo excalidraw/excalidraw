@@ -68,6 +68,7 @@
     "export": "Zapisz jako",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
+    "exportToPdf": "Zapisz jako PDF",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "save": "Zapisz",

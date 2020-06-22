@@ -68,6 +68,7 @@
     "export": "Εξαγωγή",
     "exportToPng": "Εξαγωγή σε PNG",
     "exportToSvg": "Εξαγωγή σε SVG",
+    "exportToPdf": "Εξαγωγή σε PDF",
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
     "save": "Αποθήκευση",

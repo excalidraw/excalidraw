@@ -68,6 +68,7 @@
     "export": "Ekspor",
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
+    "exportToPdf": "Ekspor ke PDF",
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke Papan Klip",
     "save": "Simpan",

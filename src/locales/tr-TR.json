@@ -68,6 +68,7 @@
     "export": "Dışa aktar",
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
+    "exportToPdf": "PDF olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
     "save": "Kaydet",

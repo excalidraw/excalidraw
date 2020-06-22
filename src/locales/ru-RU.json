@@ -68,6 +68,7 @@
     "export": "Экспортировать",
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
+    "exportToPdf": "Экспорт в PDF",
     "copyToClipboard": "Скопировать в буфер обмена",
     "copyPngToClipboard": "Скопировать PNG в буфер обмена",
     "save": "Сохранить",
