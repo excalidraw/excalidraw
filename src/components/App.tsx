@@ -113,6 +113,7 @@ import {
   EVENT,
   ENV,
   CANVAS_ONLY_ACTIONS,
+  GRID_SIZE,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
@@ -840,7 +841,7 @@ class App extends React.Component<any, AppState> {
 
   toggleGridMode = () => {
     this.setState({
-      gridSize: this.state.gridSize ? null : 20, // TODO configurable size
+      gridSize: this.state.gridSize ? null : GRID_SIZE,
     });
   };
 
