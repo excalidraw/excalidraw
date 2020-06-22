@@ -88,10 +88,11 @@ export const measureText = (text: string, font: FontString) => {
   line.style.whiteSpace = "pre";
   line.style.font = font;
   body.appendChild(line);
-  // Now we can measure width and height of the letter
   line.innerText = text
     .split("\n")
-    .map((x) => x || "@")
+    // replace empty lines with single space because leading/trailing empty
+    //  lines would be stripped from computation
+    .map((x) => x || " ")
     .join("\n");
   const width = line.offsetWidth;
   const height = line.offsetHeight;
