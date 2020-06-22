@@ -2329,10 +2329,11 @@ class App extends React.Component<any, AppState> {
         });
       }
     } else {
+      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
       const element = newElement({
         type: this.state.elementType,
-        x: x,
-        y: y,
+        x: gridX,
+        y: gridY,
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
