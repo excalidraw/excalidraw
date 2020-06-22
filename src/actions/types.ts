@@ -42,6 +42,7 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeShouldAddWatermark"
+  | "newScene"
   | "saveScene"
   | "saveAsScene"
   | "loadScene"

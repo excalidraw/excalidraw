@@ -26,6 +26,7 @@ export {
   actionZoomOut,
   actionResetZoom,
   actionZoomToFit,
+  actionNewScene,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";

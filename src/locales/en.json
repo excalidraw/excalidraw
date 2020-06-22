@@ -72,6 +72,7 @@
     "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
+    "new": "New",
     "save": "Save",
     "saveAs": "Save as",
     "load": "Load",

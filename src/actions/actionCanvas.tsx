@@ -1,7 +1,13 @@
 import React from "react";
 import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
+import {
+  trash,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+  iconNew,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom, normalizeScroll } from "../scene";
@@ -56,6 +62,47 @@ export const actionClearCanvas = register({
       title={t("buttons.clearReset")}
       aria-label={t("buttons.clearReset")}
       showAriaLabel={useIsMobile()}
+      onClick={() => {
+        if (window.confirm(t("alerts.clearReset"))) {
+          // TODO: Make this part of `AppState`.
+          (window as any).handle = null;
+          updateData(null);
+        }
+      }}
+    />
+  ),
+});
+
+export const actionNewScene = register({
+  name: "newScene",
+  perform: (elements, appState, value) => {
+    // saveAsJSON(elements, appState, (window as any).handle).catch((error) =>
+    //   console.error(error),
+    // );
+    // return { commitToHistory: false };
+    // return { commitToHistory: false };
+    return {
+      elements: elements.map((element) =>
+        newElementWith(element, { isDeleted: true }),
+      ),
+      appState: {
+        ...getDefaultAppState(),
+        username: appState.username,
+      },
+      commitToHistory: true,
+    };
+  },
+  keyTest: (event) => {
+    return event.key === "s" && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={iconNew}
+      title={t("buttons.new")}
+      aria-label={t("buttons.new")}
+      showAriaLabel={useIsMobile()}
+      // onClick={() => updateData(null)}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
           // TODO: Make this part of `AppState`.
