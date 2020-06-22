@@ -84,13 +84,13 @@ const renderGrid = (
   const origStrokeStyle = context.strokeStyle;
   context.strokeStyle = "rgba(0,0,0,0.1)";
   context.beginPath();
-  for (let x = offsetX; x < offsetX + width + gridSize; x += gridSize) {
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, offsetY + height + gridSize);
+    context.lineTo(x, offsetY + height + gridSize * 2);
   }
-  for (let y = offsetY; y < offsetY + height + gridSize; y += gridSize) {
+  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
     context.moveTo(offsetX - gridSize, y);
-    context.lineTo(offsetX + width + gridSize, y);
+    context.lineTo(offsetX + width + gridSize * 2, y);
   }
   context.stroke();
   context.strokeStyle = origStrokeStyle;
