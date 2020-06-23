@@ -340,3 +340,17 @@ const doIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
 
   return false;
 };
+
+export const getGridPoint = (
+  x: number,
+  y: number,
+  gridSize: number | null,
+): [number, number] => {
+  if (gridSize) {
+    return [
+      Math.round(x / gridSize) * gridSize,
+      Math.round(y / gridSize) * gridSize,
+    ];
+  }
+  return [x, y];
+};
