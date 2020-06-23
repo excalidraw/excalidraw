@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Fabriqué avec Excalidraw",
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
-    "collaborators": "Collaborateurs"
+    "collaborators": "Collaborateurs",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -91,7 +92,8 @@
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
-    "exitZenMode": "Quitter le mode zen"
+    "exitZenMode": "Quitter le mode zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
