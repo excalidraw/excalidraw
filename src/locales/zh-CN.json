@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "使用 Excalidraw 创建",
     "group": "组选",
     "ungroup": "取消组选",
-    "collaborators": "协作者"
+    "collaborators": "协作者",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -91,7 +92,8 @@
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
     "toggleZenMode": "切换禅模式",
-    "exitZenMode": "退出禅模式"
+    "exitZenMode": "退出禅模式",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
