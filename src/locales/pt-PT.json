@@ -64,7 +64,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "toggleGridMode": ""
+    "toggleGridMode": "Alternar modo de grade"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -93,7 +93,7 @@
     "toggleFullScreen": "Alternar tela cheia",
     "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Sair do modo zen",
-    "toggleGridMode": ""
+    "toggleGridMode": "Alternar modo de grade"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
