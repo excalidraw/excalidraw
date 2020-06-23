@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "",
     "group": "",
     "ungroup": "",
-    "collaborators": ""
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -91,7 +92,8 @@
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
