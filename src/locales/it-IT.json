@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Creato con Excalidraw",
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
-    "collaborators": ""
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -91,7 +92,8 @@
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
-    "exitZenMode": "Uscire dalla modalità zen"
+    "exitZenMode": "Uscire dalla modalità zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
