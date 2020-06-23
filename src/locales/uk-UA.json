@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Накреслене в Excalidraw",
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
-    "collaborators": "Співавтори"
+    "collaborators": "Співавтори",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -91,7 +92,8 @@
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
     "toggleZenMode": "Дзен-режим",
-    "exitZenMode": "Вийти з дзен-режиму"
+    "exitZenMode": "Вийти з дзен-режиму",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
