@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Επικόλληση",
     "selectAll": "Επιλογή όλων",
+    "moveCanvas": "",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
@@ -61,7 +62,9 @@
     "yourName": "Το όνομά σου",
     "madeWithExcalidraw": "Φτιαγμένο με Excalidraw",
     "group": "Δημιουργία ομάδας από επιλογή",
-    "ungroup": "Κατάργηση ομάδας από επιλογή"
+    "ungroup": "Κατάργηση ομάδας από επιλογή",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -89,7 +92,8 @@
     "createNewRoom": "Δημιουργία νέου χώρου",
     "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
     "toggleZenMode": "Εναλλαγή λειτουργίας Zen",
-    "exitZenMode": "Έξοδος απο την λειτουργία Zen"
+    "exitZenMode": "Έξοδος απο την λειτουργία Zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
