@@ -2298,10 +2298,15 @@ class App extends React.Component<any, AppState> {
         });
         document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
+        const [gridX, gridY] = getGridPoint(
+          x,
+          y,
+          this.state.elementType === "draw" ? null : this.state.gridSize,
+        );
         const element = newLinearElement({
           type: this.state.elementType,
-          x: x,
-          y: y,
+          x: gridX,
+          y: gridY,
           strokeColor: this.state.currentItemStrokeColor,
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
@@ -2532,8 +2537,15 @@ class App extends React.Component<any, AppState> {
       if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
         const points = draggingElement.points;
-        let dx = x - draggingElement.x;
-        let dy = y - draggingElement.y;
+        let dx: number;
+        let dy: number;
+        if (draggingElement.type === "draw") {
+          dx = x - draggingElement.x;
+          dy = y - draggingElement.y;
+        } else {
+          dx = gridX - draggingElement.x;
+          dy = gridY - draggingElement.y;
+        }
 
         if (getRotateWithDiscreteAngleKey(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
