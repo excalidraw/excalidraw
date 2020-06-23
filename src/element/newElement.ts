@@ -171,34 +171,20 @@ const getAdjustedDimensions = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
 
-    if (textAlign === "center") {
-      x = element.x;
-      y = element.y;
-
-      const cos = Math.cos(element.angle);
-      const sin = Math.sin(element.angle);
-
-      // x-axis
-      x += deltaX1 + deltaX2;
-
-      // y-axis
-      x += deltaY1 * -sin;
-      y += deltaY1 * (1 + cos);
-      x += deltaY2 * sin;
-      y += deltaY2 * (1 - cos);
-    } else {
-      [x, y] = adjustXYWithRotation(
-        textAlign === "left" ? "se" : "sw",
-        element.x,
-        element.y,
-        element.angle,
-        deltaX1,
-        deltaY1,
-        deltaX2,
-        deltaY2,
-        false,
-      );
-    }
+    [x, y] = adjustXYWithRotation(
+      {
+        s: true,
+        e: textAlign === "center" || textAlign === "left",
+        w: textAlign === "center" || textAlign === "right",
+      },
+      element.x,
+      element.y,
+      element.angle,
+      deltaX1,
+      deltaY1,
+      deltaX2,
+      deltaY2,
+    );
   }
 
   return {
