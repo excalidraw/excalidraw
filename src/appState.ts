@@ -82,5 +82,6 @@ export const clearAppStateForLocalStorage = (appState: AppState) => {
 export const cleanAppStateForExport = (appState: AppState) => {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
+    gridSize: appState.gridSize,
   };
 };
