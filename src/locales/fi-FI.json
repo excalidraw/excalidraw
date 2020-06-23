@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Tehty Excalidrawilla",
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
-    "collaborators": "Yhteistyökumppanit"
+    "collaborators": "Yhteistyökumppanit",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -91,7 +92,8 @@
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
-    "exitZenMode": "Poistu zen-tilasta"
+    "exitZenMode": "Poistu zen-tilasta",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
