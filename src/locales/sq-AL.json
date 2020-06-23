@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "",
     "group": "",
     "ungroup": "",
-    "collaborators": ""
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "",
@@ -91,7 +92,8 @@
     "createNewRoom": "",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "",
