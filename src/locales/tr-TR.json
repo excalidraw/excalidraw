@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
-    "collaborators": "Ortaklar"
+    "collaborators": "Ortaklar",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -91,7 +92,8 @@
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
     "toggleZenMode": "Zen modunu aç/kapa",
-    "exitZenMode": "Zen modundan çık"
+    "exitZenMode": "Zen modundan çık",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
