@@ -27,6 +27,9 @@ import {
   getResizeArrowDirection,
   getResizeHandlerFromCoords,
   isNonDeletedElement,
+  dragSelectedElements,
+  getDragOffsetXY,
+  dragNewElement,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -54,7 +57,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 
-import { distance2d, isPathALoop } from "../math";
+import { distance2d, isPathALoop, getGridPoint } from "../math";
 
 import {
   isWritableElement,
@@ -72,6 +75,7 @@ import {
   isArrowKey,
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
+  getRotateWithDiscreteAngleKey,
 } from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
@@ -109,6 +113,7 @@ import {
   EVENT,
   ENV,
   CANVAS_ONLY_ACTIONS,
+  GRID_SIZE,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
@@ -834,6 +839,12 @@ class App extends React.Component<any, AppState> {
     });
   };
 
+  toggleGridMode = () => {
+    this.setState({
+      gridSize: this.state.gridSize ? null : GRID_SIZE,
+    });
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1173,6 +1184,10 @@ class App extends React.Component<any, AppState> {
       this.toggleZenMode();
     }
 
+    if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
+      this.toggleGridMode();
+    }
+
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
@@ -1186,9 +1201,12 @@ class App extends React.Component<any, AppState> {
     const shape = findShapeByKey(event.key);
 
     if (isArrowKey(event.key)) {
-      const step = event.shiftKey
-        ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-        : ELEMENT_TRANSLATE_AMOUNT;
+      const step =
+        (this.state.gridSize &&
+          (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
+        (event.shiftKey
+          ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+          : ELEMENT_TRANSLATE_AMOUNT);
       globalSceneState.replaceAllElements(
         globalSceneState.getElementsIncludingDeleted().map((el) => {
           if (this.state.selectedElementIds[el.id]) {
@@ -2013,6 +2031,11 @@ class App extends React.Component<any, AppState> {
 
     const originX = x;
     const originY = y;
+    const [originGridX, originGridY] = getGridPoint(
+      originX,
+      originY,
+      this.state.gridSize,
+    );
 
     type ResizeTestType = ReturnType<typeof resizeTest>;
     let resizeHandle: ResizeTestType = false;
@@ -2023,6 +2046,7 @@ class App extends React.Component<any, AppState> {
     let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
+    let dragOffsetXY: [number, number] = [0, 0];
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
 
@@ -2105,6 +2129,20 @@ class App extends React.Component<any, AppState> {
         hitElement =
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+
+        if (hitElement && isNonDeletedElement(hitElement)) {
+          if (this.state.selectedElementIds[hitElement.id]) {
+            dragOffsetXY = getDragOffsetXY(selectedElements, x, y);
+          } else if (event.shiftKey) {
+            dragOffsetXY = getDragOffsetXY(
+              [...selectedElements, hitElement],
+              x,
+              y,
+            );
+          } else {
+            dragOffsetXY = getDragOffsetXY([hitElement], x, y);
+          }
+        }
 
         // clear selection if shift is not clicked
         if (
@@ -2260,10 +2298,15 @@ class App extends React.Component<any, AppState> {
         });
         document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
+        const [gridX, gridY] = getGridPoint(
+          x,
+          y,
+          this.state.elementType === "draw" ? null : this.state.gridSize,
+        );
         const element = newLinearElement({
           type: this.state.elementType,
-          x: x,
-          y: y,
+          x: gridX,
+          y: gridY,
           strokeColor: this.state.currentItemStrokeColor,
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
@@ -2291,10 +2334,11 @@ class App extends React.Component<any, AppState> {
         });
       }
     } else {
+      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
       const element = newElement({
         type: this.state.elementType,
-        x: x,
-        y: y,
+        x: gridX,
+        y: gridY,
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
@@ -2356,6 +2400,7 @@ class App extends React.Component<any, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2380,15 +2425,22 @@ class App extends React.Component<any, AppState> {
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
+        const [resizeX, resizeY] = getGridPoint(
+          x - resizeOffsetXY[0],
+          y - resizeOffsetXY[1],
+          this.state.gridSize,
+        );
         if (
           resizeElements(
             resizeHandle,
             setResizeHandle,
             selectedElements,
             resizeArrowDirection,
-            event,
-            x - resizeOffsetXY[0],
-            y - resizeOffsetXY[1],
+            getRotateWithDiscreteAngleKey(event),
+            getResizeWithSidesSameLengthKey(event),
+            getResizeCenterPointKey(event),
+            resizeX,
+            resizeY,
           )
         ) {
           return;
@@ -2421,21 +2473,12 @@ class App extends React.Component<any, AppState> {
           this.state,
         );
         if (selectedElements.length > 0) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            event,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
+          const [dragX, dragY] = getGridPoint(
+            x - dragOffsetXY[0],
+            y - dragOffsetXY[1],
+            this.state.gridSize,
           );
-
-          selectedElements.forEach((element) => {
-            mutateElement(element, {
-              x: element.x + x - lastX,
-              y: element.y + y - lastY,
-            });
-          });
-          lastX = x;
-          lastY = y;
+          dragSelectedElements(selectedElements, dragX, dragY);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !selectedElementWasDuplicated) {
@@ -2460,9 +2503,14 @@ class App extends React.Component<any, AppState> {
                   groupIdMap,
                   element,
                 );
+                const [originDragX, originDragY] = getGridPoint(
+                  originX - dragOffsetXY[0],
+                  originY - dragOffsetXY[1],
+                  this.state.gridSize,
+                );
                 mutateElement(duplicatedElement, {
-                  x: duplicatedElement.x + (originX - lastX),
-                  y: duplicatedElement.y + (originY - lastY),
+                  x: duplicatedElement.x + (originDragX - dragX),
+                  y: duplicatedElement.y + (originDragY - dragY),
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
@@ -2486,16 +2534,20 @@ class App extends React.Component<any, AppState> {
         return;
       }
 
-      let width = distance(originX, x);
-      let height = distance(originY, y);
-
       if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
         const points = draggingElement.points;
-        let dx = x - draggingElement.x;
-        let dy = y - draggingElement.y;
+        let dx: number;
+        let dy: number;
+        if (draggingElement.type === "draw") {
+          dx = x - draggingElement.x;
+          dy = y - draggingElement.y;
+        } else {
+          dx = gridX - draggingElement.x;
+          dy = gridY - draggingElement.y;
+        }
 
-        if (event.shiftKey && points.length === 2) {
+        if (getRotateWithDiscreteAngleKey(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
             this.state.elementType,
             dx,
@@ -2516,35 +2568,32 @@ class App extends React.Component<any, AppState> {
             });
           }
         }
+      } else if (draggingElement.type === "selection") {
+        dragNewElement(
+          draggingElement,
+          this.state.elementType,
+          originX,
+          originY,
+          x,
+          y,
+          distance(originX, x),
+          distance(originY, y),
+          getResizeWithSidesSameLengthKey(event),
+          getResizeCenterPointKey(event),
+        );
       } else {
-        if (getResizeWithSidesSameLengthKey(event)) {
-          ({ width, height } = getPerfectElementSize(
-            this.state.elementType,
-            width,
-            y < originY ? -height : height,
-          ));
-
-          if (height < 0) {
-            height = -height;
-          }
-        }
-
-        let newX = x < originX ? originX - width : originX;
-        let newY = y < originY ? originY - height : originY;
-
-        if (getResizeCenterPointKey(event)) {
-          width += width;
-          height += height;
-          newX = originX - width / 2;
-          newY = originY - height / 2;
-        }
-
-        mutateElement(draggingElement, {
-          x: newX,
-          y: newY,
-          width: width,
-          height: height,
-        });
+        dragNewElement(
+          draggingElement,
+          this.state.elementType,
+          originGridX,
+          originGridY,
+          gridX,
+          gridY,
+          distance(originGridX, gridX),
+          distance(originGridY, gridY),
+          getResizeWithSidesSameLengthKey(event),
+          getResizeCenterPointKey(event),
+        );
       }
 
       if (this.state.elementType === "selection") {
@@ -2857,6 +2906,10 @@ class App extends React.Component<any, AppState> {
           ...this.actionManager.getContextMenuItems((action) =>
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
+          {
+            label: t("labels.toggleGridMode"),
+            action: this.toggleGridMode,
+          },
         ],
         top: event.clientY,
         left: event.clientX,
