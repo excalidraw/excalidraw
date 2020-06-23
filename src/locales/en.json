@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
-    "collaborators": "Collaborators"
+    "collaborators": "Collaborators",
+    "toggleGridMode": "Toggle grid mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

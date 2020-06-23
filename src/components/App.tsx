@@ -2906,6 +2906,10 @@ class App extends React.Component<any, AppState> {
           ...this.actionManager.getContextMenuItems((action) =>
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
+          {
+            label: t("labels.toggleGridMode"),
+            action: this.toggleGridMode,
+          },
         ],
         top: event.clientY,
         left: event.clientX,
