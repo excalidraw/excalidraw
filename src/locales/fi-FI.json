@@ -64,7 +64,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": ""
+    "toggleGridMode": "Ruudukko päälle/pois"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -93,7 +93,7 @@
     "toggleFullScreen": "Koko näytön tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
     "exitZenMode": "Poistu zen-tilasta",
-    "toggleGridMode": ""
+    "toggleGridMode": "Ruudukko päälle/pois"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
