@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Incolla",
     "selectAll": "Seleziona tutto",
+    "moveCanvas": "",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -61,7 +62,9 @@
     "yourName": "Il vostro nome",
     "madeWithExcalidraw": "Creato con Excalidraw",
     "group": "Crea gruppo da selezione",
-    "ungroup": "Dividi gruppo da selezione"
+    "ungroup": "Dividi gruppo da selezione",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -89,7 +92,8 @@
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
-    "exitZenMode": "Uscire dalla modalità zen"
+    "exitZenMode": "Uscire dalla modalità zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
