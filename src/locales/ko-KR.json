@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "",
     "group": "",
     "ungroup": "",
-    "collaborators": ""
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -91,7 +92,8 @@
     "createNewRoom": "",
     "toggleFullScreen": "전체화면",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
