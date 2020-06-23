@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Excalidrawで作成",
     "group": "",
     "ungroup": "",
-    "collaborators": ""
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -91,7 +92,8 @@
     "createNewRoom": "新しい部屋を作成する",
     "toggleFullScreen": "全画面表示に切り替える",
     "toggleZenMode": "集中モードに切り替える",
-    "exitZenMode": "集中モードをやめる"
+    "exitZenMode": "集中モードをやめる",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
