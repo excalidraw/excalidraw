@@ -220,7 +220,10 @@ const measureFontSizeFromWH = (
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
   if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
-    return { size: nextFontSize, baseline: metrics.baseline };
+    return {
+      size: nextFontSize,
+      baseline: metrics.baseline + (nextHeight - metrics.height),
+    };
   }
   // second measurement
   scale = Math.min(
@@ -233,7 +236,10 @@ const measureFontSizeFromWH = (
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
   if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
-    return { size: nextFontSize, baseline: metrics.baseline };
+    return {
+      size: nextFontSize,
+      baseline: metrics.baseline + (nextHeight - metrics.height),
+    };
   }
   // third measurement
   scale *= 0.99; // just heuristics
@@ -243,7 +249,10 @@ const measureFontSizeFromWH = (
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
   if (metrics.width - nextWidth < 1 && metrics.height - nextHeight < 1) {
-    return { size: nextFontSize, baseline: metrics.baseline };
+    return {
+      size: nextFontSize,
+      baseline: metrics.baseline + (nextHeight - metrics.height),
+    };
   }
   return null;
 };
