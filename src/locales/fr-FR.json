@@ -64,7 +64,7 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "toggleGridMode": ""
+    "toggleGridMode": "Basculer le mode grille"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -93,7 +93,7 @@
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
     "exitZenMode": "Quitter le mode zen",
-    "toggleGridMode": ""
+    "toggleGridMode": "Basculer le mode grille"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
