@@ -45,6 +45,7 @@ export const actionPasteStyles = register({
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
+            strokeStyle: pastedElement?.strokeStyle,
             fillStyle: pastedElement?.fillStyle,
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
+    "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -61,7 +62,9 @@
     "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw",
     "group": "Selección de grupo",
-    "ungroup": "Desagrupar selección"
+    "ungroup": "Desagrupar selección",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -89,7 +92,8 @@
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
     "toggleZenMode": "Alternar modo zen",
-    "exitZenMode": "Salir del modo Zen"
+    "exitZenMode": "Salir del modo Zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",

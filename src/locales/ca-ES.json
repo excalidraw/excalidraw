@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Enganxar",
     "selectAll": "Seleccionar tot",
+    "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al porta-retalls com a PNG",
     "copyAsSvg": "Copiar al porta-retalls com a SVG",
@@ -61,7 +62,9 @@
     "yourName": "El teu nom",
     "madeWithExcalidraw": "Fet amb Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -89,7 +92,8 @@
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
     "toggleZenMode": "Commutar modo zen",
-    "exitZenMode": "Sortir de modo zen"
+    "exitZenMode": "Sortir de modo zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Tot el llenç s'esborrarà. Estàs segur?",

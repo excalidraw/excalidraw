@@ -39,6 +39,11 @@ export {
   getResizeOffsetXY,
   getResizeArrowDirection,
 } from "./resizeElements";
+export {
+  dragSelectedElements,
+  getDragOffsetXY,
+  dragNewElement,
+} from "./dragElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";

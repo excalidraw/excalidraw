@@ -16,6 +16,16 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
+export type Collaborator = {
+  pointer?: {
+    x: number;
+    y: number;
+  };
+  button?: "up" | "down";
+  selectedElementIds?: AppState["selectedElementIds"];
+  username?: string | null;
+};
+
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -58,21 +68,11 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
-  collaborators: Map<
-    string,
-    {
-      pointer?: {
-        x: number;
-        y: number;
-      };
-      button?: "up" | "down";
-      selectedElementIds?: AppState["selectedElementIds"];
-      username?: string | null;
-    }
-  >;
+  collaborators: Map<string, Collaborator>;
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
+  gridSize: number | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };

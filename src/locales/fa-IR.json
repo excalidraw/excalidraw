@@ -2,6 +2,7 @@
   "labels": {
     "paste": "جای گذاری",
     "selectAll": "انتخاب همه",
+    "moveCanvas": "بوم را حرکت بدهید",
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
@@ -10,8 +11,8 @@
     "bringToFront": "جلو آوردن",
     "sendBackward": "پس فرستادن",
     "delete": "حذف",
-    "copyStyles": "کپی سبک",
-    "pasteStyles": "جای گذاری سبک",
+    "copyStyles": "کپی استایل",
+    "pasteStyles": "چسباندن استایل",
     "stroke": "خط",
     "background": "پس زمینه",
     "fill": "رنگ آمیزی",
@@ -61,7 +62,9 @@
     "yourName": "نام شما",
     "madeWithExcalidraw": "ساخته شده با Excalidraw",
     "group": "گروهبندی انتخابها",
-    "ungroup": "حذف گروهبندی انتخابها"
+    "ungroup": "حذف گروهبندی انتخابها",
+    "collaborators": "همکاران",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -89,7 +92,8 @@
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
     "toggleZenMode": "تغییر به حالت تمرکز",
-    "exitZenMode": "خروج از حالت تمرکز"
+    "exitZenMode": "خروج از حالت تمرکز",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",

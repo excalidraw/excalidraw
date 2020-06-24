@@ -75,3 +75,5 @@ export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
+
+export const GRID_SIZE = 20; // TODO make it configurable?

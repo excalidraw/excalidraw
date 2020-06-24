@@ -72,6 +72,7 @@ export const exportToCanvas = (
       renderScrollbars: false,
       renderSelection: false,
       renderOptimizations: false,
+      renderGrid: false,
     },
   );
 

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
+    "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
@@ -61,7 +62,9 @@
     "yourName": "Your name",
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
-    "ungroup": "Ungroup selection"
+    "ungroup": "Ungroup selection",
+    "collaborators": "Collaborators",
+    "toggleGridMode": "Toggle grid mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -89,7 +92,8 @@
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "toggleGridMode": "Toggle grid mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
