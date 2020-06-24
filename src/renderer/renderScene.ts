@@ -74,7 +74,7 @@ const strokeCircle = (
   context.stroke();
 };
 
-const renderGrid = (
+const strokeGrid = (
   context: CanvasRenderingContext2D,
   gridSize: number,
   offsetX: number,
@@ -148,10 +148,12 @@ export const renderScene = (
     // Should not be turned on for export operations and similar, because it
     //  doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
+    renderGrid = true,
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
+    renderGrid?: boolean;
   } = {},
 ) => {
   if (!canvas) {
@@ -191,8 +193,8 @@ export const renderScene = (
   context.scale(sceneState.zoom, sceneState.zoom);
 
   // Grid
-  if (appState.gridSize) {
-    renderGrid(
+  if (renderGrid && appState.gridSize) {
+    strokeGrid(
       context,
       appState.gridSize,
       -Math.ceil(zoomTranslationX / sceneState.zoom / appState.gridSize) *
