@@ -2355,6 +2355,10 @@ class App extends React.Component<any, AppState> {
     let selectedElementWasDuplicated = false;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      // We need to initialize dragOffsetXY only after we've updated
+      // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
+      // event handler should hopefully ensure we're already working with
+      // the updated state.
       if (dragOffsetXY === null) {
         dragOffsetXY = getDragOffsetXY(
           getSelectedElements(globalSceneState.getElements(), this.state),
