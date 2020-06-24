@@ -53,8 +53,13 @@ export const textWysiwyg = ({
 
       editable.value = updatedElement.text;
 
+      const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
+      const lineHeight = updatedElement.height / lines.length;
+
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
+        // must be defined *after* font ¯\_(ツ)_/¯
+        lineHeight: `${lineHeight}px`,
         width: `${updatedElement.width}px`,
         height: `${updatedElement.height}px`,
         left: `${viewportX}px`,
