@@ -64,7 +64,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "toggleGridMode": ""
+    "toggleGridMode": "Режим сітки"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -93,7 +93,7 @@
     "toggleFullScreen": "Повноекранний режим",
     "toggleZenMode": "Дзен-режим",
     "exitZenMode": "Вийти з дзен-режиму",
-    "toggleGridMode": ""
+    "toggleGridMode": "Режим сітки"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
