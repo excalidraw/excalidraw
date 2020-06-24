@@ -2139,6 +2139,17 @@ class App extends React.Component<any, AppState> {
               x,
               y,
             );
+          } else if (hitElement.groupIds.length) {
+            const allElements = globalSceneState.getElements();
+            dragOffsetXY = getDragOffsetXY(
+              allElements.filter((element) =>
+                element.groupIds.some((groupId) =>
+                  hitElement?.groupIds.includes(groupId),
+                ),
+              ),
+              x,
+              y,
+            );
           } else {
             dragOffsetXY = getDragOffsetXY([hitElement], x, y);
           }
