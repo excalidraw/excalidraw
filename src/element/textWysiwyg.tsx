@@ -197,6 +197,7 @@ export const textWysiwyg = ({
   //  device keyboard is opened.
   window.addEventListener("resize", updateWysiwygStyle);
   window.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();
   editable.select();
