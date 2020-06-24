@@ -2029,7 +2029,7 @@ class App extends React.Component<any, AppState> {
     let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
     let draggingOccurred = false;
-    let dragOffsetXY: [number, number] = [0, 0];
+    let dragOffsetXY: [number, number] | null = null;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
 
@@ -2112,20 +2112,6 @@ class App extends React.Component<any, AppState> {
         hitElement =
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
-
-        if (hitElement && isNonDeletedElement(hitElement)) {
-          if (this.state.selectedElementIds[hitElement.id]) {
-            dragOffsetXY = getDragOffsetXY(selectedElements, x, y);
-          } else if (event.shiftKey) {
-            dragOffsetXY = getDragOffsetXY(
-              [...selectedElements, hitElement],
-              x,
-              y,
-            );
-          } else {
-            dragOffsetXY = getDragOffsetXY([hitElement], x, y);
-          }
-        }
 
         // clear selection if shift is not clicked
         if (
@@ -2343,6 +2329,18 @@ class App extends React.Component<any, AppState> {
     let selectedElementWasDuplicated = false;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      // We need to initialize dragOffsetXY only after we've updated
+      // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
+      // event handler should hopefully ensure we're already working with
+      // the updated state.
+      if (dragOffsetXY === null) {
+        dragOffsetXY = getDragOffsetXY(
+          getSelectedElements(globalSceneState.getElements(), this.state),
+          originX,
+          originY,
+        );
+      }
+
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
         return;
