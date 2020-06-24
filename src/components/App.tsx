@@ -1380,7 +1380,8 @@ class App extends React.Component<any, AppState> {
       ]);
     };
 
-    textWysiwyg(element, {
+    textWysiwyg({
+      id: element.id,
       zoom: this.state.zoom,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(

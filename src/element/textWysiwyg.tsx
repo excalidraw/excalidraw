@@ -3,7 +3,7 @@ import { isWritableElement, getFontString } from "../utils";
 import { globalSceneState } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { TextAlign, VerticalAlign, ExcalidrawTextElement } from "./types";
+import { ExcalidrawElement } from "./types";
 
 const normalizeText = (text: string) => {
   return (
@@ -18,8 +18,6 @@ const normalizeText = (text: string) => {
 const getTransform = (
   width: number,
   height: number,
-  textAlign: TextAlign,
-  verticalAlign: VerticalAlign,
   angle: number,
   zoom: number,
 ) => {
@@ -29,84 +27,64 @@ const getTransform = (
   }px) scale(${zoom}) rotate(${degree}deg)`;
 };
 
-export const textWysiwyg = (
-  element: ExcalidrawTextElement,
-  {
-    zoom,
-    onChange,
-    onSubmit,
-    onCancel,
-    getViewportCoords,
-  }: {
-    zoom: number;
-    onChange?: (text: string) => void;
-    onSubmit: (text: string) => void;
-    onCancel: () => void;
-    getViewportCoords: (x: number, y: number) => [number, number];
-  },
-) => {
-  const {
-    id,
-    x,
-    y,
-    text,
-    width,
-    height,
-    strokeColor,
-    fontSize,
-    fontFamily,
-    opacity,
-    angle,
-    textAlign,
-    verticalAlign,
-  } = element;
+export const textWysiwyg = ({
+  id,
+  zoom,
+  onChange,
+  onSubmit,
+  onCancel,
+  getViewportCoords,
+}: {
+  id: ExcalidrawElement["id"];
+  zoom: number;
+  onChange?: (text: string) => void;
+  onSubmit: (text: string) => void;
+  onCancel: () => void;
+  getViewportCoords: (x: number, y: number) => [number, number];
+}) => {
+  function updateWysiwygStyle() {
+    const updatedElement = globalSceneState.getElement(id);
+    if (isTextElement(updatedElement)) {
+      const [viewportX, viewportY] = getViewportCoords(
+        updatedElement.x,
+        updatedElement.y,
+      );
+      const { textAlign, angle } = updatedElement;
 
-  function getPositions(element: {
-    width: number;
-    x: number;
-    y: number;
-    textAlign: TextAlign;
-  }): { left: string; top: string } {
-    const [viewportX, viewportY] = getViewportCoords(element.x, element.y);
-    return {
-      left: `${viewportX}px`,
-      top: `${viewportY}px`,
-    };
+      editable.value = updatedElement.text;
+
+      Object.assign(editable.style, {
+        font: getFontString(updatedElement),
+        width: `${updatedElement.width}px`,
+        height: `${updatedElement.height}px`,
+        left: `${viewportX}px`,
+        top: `${viewportY}px`,
+        transform: getTransform(
+          updatedElement.width,
+          updatedElement.height,
+          angle,
+          zoom,
+        ),
+        textAlign: textAlign,
+        color: updatedElement.strokeColor,
+        opacity: updatedElement.opacity / 100,
+      });
+    }
   }
 
   const editable = document.createElement("textarea");
 
   editable.dir = "auto";
   editable.tabIndex = 0;
-  editable.value = text;
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
 
-  const { left, top } = getPositions({ textAlign, x, y, width });
-
   Object.assign(editable.style, {
-    color: strokeColor,
-    opacity: opacity / 100,
     position: "fixed",
-    top,
-    left,
-    width: `${width}px`,
-    height: `${height}px`,
-    transform: getTransform(
-      width,
-      height,
-      textAlign,
-      verticalAlign,
-      angle,
-      zoom,
-    ),
-    textAlign: textAlign,
     display: "inline-block",
-    font: getFontString({ fontSize, fontFamily }),
     minHeight: "1em",
     backfaceVisibility: "hidden",
-
     margin: 0,
     padding: 0,
     border: 0,
@@ -117,6 +95,8 @@ export const textWysiwyg = (
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace: "pre",
   });
+
+  updateWysiwygStyle();
 
   if (onChange) {
     editable.oninput = () => {
@@ -162,7 +142,7 @@ export const textWysiwyg = (
     editable.oninput = null;
     editable.onkeydown = null;
 
-    window.removeEventListener("resize", updateWysiwyg);
+    window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", rebindBlur);
@@ -199,38 +179,9 @@ export const textWysiwyg = (
     }
   };
 
-  function updateWysiwyg() {
-    const updatedElement = globalSceneState.getElement(element.id);
-    if (isTextElement(updatedElement)) {
-      const { left, top } = getPositions(updatedElement);
-      const { textAlign, verticalAlign, angle } = updatedElement;
-
-      editable.value = updatedElement.text;
-
-      Object.assign(editable.style, {
-        font: getFontString(updatedElement),
-        width: `${updatedElement.width}px`,
-        height: `${updatedElement.height}px`,
-        top,
-        left,
-        transform: getTransform(
-          updatedElement.width,
-          updatedElement.height,
-          textAlign,
-          verticalAlign,
-          angle,
-          zoom,
-        ),
-        textAlign: textAlign,
-        color: updatedElement.strokeColor,
-        opacity: updatedElement.opacity / 100,
-      });
-    }
-  }
-
   // handle updates of textElement properties of editing element
   const unbindUpdate = globalSceneState.addCallback(() => {
-    updateWysiwyg();
+    updateWysiwygStyle();
     editable.focus();
   });
 
@@ -239,7 +190,7 @@ export const textWysiwyg = (
   editable.onblur = handleSubmit;
   // reposition wysiwyg in case of window resize. Happens on mobile when
   //  device keyboard is opened.
-  window.addEventListener("resize", updateWysiwyg);
+  window.addEventListener("resize", updateWysiwygStyle);
   window.addEventListener("pointerdown", onPointerDown);
   document.body.appendChild(editable);
   editable.focus();
