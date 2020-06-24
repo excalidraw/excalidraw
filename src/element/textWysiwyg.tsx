@@ -162,6 +162,7 @@ export const textWysiwyg = (
     editable.oninput = null;
     editable.onkeydown = null;
 
+    window.removeEventListener("resize", updateWysiwyg);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", rebindBlur);
@@ -198,44 +199,48 @@ export const textWysiwyg = (
     }
   };
 
-  // handle updates of textElement properties of editing element
-  const unbindUpdate = globalSceneState.addCallback(() => {
-    const editingElement = globalSceneState
-      .getElementsIncludingDeleted()
-      .find((element) => element.id === id);
-    if (editingElement && isTextElement(editingElement)) {
-      const { left, top } = getPositions(editingElement);
-      const { textAlign, verticalAlign, angle } = editingElement;
+  function updateWysiwyg() {
+    const updatedElement = globalSceneState.getElement(element.id);
+    if (isTextElement(updatedElement)) {
+      const { left, top } = getPositions(updatedElement);
+      const { textAlign, verticalAlign, angle } = updatedElement;
 
-      editable.value = editingElement.text;
+      editable.value = updatedElement.text;
 
       Object.assign(editable.style, {
-        font: getFontString(editingElement),
-        width: `${editingElement.width}px`,
-        height: `${editingElement.height}px`,
+        font: getFontString(updatedElement),
+        width: `${updatedElement.width}px`,
+        height: `${updatedElement.height}px`,
         top,
         left,
         transform: getTransform(
-          editingElement.width,
-          editingElement.height,
+          updatedElement.width,
+          updatedElement.height,
           textAlign,
           verticalAlign,
           angle,
           zoom,
         ),
         textAlign: textAlign,
-        color: editingElement.strokeColor,
-        opacity: editingElement.opacity / 100,
+        color: updatedElement.strokeColor,
+        opacity: updatedElement.opacity / 100,
       });
     }
+  }
+
+  // handle updates of textElement properties of editing element
+  const unbindUpdate = globalSceneState.addCallback(() => {
+    updateWysiwyg();
     editable.focus();
   });
 
   let isDestroyed = false;
 
   editable.onblur = handleSubmit;
+  // reposition wysiwyg in case of window resize. Happens on mobile when
+  //  device keyboard is opened.
+  window.addEventListener("resize", updateWysiwyg);
   window.addEventListener("pointerdown", onPointerDown);
-  window.addEventListener("wheel", stopEvent, true);
   document.body.appendChild(editable);
   editable.focus();
   editable.select();
