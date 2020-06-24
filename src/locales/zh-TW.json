@@ -2,7 +2,7 @@
   "labels": {
     "paste": "貼上",
     "selectAll": "全選",
-    "moveCanvas": "",
+    "moveCanvas": "移動畫布",
     "copy": "複製",
     "copyAsPng": "複製 PNG 至剪貼簿",
     "copyAsSvg": "複製 SVG 至剪貼簿",
