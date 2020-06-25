@@ -1,3 +1,5 @@
+import { FontFamily } from "./element/types";
+
 export const DRAGGING_THRESHOLD = 10; // 10px
 export const LINE_CONFIRM_THRESHOLD = 10; // 10px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -66,6 +68,11 @@ export const FONT_FAMILY = {
   2: "Helvetica",
   3: "Cascadia",
 } as const;
+
+export const DEFAULT_FONT_SIZE = 20;
+export const DEFAULT_FONT_FAMILY: FontFamily = 1;
+export const DEFAULT_TEXT_ALIGN = "left";
+export const DEFAULT_VERTICAL_ALIGN = "top";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 

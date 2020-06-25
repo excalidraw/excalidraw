@@ -227,6 +227,26 @@ const measureFontSizeFromWH = (
   return null;
 };
 
+const getSidesForResizeHandle = (
+  resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  isResizeFromCenter: boolean,
+) => {
+  return {
+    n:
+      /^(n|ne|nw)$/.test(resizeHandle) ||
+      (isResizeFromCenter && /^(s|se|sw)$/.test(resizeHandle)),
+    s:
+      /^(s|se|sw)$/.test(resizeHandle) ||
+      (isResizeFromCenter && /^(n|ne|nw)$/.test(resizeHandle)),
+    w:
+      /^(w|nw|sw)$/.test(resizeHandle) ||
+      (isResizeFromCenter && /^(e|ne|se)$/.test(resizeHandle)),
+    e:
+      /^(e|ne|se)$/.test(resizeHandle) ||
+      (isResizeFromCenter && /^(w|nw|sw)$/.test(resizeHandle)),
+  };
+};
+
 const resizeSingleTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
   resizeHandle: "nw" | "ne" | "sw" | "se",
@@ -289,7 +309,7 @@ const resizeSingleTextElement = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
     const [nextElementX, nextElementY] = adjustXYWithRotation(
-      resizeHandle,
+      getSidesForResizeHandle(resizeHandle, isResizeFromCenter),
       element.x,
       element.y,
       element.angle,
@@ -297,7 +317,6 @@ const resizeSingleTextElement = (
       deltaY1,
       deltaX2,
       deltaY2,
-      isResizeFromCenter,
     );
     mutateElement(element, {
       fontSize: nextFont.size,
@@ -382,7 +401,7 @@ const resizeSingleElement = (
     element.angle,
   );
   const [nextElementX, nextElementY] = adjustXYWithRotation(
-    resizeHandle,
+    getSidesForResizeHandle(resizeHandle, isResizeFromCenter),
     element.x - flipDiffX,
     element.y - flipDiffY,
     element.angle,
@@ -390,7 +409,6 @@ const resizeSingleElement = (
     deltaY1,
     deltaX2,
     deltaY2,
-    isResizeFromCenter,
   );
   if (
     nextWidth !== 0 &&

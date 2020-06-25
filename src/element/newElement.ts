@@ -7,12 +7,16 @@ import {
   TextAlign,
   FontFamily,
   GroupId,
+  VerticalAlign,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
+import { getElementAbsoluteCoords } from ".";
+import { adjustXYWithRotation } from "../math";
+import { getResizedElementAbsoluteCoords } from "./bounds";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
@@ -72,15 +76,39 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+/** computes element x/y offset based on textAlign/verticalAlign */
+function getTextElementPositionOffsets(
+  opts: {
+    textAlign: ExcalidrawTextElement["textAlign"];
+    verticalAlign: ExcalidrawTextElement["verticalAlign"];
+  },
+  metrics: {
+    width: number;
+    height: number;
+  },
+) {
+  return {
+    x:
+      opts.textAlign === "center"
+        ? metrics.width / 2
+        : opts.textAlign === "right"
+        ? metrics.width
+        : 0,
+    y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+  };
+}
+
 export const newTextElement = (
   opts: {
     text: string;
     fontSize: number;
     fontFamily: FontFamily;
     textAlign: TextAlign;
+    verticalAlign: VerticalAlign;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
+  const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
@@ -88,9 +116,9 @@ export const newTextElement = (
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
-      // Center the text
-      x: opts.x - metrics.width / 2,
-      y: opts.y - metrics.height / 2,
+      verticalAlign: opts.verticalAlign,
+      x: opts.x - offsets.x,
+      y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
@@ -99,6 +127,84 @@ export const newTextElement = (
   );
 
   return textElement;
+};
+
+const getAdjustedDimensions = (
+  element: ExcalidrawTextElement,
+  nextText: string,
+): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  baseline: number;
+} => {
+  const {
+    width: nextWidth,
+    height: nextHeight,
+    baseline: nextBaseline,
+  } = measureText(nextText, getFontString(element));
+
+  const { textAlign, verticalAlign } = element;
+
+  let x, y;
+
+  if (textAlign === "center" && verticalAlign === "middle") {
+    const prevMetrics = measureText(element.text, getFontString(element));
+    const offsets = getTextElementPositionOffsets(element, {
+      width: nextWidth - prevMetrics.width,
+      height: nextHeight - prevMetrics.height,
+    });
+
+    x = element.x - offsets.x;
+    y = element.y - offsets.y;
+  } else {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
+      element,
+      nextWidth,
+      nextHeight,
+    );
+    const deltaX1 = (x1 - nextX1) / 2;
+    const deltaY1 = (y1 - nextY1) / 2;
+    const deltaX2 = (x2 - nextX2) / 2;
+    const deltaY2 = (y2 - nextY2) / 2;
+
+    [x, y] = adjustXYWithRotation(
+      {
+        s: true,
+        e: textAlign === "center" || textAlign === "left",
+        w: textAlign === "center" || textAlign === "right",
+      },
+      element.x,
+      element.y,
+      element.angle,
+      deltaX1,
+      deltaY1,
+      deltaX2,
+      deltaY2,
+    );
+  }
+
+  return {
+    width: nextWidth,
+    height: nextHeight,
+    x: Number.isFinite(x) ? x : element.x,
+    y: Number.isFinite(y) ? y : element.y,
+    baseline: nextBaseline,
+  };
+};
+
+export const updateTextElement = (
+  element: ExcalidrawTextElement,
+  { text, isDeleted }: { text: string; isDeleted?: boolean },
+): ExcalidrawTextElement => {
+  return newElementWith(element, {
+    text,
+    isDeleted: isDeleted ?? element.isDeleted,
+    ...getAdjustedDimensions(element, text),
+  });
 };
 
 export const newLinearElement = (
