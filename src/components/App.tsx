@@ -481,7 +481,25 @@ class App extends React.Component<any, AppState> {
     );
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
   }
+  private beforePrint = withBatchedUpdates((event: Event) => {
+    const elements = globalSceneState.getElements();
+    // const selectedElements = getSelectedElements(elements, this.state);
 
+    const appState = this.state;
+    const canvas = this.canvas;
+    const type = "print";
+    const scale = 1;
+
+    if (canvas) {
+      exportCanvas(type, elements, appState, canvas, {
+        exportBackground: appState.exportBackground,
+        name: appState.name,
+        viewBackgroundColor: appState.viewBackgroundColor,
+        scale,
+        shouldAddWatermark: appState.shouldAddWatermark,
+      });
+    }
+  });
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
       this.state.isCollaborating &&
@@ -1257,6 +1275,19 @@ class App extends React.Component<any, AppState> {
     if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    }
+    // Catch Ctrl + P event on several browsers
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === "p" ||
+        event.charCode === 16 ||
+        event.charCode === 112 ||
+        event.keyCode === 80)
+    ) {
+      this.beforePrint(event);
+      event.cancelBubble = true;
+      event.preventDefault();
+      event.stopImmediatePropagation();
     }
   });
 

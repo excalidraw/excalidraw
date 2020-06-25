@@ -242,3 +242,16 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
 export const isRTL = (text: string) => {
   return RE_RTL_CHECK.test(text);
 };
+
+export const printSvg = (svgDocument: SVGSVGElement) => {
+  const fr = document.createElement("iframe");
+  document.body.appendChild(fr);
+
+  var win = fr.contentWindow;
+
+  win?.focus();
+  win?.document.write(svgDocument.outerHTML);
+  win?.document.close();
+
+  win?.print();
+};
