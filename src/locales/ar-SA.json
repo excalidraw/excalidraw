@@ -2,6 +2,7 @@
   "labels": {
     "paste": "لصق",
     "selectAll": "",
+    "moveCanvas": "",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة كـ PNG",
     "copyAsSvg": "",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -89,7 +92,8 @@
     "createNewRoom": "إنشاء غرفة جديدة",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",

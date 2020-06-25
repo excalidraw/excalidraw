@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Colar",
     "selectAll": "Selecionar tudo",
+    "moveCanvas": "Mover tela",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
@@ -61,7 +62,9 @@
     "yourName": "Seu nome",
     "madeWithExcalidraw": "Feito com Excalidraw",
     "group": "Agrupar seleção",
-    "ungroup": "Desagrupar seleção"
+    "ungroup": "Desagrupar seleção",
+    "collaborators": "Colaboradores",
+    "toggleGridMode": "Alternar modo de grade"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -89,7 +92,8 @@
     "createNewRoom": "Criar nova sala",
     "toggleFullScreen": "Alternar tela cheia",
     "toggleZenMode": "Alternar modo zen",
-    "exitZenMode": "Sair do modo zen"
+    "exitZenMode": "Sair do modo zen",
+    "toggleGridMode": "Alternar modo de grade"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",

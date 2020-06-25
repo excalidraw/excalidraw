@@ -2,6 +2,7 @@
   "labels": {
     "paste": "הדבק",
     "selectAll": "בחר הכל",
+    "moveCanvas": "",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
@@ -61,7 +62,9 @@
     "yourName": "שם",
     "madeWithExcalidraw": "נוצר באמצעות Excalidraw",
     "group": "אחד לקבוצה",
-    "ungroup": "פרק קבוצה"
+    "ungroup": "פרק קבוצה",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -89,7 +92,8 @@
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
     "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
-    "exitZenMode": "צא ממצב תפריט מרחף"
+    "exitZenMode": "צא ממצב תפריט מרחף",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
