@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Постави",
     "selectAll": "Маркирай всичко",
+    "moveCanvas": "",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копиране в клипборда",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -89,7 +92,8 @@
     "createNewRoom": "Създай нова стая",
     "toggleFullScreen": "Превключване на цял екран",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",

@@ -859,10 +859,10 @@ describe("regression tests", () => {
     fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = ["Select all"];
+    const expectedOptions = ["Select all", "Toggle grid mode"];
 
     expect(contextMenu).not.toBeNull();
-    expect(options?.length).toBe(1);
+    expect(options?.length).toBe(2);
     expect(options?.item(0).textContent).toBe(expectedOptions[0]);
   });
 
