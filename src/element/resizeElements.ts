@@ -213,17 +213,30 @@ const measureFontSizeFromWH = (
   nextHeight: number,
 ): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
-  const nextFontSize = element.fontSize * (nextWidth / element.width);
-  const metrics = measureText(
+  let nextFontSize = element.fontSize * (nextWidth / element.width);
+  let metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
-  if (metrics.width - nextWidth < 1) {
+  if (metrics.width <= nextWidth) {
     return {
       size: nextFontSize,
       baseline: metrics.baseline + (nextHeight - metrics.height),
     };
   }
+  // Font size is still too big, so make it smaller
+  nextFontSize *= nextWidth / metrics.width;
+  metrics = measureText(
+    element.text,
+    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  );
+  if (metrics.width <= nextWidth) {
+    return {
+      size: nextFontSize,
+      baseline: metrics.baseline + (nextHeight - metrics.height),
+    };
+  }
+  // Browser doesn't allow make it smaller
   return null;
 };
 
