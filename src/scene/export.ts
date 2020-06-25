@@ -10,8 +10,6 @@ import { AppState } from "../types";
 import { t } from "../i18n";
 import { DEFAULT_FONT_FAMILY } from "../appState";
 
-import jsPDF from "jspdf";
-
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
 export const exportToCanvas = (
@@ -149,54 +147,6 @@ export const exportToSvg = (
 
   return svgRoot;
 };
-
-export const exportToPdf = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  {
-    exportBackground,
-    exportPadding = 10,
-    scale = 1,
-    viewBackgroundColor,
-    shouldAddWatermark,
-  }: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    scale?: number;
-    viewBackgroundColor: string;
-    shouldAddWatermark: boolean;
-  },
-) => {
-  let sceneElements = elements;
-  if (shouldAddWatermark) {
-    const [, , maxX, maxY] = getCommonBounds(elements);
-    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
-  }
-
-  var canvas = exportToCanvas(elements, appState, {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding,
-    scale,
-    shouldAddWatermark,
-  });
-  // calculate canvas dimensions
-  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height =
-    distance(minY, maxY) +
-    exportPadding +
-    (shouldAddWatermark ? 0 : exportPadding);
-
-  var imgData = canvas.toDataURL("image/jpeg", 1.0);
-  var pdf = new jsPDF("l", "pt", [width, height]);
-
-  pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-  var output = pdf.output("blob");
-
-  return output;
-};
-
 const getWatermarkElement = (maxX: number, maxY: number) => {
   const text = t("labels.madeWithExcalidraw");
   const fontSize = 16;

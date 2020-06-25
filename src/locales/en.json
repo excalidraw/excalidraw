@@ -70,7 +70,6 @@
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
-    "exportToPdf": "Export to PDF",
     "exportToPrint": "Export to PRINT",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",

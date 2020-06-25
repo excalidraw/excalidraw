@@ -6,7 +6,7 @@ import {
 import { getDefaultAppState } from "../appState";
 
 import { AppState } from "../types";
-import { exportToCanvas, exportToSvg, exportToPdf } from "../scene/export";
+import { exportToCanvas, exportToSvg } from "../scene/export";
 import { fileSave } from "browser-nativefs";
 
 import { t } from "../i18n";
@@ -320,19 +320,6 @@ export const exportCanvas = async (
       copyCanvasToClipboardAsSvg(tempSvg);
       return;
     }
-  }
-  if (type === "pdf") {
-    const tempPdf = exportToPdf(elements, appState, {
-      exportBackground,
-      viewBackgroundColor,
-      scale,
-      exportPadding,
-      shouldAddWatermark,
-    });
-    await fileSave(new Blob([tempPdf], { type: "application/pdf" }), {
-      fileName: `${name}.pdf`,
-    });
-    return;
   }
   if (type === "print") {
     const tempSvg = exportToSvg(elements, {
