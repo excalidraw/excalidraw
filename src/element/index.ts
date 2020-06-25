@@ -8,6 +8,7 @@ import { isInvisiblySmallElement } from "./sizeHelpers";
 export {
   newElement,
   newTextElement,
+  updateTextElement,
   newLinearElement,
   duplicateElement,
 } from "./newElement";

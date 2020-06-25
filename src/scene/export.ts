@@ -4,11 +4,11 @@ import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS, measureText, getFontString } from "../utils";
+import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { DEFAULT_FONT_FAMILY } from "../appState";
+import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -150,20 +150,13 @@ export const exportToSvg = (
 };
 
 const getWatermarkElement = (maxX: number, maxY: number) => {
-  const text = t("labels.madeWithExcalidraw");
-  const fontSize = 16;
-  const fontFamily = DEFAULT_FONT_FAMILY;
-  const { width: textWidth } = measureText(
-    text,
-    getFontString({ fontSize, fontFamily }),
-  );
-
   return newTextElement({
-    text,
-    fontSize,
-    fontFamily,
-    textAlign: "center",
-    x: maxX - textWidth / 2,
+    text: t("labels.madeWithExcalidraw"),
+    fontSize: 16,
+    fontFamily: DEFAULT_FONT_FAMILY,
+    textAlign: "right",
+    verticalAlign: DEFAULT_VERTICAL_ALIGN,
+    x: maxX,
     y: maxY + 16,
     strokeColor: oc.gray[5],
     backgroundColor: "transparent",

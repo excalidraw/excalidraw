@@ -60,6 +60,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     text: string;
     baseline: number;
     textAlign: TextAlign;
+    verticalAlign: VerticalAlign;
   }>;
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
@@ -72,6 +73,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type PointerType = "mouse" | "pen" | "touch";
 
 export type TextAlign = "left" | "center" | "right";
+export type VerticalAlign = "top" | "middle";
 
 export type FontFamily = keyof typeof FONT_FAMILY;
 export type FontString = string & { _brand: "fontString" };

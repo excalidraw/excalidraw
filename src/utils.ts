@@ -88,8 +88,12 @@ export const measureText = (text: string, font: FontString) => {
   line.style.whiteSpace = "pre";
   line.style.font = font;
   body.appendChild(line);
-  // Now we can measure width and height of the letter
-  line.innerText = text;
+  line.innerText = text
+    .split("\n")
+    // replace empty lines with single space because leading/trailing empty
+    //  lines would be stripped from computation
+    .map((x) => x || " ")
+    .join("\n");
   const width = line.offsetWidth;
   const height = line.offsetHeight;
   // Now creating 1px sized item that will be aligned to baseline
@@ -214,13 +218,8 @@ export const sceneCoordsToViewportCoords = (
   scale: number,
 ) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
-  const sceneXWithZoomAndScroll =
-    zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
-  const sceneYWithZoomAndScroll =
-    zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
-
-  const x = sceneXWithZoomAndScroll;
-  const y = sceneYWithZoomAndScroll;
+  const x = zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
+  const y = zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
 
   return { x, y };
 };

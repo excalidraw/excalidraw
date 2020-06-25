@@ -57,7 +57,12 @@ export const rotate = (
   ];
 
 export const adjustXYWithRotation = (
-  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  sides: {
+    n?: boolean;
+    e?: boolean;
+    s?: boolean;
+    w?: boolean;
+  },
   x: number,
   y: number,
   angle: number,
@@ -65,49 +70,35 @@ export const adjustXYWithRotation = (
   deltaY1: number,
   deltaX2: number,
   deltaY2: number,
-  isResizeFromCenter: boolean,
 ): [number, number] => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  if (side === "e" || side === "ne" || side === "se") {
-    if (isResizeFromCenter) {
-      x += deltaX1 + deltaX2;
-    } else {
-      x += deltaX1 * (1 + cos);
-      y += deltaX1 * sin;
-      x += deltaX2 * (1 - cos);
-      y += deltaX2 * -sin;
-    }
+  if (sides.e && sides.w) {
+    x += deltaX1 + deltaX2;
+  } else if (sides.e) {
+    x += deltaX1 * (1 + cos);
+    y += deltaX1 * sin;
+    x += deltaX2 * (1 - cos);
+    y += deltaX2 * -sin;
+  } else if (sides.w) {
+    x += deltaX1 * (1 - cos);
+    y += deltaX1 * -sin;
+    x += deltaX2 * (1 + cos);
+    y += deltaX2 * sin;
   }
-  if (side === "s" || side === "sw" || side === "se") {
-    if (isResizeFromCenter) {
-      y += deltaY1 + deltaY2;
-    } else {
-      x += deltaY1 * -sin;
-      y += deltaY1 * (1 + cos);
-      x += deltaY2 * sin;
-      y += deltaY2 * (1 - cos);
-    }
-  }
-  if (side === "w" || side === "nw" || side === "sw") {
-    if (isResizeFromCenter) {
-      x += deltaX1 + deltaX2;
-    } else {
-      x += deltaX1 * (1 - cos);
-      y += deltaX1 * -sin;
-      x += deltaX2 * (1 + cos);
-      y += deltaX2 * sin;
-    }
-  }
-  if (side === "n" || side === "nw" || side === "ne") {
-    if (isResizeFromCenter) {
-      y += deltaY1 + deltaY2;
-    } else {
-      x += deltaY1 * sin;
-      y += deltaY1 * (1 - cos);
-      x += deltaY2 * -sin;
-      y += deltaY2 * (1 + cos);
-    }
+
+  if (sides.n && sides.s) {
+    y += deltaY1 + deltaY2;
+  } else if (sides.n) {
+    x += deltaY1 * sin;
+    y += deltaY1 * (1 - cos);
+    x += deltaY2 * -sin;
+    y += deltaY2 * (1 + cos);
+  } else if (sides.s) {
+    x += deltaY1 * -sin;
+    y += deltaY1 * (1 + cos);
+    x += deltaY2 * sin;
+    y += deltaY2 * (1 - cos);
   }
   return [x, y];
 };
