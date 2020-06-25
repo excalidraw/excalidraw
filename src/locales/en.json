@@ -63,6 +63,7 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
+    "print": "Print",
     "collaborators": "Collaborators"
   },
   "buttons": {
@@ -70,7 +71,7 @@
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
-    "exportToPrint": "Export to PRINT",
+    "exportToPrint": "Print",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Save",
