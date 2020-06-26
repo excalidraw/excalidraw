@@ -92,8 +92,7 @@
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
     "toggleZenMode": "تغییر به حالت تمرکز",
-    "exitZenMode": "خروج از حالت تمرکز",
-    "toggleGridMode": "سويچ خطوط راهنما"
+    "exitZenMode": "خروج از حالت تمرکز"
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
