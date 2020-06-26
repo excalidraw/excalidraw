@@ -92,8 +92,7 @@
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
     "toggleZenMode": "Дзен-режим",
-    "exitZenMode": "Вийти з дзен-режиму",
-    "toggleGridMode": "Режим сітки"
+    "exitZenMode": "Вийти з дзен-режиму"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
