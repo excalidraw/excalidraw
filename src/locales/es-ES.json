@@ -151,8 +151,8 @@
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
     "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, usted perderá los datos a menos que los exporte a un archivo o un enlace para compartir.",
-    "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
-    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena, localmente. Tenga en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
+    "desc_shareLink": "Comparte este enlace con tus colaboradores:",
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena localmente. Ten en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
   },
   "errorDialog": {
     "title": "Error"
@@ -167,12 +167,12 @@
     "curvedLine": "Línea curva",
     "editor": "Editor",
     "view": "Vista",
-    "blog": "Leer nuestro blog",
-    "howto": "Seguir nuestras guías",
+    "blog": "Lee nuestro blog",
+    "howto": "Sigue nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": "Ajustar la vista para mostrar todos los elementos"
+    "zoomToFit": "Ajustar para mostrar todos los elementos"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
