@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставити",
     "selectAll": "Вибрати все",
+    "moveCanvas": "Перемістити полотно",
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
@@ -61,7 +62,9 @@
     "yourName": "Ваше ім’я",
     "madeWithExcalidraw": "Накреслене в Excalidraw",
     "group": "Групувати виділене",
-    "ungroup": "Розгрупувати виділене"
+    "ungroup": "Розгрупувати виділене",
+    "collaborators": "Співавтори",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -71,7 +74,7 @@
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "save": "Зберегти",
-    "saveAs": "",
+    "saveAs": "Зберегти як",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
     "close": "Закрити",
@@ -89,7 +92,8 @@
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
     "toggleZenMode": "Дзен-режим",
-    "exitZenMode": "Вийти з дзен-режиму"
+    "exitZenMode": "Вийти з дзен-режиму",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",

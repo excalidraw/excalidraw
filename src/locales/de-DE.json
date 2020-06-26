@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
+    "moveCanvas": "Leinwand verschieben",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
@@ -61,7 +62,9 @@
     "yourName": "Dein Name",
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
-    "ungroup": "Gruppierung aufheben"
+    "ungroup": "Gruppierung aufheben",
+    "collaborators": "Mitarbeitende",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -89,7 +92,8 @@
     "createNewRoom": "Neuen Raum erstellen",
     "toggleFullScreen": "Vollbild umschalten",
     "toggleZenMode": "Zen-Modus umschalten",
-    "exitZenMode": "Zen-Modus verlassen"
+    "exitZenMode": "Zen-Modus verlassen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",

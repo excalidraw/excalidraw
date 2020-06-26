@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Ngjit",
     "selectAll": "Përzgjidh të gjitha",
+    "moveCanvas": "",
     "copy": "Kopjo",
     "copyAsPng": "Kopjo në clipboard si PNG",
     "copyAsSvg": "Kopjo në clipboard si SVG",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "",
@@ -89,7 +92,8 @@
     "createNewRoom": "",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "",

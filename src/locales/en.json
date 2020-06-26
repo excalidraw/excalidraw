@@ -63,7 +63,8 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
-    "collaborators": "Collaborators"
+    "collaborators": "Collaborators",
+    "toggleGridMode": "Toggle grid mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -91,7 +92,8 @@
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "toggleGridMode": "Toggle grid mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

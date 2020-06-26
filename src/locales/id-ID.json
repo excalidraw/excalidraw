@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Tempel",
     "selectAll": "Pilih semua",
+    "moveCanvas": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
     "copyAsSvg": "Salin ke Papan Klip Sebagai SVG",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -89,7 +92,8 @@
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
     "toggleZenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",

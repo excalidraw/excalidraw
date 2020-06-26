@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставить",
     "selectAll": "Выбрать все",
+    "moveCanvas": "",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
@@ -61,7 +62,9 @@
     "yourName": "Ваше имя",
     "madeWithExcalidraw": "Сделано в Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -89,7 +92,8 @@
     "createNewRoom": "Создать новую комнату",
     "toggleFullScreen": "Переключить полноэкранный режим",
     "toggleZenMode": "Переключить режим концентрации внимания",
-    "exitZenMode": "Выключить режим концентрации внимания"
+    "exitZenMode": "Выключить режим концентрации внимания",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",

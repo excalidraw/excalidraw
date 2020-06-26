@@ -20,7 +20,7 @@ import { AppState } from "../../src/types";
 import { t } from "../i18n";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../appState";
+import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],

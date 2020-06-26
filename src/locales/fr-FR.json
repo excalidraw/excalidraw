@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
+    "moveCanvas": "Déplacer le canevas",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
@@ -61,7 +62,9 @@
     "yourName": "Votre nom",
     "madeWithExcalidraw": "Fabriqué avec Excalidraw",
     "group": "Grouper la sélection",
-    "ungroup": "Dégrouper la sélection"
+    "ungroup": "Dégrouper la sélection",
+    "collaborators": "Collaborateurs",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -89,7 +92,8 @@
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
-    "exitZenMode": "Quitter le mode zen"
+    "exitZenMode": "Quitter le mode zen",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
@@ -174,7 +178,7 @@
     "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Vous avez collé une feuille de calcul sans données numérique.",
+    "tooManyColumns": "Vous avez collé une feuille de calcul avec plus de deux colonnes."
   }
 }
