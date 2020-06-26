@@ -482,14 +482,15 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
   }
   private beforePrint = withBatchedUpdates((event: Event) => {
-    const elements = globalSceneState.getElements();
-    // const selectedElements = getSelectedElements(elements, this.state);
+    const globalElements = globalSceneState.getElements();
+    const selectedElements = getSelectedElements(globalElements, this.state);
 
     const appState = this.state;
     const canvas = this.canvas;
     const type = "print";
     const scale = 1;
-
+    const elements =
+      selectedElements.length !== 0 ? selectedElements : globalElements;
     if (canvas) {
       exportCanvas(type, elements, appState, canvas, {
         exportBackground: appState.exportBackground,
