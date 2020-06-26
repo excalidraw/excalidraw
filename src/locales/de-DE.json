@@ -92,8 +92,7 @@
     "createNewRoom": "Neuen Raum erstellen",
     "toggleFullScreen": "Vollbild umschalten",
     "toggleZenMode": "Zen-Modus umschalten",
-    "exitZenMode": "Zen-Modus verlassen",
-    "toggleGridMode": "Gitterlinien ein-/ausschalten"
+    "exitZenMode": "Zen-Modus verlassen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
