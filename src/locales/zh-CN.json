@@ -92,8 +92,7 @@
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
     "toggleZenMode": "切换禅模式",
-    "exitZenMode": "退出禅模式",
-    "toggleGridMode": ""
+    "exitZenMode": "退出禅模式"
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
