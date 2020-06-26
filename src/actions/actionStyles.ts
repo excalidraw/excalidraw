@@ -4,13 +4,13 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { KEYS } from "../keys";
+import { register } from "./register";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
-} from "../appState";
-import { register } from "./register";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+} from "../constants";
 
 let copiedStyles: string = "{}";
 
