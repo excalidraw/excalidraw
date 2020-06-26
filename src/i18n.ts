@@ -9,11 +9,7 @@ export const languages = [
   { lng: "ca-ES", label: "Catalan", data: "ca-ES.json" },
   { lng: "el-GR", label: "Ελληνικά", data: "el-GR.json" },
   { lng: "fr-FR", label: "Français", data: "fr-FR.json" },
-  {
-    lng: "id-ID",
-    label: "Bahasa Indonesia",
-    data: "id-ID.json",
-  },
+  { lng: "id-ID", label: "Bahasa Indonesia", data: "id-ID.json" },
   { lng: "it-IT", label: "Italiano", data: "it-IT.json" },
   { lng: "hu-HU", label: "Magyar", data: "hu-HU.json" },
   { lng: "nl-NL", label: "Nederlands", data: "nl-NL.json" },
@@ -27,18 +23,8 @@ export const languages = [
   { lng: "ko-KR", label: "한국어", data: "ko-KR.json" },
   { lng: "zh-TW", label: "繁體中文", data: "zh-TW.json" },
   { lng: "zh-CN", label: "简体中文", data: "zh-CN.json" },
-  {
-    lng: "ar-SA",
-    label: "العربية",
-    data: "ar-SA.json",
-    rtl: true,
-  },
-  {
-    lng: "he-IL",
-    label: "עברית",
-    data: "he-IL.json",
-    rtl: true,
-  },
+  { lng: "ar-SA", label: "العربية", data: "ar-SA.json", rtl: true },
+  { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
 ];
 
 let currentLanguage = languages[0];
