@@ -21,7 +21,7 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
-import { measureText, getFontString } from "../utils";
+import { measureText, getFontString, TEXT_WIDTH_PADDING } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -213,24 +213,12 @@ const measureFontSizeFromWH = (
   nextHeight: number,
 ): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
-  let nextFontSize = element.fontSize * (nextWidth / element.width);
-  let metrics = measureText(
+  const nextFontSize = element.fontSize * (nextWidth / element.width);
+  const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
-  if (metrics.width <= nextWidth) {
-    return {
-      size: nextFontSize,
-      baseline: metrics.baseline + (nextHeight - metrics.height),
-    };
-  }
-  // Font size is still too big, so make it smaller
-  nextFontSize *= nextWidth / metrics.width;
-  metrics = measureText(
-    element.text,
-    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-  );
-  if (metrics.width <= nextWidth) {
+  if (metrics.width <= nextWidth + TEXT_WIDTH_PADDING) {
     return {
       size: nextFontSize,
       baseline: metrics.baseline + (nextHeight - metrics.height),

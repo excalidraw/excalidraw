@@ -80,6 +80,8 @@ export const getFontString = ({
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };
 
+export const TEXT_WIDTH_PADDING = 5;
+
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (text: string, font: FontString) => {
   const line = document.createElement("div");
@@ -94,7 +96,7 @@ export const measureText = (text: string, font: FontString) => {
     //  lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const width = line.offsetWidth;
+  const width = line.offsetWidth + TEXT_WIDTH_PADDING;
   const height = line.offsetHeight;
   // Now creating 1px sized item that will be aligned to baseline
   // to calculate baseline shift
