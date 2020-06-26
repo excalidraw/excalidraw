@@ -92,8 +92,7 @@
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
-    "exitZenMode": "Quitter le mode zen",
-    "toggleGridMode": "Basculer le mode grille"
+    "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
