@@ -92,8 +92,7 @@
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
-    "exitZenMode": "Uscire dalla modalità zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
