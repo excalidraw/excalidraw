@@ -26,3 +26,12 @@
   padding: 0.8em 1.2em;
   font-size: 1.3em;
 }
+
+@media print {
+  body > * {
+    display: none;
+  }
+  #printContainer {
+    display: block !important;
+  }
+}

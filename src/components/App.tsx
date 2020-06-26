@@ -494,53 +494,28 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.AFTER_PRINT, this.afterPrint);
   }
 
-  private handlePrintShortcut = withBatchedUpdates((event: Event) => {
-    const globalElements = globalSceneState.getElements();
-    const selectedElements = getSelectedElements(globalElements, this.state);
-
-    const appState = this.state;
-    const canvas = this.canvas;
-    const type = "print";
-    const scale = 1;
-    const elements =
-      selectedElements.length !== 0 ? selectedElements : globalElements;
-    if (canvas) {
-      exportCanvas(type, elements, appState, canvas, {
-        exportBackground: appState.exportBackground,
-        name: appState.name,
-        viewBackgroundColor: appState.viewBackgroundColor,
-        scale,
-        shouldAddWatermark: appState.shouldAddWatermark,
-      });
-    }
-  });
-
   private beforePrint = withBatchedUpdates((event: Event) => {
-    const globalElements = globalSceneState.getElements();
-    const selectedElements = getSelectedElements(globalElements, this.state);
-    const appState = this.state;
-    const elements =
-      selectedElements.length !== 0 ? selectedElements : globalElements;
-    const tempSvg = exportToSvg(elements, {
-      exportBackground: appState.exportBackground,
-      exportPadding: 10,
-      viewBackgroundColor: appState.viewBackgroundColor,
-      shouldAddWatermark: appState.shouldAddWatermark,
-    });
-    const doc = document.querySelector("#root");
-    doc?.classList.add("visually-hidden");
-    const printView = document.querySelector("#print-view");
-    if (printView) {
-      printView.innerHTML = tempSvg.outerHTML;
-      printView?.classList.remove("visually-hidden");
-    }
+    const elements = globalSceneState.getElements();
+    const selectedElements = getSelectedElements(elements, this.state);
+    const tempSvg = exportToSvg(
+      selectedElements.length !== 0 ? selectedElements : elements,
+      {
+        exportBackground: this.state.exportBackground,
+        exportPadding: 10,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+        shouldAddWatermark: this.state.shouldAddWatermark,
+      },
+    );
+
+    const printContainer = document.createElement("div");
+    printContainer.id = "printContainer";
+    printContainer.style.display = "none";
+    printContainer.innerHTML = tempSvg.outerHTML;
+    document.body.appendChild(printContainer);
   });
 
   private afterPrint = withBatchedUpdates((event: Event) => {
-    const printView = document.querySelector("#print-view");
-    const doc = document.querySelector("#root");
-    printView?.classList.add("visually-hidden");
-    doc?.classList.remove("visually-hidden");
+    document.querySelector("#printContainer")?.remove();
   });
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
@@ -1331,19 +1306,6 @@ class App extends React.Component<any, AppState> {
     if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
-    }
-    // Catch Ctrl + P event on several browsers
-    if (
-      (event.ctrlKey || event.metaKey) &&
-      (event.key === "p" ||
-        event.charCode === 16 ||
-        event.charCode === 112 ||
-        event.keyCode === 80)
-    ) {
-      this.handlePrintShortcut(event);
-      event.cancelBubble = true;
-      event.preventDefault();
-      event.stopImmediatePropagation();
     }
   });
 

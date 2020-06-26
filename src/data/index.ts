@@ -20,8 +20,6 @@ import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
 
-import { printSvg } from "../utils";
-
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
 export { saveToLocalStorage } from "./localStorage";
@@ -324,15 +322,7 @@ export const exportCanvas = async (
     }
   }
   if (type === "print") {
-    const svgDocument = exportToSvg(elements, {
-      exportBackground,
-      viewBackgroundColor,
-      exportPadding,
-      shouldAddWatermark,
-    });
-
-    printSvg(svgDocument);
-
+    window.print();
     return;
   }
 
