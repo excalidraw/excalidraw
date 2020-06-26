@@ -248,7 +248,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={[getShortcutKey("Alt+Z")]}
               />
               <Shortcut
-                label={t("buttons.toggleGridMode")}
+                label={t("labels.toggleGridMode")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
               />
             </ShortcutIsland>
