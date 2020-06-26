@@ -70,3 +70,5 @@ export const FONT_FAMILY = {
 } as const;
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
+
+export const GRID_SIZE = 20; // TODO make it configurable?

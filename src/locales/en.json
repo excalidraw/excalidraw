@@ -63,14 +63,16 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
-    "collaborators": "Collaborators"
+    "print": "Print",
+    "collaborators": "Collaborators",
+    "toggleGridMode": "Toggle grid mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
-    "exportToPrint": "Export to PRINT",
+    "exportToPrint": "Print",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Save",
@@ -92,7 +94,8 @@
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "toggleGridMode": "Toggle grid mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

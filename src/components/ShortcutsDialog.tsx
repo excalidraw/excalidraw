@@ -247,6 +247,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("buttons.toggleZenMode")}
                 shortcuts={[getShortcutKey("Alt+Z")]}
               />
+              <Shortcut
+                label={t("buttons.toggleGridMode")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
+              />
             </ShortcutIsland>
           </Column>
           <Column>
@@ -333,6 +337,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut
                 label={t("labels.ungroup")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
+              />
+              <Shortcut
+                label={t("labels.print")}
+                shortcuts={[getShortcutKey("Ctrl+P")]}
               />
             </ShortcutIsland>
           </Column>

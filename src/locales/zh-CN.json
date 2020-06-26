@@ -2,6 +2,7 @@
   "labels": {
     "paste": "粘贴",
     "selectAll": "选择所有",
+    "moveCanvas": "移动画布",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
@@ -61,7 +62,9 @@
     "yourName": "您的姓名",
     "madeWithExcalidraw": "使用 Excalidraw 创建",
     "group": "组选",
-    "ungroup": "取消组选"
+    "ungroup": "取消组选",
+    "collaborators": "协作者",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -71,7 +74,7 @@
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "save": "保存",
-    "saveAs": "",
+    "saveAs": "保存为",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
     "close": "关闭",
@@ -89,7 +92,8 @@
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
     "toggleZenMode": "切换禅模式",
-    "exitZenMode": "退出禅模式"
+    "exitZenMode": "退出禅模式",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个 canvas。你确定吗?",
@@ -174,7 +178,7 @@
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "您粘贴了一个没有数字列的表格。",
+    "tooManyColumns": "您粘贴了两列以上的表格。"
   }
 }

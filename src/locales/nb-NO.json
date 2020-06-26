@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Velg alt",
+    "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
@@ -61,7 +62,9 @@
     "yourName": "Ditt navn",
     "madeWithExcalidraw": "Laget med Excalidraw",
     "group": "Gruppér utvalg",
-    "ungroup": "Avgruppér utvalg"
+    "ungroup": "Avgruppér utvalg",
+    "collaborators": "Samarbeidspartnere",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -71,7 +74,7 @@
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "save": "Lagre",
-    "saveAs": "",
+    "saveAs": "Lagre som",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
@@ -89,7 +92,8 @@
     "createNewRoom": "Opprett et nytt rom",
     "toggleFullScreen": "Skru fullskjerm av/på",
     "toggleZenMode": "Slå av/på zen-modus",
-    "exitZenMode": "Avslutt zen-modus"
+    "exitZenMode": "Avslutt zen-modus",
+    "toggleGridMode": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",

@@ -3,6 +3,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 export const languages = [
   { lng: "en", label: "English", data: require("./locales/en.json") },
   { lng: "bg-BG", label: "Български", data: require("./locales/bg-BG.json") },
+  { lng: "nb-No", label: "Bokmål", data: require("./locales/nb-NO.json") },
   { lng: "de-DE", label: "Deutsch", data: require("./locales/de-DE.json") },
   { lng: "es-ES", label: "Español", data: require("./locales/es-ES.json") },
   { lng: "ca-ES", label: "Catalan", data: require("./locales/ca-ES.json") },
@@ -16,7 +17,6 @@ export const languages = [
   { lng: "it-IT", label: "Italiano", data: require("./locales/it-IT.json") },
   { lng: "hu-HU", label: "Magyar", data: require("./locales/hu-HU.json") },
   { lng: "nl-NL", label: "Nederlands", data: require("./locales/nl-NL.json") },
-  { lng: "no-No", label: "Norsk", data: require("./locales/no-NO.json") },
   { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
   { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
   { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
