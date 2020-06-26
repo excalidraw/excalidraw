@@ -44,6 +44,8 @@ export enum EVENT {
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
   TOUCH_END = "touchend",
+  BEFORE_PRINT = "beforeprint",
+  AFTER_PRINT = "afterprint",
 }
 
 export const ENV = {

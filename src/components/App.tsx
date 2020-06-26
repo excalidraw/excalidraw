@@ -138,6 +138,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
 } from "../groups";
+import { exportToSvg } from "../scene/export";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -441,6 +442,9 @@ class App extends React.Component<any, AppState> {
       false,
     );
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+
+    window.removeEventListener(EVENT.BEFORE_PRINT, this.beforePrint);
+    window.removeEventListener(EVENT.AFTER_PRINT, this.afterPrint);
   }
 
   private addEventListeners() {
@@ -480,8 +484,12 @@ class App extends React.Component<any, AppState> {
       false,
     );
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+
+    window.addEventListener(EVENT.BEFORE_PRINT, this.beforePrint);
+    window.addEventListener(EVENT.AFTER_PRINT, this.afterPrint);
   }
-  private beforePrint = withBatchedUpdates((event: Event) => {
+
+  private handlePrintShortcut = withBatchedUpdates((event: Event) => {
     const globalElements = globalSceneState.getElements();
     const selectedElements = getSelectedElements(globalElements, this.state);
 
@@ -501,6 +509,35 @@ class App extends React.Component<any, AppState> {
       });
     }
   });
+
+  private beforePrint = withBatchedUpdates((event: Event) => {
+    const globalElements = globalSceneState.getElements();
+    const selectedElements = getSelectedElements(globalElements, this.state);
+    const appState = this.state;
+    const elements =
+      selectedElements.length !== 0 ? selectedElements : globalElements;
+    const tempSvg = exportToSvg(elements, {
+      exportBackground: appState.exportBackground,
+      exportPadding: 10,
+      viewBackgroundColor: appState.viewBackgroundColor,
+      shouldAddWatermark: appState.shouldAddWatermark,
+    });
+    const doc = document.querySelector("#root");
+    doc?.classList.add("visually-hidden");
+    const printView = document.querySelector("#print-view");
+    if (printView) {
+      printView.innerHTML = tempSvg.outerHTML;
+      printView?.classList.remove("visually-hidden");
+    }
+  });
+
+  private afterPrint = withBatchedUpdates((event: Event) => {
+    const printView = document.querySelector("#print-view");
+    const doc = document.querySelector("#root");
+    printView?.classList.add("visually-hidden");
+    doc?.classList.remove("visually-hidden");
+  });
+
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
       this.state.isCollaborating &&
@@ -1285,7 +1322,7 @@ class App extends React.Component<any, AppState> {
         event.charCode === 112 ||
         event.keyCode === 80)
     ) {
-      this.beforePrint(event);
+      this.handlePrintShortcut(event);
       event.cancelBubble = true;
       event.preventDefault();
       event.stopImmediatePropagation();
