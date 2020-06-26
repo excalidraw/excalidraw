@@ -92,8 +92,7 @@
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode",
-    "toggleGridMode": "Toggle grid mode"
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
