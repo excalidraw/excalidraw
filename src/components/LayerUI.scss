@@ -1,19 +1,26 @@
 @import "open-color/open-color";
 
 .layer-ui__wrapper {
-  .encrypted-icon {
-    position: relative;
+  &__icon {
     margin-inline-start: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: var(--space-factor);
-    color: $oc-green-9;
 
     svg {
-      width: 1.2rem;
-      height: 1.2rem;
+      width: 1.1rem;
+      height: 1.1rem;
     }
+  }
+
+  .github-icon {
+    color: $oc-black;
+  }
+
+  .encrypted-icon {
+    position: relative;
+    color: $oc-green-9;
 
     &.tooltip .tooltip-text {
       visibility: hidden;

@@ -27,7 +27,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
-import { shield } from "./icons";
+import { github, shield } from "./icons";
 import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
@@ -65,7 +65,7 @@ const LayerUI = ({
   // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
-      className={`encrypted-icon tooltip zen-mode-visibility ${
+      className={`layer-ui__wrapper__icon encrypted-icon tooltip zen-mode-visibility ${
         zenModeEnabled ? "zen-mode-visibility--hidden" : ""
       }`}
       href="https://blog.excalidraw.com/end-to-end-encryption/"
@@ -237,6 +237,17 @@ const LayerUI = ({
                     zoom={appState.zoom}
                   />
                 </Island>
+                <a
+                  className={`layer-ui__wrapper__icon github-icon zen-mode-visibility ${
+                    zenModeEnabled ? "zen-mode-visibility--hidden" : ""
+                  }`}
+                  href="https://github.com/excalidraw/excalidraw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub repository"
+                >
+                  {github}
+                </a>
                 {renderEncryptedIcon()}
               </Section>
             </Stack.Col>
