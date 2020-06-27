@@ -10,6 +10,7 @@ import {
 
 export const getDefaultAppState = (): AppState => {
   return {
+    isTouchDevice: false,
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
