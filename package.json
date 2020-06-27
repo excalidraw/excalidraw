@@ -86,7 +86,7 @@
     "test": "npm run test:app",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
     "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test:app": "react-scripts test --env=jsdom --passWithNoTests",
+    "test:app": "react-scripts test --env=jsdom-fourteen --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:other": "npm run prettier -- --list-different",
