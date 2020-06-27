@@ -1,6 +1,11 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 
-export const languages = [
+const percentages: Record<
+  string,
+  number
+> = require("./locales/percentages.json");
+
+const allLanguages = [
   { lng: "en", label: "English", data: "en.json" },
   { lng: "bg-BG", label: "Български", data: "bg-BG.json" },
   { lng: "de-DE", label: "Deutsch", data: "de-DE.json" },
@@ -26,6 +31,10 @@ export const languages = [
   { lng: "ar-SA", label: "العربية", data: "ar-SA.json", rtl: true },
   { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
 ];
+
+export const languages = allLanguages.filter(
+  (lang) => percentages[lang.lng] > 85,
+);
 
 let currentLanguage = languages[0];
 let currentLanguageData = {};

@@ -25,7 +25,7 @@ for (let i = 0; i < locales.length; i++) {
 
   const percentage = (100 * translatedKeys.length) / allKeys.length;
 
-  percentages[locales[i]] = parseInt(percentage);
+  percentages[locales[i].replace(".json", "")] = parseInt(percentage);
 }
 
 writeFileSync(
