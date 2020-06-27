@@ -57,7 +57,7 @@ export type SocketUpdateDataSource = {
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
-      touchDevice: boolean;
+      remoteIsTouchDevice: boolean;
     };
   };
 };

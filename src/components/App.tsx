@@ -194,7 +194,7 @@ class App extends React.Component<any, AppState> {
   public state: AppState = {
     ...getDefaultAppState(),
     isLoading: true,
-    isTouchDevice: false,
+    remoteIsTouchDevice: false,
   };
 
   constructor(props: any) {
@@ -668,9 +668,9 @@ class App extends React.Component<any, AppState> {
   }
 
   private onTapStart = (event: TouchEvent) => {
-    this.setState((prevState) => ({
-      isTouchDevice: !prevState.isTouchDevice,
-    }));
+    this.setState({
+      remoteIsTouchDevice: true,
+    });
 
     if (!didTapTwice) {
       didTapTwice = true;
@@ -708,7 +708,7 @@ class App extends React.Component<any, AppState> {
       this.setState({
         previousSelectedElementIds: {},
         selectedElementIds: previousSelectedElementIds,
-        isTouchDevice: false,
+        remoteIsTouchDevice: false,
       });
     }
   };
@@ -1100,7 +1100,7 @@ class App extends React.Component<any, AppState> {
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
           username: this.state.username,
-          touchDevice: this.state.isTouchDevice,
+          remoteIsTouchDevice: this.state.remoteIsTouchDevice,
         },
       };
       return this.portal._broadcastSocketData(

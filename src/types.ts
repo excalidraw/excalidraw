@@ -27,7 +27,7 @@ export type Collaborator = {
 };
 
 export type AppState = {
-  isTouchDevice: boolean;
+  remoteIsTouchDevice: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
