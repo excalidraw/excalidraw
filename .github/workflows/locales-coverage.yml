@@ -1,0 +1,26 @@
+name: Build locales percentages
+
+on:
+  push:
+    paths:
+      - "src/locales/**.json"
+
+jobs:
+  locales:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Create report file
+        run: |
+          node scripts/build-percentages.js
+          git config --global user.name 'Your Name'
+          git config --global user.email 'your-username@users.noreply.github.com'
+          git commit -am "Automated report"
+          git push
