@@ -1,7 +1,6 @@
 .UserList {
   pointer-events: none;
-  /*github corner*/
-  padding: var(--space-factor) 40px var(--space-factor) var(--space-factor);
+  padding: var(--space-factor);
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
