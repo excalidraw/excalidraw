@@ -21,5 +21,6 @@ jobs:
         run: |
           node scripts/build-locales-coverage.js
           git config --global user.name 'i18n automation'
+          git add src/locales/percentages.json
           git commit -am "Calculate percentages of each translation file"
           git push
