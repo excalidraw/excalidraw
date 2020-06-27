@@ -67,18 +67,6 @@
     }
   }
 
-  &__github-corner {
-    top: 0;
-    :root[dir="ltr"] & {
-      right: 0;
-    }
-    :root[dir="rtl"] & {
-      left: 0;
-    }
-    position: absolute;
-    width: 40px;
-  }
-
   &__footer {
     position: absolute;
     bottom: 0px;
