@@ -15,7 +15,9 @@ const locales = files.filter(
     file !== "percentages.json",
 );
 
-const percentages = {};
+const percentages = {
+  en: 100,
+};
 
 for (let i = 0; i < locales.length; i++) {
   const data = flatten(require(`${__dirname}/../src/locales/${locales[i]}`));
