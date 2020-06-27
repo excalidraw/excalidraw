@@ -19,8 +19,7 @@ jobs:
 
       - name: Create report file
         run: |
-          node scripts/build-percentages.js
-          git config --global user.name 'Your Name'
-          git config --global user.email 'your-username@users.noreply.github.com'
-          git commit -am "Automated report"
+          node scripts/build-locales-coverage.js
+          git config --global user.name 'i18n automation'
+          git commit -am "Calculate percentages of each translation file"
           git push
