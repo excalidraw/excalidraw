@@ -266,7 +266,7 @@ class App extends React.Component<any, AppState> {
   }
 
   private syncActionResult = withBatchedUpdates((res: ActionResult) => {
-    if (this.unmounted) {
+    if (this.unmounted || res === false) {
       return;
     }
 
