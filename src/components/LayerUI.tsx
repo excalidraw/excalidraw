@@ -131,6 +131,7 @@ const LayerUI = ({
       <Island padding={4} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
+            {actionManager.renderAction("openLibrary")}
             {actionManager.renderAction("loadScene")}
             {actionManager.renderAction("saveScene")}
             {actionManager.renderAction("saveAsScene")}

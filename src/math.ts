@@ -345,3 +345,11 @@ export const getGridPoint = (
   }
   return [x, y];
 };
+
+export const getAveragePosition = (points: Point[]): Point => {
+  return [average(points.map(([x]) => x)), average(points.map(([_, y]) => y))];
+};
+
+export const average = (values: number[]) => {
+  return values.reduce((a, b) => a + b, 0) / values.length;
+};

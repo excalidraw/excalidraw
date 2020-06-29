@@ -149,6 +149,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
 } from "../groups";
+import { AppContext } from "../context/AppContext";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -221,46 +222,56 @@ class App extends React.Component<any, AppState> {
 
     return (
       <div className="excalidraw">
-        <LayerUI
-          canvas={this.canvas}
-          appState={this.state}
-          setAppState={this.setAppState}
-          actionManager={this.actionManager}
-          elements={globalSceneState.getElements()}
-          onRoomCreate={this.openPortal}
-          onRoomDestroy={this.closePortal}
-          onUsernameChange={(username) => {
-            saveUsernameToLocalStorage(username);
-            this.setState({
-              username,
-            });
+        <AppContext.Provider
+          value={{
+            actionManager: this.actionManager,
+            canvas: this.canvas,
+            appState: this.state,
+            setAppState: this.setAppState,
+            scene: globalSceneState,
           }}
-          onLockToggle={this.toggleLock}
-          zenModeEnabled={zenModeEnabled}
-          toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
-        />
-        <main>
-          <canvas
-            id="canvas"
-            style={{
-              width: canvasDOMWidth,
-              height: canvasDOMHeight,
+        >
+          <LayerUI
+            canvas={this.canvas}
+            appState={this.state}
+            setAppState={this.setAppState}
+            actionManager={this.actionManager}
+            elements={globalSceneState.getElements()}
+            onRoomCreate={this.openPortal}
+            onRoomDestroy={this.closePortal}
+            onUsernameChange={(username) => {
+              saveUsernameToLocalStorage(username);
+              this.setState({
+                username,
+              });
             }}
-            width={canvasWidth}
-            height={canvasHeight}
-            ref={this.handleCanvasRef}
-            onContextMenu={this.handleCanvasContextMenu}
-            onPointerDown={this.handleCanvasPointerDown}
-            onDoubleClick={this.handleCanvasDoubleClick}
-            onPointerMove={this.handleCanvasPointerMove}
-            onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
-            onDrop={this.handleCanvasOnDrop}
-          >
-            {t("labels.drawingCanvas")}
-          </canvas>
-        </main>
+            onLockToggle={this.toggleLock}
+            zenModeEnabled={zenModeEnabled}
+            toggleZenMode={this.toggleZenMode}
+            lng={getLanguage().lng}
+          />
+          <main>
+            <canvas
+              id="canvas"
+              style={{
+                width: canvasDOMWidth,
+                height: canvasDOMHeight,
+              }}
+              width={canvasWidth}
+              height={canvasHeight}
+              ref={this.handleCanvasRef}
+              onContextMenu={this.handleCanvasContextMenu}
+              onPointerDown={this.handleCanvasPointerDown}
+              onDoubleClick={this.handleCanvasDoubleClick}
+              onPointerMove={this.handleCanvasPointerMove}
+              onPointerUp={this.removePointer}
+              onPointerCancel={this.removePointer}
+              onDrop={this.handleCanvasOnDrop}
+            >
+              {t("labels.drawingCanvas")}
+            </canvas>
+          </main>
+        </AppContext.Provider>
       </div>
     );
   }

@@ -9,10 +9,10 @@ export type ActionResult = {
   syncHistory?: boolean;
 };
 
-type ActionFn = (
+type ActionFn<Data = any> = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  formData: any,
+  data: Data,
 ) => ActionResult;
 
 export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
@@ -45,6 +45,10 @@ export type ActionName =
   | "saveScene"
   | "saveAsScene"
   | "loadScene"
+  | "addLibraryItemToScene"
+  | "addSelectionToLibrary"
+  | "addDrawingToLibrary"
+  | "openLibrary"
   | "duplicateSelection"
   | "deleteSelectedElements"
   | "changeViewBackgroundColor"
@@ -61,21 +65,23 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator";
 
-export interface Action {
+export type KeyTestFn = (
+  event: KeyboardEvent,
+  appState: AppState,
+  elements: readonly ExcalidrawElement[],
+) => boolean;
+
+export interface Action<T = any> {
   name: ActionName;
   PanelComponent?: React.FC<{
     elements: readonly ExcalidrawElement[];
     appState: AppState;
-    updateData: (formData?: any) => void;
+    updateData: (data?: T) => void;
     id?: string;
   }>;
-  perform: ActionFn;
+  perform: ActionFn<T>;
   keyPriority?: number;
-  keyTest?: (
-    event: KeyboardEvent,
-    appState: AppState,
-    elements: readonly ExcalidrawElement[],
-  ) => boolean;
+  keyTest?: KeyTestFn;
   contextItemLabel?: string;
   contextMenuOrder?: number;
 }

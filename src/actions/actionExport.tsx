@@ -11,7 +11,10 @@ import { KEYS } from "../keys";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
-    return { appState: { ...appState, name: value }, commitToHistory: false };
+    return {
+      appState: { ...appState, name: value, isUntitled: false },
+      commitToHistory: false,
+    };
   },
   PanelComponent: ({ appState, updateData }) => (
     <ProjectName

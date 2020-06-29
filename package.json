@@ -54,7 +54,8 @@
     "lint-staged": "10.2.11",
     "pepjs": "0.5.2",
     "prettier": "2.0.5",
-    "rewire": "5.0.0"
+    "rewire": "5.0.0",
+    "uuidv4": "6.1.1"
   },
   "engines": {
     "node": ">=12.0.0"

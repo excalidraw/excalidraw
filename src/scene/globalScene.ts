@@ -17,7 +17,7 @@ export interface SceneStateCallbackRemover {
   (): void;
 }
 
-class GlobalScene {
+export class GlobalScene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];

@@ -68,12 +68,12 @@ export class ActionManager implements ActionsManagerInterface {
     return true;
   }
 
-  executeAction(action: Action) {
+  executeAction<T>(action: Action<T>, data: T | null = null) {
     this.updater(
       action.perform(
         this.getElementsIncludingDeleted(),
         this.getAppState(),
-        null,
+        data as T,
       ),
     );
   }
@@ -109,7 +109,7 @@ export class ActionManager implements ActionsManagerInterface {
     if (this.actions[name] && "PanelComponent" in this.actions[name]) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
-      const updateData = (formState?: any) => {
+      const updateData = async (formState?: any) => {
         this.updater(
           action.perform(
             this.getElementsIncludingDeleted(),
@@ -129,6 +129,9 @@ export class ActionManager implements ActionsManagerInterface {
       );
     }
 
+    if (process.env.NODE_ENV === "development") {
+      console.error(`Failed to render action ${name}`);
+    }
     return null;
   };
 }

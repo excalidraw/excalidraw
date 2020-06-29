@@ -1,0 +1,34 @@
+.OpenLibraryButton {
+  &::before {
+    content: " ";
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 4px;
+    border: 4px solid #2b8a3e;
+  }
+
+  &.ItemAdded::before {
+    animation: saved-successfully 350ms forwards;
+  }
+
+  // &.ItemAdded {
+  //   animation: 150ms 100ms 3 forwards delightful-bounce ease-out;
+  // }
+}
+
+@keyframes saved-successfully {
+  0% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

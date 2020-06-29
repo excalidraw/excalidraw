@@ -1,0 +1,5 @@
+.LibraryDialog .SavedDrawingsList {
+  /* For some reason, Sass refuses to compile this,
+     so this is in a plain old CSS file instead. */
+  grid-template-columns: repeat(auto-fill, minmax(min(256px, 100%), 1fr));
+}

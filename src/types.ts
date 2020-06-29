@@ -59,6 +59,9 @@ export type AppState = {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
+  isCurrentSelectionAddedToLibrary: boolean;
+  isLibraryOpen: boolean;
+  isUntitled: boolean;
   username: string;
   isCollaborating: boolean;
   isResizing: boolean;

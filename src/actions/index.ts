@@ -49,3 +49,10 @@ export {
 export { actionGroup, actionUngroup } from "./actionGroup";
 
 export { actionGoToCollaborator } from "./actionNavigate";
+
+export {
+  actionAddDrawingToLibrary,
+  actionAddSelectionToLibrary,
+} from "./actionAddToLibrary";
+
+export { actionOpenLibrary } from "./actionOpenLibrary";

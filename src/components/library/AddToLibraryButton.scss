@@ -1,0 +1,20 @@
+.AddToLibraryButton {
+  &.Added {
+    transition: background 100ms;
+    background: #2b8a3e;
+    animation: 100ms confirmation-pop;
+    color: white;
+  }
+}
+
+@keyframes confirmation-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

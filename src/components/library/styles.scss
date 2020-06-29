@@ -1,0 +1,100 @@
+.LibraryDialog {
+  .Modal__content {
+    height: 100%;
+  }
+
+  .Island {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: hidden;
+    height: 100%;
+  }
+
+  .SavedDrawingsList {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-gap: 8px;
+    grid-row-gap: 0;
+    list-style: none;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+    margin: 8px -16px;
+    padding: 8px 16px;
+    background: #f8f9fa;
+    flex-grow: 1;
+  }
+
+  .SavedDrawingItem {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .SceneAndControls {
+    background: white;
+    border: 1px solid #eee;
+    box-shadow: var(--shadow-island);
+
+    .Controls {
+      display: flex;
+      padding: 4px;
+      border-top: 1px solid #eee;
+
+      > :not(:last-child) {
+        margin-right: 4px;
+      }
+
+      > .Spacer {
+        flex-grow: 1;
+      }
+    }
+  }
+
+  .DrawingInfo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .DrawingName {
+    font-size: 12px;
+    margin-right: 8px;
+    max-width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .LastSaveTime {
+    font-size: 10px;
+  }
+
+  .CanvasWrapper {
+    box-sizing: border-box;
+    padding: 8px;
+    cursor: pointer;
+
+    width: 256px;
+    height: 256px;
+
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: #e7f5ff;
+    }
+  }
+
+  .Canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}

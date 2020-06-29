@@ -1,6 +1,6 @@
 import "./ExportDialog.scss";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
@@ -15,6 +15,7 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import useIsMobile from "../is-mobile";
 import { Dialog } from "./Dialog";
+import { AppContext } from "../context/AppContext";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -121,6 +122,7 @@ const ExportModal = ({
               aria-label={t("buttons.getShareableLink")}
               onClick={() => onExportToBackend(exportedElements)}
             />
+            {actionManager.renderAction("addDrawingToLibrary")}
           </Stack.Row>
           <div className="ExportDialog__name">
             {actionManager.renderAction("changeProjectName")}
@@ -183,6 +185,7 @@ export const ExportDialog = ({
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
+  const { setAppState } = useContext(AppContext);
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
@@ -192,7 +195,17 @@ export const ExportDialog = ({
   return (
     <>
       <ToolButton
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          setModalIsShown(true);
+          // Deselect everything so that the "Shift+B" shortcut
+          // description on the "Export to library" button is
+          // valid.
+          setAppState({
+            ...appState,
+            selectedElementIds: {},
+            selectedGroupIds: {},
+          });
+        }}
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}

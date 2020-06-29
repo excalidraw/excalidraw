@@ -338,6 +338,14 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("labels.ungroup")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
               />
+              <Shortcut
+                label={t("labels.openLibrary")}
+                shortcuts={[getShortcutKey("B")]}
+              />
+              <Shortcut
+                label={t("labels.addSelectionToLibrary")}
+                shortcuts={[getShortcutKey("Shift+B")]}
+              />
             </ShortcutIsland>
           </Column>
         </Columns>

@@ -78,6 +78,7 @@ export const SelectedShapeActions = ({
           <div className="buttonList">
             {renderAction("duplicateSelection")}
             {renderAction("deleteSelectedElements")}
+            {renderAction("addSelectionToLibrary")}
           </div>
         </fieldset>
       )}
@@ -115,6 +116,7 @@ export const ShapesSwitcher = ({
               elementType: value,
               multiElement: null,
               selectedElementIds: {},
+              selectedGroupIds: {},
             });
             setCursorForShape(value);
             setAppState({});

@@ -71,6 +71,16 @@ export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
     {},
   );
 
+export const getSelectedIdsMapping = (
+  elements: readonly ExcalidrawElement[],
+): Record<string, true> => {
+  const out: Record<string, true> = {};
+  for (const element of elements) {
+    out[element.id] = true;
+  }
+  return out;
+};
+
 export const getDrawingVersion = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce((acc, el) => acc + el.version, 0);
 

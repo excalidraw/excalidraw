@@ -91,6 +91,10 @@
     width: 190px;
   }
 
+  .library-button {
+    height: 40px;
+  }
+
   .zen-mode-transition {
     transition: transform 0.5s ease-in-out;
     :root[dir="ltr"] &.transition-left {

@@ -57,6 +57,8 @@
     "language": "Language",
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
+    "addSelectionToLibrary": "Add selection to library",
+    "openLibrary": "Open library",
     "untitled": "Untitled",
     "name": "Name",
     "yourName": "Your name",
@@ -68,6 +70,8 @@
   },
   "buttons": {
     "clearReset": "Reset the canvas",
+    "openLibrary": "Library",
+    "addToLibrary": "Add to library",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
@@ -179,5 +183,8 @@
   "charts": {
     "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
     "tooManyColumns": "You pasted a spreadsheet with more than two columns."
+  },
+  "drawingLibrary": {
+    "dialogTitle": "Library"
   }
 }

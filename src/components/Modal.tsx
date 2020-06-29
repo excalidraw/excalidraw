@@ -34,7 +34,7 @@ export const Modal = (props: {
           {
             "--max-width": `${props.maxWidth}px`,
             maxHeight: "100%",
-            overflowY: "scroll",
+            overflowY: "auto",
           } as any
         }
       >
