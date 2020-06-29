@@ -23,7 +23,7 @@ jobs:
           npm run locales-coverage
           git diff --exit-code src/locales/percentages.json
           # if [ $? != 0 ]; then
-            git config --global user.name 'i18n automation'
+            git config --global user.name 'i18n automation test'
             git add src/locales/percentages.json
             git commit -am "Calculate percentages of each translation file"
             git push
