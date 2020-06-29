@@ -2949,12 +2949,14 @@ class App extends React.Component<any, AppState> {
       }
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
+        shouldCacheIgnoreZoom: true,
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
             ? selectedElementIds
             : previousSelectedElementIds,
       }));
+      this.resetShouldCacheIgnoreZoomDebounced();
       return;
     }
 
