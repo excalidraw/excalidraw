@@ -32,9 +32,9 @@ const allLanguages = [
   { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
 ];
 
-export const languages = allLanguages.filter(
-  (lang) => percentages[lang.lng] > 85,
-);
+export const languages = allLanguages
+  .sort((left, right) => (left.label > right.label ? 1 : -1))
+  .filter((lang) => percentages[lang.lng] > 85);
 
 let currentLanguage = languages[0];
 let currentLanguageData = {};

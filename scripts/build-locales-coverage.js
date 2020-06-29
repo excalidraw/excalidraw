@@ -8,26 +8,21 @@ const flatten = (object) =>
   );
 
 const locales = files.filter(
-  (file) =>
-    file !== "README.md" &&
-    file !== "build-percentages.js" &&
-    file !== "en.json" &&
-    file !== "percentages.json",
+  (file) => file !== "README.md" && file !== "percentages.json",
 );
 
-const percentages = {
-  en: 100,
-};
+const percentages = {};
 
-for (let i = 0; i < locales.length; i++) {
-  const data = flatten(require(`${__dirname}/../src/locales/${locales[i]}`));
+for (let index = 0; index < locales.length; index++) {
+  const currentLocale = locales[index];
+  const data = flatten(require(`${__dirname}/../src/locales/${currentLocale}`));
 
   const allKeys = Object.keys(data);
   const translatedKeys = allKeys.filter((item) => data[item] !== "");
 
   const percentage = (100 * translatedKeys.length) / allKeys.length;
 
-  percentages[locales[i].replace(".json", "")] = parseInt(percentage);
+  percentages[currentLocale.replace(".json", "")] = parseInt(percentage);
 }
 
 writeFileSync(
