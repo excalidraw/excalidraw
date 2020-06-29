@@ -21,8 +21,8 @@ jobs:
       - name: Create report file
         run: |
           npm run locales-coverage
-          FILE_CHANGED=$(git diff --exit-code src/locales/percentages.json)
-          if [ ! -z "${FILE_CHANGED}" ]; then
+          git diff --exit-code src/locales/percentages.json
+          if [ $? != 0 ]; then
             git config --global user.name 'i18n automation'
             git add src/locales/percentages.json
             git commit -am "Calculate percentages of each translation file"
