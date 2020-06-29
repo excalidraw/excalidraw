@@ -1,8 +1,8 @@
 {
   "labels": {
-    "paste": "Επικόλληση",
-    "selectAll": "Επιλογή όλων",
-    "moveCanvas": "Μετακίνηση καμβά",
+    "paste": "",
+    "selectAll": "",
+    "moveCanvas": "",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
