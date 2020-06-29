@@ -1,5 +1,7 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 
+import fallbackLanguageData from "./locales/en.json";
+
 export const languages = [
   { lng: "en", label: "English", data: "en.json" },
   { lng: "bg-BG", label: "Български", data: "bg-BG.json" },
@@ -30,7 +32,6 @@ export const languages = [
 let currentLanguage = languages[0];
 let currentLanguageData = {};
 const fallbackLanguage = languages[0];
-const fallbackLanguageData = require("./locales/en.json");
 
 export const setLanguage = async (newLng: string | undefined) => {
   currentLanguage =
