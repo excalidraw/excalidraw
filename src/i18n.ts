@@ -3,6 +3,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
+const COMPLETION_THRESHOLD_TO_EXCEED = 85;
+
 interface Language {
   lng: string;
   label: string;
@@ -42,7 +44,11 @@ export const languages: Language[] = [
   .concat(
     allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
   )
-  .filter((lang) => (percentages as Record<string, number>)[lang.lng] > 85);
+  .filter(
+    (lang) =>
+      (percentages as Record<string, number>)[lang.lng] >
+      COMPLETION_THRESHOLD_TO_EXCEED,
+  );
 
 let currentLanguage = languages[0];
 let currentLanguageData = {};
