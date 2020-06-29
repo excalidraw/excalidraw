@@ -1,37 +1,32 @@
 const { readdirSync, writeFileSync } = require("fs");
 const files = readdirSync(`${__dirname}/../src/locales`);
-try {
-  const flatten = (object) =>
-    Object.keys(object).reduce(
-      (initial, current) => ({ ...initial, ...object[current] }),
-      {},
-    );
 
-  const locales = files.filter(
-    (file) => file !== "README.md" && file !== "percentages.json",
+const flatten = (object) =>
+  Object.keys(object).reduce(
+    (initial, current) => ({ ...initial, ...object[current] }),
+    {},
   );
 
-  const percentages = {};
+const locales = files.filter(
+  (file) => file !== "README.md" && file !== "percentages.json",
+);
 
-  for (let index = 0; index < locales.length; index++) {
-    const currentLocale = locales[index];
-    const data = flatten(
-      require(`${__dirname}/../src/locales/${currentLocale}`),
-    );
+const percentages = {};
 
-    const allKeys = Object.keys(data);
-    const translatedKeys = allKeys.filter((item) => data[item] !== "");
+for (let index = 0; index < locales.length; index++) {
+  const currentLocale = locales[index];
+  const data = flatten(require(`${__dirname}/../src/locales/${currentLocale}`));
 
-    const percentage = (100 * translatedKeys.length) / allKeys.length;
+  const allKeys = Object.keys(data);
+  const translatedKeys = allKeys.filter((item) => data[item] !== "");
 
-    percentages[currentLocale.replace(".json", "")] = parseInt(percentage);
-  }
+  const percentage = (100 * translatedKeys.length) / allKeys.length;
 
-  writeFileSync(
-    `${__dirname}/../src/locales/percentages.json`,
-    JSON.stringify(percentages),
-    "utf8",
-  );
-} catch (e) {
-  console.log(e); // eslint-disable-line
+  percentages[currentLocale.replace(".json", "")] = parseInt(percentage);
 }
+
+writeFileSync(
+  `${__dirname}/../src/locales/percentages.json`,
+  JSON.stringify(percentages),
+  "utf8",
+);
