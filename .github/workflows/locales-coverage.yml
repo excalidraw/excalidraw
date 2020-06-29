@@ -4,8 +4,6 @@ on:
   push:
     paths:
       - "src/locales/**.json"
-    paths-ignore:
-      - "src/locales/percentages.json"
 
 jobs:
   locales:
