@@ -3,8 +3,14 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
-const allLanguages = [
-  { lng: "en", label: "English", data: "en.json" },
+interface Language {
+  lng: string;
+  label: string;
+  data: string;
+  rtl?: boolean;
+}
+
+const allLanguages: Language[] = [
   { lng: "bg-BG", label: "Български", data: "bg-BG.json" },
   { lng: "de-DE", label: "Deutsch", data: "de-DE.json" },
   { lng: "nb-No", label: "Bokmål", data: "nb-NO.json" },
@@ -30,8 +36,12 @@ const allLanguages = [
   { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
 ];
 
-export const languages = allLanguages
-  .sort((left, right) => (left.label > right.label ? 1 : -1))
+export const languages: Language[] = [
+  { lng: "en", label: "English", data: "en.json" },
+]
+  .concat(
+    allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
+  )
   .filter((lang) => (percentages as Record<string, number>)[lang.lng] > 85);
 
 let currentLanguage = languages[0];
