@@ -9,6 +9,7 @@ import { ToolButton } from "../ToolButton";
 import { addOutlined, close as closeIcon } from "../icons";
 import { AppState, Point } from "../../types";
 import { viewportCoordsToSceneCoords } from "../../utils";
+import { t } from "../../i18n";
 
 export interface SavedDrawingItemProps {
   dialog: {
@@ -65,16 +66,16 @@ export default function SavedDrawingItem({
           <div className="Controls">
             <ToolButton
               type="button"
-              aria-label="Add to scene"
-              title="Add to scene"
+              aria-label={t("drawingLibrary.addToScene")}
+              title={t("drawingLibrary.addToScene")}
               icon={addOutlined}
               onClick={addToScene}
             />
             <div className="Spacer"></div>
             <ToolButton
               type="button"
-              aria-label="Remove from library"
-              title="Remove from library"
+              aria-label={t("drawingLibrary.removeFromLibrary")}
+              title={t("drawingLibrary.removeFromLibrary")}
               icon={closeIcon}
               onClick={remove}
             />

@@ -185,6 +185,9 @@
     "tooManyColumns": "You pasted a spreadsheet with more than two columns."
   },
   "drawingLibrary": {
-    "dialogTitle": "Library"
+    "dialogTitle": "Library",
+    "dialogSubtitle": "Drawings are stored on this browser only. Clearing your browser data will also delete the drawings here.",
+    "addToScene": "Add to scene",
+    "removeFromLibrary": "Remove from library"
   }
 }
