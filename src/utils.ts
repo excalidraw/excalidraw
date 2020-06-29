@@ -241,3 +241,13 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
 export const isRTL = (text: string) => {
   return RE_RTL_CHECK.test(text);
 };
+
+export const isTouchDevice = () => {
+  const mediaQueryMatches = window.matchMedia
+    ? window.matchMedia(
+        "(max-width: 640px), (max-height: 500px) and (max-width: 1000px)",
+      )
+    : { matches: false };
+
+  return mediaQueryMatches.matches;
+};

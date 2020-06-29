@@ -37,6 +37,7 @@ import {
   getSelectedGroupIds,
   getElementsInGroup,
 } from "../groups";
+import { isTouchDevice } from "../utils";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -140,6 +141,7 @@ export const renderScene = (
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
+  remoteIsTouchDevice: boolean,
   // extra options, currently passed by export helper
   {
     renderScrollbars = true,
@@ -486,7 +488,8 @@ export const renderScene = (
 
     if (
       sceneState.remotePointerButton &&
-      sceneState.remotePointerButton[clientId] === "down"
+      sceneState.remotePointerButton[clientId] === "down" &&
+      remoteIsTouchDevice
     ) {
       context.beginPath();
       context.arc(x, y, 15, 0, 2 * Math.PI, false);
@@ -503,14 +506,16 @@ export const renderScene = (
       context.closePath();
     }
 
-    context.beginPath();
-    context.moveTo(x, y);
-    context.lineTo(x + 1, y + 14);
-    context.lineTo(x + 4, y + 9);
-    context.lineTo(x + 9, y + 10);
-    context.lineTo(x, y);
-    context.fill();
-    context.stroke();
+    if (!isTouchDevice()) {
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + 1, y + 14);
+      context.lineTo(x + 4, y + 9);
+      context.lineTo(x + 9, y + 10);
+      context.lineTo(x, y);
+      context.fill();
+      context.stroke();
+    }
 
     if (!isOutOfBounds && username) {
       const offsetX = x + width;

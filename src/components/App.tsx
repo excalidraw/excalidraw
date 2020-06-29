@@ -583,6 +583,7 @@ class App extends React.Component<any, AppState> {
         remotePointerUsernames: pointerUsernames,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
+      this.state.remoteIsTouchDevice,
       {
         renderOptimizations: true,
       },
