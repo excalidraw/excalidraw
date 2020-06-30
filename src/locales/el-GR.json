@@ -1,9 +1,9 @@
 {
   "labels": {
-    "paste": "Επικόλληση",
-    "selectAll": "Επιλογή όλων",
+    "paste": "",
+    "selectAll": "",
     "moveCanvas": "",
-    "copy": "Αντιγραφή",
+    "copy": "",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
     "bringForward": "Στο προσκήνιο",
