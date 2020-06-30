@@ -10,6 +10,7 @@ interface Document {
 
 interface Window {
   ClipboardItem: any;
+  __EXCALIDRAW_SHA__: string;
 }
 
 interface Clipboard extends EventTarget {
