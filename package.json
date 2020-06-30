@@ -72,24 +72,25 @@
   },
   "private": true,
   "scripts": {
-    "build": "npm run build:app && npm run build:zip",
     "build-node": "node ./scripts/build-node.js",
-    "build:app": "REACT_APP_INCLUDE_GTAG=true REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
     "build:app:docker": "REACT_APP_INCLUDE_GTAG=false REACT_APP_DISABLE_SENTRY=true react-scripts build",
+    "build:app": "REACT_APP_INCLUDE_GTAG=true REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
     "build:zip": "node ./scripts/build-version.js",
+    "build": "npm run build:app && npm run build:zip",
     "eject": "react-scripts eject",
-    "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
     "fix:other": "npm run prettier -- --write",
+    "fix": "npm run fix:other && npm run fix:code",
+    "locales-coverage": "node scripts/build-locales-coverage.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
-    "test": "npm run test:app",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
-    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
     "test:app": "react-scripts test --env=jsdom-fourteen --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:other": "npm run prettier -- --list-different",
-    "test:typecheck": "tsc"
+    "test:typecheck": "tsc",
+    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
+    "test": "npm run test:app"
   }
 }
