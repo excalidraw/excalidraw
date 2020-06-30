@@ -114,6 +114,7 @@ import {
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  TOUCH_CTX_MENU_TIMEOUT,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -247,11 +248,8 @@ class App extends React.Component<any, AppState> {
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
-            onDrop={this.handleCanvasOnDrop}
-            onTouchStart={this.handleTouchStart}
-            onTouchEnd={this.handleTouchEnd}
             onTouchMove={this.handleTouchMove}
-            onTouchCancel={this.handleTouchEnd}
+            onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
           </canvas>
@@ -810,6 +808,12 @@ class App extends React.Component<any, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement>) => {
+    // remove touch handler for context menu on touch devices
+    if (event.pointerType === "touch" && touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchMoving = false;
+    }
+
     gesture.pointers.delete(event.pointerId);
   };
 
@@ -1809,10 +1813,31 @@ class App extends React.Component<any, AppState> {
     }
   };
 
+  // set touch moving for mobile context menu
+  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    touchMoving = true;
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
+
+    // deal with opening context menu on touch devices
+    if (event.pointerType === "touch") {
+      touchMoving = false;
+
+      // open the context menu with the first touch's clientX and clientY
+      // if the touch is not moving
+      touchTimeout = window.setTimeout(() => {
+        if (!touchMoving) {
+          this.openContextMenu({
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
+        }
+      }, TOUCH_CTX_MENU_TIMEOUT);
+    }
 
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
@@ -2959,37 +2984,6 @@ class App extends React.Component<any, AppState> {
       scrollY: normalizeScroll(scrollY - deltaY / zoom),
     }));
   });
-
-  private handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    event.persist(); // prevent SyntheticEvent nullification, see https://reactjs.org/docs/events.html#event-pooling
-    event.preventDefault();
-
-    touchMoving = false;
-
-    // open the context menu with the first touch's clientX and clientY
-    // if the touch is not moving
-    touchTimeout = window.setTimeout(() => {
-      if (touchMoving === false) {
-        this.openContextMenu({
-          clientX: event.touches[0].clientX,
-          clientY: event.touches[0].clientY,
-        });
-      }
-    }, 500);
-  };
-
-  // clear touch handlers on touchEnd and touchCancel
-  private handleTouchEnd = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    if (touchTimeout) {
-      clearTimeout(touchTimeout);
-      touchMoving = false;
-    }
-  };
-
-  // set touch moving when the touch is moving
-  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    touchMoving = true;
-  };
 
   private getTextWysiwygSnappedToCenterPosition(
     x: number,
