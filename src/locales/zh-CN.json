@@ -47,8 +47,8 @@
     "extraBold": "超粗",
     "architect": "朴素",
     "artist": "艺术",
-    "cartoonist": "漫画",
-    "fileTitle": "文件名",
+    "cartoonist": "漫画师",
+    "fileTitle": "文件标题",
     "colorPicker": "调色盘",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "绘制 Canvas",
@@ -64,7 +64,7 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "toggleGridMode": ""
+    "toggleGridMode": "切换网格模式"
   },
   "buttons": {
     "clearReset": "重置画布",
