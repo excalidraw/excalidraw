@@ -3,7 +3,7 @@ name: Build locales percentages
 on:
   push:
     branches:
-      - "kb/automate-percentages-translations"
+      - "master"
     paths:
       - "src/locales/**.json"
       - "!src/locales/percentages.json"
@@ -31,6 +31,6 @@ jobs:
             git config --global user.email 'konmpar@gmail.com'
             git add src/locales/percentages.json
             git commit -am "Auto commit: Calculate translation coverage"
-            git pull origin kb/automate-percentages-translations --rebase
+            git pull origin master --rebase
             git push
           fi
