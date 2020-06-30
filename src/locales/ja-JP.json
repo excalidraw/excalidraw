@@ -92,8 +92,7 @@
     "createNewRoom": "新しい部屋を作成する",
     "toggleFullScreen": "全画面表示に切り替える",
     "toggleZenMode": "集中モードに切り替える",
-    "exitZenMode": "集中モードをやめる",
-    "toggleGridMode": ""
+    "exitZenMode": "集中モードをやめる"
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",

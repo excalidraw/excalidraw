@@ -92,8 +92,7 @@
     "createNewRoom": "إنشاء غرفة جديدة",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",

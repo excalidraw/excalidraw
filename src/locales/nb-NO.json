@@ -64,7 +64,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "toggleGridMode": ""
+    "toggleGridMode": "Slå av/på rutenett"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -92,8 +92,7 @@
     "createNewRoom": "Opprett et nytt rom",
     "toggleFullScreen": "Skru fullskjerm av/på",
     "toggleZenMode": "Slå av/på zen-modus",
-    "exitZenMode": "Avslutt zen-modus",
-    "toggleGridMode": ""
+    "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",

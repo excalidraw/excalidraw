@@ -92,8 +92,7 @@
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
     "toggleZenMode": "Zen modunu aç/kapa",
-    "exitZenMode": "Zen modundan çık",
-    "toggleGridMode": ""
+    "exitZenMode": "Zen modundan çık"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",

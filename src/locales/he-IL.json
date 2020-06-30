@@ -92,8 +92,7 @@
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
     "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
-    "exitZenMode": "צא ממצב תפריט מרחף",
-    "toggleGridMode": ""
+    "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",

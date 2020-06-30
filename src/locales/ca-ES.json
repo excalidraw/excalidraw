@@ -92,8 +92,7 @@
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
     "toggleZenMode": "Commutar modo zen",
-    "exitZenMode": "Sortir de modo zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Sortir de modo zen"
   },
   "alerts": {
     "clearReset": "Tot el llenç s'esborrarà. Estàs segur?",
