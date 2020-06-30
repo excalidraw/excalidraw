@@ -583,7 +583,7 @@ class App extends React.Component<any, AppState> {
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
-        renderOptimizations: true,
+        renderOptimizations: "batched",
       },
     );
     if (scrollBars) {

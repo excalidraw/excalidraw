@@ -28,7 +28,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  scheduleBatchedGenerateElementCanvas,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColors } from "../clients";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -152,7 +156,7 @@ export const renderScene = (
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
-    renderOptimizations?: boolean;
+    renderOptimizations?: boolean | "batched";
     renderGrid?: boolean;
   } = {},
 ) => {
@@ -218,8 +222,33 @@ export const renderScene = (
     ),
   );
 
+  if (renderOptimizations === "batched") {
+    scheduleBatchedGenerateElementCanvas(
+      visibleElements,
+      context,
+      sceneState,
+      () => {
+        renderScene(
+          elements,
+          appState,
+          selectionElement,
+          scale,
+          rc,
+          canvas,
+          sceneState,
+          {
+            renderScrollbars,
+            renderSelection,
+            renderOptimizations: true,
+            renderGrid,
+          },
+        );
+      },
+    );
+  }
+
   visibleElements.forEach((element) => {
-    renderElement(element, rc, context, renderOptimizations, sceneState);
+    renderElement(element, rc, context, !!renderOptimizations, sceneState);
     if (
       isLinearElement(element) &&
       appState.editingLinearElement &&
@@ -235,7 +264,7 @@ export const renderScene = (
       selectionElement,
       rc,
       context,
-      renderOptimizations,
+      !!renderOptimizations,
       sceneState,
     );
   }
