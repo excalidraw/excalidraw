@@ -25,7 +25,7 @@ if (
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
-  "now.sh": "staging",
+  "vercel.app": "staging",
 };
 
 const REACT_APP_DISABLE_SENTRY =
