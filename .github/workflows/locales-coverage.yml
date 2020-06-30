@@ -2,6 +2,8 @@ name: Build locales percentages
 
 on:
   push:
+    branches:
+      - "kb/automate-percentages-translations"
     paths:
       - "src/locales/**.json"
       - "!src/locales/percentages.json"
