@@ -92,8 +92,7 @@
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",

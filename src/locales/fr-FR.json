@@ -64,7 +64,7 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "toggleGridMode": ""
+    "toggleGridMode": "Basculer le mode grille"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -92,8 +92,7 @@
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
-    "exitZenMode": "Quitter le mode zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",

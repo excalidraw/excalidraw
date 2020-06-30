@@ -92,8 +92,7 @@
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "toggleFullScreen": "Schermvullende weergave",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",

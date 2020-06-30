@@ -92,8 +92,7 @@
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
     "toggleZenMode": "Włącz tryb Zen",
-    "exitZenMode": "Wyjdź z trybu Zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",

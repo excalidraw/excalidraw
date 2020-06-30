@@ -92,8 +92,7 @@
     "createNewRoom": "",
     "toggleFullScreen": "전체화면",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",

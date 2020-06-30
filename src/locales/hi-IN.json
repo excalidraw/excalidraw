@@ -64,7 +64,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "toggleGridMode": ""
+    "toggleGridMode": "टॉगल ग्रिड मोड"
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -92,8 +92,7 @@
     "createNewRoom": "एक नया कमरा बनाएं",
     "toggleFullScreen": "पूर्णस्क्रीन चालू करें",
     "toggleZenMode": "टॉगल ज़ेन मोड",
-    "exitZenMode": "जेन मोड से बाहर निकलें",
-    "toggleGridMode": ""
+    "exitZenMode": "जेन मोड से बाहर निकलें"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",

@@ -64,7 +64,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
-    "toggleGridMode": ""
+    "toggleGridMode": "سويچ خطوط راهنما"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -92,8 +92,7 @@
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
     "toggleZenMode": "تغییر به حالت تمرکز",
-    "exitZenMode": "خروج از حالت تمرکز",
-    "toggleGridMode": ""
+    "exitZenMode": "خروج از حالت تمرکز"
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",

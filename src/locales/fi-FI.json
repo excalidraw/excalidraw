@@ -92,8 +92,7 @@
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
-    "exitZenMode": "Poistu zen-tilasta",
-    "toggleGridMode": "Ruudukko päälle/pois"
+    "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",

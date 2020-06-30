@@ -2,7 +2,7 @@
   "labels": {
     "paste": "貼上",
     "selectAll": "全選",
-    "moveCanvas": "",
+    "moveCanvas": "移動畫布",
     "copy": "複製",
     "copyAsPng": "複製 PNG 至剪貼簿",
     "copyAsSvg": "複製 SVG 至剪貼簿",
@@ -92,8 +92,7 @@
     "createNewRoom": "建立新協作會議室",
     "toggleFullScreen": "切換全螢幕",
     "toggleZenMode": "切換專注模式",
-    "exitZenMode": "離開專注模式",
-    "toggleGridMode": "切換格線模式"
+    "exitZenMode": "離開專注模式"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",

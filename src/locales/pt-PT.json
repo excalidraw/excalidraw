@@ -92,8 +92,7 @@
     "createNewRoom": "Criar nova sala",
     "toggleFullScreen": "Alternar tela cheia",
     "toggleZenMode": "Alternar modo zen",
-    "exitZenMode": "Sair do modo zen",
-    "toggleGridMode": "Alternar modo de grade"
+    "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",

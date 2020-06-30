@@ -92,8 +92,7 @@
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
