@@ -95,14 +95,14 @@
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
-    "clearReset": "这将会清除整个 canvas。你确定吗?",
+    "clearReset": "这将会清除整个 画板。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
-    "couldNotLoadInvalidFile": "无法加载无效文件",
-    "importBackendFailed": "从后端导入失败。",
-    "cannotExportEmptyCanvas": "无法导出空白的 canvas。",
-    "couldNotCopyToClipboard": "无法复制到剪贴板。 请使用 Chrome 浏览器。",
-    "decryptFailed": "无法解析数据。",
-    "uploadedSecurly": "上传已经过端到端加密, 这意味着 Excalidraw 服务器和第三方无法读取内容。"
+    "couldNotLoadInvalidFile": "无法加载错误文件",
+    "importBackendFailed": "从后端导入失败",
+    "cannotExportEmptyCanvas": "无法导出空画布。",
+    "couldNotCopyToClipboard": "无法复制到剪贴板。请尝试使用 Chrome 浏览器。",
+    "decryptFailed": "无法解密数据。",
+    "uploadedSecurly": "上传已被端到端加密保护，这意味着Excalidraw 的服务器和第三方都无法读取内容。"
   },
   "toolBar": {
     "selection": "选择",
