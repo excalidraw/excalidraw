@@ -2,6 +2,7 @@
   "labels": {
     "paste": "貼り付け",
     "selectAll": "すべて選択",
+    "moveCanvas": "",
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "Excalidrawで作成",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -71,6 +74,7 @@
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "save": "保存",
+    "saveAs": "",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",

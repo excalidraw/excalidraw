@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Enganxar",
     "selectAll": "Seleccionar tot",
+    "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al porta-retalls com a PNG",
     "copyAsSvg": "Copiar al porta-retalls com a SVG",
@@ -61,7 +62,9 @@
     "yourName": "El teu nom",
     "madeWithExcalidraw": "Fet amb Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -71,6 +74,7 @@
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "save": "Desar",
+    "saveAs": "",
     "load": "Carregar",
     "getShareableLink": "Obtenir enllaç per compartir",
     "close": "Tancar",

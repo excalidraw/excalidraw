@@ -2,11 +2,11 @@ import oc from "open-color";
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
-import { FontFamily } from "./element/types";
-
-export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamily = 1;
-export const DEFAULT_TEXT_ALIGN = "left";
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+} from "./constants";
 
 export const getDefaultAppState = (): AppState => {
   return {
@@ -53,6 +53,7 @@ export const getDefaultAppState = (): AppState => {
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
     zenModeEnabled: false,
+    gridSize: null,
     editingGroupId: null,
     selectedGroupIds: {},
   };
@@ -81,5 +82,6 @@ export const clearAppStateForLocalStorage = (appState: AppState) => {
 export const cleanAppStateForExport = (appState: AppState) => {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
+    gridSize: appState.gridSize,
   };
 };

@@ -15,6 +15,7 @@ import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   handlerRectanglesFromCoords,
   handlerRectangles,
+  getElementBounds,
   getCommonBounds,
 } from "../element";
 
@@ -28,7 +29,7 @@ import {
 import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
-import colors from "../colors";
+import { getClientColors } from "../clients";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -38,19 +39,6 @@ import {
 } from "../groups";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-
-const colorsForClientId = (clientId: string) => {
-  // Naive way of getting an integer out of the clientId
-  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
-
-  // Skip transparent background.
-  const backgrounds = colors.elementBackground.slice(1);
-  const strokes = colors.elementStroke.slice(1);
-  return {
-    background: backgrounds[sum % backgrounds.length],
-    stroke: strokes[sum % strokes.length],
-  };
-};
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -84,6 +72,29 @@ const strokeCircle = (
   context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
   context.fill();
   context.stroke();
+};
+
+const strokeGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  offsetX: number,
+  offsetY: number,
+  width: number,
+  height: number,
+) => {
+  const origStrokeStyle = context.strokeStyle;
+  context.strokeStyle = "rgba(0,0,0,0.1)";
+  context.beginPath();
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    context.moveTo(x, offsetY - gridSize);
+    context.lineTo(x, offsetY + height + gridSize * 2);
+  }
+  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+    context.moveTo(offsetX - gridSize, y);
+    context.lineTo(offsetX + width + gridSize * 2, y);
+  }
+  context.stroke();
+  context.strokeStyle = origStrokeStyle;
 };
 
 const renderLinearPointHandles = (
@@ -137,10 +148,12 @@ export const renderScene = (
     // Should not be turned on for export operations and similar, because it
     //  doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
+    renderGrid = true,
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
+    renderGrid?: boolean;
   } = {},
 ) => {
   if (!canvas) {
@@ -178,6 +191,22 @@ export const renderScene = (
     (-normalizedCanvasHeight * (sceneState.zoom - 1)) / 2;
   context.translate(zoomTranslationX, zoomTranslationY);
   context.scale(sceneState.zoom, sceneState.zoom);
+
+  // Grid
+  if (renderGrid && appState.gridSize) {
+    strokeGrid(
+      context,
+      appState.gridSize,
+      -Math.ceil(zoomTranslationX / sceneState.zoom / appState.gridSize) *
+        appState.gridSize +
+        (sceneState.scrollX % appState.gridSize),
+      -Math.ceil(zoomTranslationY / sceneState.zoom / appState.gridSize) *
+        appState.gridSize +
+        (sceneState.scrollY % appState.gridSize),
+      normalizedCanvasWidth / sceneState.zoom,
+      normalizedCanvasHeight / sceneState.zoom,
+    );
+  }
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>
@@ -232,7 +261,7 @@ export const renderScene = (
       if (sceneState.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
           ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = colorsForClientId(socketId);
+            const { background } = getClientColors(socketId);
             return background;
           }),
         );
@@ -444,7 +473,7 @@ export const renderScene = (
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { background, stroke } = colorsForClientId(clientId);
+    const { background, stroke } = getClientColors(clientId);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
@@ -572,7 +601,7 @@ const isVisibleElement = (
     zoom: number;
   },
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementBounds(element);
 
   // Apply zoom
   const viewportWidthWithZoom = viewportWidth / zoom;

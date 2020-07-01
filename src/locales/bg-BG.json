@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Постави",
     "selectAll": "Маркирай всичко",
+    "moveCanvas": "",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копиране в клипборда",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -71,6 +74,7 @@
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "save": "Запази",
+    "saveAs": "",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",

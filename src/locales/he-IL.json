@@ -2,6 +2,7 @@
   "labels": {
     "paste": "הדבק",
     "selectAll": "בחר הכל",
+    "moveCanvas": "",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
@@ -61,7 +62,9 @@
     "yourName": "שם",
     "madeWithExcalidraw": "נוצר באמצעות Excalidraw",
     "group": "אחד לקבוצה",
-    "ungroup": "פרק קבוצה"
+    "ungroup": "פרק קבוצה",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -71,6 +74,7 @@
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "save": "שמור",
+    "saveAs": "",
     "load": "טען",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",

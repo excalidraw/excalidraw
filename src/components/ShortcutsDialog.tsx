@@ -247,6 +247,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("buttons.toggleZenMode")}
                 shortcuts={[getShortcutKey("Alt+Z")]}
               />
+              <Shortcut
+                label={t("labels.toggleGridMode")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
+              />
             </ShortcutIsland>
           </Column>
           <Column>
@@ -254,6 +258,14 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut
                 label={t("labels.selectAll")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
+              />
+              <Shortcut
+                label={t("labels.moveCanvas")}
+                shortcuts={[
+                  getShortcutKey(`Space+${t("shortcutsDialog.drag")}`),
+                  getShortcutKey(`Wheel+${t("shortcutsDialog.drag")}`),
+                ]}
+                isOr={true}
               />
               <Shortcut
                 label={t("labels.copy")}

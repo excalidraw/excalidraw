@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
+    "moveCanvas": "Leinwand verschieben",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
@@ -61,7 +62,9 @@
     "yourName": "Dein Name",
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
-    "ungroup": "Gruppierung aufheben"
+    "ungroup": "Gruppierung aufheben",
+    "collaborators": "Mitarbeitende",
+    "toggleGridMode": "Gitterlinien ein-/ausschalten"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -71,6 +74,7 @@
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "save": "Speichern",
+    "saveAs": "Speichern unter",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",

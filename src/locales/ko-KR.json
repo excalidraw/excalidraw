@@ -2,6 +2,7 @@
   "labels": {
     "paste": "붙여넣기",
     "selectAll": "전체 선택",
+    "moveCanvas": "",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
@@ -61,7 +62,9 @@
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -71,6 +74,7 @@
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "save": "저장",
+    "saveAs": "",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",

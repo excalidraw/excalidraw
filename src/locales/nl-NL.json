@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Plakken",
     "selectAll": "Alles selecteren",
+    "moveCanvas": "",
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
@@ -61,7 +62,9 @@
     "yourName": "Jouw naam",
     "madeWithExcalidraw": "Gemaakt met Excalidraw",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -71,6 +74,7 @@
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
     "save": "Opslaan",
+    "saveAs": "",
     "load": "Open",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",

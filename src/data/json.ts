@@ -30,25 +30,16 @@ export const saveAsJSON = async (
   const blob = new Blob([serialized], {
     type: "application/json",
   });
-  // Either "Save as" or non-supporting browser
-  if (!fileHandle) {
-    const name = `${appState.name}.excalidraw`;
-    const handle = await fileSave(
-      blob,
-      {
-        fileName: name,
-        description: "Excalidraw file",
-        extensions: ["excalidraw"],
-      },
-      fileHandle,
-    );
-    (window as any).handle = handle;
-    return;
-  }
-  // "Save"
-  const writable = await fileHandle.createWritable();
-  await writable.write(blob);
-  await writable.close();
+  const name = `${appState.name}.excalidraw`;
+  (window as any).handle = await fileSave(
+    blob,
+    {
+      fileName: name,
+      description: "Excalidraw file",
+      extensions: ["excalidraw"],
+    },
+    fileHandle || null,
+  );
 };
 
 export const loadFromJSON = async () => {

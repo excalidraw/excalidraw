@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./element/types";
 import { newElement, newTextElement } from "./element";
 import { AppState } from "./types";
 import { t } from "./i18n";
+import { DEFAULT_VERTICAL_ALIGN } from "./constants";
 
 interface Spreadsheet {
   yAxisLabel: string | null;
@@ -167,6 +168,7 @@ export function renderSpreadsheet(
     fontSize: 16,
     fontFamily: appState.currentItemFontFamily,
     textAlign: appState.currentItemTextAlign,
+    verticalAlign: DEFAULT_VERTICAL_ALIGN,
   });
 
   const maxYLabel = newTextElement({
@@ -183,6 +185,7 @@ export function renderSpreadsheet(
     fontSize: 16,
     fontFamily: appState.currentItemFontFamily,
     textAlign: appState.currentItemTextAlign,
+    verticalAlign: DEFAULT_VERTICAL_ALIGN,
   });
 
   const bars = spreadsheet.values.map((value, i) => {
@@ -226,6 +229,7 @@ export function renderSpreadsheet(
         fontSize: 16,
         fontFamily: appState.currentItemFontFamily,
         textAlign: "center",
+        verticalAlign: DEFAULT_VERTICAL_ALIGN,
         width: BAR_WIDTH,
         angle: ANGLE,
       });
@@ -246,6 +250,7 @@ export function renderSpreadsheet(
         fontSize: 20,
         fontFamily: appState.currentItemFontFamily,
         textAlign: "center",
+        verticalAlign: DEFAULT_VERTICAL_ALIGN,
         width: BAR_WIDTH,
         angle: ANGLE,
       })

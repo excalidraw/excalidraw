@@ -81,6 +81,7 @@ it("clones text element", () => {
     fontSize: 20,
     fontFamily: 1,
     textAlign: "left",
+    verticalAlign: "top",
   });
 
   const copy = duplicateElement(null, new Map(), element);

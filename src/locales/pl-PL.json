@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
+    "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
@@ -61,7 +62,9 @@
     "yourName": "Twoje imię",
     "madeWithExcalidraw": "Zrobione w Excalidraw",
     "group": "Zgrupuj wybrane",
-    "ungroup": "Rozgrupuj wybrane"
+    "ungroup": "Rozgrupuj wybrane",
+    "collaborators": "Współtwórcy",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -71,6 +74,7 @@
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "save": "Zapisz",
+    "saveAs": "Zapisz jako",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
@@ -120,7 +124,7 @@
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienać rozmiar względem środka",
+    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
     "lineEditor_pointSelected": "Naciśnij Delete by usunąć punkt albo przeciągnij by zmienić jego pozycje",

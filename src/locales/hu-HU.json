@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Beillesztés",
     "selectAll": "Összes kijelölése",
+    "moveCanvas": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
@@ -40,7 +41,7 @@
     "crossHatch": "",
     "thin": "Vékony",
     "bold": "Félkövér",
-    "left": "",
+    "left": "Bal",
     "center": "",
     "right": "",
     "extraBold": "",
@@ -57,11 +58,13 @@
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
     "untitled": "",
-    "name": "",
+    "name": "Név",
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
-    "ungroup": ""
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -71,6 +74,7 @@
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "save": "Mentés",
+    "saveAs": "",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
