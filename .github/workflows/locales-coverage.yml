@@ -1,4 +1,4 @@
-name: Build locales percentages
+name: Build locales coverage
 
 on:
   push:
