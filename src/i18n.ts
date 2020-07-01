@@ -39,7 +39,7 @@ export const languages = [
     data: require("./locales/he-IL.json"),
     rtl: true,
   },
-  { lng: "hi-IN", label: "Hindi", data: require("./locales/hi-IN.json") },
+  { lng: "hi-IN", label: "हिन्दी", data: require("./locales/hi-IN.json") },
 ];
 
 let currentLanguage = languages[0];
