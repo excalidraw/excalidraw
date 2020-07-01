@@ -37,6 +37,7 @@ const allLanguages: Language[] = [
   { lng: "zh-CN", label: "简体中文", data: "zh-CN.json" },
   { lng: "ar-SA", label: "العربية", data: "ar-SA.json", rtl: true },
   { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
+  { lng: "hi-IN", label: "हिन्दी", data: "hi-IN.json" },
 ];
 
 export const languages: Language[] = [
