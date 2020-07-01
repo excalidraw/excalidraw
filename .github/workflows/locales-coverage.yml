@@ -24,9 +24,7 @@ jobs:
 
       - name: Create report file
         run: |
-          npm install
           npm run locales-coverage
-          npm run fix:other
           FILE_CHANGED=$(git diff src/locales/percentages.json)
           if [ ! -z "${FILE_CHANGED}" ]; then
             git config --global user.name 'Kostas Bariotis'
