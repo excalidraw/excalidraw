@@ -3,4 +3,3 @@ build/
 package-lock.json
 .vscode/
 firebase/
-src/locales/percentages.json
