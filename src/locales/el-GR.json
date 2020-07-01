@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Επικόλληση",
     "selectAll": "Επιλογή όλων",
-    "moveCanvas": "",
+    "moveCanvas": "Μετακίνηση καμβά",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
@@ -64,7 +64,7 @@
     "group": "Δημιουργία ομάδας από επιλογή",
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
-    "toggleGridMode": ""
+    "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
