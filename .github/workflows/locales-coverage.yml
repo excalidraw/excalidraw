@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - "l10n_master"
-    paths:
-      - "src/locales/**.json"
-      - "!src/locales/percentages.json"
 
 jobs:
   locales:
