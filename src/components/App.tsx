@@ -120,6 +120,7 @@ import {
   CANVAS_ONLY_ACTIONS,
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
+  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
@@ -337,6 +338,39 @@ class App extends React.Component<any, AppState> {
     this.onSceneUpdated();
   };
 
+  private shouldForceLoadScene(
+    scene: ResolutionType<typeof loadScene>,
+  ): boolean {
+    if (!scene.elements.length) {
+      return true;
+    }
+
+    const roomMatch = getCollaborationLinkData(window.location.href);
+
+    if (!roomMatch) {
+      return false;
+    }
+    const collabForceLoadFlag = localStorage.getItem(
+      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+    );
+    if (collabForceLoadFlag) {
+      try {
+        const {
+          room: previousRoom,
+          timestamp,
+        }: { room: string; timestamp: number } = JSON.parse(
+          collabForceLoadFlag,
+        );
+        // if loading same room as the one previously unloaded within 15sec
+        //  force reload without prompting
+        if (previousRoom === roomMatch[1] && Date.now() - timestamp < 15000) {
+          return true;
+        }
+      } catch {}
+    }
+    return false;
+  }
+
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -351,7 +385,7 @@ class App extends React.Component<any, AppState> {
 
     if (isExternalScene) {
       if (
-        !scene.elements.length ||
+        this.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
         // Backwards compatibility with legacy url format
@@ -503,6 +537,15 @@ class App extends React.Component<any, AppState> {
   }
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
+    if (this.state.isCollaborating && this.portal.roomID) {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+        JSON.stringify({
+          timestamp: Date.now(),
+          room: this.portal.roomID,
+        }),
+      );
+    }
     if (
       this.state.isCollaborating &&
       globalSceneState.getElements().length > 0
