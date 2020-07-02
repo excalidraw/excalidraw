@@ -348,13 +348,22 @@ class App extends React.Component<any, AppState> {
 
     if (!isCollaborationScene) {
       let scene: ResolutionType<typeof loadScene> | undefined;
-      // Backwards compatibility with legacy url format
-      if (id) {
-        scene = await loadScene(id);
-      } else if (jsonMatch) {
-        scene = await loadScene(jsonMatch[1], jsonMatch[2]);
-      } else {
-        scene = await loadScene(null);
+      scene = await loadScene(null);
+      if (id || jsonMatch) {
+        if (
+          !scene.elements.length ||
+          window.confirm(
+            "Loading external scene will override your local content. Do you wish to continue?",
+          )
+        ) {
+          // Backwards compatibility with legacy url format
+          if (id) {
+            scene = await loadScene(id);
+          } else if (jsonMatch) {
+            scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+          }
+        }
+        window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
       if (scene) {
         this.syncActionResult(scene);
