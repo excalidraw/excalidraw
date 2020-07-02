@@ -344,35 +344,38 @@ class App extends React.Component<any, AppState> {
       /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
     );
 
-    const isCollaborationScene = getCollaborationLinkData(window.location.href);
+    let isCollaborationScene = getCollaborationLinkData(window.location.href);
+    let scene = await loadScene(null);
 
-    if (!isCollaborationScene) {
-      let scene: ResolutionType<typeof loadScene> | undefined;
-      scene = await loadScene(null);
-      if (id || jsonMatch) {
-        if (
-          !scene.elements.length ||
-          window.confirm(t("alerts.loadSceneOverridePrompt"))
-        ) {
-          // Backwards compatibility with legacy url format
-          if (id) {
-            scene = await loadScene(id);
-          } else if (jsonMatch) {
-            scene = await loadScene(jsonMatch[1], jsonMatch[2]);
-          }
+    if (id || jsonMatch || isCollaborationScene) {
+      if (
+        !scene.elements.length ||
+        window.confirm(t("alerts.loadSceneOverridePrompt"))
+      ) {
+        // Backwards compatibility with legacy url format
+        if (id) {
+          scene = await loadScene(id);
+        } else if (jsonMatch) {
+          scene = await loadScene(jsonMatch[1], jsonMatch[2]);
         }
+        if (!isCollaborationScene) {
+          window.history.replaceState({}, "Excalidraw", window.location.origin);
+        }
+      } else {
+        isCollaborationScene = null;
         window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
-      if (scene) {
-        this.syncActionResult(scene);
-      }
+    }
+
+    if (scene && !isCollaborationScene) {
+      this.syncActionResult(scene);
     }
 
     if (this.state.isLoading) {
       this.setState({ isLoading: false });
     }
 
-    // run this last else the `isLoading` state
+    // run this last else the `isLoading` would be overriden
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
     }
