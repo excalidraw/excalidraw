@@ -352,9 +352,7 @@ class App extends React.Component<any, AppState> {
       if (id || jsonMatch) {
         if (
           !scene.elements.length ||
-          window.confirm(
-            "Loading external scene will override your local content. Do you wish to continue?",
-          )
+          window.confirm(t("alerts.loadSceneOverridePrompt"))
         ) {
           // Backwards compatibility with legacy url format
           if (id) {
