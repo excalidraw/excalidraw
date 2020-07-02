@@ -6,6 +6,7 @@ export type ActionResult = {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: AppState | null;
   commitToHistory: boolean;
+  syncHistory?: boolean;
 };
 
 type ActionFn = (
@@ -30,6 +31,7 @@ export type ActionName =
   | "changeFillStyle"
   | "changeStrokeWidth"
   | "changeSloppiness"
+  | "changeStrokeStyle"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
@@ -41,6 +43,7 @@ export type ActionName =
   | "changeExportBackground"
   | "changeShouldAddWatermark"
   | "saveScene"
+  | "saveAsScene"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
@@ -53,7 +56,10 @@ export type ActionName =
   | "changeFontFamily"
   | "changeTextAlign"
   | "toggleFullScreen"
-  | "toggleShortcuts";
+  | "toggleShortcuts"
+  | "group"
+  | "ungroup"
+  | "goToCollaborator";
 
 export interface Action {
   name: ActionName;
@@ -61,6 +67,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData?: any) => void;
+    id?: string;
   }>;
   perform: ActionFn;
   keyPriority?: number;

@@ -1,11 +1,16 @@
 interface Document {
   fonts?: {
     ready?: Promise<void>;
+    addEventListener?(
+      type: "loading" | "loadingdone" | "loadingerror",
+      listener: (this: Document, ev: Event) => any,
+    ): void;
   };
 }
 
 interface Window {
   ClipboardItem: any;
+  __EXCALIDRAW_SHA__: string;
 }
 
 interface Clipboard extends EventTarget {
@@ -21,3 +26,6 @@ type ResolutionType<T extends (...args: any) => any> = T extends (
 ) => Promise<infer R>
   ? R
   : any;
+
+// https://github.com/krzkaczor/ts-essentials
+type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

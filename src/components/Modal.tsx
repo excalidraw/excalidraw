@@ -4,13 +4,13 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { KEYS } from "../keys";
 
-export function Modal(props: {
+export const Modal = (props: {
   className?: string;
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
   labelledBy: string;
-}) {
+}) => {
   const modalRoot = useBodyRoot();
 
   const handleKeydown = (event: React.KeyboardEvent) => {
@@ -26,7 +26,6 @@ export function Modal(props: {
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
-      tabIndex={-1}
     >
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div
@@ -44,14 +43,14 @@ export function Modal(props: {
     </div>,
     modalRoot,
   );
-}
+};
 
-function useBodyRoot() {
-  function createDiv() {
+const useBodyRoot = () => {
+  const createDiv = () => {
     const div = document.createElement("div");
     document.body.appendChild(div);
     return div;
-  }
+  };
   const [div] = useState(createDiv);
   useEffect(() => {
     return () => {
@@ -59,4 +58,4 @@ function useBodyRoot() {
     };
   }, [div]);
   return div;
-}
+};

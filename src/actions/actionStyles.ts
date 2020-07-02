@@ -4,9 +4,13 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { KEYS } from "../keys";
-import { DEFAULT_FONT, DEFAULT_TEXT_ALIGN } from "../appState";
 import { register } from "./register";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+} from "../constants";
 
 let copiedStyles: string = "{}";
 
@@ -41,13 +45,15 @@ export const actionPasteStyles = register({
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
+            strokeStyle: pastedElement?.strokeStyle,
             fillStyle: pastedElement?.fillStyle,
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
           });
           if (isTextElement(newElement)) {
             mutateElement(newElement, {
-              font: pastedElement?.font || DEFAULT_FONT,
+              fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
+              fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
             });
             redrawTextBoundingBox(newElement);

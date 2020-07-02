@@ -2,11 +2,13 @@ import oc from "open-color";
 import { AppState, FlooredNumber } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+} from "./constants";
 
-export const DEFAULT_FONT = "20px Virgil";
-export const DEFAULT_TEXT_ALIGN = "left";
-
-export function getDefaultAppState(): AppState {
+export const getDefaultAppState = (): AppState => {
   return {
     isLoading: false,
     errorMessage: null,
@@ -14,6 +16,7 @@ export function getDefaultAppState(): AppState {
     resizingElement: null,
     multiElement: null,
     editingElement: null,
+    editingLinearElement: null,
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
@@ -22,9 +25,11 @@ export function getDefaultAppState(): AppState {
     currentItemBackgroundColor: "transparent",
     currentItemFillStyle: "hachure",
     currentItemStrokeWidth: 1,
+    currentItemStrokeStyle: "solid",
     currentItemRoughness: 1,
     currentItemOpacity: 100,
-    currentItemFont: DEFAULT_FONT,
+    currentItemFontSize: DEFAULT_FONT_SIZE,
+    currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
@@ -43,13 +48,18 @@ export function getDefaultAppState(): AppState {
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
+    previousSelectedElementIds: {},
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
+    zenModeEnabled: false,
+    gridSize: null,
+    editingGroupId: null,
+    selectedGroupIds: {},
   };
-}
+};
 
-export function clearAppStateForLocalStorage(appState: AppState) {
+export const clearAppStateForLocalStorage = (appState: AppState) => {
   const {
     draggingElement,
     resizingElement,
@@ -63,33 +73,15 @@ export function clearAppStateForLocalStorage(appState: AppState) {
     isLoading,
     errorMessage,
     showShortcutsDialog,
+    editingLinearElement,
     ...exportedState
   } = appState;
   return exportedState;
-}
+};
 
-export function clearAppStatePropertiesForHistory(
-  appState: AppState,
-): Partial<AppState> {
-  return {
-    selectedElementIds: appState.selectedElementIds,
-    exportBackground: appState.exportBackground,
-    shouldAddWatermark: appState.shouldAddWatermark,
-    currentItemStrokeColor: appState.currentItemStrokeColor,
-    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-    currentItemFillStyle: appState.currentItemFillStyle,
-    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-    currentItemRoughness: appState.currentItemRoughness,
-    currentItemOpacity: appState.currentItemOpacity,
-    currentItemFont: appState.currentItemFont,
-    currentItemTextAlign: appState.currentItemTextAlign,
-    viewBackgroundColor: appState.viewBackgroundColor,
-    name: appState.name,
-  };
-}
-
-export function cleanAppStateForExport(appState: AppState) {
+export const cleanAppStateForExport = (appState: AppState) => {
   return {
     viewBackgroundColor: appState.viewBackgroundColor,
+    gridSize: appState.gridSize,
   };
-}
+};

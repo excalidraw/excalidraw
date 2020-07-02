@@ -1,11 +1,12 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "selectAll": "",
+    "selectAll": "Összes kijelölése",
+    "moveCanvas": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
-    "copyAsSvg": "",
-    "bringForward": "",
+    "copyAsSvg": "Vágólapra másolás mint SVG",
+    "bringForward": "Előrébb hozás",
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
@@ -16,6 +17,10 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Stílus",
     "opacity": "Áttetszőség",
     "textAlign": "",
@@ -36,7 +41,7 @@
     "crossHatch": "",
     "thin": "Vékony",
     "bold": "Félkövér",
-    "left": "",
+    "left": "Bal",
     "center": "",
     "right": "",
     "extraBold": "",
@@ -53,8 +58,13 @@
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
     "untitled": "",
-    "name": "",
-    "madeWithExcalidraw": ""
+    "name": "Név",
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "save": "Mentés",
+    "saveAs": "",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
@@ -79,7 +90,9 @@
     "redo": "Újra végrehajtás",
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "Kiválasztás",
+    "draw": "",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
+    "freeDraw": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
-    "resize": "A SHIFT billentyű lenyomva tartásával megőrizheti az arányokat",
-    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését"
+    "resize": "",
+    "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
@@ -131,9 +149,9 @@
     "button_startSession": "Munkamenet indítása",
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
-    "desc_persistenceWarning": "Vegye figyelembe, hogy a jelenet adatait P2P formátumban osztják meg az együttműködők között és nem maradnak meg a szerverünkön. Így ha mindketten bezárják az ablakot, akkor elveszítik az adatokat, hacsak nem exportálják fájlba vagy nem hoznak létre egy megosztható linket.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": ""
@@ -157,5 +175,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Постави",
     "selectAll": "Маркирай всичко",
+    "moveCanvas": "",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копиране в клипборда",
@@ -16,6 +17,10 @@
     "background": "Фон",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Небрежност",
     "opacity": "Непрозрачност",
     "textAlign": "Подравняване на текста",
@@ -54,7 +59,12 @@
     "duplicateSelection": "Дублирай",
     "untitled": "Неозаглавено",
     "name": "Име",
-    "madeWithExcalidraw": ""
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "save": "Запази",
+    "saveAs": "",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",
@@ -79,7 +90,9 @@
     "redo": "Повтори",
     "roomDialog": "Започнете сътрудничество на живо",
     "createNewRoom": "Създай нова стая",
-    "toggleFullScreen": "Превключване на цял екран"
+    "toggleFullScreen": "Превключване на цял екран",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "Селекция",
+    "draw": "",
     "rectangle": "Правоъгълник",
     "diamond": "Диамант",
     "ellipse": "Елипс",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
+    "freeDraw": "",
     "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
-    "resize": "Можете да ограничите пропорциите, като държите SHIFT, докато преоразмерите",
-    "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите"
+    "resize": "",
+    "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Среща грешка. Опитайте ",
@@ -131,9 +149,9 @@
     "button_startSession": "Стартирайте сесията",
     "button_stopSession": "Стоп на сесията",
     "desc_inProgressIntro": "Сесията за сътрудничество на живо е в ход.",
-    "desc_persistenceWarning": "Обърнете внимание, че данните за сцената се споделят между сътрудници по P2P начин и не се запазват на нашия сървър. По този начин, ако всички вие прекъснете връзката, ще загубите данните, освен ако не ги експортирате във файл или съвместна връзка.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "Споделете тази връзка с всеки, с когото искате да си сътрудничите:",
-    "desc_exitSession": "Спирането на сесията ще ви изключи от стаята, но ще можете да продължите да работите със сцената, локално. Имайте предвид, че това няма да засегне други хора и те все още ще могат да си сътрудничат с тяхната версия."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "Грешка"
@@ -157,5 +175,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

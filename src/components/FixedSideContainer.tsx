@@ -5,15 +5,17 @@ import React from "react";
 type FixedSideContainerProps = {
   children: React.ReactNode;
   side: "top" | "left" | "right";
+  className?: string;
 };
 
-export function FixedSideContainer({
+export const FixedSideContainer = ({
   children,
   side,
-}: FixedSideContainerProps) {
-  return (
-    <div className={`FixedSideContainer FixedSideContainer_side_${side}`}>
-      {children}
-    </div>
-  );
-}
+  className,
+}: FixedSideContainerProps) => (
+  <div
+    className={`FixedSideContainer FixedSideContainer_side_${side} ${className}`}
+  >
+    {children}
+  </div>
+);

@@ -34,6 +34,7 @@ export {
   actionChangeProjectName,
   actionChangeExportBackground,
   actionSaveScene,
+  actionSaveAsScene,
   actionLoadScene,
 } from "./actionExport";
 
@@ -44,3 +45,7 @@ export {
   actionFullScreen,
   actionShortcuts,
 } from "./actionMenu";
+
+export { actionGroup, actionUngroup } from "./actionGroup";
+
+export { actionGoToCollaborator } from "./actionNavigate";

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
+    "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
@@ -16,6 +17,10 @@
     "background": "Background",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
+    "strokeStyle": "Stroke style",
+    "strokeStyle_solid": "Solid",
+    "strokeStyle_dashed": "Dashed",
+    "strokeStyle_dotted": "Dotted",
     "sloppiness": "Sloppiness",
     "opacity": "Opacity",
     "textAlign": "Text align",
@@ -54,7 +59,12 @@
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
-    "madeWithExcalidraw": "Made with Excalidraw"
+    "yourName": "Your name",
+    "madeWithExcalidraw": "Made with Excalidraw",
+    "group": "Group selection",
+    "ungroup": "Ungroup selection",
+    "collaborators": "Collaborators",
+    "toggleGridMode": "Toggle grid mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
     "save": "Save",
+    "saveAs": "Save as",
     "load": "Load",
     "getShareableLink": "Get shareable link",
     "close": "Close",
@@ -79,7 +90,9 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen"
+    "toggleFullScreen": "Toggle full screen",
+    "toggleZenMode": "Toggle zen mode",
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "Selection",
+    "draw": "Free draw",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
+    "freeDraw": "Click and drag, release when you're finished",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
-    "rotate": "You can constrain angles by holding SHIFT while rotating"
+    "rotate": "You can constrain angles by holding SHIFT while rotating",
+    "lineEditor_info": "Double-click or press Enter to edit points",
+    "lineEditor_pointSelected": "Press Delete to remove point or drag to move",
+    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
   "errorSplash": {
     "headingMain_pre": "Encountered an error. Try ",
@@ -131,9 +149,9 @@
     "button_startSession": "Start session",
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will loose the data unless you export it to a file or a shareable link.",
+    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will lose the data unless you export it to a file or a shareable link.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect your from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   },
   "errorDialog": {
     "title": "Error"
@@ -157,5 +175,9 @@
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
+  },
+  "charts": {
+    "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
+    "tooManyColumns": "You pasted a spreadsheet with more than two columns."
   }
 }

@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 
 const context = React.createContext(false);
 
-export function IsMobileProvider({ children }: { children: React.ReactNode }) {
+export const IsMobileProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const query = useRef<MediaQueryList>();
   if (!query.current) {
     query.current = window.matchMedia
@@ -24,7 +28,7 @@ export function IsMobileProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return <context.Provider value={isMobile}>{children}</context.Provider>;
-}
+};
 
 export default function useIsMobile() {
   return useContext(context);

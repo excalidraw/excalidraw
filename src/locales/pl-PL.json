@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
+    "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
@@ -16,6 +17,10 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
+    "strokeStyle": "Styl obrysu",
+    "strokeStyle_solid": "Pełny",
+    "strokeStyle_dashed": "Kreskowany",
+    "strokeStyle_dotted": "Kropkowany",
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
@@ -23,7 +28,7 @@
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
     "withBackground": "Z tłem dokumentu",
-    "addWatermark": "",
+    "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
     "code": "Kod",
@@ -54,7 +59,12 @@
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
-    "madeWithExcalidraw": ""
+    "yourName": "Twoje imię",
+    "madeWithExcalidraw": "Zrobione w Excalidraw",
+    "group": "Zgrupuj wybrane",
+    "ungroup": "Rozgrupuj wybrane",
+    "collaborators": "Współtwórcy",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "save": "Zapisz",
+    "saveAs": "Zapisz jako",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
@@ -79,7 +90,9 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy"
+    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
+    "toggleZenMode": "Włącz tryb Zen",
+    "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
+    "draw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
+    "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "resize": "Możesz zachować proporcję trzymając wciśnięty SHIFT",
-    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT"
+    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
+    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
+    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_pointSelected": "Naciśnij Delete by usunąć punkt albo przeciągnij by zmienić jego pozycje",
+    "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
@@ -142,7 +160,7 @@
     "title": "Skróty klawiszowe",
     "shapes": "Kształty",
     "or": "lub",
-    "click": "kliknięcie",
+    "click": "klik",
     "drag": "przeciągnij",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
@@ -156,6 +174,10 @@
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
   },
   "encrypted": {
-    "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz. Kliknij ikonę, aby dowiedzieć się więcej..."
+    "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
+  },
+  "charts": {
+    "noNumericColumn": "Wklejono arkusz kalkulacyjny bez kolumny numerycznej.",
+    "tooManyColumns": "Wklejono arkusz kalkulacyjny z więcej niż dwoma kolumnami."
   }
 }

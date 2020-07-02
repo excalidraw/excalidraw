@@ -2,13 +2,14 @@
   "labels": {
     "paste": "Tempel",
     "selectAll": "Pilih semua",
+    "moveCanvas": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
     "copyAsSvg": "Salin ke Papan Klip Sebagai SVG",
-    "bringForward": "",
-    "sendToBack": "",
-    "bringToFront": "",
-    "sendBackward": "",
+    "bringForward": "Majukan",
+    "sendToBack": "Bawa ke Belakang",
+    "bringToFront": "Bawa ke depan",
+    "sendBackward": "Mundurkan",
     "delete": "Hapus",
     "copyStyles": "",
     "pasteStyles": "",
@@ -16,14 +17,18 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Sloppiness",
     "opacity": "Opasitas",
     "textAlign": "Perataan Teks",
-    "fontSize": "",
-    "fontFamily": "",
+    "fontSize": "Ukuran font",
+    "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
     "withBackground": "Dengan Latar",
-    "addWatermark": "",
+    "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "",
     "normal": "Biasa",
     "code": "Kode",
@@ -54,7 +59,12 @@
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
-    "madeWithExcalidraw": ""
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke Papan Klip",
     "save": "Simpan",
+    "saveAs": "",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
     "close": "Tutup",
@@ -79,7 +90,9 @@
     "redo": "Mengulang",
     "roomDialog": "Mulai kolaborasi secara langsung",
     "createNewRoom": "Buat ruang baru",
-    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh"
+    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
+    "draw": "",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
-    "rotate": ""
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
@@ -157,5 +175,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

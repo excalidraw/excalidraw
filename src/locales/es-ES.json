@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
+    "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -16,14 +17,18 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
+    "strokeStyle": "Estilo del trazo",
+    "strokeStyle_solid": "Sólido",
+    "strokeStyle_dashed": "Linea discontinua",
+    "strokeStyle_dotted": "Punteado",
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
     "fontSize": "Tamaño de la fuente",
-    "fontFamily": "Tipo de letra",
+    "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
     "withBackground": "Con fondo",
-    "addWatermark": "",
+    "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
     "normal": "Normal",
     "code": "Código",
@@ -37,7 +42,7 @@
     "thin": "Fino",
     "bold": "Grueso",
     "left": "Izquierda",
-    "center": "Centro",
+    "center": "Centrado",
     "right": "Derecha",
     "extraBold": "Extra negrita",
     "architect": "Arquitecto",
@@ -54,7 +59,12 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
     "name": "Nombre",
-    "madeWithExcalidraw": ""
+    "yourName": "Tu nombre",
+    "madeWithExcalidraw": "Hecho con Excalidraw",
+    "group": "Selección de grupo",
+    "ungroup": "Dividir selección",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -64,6 +74,7 @@
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
+    "saveAs": "",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
     "close": "Cerrar",
@@ -79,7 +90,9 @@
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
-    "toggleFullScreen": "Alternar pantalla completa"
+    "toggleFullScreen": "Alternar pantalla completa",
+    "toggleZenMode": "Alternar modo zen",
+    "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -89,10 +102,11 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido encriptada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
   },
   "toolBar": {
     "selection": "Selección",
+    "draw": "Dibujo libre",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
     "ellipse": "Elipse",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
+    "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "resize": "Puede restringir las proporciones manteniendo presionado SHIFT mientras cambia el tamaño",
-    "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira"
+    "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
+    "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
+    "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
+    "lineEditor_pointSelected": "Pulse Borrar para eliminar el punto o arrastre para mover",
+    "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
@@ -122,18 +140,18 @@
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos para no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
     "openIssueMessage_button": "seguimiento de errores.",
-    "openIssueMessage_post": " Por favor incluya la información a continuación copiando y pegando en el problema de GitHub.",
+    "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
     "desc_intro": "Puedes invitar a gente a tu escena actual para colaborar contigo.",
-    "desc_privacy": "No se preocupe, la sesión usa encriptación de extremo a extremo, por lo que todo lo que dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver qué se le ocurre.",
+    "desc_privacy": "No te preocupes, la sesión usa encriptación de extremo a extremo, por lo que todo lo que se dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver lo que haces.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
-    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderán los datos a menos que los exporten a un archivo o un enlace para compartir.",
-    "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
-    "desc_exitSession": "Detener la sesión lo desconectará de la sala, pero podrá continuar trabajando con la escena localmente. Tenga en cuenta que esto no afectará a otras personas, y aún podrán colaborar en su versión."
+    "desc_persistenceWarning": "Ten en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderás los datos a menos que sean exportados a un archivo o un enlace para compartir.",
+    "desc_shareLink": "Comparte este enlace con tus colaboradores:",
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena localmente. Ten en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
   },
   "errorDialog": {
     "title": "Error"
@@ -143,19 +161,23 @@
     "shapes": "Formas",
     "or": "o",
     "click": "hacer clic",
-    "drag": "",
+    "drag": "arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "editor": "Editor",
     "view": "Vista",
-    "blog": "Leer nuestro blog",
-    "howto": "Seguir nuestras guías",
+    "blog": "Lee nuestro blog",
+    "howto": "Sigue nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": ""
+    "zoomToFit": "Ajustar para mostrar todos los elementos"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
+  },
+  "charts": {
+    "noNumericColumn": "Pegaste una hoja de cálculo sin una columna numérica.",
+    "tooManyColumns": "Pegaste una hoja de cálculo con más de dos columnas."
   }
 }

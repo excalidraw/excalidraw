@@ -4,12 +4,11 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
 
-export function getElementsWithinSelection(
+export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
-) {
+) => {
   const [
     selectionX1,
     selectionY1,
@@ -29,42 +28,24 @@ export function getElementsWithinSelection(
       selectionY2 >= elementY2
     );
   });
-}
+};
 
-export function deleteSelectedElements(
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) {
-  return {
-    elements: elements.map((el) => {
-      if (appState.selectedElementIds[el.id]) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      return el;
-    }),
-    appState: {
-      ...appState,
-      selectedElementIds: {},
-    },
-  };
-}
-
-export function isSomeElementSelected(
+export const isSomeElementSelected = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-): boolean {
+): boolean => {
   return elements.some((element) => appState.selectedElementIds[element.id]);
-}
+};
 
 /**
  * Returns common attribute (picked by `getAttribute` callback) of selected
  *  elements. If elements don't share the same value, returns `null`.
  */
-export function getCommonAttributeOfSelectedElements<T>(
+export const getCommonAttributeOfSelectedElements = <T>(
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-): T | null {
+): T | null => {
   const attributes = Array.from(
     new Set(
       getSelectedElements(elements, appState).map((element) =>
@@ -73,20 +54,20 @@ export function getCommonAttributeOfSelectedElements<T>(
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;
-}
+};
 
-export function getSelectedElements(
+export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   return elements.filter((element) => appState.selectedElementIds[element.id]);
-}
+};
 
-export function getTargetElement(
+export const getTargetElement = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   return appState.editingElement
     ? [appState.editingElement]
     : getSelectedElements(elements, appState);
-}
+};

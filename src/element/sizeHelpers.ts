@@ -3,25 +3,31 @@ import { mutateElement } from "./mutateElement";
 import { isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 
-export function isInvisiblySmallElement(element: ExcalidrawElement): boolean {
+export const isInvisiblySmallElement = (
+  element: ExcalidrawElement,
+): boolean => {
   if (isLinearElement(element)) {
     return element.points.length < 2;
   }
   return element.width === 0 && element.height === 0;
-}
+};
 
 /**
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */
-export function getPerfectElementSize(
+export const getPerfectElementSize = (
   elementType: string,
   width: number,
   height: number,
-): { width: number; height: number } {
+): { width: number; height: number } => {
   const absWidth = Math.abs(width);
   const absHeight = Math.abs(height);
 
-  if (elementType === "line" || elementType === "arrow") {
+  if (
+    elementType === "line" ||
+    elementType === "arrow" ||
+    elementType === "draw"
+  ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *
       SHIFT_LOCKING_ANGLE;
@@ -38,13 +44,13 @@ export function getPerfectElementSize(
     height = absWidth * Math.sign(height);
   }
   return { width, height };
-}
+};
 
-export function resizePerfectLineForNWHandler(
+export const resizePerfectLineForNWHandler = (
   element: ExcalidrawElement,
   x: number,
   y: number,
-) {
+) => {
   const anchorX = element.x + element.width;
   const anchorY = element.y + element.height;
   const distanceToAnchorX = x - anchorX;
@@ -73,33 +79,34 @@ export function resizePerfectLineForNWHandler(
       height: nextHeight,
     });
   }
-}
+};
 
-/**
- * @returns {boolean} whether element was normalized
- */
-export function normalizeDimensions(
-  element: ExcalidrawElement | null,
-): element is ExcalidrawElement {
-  if (!element || (element.width >= 0 && element.height >= 0)) {
-    return false;
-  }
+export const getNormalizedDimensions = (
+  element: Pick<ExcalidrawElement, "width" | "height" | "x" | "y">,
+): {
+  width: ExcalidrawElement["width"];
+  height: ExcalidrawElement["height"];
+  x: ExcalidrawElement["x"];
+  y: ExcalidrawElement["y"];
+} => {
+  const ret = {
+    width: element.width,
+    height: element.height,
+    x: element.x,
+    y: element.y,
+  };
 
   if (element.width < 0) {
     const nextWidth = Math.abs(element.width);
-    mutateElement(element, {
-      width: nextWidth,
-      x: element.x - nextWidth,
-    });
+    ret.width = nextWidth;
+    ret.x = element.x - nextWidth;
   }
 
   if (element.height < 0) {
     const nextHeight = Math.abs(element.height);
-    mutateElement(element, {
-      height: nextHeight,
-      y: element.y - nextHeight,
-    });
+    ret.height = nextHeight;
+    ret.y = element.y - nextHeight;
   }
 
-  return true;
-}
+  return ret;
+};

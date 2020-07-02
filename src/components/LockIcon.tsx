@@ -11,6 +11,7 @@ type LockIconProps = {
   checked: boolean;
   onChange?(): void;
   size?: LockIconSize;
+  zenModeEnabled?: boolean;
 };
 
 const DEFAULT_SIZE: LockIconSize = "m";
@@ -39,12 +40,14 @@ const ICONS = {
   ),
 };
 
-export function LockIcon(props: LockIconProps) {
+export const LockIcon = (props: LockIconProps) => {
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
   return (
     <label
-      className={`ToolIcon ToolIcon__lock ToolIcon_type_floating ${sizeCn}`}
+      className={`ToolIcon ToolIcon__lock ToolIcon_type_floating ${sizeCn} zen-mode-visibility ${
+        props.zenModeEnabled && "zen-mode-visibility--hidden"
+      }`}
       title={`${props.title} — Q`}
     >
       <input
@@ -61,4 +64,4 @@ export function LockIcon(props: LockIconProps) {
       </div>
     </label>
   );
-}
+};

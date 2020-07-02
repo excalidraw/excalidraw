@@ -15,20 +15,24 @@ export const KEYS = {
   QUESTION_MARK: "?",
   F_KEY_CODE: 70,
   ALT_KEY_CODE: 18,
+  Z_KEY_CODE: 90,
+  GRID_KEY_CODE: 222,
+  G_KEY_CODE: 71,
 } as const;
 
 export type Key = keyof typeof KEYS;
 
-export function isArrowKey(keyCode: string) {
-  return (
-    keyCode === KEYS.ARROW_LEFT ||
-    keyCode === KEYS.ARROW_RIGHT ||
-    keyCode === KEYS.ARROW_DOWN ||
-    keyCode === KEYS.ARROW_UP
-  );
-}
+export const isArrowKey = (keyCode: string) =>
+  keyCode === KEYS.ARROW_LEFT ||
+  keyCode === KEYS.ARROW_RIGHT ||
+  keyCode === KEYS.ARROW_DOWN ||
+  keyCode === KEYS.ARROW_UP;
 
 export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
   event.altKey || event.which === KEYS.ALT_KEY_CODE;
+
 export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
+  event.shiftKey;
+
+export const getRotateWithDiscreteAngleKey = (event: MouseEvent) =>
   event.shiftKey;

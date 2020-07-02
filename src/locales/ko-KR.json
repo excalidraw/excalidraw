@@ -2,6 +2,7 @@
   "labels": {
     "paste": "붙여넣기",
     "selectAll": "전체 선택",
+    "moveCanvas": "",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
@@ -16,6 +17,10 @@
     "background": "배경색",
     "fill": "채우기 스타일",
     "strokeWidth": "선 두께",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "선 스타일",
     "opacity": "불투명도",
     "textAlign": "텍스트 정렬",
@@ -54,7 +59,12 @@
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "",
-    "madeWithExcalidraw": ""
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -64,6 +74,7 @@
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "save": "저장",
+    "saveAs": "",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",
@@ -79,7 +90,9 @@
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "",
-    "toggleFullScreen": "전체화면"
+    "toggleFullScreen": "전체화면",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -93,6 +106,7 @@
   },
   "toolBar": {
     "selection": "선택",
+    "draw": "",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
@@ -108,9 +122,13 @@
   },
   "hints": {
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
+    "freeDraw": "",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
-    "resize": "SHIFT 키를 누르면서 크기를 조정하면 비율을 제한할 수 있습니다.",
-    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다."
+    "resize": "",
+    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
@@ -131,9 +149,9 @@
     "button_startSession": "세션 시작",
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
-    "desc_persistenceWarning": "모든 데이터는 P2P 방식으로 공동 작업자 간에 공유되며 서버에는 저장되지 않습니다. 따라서 모든 작업자의 연결이 끊어지면 파일 또는 공유 가능한 링크로 보관하지 않는 한 데이터가 유실됩니다.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
-    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 로컬에서 작업을 이어갈 수 있습니다. 로컬 작업은 다른 작업자에게 영향을 미치지 않으며 그들의 공동 작업은 계속 유지됩니다."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "에러"
@@ -157,5 +175,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

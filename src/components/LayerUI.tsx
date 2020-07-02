@@ -10,6 +10,7 @@ import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
 import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
+import { UserList } from "./UserList";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
 import { LanguageList } from "./LanguageList";
@@ -28,6 +29,7 @@ import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
 import { shield } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
+import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 
@@ -41,6 +43,9 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  zenModeEnabled: boolean;
+  toggleZenMode: () => void;
+  lng: string;
 }
 
 const LayerUI = ({
@@ -53,12 +58,17 @@ const LayerUI = ({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
+  zenModeEnabled,
+  toggleZenMode,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
+  // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
-      className="encrypted-icon tooltip"
+      className={`encrypted-icon tooltip zen-mode-visibility ${
+        zenModeEnabled ? "zen-mode-visibility--hidden" : ""
+      }`}
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
@@ -112,7 +122,10 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => (
-    <Section heading="canvasActions">
+    <Section
+      heading="canvasActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
       <Island padding={4} style={{ zIndex: 1 }}>
@@ -120,6 +133,7 @@ const LayerUI = ({
           <Stack.Row gap={1} justifyContent="space-between">
             {actionManager.renderAction("loadScene")}
             {actionManager.renderAction("saveScene")}
+            {actionManager.renderAction("saveAsScene")}
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
             <RoomDialog
@@ -138,7 +152,10 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => (
-    <Section heading="selectedShapeActions">
+    <Section
+      heading="selectedShapeActions"
+      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+    >
       <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
         <SelectedShapeActions
           appState={appState}
@@ -159,7 +176,10 @@ const LayerUI = ({
       <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={4}>
+          <Stack.Col
+            gap={4}
+            className={zenModeEnabled && "disable-pointerEvents"}
+          >
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -167,7 +187,7 @@ const LayerUI = ({
             {(heading) => (
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
-                  <Island padding={1}>
+                  <Island padding={1} className={zenModeEnabled && "zen-mode"}>
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher
@@ -177,6 +197,7 @@ const LayerUI = ({
                     </Stack.Row>
                   </Island>
                   <LockIcon
+                    zenModeEnabled={zenModeEnabled}
                     checked={appState.elementLocked}
                     onChange={onLockToggle}
                     title={t("toolBar.lock")}
@@ -185,41 +206,79 @@ const LayerUI = ({
               </Stack.Col>
             )}
           </Section>
-          <div />
+          <UserList
+            className={`zen-mode-transition ${
+              zenModeEnabled && "transition-right"
+            }`}
+          >
+            {Array.from(appState.collaborators)
+              // Collaborator is either not initialized or is actually the current user.
+              .filter(([_, client]) => Object.keys(client).length !== 0)
+              .map(([clientId, client]) => (
+                <Tooltip
+                  label={client.username || "Unknown user"}
+                  key={clientId}
+                >
+                  {actionManager.renderAction("goToCollaborator", clientId)}
+                </Tooltip>
+              ))}
+          </UserList>
         </div>
-        <div className="App-menu App-menu_bottom">
-          <Stack.Col gap={2}>
-            <Section heading="canvasActions">
-              <Island padding={1}>
-                <ZoomActions
-                  renderAction={actionManager.renderAction}
-                  zoom={appState.zoom}
-                />
-              </Island>
-              {renderEncryptedIcon()}
-            </Section>
-          </Stack.Col>
-        </div>
+        {
+          <div
+            className={`App-menu App-menu_bottom zen-mode-transition ${
+              zenModeEnabled && "App-menu_bottom--transition-left"
+            }`}
+          >
+            <Stack.Col gap={2}>
+              <Section heading="canvasActions">
+                <Island padding={1}>
+                  <ZoomActions
+                    renderAction={actionManager.renderAction}
+                    zoom={appState.zoom}
+                  />
+                </Island>
+                {renderEncryptedIcon()}
+              </Section>
+            </Stack.Col>
+          </div>
+        }
       </FixedSideContainer>
     );
   };
 
   const renderFooter = () => (
-    <footer role="contentinfo">
-      <LanguageList
-        onChange={(lng) => {
-          setLanguage(lng);
-          setAppState({});
-        }}
-        languages={languages}
-        floating
-      />
-      {actionManager.renderAction("toggleShortcuts")}
+    <footer role="contentinfo" className="layer-ui__wrapper__footer">
+      <div
+        className={`zen-mode-transition ${
+          zenModeEnabled && "transition-right disable-pointerEvents"
+        }`}
+      >
+        <LanguageList
+          onChange={async (lng) => {
+            await setLanguage(lng);
+            setAppState({});
+          }}
+          languages={languages}
+          floating
+        />
+        {actionManager.renderAction("toggleShortcuts")}
+      </div>
+      <button
+        className={`disable-zen-mode ${
+          zenModeEnabled && "disable-zen-mode--visible"
+        }`}
+        onClick={toggleZenMode}
+      >
+        {t("buttons.exitZenMode")}
+      </button>
       {appState.scrolledOutside && (
         <button
           className="scroll-back-to-content"
           onClick={() => {
-            setAppState({ ...calculateScrollCenter(elements) });
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
           }}
         >
           {t("buttons.scrollBackToContent")}
@@ -239,6 +298,7 @@ const LayerUI = ({
       onRoomCreate={onRoomCreate}
       onRoomDestroy={onRoomDestroy}
       onLockToggle={onLockToggle}
+      canvas={canvas}
     />
   ) : (
     <div className="layer-ui__wrapper">
@@ -255,9 +315,15 @@ const LayerUI = ({
         />
       )}
       {renderFixedSideContainer()}
-      <aside>
-        <GitHubCorner />
-      </aside>
+      {
+        <aside
+          className={`layer-ui__wrapper__github-corner zen-mode-transition ${
+            zenModeEnabled && "transition-right"
+          }`}
+        >
+          <GitHubCorner />
+        </aside>
+      }
       {renderFooter()}
     </div>
   );
@@ -283,6 +349,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
+    prev.lng === next.lng &&
     prev.elements === next.elements &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );

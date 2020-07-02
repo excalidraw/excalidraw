@@ -51,7 +51,7 @@ canvas {
   image-rendering: -moz-crisp-edges; // FF
 }
 
-.container {
+.excalidraw {
   display: flex;
   position: fixed;
   top: 0;
@@ -267,6 +267,12 @@ button,
   cursor: default;
   pointer-events: none !important;
 
+  &--transition-left {
+    section {
+      width: 185px;
+    }
+  }
+
   section {
     display: flex;
   }
@@ -362,7 +368,7 @@ button,
   font-size: 0.8rem;
   outline: none;
   appearance: none;
-  background-image: url("https://free-use.s3-us-west-2.amazonaws.com/up-sort.svg");
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   background-repeat: no-repeat;
   background-position: right 0.7rem top 50%, 0 0;
   :root[dir="rtl"] & {
@@ -388,6 +394,7 @@ button,
 }
 
 .dropdown-select__language.dropdown-select--floating {
+  position: fixed;
   bottom: 10px;
   :root[dir="ltr"] & {
     right: 44px;
@@ -448,12 +455,41 @@ button,
 }
 
 .github-corner {
-  position: absolute;
+  position: fixed;
   top: 0;
+  z-index: 2;
   :root[dir="ltr"] & {
     right: 0;
   }
   :root[dir="rtl"] & {
     left: 0;
+  }
+}
+
+.zen-mode-visibility {
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+  width: auto;
+  transition: opacity 0.5s;
+
+  &.zen-mode-visibility--hidden {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    transition: opacity 0.5s;
+  }
+}
+
+.disable-pointerEvents {
+  pointer-events: none !important;
+}
+
+@media print {
+  .App-bottom-bar,
+  .FixedSideContainer,
+  .layer-ui__wrapper {
+    display: none;
   }
 }
