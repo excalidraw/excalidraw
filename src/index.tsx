@@ -53,6 +53,12 @@ Sentry.init({
       levels: ["error"],
     }),
   ],
+  beforeSend(event) {
+    if (event.request?.url) {
+      event.request.url = event.request.url.replace(/#.*$/, "");
+    }
+    return event;
+  },
 });
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
