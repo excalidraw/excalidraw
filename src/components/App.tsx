@@ -367,11 +367,14 @@ class App extends React.Component<any, AppState> {
       }
     }
 
+    if (this.state.isLoading) {
+      this.setState({ isLoading: false });
+    }
+
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
       this.syncActionResult(scene);
-      this.setState({ isLoading: false });
     }
   };
 
