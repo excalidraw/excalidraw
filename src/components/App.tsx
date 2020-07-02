@@ -344,10 +344,12 @@ class App extends React.Component<any, AppState> {
       /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
     );
 
-    let isCollaborationScene = getCollaborationLinkData(window.location.href);
     let scene = await loadScene(null);
 
-    if (id || jsonMatch || isCollaborationScene) {
+    let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
+    const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
+
+    if (isExternalScene) {
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -362,7 +364,7 @@ class App extends React.Component<any, AppState> {
           window.history.replaceState({}, "Excalidraw", window.location.origin);
         }
       } else {
-        isCollaborationScene = null;
+        isCollaborationScene = false;
         window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
     }
