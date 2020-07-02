@@ -367,17 +367,11 @@ class App extends React.Component<any, AppState> {
       }
     }
 
-    if (scene && !isCollaborationScene) {
-      this.syncActionResult(scene);
-    }
-
-    if (this.state.isLoading) {
-      this.setState({ isLoading: false });
-    }
-
-    // run this last else the `isLoading` would be overriden
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
+    } else if (scene) {
+      this.syncActionResult(scene);
+      this.setState({ isLoading: false });
     }
   };
 
