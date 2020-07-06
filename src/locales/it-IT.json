@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Incolla",
     "selectAll": "Seleziona tutto",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",

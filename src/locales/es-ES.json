@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",

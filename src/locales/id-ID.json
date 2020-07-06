@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Tempel",
     "selectAll": "Pilih semua",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
