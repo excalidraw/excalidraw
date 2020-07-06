@@ -2,7 +2,6 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
-    "multiSelect": "",
     "moveCanvas": "Leinwand verschieben",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
