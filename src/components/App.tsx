@@ -1924,10 +1924,6 @@ class App extends React.Component<any, AppState> {
         if (elementWithResizeHandler != null) {
           this.setState({ resizingElement: elementWithResizeHandler.element });
           resizeHandle = elementWithResizeHandler.resizeHandle;
-          document.documentElement.style.cursor = getCursorForResizingElement(
-            elementWithResizeHandler,
-          );
-          isResizingElements = true;
         }
       } else if (selectedElements.length > 1) {
         resizeHandle = getResizeHandlerFromCoords(
@@ -1937,14 +1933,12 @@ class App extends React.Component<any, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (resizeHandle) {
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            resizeHandle,
-          });
-          isResizingElements = true;
-        }
       }
-      if (isResizingElements) {
+      if (resizeHandle) {
+        document.documentElement.style.cursor = getCursorForResizingElement({
+          resizeHandle,
+        });
+        isResizingElements = true;
         resizeOffsetXY = getResizeOffsetXY(
           resizeHandle,
           selectedElements,
@@ -1961,8 +1955,7 @@ class App extends React.Component<any, AppState> {
             selectedElements[0],
           );
         }
-      }
-      if (!isResizingElements) {
+      } else {
         if (this.state.editingLinearElement) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
