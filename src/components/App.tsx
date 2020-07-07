@@ -1977,12 +1977,11 @@ class App extends React.Component<any, AppState> {
         hitElement =
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+        const isHittingASelectedElement =
+          hitElement != null && this.state.selectedElementIds[hitElement.id];
 
         // clear selection if shift is not clicked
-        if (
-          !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
-          !event.shiftKey
-        ) {
+        if (!isHittingASelectedElement && !event.shiftKey) {
           this.setState((prevState) => ({
             selectedElementIds: {},
             selectedGroupIds: {},
