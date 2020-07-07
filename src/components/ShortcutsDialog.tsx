@@ -287,11 +287,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.copyStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+C")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
               />
               <Shortcut
                 label={t("labels.pasteStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+V")]}
               />
               <Shortcut
                 label={t("labels.delete")}
