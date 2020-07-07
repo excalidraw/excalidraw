@@ -1977,27 +1977,8 @@ class App extends React.Component<any, AppState> {
         hitElement =
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
-        const isHittingASelectedElement =
-          hitElement != null && this.state.selectedElementIds[hitElement.id];
 
-        // clear selection if shift is not clicked
-        if (!isHittingASelectedElement && !event.shiftKey) {
-          this.setState((prevState) => ({
-            selectedElementIds: {},
-            selectedGroupIds: {},
-            editingGroupId:
-              prevState.editingGroupId &&
-              hitElement &&
-              isElementInGroup(hitElement, prevState.editingGroupId)
-                ? prevState.editingGroupId
-                : null,
-          }));
-          const { selectedElementIds } = this.state;
-          this.setState({
-            selectedElementIds: {},
-            previousSelectedElementIds: selectedElementIds,
-          });
-        }
+        this.maybeClearSelection(event, hitElement);
 
         // If we click on something
         if (hitElement) {
@@ -2863,6 +2844,34 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
     return true;
+  }
+
+  private maybeClearSelection(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    hitElement: ExcalidrawElement | null,
+  ): void {
+    const isHittingASelectedElement =
+      hitElement != null && this.state.selectedElementIds[hitElement.id];
+
+    // clear selection if shift is not clicked
+    if (isHittingASelectedElement || event.shiftKey) {
+      return;
+    }
+    this.setState((prevState) => ({
+      selectedElementIds: {},
+      selectedGroupIds: {},
+      editingGroupId:
+        prevState.editingGroupId &&
+        hitElement &&
+        isElementInGroup(hitElement, prevState.editingGroupId)
+          ? prevState.editingGroupId
+          : null,
+    }));
+    const { selectedElementIds } = this.state;
+    this.setState({
+      selectedElementIds: {},
+      previousSelectedElementIds: selectedElementIds,
+    });
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
