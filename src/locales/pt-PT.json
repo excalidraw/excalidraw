@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Colar",
     "selectAll": "Selecionar tudo",
-    "multiSelect": "",
+    "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
