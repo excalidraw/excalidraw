@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
+    "multiSelect": "",
     "moveCanvas": "Tuvali taşı",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
