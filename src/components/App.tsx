@@ -1866,10 +1866,15 @@ class App extends React.Component<any, AppState> {
     }
 
     // Handle scrollbars dragging
+    const isOverScrollBarsNow = isOverScrollBars(
+      currentScrollBars,
+      event.clientX,
+      event.clientY,
+    );
     const {
       isOverHorizontalScrollBar,
       isOverVerticalScrollBar,
-    } = isOverScrollBars(currentScrollBars, event.clientX, event.clientY);
+    } = isOverScrollBarsNow;
 
     const { x, y } = viewportCoordsToSceneCoords(
       event,
@@ -1879,55 +1884,7 @@ class App extends React.Component<any, AppState> {
     );
     const lastCoords = { x, y };
 
-    if (
-      (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
-      !this.state.multiElement
-    ) {
-      isDraggingScrollBar = true;
-      lastCoords.x = event.clientX;
-      lastCoords.y = event.clientY;
-      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
-
-        if (isOverHorizontalScrollBar) {
-          const x = event.clientX;
-          const dx = x - lastCoords.x;
-          this.setState({
-            scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-          });
-          lastCoords.x = x;
-          return;
-        }
-
-        if (isOverVerticalScrollBar) {
-          const y = event.clientY;
-          const dy = y - lastCoords.y;
-          this.setState({
-            scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-          });
-          lastCoords.y = y;
-        }
-      });
-
-      const onPointerUp = withBatchedUpdates(() => {
-        isDraggingScrollBar = false;
-        setCursorForShape(this.state.elementType);
-        lastPointerUp = null;
-        this.setState({
-          cursorButton: "up",
-        });
-        this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
-      });
-
-      lastPointerUp = onPointerUp;
-
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    if (this.handleDraggingScrollBar(event, lastCoords, isOverScrollBarsNow)) {
       return;
     }
 
@@ -2850,6 +2807,74 @@ class App extends React.Component<any, AppState> {
         Array.from(gesture.pointers.values()),
       );
     }
+  }
+
+  // Returns whether the event is a dragging a scrollbar
+  private handleDraggingScrollBar(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    lastCoords: { x: number; y: number },
+    {
+      isOverHorizontalScrollBar,
+      isOverVerticalScrollBar,
+    }: {
+      isOverHorizontalScrollBar: boolean;
+      isOverVerticalScrollBar: boolean;
+    },
+  ): boolean {
+    if (
+      !(
+        (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
+        !this.state.multiElement
+      )
+    ) {
+      return false;
+    }
+    isDraggingScrollBar = true;
+    lastCoords.x = event.clientX;
+    lastCoords.y = event.clientY;
+    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (isOverHorizontalScrollBar) {
+        const x = event.clientX;
+        const dx = x - lastCoords.x;
+        this.setState({
+          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+        });
+        lastCoords.x = x;
+        return;
+      }
+
+      if (isOverVerticalScrollBar) {
+        const y = event.clientY;
+        const dy = y - lastCoords.y;
+        this.setState({
+          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+        });
+        lastCoords.y = y;
+      }
+    });
+
+    const onPointerUp = withBatchedUpdates(() => {
+      isDraggingScrollBar = false;
+      setCursorForShape(this.state.elementType);
+      lastPointerUp = null;
+      this.setState({
+        cursorButton: "up",
+      });
+      this.savePointer(event.clientX, event.clientY, "up");
+      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+    });
+
+    lastPointerUp = onPointerUp;
+
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    return true;
   }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
