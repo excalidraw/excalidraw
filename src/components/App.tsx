@@ -1921,12 +1921,8 @@ class App extends React.Component<any, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (elementWithResizeHandler) {
-          this.setState({
-            resizingElement: elementWithResizeHandler
-              ? elementWithResizeHandler.element
-              : null,
-          });
+        if (elementWithResizeHandler != null) {
+          this.setState({ resizingElement: elementWithResizeHandler.element });
           resizeHandle = elementWithResizeHandler.resizeHandle;
           document.documentElement.style.cursor = getCursorForResizingElement(
             elementWithResizeHandler,
