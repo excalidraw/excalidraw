@@ -207,6 +207,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { width, height } = props;
     this.state = {
       ...defaultAppState,
+      isLoading: true,
       width,
       height,
     };
