@@ -61,12 +61,7 @@ export const getDefaultAppState = (): AppState => {
   };
 };
 
-type STORAGE_CONFIG = Record<
-  keyof AppState,
-  { browser: boolean; export: boolean }
->;
-
-const STORAGE_APP_STATE: STORAGE_CONFIG = {
+const APP_STATE_STORAGE_CONF = {
   isLoading: { browser: false, export: false },
   errorMessage: { browser: false, export: false },
   draggingElement: { browser: false, export: false },
@@ -117,25 +112,34 @@ const STORAGE_APP_STATE: STORAGE_CONFIG = {
   selectedGroupIds: { browser: true, export: false },
 } as const;
 
-const clearAppStateForStorage = <T>(
-  appState: T,
-  config: Record<keyof T, { browser: boolean; export: boolean }>,
-  type: "browser" | "export",
+const clearAppStateForStorage = <Type extends "export" | "browser">(
+  appState: AppState,
+  // we're passing config chiefly so that it's type-checked against AppState
+  //  and we don't forget to keep it up to date (we can't annotate the
+  //  config object itself because then it'd cease to be CONST and we couldn't
+  //  use it to infer return value)
+  config: Record<keyof AppState, { browser: boolean; export: boolean }>,
+  type: Type,
 ) => {
-  type K = keyof T;
-  const exportedState = {} as Record<K, T[K]>;
-  for (const [key, value] of Object.entries(appState)) {
-    if (config[key as K][type]) {
-      exportedState[key as K] = value;
+  type ExportableKeys = {
+    [K in keyof typeof APP_STATE_STORAGE_CONF]: typeof APP_STATE_STORAGE_CONF[K][Type] extends true
+      ? K
+      : never;
+  }[keyof typeof APP_STATE_STORAGE_CONF];
+  const stateForExport = {} as { [K in ExportableKeys]: typeof appState[K] };
+  for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
+    if (config[key][type]) {
+      // @ts-ignore see https://github.com/microsoft/TypeScript/issues/31445
+      stateForExport[key] = appState[key];
     }
   }
-  return exportedState;
+  return stateForExport;
 };
 
 export const clearAppStateForLocalStorage = (appState: AppState) => {
-  return clearAppStateForStorage(appState, STORAGE_APP_STATE, "browser");
+  return clearAppStateForStorage(appState, APP_STATE_STORAGE_CONF, "browser");
 };
 
 export const cleanAppStateForExport = (appState: AppState) => {
-  return clearAppStateForStorage(appState, STORAGE_APP_STATE, "export");
+  return clearAppStateForStorage(appState, APP_STATE_STORAGE_CONF, "export");
 };
