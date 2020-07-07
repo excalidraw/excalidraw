@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Vel alt",
+    "multiSelect": "",
     "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til utklippstavla som PNG",
