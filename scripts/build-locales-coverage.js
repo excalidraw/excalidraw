@@ -27,6 +27,6 @@ for (let index = 0; index < locales.length; index++) {
 
 writeFileSync(
   `${__dirname}/../src/locales/percentages.json`,
-  JSON.stringify(percentages, null, 2),
+  `${JSON.stringify(percentages, null, 2)}\n`,
   "utf8",
 );

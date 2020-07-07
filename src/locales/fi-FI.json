@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Liitä",
     "selectAll": "Valitse kaikki",
+    "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
@@ -127,7 +128,7 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen tai vedä liikuttaaksesi pistettä",
+    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
   "errorSplash": {

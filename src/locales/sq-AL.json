@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Ngjit",
     "selectAll": "Përzgjidh të gjitha",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Kopjo",
     "copyAsPng": "Kopjo në clipboard si PNG",

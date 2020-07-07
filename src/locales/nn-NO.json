@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Vel alt",
+    "multiSelect": "",
     "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til utklippstavla som PNG",
@@ -127,7 +128,7 @@
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
-    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, eller drag for å flytte",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Vel eit punkt å flytte eller fjerne, eller hald Alt og klikk for å legge til nye punkt"
   },
   "errorSplash": {

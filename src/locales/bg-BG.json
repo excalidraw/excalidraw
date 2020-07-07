@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Постави",
     "selectAll": "Маркирай всичко",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
@@ -74,7 +75,7 @@
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "save": "Запази",
-    "saveAs": "",
+    "saveAs": "Запиши като",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",

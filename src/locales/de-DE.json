@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
+    "multiSelect": "",
     "moveCanvas": "Leinwand verschieben",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
@@ -127,7 +128,7 @@
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
     "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen oder ziehe, um ihn zu verschieben",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
   "errorSplash": {
