@@ -1824,21 +1824,7 @@ class App extends React.Component<any, AppState> {
   ) => {
     event.persist();
 
-    // deal with opening context menu on touch devices
-    if (event.pointerType === "touch") {
-      touchMoving = false;
-
-      // open the context menu with the first touch's clientX and clientY
-      // if the touch is not moving
-      touchTimeout = window.setTimeout(() => {
-        if (!touchMoving) {
-          this.openContextMenu({
-            clientX: event.clientX,
-            clientY: event.clientY,
-          });
-        }
-      }, TOUCH_CTX_MENU_TIMEOUT);
-    }
+    this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
 
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
@@ -2827,6 +2813,26 @@ class App extends React.Component<any, AppState> {
 
     window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+  };
+
+  private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void => {
+    // deal with opening context menu on touch devices
+    if (event.pointerType === "touch") {
+      touchMoving = false;
+
+      // open the context menu with the first touch's clientX and clientY
+      // if the touch is not moving
+      touchTimeout = window.setTimeout(() => {
+        if (!touchMoving) {
+          this.openContextMenu({
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
+        }
+      }, TOUCH_CTX_MENU_TIMEOUT);
+    }
   };
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
