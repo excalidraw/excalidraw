@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Επικόλληση",
     "selectAll": "Επιλογή όλων",
+    "multiSelect": "",
     "moveCanvas": "Μετακίνηση καμβά",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
