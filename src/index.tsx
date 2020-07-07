@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
@@ -75,18 +75,40 @@ document.addEventListener(
   { passive: false },
 );
 
+function ExcalidrawApp() {
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  const onResize = () => {
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  };
+
+  useLayoutEffect(() => {
+    window.addEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const { width, height } = dimensions;
+  return (
+    <TopErrorBoundary>
+      <IsMobileProvider>
+        <InitializeApp>
+          <App width={width} height={height} />
+        </InitializeApp>
+      </IsMobileProvider>
+    </TopErrorBoundary>
+  );
+}
+
 const rootElement = document.getElementById("root");
 
-ReactDOM.render(
-  <TopErrorBoundary>
-    <IsMobileProvider>
-      <InitializeApp>
-        <App />
-      </InitializeApp>
-    </IsMobileProvider>
-  </TopErrorBoundary>,
-  rootElement,
-);
+ReactDOM.render(<ExcalidrawApp />, rootElement);
 
 registerServiceWorker({
   onUpdate: (registration) => {
