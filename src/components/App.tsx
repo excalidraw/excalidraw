@@ -58,6 +58,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import {
   ExcalidrawElement,
+  ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
@@ -184,7 +185,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-class App extends React.Component<any, AppState> {
+class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal(this);
@@ -194,13 +195,23 @@ class App extends React.Component<any, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
 
-  public state: AppState = {
-    ...getDefaultAppState(),
-    isLoading: true,
+  public static defaultProps: Partial<ExcalidrawProps> = {
+    width: window.innerWidth,
+    height: window.innerHeight,
   };
 
   constructor(props: any) {
     super(props);
+    const defaultAppState = getDefaultAppState();
+
+    const { width, height } = props;
+    this.state = {
+      ...defaultAppState,
+      isLoading: true,
+      width,
+      height,
+    };
+
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -213,9 +224,11 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled } = this.state;
-    const canvasDOMWidth = window.innerWidth;
-    const canvasDOMHeight = window.innerHeight;
+    const {
+      zenModeEnabled,
+      width: canvasDOMWidth,
+      height: canvasDOMHeight,
+    } = this.state;
 
     const canvasScale = window.devicePixelRatio;
 
@@ -516,7 +529,16 @@ class App extends React.Component<any, AppState> {
     this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: ExcalidrawProps) {
+    const { width: prevWidth, height: prevHeight } = prevProps;
+    const { width: currentWidth, height: currentHeight } = this.props;
+    if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
+      this.setState({
+        width: currentWidth,
+        height: currentHeight,
+      });
+    }
+
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }

@@ -56,6 +56,8 @@ export const getDefaultAppState = (): AppState => {
     gridSize: null,
     editingGroupId: null,
     selectedGroupIds: {},
+    width: window.innerWidth,
+    height: window.innerHeight,
   };
 };
 
