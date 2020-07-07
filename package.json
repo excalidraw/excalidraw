@@ -28,7 +28,7 @@
     "@types/react": "16.9.41",
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
-    "browser-nativefs": "0.9.0",
+    "browser-nativefs": "0.9.1",
     "i18next-browser-languagedetector": "5.0.0",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
