@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставить",
     "selectAll": "Выбрать все",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
@@ -63,7 +64,7 @@
     "madeWithExcalidraw": "Сделано в Excalidraw",
     "group": "",
     "ungroup": "",
-    "collaborators": "",
+    "collaborators": "Сотрудники",
     "toggleGridMode": ""
   },
   "buttons": {

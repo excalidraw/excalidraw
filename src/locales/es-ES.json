@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
@@ -127,7 +128,7 @@
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
     "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "Pulse Borrar para eliminar el punto o arrastre para mover",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "errorSplash": {

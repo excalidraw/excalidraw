@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Incolla",
     "selectAll": "Seleziona tutto",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
@@ -127,7 +128,7 @@
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "Premi il tasto cancella per rimuovere il punto o trascina per spostare",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {

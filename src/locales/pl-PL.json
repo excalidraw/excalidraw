@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
+    "multiSelect": "",
     "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
@@ -127,7 +128,7 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
-    "lineEditor_pointSelected": "Naciśnij Delete by usunąć punkt albo przeciągnij by zmienić jego pozycje",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "errorSplash": {

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "貼上",
     "selectAll": "全選",
+    "multiSelect": "將物件加入選取範圍",
     "moveCanvas": "移動畫布",
     "copy": "複製",
     "copyAsPng": "複製 PNG 至剪貼簿",
@@ -127,7 +128,7 @@
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
-    "lineEditor_pointSelected": "按下 Delete 可刪除控制點；亦可拖曳移動控制點",
+    "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點"
   },
   "errorSplash": {

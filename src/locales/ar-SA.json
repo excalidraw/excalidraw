@@ -2,6 +2,7 @@
   "labels": {
     "paste": "لصق",
     "selectAll": "",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة كـ PNG",

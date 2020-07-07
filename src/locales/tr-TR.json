@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
+    "multiSelect": "",
     "moveCanvas": "Tuvali taşı",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
@@ -127,7 +128,7 @@
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "Noktayı kaldırmak için Delete tuşuna basın veya taşımak için sürükleyin",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut"
   },
   "errorSplash": {
