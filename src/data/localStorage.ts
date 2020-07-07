@@ -80,6 +80,8 @@ export const restoreFromLocalStorage = () => {
       // If we're retrieving from local storage, we should not be collaborating
       appState.isCollaborating = false;
       appState.collaborators = new Map();
+      delete appState.width;
+      delete appState.height;
     } catch {
       // Do nothing because appState is already null
     }
