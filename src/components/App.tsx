@@ -1877,16 +1877,15 @@ class App extends React.Component<any, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
-    let lastX = x;
-    let lastY = y;
+    const lastCoords = { x, y };
 
     if (
       (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
       !this.state.multiElement
     ) {
       isDraggingScrollBar = true;
-      lastX = event.clientX;
-      lastY = event.clientY;
+      lastCoords.x = event.clientX;
+      lastCoords.y = event.clientY;
       const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) {
@@ -1895,21 +1894,21 @@ class App extends React.Component<any, AppState> {
 
         if (isOverHorizontalScrollBar) {
           const x = event.clientX;
-          const dx = x - lastX;
+          const dx = x - lastCoords.x;
           this.setState({
             scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
           });
-          lastX = x;
+          lastCoords.x = x;
           return;
         }
 
         if (isOverVerticalScrollBar) {
           const y = event.clientY;
-          const dy = y - lastY;
+          const dy = y - lastCoords.y;
           this.setState({
             scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
           });
-          lastY = y;
+          lastCoords.y = y;
         }
       });
 
@@ -2268,21 +2267,21 @@ class App extends React.Component<any, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastX;
+        const dx = x - lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastX = x;
+        lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastY;
+        const dy = y - lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastY = y;
+        lastCoords.y = y;
         return;
       }
 
@@ -2345,13 +2344,13 @@ class App extends React.Component<any, AppState> {
           (appState) => this.setState(appState),
           x,
           y,
-          lastX,
-          lastY,
+          lastCoords.x,
+          lastCoords.y,
         );
 
         if (didDrag) {
-          lastX = x;
-          lastY = y;
+          lastCoords.x = x;
+          lastCoords.y = y;
           return;
         }
       }
