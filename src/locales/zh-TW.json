@@ -2,6 +2,7 @@
   "labels": {
     "paste": "貼上",
     "selectAll": "全選",
+    "multiSelect": "",
     "moveCanvas": "移動畫布",
     "copy": "複製",
     "copyAsPng": "複製 PNG 至剪貼簿",
