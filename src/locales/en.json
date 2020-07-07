@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
+    "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
