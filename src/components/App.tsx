@@ -316,6 +316,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               editingElement || actionResult.appState?.editingElement || null,
             isCollaborating: state.isCollaborating,
             collaborators: state.collaborators,
+            width: state.width,
+            height: state.height,
           }),
           () => {
             if (actionResult.syncHistory) {
