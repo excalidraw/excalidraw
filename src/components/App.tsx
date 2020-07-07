@@ -269,51 +269,53 @@ class App extends React.Component<any, AppState> {
     );
   }
 
-  private syncActionResult = withBatchedUpdates((res: ActionResult) => {
-    if (this.unmounted) {
-      return;
-    }
-
-    let editingElement: AppState["editingElement"] | null = null;
-    if (res.elements) {
-      res.elements.forEach((element) => {
-        if (
-          this.state.editingElement?.id === element.id &&
-          this.state.editingElement !== element &&
-          isNonDeletedElement(element)
-        ) {
-          editingElement = element;
-        }
-      });
-      globalSceneState.replaceAllElements(res.elements);
-      if (res.commitToHistory) {
-        history.resumeRecording();
+  private syncActionResult = withBatchedUpdates(
+    (actionResult: ActionResult) => {
+      if (this.unmounted || actionResult === false) {
+        return;
       }
-    }
 
-    if (res.appState || editingElement) {
-      if (res.commitToHistory) {
-        history.resumeRecording();
-      }
-      this.setState(
-        (state) => ({
-          ...res.appState,
-          editingElement:
-            editingElement || res.appState?.editingElement || null,
-          isCollaborating: state.isCollaborating,
-          collaborators: state.collaborators,
-        }),
-        () => {
-          if (res.syncHistory) {
-            history.setCurrentState(
-              this.state,
-              globalSceneState.getElementsIncludingDeleted(),
-            );
+      let editingElement: AppState["editingElement"] | null = null;
+      if (actionResult.elements) {
+        actionResult.elements.forEach((element) => {
+          if (
+            this.state.editingElement?.id === element.id &&
+            this.state.editingElement !== element &&
+            isNonDeletedElement(element)
+          ) {
+            editingElement = element;
           }
-        },
-      );
-    }
-  });
+        });
+        globalSceneState.replaceAllElements(actionResult.elements);
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+      }
+
+      if (actionResult.appState || editingElement) {
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+        this.setState(
+          (state) => ({
+            ...actionResult.appState,
+            editingElement:
+              editingElement || actionResult.appState?.editingElement || null,
+            isCollaborating: state.isCollaborating,
+            collaborators: state.collaborators,
+          }),
+          () => {
+            if (actionResult.syncHistory) {
+              history.setCurrentState(
+                this.state,
+                globalSceneState.getElementsIncludingDeleted(),
+              );
+            }
+          },
+        );
+      }
+    },
+  );
 
   // Lifecycle
 
