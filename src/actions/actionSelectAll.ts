@@ -17,7 +17,6 @@ export const actionSelectAll = register({
             }
             return map;
           }, {} as any),
-          editingLinearElement: null,
         },
         getNonDeletedElements(elements),
       ),
