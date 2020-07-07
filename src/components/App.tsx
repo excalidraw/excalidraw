@@ -1909,6 +1909,14 @@ class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
 
+    if (this.state.elementType !== "selection") {
+      this.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
+    }
+
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -1978,7 +1986,7 @@ class App extends React.Component<any, AppState> {
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
 
-        this.maybeClearSelection(event, hitElement);
+        this.maybeClearSelectionWhenHittingElement(event, hitElement);
 
         // If we click on something
         if (hitElement) {
@@ -2025,12 +2033,6 @@ class App extends React.Component<any, AppState> {
           previousSelectedElementIds: selectedElementIds,
         });
       }
-    } else {
-      this.setState({
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        editingGroupId: null,
-      });
     }
 
     if (this.state.elementType === "text") {
@@ -2846,7 +2848,7 @@ class App extends React.Component<any, AppState> {
     return true;
   }
 
-  private maybeClearSelection(
+  private maybeClearSelectionWhenHittingElement(
     event: React.PointerEvent<HTMLCanvasElement>,
     hitElement: ExcalidrawElement | null,
   ): void {
@@ -2860,9 +2862,11 @@ class App extends React.Component<any, AppState> {
     this.setState((prevState) => ({
       selectedElementIds: {},
       selectedGroupIds: {},
+      // Continue editing the same group if the user selected a different
+      // element from it
       editingGroupId:
         prevState.editingGroupId &&
-        hitElement &&
+        hitElement != null &&
         isElementInGroup(hitElement, prevState.editingGroupId)
           ? prevState.editingGroupId
           : null,
