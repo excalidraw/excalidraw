@@ -61,29 +61,81 @@ export const getDefaultAppState = (): AppState => {
   };
 };
 
-export const clearAppStateForLocalStorage = (appState: AppState) => {
-  const {
-    draggingElement,
-    resizingElement,
-    multiElement,
-    editingElement,
-    selectionElement,
-    isResizing,
-    isRotating,
-    collaborators,
-    isCollaborating,
-    isLoading,
-    errorMessage,
-    showShortcutsDialog,
-    editingLinearElement,
-    ...exportedState
-  } = appState;
+type STORAGE_CONFIG = Record<
+  keyof AppState,
+  { browser: boolean; export: boolean }
+>;
+
+const STORAGE_APP_STATE: STORAGE_CONFIG = {
+  isLoading: { browser: false, export: false },
+  errorMessage: { browser: false, export: false },
+  draggingElement: { browser: false, export: false },
+  resizingElement: { browser: false, export: false },
+  multiElement: { browser: false, export: false },
+  editingElement: { browser: false, export: false },
+  editingLinearElement: { browser: false, export: false },
+  isCollaborating: { browser: false, export: false },
+  isResizing: { browser: false, export: false },
+  isRotating: { browser: false, export: false },
+  selectionElement: { browser: false, export: false },
+  collaborators: { browser: false, export: false },
+  showShortcutsDialog: { browser: false, export: false },
+  width: { browser: false, export: false },
+  height: { browser: false, export: false },
+  elementType: { browser: true, export: false },
+  elementLocked: { browser: true, export: false },
+  exportBackground: { browser: true, export: false },
+  shouldAddWatermark: { browser: true, export: false },
+  currentItemStrokeColor: { browser: true, export: false },
+  currentItemBackgroundColor: { browser: true, export: false },
+  currentItemFillStyle: { browser: true, export: false },
+  currentItemStrokeWidth: { browser: true, export: false },
+  currentItemStrokeStyle: { browser: true, export: false },
+  currentItemRoughness: { browser: true, export: false },
+  currentItemOpacity: { browser: true, export: false },
+  currentItemFontSize: { browser: true, export: false },
+  currentItemFontFamily: { browser: true, export: false },
+  currentItemTextAlign: { browser: true, export: false },
+  viewBackgroundColor: { browser: true, export: true },
+  scrollX: { browser: true, export: false },
+  scrollY: { browser: true, export: false },
+  cursorX: { browser: true, export: false },
+  cursorY: { browser: true, export: false },
+  cursorButton: { browser: true, export: false },
+  scrolledOutside: { browser: true, export: false },
+  name: { browser: true, export: false },
+  username: { browser: true, export: false },
+  zoom: { browser: true, export: false },
+  openMenu: { browser: true, export: false },
+  lastPointerDownWith: { browser: true, export: false },
+  selectedElementIds: { browser: true, export: false },
+  previousSelectedElementIds: { browser: true, export: false },
+  shouldCacheIgnoreZoom: { browser: true, export: false },
+  zenModeEnabled: { browser: true, export: false },
+  gridSize: { browser: true, export: true },
+  editingGroupId: { browser: true, export: false },
+  selectedGroupIds: { browser: true, export: false },
+} as const;
+
+const clearAppStateForStorage = <T>(
+  appState: T,
+  config: Record<keyof T, { browser: boolean; export: boolean }>,
+  type: "browser" | "export",
+) => {
+  type K = keyof T;
+  const exportedState = {} as Record<K, T[K]>;
+  for (const [key, value] of Object.entries(appState)) {
+    if (config[key as K][type]) {
+      exportedState[key as K] = value;
+    }
+  }
   return exportedState;
 };
 
+export const clearAppStateForLocalStorage = (appState: AppState) => {
+  return clearAppStateForStorage(appState, STORAGE_APP_STATE, "browser");
+};
+
 export const cleanAppStateForExport = (appState: AppState) => {
-  return {
-    viewBackgroundColor: appState.viewBackgroundColor,
-    gridSize: appState.gridSize,
-  };
+  return clearAppStateForStorage(appState, STORAGE_APP_STATE, "export");
 };
