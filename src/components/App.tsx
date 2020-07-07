@@ -1825,13 +1825,7 @@ class App extends React.Component<any, AppState> {
     event.persist();
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-
-    if (lastPointerUp !== null) {
-      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-      // this can happen when a contextual menu or alert is triggered. In order to avoid
-      // being in a weird state, we clean up on the next pointerdown
-      lastPointerUp(event);
-    }
+    this.maybeCleanupAfterMissingPointerUp(event);
 
     if (isPanning) {
       return;
@@ -1843,89 +1837,7 @@ class App extends React.Component<any, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
-    // pan canvas on wheel button drag or space+drag
-    if (
-      gesture.pointers.size === 0 &&
-      (event.button === POINTER_BUTTON.WHEEL ||
-        (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
-    ) {
-      isPanning = true;
-
-      let nextPastePrevented = false;
-      const isLinux = /Linux/.test(window.navigator.platform);
-
-      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
-      let { clientX: lastX, clientY: lastY } = event;
-      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
-        const deltaX = lastX - event.clientX;
-        const deltaY = lastY - event.clientY;
-        lastX = event.clientX;
-        lastY = event.clientY;
-
-        /*
-         * Prevent paste event if we move while middle clicking on Linux.
-         * See issue #1383.
-         */
-        if (
-          isLinux &&
-          !nextPastePrevented &&
-          (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
-        ) {
-          nextPastePrevented = true;
-
-          /* Prevent the next paste event */
-          const preventNextPaste = (event: ClipboardEvent) => {
-            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-            event.stopPropagation();
-          };
-
-          /*
-           * Reenable next paste in case of disabled middle click paste for
-           * any reason:
-           * - rigth click paste
-           * - empty clipboard
-           */
-          const enableNextPaste = () => {
-            setTimeout(() => {
-              document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-              window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
-            }, 100);
-          };
-
-          document.body.addEventListener(EVENT.PASTE, preventNextPaste);
-          window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
-        }
-
-        this.setState({
-          scrollX: normalizeScroll(
-            this.state.scrollX - deltaX / this.state.zoom,
-          ),
-          scrollY: normalizeScroll(
-            this.state.scrollY - deltaY / this.state.zoom,
-          ),
-        });
-      });
-      const teardown = withBatchedUpdates(
-        (lastPointerUp = () => {
-          lastPointerUp = null;
-          isPanning = false;
-          if (!isHoldingSpace) {
-            setCursorForShape(this.state.elementType);
-          }
-          this.setState({
-            cursorButton: "up",
-          });
-          this.savePointer(event.clientX, event.clientY, "up");
-          window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-          window.removeEventListener(EVENT.POINTER_UP, teardown);
-          window.removeEventListener(EVENT.BLUR, teardown);
-        }),
-      );
-      window.addEventListener(EVENT.BLUR, teardown);
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
-        passive: true,
-      });
-      window.addEventListener(EVENT.POINTER_UP, teardown);
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
 
@@ -1937,18 +1849,7 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
-    gesture.pointers.set(event.pointerId, {
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    if (gesture.pointers.size === 2) {
-      gesture.lastCenter = getCenter(gesture.pointers);
-      gesture.initialScale = this.state.zoom;
-      gesture.initialDistance = getDistance(
-        Array.from(gesture.pointers.values()),
-      );
-    }
+    this.updateGestureOnPointerDown(event);
 
     // fixes pointermove causing selection of UI texts #32
     event.preventDefault();
@@ -2834,6 +2735,123 @@ class App extends React.Component<any, AppState> {
       }, TOUCH_CTX_MENU_TIMEOUT);
     }
   };
+
+  private maybeCleanupAfterMissingPointerUp(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void {
+    if (lastPointerUp !== null) {
+      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
+      // this can happen when a contextual menu or alert is triggered. In order to avoid
+      // being in a weird state, we clean up on the next pointerdown
+      lastPointerUp(event);
+    }
+  }
+
+  // Returns whether the event is a panning
+  private handleCanvasPanUsingWheelOrSpaceDrag = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): boolean => {
+    if (
+      !(
+        gesture.pointers.size === 0 &&
+        (event.button === POINTER_BUTTON.WHEEL ||
+          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
+      )
+    ) {
+      return false;
+    }
+    isPanning = true;
+
+    let nextPastePrevented = false;
+    const isLinux = /Linux/.test(window.navigator.platform);
+
+    document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    let { clientX: lastX, clientY: lastY } = event;
+    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      /*
+       * Prevent paste event if we move while middle clicking on Linux.
+       * See issue #1383.
+       */
+      if (
+        isLinux &&
+        !nextPastePrevented &&
+        (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
+      ) {
+        nextPastePrevented = true;
+
+        /* Prevent the next paste event */
+        const preventNextPaste = (event: ClipboardEvent) => {
+          document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+          event.stopPropagation();
+        };
+
+        /*
+         * Reenable next paste in case of disabled middle click paste for
+         * any reason:
+         * - rigth click paste
+         * - empty clipboard
+         */
+        const enableNextPaste = () => {
+          setTimeout(() => {
+            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+            window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+          }, 100);
+        };
+
+        document.body.addEventListener(EVENT.PASTE, preventNextPaste);
+        window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+      }
+
+      this.setState({
+        scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
+        scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
+      });
+    });
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        isPanning = false;
+        if (!isHoldingSpace) {
+          setCursorForShape(this.state.elementType);
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
+    return true;
+  };
+
+  private updateGestureOnPointerDown(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void {
+    gesture.pointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (gesture.pointers.size === 2) {
+      gesture.lastCenter = getCenter(gesture.pointers);
+      gesture.initialScale = this.state.zoom;
+      gesture.initialDistance = getDistance(
+        Array.from(gesture.pointers.values()),
+      );
+    }
+  }
 
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
     // canvas is null when unmounting
