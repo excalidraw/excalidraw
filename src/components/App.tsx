@@ -58,6 +58,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import {
   ExcalidrawElement,
+  ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
@@ -125,6 +126,7 @@ import {
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  TOUCH_CTX_MENU_TIMEOUT,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -172,6 +174,8 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
+let touchTimeout = 0;
+let touchMoving = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -181,7 +185,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-class App extends React.Component<any, AppState> {
+class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal(this);
@@ -191,13 +195,23 @@ class App extends React.Component<any, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
 
-  public state: AppState = {
-    ...getDefaultAppState(),
-    isLoading: true,
+  public static defaultProps: Partial<ExcalidrawProps> = {
+    width: window.innerWidth,
+    height: window.innerHeight,
   };
 
   constructor(props: any) {
     super(props);
+    const defaultAppState = getDefaultAppState();
+
+    const { width, height } = props;
+    this.state = {
+      ...defaultAppState,
+      isLoading: true,
+      width,
+      height,
+    };
+
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -210,9 +224,11 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled } = this.state;
-    const canvasDOMWidth = window.innerWidth;
-    const canvasDOMHeight = window.innerHeight;
+    const {
+      zenModeEnabled,
+      width: canvasDOMWidth,
+      height: canvasDOMHeight,
+    } = this.state;
 
     const canvasScale = window.devicePixelRatio;
 
@@ -256,6 +272,7 @@ class App extends React.Component<any, AppState> {
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
+            onTouchMove={this.handleTouchMove}
             onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
@@ -265,51 +282,53 @@ class App extends React.Component<any, AppState> {
     );
   }
 
-  private syncActionResult = withBatchedUpdates((res: ActionResult) => {
-    if (this.unmounted) {
-      return;
-    }
-
-    let editingElement: AppState["editingElement"] | null = null;
-    if (res.elements) {
-      res.elements.forEach((element) => {
-        if (
-          this.state.editingElement?.id === element.id &&
-          this.state.editingElement !== element &&
-          isNonDeletedElement(element)
-        ) {
-          editingElement = element;
-        }
-      });
-      globalSceneState.replaceAllElements(res.elements);
-      if (res.commitToHistory) {
-        history.resumeRecording();
+  private syncActionResult = withBatchedUpdates(
+    (actionResult: ActionResult) => {
+      if (this.unmounted || actionResult === false) {
+        return;
       }
-    }
 
-    if (res.appState || editingElement) {
-      if (res.commitToHistory) {
-        history.resumeRecording();
-      }
-      this.setState(
-        (state) => ({
-          ...res.appState,
-          editingElement:
-            editingElement || res.appState?.editingElement || null,
-          isCollaborating: state.isCollaborating,
-          collaborators: state.collaborators,
-        }),
-        () => {
-          if (res.syncHistory) {
-            history.setCurrentState(
-              this.state,
-              globalSceneState.getElementsIncludingDeleted(),
-            );
+      let editingElement: AppState["editingElement"] | null = null;
+      if (actionResult.elements) {
+        actionResult.elements.forEach((element) => {
+          if (
+            this.state.editingElement?.id === element.id &&
+            this.state.editingElement !== element &&
+            isNonDeletedElement(element)
+          ) {
+            editingElement = element;
           }
-        },
-      );
-    }
-  });
+        });
+        globalSceneState.replaceAllElements(actionResult.elements);
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+      }
+
+      if (actionResult.appState || editingElement) {
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+        this.setState(
+          (state) => ({
+            ...actionResult.appState,
+            editingElement:
+              editingElement || actionResult.appState?.editingElement || null,
+            isCollaborating: state.isCollaborating,
+            collaborators: state.collaborators,
+          }),
+          () => {
+            if (actionResult.syncHistory) {
+              history.setCurrentState(
+                this.state,
+                globalSceneState.getElementsIncludingDeleted(),
+              );
+            }
+          },
+        );
+      }
+    },
+  );
 
   // Lifecycle
 
@@ -409,6 +428,8 @@ class App extends React.Component<any, AppState> {
     this.unmounted = true;
     this.removeSceneCallback!();
     this.removeEventListeners();
+
+    clearTimeout(touchTimeout);
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -508,7 +529,16 @@ class App extends React.Component<any, AppState> {
     this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: ExcalidrawProps) {
+    const { width: prevWidth, height: prevHeight } = prevProps;
+    const { width: currentWidth, height: currentHeight } = this.props;
+    if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
+      this.setState({
+        width: currentWidth,
+        height: currentHeight,
+      });
+    }
+
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
@@ -818,6 +848,12 @@ class App extends React.Component<any, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement>) => {
+    // remove touch handler for context menu on touch devices
+    if (event.pointerType === "touch" && touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchMoving = false;
+    }
+
     gesture.pointers.delete(event.pointerId);
   };
 
@@ -1802,10 +1838,31 @@ class App extends React.Component<any, AppState> {
     }
   };
 
+  // set touch moving for mobile context menu
+  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    touchMoving = true;
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
+
+    // deal with opening context menu on touch devices
+    if (event.pointerType === "touch") {
+      touchMoving = false;
+
+      // open the context menu with the first touch's clientX and clientY
+      // if the touch is not moving
+      touchTimeout = window.setTimeout(() => {
+        if (!touchMoving) {
+          this.openContextMenu({
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
+        }
+      }, TOUCH_CTX_MENU_TIMEOUT);
+    }
 
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
@@ -2847,9 +2904,18 @@ class App extends React.Component<any, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
+    this.openContextMenu(event);
+  };
 
+  private openContextMenu = ({
+    clientX,
+    clientY,
+  }: {
+    clientX: number;
+    clientY: number;
+  }) => {
     const { x, y } = viewportCoordsToSceneCoords(
-      event,
+      { clientX, clientY },
       this.state,
       this.canvas,
       window.devicePixelRatio,
@@ -2888,8 +2954,8 @@ class App extends React.Component<any, AppState> {
             action: this.toggleGridMode,
           },
         ],
-        top: event.clientY,
-        left: event.clientX,
+        top: clientY,
+        left: clientX,
       });
       return;
     }
@@ -2920,8 +2986,8 @@ class App extends React.Component<any, AppState> {
           (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),
       ],
-      top: event.clientY,
-      left: event.clientX,
+      top: clientY,
+      left: clientX,
     });
   };
 

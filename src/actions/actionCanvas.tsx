@@ -204,8 +204,8 @@ export const actionZoomToFit = register({
     const [x1, y1, x2, y2] = commonBounds;
     const centerX = (x1 + x2) / 2;
     const centerY = (y1 + y2) / 2;
-    const scrollX = normalizeScroll(window.innerWidth / 2 - centerX);
-    const scrollY = normalizeScroll(window.innerHeight / 2 - centerY);
+    const scrollX = normalizeScroll(appState.width / 2 - centerX);
+    const scrollY = normalizeScroll(appState.height / 2 - centerY);
     const zoom = calculateZoom(commonBounds, appState.zoom, {
       scrollX,
       scrollY,

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Beillesztés",
     "selectAll": "Összes kijelölése",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
@@ -41,7 +42,7 @@
     "crossHatch": "",
     "thin": "Vékony",
     "bold": "Félkövér",
-    "left": "",
+    "left": "Bal",
     "center": "",
     "right": "",
     "extraBold": "",
@@ -58,7 +59,7 @@
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
     "untitled": "",
-    "name": "",
+    "name": "Név",
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
@@ -92,8 +93,7 @@
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",

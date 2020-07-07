@@ -2,6 +2,7 @@
   "labels": {
     "paste": "붙여넣기",
     "selectAll": "전체 선택",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
@@ -92,8 +93,7 @@
     "createNewRoom": "",
     "toggleFullScreen": "전체화면",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
