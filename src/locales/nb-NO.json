@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
     "decryptFailed": "Kunne ikke dekryptere data.",
-    "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
+    "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Velg",
