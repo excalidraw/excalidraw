@@ -191,6 +191,10 @@ type PointerDownState = Readonly<{
   origin: Readonly<{ x: number; y: number }>;
   // The previous pointer position
   lastCoords: { x: number; y: number };
+  resize: {
+    // Handle when resizing, might change during the pointer interaction
+    handle: ReturnType<typeof resizeTest>;
+  };
 }>;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
@@ -1972,6 +1976,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       origin,
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
+      resize: {
+        handle: false as ReturnType<typeof resizeTest>,
+      },
     };
 
     if (
@@ -1986,11 +1993,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state.gridSize,
     );
 
-    type ResizeTestType = ReturnType<typeof resizeTest>;
-    let resizeHandle: ResizeTestType = false;
-    const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
-      resizeHandle = nextResizeHandle;
-    };
     let resizeOffsetXY: [number, number] = [0, 0];
     let resizeArrowDirection: "origin" | "end" = "origin";
     let isResizingElements = false;
@@ -2021,10 +2023,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (elementWithResizeHandler != null) {
           this.setState({ resizingElement: elementWithResizeHandler.element });
-          resizeHandle = elementWithResizeHandler.resizeHandle;
+          pointerDownState.resize.handle =
+            elementWithResizeHandler.resizeHandle;
         }
       } else if (selectedElements.length > 1) {
-        resizeHandle = getResizeHandlerFromCoords(
+        pointerDownState.resize.handle = getResizeHandlerFromCoords(
           getCommonBounds(selectedElements),
           pointerDownState.origin.x,
           pointerDownState.origin.y,
@@ -2032,13 +2035,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           event.pointerType,
         );
       }
-      if (resizeHandle) {
+      if (pointerDownState.resize.handle) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle,
+          resizeHandle: pointerDownState.resize.handle,
         });
         isResizingElements = true;
         resizeOffsetXY = getResizeOffsetXY(
-          resizeHandle,
+          pointerDownState.resize.handle,
           selectedElements,
           pointerDownState.origin.x,
           pointerDownState.origin.y,
@@ -2049,7 +2052,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           selectedElements[0].points.length === 2
         ) {
           resizeArrowDirection = getResizeArrowDirection(
-            resizeHandle,
+            pointerDownState.resize.handle,
             selectedElements[0],
           );
         }
@@ -2347,6 +2350,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           globalSceneState.getElements(),
           this.state,
         );
+        const resizeHandle = pointerDownState.resize.handle;
         this.setState({
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
@@ -2359,7 +2363,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (
           resizeElements(
             resizeHandle,
-            setResizeHandle,
+            (newResizeHandle) => {
+              pointerDownState.resize.handle = newResizeHandle;
+            },
             selectedElements,
             resizeArrowDirection,
             getRotateWithDiscreteAngleKey(event),
