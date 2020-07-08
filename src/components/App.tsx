@@ -75,6 +75,7 @@ import {
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
   setCursorForShape,
+  tupleToCoors,
 } from "../utils";
 import {
   KEYS,
@@ -196,6 +197,8 @@ type PointerDownState = Readonly<{
     handle: ReturnType<typeof resizeTest>;
     // This is determined on the initial pointer down event
     isResizing: boolean;
+    // This is determined on the initial pointer down event
+    offset: { x: number; y: number };
   };
 }>;
 
@@ -1974,13 +1977,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends pointerUp event (or another pointerDown)
-    const pointerDownState = {
+    const pointerDownState: PointerDownState = {
       origin,
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
       resize: {
         handle: false as ReturnType<typeof resizeTest>,
         isResizing: false,
+        offset: { x: 0, y: 0 },
       },
     };
 
@@ -1996,7 +2000,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state.gridSize,
     );
 
-    let resizeOffsetXY: [number, number] = [0, 0];
     let resizeArrowDirection: "origin" | "end" = "origin";
     let draggingOccurred = false;
     let dragOffsetXY: [number, number] | null = null;
@@ -2042,11 +2045,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           resizeHandle: pointerDownState.resize.handle,
         });
         pointerDownState.resize.isResizing = true;
-        resizeOffsetXY = getResizeOffsetXY(
-          pointerDownState.resize.handle,
-          selectedElements,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
+        pointerDownState.resize.offset = tupleToCoors(
+          getResizeOffsetXY(
+            pointerDownState.resize.handle,
+            selectedElements,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
         );
         if (
           selectedElements.length === 1 &&
@@ -2361,8 +2366,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           isRotating: resizeHandle === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
-          x - resizeOffsetXY[0],
-          y - resizeOffsetXY[1],
+          x - pointerDownState.resize.offset.x,
+          y - pointerDownState.resize.offset.y,
           this.state.gridSize,
         );
         if (

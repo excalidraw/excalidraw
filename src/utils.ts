@@ -241,3 +241,10 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
 export const isRTL = (text: string) => {
   return RE_RTL_CHECK.test(text);
 };
+
+export function tupleToCoors(
+  xyTuple: [number, number],
+): { x: number; y: number } {
+  const [x, y] = xyTuple;
+  return { x, y };
+}
