@@ -884,6 +884,93 @@ describe("regression tests", () => {
       "Copy styles",
       "Paste styles",
       "Delete",
+      "Send backward",
+      "Bring forward",
+      "Send to back",
+      "Bring to front",
+      "Duplicate",
+    ];
+
+    expect(contextMenu).not.toBeNull();
+    expect(contextMenu?.children.length).toBe(8);
+    options?.forEach((opt, i) => {
+      expect(opt.textContent).toBe(expectedOptions[i]);
+    });
+  });
+
+  it("shows 'Group selection' in context menu for multiple selected elements", () => {
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "en" },
+    });
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    mouse.reset();
+    mouse.click(10, 10);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(20, 0);
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = [
+      "Copy styles",
+      "Paste styles",
+      "Delete",
+      "Group selection",
+      "Send backward",
+      "Bring forward",
+      "Send to back",
+      "Bring to front",
+      "Duplicate",
+    ];
+
+    expect(contextMenu).not.toBeNull();
+    expect(contextMenu?.children.length).toBe(9);
+    options?.forEach((opt, i) => {
+      expect(opt.textContent).toBe(expectedOptions[i]);
+    });
+  });
+
+  it("shows 'Ungroup selection' in context menu for group inside selected elements", () => {
+    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
+      target: { value: "en" },
+    });
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    mouse.reset();
+    mouse.click(10, 10);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(20, 0);
+    });
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = [
+      "Copy styles",
+      "Paste styles",
+      "Delete",
       "Group selection",
       "Ungroup selection",
       "Send backward",
