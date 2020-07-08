@@ -2031,85 +2031,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
-      if (this.state.multiElement) {
-        const { multiElement } = this.state;
-
-        // finalize if completing a loop
-        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
-          mutateElement(multiElement, {
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
-          });
-          this.actionManager.executeAction(actionFinalize);
-          return;
-        }
-
-        const { x: rx, y: ry, lastCommittedPoint } = multiElement;
-
-        // clicking inside commit zone → finalize arrow
-        if (
-          multiElement.points.length > 1 &&
-          lastCommittedPoint &&
-          distance2d(
-            pointerDownState.origin.x - rx,
-            pointerDownState.origin.y - ry,
-            lastCommittedPoint[0],
-            lastCommittedPoint[1],
-          ) < LINE_CONFIRM_THRESHOLD
-        ) {
-          this.actionManager.executeAction(actionFinalize);
-          return;
-        }
-
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [multiElement.id]: true,
-          },
-        }));
-        // clicking outside commit zone → update reference for last committed
-        //  point
-        mutateElement(multiElement, {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
-        });
-        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
-      } else {
-        const [gridX, gridY] = getGridPoint(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.elementType === "draw" ? null : this.state.gridSize,
-        );
-        const element = newLinearElement({
-          type: this.state.elementType,
-          x: gridX,
-          y: gridY,
-          strokeColor: this.state.currentItemStrokeColor,
-          backgroundColor: this.state.currentItemBackgroundColor,
-          fillStyle: this.state.currentItemFillStyle,
-          strokeWidth: this.state.currentItemStrokeWidth,
-          strokeStyle: this.state.currentItemStrokeStyle,
-          roughness: this.state.currentItemRoughness,
-          opacity: this.state.currentItemOpacity,
-        });
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [element.id]: false,
-          },
-        }));
-        mutateElement(element, {
-          points: [...element.points, [0, 0]],
-        });
-        globalSceneState.replaceAllElements([
-          ...globalSceneState.getElementsIncludingDeleted(),
-          element,
-        ]);
-        this.setState({
-          draggingElement: element,
-          editingElement: element,
-        });
-      }
+      this.handleLinearElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
     } else {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
@@ -3009,6 +2935,91 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!this.state.elementLocked) {
       this.setState({
         elementType: "selection",
+      });
+    }
+  };
+
+  private handleLinearElementOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    elementType: "draw" | "line" | "arrow",
+    pointerDownState: PointerDownState,
+  ): void => {
+    if (this.state.multiElement) {
+      const { multiElement } = this.state;
+
+      // finalize if completing a loop
+      if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+        mutateElement(multiElement, {
+          lastCommittedPoint:
+            multiElement.points[multiElement.points.length - 1],
+        });
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+
+      const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+
+      // clicking inside commit zone → finalize arrow
+      if (
+        multiElement.points.length > 1 &&
+        lastCommittedPoint &&
+        distance2d(
+          pointerDownState.origin.x - rx,
+          pointerDownState.origin.y - ry,
+          lastCommittedPoint[0],
+          lastCommittedPoint[1],
+        ) < LINE_CONFIRM_THRESHOLD
+      ) {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+
+      this.setState((prevState) => ({
+        selectedElementIds: {
+          ...prevState.selectedElementIds,
+          [multiElement.id]: true,
+        },
+      }));
+      // clicking outside commit zone → update reference for last committed
+      //  point
+      mutateElement(multiElement, {
+        lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
+      });
+      document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+    } else {
+      const [gridX, gridY] = getGridPoint(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        elementType === "draw" ? null : this.state.gridSize,
+      );
+      const element = newLinearElement({
+        type: elementType,
+        x: gridX,
+        y: gridY,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+      });
+      this.setState((prevState) => ({
+        selectedElementIds: {
+          ...prevState.selectedElementIds,
+          [element.id]: false,
+        },
+      }));
+      mutateElement(element, {
+        points: [...element.points, [0, 0]],
+      });
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getElementsIncludingDeleted(),
+        element,
+      ]);
+      this.setState({
+        draggingElement: element,
+        editingElement: element,
       });
     }
   };
