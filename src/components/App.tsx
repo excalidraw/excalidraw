@@ -213,6 +213,12 @@ type PointerDownState = Readonly<{
     // pointer interation
     hasBeenDuplicated: boolean;
   };
+  drag: {
+    // Might change during the pointer interation
+    hasOccurred: boolean;
+    // Might change during the pointer interation
+    offset: { x: number; y: number } | null;
+  };
 }>;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
@@ -2005,6 +2011,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
       },
+      drag: {
+        hasOccurred: false,
+        offset: null,
+      },
     };
 
     if (
@@ -2018,9 +2028,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       pointerDownState.origin.y,
       this.state.gridSize,
     );
-
-    let draggingOccurred = false;
-    let dragOffsetXY: [number, number] | null = null;
 
     this.clearSelectionIfNotUsingSelection();
 
@@ -2053,11 +2060,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
       // the updated state.
-      if (dragOffsetXY === null) {
-        dragOffsetXY = getDragOffsetXY(
-          getSelectedElements(globalSceneState.getElements(), this.state),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
+      if (pointerDownState.drag.offset === null) {
+        pointerDownState.drag.offset = tupleToCoors(
+          getDragOffsetXY(
+            getSelectedElements(globalSceneState.getElements(), this.state),
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
         );
       }
 
@@ -2099,7 +2108,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       //  user clicks mouse in a way that it moves a tiny bit (thus
       //  triggering pointermove)
       if (
-        !draggingOccurred &&
+        !pointerDownState.drag.hasOccurred &&
         (this.state.elementType === "arrow" ||
           this.state.elementType === "line")
       ) {
@@ -2173,15 +2182,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
-        draggingOccurred = true;
+        pointerDownState.drag.hasOccurred = true;
         const selectedElements = getSelectedElements(
           globalSceneState.getElements(),
           this.state,
         );
         if (selectedElements.length > 0) {
           const [dragX, dragY] = getGridPoint(
-            x - dragOffsetXY[0],
-            y - dragOffsetXY[1],
+            x - pointerDownState.drag.offset.x,
+            y - pointerDownState.drag.offset.y,
             this.state.gridSize,
           );
           dragSelectedElements(selectedElements, dragX, dragY);
@@ -2211,8 +2220,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                   element,
                 );
                 const [originDragX, originDragY] = getGridPoint(
-                  pointerDownState.origin.x - dragOffsetXY[0],
-                  pointerDownState.origin.y - dragOffsetXY[1],
+                  pointerDownState.origin.x - pointerDownState.drag.offset.x,
+                  pointerDownState.origin.y - pointerDownState.drag.offset.y,
                   this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
@@ -2242,7 +2251,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (isLinearElement(draggingElement)) {
-        draggingOccurred = true;
+        pointerDownState.drag.hasOccurred = true;
         const points = draggingElement.points;
         let dx: number;
         let dy: number;
@@ -2383,7 +2392,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
         }
-        if (!draggingOccurred && draggingElement && !multiElement) {
+        if (
+          !pointerDownState.drag.hasOccurred &&
+          draggingElement &&
+          !multiElement
+        ) {
           const { x, y } = viewportCoordsToSceneCoords(
             childEvent,
             this.state,
@@ -2400,7 +2413,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             multiElement: draggingElement,
             editingElement: this.state.draggingElement,
           });
-        } else if (draggingOccurred && !multiElement) {
+        } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -2470,7 +2483,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (
         getSelectedGroupIds(this.state).length === 0 &&
         hitElement &&
-        !draggingOccurred &&
+        !pointerDownState.drag.hasOccurred &&
         !pointerDownState.hit.wasAddedToSelection
       ) {
         if (childEvent.shiftKey) {
