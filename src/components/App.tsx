@@ -61,6 +61,7 @@ import {
   ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
+  ExcalidrawGenericElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -2037,40 +2038,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         pointerDownState,
       );
     } else {
-      const [gridX, gridY] = getGridPoint(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        this.state.gridSize,
+      this.createGenericElementOnPointerDown(
+        this.state.elementType,
+        pointerDownState,
       );
-      const element = newElement({
-        type: this.state.elementType,
-        x: gridX,
-        y: gridY,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        strokeStyle: this.state.currentItemStrokeStyle,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-      });
-
-      if (element.type === "selection") {
-        this.setState({
-          selectionElement: element,
-          draggingElement: element,
-        });
-      } else {
-        globalSceneState.replaceAllElements([
-          ...globalSceneState.getElementsIncludingDeleted(),
-          element,
-        ]);
-        this.setState({
-          multiElement: null,
-          draggingElement: element,
-          editingElement: element,
-        });
-      }
     }
 
     let selectedElementWasDuplicated = false;
@@ -3018,6 +2989,46 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         element,
       ]);
       this.setState({
+        draggingElement: element,
+        editingElement: element,
+      });
+    }
+  };
+
+  private createGenericElementOnPointerDown = (
+    elementType: ExcalidrawGenericElement["type"],
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+    const element = newElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+    });
+
+    if (element.type === "selection") {
+      this.setState({
+        selectionElement: element,
+        draggingElement: element,
+      });
+    } else {
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getElementsIncludingDeleted(),
+        element,
+      ]);
+      this.setState({
+        multiElement: null,
         draggingElement: element,
         editingElement: element,
       });
