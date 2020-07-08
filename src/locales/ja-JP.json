@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
     "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
     "decryptFailed": "データを復号できませんでした。",
-    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。"
+    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "選択",
