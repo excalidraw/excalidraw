@@ -1765,12 +1765,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isHoldingSpace || isPanning || isDraggingScrollBar) {
       return;
     }
-    const {
-      isOverHorizontalScrollBar,
-      isOverVerticalScrollBar,
-    } = isOverScrollBars(currentScrollBars, event.clientX, event.clientY);
-    const isOverScrollBar =
-      isOverVerticalScrollBar || isOverHorizontalScrollBar;
+    const isPointerOverScrollBars = isOverScrollBars(
+      currentScrollBars,
+      event.clientX,
+      event.clientY,
+    );
+    const isOverScrollBar = isPointerOverScrollBars.isOverEither;
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor();
@@ -1977,15 +1977,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     // Handle scrollbars dragging
-    const isOverScrollBarsNow = isOverScrollBars(
+    const isPointerOverScrollBars = isOverScrollBars(
       currentScrollBars,
       event.clientX,
       event.clientY,
     );
-    const {
-      isOverHorizontalScrollBar,
-      isOverVerticalScrollBar,
-    } = isOverScrollBarsNow;
 
     const origin = viewportCoordsToSceneCoords(
       event,
@@ -2018,7 +2014,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
 
     if (
-      this.handleDraggingScrollBar(event, pointerDownState, isOverScrollBarsNow)
+      this.handleDraggingScrollBar(
+        event,
+        pointerDownState,
+        isPointerOverScrollBars,
+      )
     ) {
       return;
     }
@@ -2075,7 +2075,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isOverHorizontalScrollBar) {
+      if (isPointerOverScrollBars.isOverHorizontal) {
         const x = event.clientX;
         const dx = x - pointerDownState.lastCoords.x;
         this.setState({
@@ -2085,7 +2085,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isOverVerticalScrollBar) {
+      if (isPointerOverScrollBars.isOverVertical) {
         const y = event.clientY;
         const dy = y - pointerDownState.lastCoords.y;
         this.setState({
@@ -2686,20 +2686,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleDraggingScrollBar(
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
-    {
-      isOverHorizontalScrollBar,
-      isOverVerticalScrollBar,
-    }: {
-      isOverHorizontalScrollBar: boolean;
-      isOverVerticalScrollBar: boolean;
-    },
+    isPointerOverScrollBars: ReturnType<typeof isOverScrollBars>,
   ): boolean {
-    if (
-      !(
-        (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
-        !this.state.multiElement
-      )
-    ) {
+    if (!(isPointerOverScrollBars.isOverEither && !this.state.multiElement)) {
       return false;
     }
     isDraggingScrollBar = true;
@@ -2711,7 +2700,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isOverHorizontalScrollBar) {
+      if (isPointerOverScrollBars.isOverHorizontal) {
         const x = event.clientX;
         const dx = x - pointerDownState.lastCoords.x;
         this.setState({
@@ -2721,7 +2710,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isOverVerticalScrollBar) {
+      if (isPointerOverScrollBars.isOverVertical) {
         const y = event.clientY;
         const dy = y - pointerDownState.lastCoords.y;
         this.setState({
