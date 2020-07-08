@@ -209,6 +209,9 @@ type PointerDownState = Readonly<{
     element: ExcalidrawElement | null;
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
+    // Whether selected element(s) were duplicated, might change during the
+    // pointer interation
+    hasBeenDuplicated: boolean;
   };
 }>;
 
@@ -2000,6 +2003,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       hit: {
         element: null,
         wasAddedToSelection: false,
+        hasBeenDuplicated: false,
       },
     };
 
@@ -2043,8 +2047,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         pointerDownState,
       );
     }
-
-    let selectedElementWasDuplicated = false;
 
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       // We need to initialize dragOffsetXY only after we've updated
@@ -2185,12 +2187,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           dragSelectedElements(selectedElements, dragX, dragY);
 
           // We duplicate the selected element if alt is pressed on pointer move
-          if (event.altKey && !selectedElementWasDuplicated) {
+          if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
             // Move the currently selected elements to the top of the z index stack, and
             // put the duplicates where the selected elements used to be.
             // (the origin point where the dragging started)
 
-            selectedElementWasDuplicated = true;
+            pointerDownState.hit.hasBeenDuplicated = true;
 
             const nextElements = [];
             const elementsToAppend = [];
