@@ -200,6 +200,13 @@ type PointerDownState = Readonly<{
     // This is determined on the initial pointer down event
     offset: { x: number; y: number };
   };
+  hit: {
+    // The element the pointer is "hitting", is determined on the initial
+    // pointer down event
+    element: ExcalidrawElement | null;
+    // This is determined on the initial pointer down event
+    wasAddedToSelection: boolean;
+  };
 }>;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
@@ -1986,6 +1993,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isResizing: false,
         offset: { x: 0, y: 0 },
       },
+      hit: {
+        element: null,
+        wasAddedToSelection: false,
+      },
     };
 
     if (
@@ -2003,8 +2014,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     let resizeArrowDirection: "origin" | "end" = "origin";
     let draggingOccurred = false;
     let dragOffsetXY: [number, number] | null = null;
-    let hitElement: ExcalidrawElement | null = null;
-    let hitElementWasAddedToSelection = false;
 
     if (this.state.elementType !== "selection") {
       this.setState({
@@ -2074,7 +2083,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.y,
           );
           if (ret.hitElement) {
-            hitElement = ret.hitElement;
+            pointerDownState.hit.element = ret.hitElement;
           }
           if (ret.didAddPoint) {
             return;
@@ -2082,8 +2091,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
 
         // hitElement may already be set above, so check first
-        hitElement =
-          hitElement ||
+        pointerDownState.hit.element =
+          pointerDownState.hit.element ??
           getElementAtPosition(
             elements,
             this.state,
@@ -2092,10 +2101,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state.zoom,
           );
 
-        this.maybeClearSelectionWhenHittingElement(event, hitElement);
+        this.maybeClearSelectionWhenHittingElement(
+          event,
+          pointerDownState.hit.element,
+        );
 
         // If we click on something
-        if (hitElement) {
+        const hitElement = pointerDownState.hit.element;
+        if (hitElement != null) {
           // deselect if item is selected
           // if shift is not clicked, this will always return true
           // otherwise, it will trigger selection based on current
@@ -2130,7 +2143,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             globalSceneState.replaceAllElements(
               globalSceneState.getElementsIncludingDeleted(),
             );
-            hitElementWasAddedToSelection = true;
+            pointerDownState.hit.wasAddedToSelection = true;
           }
         }
 
@@ -2406,6 +2419,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
 
+      const hitElement = pointerDownState.hit.element;
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -2438,7 +2452,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
                 //  updated yet by the time this mousemove event is fired
-                (element.id === hitElement.id && hitElementWasAddedToSelection)
+                (element.id === hitElement.id &&
+                  pointerDownState.hit.wasAddedToSelection)
               ) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
@@ -2701,11 +2716,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // If click occurred and elements were dragged or some element
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
+      const hitElement = pointerDownState.hit.element;
       if (
         getSelectedGroupIds(this.state).length === 0 &&
         hitElement &&
         !draggingOccurred &&
-        !hitElementWasAddedToSelection
+        !pointerDownState.hit.wasAddedToSelection
       ) {
         if (childEvent.shiftKey) {
           this.setState((prevState) => ({
