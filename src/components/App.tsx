@@ -199,6 +199,8 @@ type PointerDownState = Readonly<{
     isResizing: boolean;
     // This is determined on the initial pointer down event
     offset: { x: number; y: number };
+    // This is determined on the initial pointer down event
+    arrowDirection: "origin" | "end";
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -1983,7 +1985,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     // State for the duration of a pointer interaction, which starts with a
-    // pointerDown event, ends pointerUp event (or another pointerDown)
+    // pointerDown event, ends with a pointerUp event (or another pointerDown)
     const pointerDownState: PointerDownState = {
       origin,
       // we need to duplicate because we'll be updating this state
@@ -1992,6 +1994,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         handle: false as ReturnType<typeof resizeTest>,
         isResizing: false,
         offset: { x: 0, y: 0 },
+        arrowDirection: "origin",
       },
       hit: {
         element: null,
@@ -2011,147 +2014,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state.gridSize,
     );
 
-    let resizeArrowDirection: "origin" | "end" = "origin";
     let draggingOccurred = false;
     let dragOffsetXY: [number, number] | null = null;
 
-    if (this.state.elementType !== "selection") {
-      this.setState({
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        editingGroupId: null,
-      });
-    }
+    this.clearSelectionIfNotUsingSelection();
 
-    if (this.state.elementType === "selection") {
-      const elements = globalSceneState.getElements();
-      const selectedElements = getSelectedElements(elements, this.state);
-      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithResizeHandler = getElementWithResizeHandler(
-          elements,
-          this.state,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-        );
-        if (elementWithResizeHandler != null) {
-          this.setState({ resizingElement: elementWithResizeHandler.element });
-          pointerDownState.resize.handle =
-            elementWithResizeHandler.resizeHandle;
-        }
-      } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handle = getResizeHandlerFromCoords(
-          getCommonBounds(selectedElements),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-        );
-      }
-      if (pointerDownState.resize.handle) {
-        document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle: pointerDownState.resize.handle,
-        });
-        pointerDownState.resize.isResizing = true;
-        pointerDownState.resize.offset = tupleToCoors(
-          getResizeOffsetXY(
-            pointerDownState.resize.handle,
-            selectedElements,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ),
-        );
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0]) &&
-          selectedElements[0].points.length === 2
-        ) {
-          resizeArrowDirection = getResizeArrowDirection(
-            pointerDownState.resize.handle,
-            selectedElements[0],
-          );
-        }
-      } else {
-        if (this.state.editingLinearElement) {
-          const ret = LinearElementEditor.handlePointerDown(
-            event,
-            this.state,
-            (appState) => this.setState(appState),
-            history,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          );
-          if (ret.hitElement) {
-            pointerDownState.hit.element = ret.hitElement;
-          }
-          if (ret.didAddPoint) {
-            return;
-          }
-        }
-
-        // hitElement may already be set above, so check first
-        pointerDownState.hit.element =
-          pointerDownState.hit.element ??
-          getElementAtPosition(
-            elements,
-            this.state,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            this.state.zoom,
-          );
-
-        this.maybeClearSelectionWhenHittingElement(
-          event,
-          pointerDownState.hit.element,
-        );
-
-        // If we click on something
-        const hitElement = pointerDownState.hit.element;
-        if (hitElement != null) {
-          // deselect if item is selected
-          // if shift is not clicked, this will always return true
-          // otherwise, it will trigger selection based on current
-          // state of the box
-          if (!this.state.selectedElementIds[hitElement.id]) {
-            // if we are currently editing a group, treat all selections outside of the group
-            // as exiting editing mode.
-            if (
-              this.state.editingGroupId &&
-              !isElementInGroup(hitElement, this.state.editingGroupId)
-            ) {
-              this.setState({
-                selectedElementIds: {},
-                selectedGroupIds: {},
-                editingGroupId: null,
-              });
-              return;
-            }
-            this.setState((prevState) => {
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    ...prevState.selectedElementIds,
-                    [hitElement!.id]: true,
-                  },
-                },
-                globalSceneState.getElements(),
-              );
-            });
-            // TODO: this is strange...
-            globalSceneState.replaceAllElements(
-              globalSceneState.getElementsIncludingDeleted(),
-            );
-            pointerDownState.hit.wasAddedToSelection = true;
-          }
-        }
-
-        const { selectedElementIds } = this.state;
-        this.setState({
-          previousSelectedElementIds: selectedElementIds,
-        });
-      }
+    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+      return;
     }
 
     if (this.state.elementType === "text") {
@@ -2390,7 +2259,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               pointerDownState.resize.handle = newResizeHandle;
             },
             selectedElements,
-            resizeArrowDirection,
+            pointerDownState.resize.arrowDirection,
             getRotateWithDiscreteAngleKey(event),
             getResizeWithSidesSameLengthKey(event),
             getResizeCenterPointKey(event),
@@ -2986,6 +2855,156 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
     return true;
   }
+
+  private clearSelectionIfNotUsingSelection = (): void => {
+    if (this.state.elementType !== "selection") {
+      this.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
+    }
+  };
+
+  // Returns whether the pointer event has been completely handled
+  private handleSelectionOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    if (this.state.elementType === "selection") {
+      const elements = globalSceneState.getElements();
+      const selectedElements = getSelectedElements(elements, this.state);
+      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
+        const elementWithResizeHandler = getElementWithResizeHandler(
+          elements,
+          this.state,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (elementWithResizeHandler != null) {
+          this.setState({
+            resizingElement: elementWithResizeHandler.element,
+          });
+          pointerDownState.resize.handle =
+            elementWithResizeHandler.resizeHandle;
+        }
+      } else if (selectedElements.length > 1) {
+        pointerDownState.resize.handle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          this.state.zoom,
+          event.pointerType,
+        );
+      }
+      if (pointerDownState.resize.handle) {
+        document.documentElement.style.cursor = getCursorForResizingElement({
+          resizeHandle: pointerDownState.resize.handle,
+        });
+        pointerDownState.resize.isResizing = true;
+        pointerDownState.resize.offset = tupleToCoors(
+          getResizeOffsetXY(
+            pointerDownState.resize.handle,
+            selectedElements,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
+        );
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0]) &&
+          selectedElements[0].points.length === 2
+        ) {
+          pointerDownState.resize.arrowDirection = getResizeArrowDirection(
+            pointerDownState.resize.handle,
+            selectedElements[0],
+          );
+        }
+      } else {
+        if (this.state.editingLinearElement) {
+          const ret = LinearElementEditor.handlePointerDown(
+            event,
+            this.state,
+            (appState) => this.setState(appState),
+            history,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          );
+          if (ret.hitElement) {
+            pointerDownState.hit.element = ret.hitElement;
+          }
+          if (ret.didAddPoint) {
+            return true;
+          }
+        }
+
+        // hitElement may already be set above, so check first
+        pointerDownState.hit.element =
+          pointerDownState.hit.element ??
+          getElementAtPosition(
+            elements,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+          );
+
+        this.maybeClearSelectionWhenHittingElement(
+          event,
+          pointerDownState.hit.element,
+        );
+
+        // If we click on something
+        const hitElement = pointerDownState.hit.element;
+        if (hitElement != null) {
+          // deselect if item is selected
+          // if shift is not clicked, this will always return true
+          // otherwise, it will trigger selection based on current
+          // state of the box
+          if (!this.state.selectedElementIds[hitElement.id]) {
+            // if we are currently editing a group, treat all selections outside of the group
+            // as exiting editing mode.
+            if (
+              this.state.editingGroupId &&
+              !isElementInGroup(hitElement, this.state.editingGroupId)
+            ) {
+              this.setState({
+                selectedElementIds: {},
+                selectedGroupIds: {},
+                editingGroupId: null,
+              });
+              return true;
+            }
+            this.setState((prevState) => {
+              return selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    ...prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
+                },
+                globalSceneState.getElements(),
+              );
+            });
+            // TODO: this is strange...
+            globalSceneState.replaceAllElements(
+              globalSceneState.getElementsIncludingDeleted(),
+            );
+            pointerDownState.hit.wasAddedToSelection = true;
+          }
+        }
+
+        const { selectedElementIds } = this.state;
+        this.setState({
+          previousSelectedElementIds: selectedElementIds,
+        });
+      }
+    }
+    return false;
+  };
 
   private maybeClearSelectionWhenHittingElement(
     event: React.PointerEvent<HTMLCanvasElement>,
