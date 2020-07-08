@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
     "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
     "decryptFailed": "Nem sikerült dekódolni az adatot.",
-    "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát."
+    "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Kiválasztás",
