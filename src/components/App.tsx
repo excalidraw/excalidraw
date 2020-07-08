@@ -60,6 +60,7 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
   ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -2544,7 +2545,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    elementType: "draw" | "line" | "arrow",
+    elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
     if (this.state.multiElement) {
