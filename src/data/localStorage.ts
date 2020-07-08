@@ -109,8 +109,6 @@ export const restoreFromLocalStorage = () => {
       appState.collaborators = new Map();
       delete appState.width;
       delete appState.height;
-      // Always favor the saved library
-      appState.library = loadLibrary();
     } catch {
       // Do nothing because appState is already null
     }

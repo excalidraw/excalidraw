@@ -7,7 +7,6 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "./constants";
-import { loadLibrary } from "./data/localStorage";
 
 export const getDefaultAppState = (): AppState => {
   return {
@@ -60,7 +59,7 @@ export const getDefaultAppState = (): AppState => {
     width: window.innerWidth,
     height: window.innerHeight,
     isLibraryOpen: false,
-    library: loadLibrary(),
+    library: [],
   };
 };
 

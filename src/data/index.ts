@@ -348,11 +348,12 @@ export const exportCanvas = async (
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
-    const appState = getDefaultAppState();
-    if (exportBackground) {
-      appState.viewBackgroundColor = viewBackgroundColor;
-    }
-    exportToBackend(elements, appState);
+    exportToBackend(elements, {
+      ...appState,
+      viewBackgroundColor: exportBackground
+        ? appState.viewBackgroundColor
+        : getDefaultAppState().viewBackgroundColor,
+    });
   }
 
   // clean up the DOM
