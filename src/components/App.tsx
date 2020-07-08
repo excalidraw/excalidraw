@@ -397,6 +397,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
     );
 
+    if (!this.state.isLoading) {
+      this.setState({ isLoading: true });
+    }
+
     let scene = await loadScene(null);
 
     let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
@@ -484,7 +488,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onHashChange = (event: HashChangeEvent) => {
     if (window.location.hash.length > 1) {
-      this.setState({ isLoading: true });
       this.initializeScene();
     }
   };
