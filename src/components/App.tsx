@@ -193,6 +193,8 @@ type PointerDownState = Readonly<{
   origin: Readonly<{ x: number; y: number }>;
   // Same as "origin" but snapped to the grid, if grid is on
   originInGrid: Readonly<{ x: number; y: number }>;
+  // Scrollbar checks
+  scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
   lastCoords: { x: number; y: number };
   resize: {
@@ -1985,13 +1987,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    // Handle scrollbars dragging
-    const isPointerOverScrollBars = isOverScrollBars(
-      currentScrollBars,
-      event.clientX,
-      event.clientY,
-    );
-
     const origin = viewportCoordsToSceneCoords(
       event,
       this.state,
@@ -2005,6 +2000,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       origin,
       originInGrid: tupleToCoors(
         getGridPoint(origin.x, origin.y, this.state.gridSize),
+      ),
+      scrollbars: isOverScrollBars(
+        currentScrollBars,
+        event.clientX,
+        event.clientY,
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
@@ -2029,13 +2029,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
     };
 
-    if (
-      this.handleDraggingScrollBar(
-        event,
-        pointerDownState,
-        isPointerOverScrollBars,
-      )
-    ) {
+    if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
 
@@ -2067,7 +2061,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const onPointerMove = this.onPointerMoveFromPointerDownHandler(
       pointerDownState,
-      isPointerOverScrollBars,
     );
 
     const onPointerUp = this.onPointerUpFromPointerDownHandler(
@@ -2223,9 +2216,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleDraggingScrollBar(
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
-    isPointerOverScrollBars: ReturnType<typeof isOverScrollBars>,
   ): boolean {
-    if (!(isPointerOverScrollBars.isOverEither && !this.state.multiElement)) {
+    if (
+      !(pointerDownState.scrollbars.isOverEither && !this.state.multiElement)
+    ) {
       return false;
     }
     isDraggingScrollBar = true;
@@ -2237,7 +2231,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isPointerOverScrollBars.isOverHorizontal) {
+      if (pointerDownState.scrollbars.isOverHorizontal) {
         const x = event.clientX;
         const dx = x - pointerDownState.lastCoords.x;
         this.setState({
@@ -2247,7 +2241,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isPointerOverScrollBars.isOverVertical) {
+      if (pointerDownState.scrollbars.isOverVertical) {
         const y = event.clientY;
         const dy = y - pointerDownState.lastCoords.y;
         this.setState({
@@ -2578,7 +2572,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
-    isPointerOverScrollBars: ReturnType<typeof isOverScrollBars>,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((event: PointerEvent) => {
       // We need to initialize dragOffsetXY only after we've updated
@@ -2600,7 +2593,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isPointerOverScrollBars.isOverHorizontal) {
+      if (pointerDownState.scrollbars.isOverHorizontal) {
         const x = event.clientX;
         const dx = x - pointerDownState.lastCoords.x;
         this.setState({
@@ -2610,7 +2603,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (isPointerOverScrollBars.isOverVertical) {
+      if (pointerDownState.scrollbars.isOverVertical) {
         const y = event.clientY;
         const dy = y - pointerDownState.lastCoords.y;
         this.setState({
