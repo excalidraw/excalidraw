@@ -2329,24 +2329,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (pointerDownState.scrollbars.isOverHorizontal) {
-        const x = event.clientX;
-        const dx = x - pointerDownState.lastCoords.x;
-        this.setState({
-          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-        });
-        pointerDownState.lastCoords.x = x;
-        return;
-      }
-
-      if (pointerDownState.scrollbars.isOverVertical) {
-        const y = event.clientY;
-        const dy = y - pointerDownState.lastCoords.y;
-        this.setState({
-          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-        });
-        pointerDownState.lastCoords.y = y;
-      }
+      this.handlePointerMoveOverScrollbars(event, pointerDownState);
     });
 
     const onPointerUp = withBatchedUpdates(() => {
@@ -2691,23 +2674,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (pointerDownState.scrollbars.isOverHorizontal) {
-        const x = event.clientX;
-        const dx = x - pointerDownState.lastCoords.x;
-        this.setState({
-          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-        });
-        pointerDownState.lastCoords.x = x;
-        return;
-      }
-
-      if (pointerDownState.scrollbars.isOverVertical) {
-        const y = event.clientY;
-        const dy = y - pointerDownState.lastCoords.y;
-        this.setState({
-          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-        });
-        pointerDownState.lastCoords.y = y;
+      if (this.handlePointerMoveOverScrollbars(event, pointerDownState)) {
         return;
       }
 
@@ -2962,6 +2929,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
     });
+  }
+
+  // Returns whether the pointer move happened over either scrollbar
+  private handlePointerMoveOverScrollbars(
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): boolean {
+    if (pointerDownState.scrollbars.isOverHorizontal) {
+      const x = event.clientX;
+      const dx = x - pointerDownState.lastCoords.x;
+      this.setState({
+        scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+      });
+      pointerDownState.lastCoords.x = x;
+      return true;
+    }
+
+    if (pointerDownState.scrollbars.isOverVertical) {
+      const y = event.clientY;
+      const dy = y - pointerDownState.lastCoords.y;
+      this.setState({
+        scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+      });
+      pointerDownState.lastCoords.y = y;
+      return true;
+    }
+    return false;
   }
 
   private onPointerUpFromPointerDownHandler(
