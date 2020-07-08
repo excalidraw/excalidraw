@@ -482,6 +482,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({});
   });
 
+  private onHashChange = (event: HashChangeEvent) => {
+    if (window.location.hash.length > 1) {
+      this.setState({ isLoading: true });
+      this.initializeScene();
+    }
+  };
+
   private removeEventListeners() {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
@@ -499,6 +506,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
     window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+    window.removeEventListener(EVENT.HASHCHANGE, this.onHashChange, false);
 
     document.removeEventListener(
       EVENT.GESTURE_START,
@@ -534,6 +542,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    window.addEventListener(EVENT.HASHCHANGE, this.onHashChange, false);
 
     // rerender text elements on font load to fix #637 && #1553
     document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
