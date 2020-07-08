@@ -194,6 +194,8 @@ type PointerDownState = Readonly<{
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handle: ReturnType<typeof resizeTest>;
+    // This is determined on the initial pointer down event
+    isResizing: boolean;
   };
 }>;
 
@@ -1978,6 +1980,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       lastCoords: { ...origin },
       resize: {
         handle: false as ReturnType<typeof resizeTest>,
+        isResizing: false,
       },
     };
 
@@ -1995,7 +1998,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     let resizeOffsetXY: [number, number] = [0, 0];
     let resizeArrowDirection: "origin" | "end" = "origin";
-    let isResizingElements = false;
     let draggingOccurred = false;
     let dragOffsetXY: [number, number] | null = null;
     let hitElement: ExcalidrawElement | null = null;
@@ -2039,7 +2041,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         document.documentElement.style.cursor = getCursorForResizingElement({
           resizeHandle: pointerDownState.resize.handle,
         });
-        isResizingElements = true;
+        pointerDownState.resize.isResizing = true;
         resizeOffsetXY = getResizeOffsetXY(
           pointerDownState.resize.handle,
           selectedElements,
@@ -2345,13 +2347,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
 
-      if (isResizingElements) {
+      if (pointerDownState.resize.isResizing) {
         const selectedElements = getSelectedElements(
           globalSceneState.getElements(),
           this.state,
         );
         const resizeHandle = pointerDownState.resize.handle;
         this.setState({
+          // TODO: rename this state field to "isScaling" to distinguish
+          // it from the generic "isResizing" which includes scaling and
+          // rotating
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
