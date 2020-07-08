@@ -221,6 +221,13 @@ type PointerDownState = Readonly<{
     // Might change during the pointer interation
     offset: { x: number; y: number } | null;
   };
+  // We need to have these in the state so that we can unsubscribe them
+  eventListeners: {
+    // It's defined on the initial pointer down event
+    onMove: null | ((event: PointerEvent) => void);
+    // It's defined on the initial pointer down event
+    onUp: null | ((event: PointerEvent) => void);
+  };
 }>;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
@@ -2016,6 +2023,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         hasOccurred: false,
         offset: null,
       },
+      eventListeners: {
+        onMove: null,
+        onUp: null,
+      },
     };
 
     if (
@@ -2059,206 +2070,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isPointerOverScrollBars,
     );
 
-    const onPointerUp = withBatchedUpdates((childEvent: PointerEvent) => {
-      const {
-        draggingElement,
-        resizingElement,
-        multiElement,
-        elementType,
-        elementLocked,
-      } = this.state;
-
-      this.setState({
-        isResizing: false,
-        isRotating: false,
-        resizingElement: null,
-        selectionElement: null,
-        cursorButton: "up",
-        // text elements are reset on finalize, and resetting on pointerup
-        //  may cause issues with double taps
-        editingElement:
-          multiElement || isTextElement(this.state.editingElement)
-            ? this.state.editingElement
-            : null,
-      });
-
-      this.savePointer(childEvent.clientX, childEvent.clientY, "up");
-
-      // if moving start/end point towards start/end point within threshold,
-      //  close the loop
-      if (this.state.editingLinearElement) {
-        const editingLinearElement = LinearElementEditor.handlePointerUp(
-          this.state.editingLinearElement,
-        );
-        if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({ editingLinearElement });
-        }
-      }
-
-      lastPointerUp = null;
-
-      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
-
-      if (draggingElement?.type === "draw") {
-        this.actionManager.executeAction(actionFinalize);
-        return;
-      }
-      if (isLinearElement(draggingElement)) {
-        if (draggingElement!.points.length > 1) {
-          history.resumeRecording();
-        }
-        if (
-          !pointerDownState.drag.hasOccurred &&
-          draggingElement &&
-          !multiElement
-        ) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            childEvent,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
-          mutateElement(draggingElement, {
-            points: [
-              ...draggingElement.points,
-              [x - draggingElement.x, y - draggingElement.y],
-            ],
-          });
-          this.setState({
-            multiElement: draggingElement,
-            editingElement: this.state.draggingElement,
-          });
-        } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          if (!elementLocked) {
-            resetCursor();
-            this.setState((prevState) => ({
-              draggingElement: null,
-              elementType: "selection",
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
-              },
-            }));
-          } else {
-            this.setState((prevState) => ({
-              draggingElement: null,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
-              },
-            }));
-          }
-        }
-        return;
-      }
-
-      if (
-        elementType !== "selection" &&
-        draggingElement &&
-        isInvisiblySmallElement(draggingElement)
-      ) {
-        // remove invisible element which was added in onPointerDown
-        globalSceneState.replaceAllElements(
-          globalSceneState.getElementsIncludingDeleted().slice(0, -1),
-        );
-        this.setState({
-          draggingElement: null,
-        });
-        return;
-      }
-
-      if (draggingElement) {
-        mutateElement(
-          draggingElement,
-          getNormalizedDimensions(draggingElement),
-        );
-      }
-
-      if (resizingElement) {
-        history.resumeRecording();
-      }
-
-      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        globalSceneState.replaceAllElements(
-          globalSceneState
-            .getElementsIncludingDeleted()
-            .filter((el) => el.id !== resizingElement.id),
-        );
-      }
-
-      // If click occurred on already selected element
-      // it is needed to remove selection from other elements
-      // or if SHIFT or META key pressed remove selection
-      // from hitted element
-      //
-      // If click occurred and elements were dragged or some element
-      // was added to selection (on pointerdown phase) we need to keep
-      // selection unchanged
-      const hitElement = pointerDownState.hit.element;
-      if (
-        getSelectedGroupIds(this.state).length === 0 &&
-        hitElement &&
-        !pointerDownState.drag.hasOccurred &&
-        !pointerDownState.hit.wasAddedToSelection
-      ) {
-        if (childEvent.shiftKey) {
-          this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [hitElement!.id]: false,
-            },
-          }));
-        } else {
-          this.setState((_prevState) => ({
-            selectedElementIds: { [hitElement!.id]: true },
-          }));
-        }
-      }
-
-      if (draggingElement === null) {
-        // if no element is clicked, clear the selection and redraw
-        this.setState({
-          selectedElementIds: {},
-          selectedGroupIds: {},
-          editingGroupId: null,
-        });
-        return;
-      }
-
-      if (!elementLocked) {
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [draggingElement.id]: true,
-          },
-        }));
-      }
-
-      if (
-        elementType !== "selection" ||
-        isSomeElementSelected(globalSceneState.getElements(), this.state)
-      ) {
-        history.resumeRecording();
-      }
-
-      if (!elementLocked) {
-        resetCursor();
-        this.setState({
-          draggingElement: null,
-          elementType: "selection",
-        });
-      } else {
-        this.setState({
-          draggingElement: null,
-        });
-      }
-    });
+    const onPointerUp = this.onPointerUpFromPointerDownHandler(
+      pointerDownState,
+    );
 
     lastPointerUp = onPointerUp;
 
     window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    pointerDownState.eventListeners.onMove = onPointerMove;
+    pointerDownState.eventListeners.onUp = onPointerUp;
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -3044,6 +2865,212 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             globalSceneState.getElements(),
           ),
         );
+      }
+    });
+  }
+
+  private onPointerUpFromPointerDownHandler(
+    pointerDownState: PointerDownState,
+  ): (event: PointerEvent) => void {
+    return withBatchedUpdates((childEvent: PointerEvent) => {
+      const {
+        draggingElement,
+        resizingElement,
+        multiElement,
+        elementType,
+        elementLocked,
+      } = this.state;
+
+      this.setState({
+        isResizing: false,
+        isRotating: false,
+        resizingElement: null,
+        selectionElement: null,
+        cursorButton: "up",
+        // text elements are reset on finalize, and resetting on pointerup
+        //  may cause issues with double taps
+        editingElement:
+          multiElement || isTextElement(this.state.editingElement)
+            ? this.state.editingElement
+            : null,
+      });
+
+      this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
+      // if moving start/end point towards start/end point within threshold,
+      //  close the loop
+      if (this.state.editingLinearElement) {
+        const editingLinearElement = LinearElementEditor.handlePointerUp(
+          this.state.editingLinearElement,
+        );
+        if (editingLinearElement !== this.state.editingLinearElement) {
+          this.setState({ editingLinearElement });
+        }
+      }
+
+      lastPointerUp = null;
+
+      window.removeEventListener(
+        EVENT.POINTER_MOVE,
+        pointerDownState.eventListeners.onMove!,
+      );
+      window.removeEventListener(
+        EVENT.POINTER_UP,
+        pointerDownState.eventListeners.onUp!,
+      );
+
+      if (draggingElement?.type === "draw") {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+      if (isLinearElement(draggingElement)) {
+        if (draggingElement!.points.length > 1) {
+          history.resumeRecording();
+        }
+        if (
+          !pointerDownState.drag.hasOccurred &&
+          draggingElement &&
+          !multiElement
+        ) {
+          const { x, y } = viewportCoordsToSceneCoords(
+            childEvent,
+            this.state,
+            this.canvas,
+            window.devicePixelRatio,
+          );
+          mutateElement(draggingElement, {
+            points: [
+              ...draggingElement.points,
+              [x - draggingElement.x, y - draggingElement.y],
+            ],
+          });
+          this.setState({
+            multiElement: draggingElement,
+            editingElement: this.state.draggingElement,
+          });
+        } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          if (!elementLocked) {
+            resetCursor();
+            this.setState((prevState) => ({
+              draggingElement: null,
+              elementType: "selection",
+              selectedElementIds: {
+                ...prevState.selectedElementIds,
+                [this.state.draggingElement!.id]: true,
+              },
+            }));
+          } else {
+            this.setState((prevState) => ({
+              draggingElement: null,
+              selectedElementIds: {
+                ...prevState.selectedElementIds,
+                [this.state.draggingElement!.id]: true,
+              },
+            }));
+          }
+        }
+        return;
+      }
+
+      if (
+        elementType !== "selection" &&
+        draggingElement &&
+        isInvisiblySmallElement(draggingElement)
+      ) {
+        // remove invisible element which was added in onPointerDown
+        globalSceneState.replaceAllElements(
+          globalSceneState.getElementsIncludingDeleted().slice(0, -1),
+        );
+        this.setState({
+          draggingElement: null,
+        });
+        return;
+      }
+
+      if (draggingElement) {
+        mutateElement(
+          draggingElement,
+          getNormalizedDimensions(draggingElement),
+        );
+      }
+
+      if (resizingElement) {
+        history.resumeRecording();
+      }
+
+      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+        globalSceneState.replaceAllElements(
+          globalSceneState
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== resizingElement.id),
+        );
+      }
+
+      // If click occurred on already selected element
+      // it is needed to remove selection from other elements
+      // or if SHIFT or META key pressed remove selection
+      // from hitted element
+      //
+      // If click occurred and elements were dragged or some element
+      // was added to selection (on pointerdown phase) we need to keep
+      // selection unchanged
+      const hitElement = pointerDownState.hit.element;
+      if (
+        getSelectedGroupIds(this.state).length === 0 &&
+        hitElement &&
+        !pointerDownState.drag.hasOccurred &&
+        !pointerDownState.hit.wasAddedToSelection
+      ) {
+        if (childEvent.shiftKey) {
+          this.setState((prevState) => ({
+            selectedElementIds: {
+              ...prevState.selectedElementIds,
+              [hitElement!.id]: false,
+            },
+          }));
+        } else {
+          this.setState((_prevState) => ({
+            selectedElementIds: { [hitElement!.id]: true },
+          }));
+        }
+      }
+
+      if (draggingElement === null) {
+        // if no element is clicked, clear the selection and redraw
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+          editingGroupId: null,
+        });
+        return;
+      }
+
+      if (!elementLocked) {
+        this.setState((prevState) => ({
+          selectedElementIds: {
+            ...prevState.selectedElementIds,
+            [draggingElement.id]: true,
+          },
+        }));
+      }
+
+      if (
+        elementType !== "selection" ||
+        isSomeElementSelected(globalSceneState.getElements(), this.state)
+      ) {
+        history.resumeRecording();
+      }
+
+      if (!elementLocked) {
+        resetCursor();
+        this.setState({
+          draggingElement: null,
+          elementType: "selection",
+        });
+      } else {
+        this.setState({
+          draggingElement: null,
+        });
       }
     });
   }
