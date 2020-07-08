@@ -2024,25 +2024,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (this.state.elementType === "text") {
-      // if we're currently still editing text, clicking outside
-      //  should only finalize it, not create another (irrespective
-      //  of state.elementLocked)
-      if (this.state.editingElement?.type === "text") {
-        return;
-      }
-
-      this.startTextEditing({
-        sceneX: pointerDownState.origin.x,
-        sceneY: pointerDownState.origin.y,
-        insertAtParentCenter: !event.altKey,
-      });
-
-      resetCursor();
-      if (!this.state.elementLocked) {
-        this.setState({
-          elementType: "selection",
-        });
-      }
+      this.handleTextOnPointerDown(event, pointerDownState);
       return;
     } else if (
       this.state.elementType === "arrow" ||
@@ -3004,6 +2986,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
     return false;
+  };
+
+  private handleTextOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    pointerDownState: PointerDownState,
+  ): void => {
+    // if we're currently still editing text, clicking outside
+    //  should only finalize it, not create another (irrespective
+    //  of state.elementLocked)
+    if (this.state.editingElement?.type === "text") {
+      return;
+    }
+
+    this.startTextEditing({
+      sceneX: pointerDownState.origin.x,
+      sceneY: pointerDownState.origin.y,
+      insertAtParentCenter: !event.altKey,
+    });
+
+    resetCursor();
+    if (!this.state.elementLocked) {
+      this.setState({
+        elementType: "selection",
+      });
+    }
   };
 
   private maybeClearSelectionWhenHittingElement(
