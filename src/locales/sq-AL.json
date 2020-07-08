@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "Nuk eksportohet telajo bosh.",
     "couldNotCopyToClipboard": "",
     "decryptFailed": "S'mund të deshifroj të dhënat.",
-    "uploadedSecurly": ""
+    "uploadedSecurly": "",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Përzgjedhja",
