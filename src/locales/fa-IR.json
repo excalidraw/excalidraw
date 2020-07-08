@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
     "couldNotCopyToClipboard": "کپی نشد. از مرورگر Chrome استفاده کنید.",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
-    "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند."
+    "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "گزینش",
