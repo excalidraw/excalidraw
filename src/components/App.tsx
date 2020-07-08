@@ -186,6 +186,13 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+type PointerDownState = Readonly<{
+  // The first position at which pointerDown happened
+  origin: Readonly<{ x: number; y: number }>;
+  // The previous pointer position
+  lastCoords: { x: number; y: number };
+}>;
+
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -1952,23 +1959,30 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isOverVerticalScrollBar,
     } = isOverScrollBarsNow;
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const origin = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
-    const lastCoords = { x, y };
 
-    if (this.handleDraggingScrollBar(event, lastCoords, isOverScrollBarsNow)) {
+    // State for the duration of a pointer interaction, which starts with a
+    // pointerDown event, ends pointerUp event (or another pointerDown)
+    const pointerDownState = {
+      origin,
+      // we need to duplicate because we'll be updating this state
+      lastCoords: { ...origin },
+    };
+
+    if (
+      this.handleDraggingScrollBar(event, pointerDownState, isOverScrollBarsNow)
+    ) {
       return;
     }
 
-    const originX = x;
-    const originY = y;
     const [originGridX, originGridY] = getGridPoint(
-      originX,
-      originY,
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
       this.state.gridSize,
     );
 
@@ -2000,8 +2014,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const elementWithResizeHandler = getElementWithResizeHandler(
           elements,
           this.state,
-          x,
-          y,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
         );
@@ -2012,8 +2026,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       } else if (selectedElements.length > 1) {
         resizeHandle = getResizeHandlerFromCoords(
           getCommonBounds(selectedElements),
-          x,
-          y,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
         );
@@ -2026,8 +2040,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         resizeOffsetXY = getResizeOffsetXY(
           resizeHandle,
           selectedElements,
-          x,
-          y,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
         );
         if (
           selectedElements.length === 1 &&
@@ -2046,8 +2060,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state,
             (appState) => this.setState(appState),
             history,
-            x,
-            y,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
           );
           if (ret.hitElement) {
             hitElement = ret.hitElement;
@@ -2060,7 +2074,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // hitElement may already be set above, so check first
         hitElement =
           hitElement ||
-          getElementAtPosition(elements, this.state, x, y, this.state.zoom);
+          getElementAtPosition(
+            elements,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+          );
 
         this.maybeClearSelectionWhenHittingElement(event, hitElement);
 
@@ -2120,8 +2140,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.startTextEditing({
-        sceneX: x,
-        sceneY: y,
+        sceneX: pointerDownState.origin.x,
+        sceneY: pointerDownState.origin.y,
         insertAtParentCenter: !event.altKey,
       });
 
@@ -2157,8 +2177,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           multiElement.points.length > 1 &&
           lastCommittedPoint &&
           distance2d(
-            x - rx,
-            y - ry,
+            pointerDownState.origin.x - rx,
+            pointerDownState.origin.y - ry,
             lastCommittedPoint[0],
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
@@ -2182,8 +2202,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
       } else {
         const [gridX, gridY] = getGridPoint(
-          x,
-          y,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
           this.state.elementType === "draw" ? null : this.state.gridSize,
         );
         const element = newLinearElement({
@@ -2217,7 +2237,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         });
       }
     } else {
-      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
+      const [gridX, gridY] = getGridPoint(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        this.state.gridSize,
+      );
       const element = newElement({
         type: this.state.elementType,
         x: gridX,
@@ -2259,8 +2283,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (dragOffsetXY === null) {
         dragOffsetXY = getDragOffsetXY(
           getSelectedElements(globalSceneState.getElements(), this.state),
-          originX,
-          originY,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
         );
       }
 
@@ -2271,21 +2295,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastCoords.x;
+        const dx = x - pointerDownState.lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastCoords.x = x;
+        pointerDownState.lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastCoords.y;
+        const dy = y - pointerDownState.lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastCoords.y = y;
+        pointerDownState.lastCoords.y = y;
         return;
       }
 
@@ -2306,7 +2330,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         (this.state.elementType === "arrow" ||
           this.state.elementType === "line")
       ) {
-        if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
+        if (
+          distance2d(
+            x,
+            y,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) < DRAGGING_THRESHOLD
+        ) {
           return;
         }
       }
@@ -2348,13 +2379,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           (appState) => this.setState(appState),
           x,
           y,
-          lastCoords.x,
-          lastCoords.y,
+          pointerDownState.lastCoords.x,
+          pointerDownState.lastCoords.y,
         );
 
         if (didDrag) {
-          lastCoords.x = x;
-          lastCoords.y = y;
+          pointerDownState.lastCoords.x = x;
+          pointerDownState.lastCoords.y = y;
           return;
         }
       }
@@ -2399,8 +2430,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                   element,
                 );
                 const [originDragX, originDragY] = getGridPoint(
-                  originX - dragOffsetXY[0],
-                  originY - dragOffsetXY[1],
+                  pointerDownState.origin.x - dragOffsetXY[0],
+                  pointerDownState.origin.y - dragOffsetXY[1],
                   this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
@@ -2467,12 +2498,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         dragNewElement(
           draggingElement,
           this.state.elementType,
-          originX,
-          originY,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
           x,
           y,
-          distance(originX, x),
-          distance(originY, y),
+          distance(pointerDownState.origin.x, x),
+          distance(pointerDownState.origin.y, y),
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
@@ -2859,7 +2890,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Returns whether the event is a dragging a scrollbar
   private handleDraggingScrollBar(
     event: React.PointerEvent<HTMLCanvasElement>,
-    lastCoords: { x: number; y: number },
+    pointerDownState: PointerDownState,
     {
       isOverHorizontalScrollBar,
       isOverVerticalScrollBar,
@@ -2877,8 +2908,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
     isDraggingScrollBar = true;
-    lastCoords.x = event.clientX;
-    lastCoords.y = event.clientY;
+    pointerDownState.lastCoords.x = event.clientX;
+    pointerDownState.lastCoords.y = event.clientY;
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
@@ -2887,21 +2918,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastCoords.x;
+        const dx = x - pointerDownState.lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastCoords.x = x;
+        pointerDownState.lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastCoords.y;
+        const dy = y - pointerDownState.lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastCoords.y = y;
+        pointerDownState.lastCoords.y = y;
       }
     });
 
