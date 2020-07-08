@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
     "decryptFailed": "Impossibile decriptare i dati.",
-    "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto."
+    "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Selezione",
