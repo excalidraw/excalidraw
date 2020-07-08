@@ -1987,47 +1987,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    const origin = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
-
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
-    const pointerDownState: PointerDownState = {
-      origin,
-      originInGrid: tupleToCoors(
-        getGridPoint(origin.x, origin.y, this.state.gridSize),
-      ),
-      scrollbars: isOverScrollBars(
-        currentScrollBars,
-        event.clientX,
-        event.clientY,
-      ),
-      // we need to duplicate because we'll be updating this state
-      lastCoords: { ...origin },
-      resize: {
-        handle: false as ReturnType<typeof resizeTest>,
-        isResizing: false,
-        offset: { x: 0, y: 0 },
-        arrowDirection: "origin",
-      },
-      hit: {
-        element: null,
-        wasAddedToSelection: false,
-        hasBeenDuplicated: false,
-      },
-      drag: {
-        hasOccurred: false,
-        offset: null,
-      },
-      eventListeners: {
-        onMove: null,
-        onUp: null,
-      },
-    };
+    const pointerDownState = this.initialPointerDownState(event);
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
@@ -2210,6 +2172,50 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         Array.from(gesture.pointers.values()),
       );
     }
+  }
+
+  private initialPointerDownState(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): PointerDownState {
+    const origin = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+      this.canvas,
+      window.devicePixelRatio,
+    );
+
+    return {
+      origin,
+      originInGrid: tupleToCoors(
+        getGridPoint(origin.x, origin.y, this.state.gridSize),
+      ),
+      scrollbars: isOverScrollBars(
+        currentScrollBars,
+        event.clientX,
+        event.clientY,
+      ),
+      // we need to duplicate because we'll be updating this state
+      lastCoords: { ...origin },
+      resize: {
+        handle: false as ReturnType<typeof resizeTest>,
+        isResizing: false,
+        offset: { x: 0, y: 0 },
+        arrowDirection: "origin",
+      },
+      hit: {
+        element: null,
+        wasAddedToSelection: false,
+        hasBeenDuplicated: false,
+      },
+      drag: {
+        hasOccurred: false,
+        offset: null,
+      },
+      eventListeners: {
+        onMove: null,
+        onUp: null,
+      },
+    };
   }
 
   // Returns whether the event is a dragging a scrollbar
