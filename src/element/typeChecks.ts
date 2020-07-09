@@ -14,11 +14,14 @@ export const isTextElement = (
 export const isLinearElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLinearElement => {
+  return element != null && isLinearElementType(element.type);
+};
+
+export const isLinearElementType = (
+  elementType: ExcalidrawElement["type"],
+): boolean => {
   return (
-    element != null &&
-    (element.type === "arrow" ||
-      element.type === "line" ||
-      element.type === "draw")
+    elementType === "arrow" || elementType === "line" || elementType === "draw"
   );
 };
 

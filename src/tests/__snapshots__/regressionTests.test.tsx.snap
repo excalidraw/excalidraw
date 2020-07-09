@@ -4270,7 +4270,11 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
+<<<<<<< HEAD
 exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `47`;
+=======
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `51`;
+>>>>>>> Suggest binding when hovering
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {

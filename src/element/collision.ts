@@ -45,12 +45,10 @@ export const hitTest = (
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / appState.zoom;
 
-  const absoluteCoords = getElementAbsoluteCoords(element);
+  const [xy, absoluteCoords] = adjustXYForElementRotation(element, x, y);
+  [x, y] = xy;
   const [x1, y1, x2, y2] = absoluteCoords;
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-  // reverse rotate the pointer
-  [x, y] = rotate(x, y, cx, cy, -element.angle);
+
   const relX = x - element.x;
   const relY = y - element.y;
 
@@ -114,7 +112,35 @@ export const bindingBorderTest = (
   x: number,
   y: number,
 ): boolean => {
-  return hitTest(element, appState, x, y);
+  const [xy, absoluteCoords] = adjustXYForElementRotation(element, x, y);
+  const [x1, y1, x2, y2] = absoluteCoords;
+  const size = Math.hypot(x2 - x1, y2 - y1);
+  [x, y] = xy;
+  // We make the bindable boundary bigger for bigger elements
+  const threshold = Math.max(10, Math.min(0.1 * size, 50)) / appState.zoom;
+
+  const relX = x - element.x;
+  const relY = y - element.y;
+
+  if (element.type === "ellipse") {
+    const ellipseParams = ellipseParamsRelativeTo(element, x, y);
+    return (
+      isNearEllipse(ellipseParams, threshold) &&
+      !isInsideEllipse(ellipseParams, 0)
+    );
+  } else if (element.type === "rectangle" || element.type === "text") {
+    return (
+      isInsideRectangle(x, y, absoluteCoords, threshold) &&
+      !isNearRectangle(x, y, absoluteCoords, 0)
+    );
+  } else if (element.type === "diamond") {
+    const diamondParams = getDiamondPoints(element);
+    return (
+      isInsideDiamond(relX, relY, diamondParams, threshold) &&
+      !isNearDiamond(relX, relY, diamondParams, 0)
+    );
+  }
+  return false;
 };
 
 const ellipseParamsRelativeTo = (
@@ -132,7 +158,7 @@ const ellipseParamsRelativeTo = (
   const a = Math.abs(element.width) / 2;
   const b = Math.abs(element.height) / 2;
 
-  [0, 1, 2, 3].forEach((x) => {
+  [0, 1, 2, 3].forEach((_) => {
     const xx = a * tx;
     const yy = b * ty;
 
@@ -164,6 +190,23 @@ const isInsideEllipse = (
   return (
     a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
   );
+};
+
+// The way the current hit test code works is that it takes the pointer
+// and rotates it around the element center to avoid having to rotate
+// all the element points instead to account for the element's rotation
+const adjustXYForElementRotation = (
+  element: NonDeletedExcalidrawElement,
+  x: number,
+  y: number,
+): [[number, number], [number, number, number, number]] => {
+  const absoluteCoords = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = absoluteCoords;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // reverse rotate the pointer
+  const xy = rotate(x, y, cx, cy, -element.angle);
+  return [xy, absoluteCoords];
 };
 
 const isNearEllipse = (
