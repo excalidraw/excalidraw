@@ -259,13 +259,14 @@ button,
 }
 
 .App-menu_bottom {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   grid-template-columns: 1fr auto 1fr;
   grid-gap: 4px;
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
+  left: 0.25rem;
 
   &--transition-left {
     section {
@@ -394,7 +395,7 @@ button,
 }
 
 .dropdown-select__language.dropdown-select--floating {
-  position: fixed;
+  position: absolute;
   bottom: 10px;
   :root[dir="ltr"] & {
     right: 44px;
@@ -426,7 +427,7 @@ button,
 }
 
 .help-icon {
-  position: fixed;
+  position: absolute;
   cursor: pointer;
   fill: $oc-gray-6;
   bottom: 14px;
@@ -455,7 +456,7 @@ button,
 }
 
 .github-corner {
-  position: fixed;
+  position: absolute;
   top: 0;
   z-index: 2;
   :root[dir="ltr"] & {

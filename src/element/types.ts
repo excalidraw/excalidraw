@@ -77,3 +77,8 @@ export type VerticalAlign = "top" | "middle";
 
 export type FontFamily = keyof typeof FONT_FAMILY;
 export type FontString = string & { _brand: "fontString" };
+
+export interface ExcalidrawProps {
+  width: number;
+  height: number;
+}

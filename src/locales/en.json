@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
+    "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
@@ -92,8 +93,7 @@
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode",
-    "toggleGridMode": "Toggle grid mode"
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -103,7 +103,8 @@
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
     "decryptFailed": "Couldn't decrypt data.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
+    "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -128,7 +129,7 @@
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point or drag to move",
+    "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
   "errorSplash": {

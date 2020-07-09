@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставити",
     "selectAll": "Вибрати все",
+    "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
@@ -64,7 +65,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "toggleGridMode": ""
+    "toggleGridMode": "Режим сітки"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -92,8 +93,7 @@
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
     "toggleZenMode": "Дзен-режим",
-    "exitZenMode": "Вийти з дзен-режиму",
-    "toggleGridMode": ""
+    "exitZenMode": "Вийти з дзен-режиму"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -128,7 +128,7 @@
     "resize": "Ви можете зберегти пропорції, утримуючи SHIFT під час зміни розміру,\nутримуйте ALT для змінення розміру від центру",
     "rotate": "Ви можете обмежити кути, утримуючи SHIFT під час обертання",
     "lineEditor_info": "Двічі клацніть або натисніть Enter щоб редагувати точки",
-    "lineEditor_pointSelected": "Натисніть Delete щоб видалити точку або потягніть, щоб перемістити",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки"
   },
   "errorSplash": {

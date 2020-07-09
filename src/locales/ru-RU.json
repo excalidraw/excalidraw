@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Вставить",
     "selectAll": "Выбрать все",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
@@ -63,7 +64,7 @@
     "madeWithExcalidraw": "Сделано в Excalidraw",
     "group": "",
     "ungroup": "",
-    "collaborators": "",
+    "collaborators": "Сотрудники",
     "toggleGridMode": ""
   },
   "buttons": {
@@ -74,7 +75,7 @@
     "copyToClipboard": "Скопировать в буфер обмена",
     "copyPngToClipboard": "Скопировать PNG в буфер обмена",
     "save": "Сохранить",
-    "saveAs": "",
+    "saveAs": "Сохранить как",
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
@@ -92,8 +93,7 @@
     "createNewRoom": "Создать новую комнату",
     "toggleFullScreen": "Переключить полноэкранный режим",
     "toggleZenMode": "Переключить режим концентрации внимания",
-    "exitZenMode": "Выключить режим концентрации внимания",
-    "toggleGridMode": ""
+    "exitZenMode": "Выключить режим концентрации внимания"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -165,8 +165,8 @@
     "drag": "",
     "curvedArrow": "Изогнутая стрелка",
     "curvedLine": "Изогнутая линия",
-    "editor": "",
-    "view": "",
+    "editor": "Редактор",
+    "view": "Просмотр",
     "blog": "Прочитайте наш блог",
     "howto": "",
     "github": "",

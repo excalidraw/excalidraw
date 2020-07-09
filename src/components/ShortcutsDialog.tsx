@@ -248,7 +248,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={[getShortcutKey("Alt+Z")]}
               />
               <Shortcut
-                label={t("buttons.toggleGridMode")}
+                label={t("labels.toggleGridMode")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
               />
             </ShortcutIsland>
@@ -258,6 +258,12 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut
                 label={t("labels.selectAll")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
+              />
+              <Shortcut
+                label={t("labels.multiSelect")}
+                shortcuts={[
+                  getShortcutKey(`Shift+${t("shortcutsDialog.click")}`),
+                ]}
               />
               <Shortcut
                 label={t("labels.moveCanvas")}
@@ -281,11 +287,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.copyStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+C")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
               />
               <Shortcut
                 label={t("labels.pasteStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+V")]}
               />
               <Shortcut
                 label={t("labels.delete")}

@@ -1,54 +1,81 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 
-export const languages = [
-  { lng: "en", label: "English", data: require("./locales/en.json") },
-  { lng: "bg-BG", label: "Български", data: require("./locales/bg-BG.json") },
-  { lng: "nb-No", label: "Bokmål", data: require("./locales/nb-NO.json") },
-  { lng: "de-DE", label: "Deutsch", data: require("./locales/de-DE.json") },
-  { lng: "es-ES", label: "Español", data: require("./locales/es-ES.json") },
-  { lng: "ca-ES", label: "Catalan", data: require("./locales/ca-ES.json") },
-  { lng: "el-GR", label: "Ελληνικά", data: require("./locales/el-GR.json") },
-  { lng: "fr-FR", label: "Français", data: require("./locales/fr-FR.json") },
-  {
-    lng: "id-ID",
-    label: "Bahasa Indonesia",
-    data: require("./locales/id-ID.json"),
-  },
-  { lng: "it-IT", label: "Italiano", data: require("./locales/it-IT.json") },
-  { lng: "hu-HU", label: "Magyar", data: require("./locales/hu-HU.json") },
-  { lng: "nl-NL", label: "Nederlands", data: require("./locales/nl-NL.json") },
-  { lng: "pl-PL", label: "Polski", data: require("./locales/pl-PL.json") },
-  { lng: "pt-PT", label: "Português", data: require("./locales/pt-PT.json") },
-  { lng: "ru-RU", label: "Русский", data: require("./locales/ru-RU.json") },
-  { lng: "uk-UA", label: "Українська", data: require("./locales/uk-UA.json") },
-  { lng: "fi-FI", label: "Suomi", data: require("./locales/fi-FI.json") },
-  { lng: "tr-TR", label: "Türkçe", data: require("./locales/tr-TR.json") },
-  { lng: "ja-JP", label: "日本語", data: require("./locales/ja-JP.json") },
-  { lng: "ko-KR", label: "한국어", data: require("./locales/ko-KR.json") },
-  { lng: "zh-TW", label: "繁體中文", data: require("./locales/zh-TW.json") },
-  { lng: "zh-CN", label: "简体中文", data: require("./locales/zh-CN.json") },
-  {
-    lng: "ar-SA",
-    label: "العربية",
-    data: require("./locales/ar-SA.json"),
-    rtl: true,
-  },
-  {
-    lng: "he-IL",
-    label: "עברית",
-    data: require("./locales/he-IL.json"),
-    rtl: true,
-  },
+import fallbackLanguageData from "./locales/en.json";
+import percentages from "./locales/percentages.json";
+
+const COMPLETION_THRESHOLD_TO_EXCEED = 85;
+
+interface Language {
+  lng: string;
+  label: string;
+  data: string;
+  rtl?: boolean;
+}
+
+const allLanguages: Language[] = [
+  { lng: "bg-BG", label: "Български", data: "bg-BG.json" },
+  { lng: "de-DE", label: "Deutsch", data: "de-DE.json" },
+  { lng: "es-ES", label: "Español", data: "es-ES.json" },
+  { lng: "ca-ES", label: "Catalan", data: "ca-ES.json" },
+  { lng: "el-GR", label: "Ελληνικά", data: "el-GR.json" },
+  { lng: "fr-FR", label: "Français", data: "fr-FR.json" },
+  { lng: "id-ID", label: "Bahasa Indonesia", data: "id-ID.json" },
+  { lng: "it-IT", label: "Italiano", data: "it-IT.json" },
+  { lng: "hu-HU", label: "Magyar", data: "hu-HU.json" },
+  { lng: "nl-NL", label: "Nederlands", data: "nl-NL.json" },
+  { lng: "nb-NO", label: "Norsk bokmål", data: "nb-NO.json" },
+  { lng: "nn-NO", label: "Norsk nynorsk", data: "nn-NO.json" },
+  { lng: "pl-PL", label: "Polski", data: "pl-PL.json" },
+  { lng: "pt-PT", label: "Português", data: "pt-PT.json" },
+  { lng: "ru-RU", label: "Русский", data: "ru-RU.json" },
+  { lng: "uk-UA", label: "Українська", data: "uk-UA.json" },
+  { lng: "fi-FI", label: "Suomi", data: "fi-FI.json" },
+  { lng: "tr-TR", label: "Türkçe", data: "tr-TR.json" },
+  { lng: "ja-JP", label: "日本語", data: "ja-JP.json" },
+  { lng: "ko-KR", label: "한국어", data: "ko-KR.json" },
+  { lng: "zh-TW", label: "繁體中文", data: "zh-TW.json" },
+  { lng: "zh-CN", label: "简体中文", data: "zh-CN.json" },
+  { lng: "ar-SA", label: "العربية", data: "ar-SA.json", rtl: true },
+  { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
+  { lng: "hi-IN", label: "हिन्दी", data: "hi-IN.json" },
 ];
 
+export const languages: Language[] = [
+  { lng: "en", label: "English", data: "en.json" },
+]
+  .concat(
+    allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
+  )
+  .filter(
+    (lang) =>
+      (percentages as Record<string, number>)[lang.lng] >
+      COMPLETION_THRESHOLD_TO_EXCEED,
+  );
+
 let currentLanguage = languages[0];
+let currentLanguageData = {};
 const fallbackLanguage = languages[0];
 
-export const setLanguage = (newLng: string | undefined) => {
+export const setLanguage = async (newLng: string | undefined) => {
   currentLanguage =
     languages.find((language) => language.lng === newLng) || fallbackLanguage;
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
+
+  currentLanguageData = await import(`./locales/${currentLanguage.data}`);
+
+  languageDetector.cacheUserLanguage(currentLanguage.lng);
+};
+
+export const setLanguageFirstTime = async () => {
+  const newLng: string | undefined = languageDetector.detect();
+
+  currentLanguage =
+    languages.find((language) => language.lng === newLng) || fallbackLanguage;
+
+  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
+
+  currentLanguageData = await import(`./locales/${currentLanguage.data}`);
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
@@ -72,8 +99,8 @@ const findPartsForData = (data: any, parts: string[]) => {
 export const t = (path: string, replacement?: { [key: string]: string }) => {
   const parts = path.split(".");
   let translation =
-    findPartsForData(currentLanguage.data, parts) ||
-    findPartsForData(fallbackLanguage.data, parts);
+    findPartsForData(currentLanguageData, parts) ||
+    findPartsForData(fallbackLanguageData, parts);
   if (translation === undefined) {
     throw new Error(`Can't find translation for ${path}`);
   }
@@ -94,5 +121,3 @@ languageDetector.init({
   },
   checkWhitelist: false,
 });
-
-setLanguage(languageDetector.detect());

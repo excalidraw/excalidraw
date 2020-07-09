@@ -2,8 +2,9 @@ import { reseed } from "../random";
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
-import { render, screen, fireEvent } from "./test-utils";
+import { waitFor, render, screen, fireEvent } from "./test-utils";
 import App from "../components/App";
+import { setLanguage } from "../i18n";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
@@ -227,7 +228,7 @@ const checkpoint = (name: string) => {
   );
 };
 
-beforeEach(() => {
+beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -242,6 +243,7 @@ beforeEach(() => {
   finger2.reset();
   altKey = ctrlKey = shiftKey = false;
 
+  await setLanguage("en.json");
   const renderResult = render(<App />);
 
   getByToolName = renderResult.getByToolName;
@@ -655,7 +657,7 @@ describe("regression tests", () => {
     expect(h.state.zoom).toBe(1);
   });
 
-  it("rerenders UI on language change", () => {
+  it("rerenders UI on language change", async () => {
     // select rectangle tool to show properties menu
     clickTool("rectangle");
     // english lang should display `hachure` label
@@ -664,11 +666,13 @@ describe("regression tests", () => {
       target: { value: "de-DE" },
     });
     // switching to german, `hachure` label should no longer exist
-    expect(screen.queryByText(/hachure/i)).toBeNull();
+    await waitFor(() => expect(screen.queryByText(/hachure/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "en" },
     });
+    // switching back to English
+    await waitFor(() => expect(screen.queryByText(/hachure/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {
