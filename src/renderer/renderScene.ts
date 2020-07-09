@@ -310,6 +310,23 @@ export const renderScene = (
       addSelectionForGroupId(appState.editingGroupId);
     }
 
+    if (appState.hoveredBindableElement != null) {
+      const [
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2,
+      ] = getElementAbsoluteCoords(appState.hoveredBindableElement);
+      selections.push({
+        angle: appState.hoveredBindableElement.angle,
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2,
+        selectionColors: [oc.black],
+      });
+    }
+
     selections.forEach(
       ({
         angle,

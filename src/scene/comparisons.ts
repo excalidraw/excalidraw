@@ -29,21 +29,30 @@ export const getElementAtPosition = (
   x: number,
   y: number,
   zoom: number,
+  // If passed only elements for which this function returns true will be
+  // considered - this avoids possible allocation of the `elements` array
+  filter: (element: NonDeletedExcalidrawElement) => boolean = returnTrue,
 ) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let i = elements.length - 1; i >= 0; --i) {
-    if (elements[i].isDeleted) {
+    const element = elements[i];
+    if (element.isDeleted) {
       continue;
     }
-    if (hitTest(elements[i], appState, x, y, zoom)) {
-      hitElement = elements[i];
+    if (!filter(element)) {
+      continue;
+    }
+    if (hitTest(element, appState, x, y, zoom)) {
+      hitElement = element;
       break;
     }
   }
 
   return hitElement;
 };
+
+const returnTrue = () => true;
 
 export const getElementContainingPosition = (
   elements: readonly ExcalidrawElement[],

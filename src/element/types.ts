@@ -22,19 +22,23 @@ type _ExcalidrawElementBase = Readonly<{
   versionNonce: number;
   isDeleted: boolean;
   groupIds: readonly GroupId[];
+  boundElementIDs: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
   type: "selection";
 };
+
+type ExcalidrawPolygonalElement = _ExcalidrawElementBase & {
+  type: "rectangle" | "diamond" | "ellipse";
+};
+
 /**
  * These are elements that don't have any additional properties.
  */
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
-  | (_ExcalidrawElementBase & {
-      type: "rectangle" | "diamond" | "ellipse";
-    });
+  | ExcalidrawPolygonalElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -63,11 +67,17 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
   }>;
 
+export type ExcalidrawBindableElement =
+  | ExcalidrawPolygonalElement
+  | ExcalidrawTextElement;
+
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "arrow" | "line" | "draw";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
+    startBoundElementID: ExcalidrawBindableElement["id"] | null;
+    endBoundElementID: ExcalidrawBindableElement["id"] | null;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

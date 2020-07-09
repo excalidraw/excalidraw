@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawBindableElement,
 } from "./types";
 
 export const isTextElement = (
@@ -18,6 +19,18 @@ export const isLinearElement = (
     (element.type === "arrow" ||
       element.type === "line" ||
       element.type === "draw")
+  );
+};
+
+export const isBindableElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "diamond" ||
+      element.type === "ellipse" ||
+      element.type === "text")
   );
 };
 

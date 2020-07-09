@@ -48,7 +48,8 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds || [],
+    groupIds: element.groupIds ?? [],
+    boundElementIDs: element.boundElementIDs ?? [],
   };
 
   return {
@@ -94,6 +95,8 @@ const migrateElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
+        startBoundElementID: null,
+        endBoundElementID: null,
       });
     }
     // generic elements

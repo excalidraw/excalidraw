@@ -61,6 +61,7 @@ import {
   NonDeleted,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawBindableElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -137,7 +138,7 @@ import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
-import { isLinearElement } from "../element/typeChecks";
+import { isLinearElement, isBindableElement } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
@@ -2600,6 +2601,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
+      this.maybeBindStartOfLinearElement(element, pointerDownState.origin);
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted(),
         element,
@@ -2678,13 +2680,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      const { x, y } = viewportCoordsToSceneCoords(
+      const pointerCoords = viewportCoordsToSceneCoords(
         event,
         this.state,
         this.canvas,
         window.devicePixelRatio,
       );
-      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
+      const [gridX, gridY] = getGridPoint(
+        pointerCoords.x,
+        pointerCoords.y,
+        this.state.gridSize,
+      );
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2697,8 +2703,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         if (
           distance2d(
-            x,
-            y,
+            pointerCoords.x,
+            pointerCoords.y,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ) < DRAGGING_THRESHOLD
@@ -2721,8 +2727,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           isRotating: resizeHandle === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
-          x - pointerDownState.resize.offset.x,
-          y - pointerDownState.resize.offset.y,
+          pointerCoords.x - pointerDownState.resize.offset.x,
+          pointerCoords.y - pointerDownState.resize.offset.y,
           this.state.gridSize,
         );
         if (
@@ -2751,13 +2757,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
           (appState) => this.setState(appState),
-          x,
-          y,
+          pointerCoords.x,
+          pointerCoords.y,
         );
 
         if (didDrag) {
-          pointerDownState.lastCoords.x = x;
-          pointerDownState.lastCoords.y = y;
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
           return;
         }
       }
@@ -2773,11 +2779,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (selectedElements.length > 0) {
           const [dragX, dragY] = getGridPoint(
-            x - pointerDownState.drag.offset.x,
-            y - pointerDownState.drag.offset.y,
+            pointerCoords.x - pointerDownState.drag.offset.x,
+            pointerCoords.y - pointerDownState.drag.offset.y,
             this.state.gridSize,
           );
-          dragSelectedElements(selectedElements, dragX, dragY);
+          dragSelectedElements(selectedElements, dragX, dragY, this.scene);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -2840,8 +2846,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let dx: number;
         let dy: number;
         if (draggingElement.type === "draw") {
-          dx = x - draggingElement.x;
-          dy = y - draggingElement.y;
+          dx = pointerCoords.x - draggingElement.x;
+          dy = pointerCoords.y - draggingElement.y;
         } else {
           dx = gridX - draggingElement.x;
           dy = gridY - draggingElement.y;
@@ -2871,16 +2877,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             });
           }
         }
+        this.maybeSuggestBinding(draggingElement, pointerCoords);
       } else if (draggingElement.type === "selection") {
         dragNewElement(
           draggingElement,
           this.state.elementType,
           pointerDownState.origin.x,
           pointerDownState.origin.y,
-          x,
-          y,
-          distance(pointerDownState.origin.x, x),
-          distance(pointerDownState.origin.y, y),
+          pointerCoords.x,
+          pointerCoords.y,
+          distance(pointerDownState.origin.x, pointerCoords.x),
+          distance(pointerDownState.origin.y, pointerCoords.y),
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
@@ -3016,21 +3023,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
         }
+        const pointerCoords = viewportCoordsToSceneCoords(
+          childEvent,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
         if (
           !pointerDownState.drag.hasOccurred &&
           draggingElement &&
           !multiElement
         ) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            childEvent,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
           mutateElement(draggingElement, {
             points: [
               ...draggingElement.points,
-              [x - draggingElement.x, y - draggingElement.y],
+              [
+                pointerCoords.x - draggingElement.x,
+                pointerCoords.y - draggingElement.y,
+              ],
             ],
           });
           this.setState({
@@ -3038,6 +3048,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement: this.state.draggingElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          this.maybeBindEndOfLinearElement(draggingElement, pointerCoords);
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -3163,6 +3174,80 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     });
   }
+
+  private maybeSuggestBinding = (
+    linearElement: ExcalidrawLinearElement,
+    pointerCoords: {
+      x: number;
+      y: number;
+    },
+  ): void => {
+    const hoveredBindableElement = this.getHoveredElementForBinding(
+      linearElement,
+      pointerCoords,
+    );
+    this.setState({ hoveredBindableElement });
+  };
+
+  private maybeBindStartOfLinearElement = (
+    linearElement: ExcalidrawLinearElement,
+    pointerCoords: { x: number; y: number },
+  ): void => {
+    this.maybeBindLinearElement(
+      linearElement,
+      "startBoundElementID",
+      pointerCoords,
+    );
+  };
+
+  private maybeBindEndOfLinearElement = (
+    linearElement: ExcalidrawLinearElement,
+    pointerCoords: { x: number; y: number },
+  ): void => {
+    this.maybeBindLinearElement(
+      linearElement,
+      "endBoundElementID",
+      pointerCoords,
+    );
+  };
+
+  private maybeBindLinearElement = (
+    linearElement: ExcalidrawLinearElement,
+    startOrEndBoundElementIDField: "startBoundElementID" | "endBoundElementID",
+    pointerCoords: { x: number; y: number },
+  ): void => {
+    const hoveredElement = this.getHoveredElementForBinding(
+      linearElement,
+      pointerCoords,
+    );
+    if (hoveredElement != null) {
+      mutateElement(linearElement, {
+        [startOrEndBoundElementIDField]: hoveredElement.id,
+      });
+      mutateElement(hoveredElement, {
+        boundElementIDs: [
+          ...(hoveredElement.boundElementIDs ?? []),
+          linearElement.id,
+        ],
+      });
+    }
+    this.setState({ hoveredBindableElement: null });
+  };
+
+  private getHoveredElementForBinding = (
+    linearElement: ExcalidrawLinearElement,
+    pointerCoords: { x: number; y: number },
+  ): NonDeleted<ExcalidrawBindableElement> | null => {
+    const hoveredElement = getElementAtPosition(
+      this.scene.getElements(),
+      this.state,
+      pointerCoords.x,
+      pointerCoords.y,
+      this.state.zoom,
+      (element) => element !== linearElement,
+    );
+    return isBindableElement(hoveredElement) ? hoveredElement : null;
+  };
 
   private maybeClearSelectionWhenHittingElement(
     event: React.PointerEvent<HTMLCanvasElement>,
