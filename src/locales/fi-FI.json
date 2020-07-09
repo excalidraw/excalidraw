@@ -104,7 +104,7 @@
     "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?"
   },
   "toolBar": {
     "selection": "Valinta",
