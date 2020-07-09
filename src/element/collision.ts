@@ -100,7 +100,7 @@ export const hitTest = (
       hitTestRoughShape(subshape, relX, relY, lineThreshold),
     );
   } else if (element.type === "text") {
-    return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+    return isInsideText(x, y, absoluteCoords);
   } else if (element.type === "selection") {
     console.warn("This should not happen, we need to investigate why it does.");
     return false;
@@ -264,6 +264,10 @@ const isNearDiamond = (
     distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
       lineThreshold
   );
+};
+
+const isInsideText = (x: number, y: number, [x1, y1, x2, y2]: number[]) => {
+  return x >= x1 && x <= x2 && y >= y1 && y <= y2;
 };
 
 const pointInBezierEquation = (
