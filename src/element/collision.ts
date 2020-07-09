@@ -40,11 +40,10 @@ export const hitTest = (
   appState: AppState,
   x: number,
   y: number,
-  zoom: number,
 ): boolean => {
   // For shapes that are composed of lines, we only enable point-selection when the distance
   // of the click is less than x pixels of any of the lines that the shape is composed of
-  const lineThreshold = 10 / zoom;
+  const lineThreshold = 10 / appState.zoom;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;

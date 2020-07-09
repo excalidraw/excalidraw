@@ -28,7 +28,6 @@ export const getElementAtPosition = (
   appState: AppState,
   x: number,
   y: number,
-  zoom: number,
   // If passed only elements for which this function returns true will be
   // considered - this avoids possible allocation of the `elements` array
   filter: (element: NonDeletedExcalidrawElement) => boolean = returnTrue,
@@ -43,7 +42,7 @@ export const getElementAtPosition = (
     if (!filter(element)) {
       continue;
     }
-    if (hitTest(element, appState, x, y, zoom)) {
+    if (hitTest(element, appState, x, y)) {
       hitElement = element;
       break;
     }
