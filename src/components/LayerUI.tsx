@@ -144,8 +144,8 @@ const LibraryItems = ({
   }
 
   return (
-    <Stack.Col align="center" gap={1} className="layer-ui__librarymenu">
-      <>{rows}</>
+    <Stack.Col align="center" gap={1} className="layer-ui__library-items">
+      {rows}
     </Stack.Col>
   );
 };
@@ -168,10 +168,31 @@ const LibraryMenu = ({
     NonDeleted<ExcalidrawElement>[][]
   >([]);
 
+  const [loadingState, setIsLoading] = useState<
+    "preloading" | "loading" | "ready"
+  >("preloading");
+
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    loadLibrary().then((items) => {
-      setLibraryItems(items);
+    Promise.race([
+      new Promise((resolve) => {
+        loadingTimerRef.current = setTimeout(() => {
+          resolve("loading");
+        }, 100);
+      }),
+      loadLibrary().then((items) => {
+        setLibraryItems(items);
+        setIsLoading("ready");
+      }),
+    ]).then((data) => {
+      if (data === "loading") {
+        setIsLoading("loading");
+      }
     });
+    return () => {
+      clearTimeout(loadingTimerRef.current!);
+    };
   }, []);
 
   const removeFromLibrary = useCallback(async (indexToRemove) => {
@@ -192,16 +213,22 @@ const LibraryMenu = ({
     [onAddToLibrary],
   );
 
-  return (
-    <Island padding={1} ref={ref}>
-      <LibraryItems
-        library={libraryItems}
-        onClickOutside={onClickOutside}
-        onRemoveFromLibrary={removeFromLibrary}
-        onAddToLibrary={addToLibrary}
-        onInsertShape={onInsertShape}
-        pendingElements={pendingElements}
-      />
+  return loadingState === "preloading" ? null : (
+    <Island padding={1} ref={ref} className="layer-ui__library">
+      {loadingState === "loading" ? (
+        <div className="layer-ui__library-message">
+          {t("labels.libraryLoadingMessage")}
+        </div>
+      ) : (
+        <LibraryItems
+          library={libraryItems}
+          onClickOutside={onClickOutside}
+          onRemoveFromLibrary={removeFromLibrary}
+          onAddToLibrary={addToLibrary}
+          onInsertShape={onInsertShape}
+          pendingElements={pendingElements}
+        />
+      )}
     </Island>
   );
 };
