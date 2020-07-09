@@ -214,6 +214,8 @@ export const hitTest = (
   throw new Error(`Unimplemented type ${element.type}`);
 };
 
+export const bindingBorderTest = hitTest;
+
 const pointInBezierEquation = (
   p0: Point,
   p1: Point,

@@ -28,9 +28,12 @@ export const getElementAtPosition = (
   appState: AppState,
   x: number,
   y: number,
-  // If passed only elements for which this function returns true will be
-  // considered - this avoids possible allocation of the `elements` array
-  filter: (element: NonDeletedExcalidrawElement) => boolean = returnTrue,
+  isAtPositionFn: (
+    element: NonDeletedExcalidrawElement,
+    appState: AppState,
+    x: number,
+    y: number,
+  ) => boolean = hitTest,
 ) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -39,10 +42,7 @@ export const getElementAtPosition = (
     if (element.isDeleted) {
       continue;
     }
-    if (!filter(element)) {
-      continue;
-    }
-    if (hitTest(element, appState, x, y)) {
+    if (isAtPositionFn(element, appState, x, y)) {
       hitElement = element;
       break;
     }
@@ -50,8 +50,6 @@ export const getElementAtPosition = (
 
   return hitElement;
 };
-
-const returnTrue = () => true;
 
 export const getElementContainingPosition = (
   elements: readonly ExcalidrawElement[],

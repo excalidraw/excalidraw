@@ -156,6 +156,7 @@ import {
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
+import { bindingBorderTest } from "../element/collision";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3239,7 +3240,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       pointerCoords.x,
       pointerCoords.y,
-      (element) => element !== linearElement,
+      (element, _, x, y) =>
+        element !== linearElement &&
+        bindingBorderTest(element, this.state, x, y),
     );
     return isBindableElement(hoveredElement) ? hoveredElement : null;
   };
