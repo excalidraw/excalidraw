@@ -21,7 +21,7 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
-import { measureText, getFontString, TEXT_WIDTH_PADDING } from "../utils";
+import { measureText, getFontString } from "../utils";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -207,6 +207,8 @@ const rescalePointsInElement = (
       }
     : {};
 
+const MIN_FONT_SIZE = 1;
+
 const measureFontSizeFromWH = (
   element: NonDeleted<ExcalidrawTextElement>,
   nextWidth: number,
@@ -214,18 +216,17 @@ const measureFontSizeFromWH = (
 ): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
   const nextFontSize = element.fontSize * (nextWidth / element.width);
+  if (nextFontSize < MIN_FONT_SIZE) {
+    return null;
+  }
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );
-  if (metrics.width <= nextWidth + TEXT_WIDTH_PADDING) {
-    return {
-      size: nextFontSize,
-      baseline: metrics.baseline + (nextHeight - metrics.height),
-    };
-  }
-  // Browser doesn't allow make it smaller
-  return null;
+  return {
+    size: nextFontSize,
+    baseline: metrics.baseline + (nextHeight - metrics.height),
+  };
 };
 
 const getSidesForResizeHandle = (
