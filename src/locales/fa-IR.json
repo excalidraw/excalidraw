@@ -2,7 +2,7 @@
   "labels": {
     "paste": "جای گذاری",
     "selectAll": "انتخاب همه",
-    "multiSelect": "",
+    "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
     "moveCanvas": "بوم را حرکت بدهید",
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
@@ -104,7 +104,7 @@
     "couldNotCopyToClipboard": "کپی نشد. از مرورگر Chrome استفاده کنید.",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟"
   },
   "toolBar": {
     "selection": "گزینش",
@@ -129,7 +129,7 @@
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
     "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید.",
     "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید"
   },
   "errorSplash": {
