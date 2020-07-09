@@ -2,12 +2,15 @@ import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
-export type ActionResult = {
-  elements?: readonly ExcalidrawElement[] | null;
-  appState?: AppState | null;
-  commitToHistory: boolean;
-  syncHistory?: boolean;
-};
+/** if false, the action should be prevented */
+export type ActionResult =
+  | {
+      elements?: readonly ExcalidrawElement[] | null;
+      appState?: AppState | null;
+      commitToHistory: boolean;
+      syncHistory?: boolean;
+    }
+  | false;
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],

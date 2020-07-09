@@ -10,6 +10,17 @@ interface Document {
 
 interface Window {
   ClipboardItem: any;
+  __EXCALIDRAW_SHA__: string;
+}
+
+// https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
+declare namespace NodeJS {
+  interface ProcessEnv {
+    readonly REACT_APP_BACKEND_V1_GET_URL: string;
+    readonly REACT_APP_BACKEND_V2_GET_URL: string;
+    readonly REACT_APP_BACKEND_V2_POST_URL: string;
+    readonly REACT_APP_SOCKET_SERVER_URL: string;
+  }
 }
 
 interface Clipboard extends EventTarget {

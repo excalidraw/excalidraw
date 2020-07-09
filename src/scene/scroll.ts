@@ -29,8 +29,8 @@ function isOutsideViewPort(
     window.devicePixelRatio,
   );
   return (
-    viewportX2 - viewportX1 > window.innerWidth ||
-    viewportY2 - viewportY1 > window.innerHeight
+    viewportX2 - viewportX1 > appState.width ||
+    viewportY2 - viewportY1 > appState.height
   );
 }
 
@@ -63,7 +63,7 @@ export const calculateScrollCenter = (
   const centerY = (y1 + y2) / 2;
 
   return {
-    scrollX: normalizeScroll(window.innerWidth / 2 - centerX),
-    scrollY: normalizeScroll(window.innerHeight / 2 - centerY),
+    scrollX: normalizeScroll(appState.width / 2 - centerX),
+    scrollY: normalizeScroll(appState.height / 2 - centerY),
   };
 };

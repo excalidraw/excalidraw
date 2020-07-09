@@ -58,6 +58,7 @@ import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture } from "../types";
 import {
   ExcalidrawElement,
+  ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
@@ -120,11 +121,13 @@ import {
   CANVAS_ONLY_ACTIONS,
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
+  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
 } from "../constants";
 import {
   INITAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  TOUCH_CTX_MENU_TIMEOUT,
 } from "../time_constants";
 
 import LayerUI from "./LayerUI";
@@ -172,6 +175,8 @@ let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
+let touchTimeout = 0;
+let touchMoving = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -181,7 +186,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-class App extends React.Component<any, AppState> {
+class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal = new Portal(this);
@@ -191,13 +196,23 @@ class App extends React.Component<any, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
 
-  public state: AppState = {
-    ...getDefaultAppState(),
-    isLoading: true,
+  public static defaultProps: Partial<ExcalidrawProps> = {
+    width: window.innerWidth,
+    height: window.innerHeight,
   };
 
   constructor(props: any) {
     super(props);
+    const defaultAppState = getDefaultAppState();
+
+    const { width, height } = props;
+    this.state = {
+      ...defaultAppState,
+      isLoading: true,
+      width,
+      height,
+    };
+
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -210,9 +225,11 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled } = this.state;
-    const canvasDOMWidth = window.innerWidth;
-    const canvasDOMHeight = window.innerHeight;
+    const {
+      zenModeEnabled,
+      width: canvasDOMWidth,
+      height: canvasDOMHeight,
+    } = this.state;
 
     const canvasScale = window.devicePixelRatio;
 
@@ -256,6 +273,7 @@ class App extends React.Component<any, AppState> {
             onPointerMove={this.handleCanvasPointerMove}
             onPointerUp={this.removePointer}
             onPointerCancel={this.removePointer}
+            onTouchMove={this.handleTouchMove}
             onDrop={this.handleCanvasOnDrop}
           >
             {t("labels.drawingCanvas")}
@@ -265,51 +283,53 @@ class App extends React.Component<any, AppState> {
     );
   }
 
-  private syncActionResult = withBatchedUpdates((res: ActionResult) => {
-    if (this.unmounted) {
-      return;
-    }
-
-    let editingElement: AppState["editingElement"] | null = null;
-    if (res.elements) {
-      res.elements.forEach((element) => {
-        if (
-          this.state.editingElement?.id === element.id &&
-          this.state.editingElement !== element &&
-          isNonDeletedElement(element)
-        ) {
-          editingElement = element;
-        }
-      });
-      globalSceneState.replaceAllElements(res.elements);
-      if (res.commitToHistory) {
-        history.resumeRecording();
+  private syncActionResult = withBatchedUpdates(
+    (actionResult: ActionResult) => {
+      if (this.unmounted || actionResult === false) {
+        return;
       }
-    }
 
-    if (res.appState || editingElement) {
-      if (res.commitToHistory) {
-        history.resumeRecording();
-      }
-      this.setState(
-        (state) => ({
-          ...res.appState,
-          editingElement:
-            editingElement || res.appState?.editingElement || null,
-          isCollaborating: state.isCollaborating,
-          collaborators: state.collaborators,
-        }),
-        () => {
-          if (res.syncHistory) {
-            history.setCurrentState(
-              this.state,
-              globalSceneState.getElementsIncludingDeleted(),
-            );
+      let editingElement: AppState["editingElement"] | null = null;
+      if (actionResult.elements) {
+        actionResult.elements.forEach((element) => {
+          if (
+            this.state.editingElement?.id === element.id &&
+            this.state.editingElement !== element &&
+            isNonDeletedElement(element)
+          ) {
+            editingElement = element;
           }
-        },
-      );
-    }
-  });
+        });
+        globalSceneState.replaceAllElements(actionResult.elements);
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+      }
+
+      if (actionResult.appState || editingElement) {
+        if (actionResult.commitToHistory) {
+          history.resumeRecording();
+        }
+        this.setState(
+          (state) => ({
+            ...actionResult.appState,
+            editingElement:
+              editingElement || actionResult.appState?.editingElement || null,
+            isCollaborating: state.isCollaborating,
+            collaborators: state.collaborators,
+          }),
+          () => {
+            if (actionResult.syncHistory) {
+              history.setCurrentState(
+                this.state,
+                globalSceneState.getElementsIncludingDeleted(),
+              );
+            }
+          },
+        );
+      }
+    },
+  );
 
   // Lifecycle
 
@@ -337,6 +357,39 @@ class App extends React.Component<any, AppState> {
     this.onSceneUpdated();
   };
 
+  private shouldForceLoadScene(
+    scene: ResolutionType<typeof loadScene>,
+  ): boolean {
+    if (!scene.elements.length) {
+      return true;
+    }
+
+    const roomMatch = getCollaborationLinkData(window.location.href);
+
+    if (!roomMatch) {
+      return false;
+    }
+    const collabForceLoadFlag = localStorage.getItem(
+      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+    );
+    if (collabForceLoadFlag) {
+      try {
+        const {
+          room: previousRoom,
+          timestamp,
+        }: { room: string; timestamp: number } = JSON.parse(
+          collabForceLoadFlag,
+        );
+        // if loading same room as the one previously unloaded within 15sec
+        //  force reload without prompting
+        if (previousRoom === roomMatch[1] && Date.now() - timestamp < 15000) {
+          return true;
+        }
+      } catch {}
+    }
+    return false;
+  }
+
   private initializeScene = async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
@@ -344,20 +397,28 @@ class App extends React.Component<any, AppState> {
       /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
     );
 
-    const isCollaborationScene = getCollaborationLinkData(window.location.href);
+    let scene = await loadScene(null);
 
-    if (!isCollaborationScene) {
-      let scene: ResolutionType<typeof loadScene> | undefined;
-      // Backwards compatibility with legacy url format
-      if (id) {
-        scene = await loadScene(id);
-      } else if (jsonMatch) {
-        scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+    let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
+    const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
+
+    if (isExternalScene) {
+      if (
+        this.shouldForceLoadScene(scene) ||
+        window.confirm(t("alerts.loadSceneOverridePrompt"))
+      ) {
+        // Backwards compatibility with legacy url format
+        if (id) {
+          scene = await loadScene(id);
+        } else if (jsonMatch) {
+          scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+        }
+        if (!isCollaborationScene) {
+          window.history.replaceState({}, "Excalidraw", window.location.origin);
+        }
       } else {
-        scene = await loadScene(null);
-      }
-      if (scene) {
-        this.syncActionResult(scene);
+        isCollaborationScene = false;
+        window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
     }
 
@@ -365,9 +426,10 @@ class App extends React.Component<any, AppState> {
       this.setState({ isLoading: false });
     }
 
-    // run this last else the `isLoading` state
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
+    } else if (scene) {
+      this.syncActionResult(scene);
     }
   };
 
@@ -409,6 +471,8 @@ class App extends React.Component<any, AppState> {
     this.unmounted = true;
     this.removeSceneCallback!();
     this.removeEventListeners();
+
+    clearTimeout(touchTimeout);
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -494,6 +558,15 @@ class App extends React.Component<any, AppState> {
   }
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
+    if (this.state.isCollaborating && this.portal.roomID) {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+        JSON.stringify({
+          timestamp: Date.now(),
+          room: this.portal.roomID,
+        }),
+      );
+    }
     if (
       this.state.isCollaborating &&
       globalSceneState.getElements().length > 0
@@ -508,7 +581,16 @@ class App extends React.Component<any, AppState> {
     this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: ExcalidrawProps) {
+    const { width: prevWidth, height: prevHeight } = prevProps;
+    const { width: currentWidth, height: currentHeight } = this.props;
+    if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
+      this.setState({
+        width: currentWidth,
+        height: currentHeight,
+      });
+    }
+
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
@@ -818,6 +900,12 @@ class App extends React.Component<any, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement>) => {
+    // remove touch handler for context menu on touch devices
+    if (event.pointerType === "touch" && touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchMoving = false;
+    }
+
     gesture.pointers.delete(event.pointerId);
   };
 
@@ -1802,17 +1890,18 @@ class App extends React.Component<any, AppState> {
     }
   };
 
+  // set touch moving for mobile context menu
+  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    touchMoving = true;
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
 
-    if (lastPointerUp !== null) {
-      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-      // this can happen when a contextual menu or alert is triggered. In order to avoid
-      // being in a weird state, we clean up on the next pointerdown
-      lastPointerUp(event);
-    }
+    this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
+    this.maybeCleanupAfterMissingPointerUp(event);
 
     if (isPanning) {
       return;
@@ -1824,89 +1913,7 @@ class App extends React.Component<any, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
-    // pan canvas on wheel button drag or space+drag
-    if (
-      gesture.pointers.size === 0 &&
-      (event.button === POINTER_BUTTON.WHEEL ||
-        (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
-    ) {
-      isPanning = true;
-
-      let nextPastePrevented = false;
-      const isLinux = /Linux/.test(window.navigator.platform);
-
-      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
-      let { clientX: lastX, clientY: lastY } = event;
-      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
-        const deltaX = lastX - event.clientX;
-        const deltaY = lastY - event.clientY;
-        lastX = event.clientX;
-        lastY = event.clientY;
-
-        /*
-         * Prevent paste event if we move while middle clicking on Linux.
-         * See issue #1383.
-         */
-        if (
-          isLinux &&
-          !nextPastePrevented &&
-          (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
-        ) {
-          nextPastePrevented = true;
-
-          /* Prevent the next paste event */
-          const preventNextPaste = (event: ClipboardEvent) => {
-            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-            event.stopPropagation();
-          };
-
-          /*
-           * Reenable next paste in case of disabled middle click paste for
-           * any reason:
-           * - rigth click paste
-           * - empty clipboard
-           */
-          const enableNextPaste = () => {
-            setTimeout(() => {
-              document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-              window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
-            }, 100);
-          };
-
-          document.body.addEventListener(EVENT.PASTE, preventNextPaste);
-          window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
-        }
-
-        this.setState({
-          scrollX: normalizeScroll(
-            this.state.scrollX - deltaX / this.state.zoom,
-          ),
-          scrollY: normalizeScroll(
-            this.state.scrollY - deltaY / this.state.zoom,
-          ),
-        });
-      });
-      const teardown = withBatchedUpdates(
-        (lastPointerUp = () => {
-          lastPointerUp = null;
-          isPanning = false;
-          if (!isHoldingSpace) {
-            setCursorForShape(this.state.elementType);
-          }
-          this.setState({
-            cursorButton: "up",
-          });
-          this.savePointer(event.clientX, event.clientY, "up");
-          window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-          window.removeEventListener(EVENT.POINTER_UP, teardown);
-          window.removeEventListener(EVENT.BLUR, teardown);
-        }),
-      );
-      window.addEventListener(EVENT.BLUR, teardown);
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
-        passive: true,
-      });
-      window.addEventListener(EVENT.POINTER_UP, teardown);
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
 
@@ -1918,18 +1925,7 @@ class App extends React.Component<any, AppState> {
       return;
     }
 
-    gesture.pointers.set(event.pointerId, {
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    if (gesture.pointers.size === 2) {
-      gesture.lastCenter = getCenter(gesture.pointers);
-      gesture.initialScale = this.state.zoom;
-      gesture.initialDistance = getDistance(
-        Array.from(gesture.pointers.values()),
-      );
-    }
+    this.updateGestureOnPointerDown(event);
 
     // fixes pointermove causing selection of UI texts #32
     event.preventDefault();
@@ -1946,10 +1942,15 @@ class App extends React.Component<any, AppState> {
     }
 
     // Handle scrollbars dragging
+    const isOverScrollBarsNow = isOverScrollBars(
+      currentScrollBars,
+      event.clientX,
+      event.clientY,
+    );
     const {
       isOverHorizontalScrollBar,
       isOverVerticalScrollBar,
-    } = isOverScrollBars(currentScrollBars, event.clientX, event.clientY);
+    } = isOverScrollBarsNow;
 
     const { x, y } = viewportCoordsToSceneCoords(
       event,
@@ -1957,58 +1958,9 @@ class App extends React.Component<any, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
-    let lastX = x;
-    let lastY = y;
+    const lastCoords = { x, y };
 
-    if (
-      (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
-      !this.state.multiElement
-    ) {
-      isDraggingScrollBar = true;
-      lastX = event.clientX;
-      lastY = event.clientY;
-      const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
-
-        if (isOverHorizontalScrollBar) {
-          const x = event.clientX;
-          const dx = x - lastX;
-          this.setState({
-            scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-          });
-          lastX = x;
-          return;
-        }
-
-        if (isOverVerticalScrollBar) {
-          const y = event.clientY;
-          const dy = y - lastY;
-          this.setState({
-            scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-          });
-          lastY = y;
-        }
-      });
-
-      const onPointerUp = withBatchedUpdates(() => {
-        isDraggingScrollBar = false;
-        setCursorForShape(this.state.elementType);
-        lastPointerUp = null;
-        this.setState({
-          cursorButton: "up",
-        });
-        this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
-      });
-
-      lastPointerUp = onPointerUp;
-
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    if (this.handleDraggingScrollBar(event, lastCoords, isOverScrollBarsNow)) {
       return;
     }
 
@@ -2033,6 +1985,14 @@ class App extends React.Component<any, AppState> {
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
 
+    if (this.state.elementType !== "selection") {
+      this.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
+    }
+
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -2045,17 +2005,9 @@ class App extends React.Component<any, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (elementWithResizeHandler) {
-          this.setState({
-            resizingElement: elementWithResizeHandler
-              ? elementWithResizeHandler.element
-              : null,
-          });
+        if (elementWithResizeHandler != null) {
+          this.setState({ resizingElement: elementWithResizeHandler.element });
           resizeHandle = elementWithResizeHandler.resizeHandle;
-          document.documentElement.style.cursor = getCursorForResizingElement(
-            elementWithResizeHandler,
-          );
-          isResizingElements = true;
         }
       } else if (selectedElements.length > 1) {
         resizeHandle = getResizeHandlerFromCoords(
@@ -2065,14 +2017,12 @@ class App extends React.Component<any, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (resizeHandle) {
-          document.documentElement.style.cursor = getCursorForResizingElement({
-            resizeHandle,
-          });
-          isResizingElements = true;
-        }
       }
-      if (isResizingElements) {
+      if (resizeHandle) {
+        document.documentElement.style.cursor = getCursorForResizingElement({
+          resizeHandle,
+        });
+        isResizingElements = true;
         resizeOffsetXY = getResizeOffsetXY(
           resizeHandle,
           selectedElements,
@@ -2089,8 +2039,7 @@ class App extends React.Component<any, AppState> {
             selectedElements[0],
           );
         }
-      }
-      if (!isResizingElements) {
+      } else {
         if (this.state.editingLinearElement) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
@@ -2113,27 +2062,7 @@ class App extends React.Component<any, AppState> {
           hitElement ||
           getElementAtPosition(elements, this.state, x, y, this.state.zoom);
 
-        // clear selection if shift is not clicked
-        if (
-          !(hitElement && this.state.selectedElementIds[hitElement.id]) &&
-          !event.shiftKey
-        ) {
-          this.setState((prevState) => ({
-            selectedElementIds: {},
-            selectedGroupIds: {},
-            editingGroupId:
-              prevState.editingGroupId &&
-              hitElement &&
-              isElementInGroup(hitElement, prevState.editingGroupId)
-                ? prevState.editingGroupId
-                : null,
-          }));
-          const { selectedElementIds } = this.state;
-          this.setState({
-            selectedElementIds: {},
-            previousSelectedElementIds: selectedElementIds,
-          });
-        }
+        this.maybeClearSelectionWhenHittingElement(event, hitElement);
 
         // If we click on something
         if (hitElement) {
@@ -2180,12 +2109,6 @@ class App extends React.Component<any, AppState> {
           previousSelectedElementIds: selectedElementIds,
         });
       }
-    } else {
-      this.setState({
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        editingGroupId: null,
-      });
     }
 
     if (this.state.elementType === "text") {
@@ -2348,21 +2271,21 @@ class App extends React.Component<any, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastX;
+        const dx = x - lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastX = x;
+        lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastY;
+        const dy = y - lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastY = y;
+        lastCoords.y = y;
         return;
       }
 
@@ -2425,13 +2348,13 @@ class App extends React.Component<any, AppState> {
           (appState) => this.setState(appState),
           x,
           y,
-          lastX,
-          lastY,
+          lastCoords.x,
+          lastCoords.y,
         );
 
         if (didDrag) {
-          lastX = x;
-          lastY = y;
+          lastCoords.x = x;
+          lastCoords.y = y;
           return;
         }
       }
@@ -2796,6 +2719,241 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
   };
 
+  private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void => {
+    // deal with opening context menu on touch devices
+    if (event.pointerType === "touch") {
+      touchMoving = false;
+
+      // open the context menu with the first touch's clientX and clientY
+      // if the touch is not moving
+      touchTimeout = window.setTimeout(() => {
+        if (!touchMoving) {
+          this.openContextMenu({
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
+        }
+      }, TOUCH_CTX_MENU_TIMEOUT);
+    }
+  };
+
+  private maybeCleanupAfterMissingPointerUp(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void {
+    if (lastPointerUp !== null) {
+      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
+      // this can happen when a contextual menu or alert is triggered. In order to avoid
+      // being in a weird state, we clean up on the next pointerdown
+      lastPointerUp(event);
+    }
+  }
+
+  // Returns whether the event is a panning
+  private handleCanvasPanUsingWheelOrSpaceDrag = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): boolean => {
+    if (
+      !(
+        gesture.pointers.size === 0 &&
+        (event.button === POINTER_BUTTON.WHEEL ||
+          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
+      )
+    ) {
+      return false;
+    }
+    isPanning = true;
+
+    let nextPastePrevented = false;
+    const isLinux = /Linux/.test(window.navigator.platform);
+
+    document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    let { clientX: lastX, clientY: lastY } = event;
+    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      /*
+       * Prevent paste event if we move while middle clicking on Linux.
+       * See issue #1383.
+       */
+      if (
+        isLinux &&
+        !nextPastePrevented &&
+        (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
+      ) {
+        nextPastePrevented = true;
+
+        /* Prevent the next paste event */
+        const preventNextPaste = (event: ClipboardEvent) => {
+          document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+          event.stopPropagation();
+        };
+
+        /*
+         * Reenable next paste in case of disabled middle click paste for
+         * any reason:
+         * - rigth click paste
+         * - empty clipboard
+         */
+        const enableNextPaste = () => {
+          setTimeout(() => {
+            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+            window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+          }, 100);
+        };
+
+        document.body.addEventListener(EVENT.PASTE, preventNextPaste);
+        window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+      }
+
+      this.setState({
+        scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
+        scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
+      });
+    });
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        isPanning = false;
+        if (!isHoldingSpace) {
+          setCursorForShape(this.state.elementType);
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
+    return true;
+  };
+
+  private updateGestureOnPointerDown(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): void {
+    gesture.pointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (gesture.pointers.size === 2) {
+      gesture.lastCenter = getCenter(gesture.pointers);
+      gesture.initialScale = this.state.zoom;
+      gesture.initialDistance = getDistance(
+        Array.from(gesture.pointers.values()),
+      );
+    }
+  }
+
+  // Returns whether the event is a dragging a scrollbar
+  private handleDraggingScrollBar(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    lastCoords: { x: number; y: number },
+    {
+      isOverHorizontalScrollBar,
+      isOverVerticalScrollBar,
+    }: {
+      isOverHorizontalScrollBar: boolean;
+      isOverVerticalScrollBar: boolean;
+    },
+  ): boolean {
+    if (
+      !(
+        (isOverHorizontalScrollBar || isOverVerticalScrollBar) &&
+        !this.state.multiElement
+      )
+    ) {
+      return false;
+    }
+    isDraggingScrollBar = true;
+    lastCoords.x = event.clientX;
+    lastCoords.y = event.clientY;
+    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (isOverHorizontalScrollBar) {
+        const x = event.clientX;
+        const dx = x - lastCoords.x;
+        this.setState({
+          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+        });
+        lastCoords.x = x;
+        return;
+      }
+
+      if (isOverVerticalScrollBar) {
+        const y = event.clientY;
+        const dy = y - lastCoords.y;
+        this.setState({
+          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+        });
+        lastCoords.y = y;
+      }
+    });
+
+    const onPointerUp = withBatchedUpdates(() => {
+      isDraggingScrollBar = false;
+      setCursorForShape(this.state.elementType);
+      lastPointerUp = null;
+      this.setState({
+        cursorButton: "up",
+      });
+      this.savePointer(event.clientX, event.clientY, "up");
+      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+    });
+
+    lastPointerUp = onPointerUp;
+
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    return true;
+  }
+
+  private maybeClearSelectionWhenHittingElement(
+    event: React.PointerEvent<HTMLCanvasElement>,
+    hitElement: ExcalidrawElement | null,
+  ): void {
+    const isHittingASelectedElement =
+      hitElement != null && this.state.selectedElementIds[hitElement.id];
+
+    // clear selection if shift is not clicked
+    if (isHittingASelectedElement || event.shiftKey) {
+      return;
+    }
+    this.setState((prevState) => ({
+      selectedElementIds: {},
+      selectedGroupIds: {},
+      // Continue editing the same group if the user selected a different
+      // element from it
+      editingGroupId:
+        prevState.editingGroupId &&
+        hitElement != null &&
+        isElementInGroup(hitElement, prevState.editingGroupId)
+          ? prevState.editingGroupId
+          : null,
+    }));
+    const { selectedElementIds } = this.state;
+    this.setState({
+      selectedElementIds: {},
+      previousSelectedElementIds: selectedElementIds,
+    });
+  }
+
   private handleCanvasRef = (canvas: HTMLCanvasElement) => {
     // canvas is null when unmounting
     if (canvas !== null) {
@@ -2847,9 +3005,18 @@ class App extends React.Component<any, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
+    this.openContextMenu(event);
+  };
 
+  private openContextMenu = ({
+    clientX,
+    clientY,
+  }: {
+    clientX: number;
+    clientY: number;
+  }) => {
     const { x, y } = viewportCoordsToSceneCoords(
-      event,
+      { clientX, clientY },
       this.state,
       this.canvas,
       window.devicePixelRatio,
@@ -2888,8 +3055,8 @@ class App extends React.Component<any, AppState> {
             action: this.toggleGridMode,
           },
         ],
-        top: event.clientY,
-        left: event.clientX,
+        top: clientY,
+        left: clientX,
       });
       return;
     }
@@ -2920,8 +3087,8 @@ class App extends React.Component<any, AppState> {
           (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),
       ],
-      top: event.clientY,
-      left: event.clientX,
+      top: clientY,
+      left: clientX,
     });
   };
 
