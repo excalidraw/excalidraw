@@ -104,7 +104,7 @@
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?"
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -129,7 +129,7 @@
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
     "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
     "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
   "errorSplash": {
