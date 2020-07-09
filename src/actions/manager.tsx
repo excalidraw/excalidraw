@@ -82,6 +82,14 @@ export class ActionManager implements ActionsManagerInterface {
     return Object.values(this.actions)
       .filter(actionFilter)
       .filter((action) => "contextItemLabel" in action)
+      .filter((action) =>
+        action.contextItemPredicate
+          ? action.contextItemPredicate(
+              this.getElementsIncludingDeleted(),
+              this.getAppState(),
+            )
+          : true,
+      )
       .sort(
         (a, b) =>
           (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -

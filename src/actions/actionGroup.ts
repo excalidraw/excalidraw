@@ -90,6 +90,8 @@ export const actionGroup = register({
   },
   contextMenuOrder: 4,
   contextItemLabel: "labels.group",
+  contextItemPredicate: (elements, appState) =>
+    getSelectedElements(getNonDeletedElements(elements), appState).length > 1,
   keyTest: (event) => {
     return (
       !event.shiftKey &&
@@ -136,4 +138,6 @@ export const actionUngroup = register({
   },
   contextMenuOrder: 5,
   contextItemLabel: "labels.ungroup",
+  contextItemPredicate: (elements, appState) =>
+    getSelectedGroupIds(appState).length > 0,
 });
