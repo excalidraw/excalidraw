@@ -83,8 +83,8 @@ export class ActionManager implements ActionsManagerInterface {
       .filter(actionFilter)
       .filter((action) => "contextItemLabel" in action)
       .filter((action) =>
-        action.contextItemShow
-          ? action.contextItemShow(
+        action.contextItemPredicate
+          ? action.contextItemPredicate(
               this.getElementsIncludingDeleted(),
               this.getAppState(),
             )
