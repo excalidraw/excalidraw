@@ -45,71 +45,24 @@ export const hitTest = (
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / appState.zoom;
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const absoluteCoords = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = absoluteCoords;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // reverse rotate the pointer
   [x, y] = rotate(x, y, cx, cy, -element.angle);
 
   if (element.type === "ellipse") {
-    // https://stackoverflow.com/a/46007540/232122
-    const px = Math.abs(x - element.x - element.width / 2);
-    const py = Math.abs(y - element.y - element.height / 2);
-
-    let tx = 0.707;
-    let ty = 0.707;
-
-    const a = Math.abs(element.width) / 2;
-    const b = Math.abs(element.height) / 2;
-
-    [0, 1, 2, 3].forEach((x) => {
-      const xx = a * tx;
-      const yy = b * ty;
-
-      const ex = ((a * a - b * b) * tx ** 3) / a;
-      const ey = ((b * b - a * a) * ty ** 3) / b;
-
-      const rx = xx - ex;
-      const ry = yy - ey;
-
-      const qx = px - ex;
-      const qy = py - ey;
-
-      const r = Math.hypot(ry, rx);
-      const q = Math.hypot(qy, qx);
-
-      tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-      ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-      const t = Math.hypot(ty, tx);
-      tx /= t;
-      ty /= t;
-    });
-
+    const ellipseParams = ellipseParamsRelativeTo(element, x, y);
     if (isElementDraggableFromInside(element, appState)) {
-      return (
-        a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
-      );
+      return isInsideEllipse(ellipseParams, lineThreshold);
     }
-    return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
+    return isNearEllipse(ellipseParams, lineThreshold);
   } else if (element.type === "rectangle") {
     if (isElementDraggableFromInside(element, appState)) {
-      return (
-        x > x1 - lineThreshold &&
-        x < x2 + lineThreshold &&
-        y > y1 - lineThreshold &&
-        y < y2 + lineThreshold
-      );
+      return isInsideRectangle(x, y, absoluteCoords, lineThreshold);
     }
-
-    // (x1, y1) --A-- (x2, y1)
-    //    |D             |B
-    // (x1, y2) --C-- (x2, y2)
-    return (
-      distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
-      distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
-      distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
-      distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
-    );
+    return isNearRectangle(x, y, absoluteCoords, lineThreshold);
   } else if (element.type === "diamond") {
     x -= element.x;
     y -= element.y;
@@ -214,7 +167,101 @@ export const hitTest = (
   throw new Error(`Unimplemented type ${element.type}`);
 };
 
-export const bindingBorderTest = hitTest;
+export const bindingBorderTest = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  x: number,
+  y: number,
+): boolean => {
+  return hitTest(element, appState, x, y);
+};
+
+const ellipseParamsRelativeTo = (
+  element: NonDeletedExcalidrawElement,
+  x: number,
+  y: number,
+) => {
+  // https://stackoverflow.com/a/46007540/232122
+  const px = Math.abs(x - element.x - element.width / 2);
+  const py = Math.abs(y - element.y - element.height / 2);
+
+  let tx = 0.707;
+  let ty = 0.707;
+
+  const a = Math.abs(element.width) / 2;
+  const b = Math.abs(element.height) / 2;
+
+  [0, 1, 2, 3].forEach((x) => {
+    const xx = a * tx;
+    const yy = b * ty;
+
+    const ex = ((a * a - b * b) * tx ** 3) / a;
+    const ey = ((b * b - a * a) * ty ** 3) / b;
+
+    const rx = xx - ex;
+    const ry = yy - ey;
+
+    const qx = px - ex;
+    const qy = py - ey;
+
+    const r = Math.hypot(ry, rx);
+    const q = Math.hypot(qy, qx);
+
+    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
+    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
+    const t = Math.hypot(ty, tx);
+    tx /= t;
+    ty /= t;
+  });
+  return [a, b, tx, ty, px, py];
+};
+
+const isInsideEllipse = (
+  [a, b, tx, ty, px, py]: number[],
+  lineThreshold: number,
+) => {
+  return (
+    a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
+  );
+};
+
+const isNearEllipse = (
+  [a, b, tx, ty, px, py]: number[],
+  lineThreshold: number,
+) => {
+  return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
+};
+
+const isInsideRectangle = (
+  x: number,
+  y: number,
+  [x1, y1, x2, y2]: number[],
+  lineThreshold: number,
+) => {
+  return (
+    x > x1 - lineThreshold &&
+    x < x2 + lineThreshold &&
+    y > y1 - lineThreshold &&
+    y < y2 + lineThreshold
+  );
+};
+
+const isNearRectangle = (
+  x: number,
+  y: number,
+  [x1, y1, x2, y2]: number[],
+  lineThreshold: number,
+) => {
+  // (x1, y1) --A-- (x2, y1)
+  //    |D             |B
+  // (x1, y2) --C-- (x2, y2)
+  return (
+    distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
+    distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
+    distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
+    distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
+  );
+};
 
 const pointInBezierEquation = (
   p0: Point,
