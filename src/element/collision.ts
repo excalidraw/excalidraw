@@ -51,6 +51,8 @@ export const hitTest = (
   const cy = (y1 + y2) / 2;
   // reverse rotate the pointer
   [x, y] = rotate(x, y, cx, cy, -element.angle);
+  const relX = x - element.x;
+  const relY = y - element.y;
 
   if (element.type === "ellipse") {
     const ellipseParams = ellipseParamsRelativeTo(element, x, y);
@@ -64,69 +66,11 @@ export const hitTest = (
     }
     return isNearRectangle(x, y, absoluteCoords, lineThreshold);
   } else if (element.type === "diamond") {
-    x -= element.x;
-    y -= element.y;
-    let [
-      topX,
-      topY,
-      rightX,
-      rightY,
-      bottomX,
-      bottomY,
-      leftX,
-      leftY,
-    ] = getDiamondPoints(element);
-
+    const diamondParams = getDiamondPoints(element);
     if (isElementDraggableFromInside(element, appState)) {
-      // TODO: remove this when we normalize coordinates globally
-      if (topY > bottomY) {
-        [bottomY, topY] = [topY, bottomY];
-      }
-      if (rightX < leftX) {
-        [leftX, rightX] = [rightX, leftX];
-      }
-
-      topY -= lineThreshold;
-      bottomY += lineThreshold;
-      leftX -= lineThreshold;
-      rightX += lineThreshold;
-
-      // all deltas should be < 0. Delta > 0 indicates it's on the outside side
-      //  of the line.
-      //
-      //          (topX, topY)
-      //     D  /             \ A
-      //      /               \
-      //  (leftX, leftY)  (rightX, rightY)
-      //    C \               / B
-      //      \              /
-      //      (bottomX, bottomY)
-      //
-      // https://stackoverflow.com/a/2752753/927631
-      return (
-        // delta from line D
-        (leftX - topX) * (y - leftY) - (leftX - x) * (topY - leftY) <= 0 &&
-        // delta from line A
-        (topX - rightX) * (y - rightY) - (x - rightX) * (topY - rightY) <= 0 &&
-        // delta from line B
-        (rightX - bottomX) * (y - bottomY) -
-          (x - bottomX) * (rightY - bottomY) <=
-          0 &&
-        // delta from line C
-        (bottomX - leftX) * (y - leftY) - (x - leftX) * (bottomY - leftY) <= 0
-      );
+      return isInsideDiamond(relX, relY, diamondParams, lineThreshold);
     }
-
-    return (
-      distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
-        lineThreshold ||
-      distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
-        lineThreshold
-    );
+    return isNearDiamond(relX, relY, diamondParams, lineThreshold);
   } else if (isLinearElement(element)) {
     if (!getShapeForElement(element)) {
       return false;
@@ -141,9 +85,6 @@ export const hitTest = (
     ) {
       return false;
     }
-
-    const relX = x - element.x;
-    const relY = y - element.y;
 
     if (isElementDraggableFromInside(element, appState)) {
       const hit = shape.some((subshape) =>
@@ -260,6 +201,68 @@ const isNearRectangle = (
     distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
     distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
     distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
+  );
+};
+
+const isInsideDiamond = (
+  x: number,
+  y: number,
+  [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY]: number[],
+  lineThreshold: number,
+) => {
+  // TODO: remove this when we normalize coordinates globally
+  if (topY > bottomY) {
+    [bottomY, topY] = [topY, bottomY];
+  }
+  if (rightX < leftX) {
+    [leftX, rightX] = [rightX, leftX];
+  }
+
+  topY -= lineThreshold;
+  bottomY += lineThreshold;
+  leftX -= lineThreshold;
+  rightX += lineThreshold;
+
+  // all deltas should be < 0. Delta > 0 indicates it's on the outside side
+  //  of the line.
+  //
+  //          (topX, topY)
+  //     D  /             \ A
+  //      /               \
+  //  (leftX, leftY)  (rightX, rightY)
+  //    C \               / B
+  //      \              /
+  //      (bottomX, bottomY)
+  //
+  // https://stackoverflow.com/a/2752753/927631
+  return (
+    // delta from line D
+    (leftX - topX) * (y - leftY) - (leftX - x) * (topY - leftY) <= 0 &&
+    // delta from line A
+    (topX - rightX) * (y - rightY) - (x - rightX) * (topY - rightY) <= 0 &&
+    // delta from line B
+    (rightX - bottomX) * (y - bottomY) - (x - bottomX) * (rightY - bottomY) <=
+      0 &&
+    // delta from line C
+    (bottomX - leftX) * (y - leftY) - (x - leftX) * (bottomY - leftY) <= 0
+  );
+};
+
+const isNearDiamond = (
+  x: number,
+  y: number,
+  [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY]: number[],
+  lineThreshold: number,
+) => {
+  return (
+    distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
+      lineThreshold ||
+    distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
+      lineThreshold ||
+    distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
+      lineThreshold ||
+    distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
+      lineThreshold
   );
 };
 

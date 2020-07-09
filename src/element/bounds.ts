@@ -35,7 +35,7 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const rightY = Math.floor(element.height / 2) + 1;
   const bottomX = topX;
   const bottomY = element.height;
-  const leftX = topY;
+  const leftX = 0;
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
