@@ -8,8 +8,13 @@ const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 const LOCAL_STORAGE_KEY_LIBRARY = "excalidraw-library";
 
+let _LATEST_LIBRARY_ITEMS: LibraryItems | null = null;
 export const loadLibrary = (): Promise<LibraryItems> => {
   return new Promise(async (resolve) => {
+    if (_LATEST_LIBRARY_ITEMS) {
+      return resolve(_LATEST_LIBRARY_ITEMS);
+    }
+
     try {
       const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
       if (!data) {
@@ -20,6 +25,8 @@ export const loadLibrary = (): Promise<LibraryItems> => {
         (elements) => restore(elements, null).elements,
       ) as LibraryItems;
 
+      _LATEST_LIBRARY_ITEMS = items;
+
       resolve(items);
     } catch (e) {
       console.error(e);
@@ -28,10 +35,15 @@ export const loadLibrary = (): Promise<LibraryItems> => {
   });
 };
 
-export const saveLibrary = (library: readonly ExcalidrawElement[][]) => {
+export const saveLibrary = (items: LibraryItems) => {
+  const prevLibraryItems = _LATEST_LIBRARY_ITEMS;
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, JSON.stringify(library));
+    // cache optimistically so that consumers have access to the latest
+    //  immediately
+    _LATEST_LIBRARY_ITEMS = items;
+    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, JSON.stringify(items));
   } catch (e) {
+    _LATEST_LIBRARY_ITEMS = prevLibraryItems;
     console.error(e);
   }
 };
