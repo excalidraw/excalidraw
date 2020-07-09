@@ -3242,9 +3242,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       pointerCoords.y,
       (element, _, x, y) =>
         element !== linearElement &&
+        isBindableElement(element) &&
         bindingBorderTest(element, this.state, x, y),
     );
-    return isBindableElement(hoveredElement) ? hoveredElement : null;
+    return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
   };
 
   private maybeClearSelectionWhenHittingElement(
