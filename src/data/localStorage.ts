@@ -1,5 +1,5 @@
-import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { AppState } from "../types";
+import { ExcalidrawElement } from "../element/types";
+import { AppState, LibraryItems } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
 
@@ -8,22 +8,24 @@ const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
 const LOCAL_STORAGE_KEY_LIBRARY = "excalidraw-library";
 
-export const loadLibrary = () => {
-  try {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
-    if (!data) {
-      return [];
+export const loadLibrary = (): Promise<LibraryItems> => {
+  return new Promise(async (resolve) => {
+    try {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
+      if (!data) {
+        return resolve([]);
+      }
+
+      const items = (JSON.parse(data) as ExcalidrawElement[][]).map(
+        (elements) => restore(elements, null).elements,
+      ) as LibraryItems;
+
+      resolve(items);
+    } catch (e) {
+      console.error(e);
+      resolve([]);
     }
-
-    const library: ExcalidrawElement[][] = JSON.parse(data);
-
-    return library.map(
-      (elements) => restore(elements, null).elements,
-    ) as NonDeleted<ExcalidrawElement>[][];
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
+  });
 };
 
 export const saveLibrary = (library: readonly ExcalidrawElement[][]) => {

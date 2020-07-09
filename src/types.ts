@@ -105,3 +105,5 @@ export declare class GestureEvent extends UIEvent {
 export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
   _brand: "socketUpdateData";
 };
+
+export type LibraryItems = NonDeleted<ExcalidrawElement>[][];

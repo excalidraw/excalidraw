@@ -12,8 +12,10 @@ export const actionAddToLibrary = register({
       appState,
     );
 
-    const library = loadLibrary();
-    saveLibrary([...library, selectedElements.map(deepCopyElement)]);
+    loadLibrary().then((items) => {
+      saveLibrary([...items, selectedElements.map(deepCopyElement)]);
+    });
+
     return false;
   },
   contextMenuOrder: 6,

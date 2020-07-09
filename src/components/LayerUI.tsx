@@ -169,20 +169,22 @@ const LibraryMenu = ({
   >([]);
 
   useEffect(() => {
-    setLibraryItems(loadLibrary());
+    loadLibrary().then((items) => {
+      setLibraryItems(items);
+    });
   }, []);
 
-  const removeFromLibrary = useCallback((indexToRemove) => {
-    const nextItems = loadLibrary().filter(
-      (_, index) => index !== indexToRemove,
-    );
+  const removeFromLibrary = useCallback(async (indexToRemove) => {
+    const items = await loadLibrary();
+    const nextItems = items.filter((_, index) => index !== indexToRemove);
     saveLibrary(nextItems);
     setLibraryItems(nextItems);
   }, []);
 
   const addToLibrary = useCallback(
-    (elements: NonDeleted<ExcalidrawElement>[]) => {
-      const nextItems = [...loadLibrary(), elements];
+    async (elements: NonDeleted<ExcalidrawElement>[]) => {
+      const items = await loadLibrary();
+      const nextItems = [...items, elements];
       saveLibrary(nextItems);
       setLibraryItems(nextItems);
       onAddToLibrary();
