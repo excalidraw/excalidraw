@@ -81,7 +81,7 @@ export const getElementWithResizeHandler = (
       pointerType,
     );
     return resizeHandle ? { element, resizeHandle } : null;
-  }, null as { element: NonDeletedExcalidrawElement; resizeHandle: ReturnType<typeof resizeTest> } | null);
+  }, null as { element: NonDeletedExcalidrawElement; resizeHandle: HandlerRectanglesRet } | null);
 };
 
 export const getResizeHandlerFromCoords = (
