@@ -141,8 +141,6 @@ import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
-  saveLibrary,
-  loadLibrary,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
@@ -209,7 +207,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { width, height } = props;
     this.state = {
       ...defaultAppState,
-      library: loadLibrary(),
       isLoading: true,
       width,
       height,
@@ -318,11 +315,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.setState(
           (state) => ({
             ...actionResult.appState,
-            // use prev library to guard against clearing it when restoring etc.
-            // TODO come up with a better solution. Currently, this prevents
-            //  library manipulation to go through this helper (which it doesn't
-            //  right now, so we're good)
-            library: state.library,
             editingElement:
               editingElement || actionResult.appState?.editingElement || null,
             isCollaborating: state.isCollaborating,
@@ -3143,7 +3135,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       globalSceneState.getElementsIncludingDeleted(),
       this.state,
     );
-    saveLibrary(this.state.library);
   }, 300);
 }
 

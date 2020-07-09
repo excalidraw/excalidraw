@@ -59,7 +59,6 @@ export const getDefaultAppState = (): AppState => {
     width: window.innerWidth,
     height: window.innerHeight,
     isLibraryOpen: false,
-    library: [],
   };
 };
 

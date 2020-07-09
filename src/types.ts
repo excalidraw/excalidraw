@@ -83,7 +83,6 @@ export type AppState = {
   height: number;
 
   isLibraryOpen: boolean;
-  library: NonDeleted<ExcalidrawElement>[][];
 };
 
 export type PointerCoords = Readonly<{

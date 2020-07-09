@@ -1,4 +1,10 @@
-import React, { useRef, RefObject, useEffect, useCallback } from "react";
+import React, {
+  useRef,
+  useState,
+  RefObject,
+  useEffect,
+  useCallback,
+} from "react";
 import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
@@ -37,6 +43,7 @@ import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
+import { loadLibrary, saveLibrary } from "../data/localStorage";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -82,9 +89,8 @@ function useOnClickOutside(
   }, [ref, cb]);
 }
 
-const LibraryMenu = ({
+const LibraryItems = ({
   library,
-  onClickOutside,
   onRemoveFromLibrary,
   onAddToLibrary,
   onInsertShape,
@@ -97,9 +103,6 @@ const LibraryMenu = ({
   onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
   onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  useOnClickOutside(ref, onClickOutside);
-
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
   const CELLS_PER_ROW = 3;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
@@ -141,10 +144,62 @@ const LibraryMenu = ({
   }
 
   return (
+    <Stack.Col align="center" gap={1} className="layer-ui__librarymenu">
+      <>{rows}</>
+    </Stack.Col>
+  );
+};
+
+const LibraryMenu = ({
+  onClickOutside,
+  onInsertShape,
+  pendingElements,
+  onAddToLibrary,
+}: {
+  pendingElements: NonDeleted<ExcalidrawElement>[];
+  onClickOutside: (event: MouseEvent) => void;
+  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onAddToLibrary: () => void;
+}) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useOnClickOutside(ref, onClickOutside);
+
+  const [libraryItems, setLibraryItems] = useState<
+    NonDeleted<ExcalidrawElement>[][]
+  >([]);
+
+  useEffect(() => {
+    setLibraryItems(loadLibrary());
+  }, []);
+
+  const removeFromLibrary = useCallback((indexToRemove) => {
+    const nextItems = loadLibrary().filter(
+      (_, index) => index !== indexToRemove,
+    );
+    saveLibrary(nextItems);
+    setLibraryItems(nextItems);
+  }, []);
+
+  const addToLibrary = useCallback(
+    (elements: NonDeleted<ExcalidrawElement>[]) => {
+      const nextItems = [...loadLibrary(), elements];
+      saveLibrary(nextItems);
+      setLibraryItems(nextItems);
+      onAddToLibrary();
+    },
+    [onAddToLibrary],
+  );
+
+  return (
     <Island padding={1} ref={ref}>
-      <Stack.Col align="center" gap={1} className="layer-ui__librarymenu">
-        {rows}
-      </Stack.Col>
+      <LibraryItems
+        library={libraryItems}
+        onClickOutside={onClickOutside}
+        onRemoveFromLibrary={removeFromLibrary}
+        onAddToLibrary={addToLibrary}
+        onInsertShape={onInsertShape}
+        pendingElements={pendingElements}
+      />
     </Island>
   );
 };
@@ -276,24 +331,11 @@ const LayerUI = ({
     [setAppState],
   );
 
-  const removeFromLibrary = useCallback(
-    (indexToRemove) => {
-      setAppState({
-        library: appState.library.filter((_, index) => index !== indexToRemove),
-      });
-    },
-    [appState, setAppState],
-  );
-
-  const addToLibrary = useCallback(
-    (elements: NonDeleted<ExcalidrawElement>[]) => {
-      setAppState({
-        library: [...appState.library, elements],
-        selectedElementIds: {},
-      });
-    },
-    [appState, setAppState],
-  );
+  const deselectItems = useCallback(() => {
+    setAppState({
+      selectedElementIds: {},
+    });
+  }, [setAppState]);
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -302,12 +344,10 @@ const LayerUI = ({
     );
     const libraryMenu = appState.isLibraryOpen ? (
       <LibraryMenu
-        library={appState.library}
         pendingElements={getSelectedElements(elements, appState)}
         onClickOutside={closeLibrary}
-        onRemoveFromLibrary={removeFromLibrary}
         onInsertShape={onInsertShape}
-        onAddToLibrary={addToLibrary}
+        onAddToLibrary={deselectItems}
       />
     ) : null;
     return (
