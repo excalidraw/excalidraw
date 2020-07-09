@@ -61,6 +61,7 @@ import {
   ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
+  ExcalidrawGenericElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -75,6 +76,7 @@ import {
   viewportCoordsToSceneCoords,
   sceneCoordsToViewportCoords,
   setCursorForShape,
+  tupleToCoors,
 } from "../utils";
 import {
   KEYS,
@@ -185,6 +187,30 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
+
+type PointerDownState = Readonly<{
+  // The first position at which pointerDown happened
+  origin: Readonly<{ x: number; y: number }>;
+  // The previous pointer position
+  lastCoords: { x: number; y: number };
+  resize: {
+    // Handle when resizing, might change during the pointer interaction
+    handle: ReturnType<typeof resizeTest>;
+    // This is determined on the initial pointer down event
+    isResizing: boolean;
+    // This is determined on the initial pointer down event
+    offset: { x: number; y: number };
+    // This is determined on the initial pointer down event
+    arrowDirection: "origin" | "end";
+  };
+  hit: {
+    // The element the pointer is "hitting", is determined on the initial
+    // pointer down event
+    element: ExcalidrawElement | null;
+    // This is determined on the initial pointer down event
+    wasAddedToSelection: boolean;
+  };
+}>;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -1952,301 +1978,70 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isOverVerticalScrollBar,
     } = isOverScrollBarsNow;
 
-    const { x, y } = viewportCoordsToSceneCoords(
+    const origin = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
-    const lastCoords = { x, y };
 
-    if (this.handleDraggingScrollBar(event, lastCoords, isOverScrollBarsNow)) {
+    // State for the duration of a pointer interaction, which starts with a
+    // pointerDown event, ends with a pointerUp event (or another pointerDown)
+    const pointerDownState: PointerDownState = {
+      origin,
+      // we need to duplicate because we'll be updating this state
+      lastCoords: { ...origin },
+      resize: {
+        handle: false as ReturnType<typeof resizeTest>,
+        isResizing: false,
+        offset: { x: 0, y: 0 },
+        arrowDirection: "origin",
+      },
+      hit: {
+        element: null,
+        wasAddedToSelection: false,
+      },
+    };
+
+    if (
+      this.handleDraggingScrollBar(event, pointerDownState, isOverScrollBarsNow)
+    ) {
       return;
     }
 
-    const originX = x;
-    const originY = y;
     const [originGridX, originGridY] = getGridPoint(
-      originX,
-      originY,
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
       this.state.gridSize,
     );
 
-    type ResizeTestType = ReturnType<typeof resizeTest>;
-    let resizeHandle: ResizeTestType = false;
-    const setResizeHandle = (nextResizeHandle: ResizeTestType) => {
-      resizeHandle = nextResizeHandle;
-    };
-    let resizeOffsetXY: [number, number] = [0, 0];
-    let resizeArrowDirection: "origin" | "end" = "origin";
-    let isResizingElements = false;
     let draggingOccurred = false;
     let dragOffsetXY: [number, number] | null = null;
-    let hitElement: ExcalidrawElement | null = null;
-    let hitElementWasAddedToSelection = false;
 
-    if (this.state.elementType !== "selection") {
-      this.setState({
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        editingGroupId: null,
-      });
-    }
+    this.clearSelectionIfNotUsingSelection();
 
-    if (this.state.elementType === "selection") {
-      const elements = globalSceneState.getElements();
-      const selectedElements = getSelectedElements(elements, this.state);
-      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithResizeHandler = getElementWithResizeHandler(
-          elements,
-          this.state,
-          x,
-          y,
-          this.state.zoom,
-          event.pointerType,
-        );
-        if (elementWithResizeHandler != null) {
-          this.setState({ resizingElement: elementWithResizeHandler.element });
-          resizeHandle = elementWithResizeHandler.resizeHandle;
-        }
-      } else if (selectedElements.length > 1) {
-        resizeHandle = getResizeHandlerFromCoords(
-          getCommonBounds(selectedElements),
-          x,
-          y,
-          this.state.zoom,
-          event.pointerType,
-        );
-      }
-      if (resizeHandle) {
-        document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle,
-        });
-        isResizingElements = true;
-        resizeOffsetXY = getResizeOffsetXY(
-          resizeHandle,
-          selectedElements,
-          x,
-          y,
-        );
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0]) &&
-          selectedElements[0].points.length === 2
-        ) {
-          resizeArrowDirection = getResizeArrowDirection(
-            resizeHandle,
-            selectedElements[0],
-          );
-        }
-      } else {
-        if (this.state.editingLinearElement) {
-          const ret = LinearElementEditor.handlePointerDown(
-            event,
-            this.state,
-            (appState) => this.setState(appState),
-            history,
-            x,
-            y,
-          );
-          if (ret.hitElement) {
-            hitElement = ret.hitElement;
-          }
-          if (ret.didAddPoint) {
-            return;
-          }
-        }
-
-        // hitElement may already be set above, so check first
-        hitElement =
-          hitElement ||
-          getElementAtPosition(elements, this.state, x, y, this.state.zoom);
-
-        this.maybeClearSelectionWhenHittingElement(event, hitElement);
-
-        // If we click on something
-        if (hitElement) {
-          // deselect if item is selected
-          // if shift is not clicked, this will always return true
-          // otherwise, it will trigger selection based on current
-          // state of the box
-          if (!this.state.selectedElementIds[hitElement.id]) {
-            // if we are currently editing a group, treat all selections outside of the group
-            // as exiting editing mode.
-            if (
-              this.state.editingGroupId &&
-              !isElementInGroup(hitElement, this.state.editingGroupId)
-            ) {
-              this.setState({
-                selectedElementIds: {},
-                selectedGroupIds: {},
-                editingGroupId: null,
-              });
-              return;
-            }
-            this.setState((prevState) => {
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    ...prevState.selectedElementIds,
-                    [hitElement!.id]: true,
-                  },
-                },
-                globalSceneState.getElements(),
-              );
-            });
-            // TODO: this is strange...
-            globalSceneState.replaceAllElements(
-              globalSceneState.getElementsIncludingDeleted(),
-            );
-            hitElementWasAddedToSelection = true;
-          }
-        }
-
-        const { selectedElementIds } = this.state;
-        this.setState({
-          previousSelectedElementIds: selectedElementIds,
-        });
-      }
+    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+      return;
     }
 
     if (this.state.elementType === "text") {
-      // if we're currently still editing text, clicking outside
-      //  should only finalize it, not create another (irrespective
-      //  of state.elementLocked)
-      if (this.state.editingElement?.type === "text") {
-        return;
-      }
-
-      this.startTextEditing({
-        sceneX: x,
-        sceneY: y,
-        insertAtParentCenter: !event.altKey,
-      });
-
-      resetCursor();
-      if (!this.state.elementLocked) {
-        this.setState({
-          elementType: "selection",
-        });
-      }
+      this.handleTextOnPointerDown(event, pointerDownState);
       return;
     } else if (
       this.state.elementType === "arrow" ||
       this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
-      if (this.state.multiElement) {
-        const { multiElement } = this.state;
-
-        // finalize if completing a loop
-        if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
-          mutateElement(multiElement, {
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
-          });
-          this.actionManager.executeAction(actionFinalize);
-          return;
-        }
-
-        const { x: rx, y: ry, lastCommittedPoint } = multiElement;
-
-        // clicking inside commit zone → finalize arrow
-        if (
-          multiElement.points.length > 1 &&
-          lastCommittedPoint &&
-          distance2d(
-            x - rx,
-            y - ry,
-            lastCommittedPoint[0],
-            lastCommittedPoint[1],
-          ) < LINE_CONFIRM_THRESHOLD
-        ) {
-          this.actionManager.executeAction(actionFinalize);
-          return;
-        }
-
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [multiElement.id]: true,
-          },
-        }));
-        // clicking outside commit zone → update reference for last committed
-        //  point
-        mutateElement(multiElement, {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
-        });
-        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
-      } else {
-        const [gridX, gridY] = getGridPoint(
-          x,
-          y,
-          this.state.elementType === "draw" ? null : this.state.gridSize,
-        );
-        const element = newLinearElement({
-          type: this.state.elementType,
-          x: gridX,
-          y: gridY,
-          strokeColor: this.state.currentItemStrokeColor,
-          backgroundColor: this.state.currentItemBackgroundColor,
-          fillStyle: this.state.currentItemFillStyle,
-          strokeWidth: this.state.currentItemStrokeWidth,
-          strokeStyle: this.state.currentItemStrokeStyle,
-          roughness: this.state.currentItemRoughness,
-          opacity: this.state.currentItemOpacity,
-        });
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [element.id]: false,
-          },
-        }));
-        mutateElement(element, {
-          points: [...element.points, [0, 0]],
-        });
-        globalSceneState.replaceAllElements([
-          ...globalSceneState.getElementsIncludingDeleted(),
-          element,
-        ]);
-        this.setState({
-          draggingElement: element,
-          editingElement: element,
-        });
-      }
+      this.handleLinearElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
     } else {
-      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
-      const element = newElement({
-        type: this.state.elementType,
-        x: gridX,
-        y: gridY,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        strokeStyle: this.state.currentItemStrokeStyle,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-      });
-
-      if (element.type === "selection") {
-        this.setState({
-          selectionElement: element,
-          draggingElement: element,
-        });
-      } else {
-        globalSceneState.replaceAllElements([
-          ...globalSceneState.getElementsIncludingDeleted(),
-          element,
-        ]);
-        this.setState({
-          multiElement: null,
-          draggingElement: element,
-          editingElement: element,
-        });
-      }
+      this.createGenericElementOnPointerDown(
+        this.state.elementType,
+        pointerDownState,
+      );
     }
 
     let selectedElementWasDuplicated = false;
@@ -2259,8 +2054,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (dragOffsetXY === null) {
         dragOffsetXY = getDragOffsetXY(
           getSelectedElements(globalSceneState.getElements(), this.state),
-          originX,
-          originY,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
         );
       }
 
@@ -2271,21 +2066,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastCoords.x;
+        const dx = x - pointerDownState.lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastCoords.x = x;
+        pointerDownState.lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastCoords.y;
+        const dy = y - pointerDownState.lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastCoords.y = y;
+        pointerDownState.lastCoords.y = y;
         return;
       }
 
@@ -2306,31 +2101,44 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         (this.state.elementType === "arrow" ||
           this.state.elementType === "line")
       ) {
-        if (distance2d(x, y, originX, originY) < DRAGGING_THRESHOLD) {
+        if (
+          distance2d(
+            x,
+            y,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) < DRAGGING_THRESHOLD
+        ) {
           return;
         }
       }
 
-      if (isResizingElements) {
+      if (pointerDownState.resize.isResizing) {
         const selectedElements = getSelectedElements(
           globalSceneState.getElements(),
           this.state,
         );
+        const resizeHandle = pointerDownState.resize.handle;
         this.setState({
+          // TODO: rename this state field to "isScaling" to distinguish
+          // it from the generic "isResizing" which includes scaling and
+          // rotating
           isResizing: resizeHandle && resizeHandle !== "rotation",
           isRotating: resizeHandle === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
-          x - resizeOffsetXY[0],
-          y - resizeOffsetXY[1],
+          x - pointerDownState.resize.offset.x,
+          y - pointerDownState.resize.offset.y,
           this.state.gridSize,
         );
         if (
           resizeElements(
             resizeHandle,
-            setResizeHandle,
+            (newResizeHandle) => {
+              pointerDownState.resize.handle = newResizeHandle;
+            },
             selectedElements,
-            resizeArrowDirection,
+            pointerDownState.resize.arrowDirection,
             getRotateWithDiscreteAngleKey(event),
             getResizeWithSidesSameLengthKey(event),
             getResizeCenterPointKey(event),
@@ -2348,17 +2156,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           (appState) => this.setState(appState),
           x,
           y,
-          lastCoords.x,
-          lastCoords.y,
+          pointerDownState.lastCoords.x,
+          pointerDownState.lastCoords.y,
         );
 
         if (didDrag) {
-          lastCoords.x = x;
-          lastCoords.y = y;
+          pointerDownState.lastCoords.x = x;
+          pointerDownState.lastCoords.y = y;
           return;
         }
       }
 
+      const hitElement = pointerDownState.hit.element;
       if (hitElement && this.state.selectedElementIds[hitElement.id]) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -2391,7 +2200,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
                 //  updated yet by the time this mousemove event is fired
-                (element.id === hitElement.id && hitElementWasAddedToSelection)
+                (element.id === hitElement.id &&
+                  pointerDownState.hit.wasAddedToSelection)
               ) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
@@ -2399,8 +2209,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                   element,
                 );
                 const [originDragX, originDragY] = getGridPoint(
-                  originX - dragOffsetXY[0],
-                  originY - dragOffsetXY[1],
+                  pointerDownState.origin.x - dragOffsetXY[0],
+                  pointerDownState.origin.y - dragOffsetXY[1],
                   this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
@@ -2467,12 +2277,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         dragNewElement(
           draggingElement,
           this.state.elementType,
-          originX,
-          originY,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
           x,
           y,
-          distance(originX, x),
-          distance(originY, y),
+          distance(pointerDownState.origin.x, x),
+          distance(pointerDownState.origin.y, y),
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
@@ -2654,11 +2464,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // If click occurred and elements were dragged or some element
       // was added to selection (on pointerdown phase) we need to keep
       // selection unchanged
+      const hitElement = pointerDownState.hit.element;
       if (
         getSelectedGroupIds(this.state).length === 0 &&
         hitElement &&
         !draggingOccurred &&
-        !hitElementWasAddedToSelection
+        !pointerDownState.hit.wasAddedToSelection
       ) {
         if (childEvent.shiftKey) {
           this.setState((prevState) => ({
@@ -2859,7 +2670,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Returns whether the event is a dragging a scrollbar
   private handleDraggingScrollBar(
     event: React.PointerEvent<HTMLCanvasElement>,
-    lastCoords: { x: number; y: number },
+    pointerDownState: PointerDownState,
     {
       isOverHorizontalScrollBar,
       isOverVerticalScrollBar,
@@ -2877,8 +2688,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
     isDraggingScrollBar = true;
-    lastCoords.x = event.clientX;
-    lastCoords.y = event.clientY;
+    pointerDownState.lastCoords.x = event.clientX;
+    pointerDownState.lastCoords.y = event.clientY;
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
@@ -2887,21 +2698,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (isOverHorizontalScrollBar) {
         const x = event.clientX;
-        const dx = x - lastCoords.x;
+        const dx = x - pointerDownState.lastCoords.x;
         this.setState({
           scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
         });
-        lastCoords.x = x;
+        pointerDownState.lastCoords.x = x;
         return;
       }
 
       if (isOverVerticalScrollBar) {
         const y = event.clientY;
-        const dy = y - lastCoords.y;
+        const dy = y - pointerDownState.lastCoords.y;
         this.setState({
           scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
         });
-        lastCoords.y = y;
+        pointerDownState.lastCoords.y = y;
       }
     });
 
@@ -2923,6 +2734,306 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
     return true;
   }
+
+  private clearSelectionIfNotUsingSelection = (): void => {
+    if (this.state.elementType !== "selection") {
+      this.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        editingGroupId: null,
+      });
+    }
+  };
+
+  // Returns whether the pointer event has been completely handled
+  private handleSelectionOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    if (this.state.elementType === "selection") {
+      const elements = globalSceneState.getElements();
+      const selectedElements = getSelectedElements(elements, this.state);
+      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
+        const elementWithResizeHandler = getElementWithResizeHandler(
+          elements,
+          this.state,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          this.state.zoom,
+          event.pointerType,
+        );
+        if (elementWithResizeHandler != null) {
+          this.setState({
+            resizingElement: elementWithResizeHandler.element,
+          });
+          pointerDownState.resize.handle =
+            elementWithResizeHandler.resizeHandle;
+        }
+      } else if (selectedElements.length > 1) {
+        pointerDownState.resize.handle = getResizeHandlerFromCoords(
+          getCommonBounds(selectedElements),
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          this.state.zoom,
+          event.pointerType,
+        );
+      }
+      if (pointerDownState.resize.handle) {
+        document.documentElement.style.cursor = getCursorForResizingElement({
+          resizeHandle: pointerDownState.resize.handle,
+        });
+        pointerDownState.resize.isResizing = true;
+        pointerDownState.resize.offset = tupleToCoors(
+          getResizeOffsetXY(
+            pointerDownState.resize.handle,
+            selectedElements,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
+        );
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0]) &&
+          selectedElements[0].points.length === 2
+        ) {
+          pointerDownState.resize.arrowDirection = getResizeArrowDirection(
+            pointerDownState.resize.handle,
+            selectedElements[0],
+          );
+        }
+      } else {
+        if (this.state.editingLinearElement) {
+          const ret = LinearElementEditor.handlePointerDown(
+            event,
+            this.state,
+            (appState) => this.setState(appState),
+            history,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          );
+          if (ret.hitElement) {
+            pointerDownState.hit.element = ret.hitElement;
+          }
+          if (ret.didAddPoint) {
+            return true;
+          }
+        }
+
+        // hitElement may already be set above, so check first
+        pointerDownState.hit.element =
+          pointerDownState.hit.element ??
+          getElementAtPosition(
+            elements,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+          );
+
+        this.maybeClearSelectionWhenHittingElement(
+          event,
+          pointerDownState.hit.element,
+        );
+
+        // If we click on something
+        const hitElement = pointerDownState.hit.element;
+        if (hitElement != null) {
+          // deselect if item is selected
+          // if shift is not clicked, this will always return true
+          // otherwise, it will trigger selection based on current
+          // state of the box
+          if (!this.state.selectedElementIds[hitElement.id]) {
+            // if we are currently editing a group, treat all selections outside of the group
+            // as exiting editing mode.
+            if (
+              this.state.editingGroupId &&
+              !isElementInGroup(hitElement, this.state.editingGroupId)
+            ) {
+              this.setState({
+                selectedElementIds: {},
+                selectedGroupIds: {},
+                editingGroupId: null,
+              });
+              return true;
+            }
+            this.setState((prevState) => {
+              return selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    ...prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
+                },
+                globalSceneState.getElements(),
+              );
+            });
+            // TODO: this is strange...
+            globalSceneState.replaceAllElements(
+              globalSceneState.getElementsIncludingDeleted(),
+            );
+            pointerDownState.hit.wasAddedToSelection = true;
+          }
+        }
+
+        const { selectedElementIds } = this.state;
+        this.setState({
+          previousSelectedElementIds: selectedElementIds,
+        });
+      }
+    }
+    return false;
+  };
+
+  private handleTextOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    pointerDownState: PointerDownState,
+  ): void => {
+    // if we're currently still editing text, clicking outside
+    //  should only finalize it, not create another (irrespective
+    //  of state.elementLocked)
+    if (this.state.editingElement?.type === "text") {
+      return;
+    }
+
+    this.startTextEditing({
+      sceneX: pointerDownState.origin.x,
+      sceneY: pointerDownState.origin.y,
+      insertAtParentCenter: !event.altKey,
+    });
+
+    resetCursor();
+    if (!this.state.elementLocked) {
+      this.setState({
+        elementType: "selection",
+      });
+    }
+  };
+
+  private handleLinearElementOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    elementType: "draw" | "line" | "arrow",
+    pointerDownState: PointerDownState,
+  ): void => {
+    if (this.state.multiElement) {
+      const { multiElement } = this.state;
+
+      // finalize if completing a loop
+      if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+        mutateElement(multiElement, {
+          lastCommittedPoint:
+            multiElement.points[multiElement.points.length - 1],
+        });
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+
+      const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+
+      // clicking inside commit zone → finalize arrow
+      if (
+        multiElement.points.length > 1 &&
+        lastCommittedPoint &&
+        distance2d(
+          pointerDownState.origin.x - rx,
+          pointerDownState.origin.y - ry,
+          lastCommittedPoint[0],
+          lastCommittedPoint[1],
+        ) < LINE_CONFIRM_THRESHOLD
+      ) {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+
+      this.setState((prevState) => ({
+        selectedElementIds: {
+          ...prevState.selectedElementIds,
+          [multiElement.id]: true,
+        },
+      }));
+      // clicking outside commit zone → update reference for last committed
+      //  point
+      mutateElement(multiElement, {
+        lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
+      });
+      document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+    } else {
+      const [gridX, gridY] = getGridPoint(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        elementType === "draw" ? null : this.state.gridSize,
+      );
+      const element = newLinearElement({
+        type: elementType,
+        x: gridX,
+        y: gridY,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+      });
+      this.setState((prevState) => ({
+        selectedElementIds: {
+          ...prevState.selectedElementIds,
+          [element.id]: false,
+        },
+      }));
+      mutateElement(element, {
+        points: [...element.points, [0, 0]],
+      });
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getElementsIncludingDeleted(),
+        element,
+      ]);
+      this.setState({
+        draggingElement: element,
+        editingElement: element,
+      });
+    }
+  };
+
+  private createGenericElementOnPointerDown = (
+    elementType: ExcalidrawGenericElement["type"],
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+    const element = newElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+    });
+
+    if (element.type === "selection") {
+      this.setState({
+        selectionElement: element,
+        draggingElement: element,
+      });
+    } else {
+      globalSceneState.replaceAllElements([
+        ...globalSceneState.getElementsIncludingDeleted(),
+        element,
+      ]);
+      this.setState({
+        multiElement: null,
+        draggingElement: element,
+        editingElement: element,
+      });
+    }
+  };
 
   private maybeClearSelectionWhenHittingElement(
     event: React.PointerEvent<HTMLCanvasElement>,
