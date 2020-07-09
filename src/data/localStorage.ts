@@ -23,7 +23,7 @@ export const loadLibrary = (): Promise<LibraryItems> => {
 
       const items = (JSON.parse(data) as ExcalidrawElement[][]).map(
         (elements) => restore(elements, null).elements,
-      ) as LibraryItems;
+      ) as Mutable<LibraryItems>;
 
       _LATEST_LIBRARY_ITEMS = items;
 

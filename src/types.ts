@@ -106,4 +106,4 @@ export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSour
   _brand: "socketUpdateData";
 };
 
-export type LibraryItems = NonDeleted<ExcalidrawElement>[][];
+export type LibraryItems = readonly NonDeleted<ExcalidrawElement>[][];

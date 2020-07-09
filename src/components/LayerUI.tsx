@@ -9,7 +9,7 @@ import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 import {
   NonDeletedExcalidrawElement,
   ExcalidrawElement,
@@ -89,14 +89,14 @@ function useOnClickOutside(
   }, [ref, cb]);
 }
 
-const LibraryItems = ({
+const LibraryMenuItems = ({
   library,
   onRemoveFromLibrary,
   onAddToLibrary,
   onInsertShape,
   pendingElements,
 }: {
-  library: readonly NonDeleted<ExcalidrawElement>[][];
+  library: LibraryItems;
   pendingElements: NonDeleted<ExcalidrawElement>[];
   onClickOutside: (event: MouseEvent) => void;
   onRemoveFromLibrary: (index: number) => void;
@@ -164,9 +164,7 @@ const LibraryMenu = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, onClickOutside);
 
-  const [libraryItems, setLibraryItems] = useState<
-    NonDeleted<ExcalidrawElement>[][]
-  >([]);
+  const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
 
   const [loadingState, setIsLoading] = useState<
     "preloading" | "loading" | "ready"
@@ -220,7 +218,7 @@ const LibraryMenu = ({
           {t("labels.libraryLoadingMessage")}
         </div>
       ) : (
-        <LibraryItems
+        <LibraryMenuItems
           library={libraryItems}
           onClickOutside={onClickOutside}
           onRemoveFromLibrary={removeFromLibrary}
