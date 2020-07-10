@@ -65,7 +65,10 @@
     "group": "Δημιουργία ομάδας από επιλογή",
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
-    "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος"
+    "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -115,6 +118,7 @@
     "arrow": "Βέλος",
     "line": "Γραμμή",
     "text": "Κείμενο",
+    "library": "",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο"
   },
   "headings": {
