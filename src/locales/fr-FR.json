@@ -65,7 +65,10 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "toggleGridMode": "Basculer le mode grille"
+    "toggleGridMode": "Basculer le mode grille",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -115,6 +118,7 @@
     "arrow": "Flèche",
     "line": "Ligne",
     "text": "Texte",
+    "library": "",
     "lock": "Garder l'outil sélectionné actif après le dessin"
   },
   "headings": {
