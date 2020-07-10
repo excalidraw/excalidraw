@@ -65,7 +65,10 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": "Ruudukko päälle/pois"
+    "toggleGridMode": "Ruudukko päälle/pois",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -115,6 +118,7 @@
     "arrow": "Nuoli",
     "line": "Viiva",
     "text": "Teksti",
+    "library": "",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
   },
   "headings": {
