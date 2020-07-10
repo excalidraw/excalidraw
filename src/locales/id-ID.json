@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -115,6 +118,7 @@
     "arrow": "Panah",
     "line": "Garis",
     "text": "Teks",
+    "library": "",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
   },
   "headings": {
