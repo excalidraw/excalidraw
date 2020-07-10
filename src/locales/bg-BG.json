@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -115,6 +118,7 @@
     "arrow": "Стрелка",
     "line": "Линия",
     "text": "Текст",
+    "library": "",
     "lock": "Поддържайте избрания инструмент активен след рисуване"
   },
   "headings": {
