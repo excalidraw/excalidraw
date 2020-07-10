@@ -65,7 +65,10 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "toggleGridMode": "切換格線模式"
+    "toggleGridMode": "切換格線模式",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -115,6 +118,7 @@
     "arrow": "箭頭",
     "line": "線條",
     "text": "文字",
+    "library": "",
     "lock": "可連續使用選取的工具"
   },
   "headings": {
