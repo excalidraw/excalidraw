@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "",
@@ -115,6 +118,7 @@
     "arrow": "Shigjetë",
     "line": "Vijë",
     "text": "Tekst",
+    "library": "",
     "lock": ""
   },
   "headings": {
