@@ -65,7 +65,10 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "toggleGridMode": "Alternar modo de grade"
+    "toggleGridMode": "Alternar modo de grade",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -115,6 +118,7 @@
     "arrow": "Flecha",
     "line": "Linha",
     "text": "Texto",
+    "library": "",
     "lock": "Manter a ferramenta selecionada ativa após desenhar"
   },
   "headings": {
