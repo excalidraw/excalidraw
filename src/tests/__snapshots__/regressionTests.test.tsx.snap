@@ -2447,9 +2447,9 @@ Object {
   "type": "rectangle",
   "version": 2,
   "versionNonce": 1278240551,
-  "width": 10,
+  "width": 20,
   "x": 10,
-  "y": 10,
+  "y": -10,
 }
 `;
 
@@ -2472,9 +2472,9 @@ Object {
   "type": "diamond",
   "version": 2,
   "versionNonce": 453191,
-  "width": 10,
-  "x": 30,
-  "y": 10,
+  "width": 20,
+  "x": 40,
+  "y": -10,
 }
 `;
 
@@ -2497,9 +2497,9 @@ Object {
   "type": "ellipse",
   "version": 2,
   "versionNonce": 2019559783,
-  "width": 10,
-  "x": 50,
-  "y": 10,
+  "width": 20,
+  "x": 70,
+  "y": -10,
 }
 `;
 
@@ -2522,7 +2522,7 @@ Object {
       0,
     ],
     Array [
-      10,
+      50,
       10,
     ],
   ],
@@ -2535,9 +2535,9 @@ Object {
   "type": "arrow",
   "version": 3,
   "versionNonce": 1014066025,
-  "width": 10,
-  "x": 70,
-  "y": 10,
+  "width": 50,
+  "x": 130,
+  "y": -10,
 }
 `;
 
@@ -2560,7 +2560,7 @@ Object {
       0,
     ],
     Array [
-      10,
+      50,
       10,
     ],
   ],
@@ -2573,9 +2573,9 @@ Object {
   "type": "line",
   "version": 3,
   "versionNonce": 1604849351,
-  "width": 10,
-  "x": 90,
-  "y": 10,
+  "width": 50,
+  "x": 220,
+  "y": -10,
 }
 `;
 
@@ -2591,7 +2591,7 @@ Object {
   "id": "id5",
   "isDeleted": false,
   "lastCommittedPoint": Array [
-    0,
+    80,
     20,
   ],
   "opacity": 100,
@@ -2601,11 +2601,11 @@ Object {
       0,
     ],
     Array [
-      10,
+      50,
       10,
     ],
     Array [
-      0,
+      80,
       20,
     ],
   ],
@@ -2618,9 +2618,9 @@ Object {
   "type": "arrow",
   "version": 7,
   "versionNonce": 1723083209,
-  "width": 10,
-  "x": 110,
-  "y": 10,
+  "width": 80,
+  "x": 310,
+  "y": -10,
 }
 `;
 
@@ -2636,7 +2636,7 @@ Object {
   "id": "id6",
   "isDeleted": false,
   "lastCommittedPoint": Array [
-    0,
+    80,
     20,
   ],
   "opacity": 100,
@@ -2646,11 +2646,11 @@ Object {
       0,
     ],
     Array [
-      10,
+      50,
       10,
     ],
     Array [
-      0,
+      80,
       20,
     ],
   ],
@@ -2663,9 +2663,9 @@ Object {
   "type": "line",
   "version": 7,
   "versionNonce": 406373543,
-  "width": 10,
-  "x": 120,
-  "y": 10,
+  "width": 80,
+  "x": 430,
+  "y": -10,
 }
 `;
 
@@ -2688,7 +2688,7 @@ Object {
       0,
     ],
     Array [
-      10,
+      50,
       10,
     ],
   ],
@@ -2701,9 +2701,9 @@ Object {
   "type": "draw",
   "version": 3,
   "versionNonce": 1402203177,
-  "width": 10,
-  "x": 130,
-  "y": 10,
+  "width": 50,
+  "x": 550,
+  "y": -10,
 }
 `;
 
@@ -2751,9 +2751,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
       ],
     },
@@ -2786,9 +2786,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2808,9 +2808,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
       ],
     },
@@ -2843,9 +2843,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2865,9 +2865,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2887,9 +2887,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
       ],
     },
@@ -2922,9 +2922,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2944,9 +2944,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2966,9 +2966,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -2988,7 +2988,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3001,9 +3001,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
       ],
     },
@@ -3036,9 +3036,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3058,9 +3058,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3080,9 +3080,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3102,7 +3102,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3115,9 +3115,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3137,7 +3137,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3150,9 +3150,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
       ],
     },
@@ -3185,9 +3185,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3207,9 +3207,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3229,9 +3229,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3251,7 +3251,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3264,9 +3264,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3286,7 +3286,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3299,9 +3299,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3314,7 +3314,7 @@ Object {
           "id": "id5",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            10,
+            50,
             10,
           ],
           "opacity": 100,
@@ -3324,7 +3324,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3337,9 +3337,9 @@ Object {
           "type": "arrow",
           "version": 5,
           "versionNonce": 81784553,
-          "width": 10,
-          "x": 110,
-          "y": 10,
+          "width": 50,
+          "x": 310,
+          "y": -10,
         },
       ],
     },
@@ -3372,9 +3372,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3394,9 +3394,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3416,9 +3416,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3438,7 +3438,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3451,9 +3451,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3473,7 +3473,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3486,9 +3486,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3501,7 +3501,7 @@ Object {
           "id": "id5",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -3511,11 +3511,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -3528,9 +3528,9 @@ Object {
           "type": "arrow",
           "version": 7,
           "versionNonce": 1723083209,
-          "width": 10,
-          "x": 110,
-          "y": 10,
+          "width": 80,
+          "x": 310,
+          "y": -10,
         },
       ],
     },
@@ -3563,9 +3563,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3585,9 +3585,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3607,9 +3607,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3629,7 +3629,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3642,9 +3642,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3664,7 +3664,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3677,9 +3677,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3692,7 +3692,7 @@ Object {
           "id": "id5",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -3702,11 +3702,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -3719,9 +3719,9 @@ Object {
           "type": "arrow",
           "version": 7,
           "versionNonce": 1723083209,
-          "width": 10,
-          "x": 110,
-          "y": 10,
+          "width": 80,
+          "x": 310,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3734,7 +3734,7 @@ Object {
           "id": "id6",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            10,
+            50,
             10,
           ],
           "opacity": 100,
@@ -3744,7 +3744,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3757,9 +3757,9 @@ Object {
           "type": "line",
           "version": 5,
           "versionNonce": 1898319239,
-          "width": 10,
-          "x": 120,
-          "y": 10,
+          "width": 50,
+          "x": 430,
+          "y": -10,
         },
       ],
     },
@@ -3792,9 +3792,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3814,9 +3814,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3836,9 +3836,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3858,7 +3858,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3871,9 +3871,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3893,7 +3893,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -3906,9 +3906,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3921,7 +3921,7 @@ Object {
           "id": "id5",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -3931,11 +3931,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -3948,9 +3948,9 @@ Object {
           "type": "arrow",
           "version": 7,
           "versionNonce": 1723083209,
-          "width": 10,
-          "x": 110,
-          "y": 10,
+          "width": 80,
+          "x": 310,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -3963,7 +3963,7 @@ Object {
           "id": "id6",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -3973,11 +3973,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -3990,9 +3990,9 @@ Object {
           "type": "line",
           "version": 7,
           "versionNonce": 406373543,
-          "width": 10,
-          "x": 120,
-          "y": 10,
+          "width": 80,
+          "x": 430,
+          "y": -10,
         },
       ],
     },
@@ -4025,9 +4025,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4047,9 +4047,9 @@ Object {
           "type": "diamond",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 20,
+          "x": 40,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4069,9 +4069,9 @@ Object {
           "type": "ellipse",
           "version": 2,
           "versionNonce": 2019559783,
-          "width": 10,
-          "x": 50,
-          "y": 10,
+          "width": 20,
+          "x": 70,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4091,7 +4091,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -4104,9 +4104,9 @@ Object {
           "type": "arrow",
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 70,
-          "y": 10,
+          "width": 50,
+          "x": 130,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4126,7 +4126,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -4139,9 +4139,9 @@ Object {
           "type": "line",
           "version": 3,
           "versionNonce": 1604849351,
-          "width": 10,
-          "x": 90,
-          "y": 10,
+          "width": 50,
+          "x": 220,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4154,7 +4154,7 @@ Object {
           "id": "id5",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -4164,11 +4164,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -4181,9 +4181,9 @@ Object {
           "type": "arrow",
           "version": 7,
           "versionNonce": 1723083209,
-          "width": 10,
-          "x": 110,
-          "y": 10,
+          "width": 80,
+          "x": 310,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4196,7 +4196,7 @@ Object {
           "id": "id6",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            80,
             20,
           ],
           "opacity": 100,
@@ -4206,11 +4206,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
             Array [
-              0,
+              80,
               20,
             ],
           ],
@@ -4223,9 +4223,9 @@ Object {
           "type": "line",
           "version": 7,
           "versionNonce": 406373543,
-          "width": 10,
-          "x": 120,
-          "y": 10,
+          "width": 80,
+          "x": 430,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -4245,7 +4245,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              50,
               10,
             ],
           ],
@@ -4258,9 +4258,9 @@ Object {
           "type": "draw",
           "version": 3,
           "versionNonce": 1402203177,
-          "width": 10,
-          "x": 130,
-          "y": 10,
+          "width": 50,
+          "x": 550,
+          "y": -10,
         },
       ],
     },
@@ -4270,11 +4270,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-<<<<<<< HEAD
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `47`;
-=======
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `51`;
->>>>>>> Suggest binding when hovering
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `54`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -4828,7 +4824,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -4986,7 +4982,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -5144,7 +5140,7 @@ Object {
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -5302,7 +5298,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -5724,7 +5720,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -6014,7 +6010,7 @@ Object {
 
 exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -21105,7 +21101,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `25`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `26`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
