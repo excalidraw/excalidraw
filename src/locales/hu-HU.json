@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -115,6 +118,7 @@
     "arrow": "Nyíl",
     "line": "Vonal",
     "text": "Szöveg",
+    "library": "",
     "lock": "Rajzolás után az aktív eszközt tartsa kiválasztva"
   },
   "headings": {
