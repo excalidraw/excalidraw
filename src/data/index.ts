@@ -374,7 +374,7 @@ export const loadScene = async (id: string | null, privateKey?: string) => {
 
   return {
     elements: data.elements,
-    appState: data.appState && { ...data.appState },
+    appState: data.appState,
     commitToHistory: false,
   };
 };
