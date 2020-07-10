@@ -66,9 +66,9 @@
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
     "toggleGridMode": "Ruudukko päälle/pois",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "Lisää kirjastoon",
+    "removeFromLibrary": "Poista kirjastosta",
+    "libraryLoadingMessage": "Ladataan kirjastoa..."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -118,7 +118,7 @@
     "arrow": "Nuoli",
     "line": "Viiva",
     "text": "Teksti",
-    "library": "",
+    "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
   },
   "headings": {
