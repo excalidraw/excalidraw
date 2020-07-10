@@ -66,9 +66,9 @@
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
     "toggleGridMode": "Slå av/på rutenett",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "Legg til i bibliotek",
+    "removeFromLibrary": "Fjern fra bibliotek",
+    "libraryLoadingMessage": "Laster bibliotek..."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -118,7 +118,7 @@
     "arrow": "Pil",
     "line": "Linje",
     "text": "Tekst",
-    "library": "",
+    "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt"
   },
   "headings": {
