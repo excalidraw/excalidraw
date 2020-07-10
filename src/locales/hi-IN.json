@@ -65,7 +65,10 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "toggleGridMode": "टॉगल ग्रिड मोड"
+    "toggleGridMode": "टॉगल ग्रिड मोड",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -115,6 +118,7 @@
     "arrow": "तीर",
     "line": "रेखा",
     "text": "पाठ",
+    "library": "",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
   },
   "headings": {
