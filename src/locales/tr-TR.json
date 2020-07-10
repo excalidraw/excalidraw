@@ -65,7 +65,10 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -115,6 +118,7 @@
     "arrow": "Ok",
     "line": "Çizgi",
     "text": "Yazı",
+    "library": "",
     "lock": "Seçilen aracı çizimden sonra aktif tut"
   },
   "headings": {
