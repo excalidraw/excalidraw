@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -115,6 +118,7 @@
     "arrow": "화살표",
     "line": "라인",
     "text": "텍스트",
+    "library": "",
     "lock": "선택된 도구 유지하기"
   },
   "headings": {
