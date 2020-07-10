@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -115,6 +118,7 @@
     "arrow": "Fletxa",
     "line": "Línia",
     "text": "Text",
+    "library": "",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar"
   },
   "headings": {
