@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -115,6 +118,7 @@
     "arrow": "سهم",
     "line": "خط",
     "text": "نص",
+    "library": "",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم"
   },
   "headings": {
