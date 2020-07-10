@@ -65,7 +65,10 @@
     "group": "Grupper utval",
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
-    "toggleGridMode": "Sla på/av rutenett"
+    "toggleGridMode": "Sla på/av rutenett",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -115,6 +118,7 @@
     "arrow": "Pil",
     "line": "Linje",
     "text": "Tekst",
+    "library": "",
     "lock": "Hald fram med valt verktøy"
   },
   "headings": {
