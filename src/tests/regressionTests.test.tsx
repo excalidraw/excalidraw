@@ -569,17 +569,17 @@ describe("regression tests", () => {
 
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(10, 0);
+    mouse.up(30, 20);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(60, -10);
+    mouse.click(60, 10);
+    mouse.click(40, 10);
     hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);

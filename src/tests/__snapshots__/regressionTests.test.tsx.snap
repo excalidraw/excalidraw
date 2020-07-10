@@ -20731,9 +20731,9 @@ Object {
   "type": "rectangle",
   "version": 6,
   "versionNonce": 1006504105,
-  "width": 10,
+  "width": 20,
   "x": 10,
-  "y": 10,
+  "y": -10,
 }
 `;
 
@@ -20744,7 +20744,7 @@ Object {
   "boundElementIDs": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 10,
+  "height": 20,
   "id": "id1",
   "isDeleted": false,
   "opacity": 100,
@@ -20756,9 +20756,9 @@ Object {
   "type": "rectangle",
   "version": 6,
   "versionNonce": 289600103,
-  "width": 10,
-  "x": 30,
-  "y": 10,
+  "width": 30,
+  "x": 40,
+  "y": 0,
 }
 `;
 
@@ -20774,7 +20774,7 @@ Object {
   "id": "id2",
   "isDeleted": true,
   "lastCommittedPoint": Array [
-    10,
+    60,
     10,
   ],
   "opacity": 100,
@@ -20784,7 +20784,7 @@ Object {
       0,
     ],
     Array [
-      10,
+      60,
       10,
     ],
   ],
@@ -20797,8 +20797,8 @@ Object {
   "type": "arrow",
   "version": 11,
   "versionNonce": 1315507081,
-  "width": 10,
-  "x": 50,
+  "width": 60,
+  "x": 130,
   "y": 10,
 }
 `;
@@ -20836,9 +20836,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -20846,7 +20846,7 @@ Object {
           "boundElementIDs": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 10,
+          "height": 20,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
@@ -20858,9 +20858,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 30,
+          "x": 40,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -20873,7 +20873,7 @@ Object {
           "id": "id2",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            0,
+            100,
             20,
           ],
           "opacity": 100,
@@ -20883,11 +20883,11 @@ Object {
               0,
             ],
             Array [
-              10,
+              60,
               10,
             ],
             Array [
-              0,
+              100,
               20,
             ],
           ],
@@ -20900,8 +20900,8 @@ Object {
           "type": "arrow",
           "version": 7,
           "versionNonce": 400692809,
-          "width": 10,
-          "x": 50,
+          "width": 100,
+          "x": 130,
           "y": 10,
         },
       ],
@@ -20935,9 +20935,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -20945,7 +20945,7 @@ Object {
           "boundElementIDs": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 10,
+          "height": 20,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
@@ -20957,9 +20957,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 30,
+          "x": 40,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -20972,7 +20972,7 @@ Object {
           "id": "id2",
           "isDeleted": false,
           "lastCommittedPoint": Array [
-            10,
+            60,
             10,
           ],
           "opacity": 100,
@@ -20982,7 +20982,7 @@ Object {
               0,
             ],
             Array [
-              10,
+              60,
               10,
             ],
           ],
@@ -20995,8 +20995,8 @@ Object {
           "type": "arrow",
           "version": 5,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": 50,
+          "width": 60,
+          "x": 130,
           "y": 10,
         },
       ],
@@ -21032,9 +21032,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
       ],
     },
@@ -21067,9 +21067,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 1278240551,
-          "width": 10,
+          "width": 20,
           "x": 10,
-          "y": 10,
+          "y": -10,
         },
         Object {
           "angle": 0,
@@ -21077,7 +21077,7 @@ Object {
           "boundElementIDs": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 10,
+          "height": 20,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
@@ -21089,9 +21089,9 @@ Object {
           "type": "rectangle",
           "version": 2,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 30,
-          "y": 10,
+          "width": 30,
+          "x": 40,
+          "y": 0,
         },
       ],
     },
@@ -21101,7 +21101,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `26`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `28`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
