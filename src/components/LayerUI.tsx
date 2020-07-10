@@ -81,10 +81,10 @@ function useOnClickOutside(
 
       cb(event);
     };
-    document.addEventListener("click", listener, false);
+    document.addEventListener("pointerdown", listener, false);
 
     return () => {
-      document.removeEventListener("click", listener);
+      document.removeEventListener("pointerdown", listener);
     };
   }, [ref, cb]);
 }
@@ -204,9 +204,9 @@ const LibraryMenu = ({
     async (elements: NonDeleted<ExcalidrawElement>[]) => {
       const items = await loadLibrary();
       const nextItems = [...items, elements];
+      onAddToLibrary();
       saveLibrary(nextItems);
       setLibraryItems(nextItems);
-      onAddToLibrary();
     },
     [onAddToLibrary],
   );
@@ -361,6 +361,7 @@ const LayerUI = ({
   const deselectItems = useCallback(() => {
     setAppState({
       selectedElementIds: {},
+      selectedGroupIds: {},
     });
   }, [setAppState]);
 
