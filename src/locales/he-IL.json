@@ -65,7 +65,10 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -115,6 +118,7 @@
     "arrow": "חץ",
     "line": "קו",
     "text": "טקסט",
+    "library": "",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
   },
   "headings": {
