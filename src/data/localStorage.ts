@@ -122,7 +122,9 @@ export const restoreFromLocalStorage = () => {
     try {
       appState = {
         ...getDefaultAppState(),
-        ...clearAppStateForLocalStorage(JSON.parse(savedState) as AppState),
+        ...clearAppStateForLocalStorage(
+          JSON.parse(savedState) as Partial<AppState>,
+        ),
       };
     } catch (error) {
       console.error(error);

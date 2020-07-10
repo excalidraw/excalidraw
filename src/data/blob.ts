@@ -16,7 +16,7 @@ export const loadFromBlob = async (blob: any) => {
       elements = data.elements || [];
       appState = {
         ...defaultAppState,
-        ...cleanAppStateForExport(data.appState as AppState),
+        ...cleanAppStateForExport(data.appState as Partial<AppState>),
       };
     } catch {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));

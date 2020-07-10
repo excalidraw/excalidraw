@@ -120,7 +120,7 @@ const APP_STATE_STORAGE_CONF = (<
 });
 
 const _clearAppStateForStorage = <Type extends "export" | "browser">(
-  appState: AppState,
+  appState: Partial<AppState>,
   type: Type,
 ) => {
   type ExportableKeys = {
@@ -128,7 +128,7 @@ const _clearAppStateForStorage = <Type extends "export" | "browser">(
       ? K
       : never;
   }[keyof typeof APP_STATE_STORAGE_CONF];
-  const stateForExport = {} as { [K in ExportableKeys]: typeof appState[K] };
+  const stateForExport = {} as { [K in ExportableKeys]?: typeof appState[K] };
   for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
     if (APP_STATE_STORAGE_CONF[key][type]) {
       // @ts-ignore see https://github.com/microsoft/TypeScript/issues/31445
@@ -138,10 +138,10 @@ const _clearAppStateForStorage = <Type extends "export" | "browser">(
   return stateForExport;
 };
 
-export const clearAppStateForLocalStorage = (appState: AppState) => {
+export const clearAppStateForLocalStorage = (appState: Partial<AppState>) => {
   return _clearAppStateForStorage(appState, "browser");
 };
 
-export const cleanAppStateForExport = (appState: AppState) => {
+export const cleanAppStateForExport = (appState: Partial<AppState>) => {
   return _clearAppStateForStorage(appState, "export");
 };
