@@ -63,7 +63,8 @@ export const getDefaultAppState = (): AppState => {
 };
 
 const APP_STATE_STORAGE_CONF = (<
-  T extends Record<keyof AppState, { browser: boolean; export: boolean }>
+  Values extends { browser: boolean; export: boolean },
+  T extends Record<keyof AppState, Values>
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
@@ -116,7 +117,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingGroupId: { browser: true, export: false },
   selectedGroupIds: { browser: true, export: false },
   isLibraryOpen: { browser: false, export: false },
-} as const);
+});
 
 const _clearAppStateForStorage = <Type extends "export" | "browser">(
   appState: AppState,
