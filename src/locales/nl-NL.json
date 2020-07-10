@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -115,6 +118,7 @@
     "arrow": "Pijl",
     "line": "Lijn",
     "text": "Tekst",
+    "library": "",
     "lock": "Geselecteerde tool actief houden na tekenen"
   },
   "headings": {
