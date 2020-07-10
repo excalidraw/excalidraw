@@ -65,7 +65,10 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -115,6 +118,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
+    "library": "",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
