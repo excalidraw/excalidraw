@@ -65,7 +65,10 @@
     "group": "Selección de grupo",
     "ungroup": "Dividir selección",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -115,6 +118,7 @@
     "arrow": "Flecha",
     "line": "Línea",
     "text": "Texto",
+    "library": "",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar"
   },
   "headings": {
