@@ -12,7 +12,7 @@ let _LATEST_LIBRARY_ITEMS: LibraryItems | null = null;
 export const loadLibrary = (): Promise<LibraryItems> => {
   return new Promise(async (resolve) => {
     if (_LATEST_LIBRARY_ITEMS) {
-      return resolve(_LATEST_LIBRARY_ITEMS);
+      return resolve(JSON.parse(JSON.stringify(_LATEST_LIBRARY_ITEMS)));
     }
 
     try {
@@ -25,7 +25,8 @@ export const loadLibrary = (): Promise<LibraryItems> => {
         (elements) => restore(elements, null).elements,
       ) as Mutable<LibraryItems>;
 
-      _LATEST_LIBRARY_ITEMS = items;
+      // clone to ensure we don't mutate the cached library elements in the app
+      _LATEST_LIBRARY_ITEMS = JSON.parse(JSON.stringify(items));
 
       resolve(items);
     } catch (e) {
@@ -38,10 +39,11 @@ export const loadLibrary = (): Promise<LibraryItems> => {
 export const saveLibrary = (items: LibraryItems) => {
   const prevLibraryItems = _LATEST_LIBRARY_ITEMS;
   try {
+    const serializedItems = JSON.stringify(items);
     // cache optimistically so that consumers have access to the latest
     //  immediately
-    _LATEST_LIBRARY_ITEMS = items;
-    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, JSON.stringify(items));
+    _LATEST_LIBRARY_ITEMS = JSON.parse(serializedItems);
+    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, serializedItems);
   } catch (e) {
     _LATEST_LIBRARY_ITEMS = prevLibraryItems;
     console.error(e);
