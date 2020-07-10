@@ -276,6 +276,23 @@ export class LinearElementEditor {
     });
   }
 
+  static getPointAtIndexGlobalCoordinates(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    indexMaybeFromEnd: number, // -1 for last element
+  ) {
+    const index =
+      indexMaybeFromEnd < 0
+        ? element.points.length + indexMaybeFromEnd
+        : indexMaybeFromEnd;
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+
+    const point = element.points[index];
+    const { x, y } = element;
+    return rotate(x + point[0], y + point[1], cx, cy, element.angle);
+  }
+
   static getPointIndexUnderCursor(
     element: NonDeleted<ExcalidrawLinearElement>,
     zoom: AppState["zoom"],

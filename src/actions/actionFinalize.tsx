@@ -9,6 +9,8 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { maybeBindEndOfLinearElement } from "../element/binding";
+import Scene from "../scene/Scene";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -66,11 +68,12 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
+      const isLoop = isPathALoop(multiPointElement.points);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "draw"
       ) {
-        if (isPathALoop(multiPointElement.points)) {
+        if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
@@ -81,6 +84,19 @@ export const actionFinalize = register({
             ),
           });
         }
+      }
+
+      if (!isLoop) {
+        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          multiPointElement,
+          -1,
+        );
+        maybeBindEndOfLinearElement(
+          multiPointElement,
+          appState,
+          Scene.getScene(multiPointElement)!,
+          { x, y },
+        );
       }
 
       if (!appState.elementLocked) {

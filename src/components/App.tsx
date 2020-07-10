@@ -61,7 +61,6 @@ import {
   NonDeleted,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
-  ExcalidrawBindableElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -138,11 +137,7 @@ import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
-import {
-  isLinearElement,
-  isBindableElement,
-  isLinearElementType,
-} from "../element/typeChecks";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
@@ -160,7 +155,11 @@ import {
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
-import { bindingBorderTest } from "../element/collision";
+import {
+  maybeBindStartOfLinearElement,
+  getHoveredElementForBinding,
+  maybeBindEndOfLinearElement,
+} from "../element/binding";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -2608,8 +2607,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
-      const boundElement = this.maybeBindStartOfLinearElement(
+      const boundElement = maybeBindStartOfLinearElement(
         element,
+        this.state,
+        this.scene,
         pointerDownState.origin,
       );
       this.scene.replaceAllElements([
@@ -2620,6 +2621,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         draggingElement: element,
         editingElement: element,
         boundElement,
+        hoveredBindableElement: null,
       });
     }
   };
@@ -3059,7 +3061,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement: this.state.draggingElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          this.maybeBindEndOfLinearElement(draggingElement, pointerCoords);
+          maybeBindEndOfLinearElement(
+            draggingElement,
+            this.state,
+            this.scene,
+            pointerCoords,
+          );
+          this.setState({ hoveredBindableElement: null, boundElement: null });
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -3190,69 +3198,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     x: number;
     y: number;
   }): void => {
-    const hoveredBindableElement = this.getHoveredElementForBinding(
+    const hoveredBindableElement = getHoveredElementForBinding(
+      this.state,
+      this.scene,
       pointerCoords,
     );
     this.setState({ hoveredBindableElement });
-  };
-
-  private maybeBindStartOfLinearElement = (
-    linearElement: ExcalidrawLinearElement,
-    pointerCoords: { x: number; y: number },
-  ): NonDeleted<ExcalidrawBindableElement> | null => {
-    return this.maybeBindLinearElement(
-      linearElement,
-      "startBoundElementID",
-      pointerCoords,
-    );
-  };
-
-  private maybeBindEndOfLinearElement = (
-    linearElement: ExcalidrawLinearElement,
-    pointerCoords: { x: number; y: number },
-  ): void => {
-    this.maybeBindLinearElement(
-      linearElement,
-      "endBoundElementID",
-      pointerCoords,
-    );
-  };
-
-  private maybeBindLinearElement = (
-    linearElement: ExcalidrawLinearElement,
-    startOrEndBoundElementIDField: "startBoundElementID" | "endBoundElementID",
-    pointerCoords: { x: number; y: number },
-  ): NonDeleted<ExcalidrawBindableElement> | null => {
-    const hoveredElement = this.getHoveredElementForBinding(pointerCoords);
-    if (hoveredElement != null) {
-      mutateElement(linearElement, {
-        [startOrEndBoundElementIDField]: hoveredElement.id,
-      });
-      mutateElement(hoveredElement, {
-        boundElementIDs: [
-          ...(hoveredElement.boundElementIDs ?? []),
-          linearElement.id,
-        ],
-      });
-    }
-    this.setState({ hoveredBindableElement: null, boundElement: null });
-    return hoveredElement;
-  };
-
-  private getHoveredElementForBinding = (pointerCoords: {
-    x: number;
-    y: number;
-  }): NonDeleted<ExcalidrawBindableElement> | null => {
-    const hoveredElement = getElementAtPosition(
-      this.scene.getElements(),
-      this.state,
-      pointerCoords.x,
-      pointerCoords.y,
-      (element, _, x, y) =>
-        isBindableElement(element) &&
-        bindingBorderTest(element, this.state, x, y),
-    );
-    return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
   };
 
   private maybeClearSelectionWhenHittingElement(
