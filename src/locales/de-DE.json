@@ -65,7 +65,10 @@
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
-    "toggleGridMode": "Gitterlinien ein-/ausschalten"
+    "toggleGridMode": "Gitterlinien ein-/ausschalten",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -115,6 +118,7 @@
     "arrow": "Pfeil",
     "line": "Linie",
     "text": "Text",
+    "library": "",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
   },
   "headings": {
