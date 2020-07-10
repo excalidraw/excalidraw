@@ -65,7 +65,10 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "toggleGridMode": "Режим сітки"
+    "toggleGridMode": "Режим сітки",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -115,6 +118,7 @@
     "arrow": "Стрілка",
     "line": "Лінія",
     "text": "Текст",
+    "library": "",
     "lock": "Залишити обраний інструмент після креслення"
   },
   "headings": {
