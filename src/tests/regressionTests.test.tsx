@@ -884,6 +884,7 @@ describe("regression tests", () => {
       "Copy styles",
       "Paste styles",
       "Delete",
+      "Add to library",
       "Send backward",
       "Bring forward",
       "Send to back",
@@ -892,7 +893,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(8);
+    expect(contextMenu?.children.length).toBe(9);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -926,6 +927,7 @@ describe("regression tests", () => {
       "Paste styles",
       "Delete",
       "Group selection",
+      "Add to library",
       "Send backward",
       "Bring forward",
       "Send to back",
@@ -934,7 +936,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
+    expect(contextMenu?.children.length).toBe(10);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -973,6 +975,7 @@ describe("regression tests", () => {
       "Delete",
       "Group selection",
       "Ungroup selection",
+      "Add to library",
       "Send backward",
       "Bring forward",
       "Send to back",
@@ -981,7 +984,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(11);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });

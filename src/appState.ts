@@ -58,6 +58,7 @@ export const getDefaultAppState = (): AppState => {
     selectedGroupIds: {},
     width: window.innerWidth,
     height: window.innerHeight,
+    isLibraryOpen: false,
   };
 };
 
@@ -76,6 +77,7 @@ export const clearAppStateForLocalStorage = (appState: AppState) => {
     errorMessage,
     showShortcutsDialog,
     editingLinearElement,
+    isLibraryOpen,
     ...exportedState
   } = appState;
   return exportedState;

@@ -299,6 +299,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             });
           }}
           onLockToggle={this.toggleLock}
+          onInsertShape={(elements) =>
+            this.addElementsFromPasteOrLibrary(elements)
+          }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
@@ -870,7 +873,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.error) {
         alert(data.error);
       } else if (data.elements) {
-        this.addElementsFromPaste(data.elements);
+        this.addElementsFromPasteOrLibrary(data.elements);
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
@@ -879,8 +882,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     },
   );
 
-  private addElementsFromPaste = (
+  private addElementsFromPasteOrLibrary = (
     clipboardElements: readonly ExcalidrawElement[],
+    clientX = cursorX,
+    clientY = cursorY,
   ) => {
     const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
 
@@ -888,7 +893,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const elementsCenterY = distance(minY, maxY) / 2;
 
     const { x, y } = viewportCoordsToSceneCoords(
-      { clientX: cursorX, clientY: cursorY },
+      { clientX, clientY },
       this.state,
       this.canvas,
       window.devicePixelRatio,
@@ -911,6 +916,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ]);
     history.resumeRecording();
     this.setState({
+      isLibraryOpen: false,
       selectedElementIds: newElements.reduce((map, element) => {
         map[element.id] = true;
         return map;
@@ -1353,6 +1359,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (this.actionManager.handleKeyDown(event)) {
       return;
+    }
+
+    if (event.code === "Digit9") {
+      this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
     const shape = findShapeByKey(event.key);
@@ -3135,6 +3145,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+    const libraryShapes = event.dataTransfer.getData(
+      "application/vnd.excalidraw.json",
+    );
+    if (libraryShapes !== "") {
+      this.addElementsFromPasteOrLibrary(
+        JSON.parse(libraryShapes),
+        event.clientX,
+        event.clientY,
+      );
+      return;
+    }
+
     const file = event.dataTransfer?.files[0];
     if (
       file?.type === "application/json" ||

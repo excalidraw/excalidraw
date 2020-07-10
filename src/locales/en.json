@@ -65,7 +65,10 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "toggleGridMode": "Toggle grid mode"
+    "toggleGridMode": "Toggle grid mode",
+    "addToLibrary": "Add to library",
+    "removeFromLibrary": "Remove from library",
+    "libraryLoadingMessage": "Loading library..."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -115,6 +118,7 @@
     "arrow": "Arrow",
     "line": "Line",
     "text": "Text",
+    "library": "Library",
     "lock": "Keep selected tool active after drawing"
   },
   "headings": {
