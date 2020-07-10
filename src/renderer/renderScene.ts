@@ -241,14 +241,31 @@ export const renderScene = (
     );
   }
 
+  [appState.hoveredBindableElement, appState.boundElement]
+    .filter((element) => element != null)
+    .forEach((element) => {
+      const [
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2,
+      ] = getElementAbsoluteCoords(element!);
+      renderSelectionBorder(context, sceneState, {
+        angle: element!.angle,
+        elementX1,
+        elementY1,
+        elementX2,
+        elementY2,
+        selectionColors: [oc.black],
+      });
+    });
+
   // Paint selected elements
   if (
     renderSelection &&
     !appState.multiElement &&
     !appState.editingLinearElement
   ) {
-    context.translate(sceneState.scrollX, sceneState.scrollY);
-
     const selections = elements.reduce((acc, element) => {
       const selectionColors = [];
       // local user
@@ -310,74 +327,9 @@ export const renderScene = (
       addSelectionForGroupId(appState.editingGroupId);
     }
 
-    [appState.hoveredBindableElement, appState.boundElement]
-      .filter((element) => element != null)
-      .forEach((element) => {
-        const [
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-        ] = getElementAbsoluteCoords(element!);
-        selections.push({
-          angle: element!.angle,
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-          selectionColors: [oc.black],
-        });
-      });
-
-    selections.forEach(
-      ({
-        angle,
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-        selectionColors,
-      }) => {
-        const elementWidth = elementX2 - elementX1;
-        const elementHeight = elementY2 - elementY1;
-
-        const initialLineDash = context.getLineDash();
-        const lineWidth = context.lineWidth;
-        const lineDashOffset = context.lineDashOffset;
-        const strokeStyle = context.strokeStyle;
-
-        const dashedLinePadding = 4 / sceneState.zoom;
-        const dashWidth = 8 / sceneState.zoom;
-        const spaceWidth = 4 / sceneState.zoom;
-
-        context.lineWidth = 1 / sceneState.zoom;
-
-        const count = selectionColors.length;
-        for (var i = 0; i < count; ++i) {
-          context.strokeStyle = selectionColors[i];
-          context.setLineDash([
-            dashWidth,
-            spaceWidth + (dashWidth + spaceWidth) * (count - 1),
-          ]);
-          context.lineDashOffset = (dashWidth + spaceWidth) * i;
-          strokeRectWithRotation(
-            context,
-            elementX1 - dashedLinePadding,
-            elementY1 - dashedLinePadding,
-            elementWidth + dashedLinePadding * 2,
-            elementHeight + dashedLinePadding * 2,
-            elementX1 + elementWidth / 2,
-            elementY1 + elementHeight / 2,
-            angle,
-          );
-        }
-        context.lineDashOffset = lineDashOffset;
-        context.strokeStyle = strokeStyle;
-        context.lineWidth = lineWidth;
-        context.setLineDash(initialLineDash);
-      },
+    selections.forEach((selection) =>
+      renderSelectionBorder(context, sceneState, selection),
     );
-    context.translate(-sceneState.scrollX, -sceneState.scrollY);
 
     const locallySelectedElements = getSelectedElements(elements, appState);
 
@@ -615,6 +567,68 @@ export const renderScene = (
   context.scale(1 / scale, 1 / scale);
 
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
+};
+
+const renderSelectionBorder = (
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  elementProperties: {
+    angle: number;
+    elementX1: number;
+    elementY1: number;
+    elementX2: number;
+    elementY2: number;
+    selectionColors: string[];
+  },
+) => {
+  const {
+    angle,
+    elementX1,
+    elementY1,
+    elementX2,
+    elementY2,
+    selectionColors,
+  } = elementProperties;
+  const elementWidth = elementX2 - elementX1;
+  const elementHeight = elementY2 - elementY1;
+
+  const initialLineDash = context.getLineDash();
+  const lineWidth = context.lineWidth;
+  const lineDashOffset = context.lineDashOffset;
+  const strokeStyle = context.strokeStyle;
+
+  const dashedLinePadding = 4 / sceneState.zoom;
+  const dashWidth = 8 / sceneState.zoom;
+  const spaceWidth = 4 / sceneState.zoom;
+
+  context.lineWidth = 1 / sceneState.zoom;
+
+  context.translate(sceneState.scrollX, sceneState.scrollY);
+
+  const count = selectionColors.length;
+  for (var i = 0; i < count; ++i) {
+    context.strokeStyle = selectionColors[i];
+    context.setLineDash([
+      dashWidth,
+      spaceWidth + (dashWidth + spaceWidth) * (count - 1),
+    ]);
+    context.lineDashOffset = (dashWidth + spaceWidth) * i;
+    strokeRectWithRotation(
+      context,
+      elementX1 - dashedLinePadding,
+      elementY1 - dashedLinePadding,
+      elementWidth + dashedLinePadding * 2,
+      elementHeight + dashedLinePadding * 2,
+      elementX1 + elementWidth / 2,
+      elementY1 + elementHeight / 2,
+      angle,
+    );
+  }
+  context.lineDashOffset = lineDashOffset;
+  context.strokeStyle = strokeStyle;
+  context.lineWidth = lineWidth;
+  context.setLineDash(initialLineDash);
+  context.translate(-sceneState.scrollX, -sceneState.scrollY);
 };
 
 const isVisibleElement = (
