@@ -348,11 +348,12 @@ export const exportCanvas = async (
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
-    const appState = getDefaultAppState();
-    if (exportBackground) {
-      appState.viewBackgroundColor = viewBackgroundColor;
-    }
-    exportToBackend(elements, appState);
+    exportToBackend(elements, {
+      ...appState,
+      viewBackgroundColor: exportBackground
+        ? appState.viewBackgroundColor
+        : getDefaultAppState().viewBackgroundColor,
+    });
   }
 
   // clean up the DOM
@@ -367,7 +368,6 @@ export const loadScene = async (id: string | null, privateKey?: string) => {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
-    window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {
     data = restoreFromLocalStorage();
   }

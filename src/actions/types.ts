@@ -62,7 +62,8 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
-  | "goToCollaborator";
+  | "goToCollaborator"
+  | "addToLibrary";
 
 export interface Action {
   name: ActionName;
@@ -81,6 +82,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  contextItemPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {

@@ -22,13 +22,13 @@
     "@sentry/browser": "5.19.0",
     "@sentry/integrations": "5.19.0",
     "@testing-library/jest-dom": "5.11.0",
-    "@testing-library/react": "10.4.3",
+    "@testing-library/react": "10.4.4",
     "@types/jest": "26.0.3",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.41",
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
-    "browser-nativefs": "0.9.0",
+    "browser-nativefs": "0.9.1",
     "i18next-browser-languagedetector": "5.0.0",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
@@ -41,7 +41,7 @@
     "react-scripts": "3.4.1",
     "roughjs": "4.3.1",
     "socket.io-client": "2.3.0",
-    "typescript": "3.9.5"
+    "typescript": "3.9.6"
   },
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",

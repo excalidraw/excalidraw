@@ -81,6 +81,8 @@ export type AppState = {
   editingGroupId: GroupId | null;
   width: number;
   height: number;
+
+  isLibraryOpen: boolean;
 };
 
 export type PointerCoords = Readonly<{
@@ -103,3 +105,5 @@ export declare class GestureEvent extends UIEvent {
 export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
   _brand: "socketUpdateData";
 };
+
+export type LibraryItems = readonly NonDeleted<ExcalidrawElement>[][];

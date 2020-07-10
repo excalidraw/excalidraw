@@ -58,6 +58,7 @@ export const getDefaultAppState = (): AppState => {
     selectedGroupIds: {},
     width: window.innerWidth,
     height: window.innerHeight,
+    isLibraryOpen: false,
   };
 };
 
@@ -114,6 +115,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true },
   editingGroupId: { browser: true, export: false },
   selectedGroupIds: { browser: true, export: false },
+  isLibraryOpen: { browser: false, export: false },
 } as const);
 
 const _clearAppStateForStorage = <Type extends "export" | "browser">(
