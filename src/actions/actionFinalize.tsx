@@ -101,6 +101,8 @@ export const actionFinalize = register({
         draggingElement: null,
         multiElement: null,
         editingElement: null,
+        boundElement: null,
+        hoveredBindableElement: null,
         selectedElementIds:
           multiPointElement && !appState.elementLocked
             ? {

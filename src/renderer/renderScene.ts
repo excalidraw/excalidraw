@@ -310,22 +310,24 @@ export const renderScene = (
       addSelectionForGroupId(appState.editingGroupId);
     }
 
-    if (appState.hoveredBindableElement != null) {
-      const [
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-      ] = getElementAbsoluteCoords(appState.hoveredBindableElement);
-      selections.push({
-        angle: appState.hoveredBindableElement.angle,
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-        selectionColors: [oc.black],
+    [appState.hoveredBindableElement, appState.boundElement]
+      .filter((element) => element != null)
+      .forEach((element) => {
+        const [
+          elementX1,
+          elementY1,
+          elementX2,
+          elementY2,
+        ] = getElementAbsoluteCoords(element!);
+        selections.push({
+          angle: element!.angle,
+          elementX1,
+          elementY1,
+          elementX2,
+          elementY2,
+          selectionColors: [oc.black],
+        });
       });
-    }
 
     selections.forEach(
       ({

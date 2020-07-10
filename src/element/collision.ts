@@ -117,7 +117,7 @@ export const bindingBorderTest = (
   const size = Math.hypot(x2 - x1, y2 - y1);
   [x, y] = xy;
   // We make the bindable boundary bigger for bigger elements
-  const threshold = Math.max(10, Math.min(0.1 * size, 50)) / appState.zoom;
+  const threshold = Math.max(15, Math.min(0.25 * size, 80)) / appState.zoom;
 
   const relX = x - element.x;
   const relY = y - element.y;
