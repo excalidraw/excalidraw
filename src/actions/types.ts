@@ -82,6 +82,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  contextItemPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {
