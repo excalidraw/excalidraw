@@ -55,10 +55,9 @@ import {
 import Portal from "./Portal";
 
 import { renderScene } from "../renderer";
-import { AppState, GestureEvent, Gesture } from "../types";
+import { AppState, GestureEvent, Gesture, ExcalidrawProps } from "../types";
 import {
   ExcalidrawElement,
-  ExcalidrawProps,
   ExcalidrawTextElement,
   NonDeleted,
   ExcalidrawGenericElement,
@@ -126,7 +125,7 @@ import {
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
 } from "../constants";
 import {
-  INITAL_SCENE_UPDATE_TIMEOUT,
+  INITIAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -247,7 +246,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
 
-  constructor(props: any) {
+  constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
 
@@ -1035,7 +1034,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       //  initial SCENE_UPDATE message
       const initializationTimer = setTimeout(
         initialize,
-        INITAL_SCENE_UPDATE_TIMEOUT,
+        INITIAL_SCENE_UPDATE_TIMEOUT,
       );
 
       const updateScene = (
