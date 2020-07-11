@@ -10,6 +10,7 @@ export { operateBool } from "./path/bools";
 export {
   newElement,
   newTextElement,
+  updateTextElement,
   newLinearElement,
   duplicateElement,
   newPathElement,
@@ -20,6 +21,7 @@ export {
   getCommonBounds,
   getDiamondPoints,
   getArrowPoints,
+  getClosestElementBounds,
 } from "./bounds";
 
 export {
@@ -35,7 +37,16 @@ export {
   getElementWithResizeHandler,
   getResizeHandlerFromCoords,
 } from "./resizeTest";
-export { resizeElements, canResizeMutlipleElements } from "./resizeElements";
+export {
+  resizeElements,
+  getResizeOffsetXY,
+  getResizeArrowDirection,
+} from "./resizeElements";
+export {
+  dragSelectedElements,
+  getDragOffsetXY,
+  dragNewElement,
+} from "./dragElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
@@ -43,39 +54,34 @@ export {
   getPerfectElementSize,
   isInvisiblySmallElement,
   resizePerfectLineForNWHandler,
-  normalizeDimensions,
+  getNormalizedDimensions,
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
 
-export function getSyncableElements(elements: readonly ExcalidrawElement[]) {
-  // There are places in Excalidraw where synthetic invisibly small elements are added and removed.
+export const getSyncableElements = (
+  elements: readonly ExcalidrawElement[], // There are places in Excalidraw where synthetic invisibly small elements are added and removed.
+) =>
   // It's probably best to keep those local otherwise there might be a race condition that
   // gets the app into an invalid state. I've never seen it happen but I'm worried about it :)
-  return elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
-}
+  elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
 
-export function getElementMap(elements: readonly ExcalidrawElement[]) {
-  return elements.reduce(
+export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
+  elements.reduce(
     (acc: { [key: string]: ExcalidrawElement }, element: ExcalidrawElement) => {
       acc[element.id] = element;
       return acc;
     },
     {},
   );
-}
 
-export function getDrawingVersion(elements: readonly ExcalidrawElement[]) {
-  return elements.reduce((acc, el) => acc + el.version, 0);
-}
+export const getDrawingVersion = (elements: readonly ExcalidrawElement[]) =>
+  elements.reduce((acc, el) => acc + el.version, 0);
 
-export function getNonDeletedElements(elements: readonly ExcalidrawElement[]) {
-  return elements.filter(
+export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter(
     (element) => !element.isDeleted,
   ) as readonly NonDeletedExcalidrawElement[];
-}
 
-export function isNonDeletedElement<T extends ExcalidrawElement>(
+export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
-): element is NonDeleted<T> {
-  return !element.isDeleted;
-}
+): element is NonDeleted<T> => !element.isDeleted;

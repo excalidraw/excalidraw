@@ -11,7 +11,7 @@ import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
 
-export function SelectedShapeActions({
+export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
@@ -21,7 +21,7 @@ export function SelectedShapeActions({
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
-}) {
+}) => {
   const targetElements = getTargetElement(
     getNonDeletedElements(elements),
     appState,
@@ -45,7 +45,7 @@ export function SelectedShapeActions({
         targetElements.some((element) => hasStroke(element.type))) && (
         <>
           {renderAction("changeStrokeWidth")}
-
+          {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>
       )}
@@ -87,65 +87,82 @@ export function SelectedShapeActions({
       )}
     </div>
   );
-}
+};
 
-export function ShapesSwitcher({
+const LIBRARY_ICON = (
+  // fa-th-large
+  <svg viewBox="0 0 512 512">
+    <path d="M296 32h192c13.255 0 24 10.745 24 24v160c0 13.255-10.745 24-24 24H296c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24zm-80 0H24C10.745 32 0 42.745 0 56v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24zM0 296v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V296c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm296 184h192c13.255 0 24-10.745 24-24V296c0-13.255-10.745-24-24-24H296c-13.255 0-24 10.745-24 24v160c0 13.255 10.745 24 24 24z" />
+  </svg>
+);
+
+export const ShapesSwitcher = ({
   elementType,
   setAppState,
+  isLibraryOpen,
 }: {
   elementType: ExcalidrawElement["type"];
-  setAppState: any;
-}) {
-  return (
-    <>
-      {SHAPES.map(({ value, icon }, index) => {
-        const label = t(`toolBar.${value}`);
-        const shortcut = `${capitalizeString(value)[0]} ${t(
-          "shortcutsDialog.or",
-        )} ${index + 1}`;
-        return (
-          <ToolButton
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={elementType === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${shortcut}`}
-            keyBindingLabel={`${index + 1}`}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={`${label[0]} ${index + 1}`}
-            data-testid={value}
-            onChange={() => {
-              setAppState({
-                elementType: value,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              setCursorForShape(value);
-              setAppState({});
-            }}
-          ></ToolButton>
-        );
-      })}
-    </>
-  );
-}
+  setAppState: (appState: Partial<AppState>) => void;
+  isLibraryOpen: boolean;
+}) => (
+  <>
+    {SHAPES.map(({ value, icon, key }, index) => {
+      const label = t(`toolBar.${value}`);
+      const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
+        index + 1
+      }`;
+      return (
+        <ToolButton
+          key={value}
+          type="radio"
+          icon={icon}
+          checked={elementType === value}
+          name="editor-current-shape"
+          title={`${capitalizeString(label)} — ${shortcut}`}
+          keyBindingLabel={`${index + 1}`}
+          aria-label={capitalizeString(label)}
+          aria-keyshortcuts={`${key} ${index + 1}`}
+          data-testid={value}
+          onChange={() => {
+            setAppState({
+              elementType: value,
+              multiElement: null,
+              selectedElementIds: {},
+            });
+            setCursorForShape(value);
+            setAppState({});
+          }}
+        />
+      );
+    })}
+    <ToolButton
+      type="button"
+      icon={LIBRARY_ICON}
+      name="editor-library"
+      keyBindingLabel="9"
+      aria-keyshortcuts="9"
+      title={`${capitalizeString(t("toolBar.library"))} — 9`}
+      aria-label={capitalizeString(t("toolBar.library"))}
+      onClick={() => {
+        setAppState({ isLibraryOpen: !isLibraryOpen });
+      }}
+    />
+  </>
+);
 
-export function ZoomActions({
+export const ZoomActions = ({
   renderAction,
   zoom,
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: number;
-}) {
-  return (
-    <Stack.Col gap={1}>
-      <Stack.Row gap={1} align="center">
-        {renderAction("zoomIn")}
-        {renderAction("zoomOut")}
-        {renderAction("resetZoom")}
-        <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
-      </Stack.Row>
-    </Stack.Col>
-  );
-}
+}) => (
+  <Stack.Col gap={1}>
+    <Stack.Row gap={1} align="center">
+      {renderAction("zoomIn")}
+      {renderAction("zoomOut")}
+      {renderAction("resetZoom")}
+      <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
+    </Stack.Row>
+  </Stack.Col>
+);

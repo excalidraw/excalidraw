@@ -2,6 +2,8 @@
   "labels": {
     "paste": "لصق",
     "selectAll": "",
+    "multiSelect": "",
+    "moveCanvas": "",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة كـ PNG",
     "copyAsSvg": "",
@@ -16,6 +18,10 @@
     "background": "الخلفية",
     "fill": "التعبئة",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "الإمالة",
     "opacity": "الشفافية",
     "textAlign": "",
@@ -54,7 +60,12 @@
     "duplicateSelection": "",
     "untitled": "",
     "name": "",
-    "madeWithExcalidraw": ""
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -64,6 +75,7 @@
     "copyToClipboard": "نسخ إلى الحافظة",
     "copyPngToClipboard": "نسخ الـ PNG الى الحافظة",
     "save": "حفظ",
+    "saveAs": "",
     "load": "تحميل",
     "getShareableLink": "احصل على رابط المشاركة",
     "close": "إغلاق",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
+    "draw": "",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
+    "freeDraw": "",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "",
-    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران"
+    "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
@@ -133,9 +150,9 @@
     "button_startSession": "بدء الجلسة",
     "button_stopSession": "إيقاف الجلسة",
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
-    "desc_persistenceWarning": "لاحظ أن بيانات الجلسة يتم تقاسمها عبر المتعاونين بطريقة P2P، ولا تستمر في خادمنا. وبالتالي، إذا قطعت كل اتصال، فستفقد البيانات ما لم تقم بتصديرها إلى ملف أو رابط قابل للمشاركة.",
+    "desc_persistenceWarning": "",
     "desc_shareLink": "شارك هذا الرابط مع أي شخص تريده ان يشاركك الجلسة:",
-    "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم."
+    "desc_exitSession": ""
   },
   "errorDialog": {
     "title": "خطأ"
@@ -159,5 +176,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

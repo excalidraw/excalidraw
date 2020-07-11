@@ -4,14 +4,15 @@ import { newTextElement } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS, measureText } from "../utils";
+import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
+import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-export function exportToCanvas(
+export const exportToCanvas = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   {
@@ -27,16 +28,13 @@ export function exportToCanvas(
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => any = function (
-    width,
-    height,
-  ) {
+  createCanvas: (width: number, height: number) => any = (width, height) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
     return tempCanvas;
   },
-) {
+) => {
   let sceneElements = elements;
   if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
@@ -74,13 +72,14 @@ export function exportToCanvas(
       renderScrollbars: false,
       renderSelection: false,
       renderOptimizations: false,
+      renderGrid: false,
     },
   );
 
   return tempCanvas;
-}
+};
 
-export function exportToSvg(
+export const exportToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
@@ -93,7 +92,7 @@ export function exportToSvg(
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-): SVGSVGElement {
+): SVGSVGElement => {
   let sceneElements = elements;
   if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
@@ -148,24 +147,23 @@ export function exportToSvg(
   });
 
   return svgRoot;
-}
+};
 
-function getWatermarkElement(maxX: number, maxY: number) {
-  const text = t("labels.madeWithExcalidraw");
-  const font = "16px Virgil";
-  const { width: textWidth } = measureText(text, font);
-
+const getWatermarkElement = (maxX: number, maxY: number) => {
   return newTextElement({
-    text,
-    font,
-    textAlign: "center",
-    x: maxX - textWidth / 2,
+    text: t("labels.madeWithExcalidraw"),
+    fontSize: 16,
+    fontFamily: DEFAULT_FONT_FAMILY,
+    textAlign: "right",
+    verticalAlign: DEFAULT_VERTICAL_ALIGN,
+    x: maxX,
     y: maxY + 16,
     strokeColor: oc.gray[5],
     backgroundColor: "transparent",
     fillStyle: "hachure",
     strokeWidth: 1,
+    strokeStyle: "solid",
     roughness: 1,
     opacity: 100,
   });
-}
+};

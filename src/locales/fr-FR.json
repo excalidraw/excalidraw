@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
+    "multiSelect": "",
+    "moveCanvas": "Déplacer le canevas",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
@@ -16,6 +18,10 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du contour",
+    "strokeStyle": "Style du trait",
+    "strokeStyle_solid": "Plein",
+    "strokeStyle_dashed": "Tirets",
+    "strokeStyle_dotted": "Pointillé",
     "sloppiness": "Style de tracé",
     "opacity": "Opacité",
     "textAlign": "Alignement du texte",
@@ -23,7 +29,7 @@
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
-    "addWatermark": "",
+    "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans titre",
     "name": "Nom",
-    "madeWithExcalidraw": ""
+    "yourName": "Votre nom",
+    "madeWithExcalidraw": "Fabriqué avec Excalidraw",
+    "group": "Grouper la sélection",
+    "ungroup": "Dégrouper la sélection",
+    "collaborators": "Collaborateurs",
+    "toggleGridMode": "Basculer le mode grille"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -64,6 +75,7 @@
     "copyToClipboard": "Copier dans le presse-papier",
     "copyPngToClipboard": "Copier le PNG dans le presse-papier",
     "save": "Sauvegarder",
+    "saveAs": "Enregistrer sous",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",
@@ -77,7 +89,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer le collaboration en temps réel",
+    "roomDialog": "Démarrer la collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
     "toggleZenMode": "Activer/désactiver le mode zen",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
+    "draw": "Dessin libre",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
+    "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "resize": "",
-    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation"
+    "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
+    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
+    "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
@@ -133,7 +150,7 @@
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
-    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si tous les participants se déconnecte, vous perdrez les données à moins de les exporter vers un fichier ou un lien partageable.",
+    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si vous vous déconnectez tous, vous perdrez les données sauf si vous les exportez vers un fichier ou un lien de partage.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   },
@@ -151,13 +168,17 @@
     "editor": "Éditeur",
     "view": "Afficher",
     "blog": "Lisez notre blog",
-    "howto": "Suivez notre guides",
+    "howto": "Suivez nos guides",
     "github": "Vous avez trouvé un problème ? Envoyer",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
-    "zoomToFit": ""
+    "zoomToFit": "Zoomer pour visualiser tous les éléments"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
+  },
+  "charts": {
+    "noNumericColumn": "Vous avez collé une feuille de calcul sans données numérique.",
+    "tooManyColumns": "Vous avez collé une feuille de calcul avec plus de deux colonnes."
   }
 }

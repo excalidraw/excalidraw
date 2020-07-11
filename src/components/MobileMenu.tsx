@@ -17,6 +17,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
 import { isBoolable } from "../actions/bool/commonBoolHelpers";
+import { UserList } from "./UserList";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -28,9 +29,10 @@ type MobileMenuProps = {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
+  canvas: HTMLCanvasElement | null;
 };
 
-export function MobileMenu({
+export const MobileMenu = ({
   appState,
   elements,
   actionManager,
@@ -40,120 +42,139 @@ export function MobileMenu({
   onUsernameChange,
   onRoomDestroy,
   onLockToggle,
-}: MobileMenuProps) {
-  return (
-    <>
-      {appState.isLoading && <LoadingMessage />}
-      <FixedSideContainer side="top">
-        <Section heading="shapes">
-          {(heading) => (
-            <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1}>
-                <Island padding={1}>
-                  {heading}
-                  <Stack.Row gap={1}>
-                    <ShapesSwitcher
-                      elementType={appState.elementType}
-                      setAppState={setAppState}
-                    />
-                  </Stack.Row>
-                </Island>
-                <LockIcon
-                  checked={appState.elementLocked}
-                  onChange={onLockToggle}
-                  title={t("toolBar.lock")}
-                />
-              </Stack.Row>
-            </Stack.Col>
-          )}
-        </Section>
-        <HintViewer appState={appState} elements={elements} />
-      </FixedSideContainer>
-      <div
-        className="App-bottom-bar"
-        style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
-          marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
-          marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
-        }}
-      >
-        <Island padding={3}>
-          {appState.openMenu === "canvas" ? (
-            <Section className="App-mobile-menu" heading="canvasActions">
-              <div className="panelColumn">
-                <Stack.Col gap={4}>
-                  {actionManager.renderAction("loadScene")}
-                  {actionManager.renderAction("saveScene")}
-                  {exportButton}
-                  {actionManager.renderAction("clearCanvas")}
-                  <RoomDialog
-                    isCollaborating={appState.isCollaborating}
-                    collaboratorCount={appState.collaborators.size}
-                    username={appState.username}
-                    onUsernameChange={onUsernameChange}
-                    onRoomCreate={onRoomCreate}
-                    onRoomDestroy={onRoomDestroy}
+  canvas,
+}: MobileMenuProps) => (
+  <>
+    {appState.isLoading && <LoadingMessage />}
+    <FixedSideContainer side="top">
+      <Section heading="shapes">
+        {(heading) => (
+          <Stack.Col gap={4} align="center">
+            <Stack.Row gap={1}>
+              <Island padding={1}>
+                {heading}
+                <Stack.Row gap={1}>
+                  <ShapesSwitcher
+                    elementType={appState.elementType}
+                    setAppState={setAppState}
+                    isLibraryOpen={appState.isLibraryOpen}
                   />
-                  {actionManager.renderAction("changeViewBackgroundColor")}
-                  <fieldset>
-                    <legend>{t("labels.language")}</legend>
-                    <LanguageList
-                      onChange={(lng) => {
-                        setLanguage(lng);
-                        setAppState({});
-                      }}
-                    />
-                  </fieldset>
-                </Stack.Col>
-              </div>
-            </Section>
-          ) : appState.openMenu === "shape" &&
-            showSelectedShapeActions(appState, elements) ? (
-            <Section className="App-mobile-menu" heading="selectedShapeActions">
-              <SelectedShapeActions
-                appState={appState}
-                elements={elements}
-                renderAction={actionManager.renderAction}
-                elementType={appState.elementType}
+                </Stack.Row>
+              </Island>
+              <LockIcon
+                checked={appState.elementLocked}
+                onChange={onLockToggle}
+                title={t("toolBar.lock")}
               />
-            </Section>
-          ) : appState.openMenu === "path" && isBoolable(elements, appState) ? (
-            <Section className="App-mobile-menu" heading="selectedShapeActions">
-              <div className="panelColumn">
-                <div className="buttonList">
-                  {actionManager.renderAction("shapeUnion")}
-                  {actionManager.renderAction("shapeDifference")}
-                  {actionManager.renderAction("shapeIntersection")}
-                  {actionManager.renderAction("shapeExclusion")}
-                </div>
-              </div>
-            </Section>
-          ) : null}
-          <footer className="App-toolbar">
-            <div className="App-toolbar-content">
-              {actionManager.renderAction("toggleCanvasMenu")}
-              {actionManager.renderAction("toggleEditMenu")}
-              {actionManager.renderAction("undo")}
-              {actionManager.renderAction("redo")}
-              {actionManager.renderAction("togglePathMenu")}
-              {actionManager.renderAction(
-                appState.multiElement ? "finalize" : "duplicateSelection",
-              )}
-              {actionManager.renderAction("deleteSelectedElements")}
+            </Stack.Row>
+          </Stack.Col>
+        )}
+      </Section>
+      <HintViewer appState={appState} elements={elements} />
+    </FixedSideContainer>
+    <div
+      className="App-bottom-bar"
+      style={{
+        marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+        marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+        marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+      }}
+    >
+      <Island padding={3}>
+        {appState.openMenu === "canvas" ? (
+          <Section className="App-mobile-menu" heading="canvasActions">
+            <div className="panelColumn">
+              <Stack.Col gap={4}>
+                {actionManager.renderAction("loadScene")}
+                {actionManager.renderAction("saveScene")}
+                {actionManager.renderAction("saveAsScene")}
+                {exportButton}
+                {actionManager.renderAction("clearCanvas")}
+                <RoomDialog
+                  isCollaborating={appState.isCollaborating}
+                  collaboratorCount={appState.collaborators.size}
+                  username={appState.username}
+                  onUsernameChange={onUsernameChange}
+                  onRoomCreate={onRoomCreate}
+                  onRoomDestroy={onRoomDestroy}
+                />
+                {actionManager.renderAction("changeViewBackgroundColor")}
+                <fieldset>
+                  <legend>{t("labels.language")}</legend>
+                  <LanguageList
+                    onChange={async (lng) => {
+                      await setLanguage(lng);
+                      setAppState({});
+                    }}
+                  />
+                </fieldset>
+                <fieldset>
+                  <legend>{t("labels.collaborators")}</legend>
+                  <UserList mobile>
+                    {Array.from(appState.collaborators)
+                      // Collaborator is either not initialized or is actually the current user.
+                      .filter(([_, client]) => Object.keys(client).length !== 0)
+                      .map(([clientId, client]) => (
+                        <React.Fragment key={clientId}>
+                          {actionManager.renderAction(
+                            "goToCollaborator",
+                            clientId,
+                          )}
+                        </React.Fragment>
+                      ))}
+                  </UserList>
+                </fieldset>
+              </Stack.Col>
             </div>
-            {appState.scrolledOutside && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({ ...calculateScrollCenter(elements) });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
+          </Section>
+        ) : appState.openMenu === "shape" &&
+          showSelectedShapeActions(appState, elements) ? (
+          <Section className="App-mobile-menu" heading="selectedShapeActions">
+            <SelectedShapeActions
+              appState={appState}
+              elements={elements}
+              renderAction={actionManager.renderAction}
+              elementType={appState.elementType}
+            />
+          </Section>
+        ) : appState.openMenu === "path" && isBoolable(elements, appState) ? (
+          <Section className="App-mobile-menu" heading="selectedShapeActions">
+            <div className="panelColumn">
+              <div className="buttonList">
+                {actionManager.renderAction("shapeUnion")}
+                {actionManager.renderAction("shapeDifference")}
+                {actionManager.renderAction("shapeIntersection")}
+                {actionManager.renderAction("shapeExclusion")}
+              </div>
+            </div>
+          </Section>
+        ) : null}
+        <footer className="App-toolbar">
+          <div className="App-toolbar-content">
+            {actionManager.renderAction("toggleCanvasMenu")}
+            {actionManager.renderAction("toggleEditMenu")}
+            {actionManager.renderAction("undo")}
+            {actionManager.renderAction("redo")}
+            {actionManager.renderAction("togglePathMenu")}
+            {actionManager.renderAction(
+              appState.multiElement ? "finalize" : "duplicateSelection",
             )}
-          </footer>
-        </Island>
-      </div>
-    </>
-  );
-}
+            {actionManager.renderAction("deleteSelectedElements")}
+          </div>
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({
+                  ...calculateScrollCenter(elements, appState, canvas),
+                });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
+        </footer>
+      </Island>
+    </div>
+  </>
+);

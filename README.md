@@ -10,6 +10,7 @@
     <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
+    <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
   </p>
 </div>
 
@@ -48,24 +49,28 @@ git clone https://github.com/excalidraw/excalidraw.git
 | `npm run test:update` | Update test snapshots             |
 | `npm run test:code`   | Test for formatting with Prettier |
 
-### Docker Installation
-
-A production-ready version for deploying to e.g. Kubernetes or OpenShift can be built using Docker.
-
 #### Docker Compose
+
+You can use docker-compose to work on excalidraw locally if you don't want to setup a Node.js env.
 
 ```sh
 docker-compose up --build -d
 ```
 
-#### Native Docker
+## Self hosting
+
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
 
 ```sh
 docker build -t excalidraw/excalidraw .
 docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
 ```
 
-After building the image and running the container, open <http://localhost:5000> to see the application.
+The Docker image is free of analytics and other tracking libraries.
+
+**At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
+
+We are working towards providing a full-fledged solution for self hosting your own Excalidraw.
 
 ## Contributing
 
@@ -75,11 +80,13 @@ Pull requests are welcome. For major changes, please [open an issue](https://git
 
 To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
 
+Translations will be available on the app if they exceed a certain threshold of completion (currently 85%).
+
 ## Excalidraw is built using these awesome tools
 
 - [React](https://reactjs.org)
 - [Rough.js](https://roughjs.com)
-- [TypeScript](https://typescriptlang.org)
+- [TypeScript](https://www.typescriptlang.org)
 - [Vercel](https://vercel.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.

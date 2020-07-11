@@ -2,6 +2,8 @@
   "labels": {
     "paste": "הדבק",
     "selectAll": "בחר הכל",
+    "multiSelect": "",
+    "moveCanvas": "",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
@@ -16,6 +18,10 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
+    "strokeStyle": "סגנון קו המתאר",
+    "strokeStyle_solid": "מלא",
+    "strokeStyle_dashed": "מקווקו",
+    "strokeStyle_dotted": "מנוקד",
     "sloppiness": "סגנון",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
@@ -54,7 +60,12 @@
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
-    "madeWithExcalidraw": "נוצר באמצעות Excalidraw"
+    "yourName": "שם",
+    "madeWithExcalidraw": "נוצר באמצעות Excalidraw",
+    "group": "אחד לקבוצה",
+    "ungroup": "פרק קבוצה",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -64,6 +75,7 @@
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "save": "שמור",
+    "saveAs": "",
     "load": "טען",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "בחירה",
+    "draw": "ציור חופשי",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
+    "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
-    "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב"
+    "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
@@ -135,7 +152,7 @@
     "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
     "desc_persistenceWarning": "שים לב ששיתוף הלוח נעשה בין המשתתפים ממחשב למחשב באופן ישיר, ולא נשמר בשרתים שלנו. לכן, אם כולכם תתנתקו, המידע יאבד אלא אם כן תייצא אותו לקובץ או באמצעות לינק הניתן לשיתוף.",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
-    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תןכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
+    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
   },
   "errorDialog": {
     "title": "שגיאה"
@@ -159,5 +176,9 @@
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

@@ -1,37 +1,106 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
-import { clearAppStatePropertiesForHistory } from "./appState";
-import { newElementWith } from "./element/mutateElement";
 import { isLinearElement } from "./element/typeChecks";
+import { deepCopyElement } from "./element/newElement";
 
-type Result = {
-  appState: AppState;
+export interface HistoryEntry {
+  appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
   elements: ExcalidrawElement[];
+}
+
+interface DehydratedExcalidrawElement {
+  id: string;
+  versionNonce: number;
+}
+
+interface DehydratedHistoryEntry {
+  appState: string;
+  elements: DehydratedExcalidrawElement[];
+}
+
+const clearAppStatePropertiesForHistory = (appState: AppState) => {
+  return {
+    selectedElementIds: appState.selectedElementIds,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    editingLinearElement: appState.editingLinearElement,
+    editingGroupId: appState.editingGroupId,
+    name: appState.name,
+  };
 };
 
 export class SceneHistory {
+  private elementCache = new Map<string, Map<number, ExcalidrawElement>>();
   private recording: boolean = true;
-  private stateHistory: string[] = [];
-  private redoStack: string[] = [];
+  private stateHistory: DehydratedHistoryEntry[] = [];
+  private redoStack: DehydratedHistoryEntry[] = [];
+  private lastEntry: HistoryEntry | null = null;
+
+  private hydrateHistoryEntry({
+    appState,
+    elements,
+  }: DehydratedHistoryEntry): HistoryEntry {
+    return {
+      appState: JSON.parse(appState),
+      elements: elements.map((dehydratedExcalidrawElement) => {
+        const element = this.elementCache
+          .get(dehydratedExcalidrawElement.id)
+          ?.get(dehydratedExcalidrawElement.versionNonce);
+        if (!element) {
+          throw new Error(
+            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.versionNonce}`,
+          );
+        }
+        return element;
+      }),
+    };
+  }
+
+  private dehydrateHistoryEntry({
+    appState,
+    elements,
+  }: HistoryEntry): DehydratedHistoryEntry {
+    return {
+      appState: JSON.stringify(appState),
+      elements: elements.map((element: ExcalidrawElement) => {
+        if (!this.elementCache.has(element.id)) {
+          this.elementCache.set(element.id, new Map());
+        }
+        const versions = this.elementCache.get(element.id)!;
+        if (!versions.has(element.versionNonce)) {
+          versions.set(element.versionNonce, deepCopyElement(element));
+        }
+        return {
+          id: element.id,
+          versionNonce: element.versionNonce,
+        };
+      }),
+    };
+  }
 
   getSnapshotForTest() {
     return {
       recording: this.recording,
-      stateHistory: this.stateHistory.map((s) => JSON.parse(s)),
-      redoStack: this.redoStack.map((s) => JSON.parse(s)),
+      stateHistory: this.stateHistory.map((dehydratedHistoryEntry) =>
+        this.hydrateHistoryEntry(dehydratedHistoryEntry),
+      ),
+      redoStack: this.redoStack.map((dehydratedHistoryEntry) =>
+        this.hydrateHistoryEntry(dehydratedHistoryEntry),
+      ),
     };
   }
 
   clear() {
     this.stateHistory.length = 0;
     this.redoStack.length = 0;
+    this.lastEntry = null;
+    this.elementCache.clear();
   }
 
-  private generateEntry(
+  private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
-  ) {
-    return JSON.stringify({
+  ): DehydratedHistoryEntry =>
+    this.dehydrateHistoryEntry({
       appState: clearAppStatePropertiesForHistory(appState),
       elements: elements.reduce((elements, element) => {
         if (
@@ -48,50 +117,82 @@ export class SceneHistory {
             return elements;
           }
 
-          elements.push(
-            newElementWith(element, {
-              // don't store last point if not committed
-              points:
-                element.lastCommittedPoint !==
-                element.points[element.points.length - 1]
-                  ? element.points.slice(0, -1)
-                  : element.points,
-              // don't regenerate versionNonce else this will short-circuit our
-              //  bail-on-no-change logic in pushEntry()
-              versionNonce: element.versionNonce,
-            }),
-          );
+          elements.push({
+            ...element,
+            // don't store last point if not committed
+            points:
+              element.lastCommittedPoint !==
+              element.points[element.points.length - 1]
+                ? element.points.slice(0, -1)
+                : element.points,
+          });
         } else {
-          elements.push(
-            newElementWith(element, { versionNonce: element.versionNonce }),
-          );
+          elements.push(element);
         }
         return elements;
       }, [] as Mutable<typeof elements>),
     });
+
+  shouldCreateEntry(nextEntry: HistoryEntry): boolean {
+    const { lastEntry } = this;
+
+    if (!lastEntry) {
+      return true;
+    }
+
+    if (nextEntry.elements.length !== lastEntry.elements.length) {
+      return true;
+    }
+
+    // loop from right to left as changes are likelier to happen on new elements
+    for (let i = nextEntry.elements.length - 1; i > -1; i--) {
+      const prev = nextEntry.elements[i];
+      const next = lastEntry.elements[i];
+      if (
+        !prev ||
+        !next ||
+        prev.id !== next.id ||
+        prev.versionNonce !== next.versionNonce
+      ) {
+        return true;
+      }
+    }
+
+    // note: this is safe because entry's appState is guaranteed no excess props
+    let key: keyof typeof nextEntry.appState;
+    for (key in nextEntry.appState) {
+      if (key === "editingLinearElement") {
+        if (
+          nextEntry.appState[key]?.elementId ===
+          lastEntry.appState[key]?.elementId
+        ) {
+          continue;
+        }
+      }
+      if (key === "selectedElementIds") {
+        continue;
+      }
+      if (nextEntry.appState[key] !== lastEntry.appState[key]) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    const newEntry = this.generateEntry(appState, elements);
-    if (
-      this.stateHistory.length > 0 &&
-      this.stateHistory[this.stateHistory.length - 1] === newEntry
-    ) {
-      // If the last entry is the same as this one, ignore it
-      return;
-    }
+    const newEntryDehydrated = this.generateEntry(appState, elements);
+    const newEntry: HistoryEntry = this.hydrateHistoryEntry(newEntryDehydrated);
 
-    this.stateHistory.push(newEntry);
+    if (newEntry) {
+      if (!this.shouldCreateEntry(newEntry)) {
+        return;
+      }
 
-    // As a new entry was pushed, we invalidate the redo stack
-    this.clearRedoStack();
-  }
-
-  restoreEntry(entry: string) {
-    try {
-      return JSON.parse(entry);
-    } catch {
-      return null;
+      this.stateHistory.push(newEntryDehydrated);
+      this.lastEntry = newEntry;
+      // As a new entry was pushed, we invalidate the redo stack
+      this.clearRedoStack();
     }
   }
 
@@ -99,7 +200,7 @@ export class SceneHistory {
     this.redoStack.splice(0, this.redoStack.length);
   }
 
-  redoOnce(): Result | null {
+  redoOnce(): HistoryEntry | null {
     if (this.redoStack.length === 0) {
       return null;
     }
@@ -108,13 +209,13 @@ export class SceneHistory {
 
     if (entryToRestore !== undefined) {
       this.stateHistory.push(entryToRestore);
-      return this.restoreEntry(entryToRestore);
+      return this.hydrateHistoryEntry(entryToRestore);
     }
 
     return null;
   }
 
-  undoOnce(): Result | null {
+  undoOnce(): HistoryEntry | null {
     if (this.stateHistory.length === 1) {
       return null;
     }
@@ -125,10 +226,25 @@ export class SceneHistory {
 
     if (currentEntry !== undefined) {
       this.redoStack.push(currentEntry);
-      return this.restoreEntry(entryToRestore);
+      return this.hydrateHistoryEntry(entryToRestore);
     }
 
     return null;
+  }
+
+  /**
+   * Updates history's `lastEntry` to latest app state. This is necessary
+   *  when doing undo/redo which itself doesn't commit to history, but updates
+   *  app state in a way that would break `shouldCreateEntry` which relies on
+   *  `lastEntry` to reflect last comittable history state.
+   * We can't update `lastEntry` from within history when calling undo/redo
+   *  because the action potentially mutates appState/elements before storing
+   *  it.
+   */
+  setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
+    this.lastEntry = this.hydrateHistoryEntry(
+      this.generateEntry(appState, elements),
+    );
   }
 
   // Suspicious that this is called so many places. Seems error-prone.

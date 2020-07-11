@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Colar",
     "selectAll": "Selecionar tudo",
+    "multiSelect": "Adicionar elemento à seleção",
+    "moveCanvas": "Mover tela",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
@@ -16,6 +18,10 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
+    "strokeStyle": "Estilo de traço",
+    "strokeStyle_solid": "Sólido",
+    "strokeStyle_dashed": "Tracejado",
+    "strokeStyle_dotted": "Pontilhado",
     "sloppiness": "Desleixo",
     "opacity": "Opacidade",
     "textAlign": "Alinhamento do texto",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
-    "madeWithExcalidraw": "Feito com Excalidraw"
+    "yourName": "Seu nome",
+    "madeWithExcalidraw": "Feito com Excalidraw",
+    "group": "Agrupar seleção",
+    "ungroup": "Desagrupar seleção",
+    "collaborators": "Colaboradores",
+    "toggleGridMode": "Alternar modo de grade"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -64,6 +75,7 @@
     "copyToClipboard": "Copiar para o clipboard",
     "copyPngToClipboard": "Copiar PNG para área de transferência",
     "save": "Guardar",
+    "saveAs": "Salvar como",
     "load": "Carregar",
     "getShareableLink": "Obter um link de partilha",
     "close": "Fechar",
@@ -79,14 +91,14 @@
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
-    "toggleFullScreen": "Alterar tela cheia",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleFullScreen": "Alternar tela cheia",
+    "toggleZenMode": "Alternar modo zen",
+    "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
-    "couldNotCreateShareableLink": "Não foi possível criar um link de partilha.",
-    "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo",
+    "couldNotCreateShareableLink": "Não foi possível criar um link de compartilhamento.",
+    "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
+    "draw": "Desenho livre",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -110,15 +123,19 @@
   },
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "freeDraw": "Toque e arraste, solte quando terminar",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
-    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira"
+    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
+    "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
+    "lineEditor_pointSelected": "Pressione Deletar para remover ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
+    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
-    "clearCanvasMessage_button": "limpar a tela.",
+    "clearCanvasMessage_button": "limpando a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
     "trackedToSentry_pre": "O erro com o identificador ",
     "trackedToSentry_post": " foi rastreado no nosso sistema.",
@@ -133,9 +150,9 @@
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
-    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, perderão os dados, a menos que os exportem para um arquivo ou um link compartilhável.",
+    "desc_persistenceWarning": "Observe que os dados da cena são compartilhados entre os colaboradores de maneira P2P e não permanecem no nosso servidor. Portanto, se todos vocês se desconectarem, você perderá os dados, a menos que os exporte para um arquivo ou um link de partilha.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
-    "desc_exitSession": "A interrupção da sessão o desconectará da sala, mas poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
+    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
   },
   "errorDialog": {
     "title": "Erro"
@@ -159,5 +176,9 @@
   },
   "encrypted": {
     "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão."
+  },
+  "charts": {
+    "noNumericColumn": "Você colou uma planilha sem uma coluna numérica.",
+    "tooManyColumns": "Você colou uma planilha com mais de duas colunas."
   }
 }

@@ -167,15 +167,3 @@
     right: 2px;
   }
 }
-
-.zen-mode-visibility {
-  visibility: visible;
-  opacity: 1;
-  transition: visibility 0s linear 0s, opacity 0.5s;
-
-  &.hidden {
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s linear 300ms, opacity 0.5s;
-  }
-}

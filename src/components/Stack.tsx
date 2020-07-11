@@ -10,13 +10,13 @@ type StackProps = {
   className?: string | boolean;
 };
 
-function RowStack({
+const RowStack = ({
   children,
   gap,
   align,
   justifyContent,
   className,
-}: StackProps) {
+}: StackProps) => {
   return (
     <div
       className={`Stack Stack_horizontal ${className || ""}`}
@@ -31,15 +31,15 @@ function RowStack({
       {children}
     </div>
   );
-}
+};
 
-function ColStack({
+const ColStack = ({
   children,
   gap,
   align,
   justifyContent,
   className,
-}: StackProps) {
+}: StackProps) => {
   return (
     <div
       className={`Stack Stack_vertical ${className || ""}`}
@@ -54,7 +54,7 @@ function ColStack({
       {children}
     </div>
   );
-}
+};
 
 export default {
   Row: RowStack,

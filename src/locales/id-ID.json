@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Tempel",
     "selectAll": "Pilih semua",
+    "multiSelect": "",
+    "moveCanvas": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
     "copyAsSvg": "Salin ke Papan Klip Sebagai SVG",
@@ -16,6 +18,10 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "",
+    "strokeStyle": "",
+    "strokeStyle_solid": "",
+    "strokeStyle_dashed": "",
+    "strokeStyle_dotted": "",
     "sloppiness": "Sloppiness",
     "opacity": "Opasitas",
     "textAlign": "Perataan Teks",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
-    "madeWithExcalidraw": ""
+    "yourName": "",
+    "madeWithExcalidraw": "",
+    "group": "",
+    "ungroup": "",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -64,6 +75,7 @@
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke Papan Klip",
     "save": "Simpan",
+    "saveAs": "",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
     "close": "Tutup",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
+    "draw": "",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
+    "freeDraw": "",
     "linearElementMulti": "",
     "resize": "",
-    "rotate": ""
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
@@ -159,5 +176,9 @@
   },
   "encrypted": {
     "tooltip": ""
+  },
+  "charts": {
+    "noNumericColumn": "",
+    "tooManyColumns": ""
   }
 }

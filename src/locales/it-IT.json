@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Incolla",
     "selectAll": "Seleziona tutto",
+    "multiSelect": "",
+    "moveCanvas": "",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -16,6 +18,10 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
+    "strokeStyle": "Stile del tratto",
+    "strokeStyle_solid": "Pieno",
+    "strokeStyle_dashed": "Tratteggiato",
+    "strokeStyle_dotted": "Punteggiato",
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
-    "madeWithExcalidraw": "Creato con Excalidraw"
+    "yourName": "Il vostro nome",
+    "madeWithExcalidraw": "Creato con Excalidraw",
+    "group": "Crea gruppo da selezione",
+    "ungroup": "Dividi gruppo da selezione",
+    "collaborators": "",
+    "toggleGridMode": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -64,6 +75,7 @@
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "save": "Salva",
+    "saveAs": "Salva con nome",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
@@ -80,8 +92,8 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleZenMode": "Attiva/Disattiva modalità zen",
+    "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Selezione",
+    "draw": "Disegno libero",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
+    "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "",
-    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione"
+    "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
+    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
+    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
@@ -133,7 +150,7 @@
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
-    "desc_persistenceWarning": "Nota che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Quindi, se tutti vi disconnetterete, perderete i dati a meno che non li si esporti in un file o in un link condivisibile.",
+    "desc_persistenceWarning": "Tieni presente che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Pertanto, se vi disconnettere tutti, perderete i dati a meno che non li esportiate in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
     "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   },
@@ -158,6 +175,10 @@
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
+  },
+  "charts": {
+    "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
+    "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
   }
 }

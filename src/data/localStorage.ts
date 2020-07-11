@@ -1,13 +1,56 @@
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 import { clearAppStateForLocalStorage } from "../appState";
 import { restore } from "./restore";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
 const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
+const LOCAL_STORAGE_KEY_LIBRARY = "excalidraw-library";
 
-export function saveUsernameToLocalStorage(username: string) {
+let _LATEST_LIBRARY_ITEMS: LibraryItems | null = null;
+export const loadLibrary = (): Promise<LibraryItems> => {
+  return new Promise(async (resolve) => {
+    if (_LATEST_LIBRARY_ITEMS) {
+      return resolve(JSON.parse(JSON.stringify(_LATEST_LIBRARY_ITEMS)));
+    }
+
+    try {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
+      if (!data) {
+        return resolve([]);
+      }
+
+      const items = (JSON.parse(data) as ExcalidrawElement[][]).map(
+        (elements) => restore(elements, null).elements,
+      ) as Mutable<LibraryItems>;
+
+      // clone to ensure we don't mutate the cached library elements in the app
+      _LATEST_LIBRARY_ITEMS = JSON.parse(JSON.stringify(items));
+
+      resolve(items);
+    } catch (e) {
+      console.error(e);
+      resolve([]);
+    }
+  });
+};
+
+export const saveLibrary = (items: LibraryItems) => {
+  const prevLibraryItems = _LATEST_LIBRARY_ITEMS;
+  try {
+    const serializedItems = JSON.stringify(items);
+    // cache optimistically so that consumers have access to the latest
+    //  immediately
+    _LATEST_LIBRARY_ITEMS = JSON.parse(serializedItems);
+    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, serializedItems);
+  } catch (e) {
+    _LATEST_LIBRARY_ITEMS = prevLibraryItems;
+    console.error(e);
+  }
+};
+
+export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
       LOCAL_STORAGE_KEY_COLLAB,
@@ -17,9 +60,9 @@ export function saveUsernameToLocalStorage(username: string) {
     // Unable to access window.localStorage
     console.error(error);
   }
-}
+};
 
-export function restoreUsernameFromLocalStorage(): string | null {
+export const restoreUsernameFromLocalStorage = (): string | null => {
   try {
     const data = localStorage.getItem(LOCAL_STORAGE_KEY_COLLAB);
     if (data) {
@@ -31,12 +74,12 @@ export function restoreUsernameFromLocalStorage(): string | null {
   }
 
   return null;
-}
+};
 
-export function saveToLocalStorage(
+export const saveToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) {
+) => {
   try {
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
@@ -50,9 +93,9 @@ export function saveToLocalStorage(
     // Unable to access window.localStorage
     console.error(error);
   }
-}
+};
 
-export function restoreFromLocalStorage() {
+export const restoreFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
 
@@ -80,10 +123,11 @@ export function restoreFromLocalStorage() {
       // If we're retrieving from local storage, we should not be collaborating
       appState.isCollaborating = false;
       appState.collaborators = new Map();
+      delete appState.width;
+      delete appState.height;
     } catch {
       // Do nothing because appState is already null
     }
   }
-
   return restore(elements, appState);
-}
+};

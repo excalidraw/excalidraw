@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Liitä",
     "selectAll": "Valitse kaikki",
+    "multiSelect": "Lisää kohde valintaan",
+    "moveCanvas": "Siirrä piirtoaluetta",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
@@ -16,6 +18,10 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
+    "strokeStyle": "Viivan tyyli",
+    "strokeStyle_solid": "Yhtenäinen",
+    "strokeStyle_dashed": "Katkoviiva",
+    "strokeStyle_dotted": "Pisteviiva",
     "sloppiness": "Viivan tarkkuus",
     "opacity": "Peittävyys",
     "textAlign": "Tekstin tasaus",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
-    "madeWithExcalidraw": "Tehty Excalidrawilla"
+    "yourName": "Nimesi",
+    "madeWithExcalidraw": "Tehty Excalidrawilla",
+    "group": "Ryhmitä valinta",
+    "ungroup": "Pura valittu ryhmä",
+    "collaborators": "Yhteistyökumppanit",
+    "toggleGridMode": "Ruudukko päälle/pois"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -64,6 +75,7 @@
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
     "save": "Tallenna",
+    "saveAs": "Tallenna nimellä",
     "load": "Avaa",
     "getShareableLink": "Hae jaettava linkki",
     "close": "Sulje",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Valinta",
+    "draw": "Vapaa piirto",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
+    "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
-    "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi"
+    "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
+    "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
+    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
+    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",
@@ -159,5 +176,9 @@
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
+  },
+  "charts": {
+    "noNumericColumn": "Liitit taulukon ilman lukuja sisältävää saraketta.",
+    "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
   }
 }

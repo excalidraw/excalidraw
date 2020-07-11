@@ -8,39 +8,72 @@ import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
+    if (appState.editingLinearElement) {
+      const { elementId } = appState.editingLinearElement;
+      const element = LinearElementEditor.getElement(elementId);
+
+      if (element) {
+        return {
+          elements:
+            element.points.length < 2 || isInvisiblySmallElement(element)
+              ? elements.filter((el) => el.id !== element.id)
+              : undefined,
+          appState: {
+            ...appState,
+            editingLinearElement: null,
+          },
+          commitToHistory: true,
+        };
+      }
+    }
+
     let newElements = elements;
     if (window.document.activeElement instanceof HTMLElement) {
       window.document.activeElement.blur();
     }
-    if (appState.multiElement) {
+
+    const multiPointElement = appState.multiElement
+      ? appState.multiElement
+      : appState.editingElement?.type === "draw"
+      ? appState.editingElement
+      : null;
+
+    if (multiPointElement) {
       // pen and mouse have hover
-      if (appState.lastPointerDownWith !== "touch") {
-        const { points, lastCommittedPoint } = appState.multiElement;
+      if (
+        multiPointElement.type !== "draw" &&
+        appState.lastPointerDownWith !== "touch"
+      ) {
+        const { points, lastCommittedPoint } = multiPointElement;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          mutateElement(appState.multiElement, {
-            points: appState.multiElement.points.slice(0, -1),
+          mutateElement(multiPointElement, {
+            points: multiPointElement.points.slice(0, -1),
           });
         }
       }
-      if (isInvisiblySmallElement(appState.multiElement)) {
+      if (isInvisiblySmallElement(multiPointElement)) {
         newElements = newElements.slice(0, -1);
       }
 
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      if (appState.multiElement.type === "line") {
-        if (isPathALoop(appState.multiElement.points)) {
-          const linePoints = appState.multiElement.points;
+      if (
+        multiPointElement.type === "line" ||
+        multiPointElement.type === "draw"
+      ) {
+        if (isPathALoop(multiPointElement.points)) {
+          const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          mutateElement(appState.multiElement, {
+          mutateElement(multiPointElement, {
             points: linePoints.map((point, i) =>
               i === linePoints.length - 1
                 ? ([firstPoint[0], firstPoint[1]] as const)
@@ -51,10 +84,10 @@ export const actionFinalize = register({
       }
 
       if (!appState.elementLocked) {
-        appState.selectedElementIds[appState.multiElement.id] = true;
+        appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
-    if (!appState.elementLocked || !appState.multiElement) {
+    if (!appState.elementLocked || !multiPointElement) {
       resetCursor();
     }
     return {
@@ -62,21 +95,27 @@ export const actionFinalize = register({
       appState: {
         ...appState,
         elementType:
-          appState.elementLocked && appState.multiElement
+          appState.elementLocked && multiPointElement
             ? appState.elementType
             : "selection",
         draggingElement: null,
         multiElement: null,
         editingElement: null,
-        selectedElementIds: {},
+        selectedElementIds:
+          multiPointElement && !appState.elementLocked
+            ? {
+                ...appState.selectedElementIds,
+                [multiPointElement.id]: true,
+              }
+            : appState.selectedElementIds,
       },
-      commitToHistory: false,
+      commitToHistory: appState.elementType === "draw",
     };
   },
   keyTest: (event, appState) =>
     (event.key === KEYS.ESCAPE &&
-      !appState.draggingElement &&
-      appState.multiElement === null) ||
+      (appState.editingLinearElement !== null ||
+        (!appState.draggingElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData }) => (

@@ -7,11 +7,11 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 
-function isValidColor(color: string) {
+const isValidColor = (color: string) => {
   const style = new Option().style;
   style.color = color;
   return !!style.color;
-}
+};
 
 const getColor = (color: string): string | null => {
   if (color === "transparent") {
@@ -36,7 +36,7 @@ const keyBindings = [
   ["a", "s", "d", "f", "g"],
 ].flat();
 
-const Picker = function ({
+const Picker = ({
   colors,
   color,
   onChange,
@@ -50,7 +50,7 @@ const Picker = function ({
   onClose: () => void;
   label: string;
   showInput: boolean;
-}) {
+}) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
@@ -235,7 +235,7 @@ const ColorInput = React.forwardRef(
   },
 );
 
-export function ColorPicker({
+export const ColorPicker = ({
   type,
   color,
   onChange,
@@ -245,7 +245,7 @@ export function ColorPicker({
   color: string | null;
   onChange: (color: string) => void;
   label: string;
-}) {
+}) => {
   const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -296,4 +296,4 @@ export function ColorPicker({
       </React.Suspense>
     </div>
   );
-}
+};

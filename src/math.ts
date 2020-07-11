@@ -1,5 +1,6 @@
 import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
+<<<<<<< HEAD
 import Path from "./element/path/Path";
 
 export function radianToDegree(radian: number) {
@@ -59,16 +60,19 @@ export function distanceFromPointToPath(path: string | Path, point: Point) {
 
   return bestDistance;
 }
+=======
+import { ExcalidrawLinearElement } from "./element/types";
+>>>>>>> master
 
 // https://stackoverflow.com/a/6853926/232122
-export function distanceBetweenPointAndSegment(
+export const distanceBetweenPointAndSegment = (
   x: number,
   y: number,
   x1: number,
   y1: number,
   x2: number,
   y2: number,
-) {
+) => {
   const A = x - x1;
   const B = y - y1;
   const C = x2 - x1;
@@ -97,26 +101,30 @@ export function distanceBetweenPointAndSegment(
   const dx = x - xx;
   const dy = y - yy;
   return Math.hypot(dx, dy);
-}
+};
 
-export function rotate(
+export const rotate = (
   x1: number,
   y1: number,
   x2: number,
   y2: number,
   angle: number,
-): [number, number] {
+): [number, number] =>
   // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
   // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
   // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
-  return [
+  [
     (x1 - x2) * Math.cos(angle) - (y1 - y2) * Math.sin(angle) + x2,
     (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2,
   ];
-}
 
 export const adjustXYWithRotation = (
-  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  sides: {
+    n?: boolean;
+    e?: boolean;
+    s?: boolean;
+    w?: boolean;
+  },
   x: number,
   y: number,
   angle: number,
@@ -124,49 +132,35 @@ export const adjustXYWithRotation = (
   deltaY1: number,
   deltaX2: number,
   deltaY2: number,
-  isResizeFromCenter: boolean,
 ): [number, number] => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  if (side === "e" || side === "ne" || side === "se") {
-    if (isResizeFromCenter) {
-      x += deltaX1 + deltaX2;
-    } else {
-      x += deltaX1 * (1 + cos);
-      y += deltaX1 * sin;
-      x += deltaX2 * (1 - cos);
-      y += deltaX2 * -sin;
-    }
+  if (sides.e && sides.w) {
+    x += deltaX1 + deltaX2;
+  } else if (sides.e) {
+    x += deltaX1 * (1 + cos);
+    y += deltaX1 * sin;
+    x += deltaX2 * (1 - cos);
+    y += deltaX2 * -sin;
+  } else if (sides.w) {
+    x += deltaX1 * (1 - cos);
+    y += deltaX1 * -sin;
+    x += deltaX2 * (1 + cos);
+    y += deltaX2 * sin;
   }
-  if (side === "s" || side === "sw" || side === "se") {
-    if (isResizeFromCenter) {
-      y += deltaY1 + deltaY2;
-    } else {
-      x += deltaY1 * -sin;
-      y += deltaY1 * (1 + cos);
-      x += deltaY2 * sin;
-      y += deltaY2 * (1 - cos);
-    }
-  }
-  if (side === "w" || side === "nw" || side === "sw") {
-    if (isResizeFromCenter) {
-      x += deltaX1 + deltaX2;
-    } else {
-      x += deltaX1 * (1 - cos);
-      y += deltaX1 * -sin;
-      x += deltaX2 * (1 + cos);
-      y += deltaX2 * sin;
-    }
-  }
-  if (side === "n" || side === "nw" || side === "ne") {
-    if (isResizeFromCenter) {
-      y += deltaY1 + deltaY2;
-    } else {
-      x += deltaY1 * sin;
-      y += deltaY1 * (1 - cos);
-      x += deltaY2 * -sin;
-      y += deltaY2 * (1 + cos);
-    }
+
+  if (sides.n && sides.s) {
+    y += deltaY1 + deltaY2;
+  } else if (sides.n) {
+    x += deltaY1 * sin;
+    y += deltaY1 * (1 - cos);
+    x += deltaY2 * -sin;
+    y += deltaY2 * (1 + cos);
+  } else if (sides.s) {
+    x += deltaY1 * -sin;
+    y += deltaY1 * (1 + cos);
+    x += deltaY2 * sin;
+    y += deltaY2 * (1 - cos);
   }
   return [x, y];
 };
@@ -292,15 +286,17 @@ export const getPointOnAPath = (point: Point, path: Point[]) => {
   return null;
 };
 
-export function distance2d(x1: number, y1: number, x2: number, y2: number) {
+export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   const xd = x2 - x1;
   const yd = y2 - y1;
   return Math.hypot(xd, yd);
-}
+};
 
 // Checks if the first and last point are close enough
 // to be considered a loop
-export function isPathALoop(points: Point[]): boolean {
+export const isPathALoop = (
+  points: ExcalidrawLinearElement["points"],
+): boolean => {
   if (points.length >= 3) {
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
     return (
@@ -309,16 +305,16 @@ export function isPathALoop(points: Point[]): boolean {
     );
   }
   return false;
-}
+};
 
 // Draw a line from the point to the right till infiinty
 // Check how many lines of the polygon does this infinite line intersects with
 // If the number of intersections is odd, point is in the polygon
-export function isPointInPolygon(
+export const isPointInPolygon = (
   points: Point[],
   x: number,
   y: number,
-): boolean {
+): boolean => {
   const vertices = points.length;
 
   // There must be at least 3 vertices in polygon
@@ -340,32 +336,32 @@ export function isPointInPolygon(
   }
   // true if count is off
   return count % 2 === 1;
-}
+};
 
 // Check if q lies on the line segment pr
-function onSegment(p: Point, q: Point, r: Point) {
+const onSegment = (p: Point, q: Point, r: Point) => {
   return (
     q[0] <= Math.max(p[0], r[0]) &&
     q[0] >= Math.min(p[0], r[0]) &&
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
   );
-}
+};
 
 // For the ordered points p, q, r, return
 // 0 if p, q, r are collinear
 // 1 if Clockwise
 // 2 if counterclickwise
-function orientation(p: Point, q: Point, r: Point) {
+const orientation = (p: Point, q: Point, r: Point) => {
   const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
   if (val === 0) {
     return 0;
   }
   return val > 0 ? 1 : 2;
-}
+};
 
 // Check is p1q1 intersects with p2q2
-function doIntersect(p1: Point, q1: Point, p2: Point, q2: Point) {
+const doIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   const o1 = orientation(p1, q1, p2);
   const o2 = orientation(p1, q1, q2);
   const o3 = orientation(p2, q2, p1);
@@ -396,4 +392,18 @@ function doIntersect(p1: Point, q1: Point, p2: Point, q2: Point) {
   }
 
   return false;
-}
+};
+
+export const getGridPoint = (
+  x: number,
+  y: number,
+  gridSize: number | null,
+): [number, number] => {
+  if (gridSize) {
+    return [
+      Math.round(x / gridSize) * gridSize,
+      Math.round(y / gridSize) * gridSize,
+    ];
+  }
+  return [x, y];
+};

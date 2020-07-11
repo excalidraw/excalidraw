@@ -8,16 +8,14 @@ type FixedSideContainerProps = {
   className?: string;
 };
 
-export function FixedSideContainer({
+export const FixedSideContainer = ({
   children,
   side,
   className,
-}: FixedSideContainerProps) {
-  return (
-    <div
-      className={`FixedSideContainer FixedSideContainer_side_${side} ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+}: FixedSideContainerProps) => (
+  <div
+    className={`FixedSideContainer FixedSideContainer_side_${side} ${className}`}
+  >
+    {children}
+  </div>
+);

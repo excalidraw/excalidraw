@@ -2,11 +2,15 @@ import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
-export type ActionResult = {
-  elements?: readonly ExcalidrawElement[] | null;
-  appState?: AppState | null;
-  commitToHistory: boolean;
-};
+/** if false, the action should be prevented */
+export type ActionResult =
+  | {
+      elements?: readonly ExcalidrawElement[] | null;
+      appState?: AppState | null;
+      commitToHistory: boolean;
+      syncHistory?: boolean;
+    }
+  | false;
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
@@ -30,6 +34,7 @@ export type ActionName =
   | "changeFillStyle"
   | "changeStrokeWidth"
   | "changeSloppiness"
+  | "changeStrokeStyle"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
@@ -42,6 +47,7 @@ export type ActionName =
   | "changeExportBackground"
   | "changeShouldAddWatermark"
   | "saveScene"
+  | "saveAsScene"
   | "loadScene"
   | "duplicateSelection"
   | "shapeDifference"
@@ -58,7 +64,11 @@ export type ActionName =
   | "changeFontFamily"
   | "changeTextAlign"
   | "toggleFullScreen"
-  | "toggleShortcuts";
+  | "toggleShortcuts"
+  | "group"
+  | "ungroup"
+  | "goToCollaborator"
+  | "addToLibrary";
 
 export interface Action {
   name: ActionName;
@@ -66,6 +76,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData?: any) => void;
+    id?: string;
   }>;
   perform: ActionFn;
   keyPriority?: number;
@@ -76,6 +87,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  contextItemPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {

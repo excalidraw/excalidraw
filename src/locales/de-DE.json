@@ -2,6 +2,8 @@
   "labels": {
     "paste": "Einfügen",
     "selectAll": "Alle auswählen",
+    "multiSelect": "",
+    "moveCanvas": "Leinwand verschieben",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
@@ -16,6 +18,10 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
+    "strokeStyle": "Konturstil",
+    "strokeStyle_solid": "Durchgezogen",
+    "strokeStyle_dashed": "Gestrichelt",
+    "strokeStyle_dotted": "Gepunktet",
     "sloppiness": "Sauberkeit",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
@@ -54,7 +60,12 @@
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
-    "madeWithExcalidraw": "Made with Excalidraw"
+    "yourName": "Dein Name",
+    "madeWithExcalidraw": "Made with Excalidraw",
+    "group": "Auswahl gruppieren",
+    "ungroup": "Gruppierung aufheben",
+    "collaborators": "Mitarbeitende",
+    "toggleGridMode": "Gitterlinien ein-/ausschalten"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -64,6 +75,7 @@
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "save": "Speichern",
+    "saveAs": "Speichern unter",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",
@@ -95,6 +107,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
+    "draw": "Freies Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
@@ -110,9 +123,13 @@
   },
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
+    "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
-    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
+    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
+    "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
   "errorSplash": {
     "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
@@ -124,7 +141,7 @@
     "trackedToSentry_post": " wurde in unserem System registriert.",
     "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
     "openIssueMessage_button": "Bug-Tracker.",
-    "openIssueMessage_post": " Bitte geben Sie die Informationen unten durch Kopieren und Einfügen im GitHub Issue mit an.",
+    "openIssueMessage_post": " Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
@@ -158,6 +175,10 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen"
   },
   "encrypted": {
-    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird."
+    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
+  },
+  "charts": {
+    "noNumericColumn": "Du hast eine Tabelle ohne numerische Spalte eingefügt.",
+    "tooManyColumns": "Du hast eine Tabelle mit mehr als zwei Spalten eingefügt."
   }
 }

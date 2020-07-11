@@ -1,7 +1,7 @@
 import React from "react";
 import { ProjectName } from "../components/ProjectName";
 import { saveAsJSON, loadFromJSON } from "../data";
-import { load, save } from "../components/icons";
+import { load, save, saveAs } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -65,11 +65,13 @@ export const actionChangeShouldAddWatermark = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState).catch((error) => console.error(error));
+    saveAsJSON(elements, appState, (window as any).handle).catch((error) =>
+      console.error(error),
+    );
     return { commitToHistory: false };
   },
   keyTest: (event) => {
-    return event.key === "s" && event[KEYS.CTRL_OR_CMD];
+    return event.key === "s" && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
@@ -78,6 +80,28 @@ export const actionSaveScene = register({
       title={t("buttons.save")}
       aria-label={t("buttons.save")}
       showAriaLabel={useIsMobile()}
+      onClick={() => updateData(null)}
+    />
+  ),
+});
+
+export const actionSaveAsScene = register({
+  name: "saveAsScene",
+  perform: (elements, appState, value) => {
+    saveAsJSON(elements, appState, null).catch((error) => console.error(error));
+    return { commitToHistory: false };
+  },
+  keyTest: (event) => {
+    return event.key === "s" && event.shiftKey && event[KEYS.CTRL_OR_CMD];
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={saveAs}
+      title={t("buttons.saveAs")}
+      aria-label={t("buttons.saveAs")}
+      showAriaLabel={useIsMobile()}
+      hidden={!("chooseFileSystemEntries" in window)}
       onClick={() => updateData(null)}
     />
   ),

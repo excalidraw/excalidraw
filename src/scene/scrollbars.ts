@@ -9,7 +9,7 @@ export const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
 export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
 
-export function getScrollBars(
+export const getScrollBars = (
   elements: readonly ExcalidrawElement[],
   viewportWidth: number,
   viewportHeight: number,
@@ -22,7 +22,7 @@ export function getScrollBars(
     scrollY: FlooredNumber;
     zoom: number;
   },
-): ScrollBars {
+): ScrollBars => {
   // This is the bounding box of all the elements
   const [
     elementsMinX,
@@ -100,24 +100,29 @@ export function getScrollBars(
               Math.max(SCROLLBAR_MARGIN * 2, safeArea.top + safeArea.bottom),
           },
   };
-}
+};
 
-export function isOverScrollBars(scrollBars: ScrollBars, x: number, y: number) {
-  const [isOverHorizontalScrollBar, isOverVerticalScrollBar] = [
+export const isOverScrollBars = (
+  scrollBars: ScrollBars,
+  x: number,
+  y: number,
+): {
+  isOverEither: boolean;
+  isOverHorizontal: boolean;
+  isOverVertical: boolean;
+} => {
+  const [isOverHorizontal, isOverVertical] = [
     scrollBars.horizontal,
     scrollBars.vertical,
   ].map((scrollBar) => {
     return (
-      scrollBar &&
+      scrollBar != null &&
       scrollBar.x <= x &&
       x <= scrollBar.x + scrollBar.width &&
       scrollBar.y <= y &&
       y <= scrollBar.y + scrollBar.height
     );
   });
-
-  return {
-    isOverHorizontalScrollBar,
-    isOverVerticalScrollBar,
-  };
-}
+  const isOverEither = isOverHorizontal || isOverVertical;
+  return { isOverEither, isOverHorizontal, isOverVertical };
+};

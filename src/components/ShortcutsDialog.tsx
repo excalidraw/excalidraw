@@ -56,50 +56,52 @@ const Shortcut = (props: {
   label: string;
   shortcuts: string[];
   isOr: boolean;
-}) => (
-  <div
-    style={{
-      borderTop: `1px solid ${oc.gray[4]}`,
-    }}
-  >
+}) => {
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        margin: "0",
-        padding: "4px",
-        alignItems: "center",
+        borderTop: `1px solid ${oc.gray[4]}`,
       }}
     >
       <div
         style={{
-          flexBasis: 0,
-          flexGrow: 2,
-          lineHeight: 1.4,
-        }}
-      >
-        {props.label}
-      </div>
-      <div
-        style={{
           display: "flex",
-          flexBasis: 0,
-          flexGrow: 1,
-          justifyContent: "center",
+          margin: "0",
+          padding: "4px 8px",
+          alignItems: "center",
         }}
       >
-        {props.shortcuts.map((shortcut, index) => (
-          <React.Fragment key={index}>
-            <ShortcutKey>{shortcut}</ShortcutKey>
-            {props.isOr &&
-              index !== props.shortcuts.length - 1 &&
-              t("shortcutsDialog.or")}
-          </React.Fragment>
-        ))}
+        <div
+          style={{
+            lineHeight: 1.4,
+          }}
+        >
+          {props.label}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flex: "0 0 auto",
+            justifyContent: "flex-end",
+            marginLeft: isRTL ? "0em" : "auto",
+            marginRight: isRTL ? "auto" : "0em",
+            minWidth: "30%",
+          }}
+        >
+          {props.shortcuts.map((shortcut, index) => (
+            <React.Fragment key={index}>
+              <ShortcutKey>{shortcut}</ShortcutKey>
+              {props.isOr &&
+                index !== props.shortcuts.length - 1 &&
+                t("shortcutsDialog.or")}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 Shortcut.defaultProps = {
   isOr: true,
@@ -111,10 +113,14 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
       wordBreak: "keep-all",
       border: `1px solid ${oc.gray[4]}`,
       padding: "2px 8px",
-      margin: "0 4px",
+      margin: "auto 4px",
       backgroundColor: oc.gray[2],
       borderRadius: "2px",
       fontSize: "0.8em",
+      minHeight: "26px",
+      boxSizing: "border-box",
+      display: "flex",
+      alignItems: "center",
     }}
     {...props}
   />
@@ -165,7 +171,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
   return (
     <>
       <Dialog
-        maxWidth={800}
+        maxWidth={900}
         onCloseRequest={handleClose}
         title={t("shortcutsDialog.title")}
       >
@@ -178,7 +184,8 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
               <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
               <Shortcut label={t("toolBar.line")} shortcuts={["L", "6"]} />
-              <Shortcut label={t("toolBar.text")} shortcuts={["T", "7"]} />
+              <Shortcut label={t("toolBar.draw")} shortcuts={["X", "7"]} />
+              <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
               <Shortcut
                 label={t("shortcutsDialog.textNewLine")}
                 shortcuts={[
@@ -238,7 +245,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("buttons.toggleZenMode")}
-                shortcuts={["Alt+Z"]}
+                shortcuts={[getShortcutKey("Alt+Z")]}
+              />
+              <Shortcut
+                label={t("labels.toggleGridMode")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
               />
             </ShortcutIsland>
           </Column>
@@ -247,6 +258,20 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut
                 label={t("labels.selectAll")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
+              />
+              <Shortcut
+                label={t("labels.multiSelect")}
+                shortcuts={[
+                  getShortcutKey(`Shift+${t("shortcutsDialog.click")}`),
+                ]}
+              />
+              <Shortcut
+                label={t("labels.moveCanvas")}
+                shortcuts={[
+                  getShortcutKey(`Space+${t("shortcutsDialog.drag")}`),
+                  getShortcutKey(`Wheel+${t("shortcutsDialog.drag")}`),
+                ]}
+                isOr={true}
               />
               <Shortcut
                 label={t("labels.copy")}
@@ -262,11 +287,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.copyStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+C")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
               />
               <Shortcut
                 label={t("labels.pasteStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+V")]}
               />
               <Shortcut
                 label={t("labels.delete")}
@@ -310,6 +335,14 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               <Shortcut
                 label={t("buttons.redo")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Z")]}
+              />
+              <Shortcut
+                label={t("labels.group")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+G")]}
+              />
+              <Shortcut
+                label={t("labels.ungroup")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
               />
             </ShortcutIsland>
           </Column>
