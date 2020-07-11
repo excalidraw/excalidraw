@@ -98,7 +98,7 @@ export default class Path {
   }
 
   transform(transform: Transform = {}) {
-    const matrix = toMarix(transform, this.getCenterPoint())
+    const matrix = toMarix(transform, this.getCenterPoint());
 
     this.mapPath(matrix);
   }

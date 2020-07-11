@@ -249,7 +249,6 @@ function l2c(x1, y1, x2, y2) {
   return [x1, y1, x2, y2, x2, y2];
 }
 
-
 function _path2curve(path) {
   var attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
     processPath = function (path, d) {

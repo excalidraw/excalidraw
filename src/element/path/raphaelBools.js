@@ -804,5 +804,5 @@ export function exclusion(path1, path2) {
   return {
     ...operateBool("difference", r1.data, r2.data),
     intersections: r1.intersections,
-  }
+  };
 }
