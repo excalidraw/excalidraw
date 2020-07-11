@@ -62,75 +62,84 @@ export const getDefaultAppState = (): AppState => {
   };
 };
 
+/**
+ * Config containing all AppState keys. Used to determine whether given state
+ *  prop should be stripped when exporting to given storage type.
+ */
 const APP_STATE_STORAGE_CONF = (<
-  Values extends { browser: boolean; export: boolean },
+  Values extends {
+    /** whether to keep when storing to browser storage (localStorage/IDB) */
+    browser: boolean;
+    /** whether to keep when exporting to file/database */
+    export: boolean;
+  },
   T extends Record<keyof AppState, Values>
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
-  isLoading: { browser: false, export: false },
-  errorMessage: { browser: false, export: false },
-  draggingElement: { browser: false, export: false },
-  resizingElement: { browser: false, export: false },
-  multiElement: { browser: false, export: false },
-  editingElement: { browser: false, export: false },
-  editingLinearElement: { browser: false, export: false },
-  isCollaborating: { browser: false, export: false },
-  isResizing: { browser: false, export: false },
-  isRotating: { browser: false, export: false },
-  selectionElement: { browser: false, export: false },
   collaborators: { browser: false, export: false },
-  showShortcutsDialog: { browser: false, export: false },
-  width: { browser: false, export: false },
-  height: { browser: false, export: false },
-  elementType: { browser: true, export: false },
-  elementLocked: { browser: true, export: false },
-  exportBackground: { browser: true, export: false },
-  shouldAddWatermark: { browser: true, export: false },
-  currentItemStrokeColor: { browser: true, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },
-  currentItemStrokeWidth: { browser: true, export: false },
-  currentItemStrokeStyle: { browser: true, export: false },
-  currentItemRoughness: { browser: true, export: false },
-  currentItemOpacity: { browser: true, export: false },
-  currentItemFontSize: { browser: true, export: false },
   currentItemFontFamily: { browser: true, export: false },
+  currentItemFontSize: { browser: true, export: false },
+  currentItemOpacity: { browser: true, export: false },
+  currentItemRoughness: { browser: true, export: false },
+  currentItemStrokeColor: { browser: true, export: false },
+  currentItemStrokeStyle: { browser: true, export: false },
+  currentItemStrokeWidth: { browser: true, export: false },
   currentItemTextAlign: { browser: true, export: false },
-  viewBackgroundColor: { browser: true, export: true },
-  scrollX: { browser: true, export: false },
-  scrollY: { browser: true, export: false },
+  cursorButton: { browser: true, export: false },
   cursorX: { browser: true, export: false },
   cursorY: { browser: true, export: false },
-  cursorButton: { browser: true, export: false },
-  scrolledOutside: { browser: true, export: false },
-  name: { browser: true, export: false },
-  username: { browser: true, export: false },
-  zoom: { browser: true, export: false },
-  openMenu: { browser: true, export: false },
-  lastPointerDownWith: { browser: true, export: false },
-  selectedElementIds: { browser: true, export: false },
-  previousSelectedElementIds: { browser: true, export: false },
-  shouldCacheIgnoreZoom: { browser: true, export: false },
-  zenModeEnabled: { browser: true, export: false },
-  gridSize: { browser: true, export: true },
+  draggingElement: { browser: false, export: false },
+  editingElement: { browser: false, export: false },
   editingGroupId: { browser: true, export: false },
-  selectedGroupIds: { browser: true, export: false },
+  editingLinearElement: { browser: false, export: false },
+  elementLocked: { browser: true, export: false },
+  elementType: { browser: true, export: false },
+  errorMessage: { browser: false, export: false },
+  exportBackground: { browser: true, export: false },
+  gridSize: { browser: true, export: true },
+  height: { browser: false, export: false },
+  isCollaborating: { browser: false, export: false },
   isLibraryOpen: { browser: false, export: false },
+  isLoading: { browser: false, export: false },
+  isResizing: { browser: false, export: false },
+  isRotating: { browser: false, export: false },
+  lastPointerDownWith: { browser: true, export: false },
+  multiElement: { browser: false, export: false },
+  name: { browser: true, export: false },
+  openMenu: { browser: true, export: false },
+  previousSelectedElementIds: { browser: true, export: false },
+  resizingElement: { browser: false, export: false },
+  scrolledOutside: { browser: true, export: false },
+  scrollX: { browser: true, export: false },
+  scrollY: { browser: true, export: false },
+  selectedElementIds: { browser: true, export: false },
+  selectedGroupIds: { browser: true, export: false },
+  selectionElement: { browser: false, export: false },
+  shouldAddWatermark: { browser: true, export: false },
+  shouldCacheIgnoreZoom: { browser: true, export: false },
+  showShortcutsDialog: { browser: false, export: false },
+  username: { browser: true, export: false },
+  viewBackgroundColor: { browser: true, export: true },
+  width: { browser: false, export: false },
+  zenModeEnabled: { browser: true, export: false },
+  zoom: { browser: true, export: false },
 });
 
-const _clearAppStateForStorage = <Type extends "export" | "browser">(
+const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
   appState: Partial<AppState>,
-  type: Type,
+  exportType: ExportType,
 ) => {
   type ExportableKeys = {
-    [K in keyof typeof APP_STATE_STORAGE_CONF]: typeof APP_STATE_STORAGE_CONF[K][Type] extends true
+    [K in keyof typeof APP_STATE_STORAGE_CONF]: typeof APP_STATE_STORAGE_CONF[K][ExportType] extends true
       ? K
       : never;
   }[keyof typeof APP_STATE_STORAGE_CONF];
   const stateForExport = {} as { [K in ExportableKeys]?: typeof appState[K] };
   for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
-    if (APP_STATE_STORAGE_CONF[key][type]) {
+    if (APP_STATE_STORAGE_CONF[key][exportType]) {
       // @ts-ignore see https://github.com/microsoft/TypeScript/issues/31445
       stateForExport[key] = appState[key];
     }
