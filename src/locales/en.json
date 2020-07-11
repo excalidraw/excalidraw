@@ -67,8 +67,7 @@
     "collaborators": "Collaborators",
     "toggleGridMode": "Toggle grid mode",
     "addToLibrary": "Add to library",
-    "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library..."
+    "removeFromLibrary": "Remove from library"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

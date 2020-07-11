@@ -43,7 +43,7 @@ import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
-import { loadLibrary, saveLibrary } from "../data/localStorage";
+import { globalLibraryState } from "../libraryState";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -150,6 +150,20 @@ const LibraryMenuItems = ({
   );
 };
 
+function useGlobalLibrary(): LibraryItems {
+  const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
+
+  useEffect(() => {
+    const unsubscribe = globalLibraryState.addCallback((nextLibraryItems) => {
+      setLibraryItems(nextLibraryItems);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  return libraryItems;
+}
+
 const LibraryMenu = ({
   onClickOutside,
   onInsertShape,
@@ -164,69 +178,32 @@ const LibraryMenu = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, onClickOutside);
 
-  const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
+  const libraryItems = useGlobalLibrary();
 
-  const [loadingState, setIsLoading] = useState<
-    "preloading" | "loading" | "ready"
-  >("preloading");
-
-  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    Promise.race([
-      new Promise((resolve) => {
-        loadingTimerRef.current = setTimeout(() => {
-          resolve("loading");
-        }, 100);
-      }),
-      loadLibrary().then((items) => {
-        setLibraryItems(items);
-        setIsLoading("ready");
-      }),
-    ]).then((data) => {
-      if (data === "loading") {
-        setIsLoading("loading");
-      }
-    });
-    return () => {
-      clearTimeout(loadingTimerRef.current!);
-    };
-  }, []);
-
-  const removeFromLibrary = useCallback(async (indexToRemove) => {
-    const items = await loadLibrary();
-    const nextItems = items.filter((_, index) => index !== indexToRemove);
-    saveLibrary(nextItems);
-    setLibraryItems(nextItems);
+  const removeFromLibrary = useCallback((indexToRemove) => {
+    globalLibraryState.replaceLibrary((items) =>
+      items.filter((_, index) => index !== indexToRemove),
+    );
   }, []);
 
   const addToLibrary = useCallback(
-    async (elements: NonDeleted<ExcalidrawElement>[]) => {
-      const items = await loadLibrary();
-      const nextItems = [...items, elements];
+    (elements: NonDeleted<ExcalidrawElement>[]) => {
+      globalLibraryState.replaceLibrary((items) => [...items, elements]);
       onAddToLibrary();
-      saveLibrary(nextItems);
-      setLibraryItems(nextItems);
     },
     [onAddToLibrary],
   );
 
-  return loadingState === "preloading" ? null : (
+  return (
     <Island padding={1} ref={ref} className="layer-ui__library">
-      {loadingState === "loading" ? (
-        <div className="layer-ui__library-message">
-          {t("labels.libraryLoadingMessage")}
-        </div>
-      ) : (
-        <LibraryMenuItems
-          library={libraryItems}
-          onClickOutside={onClickOutside}
-          onRemoveFromLibrary={removeFromLibrary}
-          onAddToLibrary={addToLibrary}
-          onInsertShape={onInsertShape}
-          pendingElements={pendingElements}
-        />
-      )}
+      <LibraryMenuItems
+        library={libraryItems}
+        onClickOutside={onClickOutside}
+        onRemoveFromLibrary={removeFromLibrary}
+        onAddToLibrary={addToLibrary}
+        onInsertShape={onInsertShape}
+        pendingElements={pendingElements}
+      />
     </Island>
   );
 };
