@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { AppState, LibraryItems } from "../types";
-import { clearAppStateForLocalStorage } from "../appState";
+import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
 import { restore } from "./restore";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
@@ -111,7 +111,8 @@ export const restoreFromLocalStorage = () => {
   if (savedElements) {
     try {
       elements = JSON.parse(savedElements);
-    } catch {
+    } catch (error) {
+      console.error(error);
       // Do nothing because elements array is already empty
     }
   }
@@ -119,13 +120,14 @@ export const restoreFromLocalStorage = () => {
   let appState = null;
   if (savedState) {
     try {
-      appState = JSON.parse(savedState) as AppState;
-      // If we're retrieving from local storage, we should not be collaborating
-      appState.isCollaborating = false;
-      appState.collaborators = new Map();
-      delete appState.width;
-      delete appState.height;
-    } catch {
+      appState = {
+        ...getDefaultAppState(),
+        ...clearAppStateForLocalStorage(
+          JSON.parse(savedState) as Partial<AppState>,
+        ),
+      };
+    } catch (error) {
+      console.error(error);
       // Do nothing because appState is already null
     }
   }
