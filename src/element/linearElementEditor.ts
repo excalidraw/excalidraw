@@ -293,6 +293,13 @@ export class LinearElementEditor {
     return rotate(x + point[0], y + point[1], cx, cy, element.angle);
   }
 
+  static pointFromAbsoluteCoords(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    absoluteCoords: Point,
+  ): Point {
+    return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+  }
+
   static getPointIndexUnderCursor(
     element: NonDeleted<ExcalidrawLinearElement>,
     zoom: AppState["zoom"],

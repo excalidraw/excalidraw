@@ -10,7 +10,6 @@ import { pointsOnBezierCurves } from "points-on-curve";
 import {
   NonDeletedExcalidrawElement,
   ExcalidrawBindableElement,
-  ExcalidrawElement,
 } from "./types";
 
 import {
@@ -51,7 +50,7 @@ export const hitTest = (
   const lineThreshold = 10 / appState.zoom;
 
   const absoluteCoords = getElementAbsoluteCoords(element);
-  [x, y] = adjustXYForElementRotation(element, absoluteCoords, x, y);
+  [x, y] = adjustXYForElementRotation(element.angle, absoluteCoords, x, y);
   const [x1, y1, x2, y2] = absoluteCoords;
 
   const relX = x - element.x;
@@ -118,7 +117,7 @@ export const bindingBorderTest = (
   y: number,
 ): boolean => {
   const absoluteCoords = getElementAbsoluteCoords(element);
-  [x, y] = adjustXYForElementRotation(element, absoluteCoords, x, y);
+  [x, y] = adjustXYForElementRotation(element.angle, absoluteCoords, x, y);
   const [x1, y1, x2, y2] = absoluteCoords;
   const smallerDimension = Math.min(x2 - x1, y2 - y1);
   // We make the bindable boundary bigger for bigger elements
@@ -151,19 +150,20 @@ export const bindingBorderTest = (
   return false;
 };
 
+// Input and output is in absolute coordinates
 export const intersectElementWithLine = (
   element: ExcalidrawBindableElement,
   a: Point,
   b: Point,
 ): Point[] => {
   const absoluteCoords = getElementAbsoluteCoords(element);
-  a = adjustXYForElementRotation(element, absoluteCoords, ...a);
-  b = adjustXYForElementRotation(element, absoluteCoords, ...b);
+  const [x1, y1, x2, y2] = absoluteCoords;
+  a = adjustXYForElementRotation(element.angle, absoluteCoords, ...a);
+  b = adjustXYForElementRotation(element.angle, absoluteCoords, ...b);
 
   switch (element.type) {
     case "rectangle":
     case "text":
-      const [x1, y1, x2, y2] = absoluteCoords;
       const c1: Point = [x1, y1];
       const c2: Point = [x2, y1];
       const c3: Point = [x2, y2];
@@ -173,14 +173,21 @@ export const intersectElementWithLine = (
         intersectLineAndSegment(a, b, c2, c3),
         intersectLineAndSegment(a, b, c3, c4),
         intersectLineAndSegment(a, b, c4, c1),
-      ].filter((point) => point != null) as [Point, Point];
-
+      ]
+        .filter((point) => point != null)
+        .map(
+          (point) =>
+            adjustXYForElementRotation(
+              -element.angle,
+              absoluteCoords,
+              ...(point as Point),
+            ) as Point,
+        );
     case "diamond":
       return [];
     case "ellipse":
       return [];
   }
-  throw new Error("unexpected element type");
 };
 
 const ellipseParamsRelativeTo = (
@@ -236,7 +243,7 @@ const isInsideEllipse = (
 // and rotates it around the element center to avoid having to rotate
 // all the element points instead to account for the element's rotation
 const adjustXYForElementRotation = (
-  element: ExcalidrawElement,
+  elementAngle: number,
   elementAbsoluteCoords: [number, number, number, number],
   x: number,
   y: number,
@@ -245,7 +252,7 @@ const adjustXYForElementRotation = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // reverse rotate the pointer
-  const xy = rotate(x, y, cx, cy, -element.angle);
+  const xy = rotate(x, y, cx, cy, -elementAngle);
   return xy;
 };
 

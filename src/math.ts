@@ -352,17 +352,31 @@ export const intersectLineAndSegment = (
   const [bx, by] = b;
   const [s1x, s1y] = s1;
   const [s2x, s2y] = s2;
-  const lx = bx - ax;
-  const ly = by - ay;
   const sx = s2x - s1x;
   const sy = s2y - s1y;
+  const lx = bx - ax;
+  const ly = by - ay;
 
-  const t = (sx * (ay - s1y) - sy * (ax - s1x)) / (-sx * ly + lx * sy);
+  const t = (lx * (s1y - ay) - ly * (s1x - ax)) / (-lx * sy + sx * ly);
   if (t >= 0 && t <= 1) {
-    return [ax + t * lx, ay + t * ly];
+    return [s1x + t * sx, s1y + t * sy];
   }
 
   return null;
+};
+
+// Returns a point `distance` away from `start` along the line `start,towards`.
+export const translatePointAlongLine = (
+  start: Point,
+  distance: number,
+  towards: Point,
+): Point => {
+  const [sx, sy] = start;
+  const [tx, ty] = towards;
+  const vx = tx - sx;
+  const vy = ty - sy;
+  const ratio = distance / Math.hypot(vx, vy);
+  return [sx + ratio * vx, sy + ratio * vy];
 };
 
 export const getGridPoint = (

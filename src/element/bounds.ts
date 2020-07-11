@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawBindableElement,
+} from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
@@ -24,6 +28,13 @@ export const getElementAbsoluteCoords = (
     element.x + element.width,
     element.y + element.height,
   ];
+};
+
+export const pointRelativeTo = (
+  element: ExcalidrawBindableElement,
+  absoluteCoords: Point,
+): Point => {
+  return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
 };
 
 export const getDiamondPoints = (element: ExcalidrawElement) => {

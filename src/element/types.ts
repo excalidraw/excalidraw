@@ -71,7 +71,7 @@ export type ExcalidrawBindableElement =
   | ExcalidrawPolygonalElement
   | ExcalidrawTextElement;
 
-type Binding = {
+export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focusPoint: Point;
   gap: number;
@@ -82,8 +82,8 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     type: "arrow" | "line" | "draw";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
-    startBinding: Binding | null;
-    endBinding: Binding | null;
+    startBinding: PointBinding | null;
+    endBinding: PointBinding | null;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

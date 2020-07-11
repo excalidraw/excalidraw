@@ -2,6 +2,8 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
+  PointBinding,
+  ExcalidrawBindableElement,
 } from "./types";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
@@ -9,6 +11,9 @@ import { SHAPES } from "../shapes";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { LinearElementEditor } from "./linearElementEditor";
 import Scene from "../scene/Scene";
+import { distanceBetweenPoints, translatePointAlongLine } from "../math";
+import { intersectElementWithLine } from "./collision";
+import { Point } from "../types";
 
 export const dragSelectedElements = (
   selectedElements: NonDeletedExcalidrawElement[],
@@ -32,21 +37,24 @@ const updateBoundElementsOnDrag = (
   offset: { x: number; y: number },
   scene: Scene,
 ) => {
-  scene
-    .getNonDeletedElements(draggedElement.boundElementIds ?? [])
-    .forEach((boundElement) => {
-      boundElement = boundElement as NonDeleted<ExcalidrawLinearElement>;
-      if (boundElement.startBinding?.elementId === draggedElement.id) {
-        LinearElementEditor.movePointByOffset(boundElement, 0, offset);
-      }
-      if (boundElement.endBinding?.elementId === draggedElement.id) {
-        LinearElementEditor.movePointByOffset(
-          boundElement,
-          boundElement.points.length - 1,
-          offset,
-        );
-      }
-    });
+  (scene.getNonDeletedElements(
+    draggedElement.boundElementIds ?? [],
+  ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((boundElement) => {
+    maybeMoveBoundPoint(
+      boundElement,
+      "start",
+      boundElement.startBinding,
+      draggedElement as ExcalidrawBindableElement,
+      offset,
+    );
+    maybeMoveBoundPoint(
+      boundElement,
+      "end",
+      boundElement.endBinding,
+      draggedElement as ExcalidrawBindableElement,
+      offset,
+    );
+  });
 };
 
 export const getDragOffsetXY = (
@@ -100,4 +108,73 @@ export const dragNewElement = (
       height: height,
     });
   }
+};
+
+const maybeMoveBoundPoint = (
+  boundElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  binding: PointBinding | null | undefined,
+  draggedElement: ExcalidrawBindableElement,
+  offset: { x: number; y: number },
+): void => {
+  if (binding?.elementId === draggedElement.id) {
+    moveBoundPoint(boundElement, startOrEnd, binding, draggedElement, offset);
+  }
+};
+
+const moveBoundPoint = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  binding: PointBinding,
+  draggedElement: ExcalidrawBindableElement,
+  offset: { x: number; y: number },
+): void => {
+  const direction = startOrEnd === "start" ? -1 : 1;
+  const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
+  const adjacentPointIndex = edgePointIndex - direction;
+  // The linear element was not originally pointing inside the bound shape,
+  // we use simple binding without focus points
+  if (binding.gap === 0) {
+    LinearElementEditor.movePointByOffset(
+      linearElement,
+      edgePointIndex,
+      offset,
+    );
+    return;
+  }
+  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    adjacentPointIndex,
+  );
+  const draggedFocusPointAbsolute: Point = [
+    draggedElement.x + binding.focusPoint[0] + offset.x,
+    draggedElement.y + binding.focusPoint[1] + offset.y,
+  ];
+
+  const intersections = intersectElementWithLine(
+    draggedElement,
+    adjacentPoint,
+    draggedFocusPointAbsolute,
+  );
+  if (intersections.length === 0) {
+    // TODO: This should never happen, but it does due to scaling/rotating
+    return;
+  }
+  // Guaranteed to intersect because focusPoint is always inside the shape
+  const [intersection1, intersection2] = intersections;
+  const nearIntersection =
+    distanceBetweenPoints(intersection1, adjacentPoint) <
+    distanceBetweenPoints(intersection2, adjacentPoint)
+      ? intersection1
+      : intersection2;
+  const newEdgePoint = translatePointAlongLine(
+    nearIntersection,
+    binding.gap,
+    adjacentPoint,
+  );
+  LinearElementEditor.movePoint(
+    linearElement,
+    edgePointIndex,
+    LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
+  );
 };
