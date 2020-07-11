@@ -45,8 +45,8 @@ export const hitTest = (
   // of the click is less than x pixels of any of the lines that the shape is composed of
   const lineThreshold = 10 / appState.zoom;
 
-  const [xy, absoluteCoords] = adjustXYForElementRotation(element, x, y);
-  [x, y] = xy;
+  const absoluteCoords = getElementAbsoluteCoords(element);
+  [x, y] = adjustXYForElementRotation(element, absoluteCoords, x, y);
   const [x1, y1, x2, y2] = absoluteCoords;
 
   const relX = x - element.x;
@@ -112,10 +112,10 @@ export const bindingBorderTest = (
   x: number,
   y: number,
 ): boolean => {
-  const [xy, absoluteCoords] = adjustXYForElementRotation(element, x, y);
+  const absoluteCoords = getElementAbsoluteCoords(element);
+  [x, y] = adjustXYForElementRotation(element, absoluteCoords, x, y);
   const [x1, y1, x2, y2] = absoluteCoords;
   const smallerDimension = Math.min(x2 - x1, y2 - y1);
-  [x, y] = xy;
   // We make the bindable boundary bigger for bigger elements
   const threshold =
     Math.max(15, Math.min(0.25 * smallerDimension, 80)) / appState.zoom;
@@ -197,17 +197,17 @@ const isInsideEllipse = (
 // and rotates it around the element center to avoid having to rotate
 // all the element points instead to account for the element's rotation
 const adjustXYForElementRotation = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
+  elementAbsoluteCoords: [number, number, number, number],
   x: number,
   y: number,
-): [[number, number], [number, number, number, number]] => {
-  const absoluteCoords = getElementAbsoluteCoords(element);
-  const [x1, y1, x2, y2] = absoluteCoords;
+): [number, number] => {
+  const [x1, y1, x2, y2] = elementAbsoluteCoords;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // reverse rotate the pointer
   const xy = rotate(x, y, cx, cy, -element.angle);
-  return [xy, absoluteCoords];
+  return xy;
 };
 
 const isNearEllipse = (
