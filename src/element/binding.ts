@@ -3,12 +3,13 @@ import {
   ExcalidrawBindableElement,
   NonDeleted,
 } from "./types";
-import { AppState } from "../types";
+import { AppState, Point } from "../types";
 import { getElementAtPosition } from "../scene";
 import { isBindableElement } from "./typeChecks";
-import { bindingBorderTest } from "./collision";
+import { bindingBorderTest, intersectElementWithLine } from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
+import { centerPoint, distanceBetweenPoints } from "../math";
 
 export const maybeBindLinearElement = (
   linearElement: ExcalidrawLinearElement,
@@ -17,11 +18,7 @@ export const maybeBindLinearElement = (
   pointerCoords: { x: number; y: number },
 ): void => {
   if (appState.boundElement != null) {
-    bindLinearElement(
-      linearElement,
-      appState.boundElement,
-      "start",
-    );
+    bindLinearElement(linearElement, appState.boundElement, "start");
   }
   const hoveredElement = getHoveredElementForBinding(
     appState,
@@ -29,11 +26,7 @@ export const maybeBindLinearElement = (
     pointerCoords,
   );
   if (hoveredElement != null) {
-    bindLinearElement(
-      linearElement,
-      hoveredElement,
-      "end",
-    );
+    bindLinearElement(linearElement, hoveredElement, "end");
   }
 };
 
@@ -42,12 +35,11 @@ const bindLinearElement = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
 ): void => {
-
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
-      element: hoveredElement,
+      elementId: hoveredElement.id,
       ...calculateFocusPointAndGap(linearElement, hoveredElement, startOrEnd),
-    }
+    },
   });
   mutateElement(hoveredElement, {
     boundElementIds: [
@@ -75,7 +67,6 @@ export const getHoveredElementForBinding = (
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
 
-
 const calculateFocusPointAndGap = (
   linearElement: ExcalidrawLinearElement,
   hoveredElement: ExcalidrawBindableElement,
@@ -86,14 +77,22 @@ const calculateFocusPointAndGap = (
   const adjacentPointIndex = edgePointIndex - direction;
   const edgePoint = linearElement.points[edgePointIndex];
   const adjacentPoint = linearElement.points[adjacentPointIndex];
-   = intersectElementWithSemiLine(
+  const interesections = intersectElementWithLine(
     hoveredElement,
     adjacentPoint,
     edgePoint,
   );
-  const [nearIntersection, farIntersection] = 
+  if (interesections.length === 0) {
+    // The linear element is not pointing at the shape, just bind to
+    // the position of the edge point
+    return { focusPoint: edgePoint, gap: 0 };
+  }
+  const [intersection1, intersection2] = interesections;
   return {
-    focusPoint: centerPoint(nearIntersection, farIntersection),
-    gap: distanceBetweenPoints(nearIntersection, farIntersection),
+    focusPoint: centerPoint(intersection1, intersection2),
+    gap: Math.min(
+      distanceBetweenPoints(intersection1, edgePoint),
+      distanceBetweenPoints(intersection2, edgePoint),
+    ),
   };
 };

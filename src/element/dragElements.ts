@@ -36,10 +36,10 @@ const updateBoundElementsOnDrag = (
     .getNonDeletedElements(draggedElement.boundElementIds ?? [])
     .forEach((boundElement) => {
       boundElement = boundElement as NonDeleted<ExcalidrawLinearElement>;
-      if (boundElement.startBoundElementID === draggedElement.id) {
+      if (boundElement.startBinding?.elementId === draggedElement.id) {
         LinearElementEditor.movePointByOffset(boundElement, 0, offset);
       }
-      if (boundElement.endBoundElementID === draggedElement.id) {
+      if (boundElement.endBinding?.elementId === draggedElement.id) {
         LinearElementEditor.movePointByOffset(
           boundElement,
           boundElement.points.length - 1,

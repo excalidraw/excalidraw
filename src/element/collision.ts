@@ -3,10 +3,15 @@ import {
   isPathALoop,
   rotate,
   isPointInPolygon,
+  intersectLineAndSegment,
 } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
-import { NonDeletedExcalidrawElement } from "./types";
+import {
+  NonDeletedExcalidrawElement,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+} from "./types";
 
 import {
   getDiamondPoints,
@@ -123,25 +128,59 @@ export const bindingBorderTest = (
   const relX = x - element.x;
   const relY = y - element.y;
 
-  if (element.type === "ellipse") {
-    const ellipseParams = ellipseParamsRelativeTo(element, x, y);
-    return (
-      isNearEllipse(ellipseParams, threshold) &&
-      !isInsideEllipse(ellipseParams, 0)
-    );
-  } else if (element.type === "rectangle" || element.type === "text") {
-    return (
-      isNearRectangle(x, y, absoluteCoords, threshold) &&
-      !isInsideRectangle(x, y, absoluteCoords, 0)
-    );
-  } else if (element.type === "diamond") {
-    const diamondParams = getDiamondPoints(element);
-    return (
-      isInsideDiamond(relX, relY, diamondParams, threshold) &&
-      !isNearDiamond(relX, relY, diamondParams, 0)
-    );
+  switch (element.type) {
+    case "rectangle":
+    case "text":
+      return (
+        isNearRectangle(x, y, absoluteCoords, threshold) &&
+        !isInsideRectangle(x, y, absoluteCoords, 0)
+      );
+    case "diamond":
+      const diamondParams = getDiamondPoints(element);
+      return (
+        isInsideDiamond(relX, relY, diamondParams, threshold) &&
+        !isNearDiamond(relX, relY, diamondParams, 0)
+      );
+    case "ellipse":
+      const ellipseParams = ellipseParamsRelativeTo(element, x, y);
+      return (
+        isNearEllipse(ellipseParams, threshold) &&
+        !isInsideEllipse(ellipseParams, 0)
+      );
   }
   return false;
+};
+
+export const intersectElementWithLine = (
+  element: ExcalidrawBindableElement,
+  a: Point,
+  b: Point,
+): Point[] => {
+  const absoluteCoords = getElementAbsoluteCoords(element);
+  a = adjustXYForElementRotation(element, absoluteCoords, ...a);
+  b = adjustXYForElementRotation(element, absoluteCoords, ...b);
+
+  switch (element.type) {
+    case "rectangle":
+    case "text":
+      const [x1, y1, x2, y2] = absoluteCoords;
+      const c1: Point = [x1, y1];
+      const c2: Point = [x2, y1];
+      const c3: Point = [x2, y2];
+      const c4: Point = [x1, y2];
+      return [
+        intersectLineAndSegment(a, b, c1, c2),
+        intersectLineAndSegment(a, b, c2, c3),
+        intersectLineAndSegment(a, b, c3, c4),
+        intersectLineAndSegment(a, b, c4, c1),
+      ].filter((point) => point != null) as [Point, Point];
+
+    case "diamond":
+      return [];
+    case "ellipse":
+      return [];
+  }
+  throw new Error("unexpected element type");
 };
 
 const ellipseParamsRelativeTo = (

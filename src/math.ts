@@ -230,6 +230,14 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   return Math.hypot(xd, yd);
 };
 
+export const distanceBetweenPoints = (a: Point, b: Point): number => {
+  return distance2d(a[0], a[1], b[0], b[1]);
+};
+
+export const centerPoint = (a: Point, b: Point): Point => {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+};
+
 // Checks if the first and last point are close enough
 // to be considered a loop
 export const isPathALoop = (
@@ -331,6 +339,30 @@ const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   }
 
   return false;
+};
+
+// Returns the intersection between line `a,b` and segment `s1,s2`.
+export const intersectLineAndSegment = (
+  a: Point,
+  b: Point,
+  s1: Point,
+  s2: Point,
+): Point | null => {
+  const [ax, ay] = a;
+  const [bx, by] = b;
+  const [s1x, s1y] = s1;
+  const [s2x, s2y] = s2;
+  const lx = bx - ax;
+  const ly = by - ay;
+  const sx = s2x - s1x;
+  const sy = s2y - s1y;
+
+  const t = (sx * (ay - s1y) - sy * (ax - s1x)) / (-sx * ly + lx * sy);
+  if (t >= 0 && t <= 1) {
+    return [ax + t * lx, ay + t * ly];
+  }
+
+  return null;
 };
 
 export const getGridPoint = (

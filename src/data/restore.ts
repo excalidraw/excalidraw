@@ -86,8 +86,8 @@ const migrateElement = (
     case "line":
     case "arrow": {
       return migrateElementWithProperties(element, {
-        startBoundElementID: element.startBoundElementID,
-        endBoundElementID: element.endBoundElementID,
+        startBinding: element.startBinding,
+        endBinding: element.endBinding,
         points:
           // migrate old arrow model to new one
           !Array.isArray(element.points) || element.points.length < 2

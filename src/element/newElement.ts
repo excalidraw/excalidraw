@@ -218,8 +218,8 @@ export const newLinearElement = (
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
     lastCommittedPoint: null,
-    startBoundElementID: null,
-    endBoundElementID: null,
+    startBinding: null,
+    endBinding: null,
   };
 };
 
