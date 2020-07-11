@@ -20,7 +20,7 @@ export const maybeBindLinearElement = (
     bindLinearElement(
       linearElement,
       appState.boundElement,
-      "startBoundElementID",
+      "start",
     );
   }
   const hoveredElement = getHoveredElementForBinding(
@@ -29,17 +29,25 @@ export const maybeBindLinearElement = (
     pointerCoords,
   );
   if (hoveredElement != null) {
-    bindLinearElement(linearElement, hoveredElement, "endBoundElementID");
+    bindLinearElement(
+      linearElement,
+      hoveredElement,
+      "end",
+    );
   }
 };
 
 const bindLinearElement = (
   linearElement: ExcalidrawLinearElement,
   hoveredElement: ExcalidrawBindableElement,
-  startOrEndBoundElementIDField: "startBoundElementID" | "endBoundElementID",
+  startOrEnd: "start" | "end",
 ): void => {
+
   mutateElement(linearElement, {
-    [startOrEndBoundElementIDField]: hoveredElement.id,
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
+      element: hoveredElement,
+      ...calculateFocusPointAndGap(linearElement, hoveredElement, startOrEnd),
+    }
   });
   mutateElement(hoveredElement, {
     boundElementIds: [
@@ -65,4 +73,27 @@ export const getHoveredElementForBinding = (
       isBindableElement(element) && bindingBorderTest(element, appState, x, y),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
+};
+
+
+const calculateFocusPointAndGap = (
+  linearElement: ExcalidrawLinearElement,
+  hoveredElement: ExcalidrawBindableElement,
+  startOrEnd: "start" | "end",
+): { focusPoint: Point; gap: number } => {
+  const direction = startOrEnd === "start" ? -1 : 1;
+  const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
+  const adjacentPointIndex = edgePointIndex - direction;
+  const edgePoint = linearElement.points[edgePointIndex];
+  const adjacentPoint = linearElement.points[adjacentPointIndex];
+   = intersectElementWithSemiLine(
+    hoveredElement,
+    adjacentPoint,
+    edgePoint,
+  );
+  const [nearIntersection, farIntersection] = 
+  return {
+    focusPoint: centerPoint(nearIntersection, farIntersection),
+    gap: distanceBetweenPoints(nearIntersection, farIntersection),
+  };
 };
