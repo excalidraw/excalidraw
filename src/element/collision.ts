@@ -6,7 +6,7 @@ import {
   isPointInPolygon,
 } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
-import { isPointInsidePath } from "./path/R";
+import { isPointInsidePath } from "./path/raphael";
 
 import { NonDeletedExcalidrawElement } from "./types";
 

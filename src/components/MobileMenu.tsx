@@ -16,6 +16,7 @@ import { RoomDialog } from "./RoomDialog";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
+import { isBoolable } from "../actions/bool/commonBoolHelpers";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -116,6 +117,17 @@ export function MobileMenu({
                 elementType={appState.elementType}
               />
             </Section>
+          ) : appState.openMenu === "path" && isBoolable(elements, appState) ? (
+            <Section className="App-mobile-menu" heading="selectedShapeActions">
+              <div className="panelColumn">
+                <div className="buttonList">
+                  {actionManager.renderAction("shapeUnion")}
+                  {actionManager.renderAction("shapeDifference")}
+                  {actionManager.renderAction("shapeIntersection")}
+                  {actionManager.renderAction("shapeExclusion")}
+                </div>
+              </div>
+            </Section>
           ) : null}
           <footer className="App-toolbar">
             <div className="App-toolbar-content">
@@ -123,6 +135,7 @@ export function MobileMenu({
               {actionManager.renderAction("toggleEditMenu")}
               {actionManager.renderAction("undo")}
               {actionManager.renderAction("redo")}
+              {actionManager.renderAction("togglePathMenu")}
               {actionManager.renderAction(
                 appState.multiElement ? "finalize" : "duplicateSelection",
               )}

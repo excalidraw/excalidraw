@@ -7,7 +7,10 @@ export {
 } from "./actionZindex";
 export { actionSelectAll } from "./actionSelectAll";
 export { actionDuplicateSelection } from "./actionDuplicateSelection";
-export { actionShapeDifference } from "./actionShapeBoolean";
+export { actionShapeDifference } from "./bool/actionShapeDifference";
+export { actionShapeUnion } from "./bool/actionShapeUnion";
+export { actionShapeIntersection } from "./bool/actionShapeIntersection";
+export { actionShapeExclusion } from "./bool/actionShapeExclusion";
 export {
   actionChangeStrokeColor,
   actionChangeBackgroundColor,
@@ -44,4 +47,5 @@ export {
   actionToggleEditMenu,
   actionFullScreen,
   actionShortcuts,
+  actionTogglePathMenu,
 } from "./actionMenu";

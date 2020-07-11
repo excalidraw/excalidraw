@@ -1,4 +1,6 @@
-import * as R from "./R";
+import * as R from "./raphael";
+
+let retried = false;
 
 /**
  * convert raphael's internal path representation (must be converted to curves before) to segments / bezier curves
@@ -90,32 +92,50 @@ function markSubpathEndings(...pathSegments) {
  *
  * @return array newPath (segment representation of the resulting path)
  */
-function operateBool(type, path1, path2) {
+function operateBool(type, path1, path2, fix) {
   const path1Segs = generatePathSegments(path1);
   const path2Segs = generatePathSegments(path2);
 
   markSubpathEndings(path1Segs, path2Segs);
 
   //get intersections of both paths
-  var inters = getIntersections(path1, path2);
+  var intersections = getIntersections(path1, path2);
 
   //if any insert intersections into paths
-  if (inters.length > 0) {
-    insertIntersectionPoints(path1Segs, 1, inters);
-    insertIntersectionPoints(path2Segs, 2, inters);
+  if (intersections.length > 0) {
+    insertIntersectionPoints(path1Segs, 1, intersections);
+    insertIntersectionPoints(path2Segs, 2, intersections);
   }
 
-  var newParts = buildNewPathParts(type, path1Segs, path2Segs);
+  var newParts = buildNewPathParts(type, path1Segs, path2Segs, fix);
   var indexes = buildPartIndexes(newParts);
 
-  const result = buildNewPath(
-    type,
-    newParts,
-    indexes.inversions,
-    indexes.startIndex,
-  );
+  let result;
 
-  return pathSegsToArr(result);
+  try {
+    result = buildNewPath(
+      type,
+      newParts,
+      indexes.inversions,
+      indexes.startIndex,
+      fix,
+    );
+  } catch (error) {
+    if (retried) {
+      retried = false;
+
+      return;
+    }
+
+    retried = true;
+
+    return operateBool(type, path1, path2, true);
+  }
+
+  return {
+    data: pathSegsToArr(result),
+    intersections,
+  };
 }
 
 /**
@@ -299,12 +319,12 @@ function insertIntersectionPoints(pathSegs, pathNr, inters) {
  *
  * @returns bool
  */
-var isSegInsidePath = function (segments, path) {
+var isSegInsidePath = function (segments, path, fix) {
   //get point on segment (t = 0.5)
   var point = R.findDotsAtSegment(...[...segments, 0.5]);
 
   //is point inside of given path
-  return R.isPointInsidePath(path, point.x, point.y);
+  return R.isPointInsidePath(path, point.x, point.y, fix);
 };
 
 /**
@@ -477,7 +497,7 @@ function getIntersections(path1, path2) {
  *
  * @returns array newParts (array of arrays holding segments)
  */
-function buildNewPathParts(type, path1Segs, path2Segs) {
+function buildNewPathParts(type, path1Segs, path2Segs, fix) {
   let IOSituationChecked = false;
   let insideOtherPath; //temporary flag
   let partNeeded = false;
@@ -537,6 +557,7 @@ function buildNewPathParts(type, path1Segs, path2Segs) {
         insideOtherPath = isSegInsidePath(
           segCoords,
           pathSegsToStr(paths[p ^ 1].segs),
+          fix,
         );
 
         IOSituationChecked = true;
@@ -623,7 +644,7 @@ function buildPartIndexes(parts) {
  *
  * @returns array resultPath (segment representation of the operation's resulting path)
  */
-function buildNewPath(type, parts, inversions, startIndex) {
+function buildNewPath(type, parts, inversions, startIndex, fix) {
   var newPath = [];
   var dirCheck = []; //starting position of subpaths marked for a direction check
 
@@ -699,7 +720,9 @@ function buildNewPath(type, parts, inversions, startIndex) {
           continue;
         }
 
-        if (isSegInsidePath(newPath[n][0].items, pathSegsToStr(newPath[o]))) {
+        if (
+          isSegInsidePath(newPath[n][0].items, pathSegsToStr(newPath[o]), fix)
+        ) {
           var pathDirOut = getPathDirection(newPath[o]);
           var pathDirIn = getPathDirection(newPath[n]);
 
@@ -721,22 +744,28 @@ function buildNewPath(type, parts, inversions, startIndex) {
 /**
  * perform a union of the two given paths
  *
- * @param object el1 (RaphaelJS element)
- * @param object el2 (RaphaelJS element)
+ * @param object path1: Path
+ * @param object path2: Path
  *
- * @returns string (path string)
+ * @returns {
+    data,
+    intersections,
+  }
  */
 export function union(path1, path2) {
-  return pathSegsToStr(operateBool("union", path1, path2));
+  return operateBool("union", path1, path2);
 }
 
 /**
  * perform a difference of the two given paths
  *
- * @param object el1 (RaphaelJS element)
- * @param object el2 (RaphaelJS element)
+ * @param object path1: Path
+ * @param object path2: Path
  *
- * @returns string (path string)
+ * @returns {
+    data,
+    intersections,
+  }
  */
 export function difference(path1, path2) {
   return operateBool("difference", path1, path2);
@@ -745,29 +774,35 @@ export function difference(path1, path2) {
 /**
  * perform an intersection of the two given paths
  *
- * @param object el1 (RaphaelJS element)
- * @param object el2 (RaphaelJS element)
+ * @param object path1: Path
+ * @param object path2: Path
  *
- * @returns string (path string)
+ * @returns {
+    data,
+    intersections,
+  }
  */
 export function intersection(path1, path2) {
-  return pathSegsToStr(operateBool("intersection", path1, path2));
+  return operateBool("intersection", path1, path2);
 }
 
 /**
  * perform an exclusion of the two given paths -> A Exclusion B = (A Union B) Difference (A Intersection B)
  *
- * @param object el1 (RaphaelJS element)
- * @param object el2 (RaphaelJS element)
+ * @param object path1: Path
+ * @param object path2: Path
  *
- * @returns string (path string)
+ * @returns {
+    data,
+    intersections,
+  }
  */
 export function exclusion(path1, path2) {
-  return pathSegsToStr(
-    operateBool(
-      "difference",
-      operateBool("union", path1, path2),
-      operateBool("intersection", path1, path2),
-    ),
-  );
+  const r1 = operateBool("union", path1, path2);
+  const r2 = operateBool("intersection", path1, path2);
+
+  return {
+    ...operateBool("difference", r1.data, r2.data),
+    intersections: r1.intersections,
+  }
 }

@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawPathElement,
 } from "./types";
 
 export function isTextElement(
@@ -16,6 +17,12 @@ export function isLinearElement(
   return (
     element != null && (element.type === "arrow" || element.type === "line")
   );
+}
+
+export function isPathElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawPathElement {
+  return element != null && element.type === "path";
 }
 
 export function isExcalidrawElement(element: any): boolean {

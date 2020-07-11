@@ -53,6 +53,9 @@
     "createRoom": "Share a live-collaboration session",
     "duplicateSelection": "Duplicate",
     "shapeDifference": "Difference",
+    "shapeUnion": "Union",
+    "shapeIntersection": "Intersection",
+    "shapeExclusion": "Exclusion",
     "untitled": "Untitled",
     "name": "Name",
     "madeWithExcalidraw": "Made with Excalidraw"
@@ -76,6 +79,7 @@
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
+    "path": "Path",
     "undo": "Undo",
     "redo": "Redo",
     "roomDialog": "Start live collaboration",

@@ -1,5 +1,5 @@
 import React from "react";
-import { menu, palette } from "../components/icons";
+import { menu, palette, path } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
@@ -7,6 +7,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
+import { isBoolable } from "../actions/bool/commonBoolHelpers";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -50,6 +51,27 @@ export const actionToggleEditMenu = register({
       selected={appState.openMenu === "shape"}
     />
   ),
+});
+
+export const actionTogglePathMenu = register({
+  name: "togglePathMenu",
+  perform: (_elements, appState) => ({
+    appState: {
+      ...appState,
+      openMenu: appState.openMenu === "path" ? null : "path",
+    },
+    commitToHistory: false,
+  }),
+  PanelComponent: ({ elements, appState, updateData }) =>
+    isBoolable(elements, appState) ? (
+      <ToolButton
+        type="button"
+        icon={path}
+        aria-label={t("buttons.edit")}
+        onClick={updateData}
+        selected={appState.openMenu === "path"}
+      />
+    ) : null,
 });
 
 export const actionFullScreen = register({

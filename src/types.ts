@@ -47,7 +47,7 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: number;
-  openMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | "shape" | "path" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   collaborators: Map<
@@ -86,12 +86,4 @@ export declare class GestureEvent extends UIEvent {
 
 export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
   _brand: "socketUpdateData";
-};
-
-export type BoundingPoints = {
-  nw: Point;
-  ne: Point;
-  sw: Point;
-  se: Point;
-  [key: string]: Point;
 };

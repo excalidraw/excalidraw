@@ -76,7 +76,10 @@ export function SelectedShapeActions({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
+            {renderAction("shapeUnion")}
             {renderAction("shapeDifference")}
+            {renderAction("shapeIntersection")}
+            {renderAction("shapeExclusion")}
             {renderAction("duplicateSelection")}
             {renderAction("deleteSelectedElements")}
           </div>

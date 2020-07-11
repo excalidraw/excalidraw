@@ -15,7 +15,7 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { isLinearElement } from "./typeChecks";
+import { isLinearElement, isPathElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import {
@@ -27,6 +27,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
 } from "../keys";
+import Path from "../element/path/Path";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -54,6 +55,7 @@ export const resizeElements = (
   const handleOffset = 4 / appState.zoom; // XXX import constant
   const dashedLinePadding = 4 / appState.zoom; // XXX import constant
   const offsetPointer = handleOffset + dashedLinePadding;
+
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
@@ -312,6 +314,7 @@ const resizeSingleElement = (
   if (resizeHandle === "n" || resizeHandle === "nw" || resizeHandle === "ne") {
     scaleY = adjustWithOffsetPointer(y2 - rotatedY) / (y2 - y1);
   }
+
   let nextWidth = element.width * scaleX;
   let nextHeight = element.height * scaleY;
   if (sidesWithSameLength) {
@@ -326,6 +329,7 @@ const resizeSingleElement = (
   const deltaY1 = (y1 - nextY1) / 2;
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
+
   const rescaledPoints = isLinearElement(element)
     ? {
         points: rescalePoints(
@@ -335,6 +339,7 @@ const resizeSingleElement = (
         ),
       }
     : {};
+
   const [finalX1, finalY1, finalX2, finalY2] = getResizedElementAbsoluteCoords(
     {
       ...element,
@@ -369,6 +374,21 @@ const resizeSingleElement = (
     deltaY2,
     isResizeFromCenter,
   );
+
+  let nextPathData = {};
+
+  if (isPathElement(element)) {
+    const path = new Path(element.d);
+
+    path.transform({
+      scale: [scaleX, scaleY],
+    });
+
+    nextPathData = {
+      d: path.toPathString(),
+    };
+  }
+
   if (
     nextWidth !== 0 &&
     nextHeight !== 0 &&
@@ -381,6 +401,7 @@ const resizeSingleElement = (
       x: nextElementX,
       y: nextElementY,
       ...rescaledPoints,
+      ...nextPathData,
     });
   }
 };

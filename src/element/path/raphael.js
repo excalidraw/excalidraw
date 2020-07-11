@@ -1,3 +1,6 @@
+// Ported from Raphaeljs
+// https://github.com/DmitryBaranovskiy/raphael
+
 const pathCommand = /([achlmrqstvz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/gi;
 const pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)[\s]*,?[\s]*/gi;
 const notcurvepath = /,?([achlqrstvx]),?/i;
@@ -246,100 +249,6 @@ function l2c(x1, y1, x2, y2) {
   return [x1, y1, x2, y2, x2, y2];
 }
 
-// function pathToAbsolute(pathArray) {
-//   var pth = paths(pathArray);
-//   if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) { // rough assumption
-//       pathArray = R.parsePathString(pathArray);
-//   }
-//   if (!pathArray || !pathArray.length) {
-//       return [["M", 0, 0]];
-//   }
-//   var res = [],
-//       x = 0,
-//       y = 0,
-//       mx = 0,
-//       my = 0,
-//       start = 0;
-//   if (pathArray[0][0] == "M") {
-//       x = +pathArray[0][1];
-//       y = +pathArray[0][2];
-//       mx = x;
-//       my = y;
-//       start++;
-//       res[0] = ["M", x, y];
-//   }
-//   var crz = pathArray.length == 3 && pathArray[0][0] == "M" && pathArray[1][0].toUpperCase() == "R" && pathArray[2][0].toUpperCase() == "Z";
-//   for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
-//       res.push(r = []);
-//       pa = pathArray[i];
-//       if (pa[0] != upperCase.call(pa[0])) {
-//           r[0] = upperCase.call(pa[0]);
-//           switch (r[0]) {
-//               case "A":
-//                   r[1] = pa[1];
-//                   r[2] = pa[2];
-//                   r[3] = pa[3];
-//                   r[4] = pa[4];
-//                   r[5] = pa[5];
-//                   r[6] = +(pa[6] + x);
-//                   r[7] = +(pa[7] + y);
-//                   break;
-//               case "V":
-//                   r[1] = +pa[1] + y;
-//                   break;
-//               case "H":
-//                   r[1] = +pa[1] + x;
-//                   break;
-//               case "R":
-//                   var dots = [x, y][concat](pa.slice(1));
-//                   for (var j = 2, jj = dots.length; j < jj; j++) {
-//                       dots[j] = +dots[j] + x;
-//                       dots[++j] = +dots[j] + y;
-//                   }
-//                   res.pop();
-//                   res = res[concat](catmullRom2bezier(dots, crz));
-//                   break;
-//               case "M":
-//                   mx = +pa[1] + x;
-//                   my = +pa[2] + y;
-//               default:
-//                   for (j = 1, jj = pa.length; j < jj; j++) {
-//                       r[j] = +pa[j] + ((j % 2) ? x : y);
-//                   }
-//           }
-//       } else if (pa[0] == "R") {
-//           dots = [x, y][concat](pa.slice(1));
-//           res.pop();
-//           res = res[concat](catmullRom2bezier(dots, crz));
-//           r = ["R"][concat](pa.slice(-2));
-//       } else {
-//           for (var k = 0, kk = pa.length; k < kk; k++) {
-//               r[k] = pa[k];
-//           }
-//       }
-//       switch (r[0]) {
-//           case "Z":
-//               x = mx;
-//               y = my;
-//               break;
-//           case "H":
-//               x = r[1];
-//               break;
-//           case "V":
-//               y = r[1];
-//               break;
-//           case "M":
-//               mx = r[r.length - 2];
-//               my = r[r.length - 1];
-//           default:
-//               x = r[r.length - 2];
-//               y = r[r.length - 1];
-//       }
-//   }
-//   res.toString = R._path2string;
-//   pth.abs = pathClone(res);
-//   return res;
-// }
 
 function _path2curve(path) {
   var attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
@@ -550,13 +459,13 @@ export function parsePathString(pathString) {
   return data;
 }
 
-export function isPointInsidePath(path, x, y) {
+export function isPointInsidePath(path, x, y, fix) {
   var bbox = pathDimensions(path);
 
   return (
     isPointInsideBBox(bbox, x, y) &&
     // eslint-disable-next-line
-    pathIntersection(path, _path2curve([["M", x, y], ["L", bbox.x2 + 10, bbox.y2 + 10]])).length % 2 === 1
+    pathIntersection(path, _path2curve(fix ? [["M", x, y], ["H", bbox.x2 + 10]] : [["M", x, y], ["L", bbox.x2 + 10, bbox.y2 + 10]])).length % 2 === 1
   );
 }
 

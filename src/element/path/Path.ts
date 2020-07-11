@@ -1,14 +1,20 @@
 import { ExcalidrawElement } from "../types";
-import { difference, pathArrToStr } from "./path-boolop";
+import {
+  difference,
+  union,
+  intersection,
+  exclusion,
+  pathArrToStr,
+} from "./raphaelBools";
 import {
   parsePathString,
   getTotalLength,
   getPointAtLength,
   normalizePath,
   pathDimensions,
-} from "./R";
+} from "./raphael";
 import Matrix from "./Matrix";
-import { Point } from "roughjs/bin/geometry";
+import { Point } from "../../types";
 
 function isHollow(path: (string | number)[][]) {
   const index = path.findIndex(
@@ -25,16 +31,42 @@ function isHollow(path: (string | number)[][]) {
   );
 }
 
+interface Transform {
+  translate?: number[];
+  scale?: number[];
+  rotate?: number;
+}
+
+function toMarix(transform: Transform, centerPoint: Point) {
+  const matrix = new Matrix();
+
+  if (transform.translate) {
+    matrix.translate(...(transform.translate as [number, number]));
+  }
+
+  if (transform.rotate) {
+    matrix.rotate(transform.rotate as number, ...centerPoint);
+  }
+
+  if (transform.scale) {
+    const [scaleX, scaleY] = transform.scale;
+
+    matrix.scale(scaleX, scaleY, 0, 0);
+  }
+
+  return matrix;
+}
+
 export default class Path {
-  path: (string | number)[][];
+  data: (string | number)[][];
   isHollow: boolean = false;
 
   constructor(d: string | ExcalidrawElement) {
-    this.path = typeof d === "string" ? parsePathString(d) : this.toPath(d);
+    this.data = typeof d === "string" ? parsePathString(d) : this.toPath(d);
   }
 
   mapPath(matrix: Matrix) {
-    this.path.forEach((path) => {
+    this.data.forEach((path) => {
       for (let i = 1; i < path.length; i += 2) {
         const n1 = path[i] as number;
         const n2 = path[i + 1] as number;
@@ -47,7 +79,7 @@ export default class Path {
   }
 
   getBoundingBox() {
-    return pathDimensions(this.path);
+    return pathDimensions(this.data);
   }
 
   getCenterPoint(): Point {
@@ -56,22 +88,23 @@ export default class Path {
     return [box.x + box.width / 2, box.y + box.height / 2];
   }
 
-  transform(transform: { translate?: number[]; rotate?: number } = {}) {
-    const matrix = new Matrix();
+  transformPoint(point: Point, transform: Transform = {}): Point {
+    const matrix = toMarix(transform, this.getCenterPoint());
 
-    if (transform.translate) {
-      matrix.translate(...(transform.translate as [number, number]));
-    }
+    const newX = matrix.x(...point);
+    const newY = matrix.y(...point);
 
-    if (transform.rotate) {
-      matrix.rotate(transform.rotate as number, ...this.getCenterPoint());
-    }
+    return [newX, newY];
+  }
+
+  transform(transform: Transform = {}) {
+    const matrix = toMarix(transform, this.getCenterPoint())
 
     this.mapPath(matrix);
   }
 
   toPathString() {
-    return pathArrToStr(this.path);
+    return pathArrToStr(this.data);
   }
 
   /**
@@ -83,16 +116,70 @@ export default class Path {
    * @returns string (path string)
    */
   difference(path: Path) {
-    this.path = difference(this.path, path.path);
-    this.isHollow = isHollow(this.path);
+    const { data, intersections } = difference(this.data, path.data);
+
+    this.data = data;
+    this.isHollow = isHollow(this.data);
+
+    return intersections;
+  }
+
+  /**
+   * perform a union of the two given paths
+   *
+   * @param object el1 (RaphaelJS element)
+   * @param object el2 (RaphaelJS element)
+   *
+   * @returns string (path string)
+   */
+  union(path: Path) {
+    const { data, intersections } = union(this.data, path.data);
+    this.data = data;
+    this.isHollow = isHollow(this.data);
+
+    return intersections;
+  }
+
+  /**
+   * perform a intersection of the two given paths
+   *
+   * @param object el1 (RaphaelJS element)
+   * @param object el2 (RaphaelJS element)
+   *
+   * @returns string (path string)
+   */
+  intersection(path: Path) {
+    const { data, intersections } = intersection(this.data, path.data);
+
+    this.data = data;
+    this.isHollow = isHollow(this.data);
+
+    return intersections;
+  }
+
+  /**
+   * perform a exclusion of the two given paths
+   *
+   * @param object el1 (RaphaelJS element)
+   * @param object el2 (RaphaelJS element)
+   *
+   * @returns string (path string)
+   */
+  exclusion(path: Path) {
+    const { data, intersections } = exclusion(this.data, path.data);
+
+    this.data = data;
+    this.isHollow = isHollow(this.data);
+
+    return intersections;
   }
 
   getTotalLength(): number {
-    return getTotalLength(this.path) as number;
+    return getTotalLength(this.data) as number;
   }
 
   getPointAtLength(length: number) {
-    return getPointAtLength(this.path, length);
+    return getPointAtLength(this.data, length);
   }
 
   toPath(element: ExcalidrawElement) {
@@ -158,5 +245,13 @@ export default class Path {
     }
 
     return normalizePath(pathArrToStr(path));
+  }
+
+  static clone(path: Path): Path {
+    const clone = new Path(path.toPathString());
+
+    clone.isHollow = path.isHollow;
+
+    return clone;
   }
 }

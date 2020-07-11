@@ -89,6 +89,24 @@ export default class Matrix {
   }
 
   /*\
+    * Matrix.scale
+    [ method ]
+    **
+    * Scales the matrix
+    > Parameters
+    - x (number)
+    - y (number) #optional
+    - cx (number) #optional
+    - cy (number) #optional
+  \*/
+  scale(x: number, y: number, cx: number, cy: number) {
+    y == null && (y = x);
+    (cx || cy) && this.add(1, 0, 0, 1, cx, cy);
+    this.add(x, 0, 0, y, 0, 0);
+    (cx || cy) && this.add(1, 0, 0, 1, -cx, -cy);
+  }
+
+  /*\
     * Matrix.x
     [ method ]
     **
