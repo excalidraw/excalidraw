@@ -360,6 +360,18 @@ export class LinearElementEditor {
     });
   }
 
+  static movePointByOffset(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    pointIndex: number,
+    offset: { x: number; y: number },
+  ) {
+    const [x, y] = element.points[pointIndex];
+    LinearElementEditor.movePoint(element, pointIndex, [
+      x + offset.x,
+      y + offset.y,
+    ]);
+  }
+
   static movePoint(
     element: NonDeleted<ExcalidrawLinearElement>,
     pointIndex: number | "new",

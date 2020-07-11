@@ -97,8 +97,6 @@ const migrateElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
-        startBoundElementID: null,
-        endBoundElementID: null,
       });
     }
     // generic elements
