@@ -24,7 +24,7 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
-  | "boundElementIDs"
+  | "boundElementIds"
   | "seed"
   | "version"
   | "versionNonce"
@@ -46,7 +46,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
-    boundElementIDs = null,
+    boundElementIds = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => ({
@@ -69,7 +69,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   version: rest.version || 1,
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
-  boundElementIDs,
+  boundElementIds,
 });
 
 export const newElement = (

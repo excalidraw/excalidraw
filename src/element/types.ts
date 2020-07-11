@@ -22,7 +22,7 @@ type _ExcalidrawElementBase = Readonly<{
   versionNonce: number;
   isDeleted: boolean;
   groupIds: readonly GroupId[];
-  boundElementIDs: readonly ExcalidrawLinearElement["id"][] | null;
+  boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

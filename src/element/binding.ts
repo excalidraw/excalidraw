@@ -57,8 +57,8 @@ const maybeBindLinearElement = (
       [startOrEndBoundElementIDField]: hoveredElement.id,
     });
     mutateElement(hoveredElement, {
-      boundElementIDs: [
-        ...(hoveredElement.boundElementIDs ?? []),
+      boundElementIds: [
+        ...(hoveredElement.boundElementIds ?? []),
         linearElement.id,
       ],
     });

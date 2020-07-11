@@ -34,7 +34,7 @@ const updateBoundElementsOnDrag = (
   scene: Scene,
 ) => {
   scene
-    .getNonDeletedElements(draggedElement.boundElementIDs ?? [])
+    .getNonDeletedElements(draggedElement.boundElementIds ?? [])
     .forEach((boundElement) => {
       boundElement = boundElement as NonDeleted<ExcalidrawLinearElement>;
       // TODO: simplify by adding offsetPoint to LinearElementEditor
