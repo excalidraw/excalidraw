@@ -131,8 +131,8 @@ export const bindingBorderTest = (
     );
   } else if (element.type === "rectangle" || element.type === "text") {
     return (
-      isInsideRectangle(x, y, absoluteCoords, threshold) &&
-      !isNearRectangle(x, y, absoluteCoords, 0)
+      isNearRectangle(x, y, absoluteCoords, threshold) &&
+      !isInsideRectangle(x, y, absoluteCoords, 0)
     );
   } else if (element.type === "diamond") {
     const diamondParams = getDiamondPoints(element);
