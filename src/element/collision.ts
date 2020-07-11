@@ -114,10 +114,11 @@ export const bindingBorderTest = (
 ): boolean => {
   const [xy, absoluteCoords] = adjustXYForElementRotation(element, x, y);
   const [x1, y1, x2, y2] = absoluteCoords;
-  const size = Math.hypot(x2 - x1, y2 - y1);
+  const smallerDimension = Math.min(x2 - x1, y2 - y1);
   [x, y] = xy;
   // We make the bindable boundary bigger for bigger elements
-  const threshold = Math.max(15, Math.min(0.25 * size, 80)) / appState.zoom;
+  const threshold =
+    Math.max(15, Math.min(0.25 * smallerDimension, 80)) / appState.zoom;
 
   const relX = x - element.x;
   const relY = y - element.y;
