@@ -156,9 +156,8 @@ import {
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
 import {
-  maybeBindStartOfLinearElement,
   getHoveredElementForBinding,
-  maybeBindEndOfLinearElement,
+  maybeBindLinearElement,
 } from "../element/binding";
 
 /**
@@ -2603,8 +2602,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
-      const boundElement = maybeBindStartOfLinearElement(
-        element,
+      const boundElement = getHoveredElementForBinding(
         this.state,
         this.scene,
         pointerDownState.origin,
@@ -3057,7 +3055,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement: this.state.draggingElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          maybeBindEndOfLinearElement(
+          maybeBindLinearElement(
             draggingElement,
             this.state,
             this.scene,

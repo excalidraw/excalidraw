@@ -10,62 +10,42 @@ import { bindingBorderTest } from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 
-export const maybeBindStartOfLinearElement = (
-  linearElement: ExcalidrawLinearElement,
-  appState: AppState,
-  scene: Scene,
-  pointerCoords: { x: number; y: number },
-): NonDeleted<ExcalidrawBindableElement> | null => {
-  return maybeBindLinearElement(
-    linearElement,
-    "startBoundElementID",
-    appState,
-    scene,
-    pointerCoords,
-  );
-};
-
-export const maybeBindEndOfLinearElement = (
+export const maybeBindLinearElement = (
   linearElement: ExcalidrawLinearElement,
   appState: AppState,
   scene: Scene,
   pointerCoords: { x: number; y: number },
 ): void => {
-  maybeBindLinearElement(
-    linearElement,
-    "endBoundElementID",
-    appState,
-    scene,
-    pointerCoords,
-  );
-};
-
-const maybeBindLinearElement = (
-  linearElement: ExcalidrawLinearElement,
-  startOrEndBoundElementIDField: "startBoundElementID" | "endBoundElementID",
-  appState: AppState,
-  scene: Scene,
-  pointerCoords: { x: number; y: number },
-): NonDeleted<ExcalidrawBindableElement> | null => {
+  if (appState.boundElement != null) {
+    bindLinearElement(
+      linearElement,
+      appState.boundElement,
+      "startBoundElementID",
+    );
+  }
   const hoveredElement = getHoveredElementForBinding(
     appState,
     scene,
     pointerCoords,
   );
   if (hoveredElement != null) {
-    mutateElement(linearElement, {
-      [startOrEndBoundElementIDField]: hoveredElement.id,
-    });
-    mutateElement(hoveredElement, {
-      boundElementIds: [
-        ...new Set([
-          ...(hoveredElement.boundElementIds ?? []),
-          linearElement.id,
-        ]),
-      ],
-    });
+    bindLinearElement(linearElement, hoveredElement, "endBoundElementID");
   }
-  return hoveredElement;
+};
+
+const bindLinearElement = (
+  linearElement: ExcalidrawLinearElement,
+  hoveredElement: ExcalidrawBindableElement,
+  startOrEndBoundElementIDField: "startBoundElementID" | "endBoundElementID",
+): void => {
+  mutateElement(linearElement, {
+    [startOrEndBoundElementIDField]: hoveredElement.id,
+  });
+  mutateElement(hoveredElement, {
+    boundElementIds: [
+      ...new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
+    ],
+  });
 };
 
 export const getHoveredElementForBinding = (

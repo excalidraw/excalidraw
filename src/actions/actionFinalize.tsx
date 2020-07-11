@@ -9,7 +9,7 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { maybeBindEndOfLinearElement } from "../element/binding";
+import { maybeBindLinearElement } from "../element/binding";
 import Scene from "../scene/Scene";
 
 export const actionFinalize = register({
@@ -91,7 +91,7 @@ export const actionFinalize = register({
           multiPointElement,
           -1,
         );
-        maybeBindEndOfLinearElement(
+        maybeBindLinearElement(
           multiPointElement,
           appState,
           Scene.getScene(multiPointElement)!,
