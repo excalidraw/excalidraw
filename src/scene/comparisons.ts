@@ -10,26 +10,18 @@ export const hasBackground = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
-<<<<<<< HEAD
+  type === "draw" ||
   type === "line" ||
   type === "path";
-=======
-  type === "draw" ||
-  type === "line";
->>>>>>> master
 
 export const hasStroke = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
-<<<<<<< HEAD
+  type === "draw" ||
   type === "line" ||
   type === "path";
-=======
-  type === "draw" ||
-  type === "line";
->>>>>>> master
 
 export const hasText = (type: string) => type === "text";
 

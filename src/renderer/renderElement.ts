@@ -14,10 +14,6 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-<<<<<<< HEAD
-import { SVG_NS, distance } from "../utils";
-import { isPathALoop, radianToDegree } from "../math";
-=======
 import {
   SVG_NS,
   distance,
@@ -26,7 +22,6 @@ import {
   isRTL,
 } from "../utils";
 import { isPathALoop } from "../math";
->>>>>>> master
 import rough from "roughjs/bin/rough";
 
 const CANVAS_PADDING = 20;
@@ -98,7 +93,10 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse":
+    case "ellipse": {
+      rc.draw(getShapeForElement(element) as Drawable);
+      break;
+    }
     case "path": {
       rc.draw(getShapeForElement(element) as Drawable);
       break;
@@ -169,7 +167,6 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
-<<<<<<< HEAD
 function fixPath(d: string): string {
   return `${d.replace(rM, "M0,0")}M0,0`;
 }
@@ -206,114 +203,12 @@ function fixShape(shape: Drawable): Drawable {
   return shape;
 }
 
-export function getShapeForElement(element: ExcalidrawElement) {
-  return shapeCache.get(element);
-}
-=======
 export const getShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.get(element);
->>>>>>> master
 
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
-<<<<<<< HEAD
-export function generateShape(
-  element: NonDeletedExcalidrawElement,
-  generator: RoughGenerator,
-) {
-  let shape: Drawable | Drawable[] | null = [];
-
-  switch (element.type) {
-    case "rectangle":
-      shape = generator.rectangle(0, 0, element.width, element.height, {
-        stroke: element.strokeColor,
-        fill:
-          element.backgroundColor === "transparent"
-            ? undefined
-            : element.backgroundColor,
-        fillStyle: element.fillStyle,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness,
-        seed: element.seed,
-      });
-
-      break;
-    case "diamond": {
-      const [
-        topX,
-        topY,
-        rightX,
-        rightY,
-        bottomX,
-        bottomY,
-        leftX,
-        leftY,
-      ] = getDiamondPoints(element);
-      shape = generator.polygon(
-        [
-          [topX, topY],
-          [rightX, rightY],
-          [bottomX, bottomY],
-          [leftX, leftY],
-        ],
-        {
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-        },
-      );
-      break;
-    }
-    case "ellipse":
-      shape = generator.ellipse(
-        element.width / 2,
-        element.height / 2,
-        element.width,
-        element.height,
-        {
-          stroke: element.strokeColor,
-          fill:
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor,
-          fillStyle: element.fillStyle,
-          strokeWidth: element.strokeWidth,
-          roughness: element.roughness,
-          seed: element.seed,
-          curveFitting: 1,
-        },
-      );
-      break;
-    case "line":
-    case "arrow": {
-      const options: Options = {
-        stroke: element.strokeColor,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness,
-        seed: element.seed,
-      };
-
-      // points array can be empty in the beginning, so it is important to add
-      // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]];
-
-      // If shape is a line and is a closed shape,
-      // fill the shape if a color is set.
-      if (element.type === "line") {
-        if (isPathALoop(element.points)) {
-          options.fillStyle = element.fillStyle;
-          options.fill =
-            element.backgroundColor === "transparent"
-              ? undefined
-              : element.backgroundColor;
-=======
 export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   const options: Options = {
     seed: element.seed,
@@ -376,7 +271,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
-const generateElementShape = (
+export const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
 ) => {
@@ -455,80 +350,47 @@ const generateElementShape = (
               generator.line(x4, y4, x2, y2, options),
             ],
           );
->>>>>>> master
         }
+        break;
       }
+      case "path": {
+        const fixedPath = fixPath(element.d);
 
-      // curve is always the first element
-      // this simplifies finding the curve for an element
-      shape = [generator.curve(points as [number, number][], options)];
+        shape = generator.path(fixedPath, {
+          stroke: element.strokeColor,
+          fill:
+            element.backgroundColor === "transparent"
+              ? undefined
+              : element.backgroundColor,
+          fillStyle: element.fillStyle,
+          strokeWidth: element.strokeWidth,
+          roughness: element.roughness,
+          seed: element.seed,
+          combineNestedSvgPaths: element.hollow,
+        });
 
-      // add lines only in arrow
-      if (element.type === "arrow") {
-        const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
-        shape.push(
-          ...[
-            generator.line(x3, y3, x2, y2, options),
-            generator.line(x4, y4, x2, y2, options),
-          ],
-        );
+        if (element.roughness > 0 && element.fillStyle === "solid") {
+          shape = fixShape(shape);
+        }
+
+        break;
       }
-      break;
-    }
-    case "path": {
-      const fixedPath = fixPath(element.d);
-
-      shape = generator.path(fixedPath, {
-        stroke: element.strokeColor,
-        fill:
-          element.backgroundColor === "transparent"
-            ? undefined
-            : element.backgroundColor,
-        fillStyle: element.fillStyle,
-        strokeWidth: element.strokeWidth,
-        roughness: element.roughness,
-        seed: element.seed,
-        combineNestedSvgPaths: element.hollow,
-      });
-
-      if (element.roughness > 0 && element.fillStyle === "solid") {
-        shape = fixShape(shape);
+      case "text": {
+        // just to ensure we don't regenerate element.canvas on rerenders
+        shape = [];
+        break;
       }
-
-      break;
     }
-    case "text": {
-      // just to ensure we don't regenerate element.canvas on rerenders
-      shape = [];
-      break;
-    }
+    shapeCache.set(element, shape);
   }
 
   return shape;
-}
-
-function generateElement(
-  element: NonDeletedExcalidrawElement,
-  generator: RoughGenerator,
-  sceneState?: SceneState,
-) {
-  let shape = shapeCache.get(element) || null;
-  if (!shape) {
-    elementWithCanvasCache.delete(element);
-    shape = generateShape(element, generator);
-
-    shapeCache.set(element, shape);
-  }
-<<<<<<< HEAD
-
-=======
 };
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
->>>>>>> master
   const zoom = sceneState ? sceneState.zoom : 1;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
@@ -642,10 +504,9 @@ export const renderElementToSvg = (
   offsetY?: number,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
-  const degree = radianToDegree(element.angle);
+  const degree = (180 * element.angle) / Math.PI;
   const generator = rsvg.generator;
   switch (element.type) {
     case "selection": {
@@ -655,14 +516,9 @@ export const renderElementToSvg = (
     }
     case "rectangle":
     case "diamond":
-<<<<<<< HEAD
     case "ellipse":
     case "path": {
-      generateElement(element, generator);
-=======
-    case "ellipse": {
       generateElementShape(element, generator);
->>>>>>> master
       const node = rsvg.draw(getShapeForElement(element) as Drawable);
       const opacity = element.opacity / 100;
       if (opacity !== 1) {

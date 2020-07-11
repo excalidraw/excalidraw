@@ -4,7 +4,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../../element/types";
 import { getNonDeletedElements } from "../../element";
-import { deleteSelectedElements } from "../../scene";
+import { deleteSelectedElements } from "../actionDeleteSelected";
 import { AppState } from "../../types";
 import { operateBool } from "../../element";
 

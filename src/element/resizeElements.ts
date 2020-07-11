@@ -21,15 +21,8 @@ import {
   getCursorForResizingElement,
   normalizeResizeHandle,
 } from "./resizeTest";
-<<<<<<< HEAD
-import {
-  getResizeCenterPointKey,
-  getResizeWithSidesSameLengthKey,
-} from "../keys";
-import Path from "../element/path/Path";
-=======
 import { measureText, getFontString } from "../utils";
->>>>>>> master
+import Path from "../element/path/Path";
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
@@ -44,21 +37,6 @@ export const resizeElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-<<<<<<< HEAD
-  setAppState({
-    isResizing: resizeHandle && resizeHandle !== "rotation",
-    isRotating: resizeHandle === "rotation",
-  });
-  const selectedElements = getSelectedElements(
-    globalSceneState.getElements(),
-    appState,
-  );
-  const handleOffset = 4 / appState.zoom; // XXX import constant
-  const dashedLinePadding = 4 / appState.zoom; // XXX import constant
-  const offsetPointer = handleOffset + dashedLinePadding;
-
-=======
->>>>>>> master
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (resizeHandle === "rotation") {
@@ -402,21 +380,7 @@ const resizeSingleElement = (
   const deltaY1 = (y1 - nextY1) / 2;
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
-<<<<<<< HEAD
-
-  const rescaledPoints = isLinearElement(element)
-    ? {
-        points: rescalePoints(
-          0,
-          nextWidth,
-          rescalePoints(1, nextHeight, element.points),
-        ),
-      }
-    : {};
-
-=======
   const rescaledPoints = rescalePointsInElement(element, nextWidth, nextHeight);
->>>>>>> master
   const [finalX1, finalY1, finalX2, finalY2] = getResizedElementAbsoluteCoords(
     {
       ...element,

@@ -1,6 +1,6 @@
 import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
-<<<<<<< HEAD
+import { ExcalidrawLinearElement } from "./element/types";
 import Path from "./element/path/Path";
 
 export function radianToDegree(radian: number) {
@@ -60,9 +60,6 @@ export function distanceFromPointToPath(path: string | Path, point: Point) {
 
   return bestDistance;
 }
-=======
-import { ExcalidrawLinearElement } from "./element/types";
->>>>>>> master
 
 // https://stackoverflow.com/a/6853926/232122
 export const distanceBetweenPointAndSegment = (

@@ -4,10 +4,9 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { newPathElement } from "../index";
 import { ExcalidrawElement, NonDeletedExcalidrawElement } from "../types";
 import { Point } from "../../types";
-import { generateShape } from "../../renderer/renderElement";
+import { generateElementShape } from "../../renderer/renderElement";
 import { getElementBounds, getElementAbsoluteCoords } from "../bounds";
 import { radianToDegree, rotate } from "../../math";
-import { isPointInsidePath } from "../path/raphael";
 
 import Path from "./Path";
 
@@ -55,7 +54,7 @@ function normalizeShape(shape: Drawable) {
 }
 
 function objectToPath(rc: RoughCanvas, element: ExcalidrawElement) {
-  const shape = generateShape(
+  const shape = generateElementShape(
     {
       ...element,
       roughness: 0,

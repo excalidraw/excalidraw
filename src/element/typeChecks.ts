@@ -22,17 +22,7 @@ export const isLinearElement = (
   );
 };
 
-<<<<<<< HEAD
-export function isPathElement(
-  element?: ExcalidrawElement | null,
-): element is ExcalidrawPathElement {
-  return element != null && element.type === "path";
-}
-
-export function isExcalidrawElement(element: any): boolean {
-=======
 export const isExcalidrawElement = (element: any): boolean => {
->>>>>>> master
   return (
     element?.type === "text" ||
     element?.type === "diamond" ||
@@ -43,3 +33,9 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "line"
   );
 };
+
+export function isPathElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawPathElement {
+  return element != null && element.type === "path";
+}

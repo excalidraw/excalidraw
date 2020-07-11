@@ -12,7 +12,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
-const deleteSelectedElements = (
+export const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
