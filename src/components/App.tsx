@@ -1564,10 +1564,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     gesture.initialScale = null;
   });
 
-  private setElements = (elements: readonly ExcalidrawElement[]) => {
-    this.scene.replaceAllElements(elements);
-  };
-
   private handleTextWysiwyg(
     element: ExcalidrawTextElement,
     {
