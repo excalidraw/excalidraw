@@ -13,29 +13,29 @@ export interface LibraryStateCallbackRemover {
 class LibraryState {
   private callbacks = new Set<LibraryStateCallback>();
   private libraryItems: LibraryItems = [];
-  private initialized: boolean = false;
+  private loadedPromise: Promise<void>;
 
   constructor() {
     this.saveLibraryToDisk = throttle(this.saveLibraryToDisk.bind(this), 500);
+    this.loadedPromise = this.loadLibraryFromDisk();
   }
 
-  private loadLibraryFromDisk(): Promise<LibraryItems> {
-    return loadLibrary();
+  private async loadLibraryFromDisk(): Promise<void> {
+    this.libraryItems = await loadLibrary();
+    for (const callback of this.callbacks) {
+      callback(this.libraryItems);
+    }
   }
 
   private saveLibraryToDisk() {
-    saveLibrary(this.libraryItems).catch((e) => {
-      console.error(e);
+    this.loadedPromise.then(() => {
+      return saveLibrary(this.libraryItems).catch((e) => {
+        console.error(e);
+      });
     });
   }
 
   addCallback(callback: LibraryStateCallback): LibraryStateCallbackRemover {
-    if (!this.initialized) {
-      this.initialized = true;
-      this.loadLibraryFromDisk().then((library) => {
-        this.replaceLibrary(() => library);
-      });
-    }
     this.callbacks.add(callback);
     callback(this.libraryItems);
     return () => {
@@ -46,21 +46,13 @@ class LibraryState {
   }
 
   replaceLibrary(cb: (prevlibraryItems: LibraryItems) => LibraryItems) {
-    if (!this.initialized) {
-      this.initialized = true;
-      this.loadLibraryFromDisk().then((libraryItems) => {
-        this.libraryItems = cb(libraryItems);
-        for (const callback of this.callbacks) {
-          callback(this.libraryItems);
-        }
-      });
-    }
-
-    this.libraryItems = cb(this.libraryItems);
-    for (const callback of this.callbacks) {
-      callback(this.libraryItems);
-    }
-    this.saveLibraryToDisk();
+    this.loadedPromise.then(() => {
+      this.libraryItems = cb(this.libraryItems);
+      for (const callback of this.callbacks) {
+        callback(this.libraryItems);
+      }
+      this.saveLibraryToDisk();
+    });
   }
 }
 
