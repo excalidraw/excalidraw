@@ -83,6 +83,7 @@ export type AppState = {
   height: number;
 
   isLibraryOpen: boolean;
+  readonly: boolean;
 };
 
 export type PointerCoords = Readonly<{

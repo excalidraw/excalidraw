@@ -59,6 +59,10 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  READONLY_MODE: {
+    type: "READONLY_MODE";
+    readonly: boolean;
+  };
 };
 
 export type SocketUpdateDataIncoming =

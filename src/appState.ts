@@ -59,6 +59,7 @@ export const getDefaultAppState = (): AppState => {
     width: window.innerWidth,
     height: window.innerHeight,
     isLibraryOpen: false,
+    readonly: false,
   };
 };
 
@@ -126,6 +127,7 @@ const APP_STATE_STORAGE_CONF = (<
   width: { browser: false, export: false },
   zenModeEnabled: { browser: true, export: false },
   zoom: { browser: true, export: false },
+  readonly: { browser: false, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

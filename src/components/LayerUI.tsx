@@ -59,6 +59,7 @@ interface LayerUIProps {
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
+  readonly: boolean;
 }
 
 function useOnClickOutside(
@@ -244,6 +245,7 @@ const LayerUI = ({
   onInsertShape,
   zenModeEnabled,
   toggleZenMode,
+  readonly,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -525,7 +527,7 @@ const LayerUI = ({
           onClose={() => setAppState({ showShortcutsDialog: null })}
         />
       )}
-      {renderFixedSideContainer()}
+      {!readonly && renderFixedSideContainer()}
       {renderBottomAppMenu()}
       {
         <aside

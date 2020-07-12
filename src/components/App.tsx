@@ -245,6 +245,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     width: window.innerWidth,
     height: window.innerHeight,
   };
+  private roomCreator: boolean = false;
 
   constructor(props: ExcalidrawProps) {
     super(props);
@@ -267,19 +268,69 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
+    const collabForceLoadFlag = localStorage.getItem(
+      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+    );
+
+    if (collabForceLoadFlag) {
+      try {
+        this.roomCreator = JSON.parse(collabForceLoadFlag).roomCreator;
+      } catch (e) {}
+    }
   }
 
-  public render() {
+  renderCanvas() {
     const {
-      zenModeEnabled,
+      readonly,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
     } = this.state;
-
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
+    if (readonly && !this.roomCreator) {
+      return (
+        <canvas
+          id="canvas"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasRef}
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      );
+    }
+
+    return (
+      <canvas
+        id="canvas"
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+        }}
+        width={canvasWidth}
+        height={canvasHeight}
+        ref={this.handleCanvasRef}
+        onContextMenu={this.handleCanvasContextMenu}
+        onPointerDown={this.handleCanvasPointerDown}
+        onDoubleClick={this.handleCanvasDoubleClick}
+        onPointerMove={this.handleCanvasPointerMove}
+        onPointerUp={this.removePointer}
+        onPointerCancel={this.removePointer}
+        onTouchMove={this.handleTouchMove}
+        onDrop={this.handleCanvasOnDrop}
+      >
+        {t("labels.drawingCanvas")}
+      </canvas>
+    );
+  }
+  public render() {
+    const { zenModeEnabled, readonly } = this.state;
 
     return (
       <div className="excalidraw">
@@ -304,29 +355,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
+          readonly={readonly && !this.roomCreator}
         />
-        <main>
-          <canvas
-            id="canvas"
-            style={{
-              width: canvasDOMWidth,
-              height: canvasDOMHeight,
-            }}
-            width={canvasWidth}
-            height={canvasHeight}
-            ref={this.handleCanvasRef}
-            onContextMenu={this.handleCanvasContextMenu}
-            onPointerDown={this.handleCanvasPointerDown}
-            onDoubleClick={this.handleCanvasDoubleClick}
-            onPointerMove={this.handleCanvasPointerMove}
-            onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
-            onTouchMove={this.handleTouchMove}
-            onDrop={this.handleCanvasOnDrop}
-          >
-            {t("labels.drawingCanvas")}
-          </canvas>
-        </main>
+        <main>{this.renderCanvas()}</main>
       </div>
     );
   }
@@ -514,7 +545,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.removeSceneCallback = globalSceneState.addCallback(
       this.onSceneUpdated,
     );
-
     this.addEventListeners();
     this.initializeScene();
   }
@@ -624,6 +654,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         JSON.stringify({
           timestamp: Date.now(),
           room: this.portal.roomID,
+          roomCreator: this.roomCreator,
         }),
       );
     }
@@ -973,6 +1004,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   openPortal = async () => {
+    this.roomCreator = true;
     window.history.pushState(
       {},
       "Excalidraw",
@@ -982,6 +1014,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   closePortal = () => {
+    this.roomCreator = false;
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -1005,6 +1038,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       gridSize: this.state.gridSize ? null : GRID_SIZE,
     });
+  };
+
+  toggleReadonly = () => {
+    if (!this.roomCreator) {
+      window.alert("Only room creator can switch to readonly mode!");
+      return;
+    }
+    this.setState(
+      {
+        readonly: !this.state.readonly,
+      },
+      () => {
+        const { readonly } = this.state;
+        if (readonly) {
+          window.alert("All viewers will enter readonly mode");
+        } else {
+          window.alert("All viewers will enter edit mode");
+        }
+        this.broadcastReadonly();
+      },
+    );
   };
 
   private destroySocketClient = () => {
@@ -1197,6 +1251,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               });
               break;
             }
+            case "READONLY_MODE": {
+              const { readonly } = decryptedData;
+              this.setState(
+                {
+                  readonly,
+                },
+                () => {
+                  const { readonly } = this.state;
+                  if (readonly) {
+                    window.alert("You have been switched to readonly mode");
+                  } else {
+                    window.alert("You have been switched to edit mode");
+                  }
+                },
+              );
+            }
           }
         },
       );
@@ -1231,6 +1301,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       };
     });
   }
+
+  private broadcastReadonly = () => {
+    const data: SocketUpdateDataSource["READONLY_MODE"] = {
+      type: "READONLY_MODE",
+      readonly: this.state.readonly,
+    };
+    if (this.portal.socket?.id) {
+      return this.portal._broadcastSocketData(data as SocketUpdateData);
+    }
+  };
 
   private broadcastMouseLocation = (payload: {
     pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
@@ -1348,6 +1428,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
       this.toggleGridMode();
+    }
+
+    if (
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.altKey &&
+      event.keyCode === KEYS.R_KEY_CODE
+    ) {
+      this.toggleReadonly();
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
