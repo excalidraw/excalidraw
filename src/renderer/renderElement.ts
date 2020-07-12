@@ -369,7 +369,11 @@ export const generateElementShape = (
           combineNestedSvgPaths: element.hollow,
         });
 
-        if (element.roughness > 0 && element.fillStyle === "solid") {
+        if (
+          element.roughness > 0 &&
+          element.fillStyle === "solid" &&
+          element.hollow
+        ) {
           shape = fixShape(shape);
         }
 

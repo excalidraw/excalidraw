@@ -890,10 +890,14 @@ describe("regression tests", () => {
       "Send to back",
       "Bring to front",
       "Duplicate",
+      "Difference",
+      "Union",
+      "Intersection",
+      "Exclusion",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
+    expect(contextMenu?.children.length).toBe(13);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -933,10 +937,14 @@ describe("regression tests", () => {
       "Send to back",
       "Bring to front",
       "Duplicate",
+      "Difference",
+      "Union",
+      "Intersection",
+      "Exclusion",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(14);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -981,10 +989,14 @@ describe("regression tests", () => {
       "Send to back",
       "Bring to front",
       "Duplicate",
+      "Difference",
+      "Union",
+      "Intersection",
+      "Exclusion",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(11);
+    expect(contextMenu?.children.length).toBe(15);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
