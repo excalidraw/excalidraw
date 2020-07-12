@@ -133,8 +133,8 @@
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_pointSelected": "Premi Suprimir per eliminar el punt, CtrlOrCmd+D per duplicar-lo, o arrosega'l per moure'l",
+    "lineEditor_nothingSelected": "Selecciona un punt per moure o eliminar, o manté premut Alt i fes clic per afegir punts nous"
   },
   "errorSplash": {
     "headingMain_pre": "S'ha produït un error. Intentar ",
@@ -157,7 +157,7 @@
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_persistenceWarning": "Tingues en compte que les dades de l'escena es comparteixen entre col·laboradors de manera P2P i no es desen al nostre servidor. Així, si tots us desconnecteu, perdreu les dades, tret que els exporteu a un fitxer o a un enllaç per a compartir.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
   },
   "errorDialog": {
     "title": "Error"
@@ -183,7 +183,7 @@
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Has enganxat un full de càlcul sense columna numèrica.",
+    "tooManyColumns": "Has enganxat un full de càlcul amb més de dues columnes."
   }
 }
