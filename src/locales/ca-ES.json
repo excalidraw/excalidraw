@@ -67,8 +67,8 @@
     "collaborators": "Col·laboradors",
     "toggleGridMode": "Commutar línies de graella",
     "addToLibrary": "Afegir a la biblioteca",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "removeFromLibrary": "Eliminar de la biblioteca",
+    "libraryLoadingMessage": "Carregant la biblioteca..."
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -78,7 +78,7 @@
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "save": "Desar",
-    "saveAs": "",
+    "saveAs": "Desar com",
     "load": "Carregar",
     "getShareableLink": "Obtenir enllaç per compartir",
     "close": "Tancar",
@@ -107,7 +107,7 @@
     "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?"
   },
   "toolBar": {
     "selection": "Selecció",
@@ -118,7 +118,7 @@
     "arrow": "Fletxa",
     "line": "Línia",
     "text": "Text",
-    "library": "",
+    "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar"
   },
   "headings": {
@@ -132,7 +132,7 @@
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "",
+    "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
