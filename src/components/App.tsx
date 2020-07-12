@@ -1267,8 +1267,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 () => {
                   const { readonly } = this.state;
                   if (readonly) {
+                    this.removeEventListeners();
                     window.alert("You have been switched to readonly mode");
                   } else {
+                    this.addEventListeners();
                     window.alert("You have been switched to edit mode");
                   }
                 },
