@@ -268,13 +268,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
+    this.roomCreator = false;
+
+    const roomMatch = getCollaborationLinkData(window.location.href);
+
+    this.roomCreator = false;
+
     const collabForceLoadFlag = localStorage.getItem(
       LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
     );
 
-    if (collabForceLoadFlag) {
+    if (roomMatch && roomMatch.length && collabForceLoadFlag) {
       try {
-        this.roomCreator = JSON.parse(collabForceLoadFlag).roomCreator;
+        const { roomCreator, room } = JSON.parse(collabForceLoadFlag);
+        this.roomCreator = roomCreator && roomMatch[1] === room;
       } catch (e) {}
     }
   }
