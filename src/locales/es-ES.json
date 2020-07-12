@@ -2,8 +2,8 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
-    "multiSelect": "",
-    "moveCanvas": "",
+    "multiSelect": "Añadir elemento a la selección",
+    "moveCanvas": "Mover el lienzo",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -64,8 +64,8 @@
     "madeWithExcalidraw": "Hecho con Excalidraw",
     "group": "Selección de grupo",
     "ungroup": "Dividir selección",
-    "collaborators": "",
-    "toggleGridMode": "",
+    "collaborators": "Colaboradores",
+    "toggleGridMode": "Alternar modo cuadrícula",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": ""
