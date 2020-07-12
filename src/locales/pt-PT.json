@@ -66,9 +66,9 @@
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
     "toggleGridMode": "Alternar modo de grade",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "Adicionar à biblioteca",
+    "removeFromLibrary": "Remover da biblioteca",
+    "libraryLoadingMessage": "Carregando biblioteca..."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -118,7 +118,7 @@
     "arrow": "Flecha",
     "line": "Linha",
     "text": "Texto",
-    "library": "",
+    "library": "Biblioteca",
     "lock": "Manter a ferramenta selecionada ativa após desenhar"
   },
   "headings": {
