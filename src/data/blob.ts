@@ -1,6 +1,7 @@
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, cleanAppStateForExport } from "../appState";
 import { restore } from "./restore";
 import { t } from "../i18n";
+import { AppState } from "../types";
 
 export const loadFromBlob = async (blob: any) => {
   const updateAppState = (contents: string) => {
@@ -13,7 +14,10 @@ export const loadFromBlob = async (blob: any) => {
         throw new Error(t("alerts.couldNotLoadInvalidFile"));
       }
       elements = data.elements || [];
-      appState = { ...defaultAppState, ...data.appState };
+      appState = {
+        ...defaultAppState,
+        ...cleanAppStateForExport(data.appState as Partial<AppState>),
+      };
     } catch {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }

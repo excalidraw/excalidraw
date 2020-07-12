@@ -82,6 +82,11 @@ const migrateElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
+    case "path":
+      return migrateElementWithProperties(element, {
+        d: element.d,
+        hollow: element.hollow,
+      });
     case "draw":
     case "line":
     case "arrow": {

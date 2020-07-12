@@ -107,3 +107,8 @@ export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSour
 };
 
 export type LibraryItems = readonly NonDeleted<ExcalidrawElement>[][];
+
+export interface ExcalidrawProps {
+  width: number;
+  height: number;
+}
