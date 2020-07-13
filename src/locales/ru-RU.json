@@ -184,6 +184,6 @@
   },
   "charts": {
     "noNumericColumn": "",
-    "tooManyColumns": ""
+    "tooManyColumns": "Вы вставили таблицу с более чем двумя столбцами."
   }
 }
