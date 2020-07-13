@@ -81,10 +81,7 @@ export const actionChangeStrokeColor = register({
         color={getFormValue(
           elements,
           appState,
-          (element) =>
-            element.version === 3
-              ? appState.currentItemStrokeColor
-              : element.strokeColor,
+          (element) => element.strokeColor,
           appState.currentItemStrokeColor,
         )}
         onChange={updateData}
