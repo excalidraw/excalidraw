@@ -1514,13 +1514,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const resetSelection = () => {
-      this.setState({
-        draggingElement: null,
-        editingElement: null,
-      });
-    };
-
     const updateElement = (text: string, isDeleted = false) => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
@@ -1560,14 +1553,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               [element.id]: true,
             },
           }));
-          if (this.state.elementLocked) {
-            setCursorForShape(this.state.elementType);
-          }
         }
         if (!isDeleted || isExistingElement) {
           history.resumeRecording();
         }
-        resetSelection();
+
+        this.setState({
+          draggingElement: null,
+          editingElement: null,
+        });
+        if (this.state.elementLocked) {
+          setCursorForShape(this.state.elementType);
+        }
       }),
     });
     // deselect all other elements when inserting text
