@@ -469,6 +469,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           window.history.replaceState({}, "Excalidraw", window.location.origin);
         }
       } else {
+        // https://github.com/excalidraw/excalidraw/issues/1919
+        if (document.hidden) {
+          const reinitialize = () => {
+            this.initializeScene();
+            window.removeEventListener("focus", reinitialize);
+          };
+          window.addEventListener("focus", reinitialize);
+          return;
+        }
+
         isCollaborationScene = false;
         window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
