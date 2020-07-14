@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
     "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
     "decryptFailed": "データを復号できませんでした。",
-    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。"
+    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "選択",
@@ -114,6 +118,7 @@
     "arrow": "矢印",
     "line": "直線",
     "text": "テキスト",
+    "library": "",
     "lock": "描画後も使用中のツールを選択したままにする"
   },
   "headings": {

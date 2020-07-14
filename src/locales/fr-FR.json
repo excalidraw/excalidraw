@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
-    "multiSelect": "",
+    "multiSelect": "Ajouter l'élément à la sélection",
     "moveCanvas": "Déplacer le canevas",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
@@ -65,7 +65,10 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "toggleGridMode": "Basculer le mode grille"
+    "toggleGridMode": "Basculer le mode grille",
+    "addToLibrary": "Ajouter à la bibliotèque",
+    "removeFromLibrary": "Supprimer de la bibliothèque",
+    "libraryLoadingMessage": "Chargement de la bibliothèque..."
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
-    "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu."
+    "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
+    "loadSceneOverridePrompt": "Si vous chargez ce dessin externe, il remplacera celui que vous avez. Voulez-vous continuer?"
   },
   "toolBar": {
     "selection": "Sélection",
@@ -114,6 +118,7 @@
     "arrow": "Flèche",
     "line": "Ligne",
     "text": "Texte",
+    "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, CtrlOrCmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
     "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
   },
   "errorSplash": {

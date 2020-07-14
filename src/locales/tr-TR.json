@@ -65,7 +65,10 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Boş tuval dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
-    "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır."
+    "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Seçme",
@@ -114,6 +118,7 @@
     "arrow": "Ok",
     "line": "Çizgi",
     "text": "Yazı",
+    "library": "",
     "lock": "Seçilen aracı çizimden sonra aktif tut"
   },
   "headings": {

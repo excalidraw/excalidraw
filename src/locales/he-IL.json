@@ -65,7 +65,10 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
     "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
     "decryptFailed": "לא ניתן לפענח מידע.",
-    "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן."
+    "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "בחירה",
@@ -114,6 +118,7 @@
     "arrow": "חץ",
     "line": "קו",
     "text": "טקסט",
+    "library": "",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
   },
   "headings": {

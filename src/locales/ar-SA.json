@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
     "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة. حاول استخدام متصفح Chrome.",
     "decryptFailed": "تعذر فك تشفير البيانات.",
-    "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى."
+    "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -114,6 +118,7 @@
     "arrow": "سهم",
     "line": "خط",
     "text": "نص",
+    "library": "",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم"
   },
   "headings": {

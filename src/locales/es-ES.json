@@ -2,8 +2,8 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
-    "multiSelect": "",
-    "moveCanvas": "",
+    "multiSelect": "Añadir elemento a la selección",
+    "moveCanvas": "Mover el lienzo",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -64,8 +64,11 @@
     "madeWithExcalidraw": "Hecho con Excalidraw",
     "group": "Selección de grupo",
     "ungroup": "Dividir selección",
-    "collaborators": "",
-    "toggleGridMode": ""
+    "collaborators": "Colaboradores",
+    "toggleGridMode": "Alternar modo cuadrícula",
+    "addToLibrary": "Añadir a la biblioteca",
+    "removeFromLibrary": "Eliminar de la biblioteca",
+    "libraryLoadingMessage": "Cargando biblioteca..."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -75,7 +78,7 @@
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
-    "saveAs": "",
+    "saveAs": "Guardar como",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
     "close": "Cerrar",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
+    "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?"
   },
   "toolBar": {
     "selection": "Selección",
@@ -114,6 +118,7 @@
     "arrow": "Flecha",
     "line": "Línea",
     "text": "Texto",
+    "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
     "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "errorSplash": {

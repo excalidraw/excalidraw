@@ -3,7 +3,7 @@
     "paste": "Вставить",
     "selectAll": "Выбрать все",
     "multiSelect": "",
-    "moveCanvas": "",
+    "moveCanvas": "Переместить холст",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
@@ -62,10 +62,13 @@
     "name": "Имя",
     "yourName": "Ваше имя",
     "madeWithExcalidraw": "Сделано в Excalidraw",
-    "group": "",
-    "ungroup": "",
+    "group": "Сгруппировать выделение",
+    "ungroup": "Разделить выделение",
     "collaborators": "Сотрудники",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "Добавить в библиотеку",
+    "removeFromLibrary": "Удалить из библиотеки",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -103,17 +106,19 @@
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
     "decryptFailed": "Не удалось декодировать данные.",
-    "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое."
+    "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Выделение области",
-    "draw": "",
+    "draw": "Свободное рисование",
     "rectangle": "Прямоугольник",
     "diamond": "Ромб",
     "ellipse": "Эллипс",
     "arrow": "Cтрелка",
     "line": "Линия",
     "text": "Текст",
+    "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования"
   },
   "headings": {
@@ -123,11 +128,11 @@
   },
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
-    "freeDraw": "",
+    "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размеров,\nудерживайте ALT чтобы изменить размер из центра",
     "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения",
-    "lineEditor_info": "",
+    "lineEditor_info": "Дважды кликните или нажмите Enter, чтобы редактировать точки",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
@@ -161,17 +166,17 @@
     "title": "Сочетания клавиш",
     "shapes": "Фигуры",
     "or": "или",
-    "click": "",
-    "drag": "",
+    "click": "нажать",
+    "drag": "перетащить",
     "curvedArrow": "Изогнутая стрелка",
     "curvedLine": "Изогнутая линия",
     "editor": "Редактор",
     "view": "Просмотр",
     "blog": "Прочитайте наш блог",
-    "howto": "",
-    "github": "",
+    "howto": "Следуйте нашим инструкциям",
+    "github": "Нашли проблему? Отправьте",
     "textNewLine": "Добавить новую строку (текст)",
-    "textFinish": "",
+    "textFinish": "Закончить редактирование (текст)",
     "zoomToFit": ""
   },
   "encrypted": {
@@ -179,6 +184,6 @@
   },
   "charts": {
     "noNumericColumn": "",
-    "tooManyColumns": ""
+    "tooManyColumns": "Вы вставили таблицу с более чем двумя столбцами."
   }
 }

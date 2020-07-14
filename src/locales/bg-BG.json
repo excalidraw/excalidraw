@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
     "couldNotCopyToClipboard": "Неуспешно копиране в клипборда. Опитайте да използвате браузъра Chrome.",
     "decryptFailed": "Данните не можаха да се дешифрират.",
-    "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието."
+    "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Селекция",
@@ -114,6 +118,7 @@
     "arrow": "Стрелка",
     "line": "Линия",
     "text": "Текст",
+    "library": "",
     "lock": "Поддържайте избрания инструмент активен след рисуване"
   },
   "headings": {
