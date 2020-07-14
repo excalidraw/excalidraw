@@ -65,7 +65,10 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": "Ruudukko päälle/pois"
+    "toggleGridMode": "Ruudukko päälle/pois",
+    "addToLibrary": "Lisää kirjastoon",
+    "removeFromLibrary": "Poista kirjastosta",
+    "libraryLoadingMessage": "Ladataan kirjastoa..."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
     "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
-    "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä."
+    "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
+    "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?"
   },
   "toolBar": {
     "selection": "Valinta",
@@ -114,6 +118,7 @@
     "arrow": "Nuoli",
     "line": "Viiva",
     "text": "Teksti",
+    "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
   },
   "headings": {

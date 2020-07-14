@@ -2,8 +2,8 @@
   "labels": {
     "paste": "Incolla",
     "selectAll": "Seleziona tutto",
-    "multiSelect": "",
-    "moveCanvas": "",
+    "multiSelect": "Aggiungi elemento alla selezione",
+    "moveCanvas": "Sposta tela",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -64,8 +64,11 @@
     "madeWithExcalidraw": "Creato con Excalidraw",
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
-    "collaborators": "",
-    "toggleGridMode": ""
+    "collaborators": "Collaboratori",
+    "toggleGridMode": "Attiva/disattiva modalità quadrícula",
+    "addToLibrary": "Aggiungi alla biblioteca",
+    "removeFromLibrary": "Rimuovi dalla biblioteca",
+    "libraryLoadingMessage": "Caricamento della biblioteca..."
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
     "decryptFailed": "Impossibile decriptare i dati.",
-    "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto."
+    "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
+    "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -114,6 +118,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
+    "library": "Biblioteca",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
@@ -128,8 +133,8 @@
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
+    "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti"
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",

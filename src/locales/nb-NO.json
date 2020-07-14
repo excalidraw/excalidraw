@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Velg alt",
-    "multiSelect": "",
+    "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
@@ -65,7 +65,10 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "toggleGridMode": "Slå av/på rutenett"
+    "toggleGridMode": "Slå av/på rutenett",
+    "addToLibrary": "Legg til i bibliotek",
+    "removeFromLibrary": "Fjern fra bibliotek",
+    "libraryLoadingMessage": "Laster bibliotek..."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
     "decryptFailed": "Kunne ikke dekryptere data.",
-    "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter."
+    "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
+    "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?"
   },
   "toolBar": {
     "selection": "Velg",
@@ -114,6 +118,7 @@
     "arrow": "Pil",
     "line": "Linje",
     "text": "Tekst",
+    "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter"
   },
   "errorSplash": {

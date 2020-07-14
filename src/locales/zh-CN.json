@@ -65,7 +65,10 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "toggleGridMode": "切换网格模式"
+    "toggleGridMode": "切换网格模式",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "无法导出空画布。",
     "couldNotCopyToClipboard": "无法复制到剪贴板。请尝试使用 Chrome 浏览器。",
     "decryptFailed": "无法解密数据。",
-    "uploadedSecurly": "上传已被端到端加密保护，这意味着Excalidraw 的服务器和第三方都无法读取内容。"
+    "uploadedSecurly": "上传已被端到端加密保护，这意味着Excalidraw 的服务器和第三方都无法读取内容。",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "选择",
@@ -114,6 +118,7 @@
     "arrow": "箭头",
     "line": "线条",
     "text": "文字",
+    "library": "",
     "lock": "绘制后保持所选的工具栏状态"
   },
   "headings": {

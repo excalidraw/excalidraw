@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Nuk eksportohet telajo bosh.",
     "couldNotCopyToClipboard": "",
     "decryptFailed": "S'mund të deshifroj të dhënat.",
-    "uploadedSecurly": ""
+    "uploadedSecurly": "",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Përzgjedhja",
@@ -114,6 +118,7 @@
     "arrow": "Shigjetë",
     "line": "Vijë",
     "text": "Tekst",
+    "library": "",
     "lock": ""
   },
   "headings": {

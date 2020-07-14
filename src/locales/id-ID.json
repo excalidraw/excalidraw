@@ -65,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
     "decryptFailed": "Tidak dapat mengdeskripsi data.",
-    "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya"
+    "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -114,6 +118,7 @@
     "arrow": "Panah",
     "line": "Garis",
     "text": "Teks",
+    "library": "",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
   },
   "headings": {
