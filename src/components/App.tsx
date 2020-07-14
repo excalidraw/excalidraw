@@ -1514,20 +1514,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const resetSelection = () => {
-      this.setState({
-        draggingElement: null,
-        editingElement: null,
-      });
-    };
-
-    const updateElement = (text: string) => {
+    const updateElement = (text: string, isDeleted = false) => {
       globalSceneState.replaceAllElements([
         ...globalSceneState.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(_element, {
               text,
-              isDeleted: !text.trim(),
+              isDeleted,
             });
           }
           return _element;
@@ -1551,25 +1544,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         updateElement(text);
       }),
       onSubmit: withBatchedUpdates((text) => {
-        updateElement(text);
-        this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [element.id]: true,
-          },
-        }));
+        const isDeleted = !text.trim();
+        updateElement(text, isDeleted);
+        if (!isDeleted) {
+          this.setState((prevState) => ({
+            selectedElementIds: {
+              ...prevState.selectedElementIds,
+              [element.id]: true,
+            },
+          }));
+        }
+        if (!isDeleted || isExistingElement) {
+          history.resumeRecording();
+        }
+
+        this.setState({
+          draggingElement: null,
+          editingElement: null,
+        });
         if (this.state.elementLocked) {
           setCursorForShape(this.state.elementType);
         }
-        history.resumeRecording();
-        resetSelection();
-      }),
-      onCancel: withBatchedUpdates(() => {
-        updateElement("");
-        if (isExistingElement) {
-          history.resumeRecording();
-        }
-        resetSelection();
       }),
     });
     // deselect all other elements when inserting text
