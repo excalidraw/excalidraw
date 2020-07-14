@@ -25,7 +25,7 @@
     "@testing-library/react": "10.4.4",
     "@types/jest": "26.0.4",
     "@types/nanoid": "2.1.0",
-    "@types/react": "16.9.41",
+    "@types/react": "16.9.43",
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
     "browser-nativefs": "0.9.1",
