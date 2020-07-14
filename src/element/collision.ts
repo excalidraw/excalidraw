@@ -190,18 +190,39 @@ export const intersectElementWithLine = (
   }
 };
 
+// The way the current hit test code works is that it takes the pointer
+// and rotates it around the element center to avoid having to rotate
+// all the element points instead to account for the element's rotation
+const adjustXYForElementRotation = (
+  elementAngle: number,
+  elementAbsoluteCoords: [number, number, number, number],
+  x: number,
+  y: number,
+): [number, number] => {
+  const [x1, y1, x2, y2] = elementAbsoluteCoords;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // reverse rotate the pointer
+  const xy = rotate(x, y, cx, cy, -elementAngle);
+  return xy;
+};
+
 const ellipseParamsRelativeTo = (
   element: NonDeletedExcalidrawElement,
   x: number,
   y: number,
 ) => {
   // https://stackoverflow.com/a/46007540/232122
+
+  // `px` and `py` is `x` `y` relative to the ellipse center, in the "positive"
+  // quadrant (this makes the `isInsideEllipse` check easier)
   const px = Math.abs(x - element.x - element.width / 2);
   const py = Math.abs(y - element.y - element.height / 2);
 
   let tx = 0.707;
   let ty = 0.707;
 
+  // `a` and `b` is just `rx` and `ry` of the ellipse (the radii)
   const a = Math.abs(element.width) / 2;
   const b = Math.abs(element.height) / 2;
 
@@ -227,33 +248,19 @@ const ellipseParamsRelativeTo = (
     tx /= t;
     ty /= t;
   });
+  // (`tx`,`ty`) are the parameters of the closest point on the ellipse
+  // to (`px`,`py`)
   return [a, b, tx, ty, px, py];
 };
 
+// The threshold is not applied uniformly around the ellipse,
+// the points between vertices are consider in even they're farther than
+// the threshold
 const isInsideEllipse = (
   [a, b, tx, ty, px, py]: number[],
   lineThreshold: number,
 ) => {
-  return (
-    a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
-  );
-};
-
-// The way the current hit test code works is that it takes the pointer
-// and rotates it around the element center to avoid having to rotate
-// all the element points instead to account for the element's rotation
-const adjustXYForElementRotation = (
-  elementAngle: number,
-  elementAbsoluteCoords: [number, number, number, number],
-  x: number,
-  y: number,
-): [number, number] => {
-  const [x1, y1, x2, y2] = elementAbsoluteCoords;
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-  // reverse rotate the pointer
-  const xy = rotate(x, y, cx, cy, -elementAngle);
-  return xy;
+  return a * tx - px >= -lineThreshold && b * ty - py >= -lineThreshold;
 };
 
 const isNearEllipse = (
