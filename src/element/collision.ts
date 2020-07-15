@@ -1,5 +1,10 @@
+import * as GA from "../ga";
+import * as GAPoint from "../gapoints";
+import * as GADirection from "../gadirections";
+import * as GALine from "../galines";
+import * as GATransform from "../gatransforms";
+
 import {
-  distanceBetweenPointAndSegment,
   isPathALoop,
   rotate,
   isPointInPolygon,
@@ -12,16 +17,11 @@ import {
   ExcalidrawBindableElement,
 } from "./types";
 
-import {
-  getDiamondPoints,
-  getElementAbsoluteCoords,
-  getCurvePathOps,
-} from "./bounds";
+import { getElementAbsoluteCoords, getCurvePathOps } from "./bounds";
 import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
-import { isLinearElement } from "./typeChecks";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -45,69 +45,12 @@ export const hitTest = (
   x: number,
   y: number,
 ): boolean => {
-  // For shapes that are composed of lines, we only enable point-selection when the distance
-  // of the click is less than x pixels of any of the lines that the shape is composed of
-  const lineThreshold = 10 / appState.zoom;
-
-  const absoluteCoords = getElementAbsoluteCoords(element);
-  [x, y] = adjustXYForElementRotation(element.angle, absoluteCoords, x, y);
-  const [x1, y1, x2, y2] = absoluteCoords;
-
-  const relX = x - element.x;
-  const relY = y - element.y;
-
-  if (element.type === "ellipse") {
-    const ellipseParams = ellipseParamsRelativeTo(element, x, y);
-    if (isElementDraggableFromInside(element, appState)) {
-      return isInsideEllipse(ellipseParams, lineThreshold);
-    }
-    return isNearEllipse(ellipseParams, lineThreshold);
-  } else if (element.type === "rectangle") {
-    if (isElementDraggableFromInside(element, appState)) {
-      return isInsideRectangle(x, y, absoluteCoords, lineThreshold);
-    }
-    return isNearRectangle(x, y, absoluteCoords, lineThreshold);
-  } else if (element.type === "diamond") {
-    const diamondParams = getDiamondPoints(element);
-    if (isElementDraggableFromInside(element, appState)) {
-      return isInsideDiamond(relX, relY, diamondParams, lineThreshold);
-    }
-    return isNearDiamond(relX, relY, diamondParams, lineThreshold);
-  } else if (isLinearElement(element)) {
-    if (!getShapeForElement(element)) {
-      return false;
-    }
-    const shape = getShapeForElement(element) as Drawable[];
-
-    if (
-      x < x1 - lineThreshold ||
-      y < y1 - lineThreshold ||
-      x > x2 + lineThreshold ||
-      y > y2 + lineThreshold
-    ) {
-      return false;
-    }
-
-    if (isElementDraggableFromInside(element, appState)) {
-      const hit = shape.some((subshape) =>
-        hitTestCurveInside(subshape, relX, relY, lineThreshold),
-      );
-      if (hit) {
-        return true;
-      }
-    }
-
-    // hit thest all "subshapes" of the linear element
-    return shape.some((subshape) =>
-      hitTestRoughShape(subshape, relX, relY, lineThreshold),
-    );
-  } else if (element.type === "text") {
-    return isInsideText(x, y, absoluteCoords);
-  } else if (element.type === "selection") {
-    console.warn("This should not happen, we need to investigate why it does.");
-    return false;
-  }
-  throw new Error(`Unimplemented type ${element.type}`);
+  // How many pixels off the shape boundary we still consider a hit
+  const threshold = 10 / appState.zoom;
+  const check = isElementDraggableFromInside(element, appState)
+    ? isInsideCheck
+    : isNearCheck;
+  return hitTestPointAgainstElement({ element, x, y, threshold, check });
 };
 
 export const bindingBorderTest = (
@@ -116,38 +59,194 @@ export const bindingBorderTest = (
   x: number,
   y: number,
 ): boolean => {
-  const absoluteCoords = getElementAbsoluteCoords(element);
-  [x, y] = adjustXYForElementRotation(element.angle, absoluteCoords, x, y);
-  const [x1, y1, x2, y2] = absoluteCoords;
-  const smallerDimension = Math.min(x2 - x1, y2 - y1);
-  // We make the bindable boundary bigger for bigger elements
-  const threshold =
-    Math.max(15, Math.min(0.25 * smallerDimension, 80)) / appState.zoom;
-
-  const relX = x - element.x;
-  const relY = y - element.y;
-
   switch (element.type) {
     case "rectangle":
     case "text":
-      return (
-        isNearRectangle(x, y, absoluteCoords, threshold) &&
-        !isInsideRectangle(x, y, absoluteCoords, 0)
-      );
     case "diamond":
-      const diamondParams = getDiamondPoints(element);
-      return (
-        isInsideDiamond(relX, relY, diamondParams, threshold) &&
-        !isNearDiamond(relX, relY, diamondParams, 0)
-      );
     case "ellipse":
-      const ellipseParams = ellipseParamsRelativeTo(element, x, y);
-      return (
-        isNearEllipse(ellipseParams, threshold) &&
-        !isInsideEllipse(ellipseParams, 0)
-      );
+      const smallerDimension = Math.min(element.width, element.height);
+      // We make the bindable boundary bigger for bigger elements
+      const threshold =
+        Math.max(15, Math.min(0.25 * smallerDimension, 80)) / appState.zoom;
+      const check = isOutsideCheck;
+      return hitTestPointAgainstElement({ element, x, y, threshold, check });
   }
   return false;
+};
+
+type HitTestArgs = {
+  element: NonDeletedExcalidrawElement;
+  x: number;
+  y: number;
+  threshold: number;
+  check: (point: GA.Point, line: GA.Line, threshold: number) => boolean;
+};
+
+const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
+  switch (args.element.type) {
+    case "rectangle":
+    case "text":
+      return hitTestRectangle(args);
+    case "diamond":
+      return hitTestDiamond(args);
+    case "ellipse":
+      return hitTestEllipse(args);
+    case "arrow":
+    case "line":
+    case "draw":
+      return hitTestLinear(args);
+    case "selection":
+      console.warn(
+        "This should not happen, we need to investigate why it does.",
+      );
+      return false;
+  }
+};
+
+const isInsideCheck = (
+  point: GA.Point,
+  line: GA.Line,
+  threshold: number,
+): boolean => {
+  return GAPoint.distanceToLine(point, line) < threshold;
+};
+
+const isNearCheck = (
+  point: GA.Point,
+  line: GA.Line,
+  threshold: number,
+): boolean => {
+  return Math.abs(GAPoint.distanceToLine(point, line)) < threshold;
+};
+
+const isOutsideCheck = (
+  point: GA.Point,
+  line: GA.Line,
+  threshold: number,
+): boolean => {
+  const distance = GAPoint.distanceToLine(point, line);
+  return 0 <= distance && distance < threshold;
+};
+
+const hitTestRectangle = (args: HitTestArgs): boolean => {
+  const [, point, hwidth, hheight] = pointRelativeToElement(args);
+  const nearSide =
+    GAPoint.distanceToLine(point, GALine.vector(hwidth, hheight)) > 0
+      ? GALine.equation(0, 1, -hheight)
+      : GALine.equation(1, 0, -hwidth);
+  return args.check(point, nearSide, args.threshold);
+};
+
+const hitTestDiamond = (args: HitTestArgs): boolean => {
+  const [, point, hwidth, hheight] = pointRelativeToElement(args);
+  const side = GALine.equation(hheight, hwidth, -hheight * hwidth);
+  return args.check(point, side, args.threshold);
+};
+
+const hitTestEllipse = (args: HitTestArgs): boolean => {
+  const [point, tangent] = ellipseParamsForTest(args);
+  return args.check(point, tangent, args.threshold);
+};
+
+const ellipseParamsForTest = (args: HitTestArgs): [GA.Point, GA.Line] => {
+  const [, point, hwidth, hheight] = pointRelativeToElement(args);
+  const [px, py] = GAPoint.toTuple(point);
+
+  let tx = 0.707;
+  let ty = 0.707;
+
+  const a = hwidth;
+  const b = hheight;
+
+  // This is a numerical method to find the params tx, ty at which
+  // the ellipse has the closest point to the given point
+  [0, 1, 2, 3].forEach((_) => {
+    const xx = a * tx;
+    const yy = b * ty;
+
+    const ex = ((a * a - b * b) * tx ** 3) / a;
+    const ey = ((b * b - a * a) * ty ** 3) / b;
+
+    const rx = xx - ex;
+    const ry = yy - ey;
+
+    const qx = px - ex;
+    const qy = py - ey;
+
+    const r = Math.hypot(ry, rx);
+    const q = Math.hypot(qy, qx);
+
+    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
+    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
+    const t = Math.hypot(ty, tx);
+    tx /= t;
+    ty /= t;
+  });
+
+  const closestPoint = GA.point(a * tx, b * ty);
+
+  const tangent = GALine.orthogonalThrough(point, closestPoint);
+  return [point, tangent];
+};
+
+const hitTestLinear = (args: HitTestArgs): boolean => {
+  const { element, threshold } = args;
+  if (!getShapeForElement(element)) {
+    return false;
+  }
+  const [point, pointAbs, hwidth, hheight] = pointRelativeToElement(args);
+  const side1 = GALine.equation(0, 1, -hheight);
+  const side2 = GALine.equation(1, 0, -hwidth);
+  if (
+    !isInsideCheck(pointAbs, side1, threshold) ||
+    !isInsideCheck(pointAbs, side2, threshold)
+  ) {
+    return false;
+  }
+  const [relX, relY] = GAPoint.toTuple(point);
+
+  const shape = getShapeForElement(element) as Drawable[];
+
+  if (args.check === isInsideCheck) {
+    const hit = shape.some((subshape) =>
+      hitTestCurveInside(subshape, relX, relY, threshold),
+    );
+    if (hit) {
+      return true;
+    }
+  }
+
+  // hit test all "subshapes" of the linear element
+  return shape.some((subshape) =>
+    hitTestRoughShape(subshape, relX, relY, threshold),
+  );
+};
+
+// Returns the point relative to the elements (x, y) position, the point
+// relative to the element's center with positive (x, y), and half
+// the element's width/height.
+//
+// Rectangles, diamonds and ellipses are symmetrical over axes,
+// and other elements have a rectangular boundary,
+// so we only need to perform hit tests for the positive quadrant.
+//
+// Note that for linear elements the (x, y) position is not at the
+// top right corner of their boundary.
+const pointRelativeToElement = (
+  args: HitTestArgs,
+): [GA.Point, GA.Point, number, number] => {
+  const { x, y, element } = args;
+  // a is topleft corner, b is bottom right
+  const [ax, ay, bx, by] = getElementAbsoluteCoords(element);
+  const center = GA.point((ax + bx) / 2, (ay + by) / 2);
+  const point = GA.point(x, y);
+  const counterRotate = GATransform.rotation(center, -element.angle);
+  const pointRotated = GATransform.apply(counterRotate, point);
+  const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
+  const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
+  const position = GA.offset(element.x, element.y);
+  const pointRelToPos = GA.sub(pointRotated, position);
+  return [pointRelToPos, pointRelToCenterAbs, (bx - ax) / 2, (by - ay) / 2];
 };
 
 // Input and output is in absolute coordinates
@@ -205,166 +304,6 @@ const adjustXYForElementRotation = (
   // reverse rotate the pointer
   const xy = rotate(x, y, cx, cy, -elementAngle);
   return xy;
-};
-
-const ellipseParamsRelativeTo = (
-  element: NonDeletedExcalidrawElement,
-  x: number,
-  y: number,
-) => {
-  // https://stackoverflow.com/a/46007540/232122
-
-  // `px` and `py` is `x` `y` relative to the ellipse center, in the "positive"
-  // quadrant (this makes the `isInsideEllipse` check easier)
-  const px = Math.abs(x - element.x - element.width / 2);
-  const py = Math.abs(y - element.y - element.height / 2);
-
-  let tx = 0.707;
-  let ty = 0.707;
-
-  // `a` and `b` is just `rx` and `ry` of the ellipse (the radii)
-  const a = Math.abs(element.width) / 2;
-  const b = Math.abs(element.height) / 2;
-
-  [0, 1, 2, 3].forEach((_) => {
-    const xx = a * tx;
-    const yy = b * ty;
-
-    const ex = ((a * a - b * b) * tx ** 3) / a;
-    const ey = ((b * b - a * a) * ty ** 3) / b;
-
-    const rx = xx - ex;
-    const ry = yy - ey;
-
-    const qx = px - ex;
-    const qy = py - ey;
-
-    const r = Math.hypot(ry, rx);
-    const q = Math.hypot(qy, qx);
-
-    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-    const t = Math.hypot(ty, tx);
-    tx /= t;
-    ty /= t;
-  });
-  // (`tx`,`ty`) are the parameters of the closest point on the ellipse
-  // to (`px`,`py`)
-  return [a, b, tx, ty, px, py];
-};
-
-// The threshold is not applied uniformly around the ellipse,
-// the points between vertices are consider in even they're farther than
-// the threshold
-const isInsideEllipse = (
-  [a, b, tx, ty, px, py]: number[],
-  lineThreshold: number,
-) => {
-  return a * tx - px >= -lineThreshold && b * ty - py >= -lineThreshold;
-};
-
-const isNearEllipse = (
-  [a, b, tx, ty, px, py]: number[],
-  lineThreshold: number,
-) => {
-  return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
-};
-
-const isInsideRectangle = (
-  x: number,
-  y: number,
-  [x1, y1, x2, y2]: number[],
-  lineThreshold: number,
-) => {
-  return (
-    x > x1 - lineThreshold &&
-    x < x2 + lineThreshold &&
-    y > y1 - lineThreshold &&
-    y < y2 + lineThreshold
-  );
-};
-
-const isNearRectangle = (
-  x: number,
-  y: number,
-  [x1, y1, x2, y2]: number[],
-  lineThreshold: number,
-) => {
-  // (x1, y1) --A-- (x2, y1)
-  //    |D             |B
-  // (x1, y2) --C-- (x2, y2)
-  return (
-    distanceBetweenPointAndSegment(x, y, x1, y1, x2, y1) < lineThreshold || // A
-    distanceBetweenPointAndSegment(x, y, x2, y1, x2, y2) < lineThreshold || // B
-    distanceBetweenPointAndSegment(x, y, x2, y2, x1, y2) < lineThreshold || // C
-    distanceBetweenPointAndSegment(x, y, x1, y2, x1, y1) < lineThreshold // D
-  );
-};
-
-const isInsideDiamond = (
-  x: number,
-  y: number,
-  [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY]: number[],
-  lineThreshold: number,
-) => {
-  // TODO: remove this when we normalize coordinates globally
-  if (topY > bottomY) {
-    [bottomY, topY] = [topY, bottomY];
-  }
-  if (rightX < leftX) {
-    [leftX, rightX] = [rightX, leftX];
-  }
-
-  topY -= lineThreshold;
-  bottomY += lineThreshold;
-  leftX -= lineThreshold;
-  rightX += lineThreshold;
-
-  // all deltas should be < 0. Delta > 0 indicates it's on the outside side
-  //  of the line.
-  //
-  //          (topX, topY)
-  //     D  /             \ A
-  //      /               \
-  //  (leftX, leftY)  (rightX, rightY)
-  //    C \               / B
-  //      \              /
-  //      (bottomX, bottomY)
-  //
-  // https://stackoverflow.com/a/2752753/927631
-  return (
-    // delta from line D
-    (leftX - topX) * (y - leftY) - (leftX - x) * (topY - leftY) <= 0 &&
-    // delta from line A
-    (topX - rightX) * (y - rightY) - (x - rightX) * (topY - rightY) <= 0 &&
-    // delta from line B
-    (rightX - bottomX) * (y - bottomY) - (x - bottomX) * (rightY - bottomY) <=
-      0 &&
-    // delta from line C
-    (bottomX - leftX) * (y - leftY) - (x - leftX) * (bottomY - leftY) <= 0
-  );
-};
-
-const isNearDiamond = (
-  x: number,
-  y: number,
-  [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY]: number[],
-  lineThreshold: number,
-) => {
-  return (
-    distanceBetweenPointAndSegment(x, y, topX, topY, rightX, rightY) <
-      lineThreshold ||
-    distanceBetweenPointAndSegment(x, y, rightX, rightY, bottomX, bottomY) <
-      lineThreshold ||
-    distanceBetweenPointAndSegment(x, y, bottomX, bottomY, leftX, leftY) <
-      lineThreshold ||
-    distanceBetweenPointAndSegment(x, y, leftX, leftY, topX, topY) <
-      lineThreshold
-  );
-};
-
-const isInsideText = (x: number, y: number, [x1, y1, x2, y2]: number[]) => {
-  return x >= x1 && x <= x2 && y >= y1 && y <= y2;
 };
 
 const pointInBezierEquation = (
