@@ -103,8 +103,9 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
   onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
 }) => {
+  const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
-  const CELLS_PER_ROW = 6;
+  const CELLS_PER_ROW = isMobile ? 4 : 6;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
@@ -365,19 +366,21 @@ const LayerUI = ({
     });
   }, [setAppState]);
 
+  const libraryMenu = appState.isLibraryOpen ? (
+    <LibraryMenu
+      pendingElements={getSelectedElements(elements, appState)}
+      onClickOutside={closeLibrary}
+      onInsertShape={onInsertShape}
+      onAddToLibrary={deselectItems}
+    />
+  ) : null;
+
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
       elements,
     );
-    const libraryMenu = appState.isLibraryOpen ? (
-      <LibraryMenu
-        pendingElements={getSelectedElements(elements, appState)}
-        onClickOutside={closeLibrary}
-        onInsertShape={onInsertShape}
-        onAddToLibrary={deselectItems}
-      />
-    ) : null;
+
     return (
       <FixedSideContainer side="top">
         <HintViewer appState={appState} elements={elements} />
@@ -503,6 +506,7 @@ const LayerUI = ({
       appState={appState}
       elements={elements}
       actionManager={actionManager}
+      libraryMenu={libraryMenu}
       exportButton={renderExportDialog()}
       setAppState={setAppState}
       onUsernameChange={onUsernameChange}
