@@ -104,7 +104,7 @@ const LibraryMenuItems = ({
   onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
 }) => {
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
-  const CELLS_PER_ROW = 3;
+  const CELLS_PER_ROW = 6;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
@@ -112,7 +112,7 @@ const LibraryMenuItems = ({
   for (let row = 0; row < numRows; row++) {
     const i = CELLS_PER_ROW * row;
     const children = [];
-    for (let j = 0; j < 3; j++) {
+    for (let j = 0; j < CELLS_PER_ROW; j++) {
       const shouldAddPendingElements: boolean =
         pendingElements.length > 0 &&
         !addedPendingElements &&
