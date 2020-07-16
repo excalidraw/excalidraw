@@ -139,7 +139,13 @@ const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
   }[keyof typeof APP_STATE_STORAGE_CONF];
   const stateForExport = {} as { [K in ExportableKeys]?: typeof appState[K] };
   for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
-    if (APP_STATE_STORAGE_CONF[key][exportType]) {
+    const propConfig = APP_STATE_STORAGE_CONF[key];
+    if (!propConfig) {
+      console.error(
+        `_clearAppStateForStorage: appState key "${key}" config doesn't exist for "${exportType}" export type`,
+      );
+    }
+    if (propConfig?.[exportType]) {
       // @ts-ignore see https://github.com/microsoft/TypeScript/issues/31445
       stateForExport[key] = appState[key];
     }
