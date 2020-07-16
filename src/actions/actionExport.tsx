@@ -8,7 +8,7 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
 
-const handleFSError = (error?: Error) => {
+const muteFSAbortError = (error?: Error) => {
   // if user cancels, ignore the error
   if (error?.name === "AbortError") {
     return;
@@ -74,7 +74,7 @@ export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
     saveAsJSON(elements, appState, (window as any).handle)
-      .catch(handleFSError)
+      .catch(muteFSAbortError)
       .catch((error) => console.error(error));
     return { commitToHistory: false };
   },
@@ -97,7 +97,7 @@ export const actionSaveAsScene = register({
   name: "saveAsScene",
   perform: (elements, appState, value) => {
     saveAsJSON(elements, appState, null)
-      .catch(handleFSError)
+      .catch(muteFSAbortError)
       .catch((error) => console.error(error));
     return { commitToHistory: false };
   },
@@ -145,7 +145,7 @@ export const actionLoadScene = register({
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
-          .catch(handleFSError)
+          .catch(muteFSAbortError)
           .catch((error) => {
             updateData({ error: error.message });
           });
