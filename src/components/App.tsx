@@ -417,9 +417,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!roomMatch) {
       return false;
     }
-    const collabForceLoadFlag = localStorage.getItem(
-      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-    );
+
+    let collabForceLoadFlag;
+    try {
+      collabForceLoadFlag = localStorage?.getItem(
+        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+      );
+    } catch {}
+
     if (collabForceLoadFlag) {
       try {
         const {
@@ -619,13 +624,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (this.state.isCollaborating && this.portal.roomID) {
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-        JSON.stringify({
-          timestamp: Date.now(),
-          room: this.portal.roomID,
-        }),
-      );
+      try {
+        localStorage?.setItem(
+          LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+          JSON.stringify({
+            timestamp: Date.now(),
+            room: this.portal.roomID,
+          }),
+        );
+      } catch {}
     }
     if (
       this.state.isCollaborating &&
