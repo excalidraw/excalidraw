@@ -47,6 +47,7 @@ export const SelectedShapeActions = ({
           {renderAction("changeStrokeWidth")}
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
+          {renderAction("changeSharpness")}
         </>
       )}
 

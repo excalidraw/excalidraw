@@ -448,3 +448,39 @@ export const actionChangeTextAlign = register({
     </fieldset>
   ),
 });
+
+export const actionChangeSharpness = register({
+  name: "changeSharpness",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeSharpness: value,
+        }),
+      ),
+      appState: { ...appState, currentItemStrokeSharpness: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.sharpness")}</legend>
+      <ButtonSelect
+        group="sloppiness"
+        options={[
+          { value: "sharp", text: t("labels.sharp") },
+          { value: "round", text: t("labels.round") },
+        ]}
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeSharpness,
+            appState.currentItemStrokeSharpness,
+          ) || null
+        }
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});

@@ -2531,6 +2531,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
+        strokeSharpness: this.state.currentItemStrokeSharpness,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -2572,6 +2573,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemStrokeSharpness,
     });
 
     if (element.type === "selection") {

@@ -240,14 +240,29 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        shape = generator.rectangle(
-          0,
-          0,
-          element.width,
-          element.height,
-          generateRoughOptions(element),
-        );
-
+        if (element.strokeSharpness === "round") {
+          const w = element.width;
+          const h = element.height;
+          const r = Math.min(w, h) * 0.1;
+          shape = generator.path(
+            `M ${r} 0 L ${w - r} 0 C ${w - r / 2} 0, ${w} ${
+              r / 2
+            }, ${w} ${r} L ${w} ${h - r} C ${w} ${h - r / 2}, ${
+              w - r / 2
+            } ${h}, ${w - r} ${h} L ${r} ${h} C ${r / 2} ${h}, 0 ${
+              h - r / 2
+            }, 0 ${h - r} L 0 ${r} C 0 ${r / 2}, ${r / 2} 0, ${r} 0`,
+            generateRoughOptions(element),
+          );
+        } else {
+          shape = generator.rectangle(
+            0,
+            0,
+            element.width,
+            element.height,
+            generateRoughOptions(element),
+          );
+        }
         break;
       case "diamond": {
         const [
@@ -291,7 +306,11 @@ const generateElementShape = (
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        shape = [generator.curve(points as [number, number][], options)];
+        if (element.strokeSharpness === "sharp") {
+          shape = [generator.linearPath(points as [number, number][], options)];
+        } else {
+          shape = [generator.curve(points as [number, number][], options)];
+        }
 
         // add lines only in arrow
         if (element.type === "arrow") {

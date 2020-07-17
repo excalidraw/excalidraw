@@ -50,6 +50,7 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds || [],
+    strokeSharpness: element.strokeSharpness,
   };
 
   return {
