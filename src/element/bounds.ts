@@ -14,11 +14,14 @@ import {
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
+// x and y position of top left corner, x and y position of bottom right corner
+export type Bounds = readonly [number, number, number, number];
+
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): [number, number, number, number] => {
+): Bounds => {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteCoords(element);
   }

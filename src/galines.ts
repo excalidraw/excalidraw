@@ -40,7 +40,7 @@ export function orthogonalThrough(against: Point, intersection: Point): Line {
 
 export function parallel(line: Line, distance: number): Line {
   const result = line.slice();
-  result[1] += distance;
+  result[1] -= distance;
   return (result as unknown) as Line;
 }
 

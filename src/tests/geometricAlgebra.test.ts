@@ -26,6 +26,12 @@ describe("geometric algebra", () => {
         toString(GALine.equation(0, 2, 0)),
       );
     });
+    it("parallel", () => {
+      const point = GA.point(3, 3);
+      const line = GALine.equation(0, 1, -1);
+      const parallel = GALine.parallel(line, 2);
+      expect(GAPoint.distanceToLine(point, parallel)).toEqual(0);
+    });
   });
 
   describe("translation", () => {

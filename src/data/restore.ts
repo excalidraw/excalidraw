@@ -101,7 +101,9 @@ const migrateElement = (
     }
     // generic elements
     case "ellipse":
+      return migrateElementWithProperties(element, {});
     case "rectangle":
+      return migrateElementWithProperties(element, {});
     case "diamond":
       return migrateElementWithProperties(element, {});
 

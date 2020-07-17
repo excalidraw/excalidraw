@@ -1,6 +1,6 @@
 import { ExcalidrawElement, PointerType } from "./types";
 
-import { getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
@@ -61,7 +61,7 @@ const generateHandler = (
 };
 
 export const handlerRectanglesFromCoords = (
-  [x1, y1, x2, y2]: [number, number, number, number],
+  [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: number,
   pointerType: PointerType = "mouse",

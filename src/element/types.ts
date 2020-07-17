@@ -29,8 +29,16 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
   type: "selection";
 };
 
-type ExcalidrawPolygonalElement = _ExcalidrawElementBase & {
-  type: "rectangle" | "diamond" | "ellipse";
+export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
+  type: "rectangle";
+};
+
+export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
+  type: "diamond";
+};
+
+export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
+  type: "ellipse";
 };
 
 /**
@@ -38,7 +46,9 @@ type ExcalidrawPolygonalElement = _ExcalidrawElementBase & {
  */
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
-  | ExcalidrawPolygonalElement;
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -68,7 +78,9 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   }>;
 
 export type ExcalidrawBindableElement =
-  | ExcalidrawPolygonalElement
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
   | ExcalidrawTextElement;
 
 export type PointBinding = {

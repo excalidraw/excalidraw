@@ -11,7 +11,6 @@ import { SHAPES } from "../shapes";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { LinearElementEditor } from "./linearElementEditor";
 import Scene from "../scene/Scene";
-import { distanceBetweenPoints, translatePointAlongLine } from "../math";
 import { intersectElementWithLine } from "./collision";
 import { Point } from "../types";
 
@@ -155,26 +154,20 @@ const moveBoundPoint = (
     draggedElement,
     adjacentPoint,
     draggedFocusPointAbsolute,
+    binding.gap,
   );
   if (intersections.length === 0) {
     // TODO: This should never happen, but it does due to scaling/rotating
     return;
   }
   // Guaranteed to intersect because focusPoint is always inside the shape
-  const [intersection1, intersection2] = intersections;
-  const nearIntersection =
-    distanceBetweenPoints(intersection1, adjacentPoint) <
-    distanceBetweenPoints(intersection2, adjacentPoint)
-      ? intersection1
-      : intersection2;
-  const newEdgePoint = translatePointAlongLine(
-    nearIntersection,
-    binding.gap,
-    adjacentPoint,
-  );
+  const [nearIntersection] = intersections;
   LinearElementEditor.movePoint(
     linearElement,
     edgePointIndex,
-    LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
+    LinearElementEditor.pointFromAbsoluteCoords(
+      linearElement,
+      nearIntersection,
+    ),
   );
 };

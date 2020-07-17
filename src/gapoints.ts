@@ -6,7 +6,7 @@ import { Point, Line, join } from "./ga";
  * TODO: docs
  */
 
-export function from([x, y]: [number, number]): Point {
+export function from([x, y]: readonly [number, number]): Point {
   return [0, 0, 0, 0, y, x, 1, 0];
 }
 
@@ -19,7 +19,7 @@ export function abs(point: Point): Point {
 }
 
 export function intersect(line1: Line, line2: Line): Point {
-  return GA.meet(line1, line2);
+  return GA.normalized(GA.meet(line1, line2));
 }
 
 export function project(point: Point, line: Line): Point {

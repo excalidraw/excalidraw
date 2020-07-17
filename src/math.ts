@@ -2,45 +2,6 @@ import { Point } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement } from "./element/types";
 
-// https://stackoverflow.com/a/6853926/232122
-export const distanceBetweenPointAndSegment = (
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-) => {
-  const A = x - x1;
-  const B = y - y1;
-  const C = x2 - x1;
-  const D = y2 - y1;
-
-  const dot = A * C + B * D;
-  const lenSquare = C * C + D * D;
-  let param = -1;
-  if (lenSquare !== 0) {
-    // in case of 0 length line
-    param = dot / lenSquare;
-  }
-
-  let xx, yy;
-  if (param < 0) {
-    xx = x1;
-    yy = y1;
-  } else if (param > 1) {
-    xx = x2;
-    yy = y2;
-  } else {
-    xx = x1 + param * C;
-    yy = y1 + param * D;
-  }
-
-  const dx = x - xx;
-  const dy = y - yy;
-  return Math.hypot(dx, dy);
-};
-
 export const rotate = (
   x1: number,
   y1: number,
@@ -230,10 +191,6 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   return Math.hypot(xd, yd);
 };
 
-export const distanceBetweenPoints = (a: Point, b: Point): number => {
-  return distance2d(a[0], a[1], b[0], b[1]);
-};
-
 export const centerPoint = (a: Point, b: Point): Point => {
   return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 };
@@ -339,44 +296,6 @@ const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   }
 
   return false;
-};
-
-// Returns the intersection between line `a,b` and segment `s1,s2`.
-export const intersectLineAndSegment = (
-  a: Point,
-  b: Point,
-  s1: Point,
-  s2: Point,
-): Point | null => {
-  const [ax, ay] = a;
-  const [bx, by] = b;
-  const [s1x, s1y] = s1;
-  const [s2x, s2y] = s2;
-  const sx = s2x - s1x;
-  const sy = s2y - s1y;
-  const lx = bx - ax;
-  const ly = by - ay;
-
-  const t = (lx * (s1y - ay) - ly * (s1x - ax)) / (-lx * sy + sx * ly);
-  if (t >= 0 && t <= 1) {
-    return [s1x + t * sx, s1y + t * sy];
-  }
-
-  return null;
-};
-
-// Returns a point `distance` away from `start` along the line `start,towards`.
-export const translatePointAlongLine = (
-  start: Point,
-  distance: number,
-  towards: Point,
-): Point => {
-  const [sx, sy] = start;
-  const [tx, ty] = towards;
-  const vx = tx - sx;
-  const vy = ty - sy;
-  const ratio = distance / Math.hypot(vx, vy);
-  return [sx + ratio * vx, sy + ratio * vy];
 };
 
 export const getGridPoint = (

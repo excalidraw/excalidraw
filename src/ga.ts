@@ -310,7 +310,8 @@ export function normalized(a: NVector): NVector {
   if (n === 0 || n === 1) {
     return a;
   }
-  return mul(a, 1 / n);
+  const sign = a[6] < 0 ? -1 : 1;
+  return mul(a, sign / n);
 }
 
 export function inormalized(a: NVector): NVector {

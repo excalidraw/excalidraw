@@ -6,10 +6,14 @@ import {
 import { AppState, Point } from "../types";
 import { getElementAtPosition } from "../scene";
 import { isBindableElement } from "./typeChecks";
-import { bindingBorderTest, intersectElementWithLine } from "./collision";
+import {
+  bindingBorderTest,
+  intersectElementWithLine,
+  distanceToBindableElement,
+} from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
-import { centerPoint, distanceBetweenPoints } from "../math";
+import { centerPoint } from "../math";
 import { LinearElementEditor } from "./linearElementEditor";
 import { pointRelativeTo } from "./bounds";
 
@@ -96,15 +100,13 @@ const calculateFocusPointAndGap = (
     return { focusPoint: edgePoint, gap: 0 };
   }
 
-  const [intersection1, intersection2] = intersections;
+  const [intersectionNear, intersectionFar] = intersections;
+
   return {
     focusPoint: pointRelativeTo(
       hoveredElement,
-      centerPoint(intersection1, intersection2),
+      centerPoint(intersectionNear, intersectionFar),
     ),
-    gap: Math.min(
-      distanceBetweenPoints(intersection1, edgePoint),
-      distanceBetweenPoints(intersection2, edgePoint),
-    ),
+    gap: distanceToBindableElement(hoveredElement, edgePoint),
   };
 };

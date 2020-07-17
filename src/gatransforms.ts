@@ -1,5 +1,6 @@
 import * as GA from "./ga";
 import { Line, Direction, Point, Transform } from "./ga";
+import * as GADirection from "./gadirections";
 
 /**
  * TODO: docs
@@ -11,6 +12,10 @@ export function rotation(pivot: Point, angle: number): Transform {
 
 export function translation(direction: Direction): Transform {
   return [1, 0, 0, 0, -(0.5 * direction[5]), 0.5 * direction[4], 0, 0];
+}
+
+export function translationAlong(line: Line, distance: number): Transform {
+  return GA.add(GA.mul(GADirection.orthogonalToLine(line), 0.5 * distance), 1);
 }
 
 export function compose(motor1: Transform, motor2: Transform): Transform {
