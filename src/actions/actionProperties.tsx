@@ -466,7 +466,7 @@ export const actionChangeSharpness = register({
     <fieldset>
       <legend>{t("labels.edges")}</legend>
       <ButtonSelect
-        group="sloppiness"
+        group="edges"
         options={[
           { value: "sharp", text: t("labels.sharp") },
           { value: "round", text: t("labels.round") },
