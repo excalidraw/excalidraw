@@ -243,7 +243,7 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r = Math.min(w, h) * 0.1;
+          const r = Math.min(w, h) * 0.2;
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 C ${w - r / 2} 0, ${w} ${
               r / 2
@@ -307,7 +307,13 @@ const generateElementShape = (
         // curve is always the first element
         // this simplifies finding the curve for an element
         if (element.strokeSharpness === "sharp") {
-          shape = [generator.linearPath(points as [number, number][], options)];
+          if (options.fill) {
+            shape = [generator.polygon(points as [number, number][], options)];
+          } else {
+            shape = [
+              generator.linearPath(points as [number, number][], options),
+            ];
+          }
         } else {
           shape = [generator.curve(points as [number, number][], options)];
         }

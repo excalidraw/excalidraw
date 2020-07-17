@@ -464,7 +464,7 @@ export const actionChangeSharpness = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
-      <legend>{t("labels.sharpness")}</legend>
+      <legend>{t("labels.edges")}</legend>
       <ButtonSelect
         group="sloppiness"
         options={[
