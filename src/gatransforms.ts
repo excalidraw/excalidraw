@@ -14,6 +14,14 @@ export function translation(direction: Direction): Transform {
   return [1, 0, 0, 0, -(0.5 * direction[5]), 0.5 * direction[4], 0, 0];
 }
 
+export function translationOrthogonal(
+  direction: Direction,
+  distance: number,
+): Transform {
+  const scale = 0.5 * distance;
+  return [1, 0, 0, 0, scale * direction[4], scale * direction[5], 0, 0];
+}
+
 export function translationAlong(line: Line, distance: number): Transform {
   return GA.add(GA.mul(GADirection.orthogonalToLine(line), 0.5 * distance), 1);
 }

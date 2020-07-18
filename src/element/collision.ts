@@ -308,14 +308,17 @@ export const intersectElementWithLine = (
     case "rectangle":
     case "text":
     case "diamond":
-      // TODO: This doesn't work well in the corners, it needs the actual
-      // circles around corners and intersect with those (quarter-circles)
-      intersections = getEdgesRelativeToCenter(element, gap)
-        .map((edge) => intersectSegment(line, edge))
-        .filter((point): point is GA.Point => point != null);
+      const corners = getCorners(element);
+      intersections = corners
+        .flatMap((point, i) => {
+          const edge: [GA.Point, GA.Point] = [point, corners[(i + 1) % 4]];
+          return intersectSegment(line, offsetSegment(edge, gap));
+        })
+        .concat(
+          corners.flatMap((point) => getCircleIntersections(point, gap, line)),
+        );
       break;
     case "ellipse":
-      // TODO:
       intersections = getEllipseIntersections(element, gap, line);
       break;
   }
@@ -323,66 +326,71 @@ export const intersectElementWithLine = (
     // Ignore the "edge" case of only intersecting with a single corner
     return [];
   }
-  return intersections
-    .sort((i1, i2) => GAPoint.distance(i1, aRel) - GAPoint.distance(i2, aRel))
-    .map((point) =>
-      GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point)),
-    );
+  const sortedIntersections = intersections.sort(
+    (i1, i2) => GAPoint.distance(i1, aRel) - GAPoint.distance(i2, aRel),
+  );
+  return [
+    sortedIntersections[0],
+    sortedIntersections[sortedIntersections.length - 1],
+  ].map((point) =>
+    GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point)),
+  );
 };
 
-const getEdgesRelativeToCenter = (
+const getCorners = (
   element:
     | ExcalidrawRectangleElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
-  gap: number,
-): [GA.Point, GA.Point][] => {
+): GA.Point[] => {
   const hx = element.width / 2;
   const hy = element.height / 2;
-  const isDiamond = element.type === "diamond";
-  const gx = (isDiamond ? Math.hypot(hx, hy) / hy : 1) * gap;
-  const gy = (isDiamond ? Math.hypot(hx, hy) / hx : 1) * gap;
-  const hgx = hx + gx;
-  const hgy = hy + gy;
-  let a, b, c, d;
   switch (element.type) {
     case "rectangle":
     case "text":
-      a = GA.point(hgx, hgy);
-      b = GA.point(hgx, -hgy);
-      c = GA.point(-hgx, -hgy);
-      d = GA.point(-hgx, hgy);
-      break;
+      return [
+        GA.point(hx, hy),
+        GA.point(hx, -hy),
+        GA.point(-hx, -hy),
+        GA.point(-hx, hy),
+      ];
     case "diamond":
-      a = GA.point(0, hgy);
-      b = GA.point(hgx, 0);
-      c = GA.point(0, -hgy);
-      d = GA.point(-hgx, 0);
-      break;
+      return [
+        GA.point(0, hy),
+        GA.point(hx, 0),
+        GA.point(0, -hy),
+        GA.point(-hx, 0),
+      ];
   }
-  return [
-    [a, b],
-    [b, c],
-    [c, d],
-    [d, a],
-  ];
 };
 
 // Returns intersection of `line` with `segment`, with `segment` moved by
 // `gap` in its polar direction.
-// If intersection conincides with second segment point returns null.
+// If intersection conincides with second segment point returns empty array.
 const intersectSegment = (
   line: GA.Line,
   segment: [GA.Point, GA.Point],
-): GA.Point | null => {
+): GA.Point[] => {
   const [a, b] = segment;
   const aDist = GAPoint.distanceToLine(a, line);
   const bDist = GAPoint.distanceToLine(b, line);
-  if (bDist === 0 || aDist * bDist > 0) {
-    // The intersection is outside segment `[a, b)`
-    return null;
+  if (aDist * bDist >= 0) {
+    // The intersection is outside segment `(a, b)`
+    return [];
   }
-  return GAPoint.intersect(line, GALine.through(a, b));
+  return [GAPoint.intersect(line, GALine.through(a, b))];
+};
+
+const offsetSegment = (
+  segment: [GA.Point, GA.Point],
+  distance: number,
+): [GA.Point, GA.Point] => {
+  const [a, b] = segment;
+  const offset = GATransform.translationOrthogonal(
+    GADirection.fromTo(a, b),
+    distance,
+  );
+  return [GATransform.apply(offset, a), GATransform.apply(offset, b)];
 };
 
 const getEllipseIntersections = (
@@ -396,21 +404,50 @@ const getEllipseIntersections = (
   const n = line[3];
   const c = line[1];
   const squares = a * a * m * m + b * b * n * n;
-  const discr = Math.sqrt(squares - c * c);
-  if (squares === 0 || discr === 0) {
+  const discr = squares - c * c;
+  if (squares === 0 || discr <= 0) {
     return [];
   }
+  const discrRoot = Math.sqrt(discr);
   const xn = -a * a * m * c;
   const yn = -b * b * n * c;
   return [
     GA.point(
-      (xn + a * b * n * discr) / squares,
-      (yn - a * b * m * discr) / squares,
+      (xn + a * b * n * discrRoot) / squares,
+      (yn - a * b * m * discrRoot) / squares,
     ),
     GA.point(
-      (xn - a * b * n * discr) / squares,
-      (yn + a * b * m * discr) / squares,
+      (xn - a * b * n * discrRoot) / squares,
+      (yn + a * b * m * discrRoot) / squares,
     ),
+  ];
+};
+
+export const getCircleIntersections = (
+  center: GA.Point,
+  radius: number,
+  line: GA.Line,
+): GA.Point[] => {
+  if (radius === 0) {
+    return GAPoint.distanceToLine(line, center) === 0 ? [center] : [];
+  }
+  const m = line[2];
+  const n = line[3];
+  const c = line[1];
+  const [a, b] = GAPoint.toTuple(center);
+  const r = radius;
+  const squares = m * m + n * n;
+  const discr = r * r * squares - (m * a + n * b + c) ** 2;
+  if (squares === 0 || discr <= 0) {
+    return [];
+  }
+  const discrRoot = Math.sqrt(discr);
+  const xn = a * n * n - b * m * n - m * c;
+  const yn = b * m * m - a * m * n - n * c;
+
+  return [
+    GA.point((xn + n * discrRoot) / squares, (yn - m * discrRoot) / squares),
+    GA.point((xn - n * discrRoot) / squares, (yn + m * discrRoot) / squares),
   ];
 };
 

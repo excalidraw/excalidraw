@@ -10,8 +10,12 @@ export function from(point: Point): Point {
   return [0, 0, 0, 0, point[4], point[5], 0, 0];
 }
 
+export function fromTo(from: Point, to: Point): Direction {
+  return GA.inormalized([0, 0, 0, 0, to[4] - from[4], to[5] - from[5], 0, 0]);
+}
+
 export function orthogonal(direction: Direction): Direction {
-  return [0, 0, 0, 0, -direction[5], direction[4], 0, 0];
+  return GA.inormalized([0, 0, 0, 0, -direction[5], direction[4], 0, 0]);
 }
 
 export function orthogonalToLine(line: Line): Direction {
