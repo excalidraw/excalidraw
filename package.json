@@ -70,6 +70,7 @@
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
     ]
   },
+  "name": "excalidraw",
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
