@@ -243,15 +243,13 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r = Math.min(w, h) * 0.2;
+          const r = Math.min(w, h) * 0.25;
           shape = generator.path(
-            `M ${r} 0 L ${w - r} 0 C ${w - r / 2} 0, ${w} ${
-              r / 2
-            }, ${w} ${r} L ${w} ${h - r} C ${w} ${h - r / 2}, ${
-              w - r / 2
-            } ${h}, ${w - r} ${h} L ${r} ${h} C ${r / 2} ${h}, 0 ${
-              h - r / 2
-            }, 0 ${h - r} L 0 ${r} C 0 ${r / 2}, ${r / 2} 0, ${r} 0`,
+            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+              h - r
+            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+              h - r
+            } L 0 ${r} Q 0 0, ${r} 0`,
             generateRoughOptions(element),
           );
         } else {
