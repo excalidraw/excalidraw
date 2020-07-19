@@ -3193,6 +3193,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
           loadLibrary().then((items) => {
             saveLibrary([...items, ...data.library!]);
+            this.setState({ isLibraryOpen: false });
           });
         })
         .catch((error) =>

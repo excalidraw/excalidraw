@@ -97,6 +97,7 @@ const LibraryMenuItems = ({
   onAddToLibrary,
   onInsertShape,
   pendingElements,
+  setAppState,
 }: {
   library: LibraryItems;
   pendingElements: NonDeleted<ExcalidrawElement>[];
@@ -104,6 +105,7 @@ const LibraryMenuItems = ({
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
   onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
+  setAppState: any;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -120,7 +122,16 @@ const LibraryMenuItems = ({
         title={t("buttons.load")}
         aria-label={t("buttons.load")}
         icon={load}
-        onClick={loadLibraryFromJSON}
+        onClick={async () => {
+          try {
+            await loadLibraryFromJSON();
+            // Maybe we should close and open the menu so that the items get updated.
+            // But for now we just close the menu.
+            setAppState({ isLibraryOpen: false });
+          } catch (error) {
+            setAppState({ errorMessage: error.message });
+          }
+        }}
       />
       <ToolButton
         key="export"
@@ -179,11 +190,13 @@ const LibraryMenu = ({
   onInsertShape,
   pendingElements,
   onAddToLibrary,
+  setAppState,
 }: {
   pendingElements: NonDeleted<ExcalidrawElement>[];
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
   onAddToLibrary: () => void;
+  setAppState: any;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, onClickOutside);
@@ -249,6 +262,7 @@ const LibraryMenu = ({
           onAddToLibrary={addToLibrary}
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
+          setAppState={setAppState}
         />
       )}
     </Island>
@@ -395,6 +409,7 @@ const LayerUI = ({
       onClickOutside={closeLibrary}
       onInsertShape={onInsertShape}
       onAddToLibrary={deselectItems}
+      setAppState={setAppState}
     />
   ) : null;
 
