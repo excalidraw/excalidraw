@@ -2,10 +2,10 @@
   align-items: center;
   border: 1px solid #ccc;
   display: flex;
-  height: 126px; // match width
   justify-content: center;
   position: relative;
-  width: 126px; // exactly match the toolbar width when 3 are lined up + padding
+  width: 63px;
+  height: 63px; // match width
 }
 
 .library-unit__dragger {

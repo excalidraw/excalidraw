@@ -24,6 +24,7 @@ type MobileMenuProps = {
   exportButton: React.ReactNode;
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
+  libraryMenu: JSX.Element | null;
   onRoomCreate: () => void;
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
@@ -34,6 +35,7 @@ type MobileMenuProps = {
 export const MobileMenu = ({
   appState,
   elements,
+  libraryMenu,
   actionManager,
   exportButton,
   setAppState,
@@ -66,6 +68,7 @@ export const MobileMenu = ({
                 title={t("toolBar.lock")}
               />
             </Stack.Row>
+            {libraryMenu}
           </Stack.Col>
         )}
       </Section>

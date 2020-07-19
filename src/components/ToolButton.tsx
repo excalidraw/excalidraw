@@ -78,7 +78,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   }
 
   return (
-    <label className="ToolIcon" title={props.title}>
+    <label className={`ToolIcon ${props.className ?? ""}`} title={props.title}>
       <input
         className={`ToolIcon_type_radio ${sizeCn}`}
         type="radio"
