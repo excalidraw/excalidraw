@@ -2,6 +2,7 @@ import {
   NonDeleted,
   ExcalidrawLinearElement,
   ExcalidrawElement,
+  PointBinding,
 } from "./types";
 import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
 import { getElementAbsoluteCoords } from ".";
@@ -383,6 +384,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     pointIndex: number | "new",
     targetPosition: Point | "delete",
+    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
   ) {
     const { points } = element;
 
@@ -448,6 +450,7 @@ export class LinearElementEditor {
     const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
 
     mutateElement(element, {
+      ...otherUpdates,
       points: nextPoints,
       x: element.x + rotated[0],
       y: element.y + rotated[1],

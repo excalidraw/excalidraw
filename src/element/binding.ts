@@ -13,6 +13,7 @@ import {
   intersectElementWithLine,
   distanceToBindableElement,
   pointInAbsoluteCoords,
+  maxBindingGap,
 } from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
@@ -114,27 +115,35 @@ const calculateFocusPointAndGap = (
   };
 };
 
+// Supports translating, rotating and scaling `changedElement` with bound
+// linear elements.
+// Because scaling involves moving the focus points as well, it is
+// done before the `changedElement` is updated, and the `newSize` is passed
+// in explicitly.
 export const updateBoundElements = (
-  draggedElement: NonDeletedExcalidrawElement,
+  changedElement: NonDeletedExcalidrawElement,
+  newSize?: { width: number; height: number },
 ) => {
-  const boundElementIds = draggedElement.boundElementIds ?? [];
+  const boundElementIds = changedElement.boundElementIds ?? [];
   if (boundElementIds.length === 0) {
     return;
   }
-  (Scene.getScene(draggedElement)!.getNonDeletedElements(
-    draggedElement.boundElementIds ?? [],
+  (Scene.getScene(changedElement)!.getNonDeletedElements(
+    changedElement.boundElementIds ?? [],
   ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((boundElement) => {
     maybeUpdateBoundPoint(
       boundElement,
       "start",
       boundElement.startBinding,
-      draggedElement as ExcalidrawBindableElement,
+      changedElement as ExcalidrawBindableElement,
+      newSize,
     );
     maybeUpdateBoundPoint(
       boundElement,
       "end",
       boundElement.endBinding,
-      draggedElement as ExcalidrawBindableElement,
+      changedElement as ExcalidrawBindableElement,
+      newSize,
     );
   });
 };
@@ -143,24 +152,37 @@ const maybeUpdateBoundPoint = (
   boundElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   binding: PointBinding | null | undefined,
-  draggedElement: ExcalidrawBindableElement,
+  changedElement: ExcalidrawBindableElement,
+  newSize: { width: number; height: number } | undefined,
 ): void => {
-  if (binding?.elementId === draggedElement.id) {
-    updateBoundPoint(boundElement, startOrEnd, binding, draggedElement);
+  if (binding?.elementId === changedElement.id) {
+    updateBoundPoint(
+      boundElement,
+      startOrEnd,
+      binding,
+      changedElement,
+      newSize,
+    );
   }
 };
 
 const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
-  binding: PointBinding,
-  draggedElement: ExcalidrawBindableElement,
+  currentBinding: PointBinding,
+  changedElement: ExcalidrawBindableElement,
+  newSize: { width: number; height: number } | undefined,
 ): void => {
+  const binding = maybeCalculateFocusPointAndGapWhenScaling(
+    changedElement,
+    currentBinding,
+    newSize,
+  );
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
   const draggedFocusPointAbsolute = pointInAbsoluteCoords(
-    draggedElement,
+    changedElement,
     binding.focusPoint,
   );
   let newEdgePoint;
@@ -174,7 +196,7 @@ const updateBoundPoint = (
       adjacentPointIndex,
     );
     const intersections = intersectElementWithLine(
-      draggedElement,
+      changedElement,
       adjacentPoint,
       draggedFocusPointAbsolute,
       binding.gap,
@@ -190,5 +212,27 @@ const updateBoundPoint = (
     linearElement,
     edgePointIndex,
     LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
+    { [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding },
   );
+};
+
+const maybeCalculateFocusPointAndGapWhenScaling = (
+  changedElement: ExcalidrawBindableElement,
+  currentBinding: PointBinding,
+  newSize: { width: number; height: number } | undefined,
+): PointBinding => {
+  if (newSize == null) {
+    return currentBinding;
+  }
+  const { gap, focusPoint, elementId } = currentBinding;
+  const { width: newWidth, height: newHeight } = newSize;
+  const newGap = Math.min(maxBindingGap(newWidth, newHeight), gap);
+
+  const { width, height } = changedElement;
+  const [x, y] = focusPoint;
+  const newFocusPoint: Point = [
+    x * (newWidth / width),
+    y * (newHeight / height),
+  ];
+  return { elementId, gap: newGap, focusPoint: newFocusPoint };
 };

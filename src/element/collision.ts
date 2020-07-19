@@ -15,6 +15,7 @@ import {
   ExcalidrawDiamondElement,
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
+  NonDeleted,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -55,25 +56,24 @@ export const hitTest = (
 };
 
 export const bindingBorderTest = (
-  element: NonDeletedExcalidrawElement,
+  element: NonDeleted<ExcalidrawBindableElement>,
   appState: AppState,
   x: number,
   y: number,
 ): boolean => {
-  switch (element.type) {
-    case "rectangle":
-    case "text":
-    case "diamond":
-    case "ellipse":
-      const smallerDimension = Math.min(element.width, element.height);
-      // We make the bindable boundary bigger for bigger elements
-      const threshold =
-        Math.max(15, Math.min(0.25 * smallerDimension, 80)) / appState.zoom;
-      const check = isOutsideCheck;
-      const point: Point = [x, y];
-      return hitTestPointAgainstElement({ element, point, threshold, check });
-  }
-  return false;
+  const threshold = maxBindingGap(element.width, element.height);
+  const check = isOutsideCheck;
+  const point: Point = [x, y];
+  return hitTestPointAgainstElement({ element, point, threshold, check });
+};
+
+export const maxBindingGap = (
+  elementWidth: number,
+  elementHeight: number,
+): number => {
+  const smallerDimension = Math.min(elementWidth, elementHeight);
+  // We make the bindable boundary bigger for bigger elements
+  return Math.max(15, Math.min(0.25 * smallerDimension, 80));
 };
 
 type HitTestArgs = {

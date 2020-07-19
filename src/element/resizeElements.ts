@@ -406,6 +406,7 @@ const resizeSingleElement = (
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
   const rescaledPoints = rescalePointsInElement(element, nextWidth, nextHeight);
+  updateBoundElements(element, { width: nextWidth, height: nextHeight });
   const [finalX1, finalY1, finalX2, finalY2] = getResizedElementAbsoluteCoords(
     {
       ...element,
@@ -532,6 +533,7 @@ const resizeMultipleElements = (
         }
         const origCoords = getElementAbsoluteCoords(element);
         const rescaledPoints = rescalePointsInElement(element, width, height);
+        updateBoundElements(element, { width, height });
         const finalCoords = getResizedElementAbsoluteCoords(
           {
             ...element,
