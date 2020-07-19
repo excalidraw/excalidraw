@@ -37,7 +37,6 @@ import {
   getSelectedGroupIds,
   getElementsInGroup,
 } from "../groups";
-import { isTouchDevice } from "../utils";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -142,6 +141,7 @@ export const renderScene = (
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
   remoteIsTouchDevice: boolean,
+  touchMove: boolean,
   // extra options, currently passed by export helper
   {
     renderScrollbars = true,
@@ -506,7 +506,7 @@ export const renderScene = (
       context.closePath();
     }
 
-    if (!isTouchDevice()) {
+    if (!touchMove) {
       context.beginPath();
       context.moveTo(x, y);
       context.lineTo(x + 1, y + 14);
