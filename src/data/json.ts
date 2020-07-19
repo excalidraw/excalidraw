@@ -1,5 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 import { cleanAppStateForExport } from "../appState";
 
 import { fileOpen, fileSave } from "browser-nativefs";
@@ -46,6 +46,39 @@ export const loadFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: ["json", "excalidraw"],
+    mimeTypes: ["application/json"],
+  });
+  return loadFromBlob(blob);
+};
+
+export const saveLibraryAsJSON = async (
+  library: LibraryItems,
+  name = "library",
+) => {
+  const serialized = JSON.stringify(
+    {
+      type: "excalidrawlib",
+      version: 1,
+      library,
+    },
+    null,
+    2,
+  );
+  const fileName = `${name}.excalidrawlib`;
+  const blob = new Blob([serialized], {
+    type: "application/excalidrawlib.json",
+  });
+  await fileSave(blob, {
+    fileName,
+    description: "Excalidraw library file",
+    extensions: ["excalidrawlib"],
+  });
+};
+
+export const loadLibraryFromJSON = async () => {
+  const blob = await fileOpen({
+    description: "Excalidraw library files",
+    extensions: ["json", "excalidrawlib"],
     mimeTypes: ["application/json"],
   });
   return loadFromBlob(blob);

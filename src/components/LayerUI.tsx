@@ -37,13 +37,14 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
-import { shield } from "./icons";
+import { shield, exportFile, load } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
 import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { loadLibrary, saveLibrary } from "../data/localStorage";
+import { ToolButton } from "./ToolButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -108,6 +109,27 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
+
+  rows.push(
+    <Stack.Row align="center" gap={1} key={113423423423534}>
+      <ToolButton
+        key="import"
+        type="button"
+        title={t("buttons.load")}
+        aria-label={t("buttons.load")}
+        icon={load}
+        onClick={() => {}}
+      />
+      <ToolButton
+        key="export"
+        type="button"
+        title={t("buttons.export")}
+        aria-label={t("buttons.export")}
+        icon={exportFile}
+        onClick={() => {}}
+      />
+    </Stack.Row>,
+  );
 
   for (let row = 0; row < numRows; row++) {
     const i = CELLS_PER_ROW * row;
