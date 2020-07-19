@@ -5,6 +5,7 @@ import { close } from "../components/icons";
 
 import "./LibraryUnit.scss";
 import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
 
 // fa-plus
 const PLUS_ICON = (
@@ -50,8 +51,9 @@ export const LibraryUnit = ({
   }, [elements, pendingElements]);
 
   const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
 
-  const adder = isHovered && pendingElements && (
+  const adder = (isHovered || isMobile) && pendingElements && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
 
@@ -79,7 +81,7 @@ export const LibraryUnit = ({
         }}
       />
       {adder}
-      {elements && isHovered && (
+      {elements && (isHovered || isMobile) && (
         <button
           className="library-unit__removeFromLibrary"
           aria-label={t("labels.removeFromLibrary")}
