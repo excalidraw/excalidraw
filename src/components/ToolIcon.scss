@@ -130,6 +130,17 @@
   user-select: none;
 }
 
+@media (max-width: 425px) {
+  .Shape .ToolIcon__icon {
+    width: 2rem;
+    height: 2rem;
+
+    svg {
+      height: 0.8em;
+    }
+  }
+}
+
 @media (max-width: 360px) {
   .ToolIcon.ToolIcon__lock {
     display: inline-block;
@@ -149,8 +160,6 @@
     }
 
     .ToolIcon__icon {
-      width: 2.5rem;
-      height: 2.5rem;
       border-radius: inherit;
     }
     svg {

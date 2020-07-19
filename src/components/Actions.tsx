@@ -109,6 +109,7 @@ export const ShapesSwitcher = ({
       }`;
       return (
         <ToolButton
+          className="Shape"
           key={value}
           type="radio"
           icon={icon}
@@ -132,6 +133,7 @@ export const ShapesSwitcher = ({
       );
     })}
     <ToolButton
+      className="Shape"
       type="button"
       icon={LIBRARY_ICON}
       name="editor-library"
