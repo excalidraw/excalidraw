@@ -69,6 +69,7 @@ export const exportToCanvas = (
       remotePointerUsernames: {},
     },
     false,
+    false,
     {
       renderScrollbars: false,
       renderSelection: false,
