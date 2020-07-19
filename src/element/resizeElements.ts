@@ -22,6 +22,7 @@ import {
   normalizeResizeHandle,
 } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
+import { updateBoundElements } from "./binding";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -55,6 +56,7 @@ export const resizeElements = (
         pointerY,
         isRotateWithDiscreteAngle,
       );
+      updateBoundElements(element);
     } else if (
       isLinearElement(element) &&
       element.points.length === 2 &&
