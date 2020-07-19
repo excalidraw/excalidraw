@@ -70,7 +70,7 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamily;
 }) => {
-  return [FONT_FAMILY[fontFamily], WINDOWS_EMOJI_FALLBACK_FONT].join(",");
+  return `${FONT_FAMILY[fontFamily]}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
 };
 
 /** returns fontSize+fontFamily string for assignment to DOM elements */
