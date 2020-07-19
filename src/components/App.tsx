@@ -246,7 +246,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     isLoading: true,
     remoteIsTouchDevice: false,
   };
-  
+
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
     height: window.innerHeight,
