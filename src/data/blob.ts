@@ -2,6 +2,25 @@ import { getDefaultAppState, cleanAppStateForExport } from "../appState";
 import { restore } from "./restore";
 import { t } from "../i18n";
 import { AppState } from "../types";
+import { LibraryData } from "./types";
+
+const loadFileContents = async (blob: any) => {
+  let contents: string;
+  if ("text" in Blob) {
+    contents = await blob.text();
+  } else {
+    contents = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsText(blob, "utf8");
+      reader.onloadend = () => {
+        if (reader.readyState === FileReader.DONE) {
+          resolve(reader.result as string);
+        }
+      };
+    });
+  }
+  return contents;
+};
 
 export const loadFromBlob = async (blob: any) => {
   const updateAppState = (contents: string) => {
@@ -27,21 +46,16 @@ export const loadFromBlob = async (blob: any) => {
   if (blob.handle) {
     (window as any).handle = blob.handle;
   }
-  let contents;
-  if ("text" in Blob) {
-    contents = await blob.text();
-  } else {
-    contents = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsText(blob, "utf8");
-      reader.onloadend = () => {
-        if (reader.readyState === FileReader.DONE) {
-          resolve(reader.result as string);
-        }
-      };
-    });
-  }
-
+  const contents = await loadFileContents(blob);
   const { elements, appState } = updateAppState(contents);
   return restore(elements, appState, { scrollToContent: true });
+};
+
+export const loadLibraryFromBlob = async (blob: any) => {
+  const contents = await loadFileContents(blob);
+  const data: LibraryData = JSON.parse(contents);
+  if (data.type !== "excalidrawlib") {
+    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+  }
+  return data;
 };
