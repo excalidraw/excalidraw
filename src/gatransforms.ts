@@ -27,7 +27,7 @@ export function translationAlong(line: Line, distance: number): Transform {
 }
 
 export function compose(motor1: Transform, motor2: Transform): Transform {
-  return GA.mul(motor1, motor2);
+  return GA.mul(motor2, motor1);
 }
 
 export function apply(

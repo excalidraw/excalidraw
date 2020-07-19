@@ -4,7 +4,7 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { isPathALoop, isPointInPolygon } from "../math";
+import { isPathALoop, isPointInPolygon, rotate } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import {
@@ -270,12 +270,27 @@ const pointRelativeToElement = (
   return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
+// Returns point in absolute coordinates
+export const pointInAbsoluteCoords = (
+  element: ExcalidrawElement,
+  // Point relative to the element position
+  point: Point,
+): Point => {
+  const [x, y] = point;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x2 - x1) / 2;
+  const cy = (y2 - y1) / 2;
+  const [rotatedX, rotatedY] = rotate(x, y, cx, cy, element.angle);
+  return [element.x + rotatedX, element.y + rotatedY];
+};
+
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
   const elementCoords = getElementAbsoluteCoords(element);
   const center = coordsCenter(elementCoords);
-  const rotate = GATransform.rotation(center, -element.angle);
+  // GA has angle orientation opposite to `rotate`
+  const rotate = GATransform.rotation(center, element.angle);
   const translate = GA.reverse(
     GATransform.translation(GADirection.from(center)),
   );

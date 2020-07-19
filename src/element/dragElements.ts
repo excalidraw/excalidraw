@@ -11,8 +11,7 @@ import { SHAPES } from "../shapes";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { LinearElementEditor } from "./linearElementEditor";
 import Scene from "../scene/Scene";
-import { intersectElementWithLine } from "./collision";
-import { Point } from "../types";
+import { intersectElementWithLine, pointInAbsoluteCoords } from "./collision";
 
 export const dragSelectedElements = (
   selectedElements: NonDeletedExcalidrawElement[],
@@ -145,11 +144,10 @@ const moveBoundPoint = (
     linearElement,
     adjacentPointIndex,
   );
-  const draggedFocusPointAbsolute: Point = [
-    draggedElement.x + binding.focusPoint[0] + offset.x,
-    draggedElement.y + binding.focusPoint[1] + offset.y,
-  ];
-
+  const draggedFocusPointAbsolute = pointInAbsoluteCoords(
+    draggedElement,
+    binding.focusPoint,
+  );
   const intersections = intersectElementWithLine(
     draggedElement,
     adjacentPoint,

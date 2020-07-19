@@ -58,4 +58,13 @@ describe("geometric algebra", () => {
       );
     });
   });
+  describe("rotation", () => {
+    it("points", () => {
+      const start = point(2, 2);
+      const pivot = point(1, 1);
+      const rotate = GATransform.rotation(pivot, Math.PI / 2);
+      const end = GATransform.apply(rotate, start);
+      expect(toString(end)).toEqual(toString(point(2, 0)));
+    });
+  });
 });
