@@ -258,7 +258,8 @@ const pointRelativeToElement = (
   const point = GAPoint.from(pointTuple);
   const elementCoords = getElementAbsoluteCoords(element);
   const center = coordsCenter(elementCoords);
-  const rotate = GATransform.rotation(center, -element.angle);
+  // GA has angle orientation opposite to `rotate`
+  const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
   const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
   const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);

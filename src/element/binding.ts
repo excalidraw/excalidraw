@@ -2,6 +2,8 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   NonDeleted,
+  NonDeletedExcalidrawElement,
+  PointBinding,
 } from "./types";
 import { AppState, Point } from "../types";
 import { getElementAtPosition } from "../scene";
@@ -10,6 +12,7 @@ import {
   bindingBorderTest,
   intersectElementWithLine,
   distanceToBindableElement,
+  pointInAbsoluteCoords,
 } from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
@@ -97,7 +100,7 @@ const calculateFocusPointAndGap = (
   if (intersections.length === 0) {
     // The linear element is not pointing at the shape, just bind to
     // the position of the edge point
-    return { focusPoint: edgePoint, gap: 0 };
+    return { focusPoint: pointRelativeTo(hoveredElement, edgePoint), gap: 0 };
   }
 
   const [intersectionNear, intersectionFar] = intersections;
@@ -109,4 +112,83 @@ const calculateFocusPointAndGap = (
     ),
     gap: distanceToBindableElement(hoveredElement, edgePoint),
   };
+};
+
+export const updateBoundElements = (
+  draggedElement: NonDeletedExcalidrawElement,
+) => {
+  const boundElementIds = draggedElement.boundElementIds ?? [];
+  if (boundElementIds.length === 0) {
+    return;
+  }
+  (Scene.getScene(draggedElement)!.getNonDeletedElements(
+    draggedElement.boundElementIds ?? [],
+  ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((boundElement) => {
+    maybeUpdateBoundPoint(
+      boundElement,
+      "start",
+      boundElement.startBinding,
+      draggedElement as ExcalidrawBindableElement,
+    );
+    maybeUpdateBoundPoint(
+      boundElement,
+      "end",
+      boundElement.endBinding,
+      draggedElement as ExcalidrawBindableElement,
+    );
+  });
+};
+
+const maybeUpdateBoundPoint = (
+  boundElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  binding: PointBinding | null | undefined,
+  draggedElement: ExcalidrawBindableElement,
+): void => {
+  if (binding?.elementId === draggedElement.id) {
+    updateBoundPoint(boundElement, startOrEnd, binding, draggedElement);
+  }
+};
+
+const updateBoundPoint = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  binding: PointBinding,
+  draggedElement: ExcalidrawBindableElement,
+): void => {
+  const direction = startOrEnd === "start" ? -1 : 1;
+  const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
+  const adjacentPointIndex = edgePointIndex - direction;
+  const draggedFocusPointAbsolute = pointInAbsoluteCoords(
+    draggedElement,
+    binding.focusPoint,
+  );
+  let newEdgePoint;
+  // The linear element was not originally pointing inside the bound shape,
+  // we use simple binding without focus points
+  if (binding.gap === 0) {
+    newEdgePoint = draggedFocusPointAbsolute;
+  } else {
+    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      adjacentPointIndex,
+    );
+    const intersections = intersectElementWithLine(
+      draggedElement,
+      adjacentPoint,
+      draggedFocusPointAbsolute,
+      binding.gap,
+    );
+    if (intersections.length === 0) {
+      // TODO: This should never happen, but it does due to scaling/rotating
+      return;
+    }
+    // Guaranteed to intersect because focusPoint is always inside the shape
+    newEdgePoint = intersections[0];
+  }
+  LinearElementEditor.movePoint(
+    linearElement,
+    edgePointIndex,
+    LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
+  );
 };
