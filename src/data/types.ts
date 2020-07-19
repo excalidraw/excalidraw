@@ -1,5 +1,5 @@
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 
 export interface DataState {
   type?: string;
@@ -7,4 +7,11 @@ export interface DataState {
   source?: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState | null;
+}
+
+export interface LibraryData {
+  type?: string;
+  version?: number;
+  source?: string;
+  library?: LibraryItems;
 }
