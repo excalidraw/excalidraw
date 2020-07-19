@@ -535,7 +535,10 @@ const resizeMultipleElements = (
         }
         const origCoords = getElementAbsoluteCoords(element);
         const rescaledPoints = rescalePointsInElement(element, width, height);
-        updateBoundElements(element, { newSize: { width, height } });
+        updateBoundElements(element, {
+          newSize: { width, height },
+          simultaneouslyUpdated: elements,
+        });
         const finalCoords = getResizedElementAbsoluteCoords(
           {
             ...element,

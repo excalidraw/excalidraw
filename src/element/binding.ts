@@ -124,18 +124,17 @@ const calculateFocusPointAndGap = (
 export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
   options?: {
-    ignoredElements?: ExcalidrawElement[];
+    simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
   },
 ) => {
-  const allBoundElementIds = changedElement.boundElementIds ?? [];
-  if (allBoundElementIds.length === 0) {
+  const boundElementIds = changedElement.boundElementIds ?? [];
+  if (boundElementIds.length === 0) {
     return;
   }
-  const { newSize, ignoredElements } = options ?? {};
-  const boundElementIds = boundElementsThatNeedUpdateIds(
-    allBoundElementIds,
-    ignoredElements,
+  const { newSize, simultaneouslyUpdated } = options ?? {};
+  const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
+    simultaneouslyUpdated,
   );
   (Scene.getScene(changedElement)!.getNonDeletedElements(
     boundElementIds,
@@ -145,6 +144,7 @@ export const updateBoundElements = (
       "start",
       boundElement.startBinding,
       changedElement as ExcalidrawBindableElement,
+      simultaneouslyUpdatedElementIds,
       newSize,
     );
     maybeUpdateBoundPoint(
@@ -152,21 +152,16 @@ export const updateBoundElements = (
       "end",
       boundElement.endBinding,
       changedElement as ExcalidrawBindableElement,
+      simultaneouslyUpdatedElementIds,
       newSize,
     );
   });
 };
 
-const boundElementsThatNeedUpdateIds = (
-  boundElementIds: readonly ExcalidrawElement["id"][],
-  ignoredElements: ExcalidrawElement[] | undefined,
-): ExcalidrawElement["id"][] => {
-  const ignoredElementIds = new Set(
-    (ignoredElements || []).map((element) => element.id),
-  );
-  return boundElementIds.filter(
-    (boundElementId) => !ignoredElementIds.has(boundElementId),
-  );
+const getSimultaneouslyUpdatedElementIds = (
+  simultaneouslyUpdated: readonly ExcalidrawElement[] | undefined,
+): Set<ExcalidrawElement["id"]> => {
+  return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
 const maybeUpdateBoundPoint = (
@@ -174,6 +169,7 @@ const maybeUpdateBoundPoint = (
   startOrEnd: "start" | "end",
   binding: PointBinding | null | undefined,
   changedElement: ExcalidrawBindableElement,
+  simultaneouslyUpdatedElementIds: Set<ExcalidrawElement["id"]>,
   newSize: { width: number; height: number } | undefined,
 ): void => {
   if (binding?.elementId === changedElement.id) {
@@ -182,6 +178,7 @@ const maybeUpdateBoundPoint = (
       startOrEnd,
       binding,
       changedElement,
+      simultaneouslyUpdatedElementIds,
       newSize,
     );
   }
@@ -192,13 +189,25 @@ const updateBoundPoint = (
   startOrEnd: "start" | "end",
   currentBinding: PointBinding,
   changedElement: ExcalidrawBindableElement,
+  simultaneouslyUpdatedElementIds: Set<ExcalidrawElement["id"]>,
   newSize: { width: number; height: number } | undefined,
 ): void => {
+  const isSimultaneouslyUpdated = simultaneouslyUpdatedElementIds.has(
+    linearElement.id,
+  );
   const binding = maybeCalculateFocusPointAndGapWhenScaling(
     changedElement,
     currentBinding,
     newSize,
   );
+  const bindingUpdate = {
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
+  };
+  // `linearElement` is being moved/scaled already, just update the binding
+  if (isSimultaneouslyUpdated) {
+    mutateElement(linearElement, bindingUpdate);
+    return;
+  }
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
@@ -233,7 +242,7 @@ const updateBoundPoint = (
     linearElement,
     edgePointIndex,
     LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
-    { [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding },
+    bindingUpdate,
   );
 };
 
@@ -247,9 +256,12 @@ const maybeCalculateFocusPointAndGapWhenScaling = (
   }
   const { gap, focusPoint, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
-  const newGap = Math.min(maxBindingGap(newWidth, newHeight), gap);
-
   const { width, height } = changedElement;
+  const newGap = Math.min(
+    maxBindingGap(newWidth, newHeight),
+    gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
+  );
+
   const [x, y] = focusPoint;
   const newFocusPoint: Point = [
     x * (newWidth / width),

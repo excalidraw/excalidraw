@@ -19,7 +19,7 @@ export const dragSelectedElements = (
       x: element.x + offset.x,
       y: element.y + offset.y,
     });
-    updateBoundElements(element, { ignoredElements: selectedElements });
+    updateBoundElements(element, { simultaneouslyUpdated: selectedElements });
   });
 };
 
