@@ -80,6 +80,10 @@ export type AppState = {
   /** group being edited when you drill down to its constituent element
     (e.g. when you double-click on a group's element) */
   editingGroupId: GroupId | null;
+  width: number;
+  height: number;
+
+  isLibraryOpen: boolean;
 };
 
 export type PointerCoords = Readonly<{
@@ -102,3 +106,10 @@ export declare class GestureEvent extends UIEvent {
 export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
   _brand: "socketUpdateData";
 };
+
+export type LibraryItems = readonly NonDeleted<ExcalidrawElement>[][];
+
+export interface ExcalidrawProps {
+  width: number;
+  height: number;
+}

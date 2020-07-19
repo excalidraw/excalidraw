@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Постави",
     "selectAll": "Маркирай всичко",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -74,7 +78,7 @@
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "save": "Запази",
-    "saveAs": "",
+    "saveAs": "Запиши като",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",
@@ -92,8 +96,7 @@
     "createNewRoom": "Създай нова стая",
     "toggleFullScreen": "Превключване на цял екран",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
     "couldNotCopyToClipboard": "Неуспешно копиране в клипборда. Опитайте да използвате браузъра Chrome.",
     "decryptFailed": "Данните не можаха да се дешифрират.",
-    "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието."
+    "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Селекция",
@@ -114,6 +118,7 @@
     "arrow": "Стрелка",
     "line": "Линия",
     "text": "Текст",
+    "library": "",
     "lock": "Поддържайте избрания инструмент активен след рисуване"
   },
   "headings": {

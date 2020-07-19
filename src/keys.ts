@@ -18,6 +18,8 @@ export const KEYS = {
   Z_KEY_CODE: 90,
   GRID_KEY_CODE: 222,
   G_KEY_CODE: 71,
+  C_KEY_CODE: 67,
+  V_KEY_CODE: 86,
 } as const;
 
 export type Key = keyof typeof KEYS;

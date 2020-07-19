@@ -32,14 +32,12 @@ export const textWysiwyg = ({
   zoom,
   onChange,
   onSubmit,
-  onCancel,
   getViewportCoords,
 }: {
   id: ExcalidrawElement["id"];
   zoom: number;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
-  onCancel: () => void;
   getViewportCoords: (x: number, y: number) => [number, number];
 }) => {
   function updateWysiwygStyle() {
@@ -129,11 +127,7 @@ export const textWysiwyg = ({
   };
 
   const handleSubmit = () => {
-    if (editable.value) {
-      onSubmit(normalizeText(editable.value));
-    } else {
-      onCancel();
-    }
+    onSubmit(normalizeText(editable.value));
     cleanup();
   };
 

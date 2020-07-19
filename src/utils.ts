@@ -251,3 +251,10 @@ export const isTouchDevice = () => {
 
   return mediaQueryMatches.matches;
 };
+
+export function tupleToCoors(
+  xyTuple: [number, number],
+): { x: number; y: number } {
+  const [x, y] = xyTuple;
+  return { x, y };
+}

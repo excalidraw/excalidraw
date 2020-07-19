@@ -2,12 +2,15 @@ import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
-export type ActionResult = {
-  elements?: readonly ExcalidrawElement[] | null;
-  appState?: AppState | null;
-  commitToHistory: boolean;
-  syncHistory?: boolean;
-};
+/** if false, the action should be prevented */
+export type ActionResult =
+  | {
+      elements?: readonly ExcalidrawElement[] | null;
+      appState?: AppState | null;
+      commitToHistory: boolean;
+      syncHistory?: boolean;
+    }
+  | false;
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
@@ -59,7 +62,8 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
-  | "goToCollaborator";
+  | "goToCollaborator"
+  | "addToLibrary";
 
 export interface Action {
   name: ActionName;
@@ -78,6 +82,10 @@ export interface Action {
   ) => boolean;
   contextItemLabel?: string;
   contextMenuOrder?: number;
+  contextItemPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
 }
 
 export interface ActionsManagerInterface {

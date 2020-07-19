@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Beillesztés",
     "selectAll": "Összes kijelölése",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
@@ -41,7 +42,7 @@
     "crossHatch": "",
     "thin": "Vékony",
     "bold": "Félkövér",
-    "left": "",
+    "left": "Bal",
     "center": "",
     "right": "",
     "extraBold": "",
@@ -58,13 +59,16 @@
     "createRoom": "Élő együttmüködés megosztása",
     "duplicateSelection": "",
     "untitled": "",
-    "name": "",
+    "name": "Név",
     "yourName": "",
     "madeWithExcalidraw": "",
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -92,8 +96,7 @@
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
     "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
     "decryptFailed": "Nem sikerült dekódolni az adatot.",
-    "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát."
+    "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Kiválasztás",
@@ -114,6 +118,7 @@
     "arrow": "Nyíl",
     "line": "Vonal",
     "text": "Szöveg",
+    "library": "",
     "lock": "Rajzolás után az aktív eszközt tartsa kiválasztva"
   },
   "headings": {

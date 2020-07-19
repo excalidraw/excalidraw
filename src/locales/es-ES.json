@@ -2,7 +2,8 @@
   "labels": {
     "paste": "Pegar",
     "selectAll": "Seleccionar todo",
-    "moveCanvas": "",
+    "multiSelect": "Añadir elemento a la selección",
+    "moveCanvas": "Mover el lienzo",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -19,7 +20,7 @@
     "strokeWidth": "Grosor del trazo",
     "strokeStyle": "Estilo del trazo",
     "strokeStyle_solid": "Sólido",
-    "strokeStyle_dashed": "Discontinuo",
+    "strokeStyle_dashed": "Linea discontinua",
     "strokeStyle_dotted": "Punteado",
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
@@ -62,9 +63,12 @@
     "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw",
     "group": "Selección de grupo",
-    "ungroup": "Desagrupar selección",
-    "collaborators": "",
-    "toggleGridMode": ""
+    "ungroup": "Dividir selección",
+    "collaborators": "Colaboradores",
+    "toggleGridMode": "Alternar modo cuadrícula",
+    "addToLibrary": "Añadir a la biblioteca",
+    "removeFromLibrary": "Eliminar de la biblioteca",
+    "libraryLoadingMessage": "Cargando biblioteca..."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -74,7 +78,7 @@
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "save": "Guardar",
-    "saveAs": "",
+    "saveAs": "Guardar como",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
     "close": "Cerrar",
@@ -92,8 +96,7 @@
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
     "toggleZenMode": "Alternar modo zen",
-    "exitZenMode": "Salir del modo Zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido."
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
+    "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?"
   },
   "toolBar": {
     "selection": "Selección",
@@ -114,6 +118,7 @@
     "arrow": "Flecha",
     "line": "Línea",
     "text": "Texto",
+    "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
     "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "Pulse Borrar para eliminar el punto o arrastre para mover",
+    "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "errorSplash": {
@@ -146,13 +151,13 @@
   },
   "roomDialog": {
     "desc_intro": "Puedes invitar a gente a tu escena actual para colaborar contigo.",
-    "desc_privacy": "No se preocupe, la sesión usa encriptación de extremo a extremo, por lo que todo lo que dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver qué se le ocurre.",
+    "desc_privacy": "No te preocupes, la sesión usa encriptación de extremo a extremo, por lo que todo lo que se dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver lo que haces.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
-    "desc_persistenceWarning": "Tenga en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, usted perderá los datos a menos que los exporte a un archivo o un enlace para compartir.",
-    "desc_shareLink": "Comparta este enlace con cualquier persona con quien quiera colaborar:",
-    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena, localmente. Tenga en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
+    "desc_persistenceWarning": "Ten en cuenta que los datos de la escena se comparten entre los colaboradores de forma P2P y no se almacenan en nuestro servidor. Por lo tanto, si todos se desconectan, perderás los datos a menos que sean exportados a un archivo o un enlace para compartir.",
+    "desc_shareLink": "Comparte este enlace con tus colaboradores:",
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena localmente. Ten en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
   },
   "errorDialog": {
     "title": "Error"
@@ -167,12 +172,12 @@
     "curvedLine": "Línea curva",
     "editor": "Editor",
     "view": "Vista",
-    "blog": "Leer nuestro blog",
-    "howto": "Seguir nuestras guías",
+    "blog": "Lee nuestro blog",
+    "howto": "Sigue nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": "Ajustar la vista para mostrar todos los elementos"
+    "zoomToFit": "Ajustar para mostrar todos los elementos"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."

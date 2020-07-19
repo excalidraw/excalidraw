@@ -52,49 +52,45 @@ function handleGroupEditingState(
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   perform: (elements, appState) => {
-    if (
-      appState.editingLinearElement?.activePointIndex != null &&
-      appState.editingLinearElement?.activePointIndex > -1
-    ) {
-      const { elementId } = appState.editingLinearElement;
+    if (appState.editingLinearElement) {
+      const { elementId, activePointIndex } = appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId);
-      if (element) {
+      if (!element) {
+        return false;
+      }
+      if (
+        // case: no point selected → delete whole element
+        activePointIndex == null ||
+        activePointIndex === -1 ||
         // case: deleting last point
-        if (element.points.length < 2) {
-          const nextElements = elements.filter((el) => el.id !== element.id);
-          const nextAppState = handleGroupEditingState(appState, nextElements);
-
-          return {
-            elements: nextElements,
-            appState: {
-              ...nextAppState,
-              editingLinearElement: null,
-            },
-            commitToHistory: false,
-          };
-        }
-
-        LinearElementEditor.movePoint(
-          element,
-          appState.editingLinearElement.activePointIndex,
-          "delete",
-        );
+        element.points.length < 2
+      ) {
+        const nextElements = elements.filter((el) => el.id !== element.id);
+        const nextAppState = handleGroupEditingState(appState, nextElements);
 
         return {
-          elements: elements,
+          elements: nextElements,
           appState: {
-            ...appState,
-            editingLinearElement: {
-              ...appState.editingLinearElement,
-              activePointIndex:
-                appState.editingLinearElement.activePointIndex > 0
-                  ? appState.editingLinearElement.activePointIndex - 1
-                  : 0,
-            },
+            ...nextAppState,
+            editingLinearElement: null,
           },
-          commitToHistory: true,
+          commitToHistory: false,
         };
       }
+
+      LinearElementEditor.movePoint(element, activePointIndex, "delete");
+
+      return {
+        elements: elements,
+        appState: {
+          ...appState,
+          editingLinearElement: {
+            ...appState.editingLinearElement,
+            activePointIndex: activePointIndex > 0 ? activePointIndex - 1 : 0,
+          },
+        },
+        commitToHistory: true,
+      };
     }
 
     let {

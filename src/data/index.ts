@@ -24,12 +24,12 @@ export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
 export { saveToLocalStorage } from "./localStorage";
 
-const BACKEND_GET = "https://json.excalidraw.com/api/v1/";
+const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 
-const BACKEND_V2_POST = "https://json.excalidraw.com/api/v2/post/";
-const BACKEND_V2_GET = "https://json.excalidraw.com/api/v2/";
+const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
+const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 
-export const SOCKET_SERVER = "https://excalidraw-socket.herokuapp.com";
+export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
 
 export type EncryptedData = {
   data: ArrayBuffer;
@@ -349,11 +349,12 @@ export const exportCanvas = async (
       window.alert(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
-    const appState = getDefaultAppState();
-    if (exportBackground) {
-      appState.viewBackgroundColor = viewBackgroundColor;
-    }
-    exportToBackend(elements, appState);
+    exportToBackend(elements, {
+      ...appState,
+      viewBackgroundColor: exportBackground
+        ? appState.viewBackgroundColor
+        : getDefaultAppState().viewBackgroundColor,
+    });
   }
 
   // clean up the DOM
@@ -368,14 +369,13 @@ export const loadScene = async (id: string | null, privateKey?: string) => {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
-    window.history.replaceState({}, "Excalidraw", window.location.origin);
   } else {
     data = restoreFromLocalStorage();
   }
 
   return {
     elements: data.elements,
-    appState: data.appState && { ...data.appState },
+    appState: data.appState,
     commitToHistory: false,
   };
 };
