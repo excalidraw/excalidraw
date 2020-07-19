@@ -24,18 +24,22 @@ import { pointRelativeTo } from "./bounds";
 
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startBindingElement: ExcalidrawBindableElement | null,
-  endBindingElement: ExcalidrawBindableElement | null,
+  startBindingElement: ExcalidrawBindableElement | null | "keep",
+  endBindingElement: ExcalidrawBindableElement | null | "keep",
 ): void => {
-  if (startBindingElement != null) {
-    bindLinearElement(linearElement, startBindingElement, "start");
-  } else {
-    unbindLinearElement(linearElement, "start");
+  if (startBindingElement !== "keep") {
+    if (startBindingElement != null) {
+      bindLinearElement(linearElement, startBindingElement, "start");
+    } else {
+      unbindLinearElement(linearElement, "start");
+    }
   }
-  if (endBindingElement != null) {
-    bindLinearElement(linearElement, endBindingElement, "end");
-  } else {
-    unbindLinearElement(linearElement, "end");
+  if (endBindingElement !== "keep") {
+    if (endBindingElement != null) {
+      bindLinearElement(linearElement, endBindingElement, "end");
+    } else {
+      unbindLinearElement(linearElement, "end");
+    }
   }
 };
 

@@ -28,8 +28,8 @@ export class LinearElementEditor {
   public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
   public pointerOffset: { x: number; y: number };
-  public startBindingElement: ExcalidrawBindableElement | null;
-  public endBindingElement: ExcalidrawBindableElement | null;
+  public startBindingElement: ExcalidrawBindableElement | null | "keep";
+  public endBindingElement: ExcalidrawBindableElement | null | "keep";
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -42,8 +42,8 @@ export class LinearElementEditor {
     this.lastUncommittedPoint = null;
     this.isDragging = false;
     this.pointerOffset = { x: 0, y: 0 };
-    this.startBindingElement = null;
-    this.endBindingElement = null;
+    this.startBindingElement = "keep";
+    this.endBindingElement = "keep";
   }
 
   // ---------------------------------------------------------------------------
