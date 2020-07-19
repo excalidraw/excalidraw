@@ -738,6 +738,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       this.state.remoteIsTouchDevice,
+      touchMoving,
       {
         renderOptimizations: true,
       },
