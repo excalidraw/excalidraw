@@ -70,6 +70,8 @@ export const FONT_FAMILY = {
   3: "Cascadia",
 } as const;
 
+export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
+
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamily = 1;
 export const DEFAULT_TEXT_ALIGN = "left";
