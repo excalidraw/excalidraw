@@ -3,8 +3,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 
-import { getElementAbsoluteCoords, hitTest } from "../element";
-import { AppState } from "../types";
+import { getElementAbsoluteCoords } from "../element";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -25,15 +24,7 @@ export const hasText = (type: string) => type === "text";
 
 export const getElementAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  x: number,
-  y: number,
-  isAtPositionFn: (
-    element: NonDeletedExcalidrawElement,
-    appState: AppState,
-    x: number,
-    y: number,
-  ) => boolean = hitTest,
+  isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
 ) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -42,7 +33,7 @@ export const getElementAtPosition = (
     if (element.isDeleted) {
       continue;
     }
-    if (isAtPositionFn(element, appState, x, y)) {
+    if (isAtPositionFn(element)) {
       hitElement = element;
       break;
     }

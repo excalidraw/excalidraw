@@ -31,6 +31,7 @@ import {
   dragSelectedElements,
   getDragOffsetXY,
   dragNewElement,
+  hitTest,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -1649,17 +1650,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = getElementAtPosition(
-      this.scene.getElements(),
-      this.state,
-      x,
-      y,
-    );
+    const element = this.getElementAtPosition(x, y);
 
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
     }
     return null;
+  }
+
+  private getElementAtPosition(
+    x: number,
+    y: number,
+  ): NonDeleted<ExcalidrawElement> | null {
+    return getElementAtPosition(this.scene.getElements(), (element) =>
+      hitTest(element, this.state, x, y),
+    );
   }
 
   private startTextEditing = ({
@@ -1791,13 +1796,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
     if (selectedGroupIds.length > 0) {
-      const elements = this.scene.getElements();
-      const hitElement = getElementAtPosition(
-        elements,
-        this.state,
-        sceneX,
-        sceneY,
-      );
+      const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       const selectedGroupId =
         hitElement &&
@@ -2013,12 +2012,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
     }
-    const hitElement = getElementAtPosition(
-      elements,
-      this.state,
-      scenePointerX,
-      scenePointerY,
-    );
+    const hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
     if (this.state.elementType === "text") {
       document.documentElement.style.cursor = isTextElement(hitElement)
         ? CURSOR_TYPE.TEXT
@@ -2432,8 +2426,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state,
             (appState) => this.setState(appState),
             history,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+            pointerDownState.origin,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -2446,9 +2439,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // hitElement may already be set above, so check first
         pointerDownState.hit.element =
           pointerDownState.hit.element ??
-          getElementAtPosition(
-            elements,
-            this.state,
+          this.getElementAtPosition(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
@@ -2608,9 +2599,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         points: [...element.points, [0, 0]],
       });
       const boundElement = getHoveredElementForBinding(
-        this.state,
-        this.scene,
         pointerDownState.origin,
+        this.scene,
       );
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted(),
@@ -2772,6 +2762,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           pointerCoords.x,
           pointerCoords.y,
         );
+        this.maybeSuggestBinding(pointerCoords);
 
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -3005,14 +2996,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      // if moving start/end point towards start/end point within threshold,
-      //  close the loop
+      // Handle end of dragging a point of a linear element, might close a loop
+      // and sets binding element
       if (this.state.editingLinearElement) {
         const editingLinearElement = LinearElementEditor.handlePointerUp(
           this.state.editingLinearElement,
         );
         if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({ editingLinearElement });
+          this.setState({ editingLinearElement, hoveredBindableElement: null });
         }
       }
 
@@ -3198,9 +3189,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     y: number;
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
-      this.state,
-      this.scene,
       pointerCoords,
+      this.scene,
     );
     this.setState({ hoveredBindableElement });
   };
@@ -3327,7 +3317,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     const elements = this.scene.getElements();
-    const element = getElementAtPosition(elements, this.state, x, y);
+    const element = this.getElementAtPosition(x, y);
     if (!element) {
       ContextMenu.push({
         options: [

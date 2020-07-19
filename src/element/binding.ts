@@ -22,6 +22,23 @@ import { centerPoint } from "../math";
 import { LinearElementEditor } from "./linearElementEditor";
 import { pointRelativeTo } from "./bounds";
 
+export const bindOrUnbindLinearElement = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startBindingElement: ExcalidrawBindableElement | null,
+  endBindingElement: ExcalidrawBindableElement | null,
+): void => {
+  if (startBindingElement != null) {
+    bindLinearElement(linearElement, startBindingElement, "start");
+  } else {
+    unbindLinearElement(linearElement, "start");
+  }
+  if (endBindingElement != null) {
+    bindLinearElement(linearElement, endBindingElement, "end");
+  } else {
+    unbindLinearElement(linearElement, "end");
+  }
+};
+
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
@@ -31,11 +48,7 @@ export const maybeBindLinearElement = (
   if (appState.boundElement != null) {
     bindLinearElement(linearElement, appState.boundElement, "start");
   }
-  const hoveredElement = getHoveredElementForBinding(
-    appState,
-    scene,
-    pointerCoords,
-  );
+  const hoveredElement = getHoveredElementForBinding(pointerCoords, scene);
   if (hoveredElement != null) {
     bindLinearElement(linearElement, hoveredElement, "end");
   }
@@ -59,21 +72,41 @@ const bindLinearElement = (
   });
 };
 
+const unbindLinearElement = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+): void => {
+  const field = startOrEnd === "start" ? "startBinding" : "endBinding";
+  const binding = linearElement[field];
+  if (binding == null) {
+    return;
+  }
+  const bindingElement = Scene.getScene(linearElement)!.getNonDeletedElement(
+    binding.elementId,
+  );
+  mutateElement(linearElement, { [field]: null });
+  if (bindingElement == null) {
+    return;
+  }
+  mutateElement(bindingElement, {
+    boundElementIds: bindingElement.boundElementIds?.filter(
+      (id) => id !== linearElement.id,
+    ),
+  });
+};
+
 export const getHoveredElementForBinding = (
-  appState: AppState,
-  scene: Scene,
   pointerCoords: {
     x: number;
     y: number;
   },
+  scene: Scene,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const hoveredElement = getElementAtPosition(
     scene.getElements(),
-    appState,
-    pointerCoords.x,
-    pointerCoords.y,
-    (element, _, x, y) =>
-      isBindableElement(element) && bindingBorderTest(element, appState, x, y),
+    (element) =>
+      isBindableElement(element) &&
+      bindingBorderTest(element, pointerCoords.x, pointerCoords.y),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };

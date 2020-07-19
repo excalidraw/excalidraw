@@ -3,6 +3,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawElement,
   PointBinding,
+  ExcalidrawBindableElement,
 } from "./types";
 import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
 import { getElementAbsoluteCoords } from ".";
@@ -12,6 +13,11 @@ import { mutateElement } from "./mutateElement";
 import { SceneHistory } from "../history";
 
 import Scene from "../scene/Scene";
+import {
+  bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
+} from "./binding";
+import { tupleToCoors } from "../utils";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
@@ -22,6 +28,8 @@ export class LinearElementEditor {
   public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
   public pointerOffset: { x: number; y: number };
+  public startBindingElement: ExcalidrawBindableElement | null;
+  public endBindingElement: ExcalidrawBindableElement | null;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -34,6 +42,8 @@ export class LinearElementEditor {
     this.lastUncommittedPoint = null;
     this.isDragging = false;
     this.pointerOffset = { x: 0, y: 0 };
+    this.startBindingElement = null;
+    this.endBindingElement = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -117,8 +127,26 @@ export class LinearElementEditor {
           : element.points[0],
       );
     }
+    let binding = {};
+    if (isDragging) {
+      const bindingElement = getHoveredElementForBinding(
+        tupleToCoors(
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            activePointIndex!,
+          ),
+        ),
+        Scene.getScene(element)!,
+      );
+      binding = {
+        [activePointIndex === 0
+          ? "startBindingElement"
+          : "endBindingElement"]: bindingElement,
+      };
+    }
     return {
       ...editingLinearElement,
+      ...binding,
       isDragging: false,
       pointerOffset: { x: 0, y: 0 },
     };
@@ -129,8 +157,7 @@ export class LinearElementEditor {
     appState: AppState,
     setState: React.Component<any, AppState>["setState"],
     history: SceneHistory,
-    scenePointerX: number,
-    scenePointerY: number,
+    scenePointer: { x: number; y: number },
   ): {
     didAddPoint: boolean;
     hitElement: ExcalidrawElement | null;
@@ -158,8 +185,8 @@ export class LinearElementEditor {
             ...element.points,
             LinearElementEditor.createPointAt(
               element,
-              scenePointerX,
-              scenePointerY,
+              scenePointer.x,
+              scenePointer.y,
               appState.gridSize,
             ),
           ],
@@ -180,14 +207,25 @@ export class LinearElementEditor {
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
       element,
       appState.zoom,
-      scenePointerX,
-      scenePointerY,
+      scenePointer.x,
+      scenePointer.y,
     );
 
     // if we clicked on a point, set the element as hitElement otherwise
     //  it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex > -1) {
       ret.hitElement = element;
+    } else {
+      const {
+        startBindingElement,
+        endBindingElement,
+      } = appState.editingLinearElement;
+      // TODO: Also handle escape/enter
+      bindOrUnbindLinearElement(
+        element,
+        startBindingElement,
+        endBindingElement,
+      );
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -209,8 +247,8 @@ export class LinearElementEditor {
         activePointIndex: clickedPointIndex > -1 ? clickedPointIndex : null,
         pointerOffset: targetPoint
           ? {
-              x: scenePointerX - targetPoint[0],
-              y: scenePointerY - targetPoint[1],
+              x: scenePointer.x - targetPoint[0],
+              y: scenePointer.y - targetPoint[1],
             }
           : { x: 0, y: 0 },
       },

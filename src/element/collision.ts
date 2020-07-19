@@ -57,7 +57,6 @@ export const hitTest = (
 
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
-  appState: AppState,
   x: number,
   y: number,
 ): boolean => {
