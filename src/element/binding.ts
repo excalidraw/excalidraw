@@ -4,6 +4,7 @@ import {
   NonDeleted,
   NonDeletedExcalidrawElement,
   PointBinding,
+  ExcalidrawElement,
 } from "./types";
 import { AppState, Point } from "../types";
 import { getElementAtPosition } from "../scene";
@@ -122,14 +123,22 @@ const calculateFocusPointAndGap = (
 // in explicitly.
 export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
-  newSize?: { width: number; height: number },
+  options?: {
+    ignoredElements?: ExcalidrawElement[];
+    newSize?: { width: number; height: number };
+  },
 ) => {
-  const boundElementIds = changedElement.boundElementIds ?? [];
-  if (boundElementIds.length === 0) {
+  const allBoundElementIds = changedElement.boundElementIds ?? [];
+  if (allBoundElementIds.length === 0) {
     return;
   }
+  const { newSize, ignoredElements } = options ?? {};
+  const boundElementIds = boundElementsThatNeedUpdateIds(
+    allBoundElementIds,
+    ignoredElements,
+  );
   (Scene.getScene(changedElement)!.getNonDeletedElements(
-    changedElement.boundElementIds ?? [],
+    boundElementIds,
   ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((boundElement) => {
     maybeUpdateBoundPoint(
       boundElement,
@@ -146,6 +155,18 @@ export const updateBoundElements = (
       newSize,
     );
   });
+};
+
+const boundElementsThatNeedUpdateIds = (
+  boundElementIds: readonly ExcalidrawElement["id"][],
+  ignoredElements: ExcalidrawElement[] | undefined,
+): ExcalidrawElement["id"][] => {
+  const ignoredElementIds = new Set(
+    (ignoredElements || []).map((element) => element.id),
+  );
+  return boundElementIds.filter(
+    (boundElementId) => !ignoredElementIds.has(boundElementId),
+  );
 };
 
 const maybeUpdateBoundPoint = (
