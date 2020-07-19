@@ -45,6 +45,7 @@ import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
+import { saveLibraryAsJSON, loadLibraryFromJSON } from "../data/json";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -111,14 +112,14 @@ const LibraryMenuItems = ({
   let addedPendingElements = false;
 
   rows.push(
-    <Stack.Row align="center" gap={1} key={113423423423534}>
+    <Stack.Row align="center" gap={1} key={"actions"}>
       <ToolButton
         key="import"
         type="button"
         title={t("buttons.load")}
         aria-label={t("buttons.load")}
         icon={load}
-        onClick={() => {}}
+        onClick={loadLibraryFromJSON}
       />
       <ToolButton
         key="export"
@@ -126,7 +127,7 @@ const LibraryMenuItems = ({
         title={t("buttons.export")}
         aria-label={t("buttons.export")}
         icon={exportFile}
-        onClick={() => {}}
+        onClick={saveLibraryAsJSON}
       />
     </Stack.Row>,
   );

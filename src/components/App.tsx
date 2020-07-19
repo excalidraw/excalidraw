@@ -143,6 +143,8 @@ import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  loadLibrary,
+  saveLibrary,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
@@ -153,6 +155,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
 } from "../groups";
+import { loadLibraryFromBlob } from "../data/blob";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3178,6 +3181,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         .catch((error) => {
           this.setState({ isLoading: false, errorMessage: error.message });
         });
+    } else if (
+      file?.type === "application/excalidrawlib.json" ||
+      file?.name.endsWith(".excalidrawlib")
+    ) {
+      loadLibraryFromBlob(file)
+        .then((data) => {
+          if (!data || !data.library) {
+            return;
+          }
+
+          loadLibrary().then((items) => {
+            saveLibrary([...items, ...data.library!]);
+          });
+        })
+        .catch((error) =>
+          this.setState({ isLoading: false, errorMessage: error.message }),
+        );
     } else {
       this.setState({
         isLoading: false,
