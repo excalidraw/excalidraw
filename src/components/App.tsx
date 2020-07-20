@@ -3216,13 +3216,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         items: LibraryItems,
         item: NonDeleted<ExcalidrawElement>[],
       ) => {
-        let included = false;
         for (const libItem of items) {
           if (itemsEqual(item, libItem)) {
-            included = true;
+            return true;
           }
         }
-        return included;
+        return false;
       };
 
       loadLibraryFromBlob(file)
