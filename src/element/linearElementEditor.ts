@@ -220,7 +220,6 @@ export class LinearElementEditor {
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      // TODO: Also handle escape/enter
       bindOrUnbindLinearElement(
         element,
         startBindingElement,

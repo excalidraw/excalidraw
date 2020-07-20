@@ -9,17 +9,29 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { maybeBindLinearElement } from "../element/binding";
 import Scene from "../scene/Scene";
+import {
+  maybeBindLinearElement,
+  bindOrUnbindLinearElement,
+} from "../element/binding";
 
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
-      const { elementId } = appState.editingLinearElement;
+      const {
+        elementId,
+        startBindingElement,
+        endBindingElement,
+      } = appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
+        bindOrUnbindLinearElement(
+          element,
+          startBindingElement,
+          endBindingElement,
+        );
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
