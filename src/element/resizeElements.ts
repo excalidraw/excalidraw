@@ -33,6 +33,7 @@ const normalizeAngle = (angle: number): number => {
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
+// Returns true when a resize (scaling/rotation) happened
 export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,

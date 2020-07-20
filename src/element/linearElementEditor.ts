@@ -216,6 +216,11 @@ export class LinearElementEditor {
     if (clickedPointIndex > -1) {
       ret.hitElement = element;
     } else {
+      // You might be wandering why we are storing the binding elements on
+      // LinearElementEditor and passing them in, insted of calculating them
+      // from the end points of the `linearElement` - this is to allow disabling
+      // binding (which needs to happen at the point the user finishes moving
+      // the point).
       const {
         startBindingElement,
         endBindingElement,
@@ -317,7 +322,7 @@ export class LinearElementEditor {
   static getPointAtIndexGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
     indexMaybeFromEnd: number, // -1 for last element
-  ) {
+  ): Point {
     const index =
       indexMaybeFromEnd < 0
         ? element.points.length + indexMaybeFromEnd

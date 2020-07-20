@@ -159,6 +159,8 @@ import Scene from "../scene/Scene";
 import {
   getHoveredElementForBinding,
   maybeBindLinearElement,
+  getEligibleElementsForBinding,
+  bindOrUnbindSelectedElements,
 } from "../element/binding";
 
 /**
@@ -2785,6 +2787,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state.gridSize,
           );
           dragSelectedElements(selectedElements, dragX, dragY, this.scene);
+          this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -3171,15 +3174,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
+      if (pointerDownState.drag.hasOccurred) {
+        bindOrUnbindSelectedElements(
+          getSelectedElements(this.scene.getElements(), this.state),
+        );
+      }
+
       if (!elementLocked) {
         resetCursor();
         this.setState({
           draggingElement: null,
+          suggestedBindableElements: [],
           elementType: "selection",
         });
       } else {
         this.setState({
           draggingElement: null,
+          suggestedBindableElements: [],
         });
       }
     });
@@ -3198,6 +3209,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         hoveredBindableElement != null ? [hoveredBindableElement] : [],
     });
   };
+
+  private maybeSuggestBindingForAll(
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+  ): void {
+    const suggestedBindableElements = getEligibleElementsForBinding(
+      selectedElements,
+    );
+    this.setState({ suggestedBindableElements });
+  }
 
   private maybeClearSelectionWhenHittingElement(
     event: React.PointerEvent<HTMLCanvasElement>,
