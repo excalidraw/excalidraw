@@ -3,7 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData, LibraryItems } from "../types";
+import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -3195,33 +3195,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           return false;
         }
 
-        for (const [index, el] of item1.entries()) {
-          if (!item1[index] || !item2[index]) {
-            return false;
-          }
-
+        for (const el1 of item1) {
           if (
-            el.versionNonce !== item2[index].versionNonce &&
-            el.id !== item2[index].id
+            !item2.find(
+              (el) => el.versionNonce === el1.versionNonce || el.id === el1.id,
+            )
           ) {
             return false;
           }
         }
 
         return true;
-      };
-
-      // checks if library item exists.
-      const exist = (
-        items: LibraryItems,
-        item: NonDeleted<ExcalidrawElement>[],
-      ) => {
-        for (const libItem of items) {
-          if (itemsEqual(item, libItem)) {
-            return true;
-          }
-        }
-        return false;
       };
 
       loadLibraryFromBlob(file)
@@ -3232,7 +3216,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
           loadLibrary().then((items) => {
             const filtered = data.library!.filter(
-              (item) => !exist(items, item),
+              (item) => !items.find((libItem) => itemsEqual(item, libItem)),
             );
             saveLibrary([...items, ...filtered]);
             this.setState({ isLibraryOpen: false });
