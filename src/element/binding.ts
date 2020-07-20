@@ -190,24 +190,53 @@ export const updateBoundElements = (
   );
   (Scene.getScene(changedElement)!.getNonDeletedElements(
     boundElementIds,
-  ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((boundElement) => {
-    maybeUpdateBoundPoint(
-      boundElement,
+  ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((linearElement) => {
+    const bindingElement = changedElement as ExcalidrawBindableElement;
+    if (!doesNeedUpdate(linearElement, bindingElement)) {
+      return;
+    }
+    const startBinding = maybeCalculateFocusPointAndGapWhenScaling(
+      bindingElement,
+      linearElement.startBinding,
+      newSize,
+    );
+    const endBinding = maybeCalculateFocusPointAndGapWhenScaling(
+      bindingElement,
+      linearElement.endBinding,
+      newSize,
+    );
+    // `linearElement` is being moved/scaled already, just update the binding
+    if (simultaneouslyUpdatedElementIds.has(linearElement.id)) {
+      mutateElement(linearElement, { startBinding, endBinding });
+      return;
+    }
+    updateBoundPoint(
+      linearElement,
       "start",
-      boundElement.startBinding,
+      startBinding,
       changedElement as ExcalidrawBindableElement,
       simultaneouslyUpdatedElementIds,
       newSize,
     );
-    maybeUpdateBoundPoint(
-      boundElement,
+    updateBoundPoint(
+      linearElement,
       "end",
-      boundElement.endBinding,
+      endBinding,
       changedElement as ExcalidrawBindableElement,
       simultaneouslyUpdatedElementIds,
       newSize,
     );
   });
+};
+
+const doesNeedUpdate = (
+  boundElement: NonDeleted<ExcalidrawLinearElement>,
+  changedElement: ExcalidrawBindableElement,
+) => {
+  return (
+    boundElement.startBinding?.elementId === changedElement.id ||
+    boundElement.endBinding?.elementId === changedElement.id
+  );
 };
 
 const getSimultaneouslyUpdatedElementIds = (
@@ -216,55 +245,33 @@ const getSimultaneouslyUpdatedElementIds = (
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
-const maybeUpdateBoundPoint = (
-  boundElement: NonDeleted<ExcalidrawLinearElement>,
+const updateBoundPoint = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   binding: PointBinding | null | undefined,
   changedElement: ExcalidrawBindableElement,
   simultaneouslyUpdatedElementIds: Set<ExcalidrawElement["id"]>,
   newSize: { width: number; height: number } | undefined,
 ): void => {
-  if (binding?.elementId === changedElement.id) {
-    updateBoundPoint(
-      boundElement,
-      startOrEnd,
-      binding,
-      changedElement,
-      simultaneouslyUpdatedElementIds,
-      newSize,
-    );
+  if (
+    binding == null ||
+    // We only need to update the other end if this is a 2 point line element
+    (binding.elementId !== changedElement.id && linearElement.points.length > 2)
+  ) {
+    return;
   }
-};
-
-const updateBoundPoint = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startOrEnd: "start" | "end",
-  currentBinding: PointBinding,
-  changedElement: ExcalidrawBindableElement,
-  simultaneouslyUpdatedElementIds: Set<ExcalidrawElement["id"]>,
-  newSize: { width: number; height: number } | undefined,
-): void => {
-  const isSimultaneouslyUpdated = simultaneouslyUpdatedElementIds.has(
-    linearElement.id,
-  );
-  const binding = maybeCalculateFocusPointAndGapWhenScaling(
-    changedElement,
-    currentBinding,
-    newSize,
-  );
-  const bindingUpdate = {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  };
-  // `linearElement` is being moved/scaled already, just update the binding
-  if (isSimultaneouslyUpdated) {
-    mutateElement(linearElement, bindingUpdate);
+  const bindingElement = Scene.getScene(linearElement)!.getElement(
+    binding.elementId,
+  ) as ExcalidrawBindableElement | null;
+  if (bindingElement == null) {
+    // We're not cleaning up after deleted elements atm., so handle this case
     return;
   }
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
   const draggedFocusPointAbsolute = pointInAbsoluteCoords(
-    changedElement,
+    bindingElement,
     binding.focusPoint,
   );
   let newEdgePoint;
@@ -278,7 +285,7 @@ const updateBoundPoint = (
       adjacentPointIndex,
     );
     const intersections = intersectElementWithLine(
-      changedElement,
+      bindingElement,
       adjacentPoint,
       draggedFocusPointAbsolute,
       binding.gap,
@@ -294,16 +301,16 @@ const updateBoundPoint = (
     linearElement,
     edgePointIndex,
     LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
-    bindingUpdate,
+    { [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding },
   );
 };
 
 const maybeCalculateFocusPointAndGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
-  currentBinding: PointBinding,
+  currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
-): PointBinding => {
-  if (newSize == null) {
+): PointBinding | null | undefined => {
+  if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
   const { gap, focusPoint, elementId } = currentBinding;
