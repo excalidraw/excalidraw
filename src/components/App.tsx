@@ -3,7 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData } from "../types";
+import { FlooredNumber, SocketUpdateData, LibraryItems } from "../types";
 
 import {
   newElement,
@@ -3185,6 +3185,46 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.type === "application/excalidrawlib.json" ||
       file?.name.endsWith(".excalidrawlib")
     ) {
+      // compares two library items and returns true if they are
+      // the same otherwise returns false.
+      const itemsEqual = (
+        item1: NonDeleted<ExcalidrawElement>[],
+        item2: NonDeleted<ExcalidrawElement>[],
+      ) => {
+        if (item1?.length !== item2?.length) {
+          return false;
+        }
+
+        for (const [index, el] of item1.entries()) {
+          if (!item1[index] || !item2[index]) {
+            return false;
+          }
+
+          if (
+            el.versionNonce !== item2[index].versionNonce &&
+            el.id !== item2[index].id
+          ) {
+            return false;
+          }
+        }
+
+        return true;
+      };
+
+      // checks if library item exists.
+      const exist = (
+        items: LibraryItems,
+        item: NonDeleted<ExcalidrawElement>[],
+      ) => {
+        let included = false;
+        for (const libItem of items) {
+          if (itemsEqual(item, libItem)) {
+            included = true;
+          }
+        }
+        return included;
+      };
+
       loadLibraryFromBlob(file)
         .then((data) => {
           if (!data || !data.library) {
@@ -3192,7 +3232,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
 
           loadLibrary().then((items) => {
-            saveLibrary([...items, ...data.library!]);
+            const filtered = data.library!.filter(
+              (item) => !exist(items, item),
+            );
+            saveLibrary([...items, ...filtered]);
             this.setState({ isLibraryOpen: false });
           });
         })
