@@ -3185,38 +3185,37 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.type === "application/excalidrawlib.json" ||
       file?.name.endsWith(".excalidrawlib")
     ) {
-      // compares two library items and returns true if they are
-      // the same otherwise returns false.
-      const itemsEqual = (
-        item1: NonDeleted<ExcalidrawElement>[],
-        item2: NonDeleted<ExcalidrawElement>[],
-      ) => {
-        if (item1?.length !== item2?.length) {
-          return false;
-        }
-
-        for (const el1 of item1) {
-          if (
-            !item2.find(
-              (el) => el.versionNonce === el1.versionNonce || el.id === el1.id,
-            )
-          ) {
-            return false;
-          }
-        }
-
-        return true;
-      };
-
       loadLibraryFromBlob(file)
         .then((data) => {
           if (!data || !data.library) {
             return;
           }
 
+          // compares two library items and returns true if they are
+          // the same otherwise returns false.
+          const match = (
+            item1: NonDeleted<ExcalidrawElement>[],
+            item2: NonDeleted<ExcalidrawElement>[],
+          ) => {
+            if (item1?.length !== item2?.length) {
+              return false;
+            }
+
+            const mismatch = item1.find(
+              (el1) =>
+                !item2.find(
+                  (el2) =>
+                    el1.versionNonce === el2.versionNonce || el1.id === el2.id,
+                ),
+            );
+
+            return !mismatch;
+          };
+
           loadLibrary().then((items) => {
             const filtered = data.library!.filter(
-              (item) => !items.find((libItem) => itemsEqual(item, libItem)),
+              (importedItem) =>
+                !items.find((item) => match(importedItem, item)),
             );
             saveLibrary([...items, ...filtered]);
             this.setState({ isLibraryOpen: false });
