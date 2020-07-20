@@ -2751,6 +2751,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.resize.originalElements,
           )
         ) {
+          this.maybeSuggestBindingForAll(selectedElements);
           return;
         }
       }
@@ -2979,6 +2980,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         multiElement,
         elementType,
         elementLocked,
+        isResizing,
       } = this.state;
 
       this.setState({
@@ -3174,7 +3176,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred) {
+      if (pointerDownState.drag.hasOccurred || isResizing) {
         bindOrUnbindSelectedElements(
           getSelectedElements(this.scene.getElements(), this.state),
         );
