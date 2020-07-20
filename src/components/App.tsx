@@ -1527,9 +1527,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       document.activeElement.blur();
     }
     if (!isLinearElementType(elementType)) {
-      this.setState({
-        hoveredBindableElement: null,
-      });
+      this.setState({ suggestedBindableElements: [] });
     }
     if (elementType !== "selection") {
       this.setState({
@@ -2610,7 +2608,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         draggingElement: element,
         editingElement: element,
         boundElement,
-        hoveredBindableElement: null,
+        suggestedBindableElements: [],
       });
     }
   };
@@ -3003,7 +3001,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.editingLinearElement,
         );
         if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({ editingLinearElement, hoveredBindableElement: null });
+          this.setState({
+            editingLinearElement,
+            suggestedBindableElements: [],
+          });
         }
       }
 
@@ -3057,7 +3058,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.scene,
             pointerCoords,
           );
-          this.setState({ hoveredBindableElement: null, boundElement: null });
+          this.setState({ suggestedBindableElements: [], boundElement: null });
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -3192,7 +3193,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       pointerCoords,
       this.scene,
     );
-    this.setState({ hoveredBindableElement });
+    this.setState({
+      suggestedBindableElements:
+        hoveredBindableElement != null ? [hoveredBindableElement] : [],
+    });
   };
 
   private maybeClearSelectionWhenHittingElement(

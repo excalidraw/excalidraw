@@ -241,7 +241,7 @@ export const renderScene = (
     );
   }
 
-  [appState.hoveredBindableElement, appState.boundElement]
+  [...appState.suggestedBindableElements, appState.boundElement]
     .filter((element) => element != null)
     .forEach((element) => {
       const [
