@@ -471,11 +471,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       } else {
         // https://github.com/excalidraw/excalidraw/issues/1919
         if (document.hidden) {
-          const reinitialize = () => {
-            this.initializeScene();
-            window.removeEventListener("focus", reinitialize);
-          };
-          window.addEventListener("focus", reinitialize);
+          window.addEventListener("focus", () => this.initializeScene(), {
+            once: true,
+          });
           return;
         }
 
