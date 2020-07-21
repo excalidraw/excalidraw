@@ -6,6 +6,7 @@ import {
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
+import { isLinearElement } from "../element/typeChecks";
 import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
 import {
@@ -50,7 +51,8 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds || [],
-    strokeSharpness: element.strokeSharpness,
+    strokeSharpness:
+      element.strokeSharpness ?? (isLinearElement(element) ? "round" : "sharp"),
   };
 
   return {

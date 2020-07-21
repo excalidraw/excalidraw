@@ -52,6 +52,7 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;

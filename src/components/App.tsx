@@ -941,6 +941,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemStrokeSharpness,
       text: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
@@ -1637,6 +1638,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
+          strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
@@ -2531,7 +2533,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
-        strokeSharpness: this.state.currentItemStrokeSharpness,
+        strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
