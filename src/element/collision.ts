@@ -6,7 +6,7 @@ import {
 } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
-import { NonDeletedExcalidrawElement } from "./types";
+import { NonDeletedExcalidrawElement, ExcalidrawElement } from "./types";
 
 import {
   getDiamondPoints,
@@ -195,7 +195,7 @@ export const hitTest = (
 
     if (isElementDraggableFromInside(element, appState)) {
       const hit = shape.some((subshape) =>
-        hitTestCurveInside(subshape, relX, relY, lineThreshold),
+        hitTestCurveInside(subshape, relX, relY, element.strokeSharpness),
       );
       if (hit) {
         return true;
@@ -252,23 +252,29 @@ const hitTestCurveInside = (
   drawable: Drawable,
   x: number,
   y: number,
-  lineThreshold: number,
+  sharpness: ExcalidrawElement["strokeSharpness"],
 ) => {
   const ops = getCurvePathOps(drawable);
   const points: Point[] = [];
+  let odd = false; // select one line out of double lines
   for (const operation of ops) {
     if (operation.op === "move") {
-      if (points.length) {
-        break;
+      odd = !odd;
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
       }
-      points.push([operation.data[0], operation.data[1]]);
     } else if (operation.op === "bcurveTo") {
-      points.push([operation.data[0], operation.data[1]]);
-      points.push([operation.data[2], operation.data[3]]);
-      points.push([operation.data[4], operation.data[5]]);
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+        points.push([operation.data[2], operation.data[3]]);
+        points.push([operation.data[4], operation.data[5]]);
+      }
     }
   }
   if (points.length >= 4) {
+    if (sharpness === "sharp") {
+      return isPointInPolygon(points, x, y);
+    }
     const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
