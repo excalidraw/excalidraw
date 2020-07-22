@@ -99,7 +99,7 @@
     "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
-    "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
+    "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de compartilhamento.",
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
