@@ -178,7 +178,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
         <Columns>
           <Column>
             <ShortcutIsland caption={t("shortcutsDialog.shapes")}>
-              <Shortcut label={t("toolBar.selection")} shortcuts={["S", "1"]} />
+              <Shortcut label={t("toolBar.selection")} shortcuts={["V", "1"]} />
               <Shortcut label={t("toolBar.rectangle")} shortcuts={["R", "2"]} />
               <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
               <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />

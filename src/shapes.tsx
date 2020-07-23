@@ -11,7 +11,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "selection",
-    key: "s",
+    key: "v",
   },
   {
     icon: (
