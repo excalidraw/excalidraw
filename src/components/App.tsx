@@ -1444,7 +1444,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+      const targetKey = event.key.toLowerCase();
+      if (
+        shapesShortcutKeys.find((key) => {
+          if (typeof key === "string") {
+            return key === targetKey;
+          }
+          return key.includes(targetKey);
+        })
+      ) {
         this.selectShapeTool(shape);
       } else if (event.key === "q") {
         this.toggleLock();
