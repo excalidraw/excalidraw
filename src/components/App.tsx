@@ -1567,7 +1567,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zoom: this.state.zoom,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          { sceneX: x, sceneY: y },
+          { sceneX: x + this.parentDOMLeft, sceneY: y + this.parentDOMTop },
           this.state,
           this.canvas,
           window.devicePixelRatio,
