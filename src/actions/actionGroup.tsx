@@ -1,7 +1,11 @@
+import React from "react";
 import { KEYS } from "../keys";
+import { t } from "../i18n";
+import { getShortcutKey } from "../utils";
 import { register } from "./register";
+import { group, ungroup } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
-import { getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import {
   getSelectedGroupIds,
   selectGroup,
@@ -13,6 +17,7 @@ import {
 } from "../groups";
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
+import { ToolButton } from "../components/ToolButton";
 
 export const actionGroup = register({
   name: "group",
@@ -99,6 +104,16 @@ export const actionGroup = register({
       event.keyCode === KEYS.G_KEY_CODE
     );
   },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={group}
+      onClick={() => updateData(null)}
+      title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
+      aria-label={t("labels.group")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+    ></ToolButton>
+  ),
 });
 
 export const actionUngroup = register({
@@ -140,4 +155,15 @@ export const actionUngroup = register({
   contextItemLabel: "labels.ungroup",
   contextItemPredicate: (elements, appState) =>
     getSelectedGroupIds(appState).length > 0,
+
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={ungroup}
+      onClick={() => updateData(null)}
+      title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
+      aria-label={t("labels.ungroup")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+    ></ToolButton>
+  ),
 });
