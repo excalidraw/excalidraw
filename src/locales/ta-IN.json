@@ -1,10 +1,10 @@
 {
   "labels": {
-    "paste": "",
-    "selectAll": "",
+    "paste": "ஒட்டு",
+    "selectAll": "Select all",
     "multiSelect": "",
-    "moveCanvas": "",
-    "copy": "",
+    "moveCanvas": "திரை நகர்த்து",
+    "copy": "நகல்",
     "copyAsPng": "",
     "copyAsSvg": "",
     "bringForward": "",
