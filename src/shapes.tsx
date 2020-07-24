@@ -68,7 +68,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "line",
-    key: "l",
+    key: ["p", "l"],
   },
   {
     icon: (
@@ -81,7 +81,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "draw",
-    key: "x",
+    key: ["P", "x"],
   },
   {
     icon: (
@@ -96,7 +96,6 @@ export const SHAPES = [
 ] as const;
 
 export const findShapeByKey = (key: string) => {
-  key = key.toLowerCase();
   const shape = SHAPES.find((shape, index) => {
     return (
       key === (index + 1).toString() ||
