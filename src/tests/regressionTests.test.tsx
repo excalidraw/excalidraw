@@ -973,7 +973,6 @@ describe("regression tests", () => {
       "Copy styles",
       "Paste styles",
       "Delete",
-      "Group selection",
       "Ungroup selection",
       "Add to library",
       "Send backward",
@@ -984,7 +983,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(11);
+    expect(contextMenu?.children.length).toBe(10);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
