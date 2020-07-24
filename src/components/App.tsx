@@ -85,7 +85,7 @@ import {
   getRotateWithDiscreteAngleKey,
 } from "../keys";
 
-import { findShapeByKey, shapesShortcutKeys } from "../shapes";
+import { findShapeByKey } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
 
 import ContextMenu from "./ContextMenu";
@@ -1379,8 +1379,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
-    const shape = findShapeByKey(event.key);
-
     if (isArrowKey(event.key)) {
       const step =
         (this.state.gridSize &&
@@ -1444,7 +1442,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      if (shapesShortcutKeys.includes(event.key.toLowerCase())) {
+      const shape = findShapeByKey(event.key);
+      if (shape) {
         this.selectShapeTool(shape);
       } else if (event.key === "q") {
         this.toggleLock();
