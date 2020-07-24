@@ -547,16 +547,7 @@ const LayerUI = ({
 
 const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const {
-      draggingElement,
-      resizingElement,
-      multiElement,
-      editingElement,
-      isResizing,
-      cursorX,
-      cursorY,
-      ...ret
-    } = appState;
+    const { cursorX, cursorY, ...ret } = appState;
     return ret;
   };
   const prevAppState = getNecessaryObj(prev.appState);
