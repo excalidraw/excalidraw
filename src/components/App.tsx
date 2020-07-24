@@ -240,6 +240,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   removeSceneCallback: SceneStateCallbackRemover | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
+  private excalidrawRef: any;
+  private parentDOMLeft: number;
+  private parentDOMTop: number;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -257,6 +260,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       width,
       height,
     };
+
+    this.excalidrawRef = React.createRef();
+    this.parentDOMLeft = this.parentDOMTop = 0;
 
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -282,7 +288,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
-      <div className="excalidraw">
+      <div
+        className="excalidraw"
+        ref={this.excalidrawRef}
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+          top: this.parentDOMTop,
+          left: this.parentDOMLeft,
+        }}
+      >
         <LayerUI
           canvas={this.canvas}
           appState={this.state}
@@ -530,6 +545,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.addEventListeners();
     this.initializeScene();
+    this.calculateCanvasDimensions();
   }
 
   public componentWillUnmount() {
@@ -664,6 +680,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         width: currentWidth,
         height: currentHeight,
       });
+      this.calculateCanvasDimensions();
     }
 
     if (this.state.isCollaborating && !this.portal.socket) {
@@ -911,6 +928,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const dx = x - elementsCenterX;
@@ -919,8 +937,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const newElements = clipboardElements.map((element) =>
       duplicateElement(this.state.editingGroupId, groupIdMap, element, {
-        x: element.x + dx - minX,
-        y: element.y + dy - minY,
+        x: element.x + dx - minX + this.parentDOMLeft,
+        y: element.y + dy - minY + this.parentDOMTop,
       }),
     );
 
@@ -944,6 +962,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const element = newTextElement({
@@ -1316,8 +1335,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.x;
-      cursorY = event.y;
+      cursorX = event.x - this.parentDOMLeft;
+      cursorY = event.y - this.parentDOMTop;
     },
   );
 
@@ -1729,6 +1748,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
@@ -1821,11 +1841,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
+    const {
+      x: scenePointerX,
+      y: scenePointerY,
+    } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     if (
@@ -2213,6 +2237,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     return {
@@ -2655,6 +2680,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state,
         this.canvas,
         window.devicePixelRatio,
+        { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
       );
       const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
 
@@ -2967,6 +2993,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state,
             this.canvas,
             window.devicePixelRatio,
+            { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
           );
           mutateElement(draggingElement, {
             points: [
@@ -3213,6 +3240,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const elements = globalSceneState.getElements();
@@ -3353,9 +3381,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
     if (elementClickedInside) {
       const elementCenterX =
-        elementClickedInside.x + elementClickedInside.width / 2;
+        elementClickedInside.x +
+        elementClickedInside.width / 2 +
+        this.parentDOMLeft;
       const elementCenterY =
-        elementClickedInside.y + elementClickedInside.height / 2;
+        elementClickedInside.y +
+        elementClickedInside.height / 2 +
+        this.parentDOMTop;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
@@ -3383,6 +3415,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
+      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
@@ -3408,6 +3441,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
     );
   }, 300);
+
+  private calculateCanvasDimensions() {
+    const parentElement = this.excalidrawRef.current.parentElement;
+    const { left, top } = parentElement.getBoundingClientRect();
+    this.parentDOMLeft = left;
+    this.parentDOMTop = top;
+  }
 }
 
 // -----------------------------------------------------------------------------
