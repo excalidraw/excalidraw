@@ -100,15 +100,29 @@ export const resizeElements = (
     });
 
     return true;
-  } else if (
-    selectedElements.length > 1 &&
-    (resizeHandle === "nw" ||
+  } else if (selectedElements.length > 1) {
+    if (resizeHandle === "rotation") {
+      rotateMultipleElements(
+        selectedElements,
+        pointerX,
+        pointerY,
+        isRotateWithDiscreteAngle,
+      );
+      return true;
+    } else if (
+      resizeHandle === "nw" ||
       resizeHandle === "ne" ||
       resizeHandle === "sw" ||
-      resizeHandle === "se")
-  ) {
-    resizeMultipleElements(selectedElements, resizeHandle, pointerX, pointerY);
-    return true;
+      resizeHandle === "se"
+    ) {
+      resizeMultipleElements(
+        selectedElements,
+        resizeHandle,
+        pointerX,
+        pointerY,
+      );
+      return true;
+    }
   }
   return false;
 };
@@ -534,6 +548,43 @@ const resizeMultipleElements = (
       });
     }
   }
+};
+
+const rotateMultipleElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  pointerX: number,
+  pointerY: number,
+  isRotateWithDiscreteAngle: boolean,
+) => {
+  const [gx1, gy1, gx2, gy2] = getCommonBounds(elements);
+  const centerX = (gx1 + gx2) / 2;
+  const centerY = (gy1 + gy2) / 2;
+  let angle =
+    (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
+  if (isRotateWithDiscreteAngle) {
+    angle += SHIFT_LOCKING_ANGLE / 2;
+    angle -= angle % SHIFT_LOCKING_ANGLE;
+  }
+  if (angle >= 2 * Math.PI) {
+    angle -= 2 * Math.PI;
+  }
+  elements.forEach((element) => {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const [rotatedCX, rotatedCY] = rotate(
+      cx,
+      cy,
+      centerX,
+      centerY,
+      angle - element.angle,
+    );
+    mutateElement(element, {
+      x: element.x + (rotatedCX - cx),
+      y: element.y + (rotatedCY - cy),
+      angle,
+    });
+  });
 };
 
 export const getResizeOffsetXY = (
