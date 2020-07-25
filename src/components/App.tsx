@@ -205,6 +205,8 @@ type PointerDownState = Readonly<{
     offset: { x: number; y: number };
     // This is determined on the initial pointer down event
     arrowDirection: "origin" | "end";
+    // This is a list of angles of selected elements determined on the initial pointer down event (rotation only)
+    angles: readonly number[];
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -2213,6 +2215,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
+    const selectedElements = getSelectedElements(
+      globalSceneState.getElements(),
+      this.state,
+    );
 
     return {
       origin,
@@ -2231,6 +2237,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
+        angles: selectedElements.map((element) => element.angle),
       },
       hit: {
         element: null,
@@ -2709,6 +2716,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             getResizeCenterPointKey(event),
             resizeX,
             resizeY,
+            pointerDownState.resize.angles,
           )
         ) {
           return;

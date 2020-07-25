@@ -35,6 +35,7 @@ export const resizeElements = (
   isResizeCenterPoint: boolean,
   pointerX: number,
   pointerY: number,
+  origAngles: readonly number[],
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -107,6 +108,7 @@ export const resizeElements = (
         pointerX,
         pointerY,
         isRotateWithDiscreteAngle,
+        origAngles,
       );
       return true;
     } else if (
@@ -555,20 +557,18 @@ const rotateMultipleElements = (
   pointerX: number,
   pointerY: number,
   isRotateWithDiscreteAngle: boolean,
+  origAngles: readonly number[],
 ) => {
   const [gx1, gy1, gx2, gy2] = getCommonBounds(elements);
   const centerX = (gx1 + gx2) / 2;
   const centerY = (gy1 + gy2) / 2;
-  let angle =
+  let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
   if (isRotateWithDiscreteAngle) {
-    angle += SHIFT_LOCKING_ANGLE / 2;
-    angle -= angle % SHIFT_LOCKING_ANGLE;
+    centerAngle += SHIFT_LOCKING_ANGLE / 2;
+    centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
-  if (angle >= 2 * Math.PI) {
-    angle -= 2 * Math.PI;
-  }
-  elements.forEach((element) => {
+  elements.forEach((element, index) => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -577,8 +577,12 @@ const rotateMultipleElements = (
       cy,
       centerX,
       centerY,
-      angle - element.angle,
+      centerAngle - element.angle + origAngles[index],
     );
+    let angle = centerAngle + origAngles[index];
+    if (angle >= 2 * Math.PI) {
+      angle -= 2 * Math.PI;
+    }
     mutateElement(element, {
       x: element.x + (rotatedCX - cx),
       y: element.y + (rotatedCY - cy),
