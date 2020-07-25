@@ -78,6 +78,8 @@ export const SelectedShapeActions = ({
           <div className="buttonList">
             {renderAction("duplicateSelection")}
             {renderAction("deleteSelectedElements")}
+            {renderAction("group")}
+            {renderAction("ungroup")}
           </div>
         </fieldset>
       )}
