@@ -433,13 +433,15 @@ export const renderScene = (
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
           if (key === "rotation") {
-            strokeCircle(
-              context,
-              handler[0],
-              handler[1],
-              handler[2],
-              handler[3],
-            );
+            if (!appState.isRotating) {
+              strokeCircle(
+                context,
+                handler[0],
+                handler[1],
+                handler[2],
+                handler[3],
+              );
+            }
           } else {
             strokeRectWithRotation(
               context,
