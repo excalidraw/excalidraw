@@ -212,3 +212,128 @@ export const shield = createIcon(
   "M11.553 22.894a.998.998 0 00.894 0s3.037-1.516 5.465-4.097C19.616 16.987 21 14.663 21 12V5a1 1 0 00-.649-.936l-8-3a.998.998 0 00-.702 0l-8 3A1 1 0 003 5v7c0 2.663 1.384 4.987 3.088 6.797 2.428 2.581 5.465 4.097 5.465 4.097zm-1.303-8.481l6.644-6.644a.856.856 0 111.212 1.212l-7.25 7.25a.856.856 0 01-1.212 0l-3.75-3.75a.856.856 0 111.212-1.212l3.144 3.144z",
   { width: 24 },
 );
+
+export const group = createIcon(
+  <>
+    <path d="M25 26H111V111H25" fill={oc.black} />
+    <path
+      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+      stroke={oc.black}
+      strokeWidth="2"
+    />
+    <path d="M100 100H160V160H100" fill={oc.black} />
+    <path
+      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+      stroke={oc.black}
+      strokeWidth="2"
+    />
+    <rect
+      x="2.5"
+      y="2.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="2.5"
+      y="149.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="147.5"
+      y="149.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="147.5"
+      y="2.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+  </>,
+  { width: 182, height: 182 },
+);
+export const ungroup = createIcon(
+  <>
+    <path d="M25 26H111V111H25" fill={oc.black} />
+    <path
+      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+      stroke={oc.black}
+      strokeWidth="2"
+    />
+    <path d="M100 100H160V160H100" fill={oc.black} />
+    <path
+      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+      stroke={oc.black}
+      strokeWidth="2"
+    />
+    <rect
+      x="2.5"
+      y="2.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="78.5"
+      y="149.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="147.5"
+      y="149.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="147.5"
+      y="78.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="105.5"
+      y="2.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+    <rect
+      x="2.5"
+      y="102.5"
+      width="30"
+      height="30"
+      fill={oc.white}
+      stroke={oc.black}
+      strokeWidth="6"
+    />
+  </>,
+  { width: 182, height: 182 },
+);
