@@ -23,6 +23,13 @@ import {
 } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
 
+const normalizeAngle = (angle: number): number => {
+  if (angle >= 2 * Math.PI) {
+    return angle - 2 * Math.PI;
+  }
+  return angle;
+};
+
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
 export const resizeElements = (
@@ -143,9 +150,7 @@ const rotateSingleElement = (
     angle += SHIFT_LOCKING_ANGLE / 2;
     angle -= angle % SHIFT_LOCKING_ANGLE;
   }
-  if (angle >= 2 * Math.PI) {
-    angle -= 2 * Math.PI;
-  }
+  angle = normalizeAngle(angle);
   mutateElement(element, { angle });
 };
 
@@ -579,14 +584,10 @@ const rotateMultipleElements = (
       centerY,
       centerAngle - element.angle + origAngles[index],
     );
-    let angle = centerAngle + origAngles[index];
-    if (angle >= 2 * Math.PI) {
-      angle -= 2 * Math.PI;
-    }
     mutateElement(element, {
       x: element.x + (rotatedCX - cx),
       y: element.y + (rotatedCY - cy),
-      angle,
+      angle: normalizeAngle(centerAngle + origAngles[index]),
     });
   });
 };
