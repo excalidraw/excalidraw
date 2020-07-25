@@ -205,7 +205,9 @@ type PointerDownState = Readonly<{
     offset: { x: number; y: number };
     // This is determined on the initial pointer down event
     arrowDirection: "origin" | "end";
-    // This is a list of angles of selected elements determined on the initial pointer down event (rotation only)
+    // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
+    center: { x: number; y: number };
+    // This is a list of angles of selected elements determined on the initial pointer down event (for rotation only)
     angles: readonly number[];
   };
   hit: {
@@ -2219,6 +2221,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       globalSceneState.getElements(),
       this.state,
     );
+    const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
 
     return {
       origin,
@@ -2237,6 +2240,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
+        center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
         angles: selectedElements.map((element) => element.angle),
       },
       hit: {
@@ -2716,6 +2720,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             getResizeCenterPointKey(event),
             resizeX,
             resizeY,
+            pointerDownState.resize.center.x,
+            pointerDownState.resize.center.y,
             pointerDownState.resize.angles,
           )
         ) {

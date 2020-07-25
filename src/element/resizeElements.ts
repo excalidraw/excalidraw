@@ -42,6 +42,8 @@ export const resizeElements = (
   isResizeCenterPoint: boolean,
   pointerX: number,
   pointerY: number,
+  centerX: number,
+  centerY: number,
   origAngles: readonly number[],
 ) => {
   if (selectedElements.length === 1) {
@@ -115,6 +117,8 @@ export const resizeElements = (
         pointerX,
         pointerY,
         isRotateWithDiscreteAngle,
+        centerX,
+        centerY,
         origAngles,
       );
       return true;
@@ -562,11 +566,10 @@ const rotateMultipleElements = (
   pointerX: number,
   pointerY: number,
   isRotateWithDiscreteAngle: boolean,
+  centerX: number,
+  centerY: number,
   origAngles: readonly number[],
 ) => {
-  const [gx1, gy1, gx2, gy2] = getCommonBounds(elements);
-  const centerX = (gx1 + gx2) / 2;
-  const centerY = (gy1 + gy2) / 2;
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
   if (isRotateWithDiscreteAngle) {
@@ -582,7 +585,7 @@ const rotateMultipleElements = (
       cy,
       centerX,
       centerY,
-      centerAngle - element.angle + origAngles[index],
+      centerAngle + origAngles[index] - element.angle,
     );
     mutateElement(element, {
       x: element.x + (rotatedCX - cx),
