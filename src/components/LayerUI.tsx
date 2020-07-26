@@ -41,7 +41,7 @@ import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
-import { saveLibraryAsJSON, loadLibraryFromJSON } from "../data/json";
+import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
 
 interface LayerUIProps {
@@ -120,7 +120,7 @@ const LibraryMenuItems = ({
         aria-label={t("buttons.load")}
         icon={load}
         onClick={() => {
-          loadLibraryFromJSON()
+          importLibraryFromJSON()
             .then(() => {
               // Maybe we should close and open the menu so that the items get updated.
               // But for now we just close the menu.

@@ -3,12 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import {
-  FlooredNumber,
-  SocketUpdateData,
-  LibraryItems,
-  LibraryItem,
-} from "../types";
+import { FlooredNumber, SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -149,7 +144,6 @@ import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
   loadLibrary,
-  saveLibrary,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
@@ -160,7 +154,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
 } from "../groups";
-import { loadLibraryFromBlob } from "../data/blob";
+import { Library } from "../data/library";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3190,43 +3184,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.type === "application/vnd.excalidrawlib+json" ||
       file?.name.endsWith(".excalidrawlib")
     ) {
-      loadLibraryFromBlob(file)
-        .then((libraryFile) => {
-          if (!libraryFile || !libraryFile.library) {
-            return;
-          }
-
-          /**
-           * checks if library item does not exist already in current library
-           */
-          const isUniqueitem = (
-            existingLibraryItems: LibraryItems,
-            targetLibraryItem: LibraryItem,
-          ) => {
-            return !existingLibraryItems.find((libraryItem) => {
-              if (libraryItem.length !== targetLibraryItem.length) {
-                return false;
-              }
-
-              // detect z-index difference by checking the excalidraw elements
-              //  are in order
-              return libraryItem.every((libItemExcalidrawItem, idx) => {
-                return (
-                  libItemExcalidrawItem.id === targetLibraryItem[idx].id &&
-                  libItemExcalidrawItem.versionNonce ===
-                    targetLibraryItem[idx].versionNonce
-                );
-              });
-            });
-          };
-
-          loadLibrary().then((items) => {
-            const filtered = libraryFile.library!.filter((libraryItem) =>
-              isUniqueitem(items, libraryItem),
-            );
-            saveLibrary([...items, ...filtered]);
-            this.setState({ isLibraryOpen: false });
-          });
+      Library.importLibrary(file)
+        .then(() => {
+          this.setState({ isLibraryOpen: false });
         })
         .catch((error) =>
           this.setState({ isLoading: false, errorMessage: error.message }),
