@@ -3460,6 +3460,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
+      library: ReturnType<typeof loadLibrary>;
     };
   }
 }
@@ -3481,6 +3482,9 @@ if (
     },
     history: {
       get: () => history,
+    },
+    library: {
+      get: () => loadLibrary(),
     },
   });
 }
