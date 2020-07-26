@@ -6,6 +6,9 @@ import { getNonDeletedElements } from "../element";
 export const actionSelectAll = register({
   name: "selectAll",
   perform: (elements, appState) => {
+    if (appState.editingLinearElement) {
+      return false;
+    }
     return {
       appState: selectGroupsForSelectedElements(
         {

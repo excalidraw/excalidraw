@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
+    "multiSelect": "Seçime öğe ekle",
     "moveCanvas": "Tuvali taşı",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
@@ -64,7 +65,10 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "toggleGridMode": ""
+    "toggleGridMode": "Izgara modunu aç",
+    "addToLibrary": "Kütüphaneye ekle",
+    "removeFromLibrary": "Kütüphaneden kaldır",
+    "libraryLoadingMessage": "Kütüphane yükleniyor..."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -92,8 +96,7 @@
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
     "toggleZenMode": "Zen modunu aç/kapa",
-    "exitZenMode": "Zen modundan çık",
-    "toggleGridMode": ""
+    "exitZenMode": "Zen modundan çık"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Boş tuval dışarıya aktarılamaz.",
     "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
-    "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır."
+    "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
+    "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?"
   },
   "toolBar": {
     "selection": "Seçme",
@@ -114,6 +118,7 @@
     "arrow": "Ok",
     "line": "Çizgi",
     "text": "Yazı",
+    "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "Noktayı kaldırmak için Delete tuşuna basın veya taşımak için sürükleyin",
+    "lineEditor_pointSelected": "Noktayı silmek için Delete'e, kopyalamak için CtrlVeyaCmd+D'ye, veya hareket ettirmek için sürükleyin",
     "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut"
   },
   "errorSplash": {

@@ -1,6 +1,6 @@
 .FixedSideContainer {
   --margin: 0.25rem;
-  position: fixed;
+  position: absolute;
   pointer-events: none;
 }
 

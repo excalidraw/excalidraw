@@ -178,13 +178,16 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
         <Columns>
           <Column>
             <ShortcutIsland caption={t("shortcutsDialog.shapes")}>
-              <Shortcut label={t("toolBar.selection")} shortcuts={["S", "1"]} />
+              <Shortcut label={t("toolBar.selection")} shortcuts={["V", "1"]} />
               <Shortcut label={t("toolBar.rectangle")} shortcuts={["R", "2"]} />
               <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
               <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
               <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
-              <Shortcut label={t("toolBar.line")} shortcuts={["L", "6"]} />
-              <Shortcut label={t("toolBar.draw")} shortcuts={["X", "7"]} />
+              <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
+              <Shortcut
+                label={t("toolBar.draw")}
+                shortcuts={["Shift+P", "7"]}
+              />
               <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
               <Shortcut
                 label={t("shortcutsDialog.textNewLine")}
@@ -260,6 +263,12 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
               />
               <Shortcut
+                label={t("labels.multiSelect")}
+                shortcuts={[
+                  getShortcutKey(`Shift+${t("shortcutsDialog.click")}`),
+                ]}
+              />
+              <Shortcut
                 label={t("labels.moveCanvas")}
                 shortcuts={[
                   getShortcutKey(`Space+${t("shortcutsDialog.drag")}`),
@@ -281,11 +290,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               />
               <Shortcut
                 label={t("labels.copyStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+C")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
               />
               <Shortcut
                 label={t("labels.pasteStyles")}
-                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Alt+V")]}
               />
               <Shortcut
                 label={t("labels.delete")}

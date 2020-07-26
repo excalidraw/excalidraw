@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Plakken",
     "selectAll": "Alles selecteren",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -92,8 +96,7 @@
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "toggleFullScreen": "Schermvullende weergave",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Kan geen leeg canvas exporteren.",
     "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
     "decryptFailed": "Kan gegevens niet decoderen.",
-    "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen."
+    "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Selectie",
@@ -114,6 +118,7 @@
     "arrow": "Pijl",
     "line": "Lijn",
     "text": "Tekst",
+    "library": "",
     "lock": "Geselecteerde tool actief houden na tekenen"
   },
   "headings": {

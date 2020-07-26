@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
@@ -25,12 +25,16 @@ if (
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
   "excalidraw.com": "production",
-  "now.sh": "staging",
+  "vercel.app": "staging",
 };
+
+const REACT_APP_DISABLE_SENTRY =
+  process.env.REACT_APP_DISABLE_SENTRY === "true";
+const REACT_APP_GIT_SHA = process.env.REACT_APP_GIT_SHA as string;
 
 // Disable Sentry locally or inside the Docker to avoid noise/respect privacy
 const onlineEnv =
-  process.env.REACT_APP_DISABLE_SENTRY !== "true" &&
+  !REACT_APP_DISABLE_SENTRY &&
   Object.keys(SentryEnvHostnameMap).find(
     (item) => window.location.hostname.indexOf(item) >= 0,
   );
@@ -40,7 +44,7 @@ Sentry.init({
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
-  release: process.env.REACT_APP_GIT_SHA,
+  release: REACT_APP_GIT_SHA,
   ignoreErrors: [
     "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
   ],
@@ -49,7 +53,15 @@ Sentry.init({
       levels: ["error"],
     }),
   ],
+  beforeSend(event) {
+    if (event.request?.url) {
+      event.request.url = event.request.url.replace(/#.*$/, "");
+    }
+    return event;
+  },
 });
+
+window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
 // Block pinch-zooming on iOS outside of the content area
 document.addEventListener(
@@ -63,18 +75,40 @@ document.addEventListener(
   { passive: false },
 );
 
+function ExcalidrawApp() {
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  const onResize = () => {
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  };
+
+  useLayoutEffect(() => {
+    window.addEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const { width, height } = dimensions;
+  return (
+    <TopErrorBoundary>
+      <IsMobileProvider>
+        <InitializeApp>
+          <App width={width} height={height} />
+        </InitializeApp>
+      </IsMobileProvider>
+    </TopErrorBoundary>
+  );
+}
+
 const rootElement = document.getElementById("root");
 
-ReactDOM.render(
-  <TopErrorBoundary>
-    <IsMobileProvider>
-      <InitializeApp>
-        <App />
-      </InitializeApp>
-    </IsMobileProvider>
-  </TopErrorBoundary>,
-  rootElement,
-);
+ReactDOM.render(<ExcalidrawApp />, rootElement);
 
 registerServiceWorker({
   onUpdate: (registration) => {

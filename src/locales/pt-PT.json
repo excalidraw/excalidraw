@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Colar",
     "selectAll": "Selecionar tudo",
+    "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
@@ -64,7 +65,10 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "toggleGridMode": "Alternar modo de grade"
+    "toggleGridMode": "Alternar modo de grade",
+    "addToLibrary": "Adicionar à biblioteca",
+    "removeFromLibrary": "Remover da biblioteca",
+    "libraryLoadingMessage": "Carregando biblioteca..."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -92,8 +96,7 @@
     "createNewRoom": "Criar nova sala",
     "toggleFullScreen": "Alternar tela cheia",
     "toggleZenMode": "Alternar modo zen",
-    "exitZenMode": "Sair do modo zen",
-    "toggleGridMode": "Alternar modo de grade"
+    "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
     "clearReset": "O canvas inteiro será excluído. Tens a certeza?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
     "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
     "decryptFailed": "Não foi possível descriptografar os dados.",
-    "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo."
+    "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
+    "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?"
   },
   "toolBar": {
     "selection": "Seleção",
@@ -114,6 +118,7 @@
     "arrow": "Flecha",
     "line": "Linha",
     "text": "Texto",
+    "library": "Biblioteca",
     "lock": "Manter a ferramenta selecionada ativa após desenhar"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
-    "lineEditor_pointSelected": "Pressione Delete para remover o ponto ou arraste para mover",
+    "lineEditor_pointSelected": "Pressione Deletar para remover ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
   },
   "errorSplash": {

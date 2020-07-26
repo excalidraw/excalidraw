@@ -1,6 +1,10 @@
 import { FlooredNumber } from "./types";
 import { getZoomOrigin } from "./scene";
-import { CURSOR_TYPE, FONT_FAMILY } from "./constants";
+import {
+  CURSOR_TYPE,
+  FONT_FAMILY,
+  WINDOWS_EMOJI_FALLBACK_FONT,
+} from "./constants";
 import { FontFamily, FontString } from "./element/types";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
@@ -66,7 +70,7 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamily;
 }) => {
-  return FONT_FAMILY[fontFamily];
+  return `${FONT_FAMILY[fontFamily]}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
 };
 
 /** returns fontSize+fontFamily string for assignment to DOM elements */
@@ -241,3 +245,10 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
 export const isRTL = (text: string) => {
   return RE_RTL_CHECK.test(text);
 };
+
+export function tupleToCoors(
+  xyTuple: [number, number],
+): { x: number; y: number } {
+  const [x, y] = xyTuple;
+  return { x, y };
+}

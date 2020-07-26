@@ -46,6 +46,7 @@ export enum EVENT {
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
   TOUCH_END = "touchend",
+  HASHCHANGE = "hashchange",
 }
 
 export const ENV = {
@@ -69,6 +70,8 @@ export const FONT_FAMILY = {
   3: "Cascadia",
 } as const;
 
+export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
+
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamily = 1;
 export const DEFAULT_TEXT_ALIGN = "left";
@@ -77,3 +80,5 @@ export const DEFAULT_VERTICAL_ALIGN = "top";
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
+
+export const LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG = "collabLinkForceLoadFlag";
