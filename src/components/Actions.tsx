@@ -78,6 +78,8 @@ export const SelectedShapeActions = ({
           <div className="buttonList">
             {renderAction("duplicateSelection")}
             {renderAction("deleteSelectedElements")}
+            {renderAction("group")}
+            {renderAction("ungroup")}
           </div>
         </fieldset>
       )}
@@ -104,9 +106,11 @@ export const ShapesSwitcher = ({
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
       const label = t(`toolBar.${value}`);
-      const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
-        index + 1
-      }`;
+      const letter = typeof key === "string" ? key : key[0];
+      const letterShortcut = /[a-z]/.test(letter) ? letter : `Shift+${letter}`;
+      const shortcut = `${capitalizeString(letterShortcut)} ${t(
+        "shortcutsDialog.or",
+      )} ${index + 1}`;
       return (
         <ToolButton
           className="Shape"

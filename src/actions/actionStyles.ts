@@ -12,7 +12,8 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
 
-let copiedStyles: string = "{}";
+// `copiedStyles` is exported only for tests.
+export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
