@@ -399,7 +399,7 @@ export const renderScene = (
         }
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
-    } else if (locallySelectedElements.length > 1) {
+    } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom;
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = oc.white;
@@ -433,15 +433,13 @@ export const renderScene = (
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
           if (key === "rotation") {
-            if (!appState.isRotating) {
-              strokeCircle(
-                context,
-                handler[0],
-                handler[1],
-                handler[2],
-                handler[3],
-              );
-            }
+            strokeCircle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+            );
           } else {
             strokeRectWithRotation(
               context,
