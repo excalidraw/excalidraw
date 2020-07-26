@@ -3,7 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData } from "../types";
+import { SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -241,8 +241,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
-  private parentDOMLeft: number;
-  private parentDOMTop: number;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -259,11 +257,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isLoading: true,
       width,
       height,
+      ...this.getCanvasOffsets(),
     };
 
     this.excalidrawRef = React.createRef();
-    this.parentDOMLeft = this.parentDOMTop = 0;
-
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -294,8 +291,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
-          top: this.parentDOMTop,
-          left: this.parentDOMLeft,
+          top: this.state.offsetTop,
+          left: this.state.offsetLeft,
         }}
       >
         <LayerUI
@@ -380,6 +377,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               editingElement || actionResult.appState?.editingElement || null,
             isCollaborating: state.isCollaborating,
             collaborators: state.collaborators,
+            width: state.width,
+            height: state.height,
+            offsetTop: state.offsetTop,
+            offsetLeft: state.offsetLeft,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -509,6 +510,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
+      if (scene.appState) {
+        scene.appState = {
+          ...scene.appState,
+          ...calculateScrollCenter(
+            scene.elements,
+            {
+              ...scene.appState,
+              offsetTop: this.state.offsetTop,
+              offsetLeft: this.state.offsetLeft,
+            },
+            null,
+          ),
+        };
+      }
       this.syncActionResult(scene);
     }
   };
@@ -544,8 +559,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     this.addEventListeners();
-    this.initializeScene();
-    this.calculateCanvasDimensions();
+    this.setState(this.getCanvasOffsets(), () => {
+      this.initializeScene();
+    });
   }
 
   public componentWillUnmount() {
@@ -679,8 +695,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         width: currentWidth,
         height: currentHeight,
+        ...this.getCanvasOffsets(),
       });
-      this.calculateCanvasDimensions();
     }
 
     if (this.state.isCollaborating && !this.portal.socket) {
@@ -928,7 +944,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const dx = x - elementsCenterX;
@@ -937,8 +952,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const newElements = clipboardElements.map((element) =>
       duplicateElement(this.state.editingGroupId, groupIdMap, element, {
-        x: element.x + dx - minX + this.parentDOMLeft,
-        y: element.y + dy - minY + this.parentDOMTop,
+        x: element.x + dx - minX,
+        y: element.y + dy - minY,
       }),
     );
 
@@ -962,7 +977,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const element = newTextElement({
@@ -1335,8 +1349,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.x - this.parentDOMLeft;
-      cursorY = event.y - this.parentDOMTop;
+      cursorX = event.x;
+      cursorY = event.y;
     },
   );
 
@@ -1567,7 +1581,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zoom: this.state.zoom,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          { sceneX: x + this.parentDOMLeft, sceneY: y + this.parentDOMTop },
+          {
+            sceneX: x,
+            sceneY: y,
+          },
           this.state,
           this.canvas,
           window.devicePixelRatio,
@@ -1748,7 +1765,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
@@ -1841,15 +1857,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    const {
-      x: scenePointerX,
-      y: scenePointerY,
-    } = viewportCoordsToSceneCoords(
+    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     if (
@@ -2237,7 +2249,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     return {
@@ -2680,7 +2691,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state,
         this.canvas,
         window.devicePixelRatio,
-        { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
       );
       const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
 
@@ -2993,7 +3003,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state,
             this.canvas,
             window.devicePixelRatio,
-            { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
           );
           mutateElement(draggingElement, {
             points: [
@@ -3199,7 +3208,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
-      loadFromBlob(file)
+      loadFromBlob(file, this.state)
         .then(({ elements, appState }) =>
           this.syncActionResult({
             elements,
@@ -3240,7 +3249,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     const elements = globalSceneState.getElements();
@@ -3364,11 +3372,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private getTextWysiwygSnappedToCenterPosition(
     x: number,
     y: number,
-    state: {
-      scrollX: FlooredNumber;
-      scrollY: FlooredNumber;
-      zoom: number;
-    },
+    appState: AppState,
     canvas: HTMLCanvasElement | null,
     scale: number,
   ) {
@@ -3381,13 +3385,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
     if (elementClickedInside) {
       const elementCenterX =
-        elementClickedInside.x +
-        elementClickedInside.width / 2 +
-        this.parentDOMLeft;
+        elementClickedInside.x + elementClickedInside.width / 2;
       const elementCenterY =
-        elementClickedInside.y +
-        elementClickedInside.height / 2 +
-        this.parentDOMTop;
+        elementClickedInside.y + elementClickedInside.height / 2;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
@@ -3397,7 +3397,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (isSnappedToCenter) {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           { sceneX: elementCenterX, sceneY: elementCenterY },
-          state,
+          appState,
           canvas,
           scale,
         );
@@ -3415,7 +3415,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
       this.canvas,
       window.devicePixelRatio,
-      { deltaX: this.parentDOMLeft, deltaY: this.parentDOMTop },
     );
 
     if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
@@ -3442,11 +3441,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
   }, 300);
 
-  private calculateCanvasDimensions() {
-    const parentElement = this.excalidrawRef.current.parentElement;
-    const { left, top } = parentElement.getBoundingClientRect();
-    this.parentDOMLeft = left;
-    this.parentDOMTop = top;
+  private getCanvasOffsets() {
+    if (this.excalidrawRef?.current) {
+      const parentElement = this.excalidrawRef.current.parentElement;
+      const { left, top } = parentElement.getBoundingClientRect();
+      return {
+        offsetLeft: left,
+        offsetTop: top,
+      };
+    }
+    return {
+      offsetLeft: 0,
+      offsetTop: 0,
+    };
   }
 }
 

@@ -47,11 +47,6 @@ export const calculateScrollCenter = (
   }
   const scale = window.devicePixelRatio;
   let [x1, y1, x2, y2] = getCommonBounds(elements);
-  const parentBoundingRect = document
-    .querySelector(".excalidraw")
-    ?.parentElement?.getBoundingClientRect();
-  const deltaX = parentBoundingRect?.left || 0;
-  const deltaY = parentBoundingRect?.top || 0;
 
   if (isOutsideViewPort(appState, canvas, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
@@ -61,7 +56,6 @@ export const calculateScrollCenter = (
         appState,
         canvas,
         scale,
-        { deltaX, deltaY },
       ),
     );
   }
