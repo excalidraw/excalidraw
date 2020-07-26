@@ -12,7 +12,9 @@ import { SceneHistory } from "../history";
 import { globalSceneState } from "../scene";
 
 export class LinearElementEditor {
-  public elementId: ExcalidrawElement["id"];
+  public elementId: ExcalidrawElement["id"] & {
+    _brand: "excalidrawLinearElementId";
+  };
   public activePointIndex: number | null;
   public draggingElementPointIndex: number | null;
   public lastUncommittedPoint: Point | null;
@@ -20,7 +22,9 @@ export class LinearElementEditor {
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     LinearElementEditor.normalizePoints(element);
 
-    this.elementId = element.id;
+    this.elementId = element.id as string & {
+      _brand: "excalidrawLinearElementId";
+    };
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
     this.draggingElementPointIndex = null;
@@ -32,7 +36,11 @@ export class LinearElementEditor {
 
   static POINT_HANDLE_SIZE = 20;
 
-  static getElement(id: ExcalidrawElement["id"]) {
+  /**
+   * @param id the `elementId` from the instance of this class (so that we can
+   *  statically guarantee this method returns an ExcalidrawLinearElement)
+   */
+  static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
     const element = globalSceneState.getNonDeletedElement(id);
     if (element) {
       return element as NonDeleted<ExcalidrawLinearElement>;
