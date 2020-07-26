@@ -3,7 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData } from "../types";
+import { FlooredNumber, SocketUpdateData, LibraryItems } from "../types";
 
 import {
   newElement,
@@ -3186,36 +3186,38 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidrawlib")
     ) {
       loadLibraryFromBlob(file)
-        .then((data) => {
-          if (!data || !data.library) {
+        .then((libraryFile) => {
+          if (!libraryFile || !libraryFile.library) {
             return;
           }
 
-          // compares two library items and returns true if they are
-          // the same otherwise returns false.
-          const match = (
-            item1: NonDeleted<ExcalidrawElement>[],
-            item2: NonDeleted<ExcalidrawElement>[],
+          /**
+           * checks if library item does not exist already in current library
+           */
+          const isUniqueitem = (
+            existingLibraryItems: LibraryItems,
+            targetLibraryItem: LibraryItem,
           ) => {
-            if (item1?.length !== item2?.length) {
-              return false;
-            }
+            return !existingLibraryItems.find((libraryItem) => {
+              if (libraryItem.length !== targetLibraryItem.length) {
+                return false;
+              }
 
-            const mismatch = item1.find(
-              (el1) =>
-                !item2.find(
-                  (el2) =>
-                    el1.versionNonce === el2.versionNonce || el1.id === el2.id,
-                ),
-            );
-
-            return !mismatch;
+              // detect z-index difference by checking the excalidraw elements
+              //  are in order
+              return libraryItem.every((libItemExcalidrawItem, idx) => {
+                return (
+                  libItemExcalidrawItem.id === targetLibraryItem[idx].id &&
+                  libItemExcalidrawItem.versionNonce ===
+                    targetLibraryItem[idx].versionNonce
+                );
+              });
+            });
           };
 
           loadLibrary().then((items) => {
-            const filtered = data.library!.filter(
-              (importedItem) =>
-                !items.find((item) => match(importedItem, item)),
+            const filtered = libraryFile.library!.filter((libraryItem) =>
+              isUniqueitem(items, libraryItem),
             );
             saveLibrary([...items, ...filtered]);
             this.setState({ isLibraryOpen: false });
