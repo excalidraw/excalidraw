@@ -205,6 +205,10 @@ type PointerDownState = Readonly<{
     offset: { x: number; y: number };
     // This is determined on the initial pointer down event
     arrowDirection: "origin" | "end";
+    // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
+    center: { x: number; y: number };
+    // This is a list of selected elements determined on the initial pointer down event (for rotation only)
+    originalElements: readonly NonDeleted<ExcalidrawElement>[];
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -2213,6 +2217,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.canvas,
       window.devicePixelRatio,
     );
+    const selectedElements = getSelectedElements(
+      globalSceneState.getElements(),
+      this.state,
+    );
+    const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
 
     return {
       origin,
@@ -2231,6 +2240,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
+        center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
+        originalElements: selectedElements.map((element) => ({ ...element })),
       },
       hit: {
         element: null,
@@ -2709,6 +2720,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             getResizeCenterPointKey(event),
             resizeX,
             resizeY,
+            pointerDownState.resize.center.x,
+            pointerDownState.resize.center.y,
+            pointerDownState.resize.originalElements,
           )
         ) {
           return;
