@@ -42,6 +42,7 @@ import { LibraryUnit } from "./LibraryUnit";
 import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, loadLibraryFromJSON } from "../data/json";
+import { muteFSAbortError } from "../utils";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -118,15 +119,17 @@ const LibraryMenuItems = ({
         title={t("buttons.load")}
         aria-label={t("buttons.load")}
         icon={load}
-        onClick={async () => {
-          try {
-            await loadLibraryFromJSON();
-            // Maybe we should close and open the menu so that the items get updated.
-            // But for now we just close the menu.
-            setAppState({ isLibraryOpen: false });
-          } catch (error) {
-            setAppState({ errorMessage: error.message });
-          }
+        onClick={() => {
+          loadLibraryFromJSON()
+            .then(() => {
+              // Maybe we should close and open the menu so that the items get updated.
+              // But for now we just close the menu.
+              setAppState({ isLibraryOpen: false });
+            })
+            .catch(muteFSAbortError)
+            .catch((error) => {
+              setAppState({ errorMessage: error.message });
+            });
         }}
       />
       <ToolButton
@@ -135,7 +138,13 @@ const LibraryMenuItems = ({
         title={t("buttons.export")}
         aria-label={t("buttons.export")}
         icon={exportFile}
-        onClick={saveLibraryAsJSON}
+        onClick={() => {
+          saveLibraryAsJSON()
+            .catch(muteFSAbortError)
+            .catch((error) => {
+              setAppState({ errorMessage: error.message });
+            });
+        }}
       />
     </Stack.Row>,
   );
