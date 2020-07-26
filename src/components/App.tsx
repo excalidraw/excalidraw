@@ -123,6 +123,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+  ELEMENT_SIZE_FOR_WHEEL_DEBOUNCE,
 } from "../constants";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -3302,6 +3303,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event.preventDefault();
     const { deltaX, deltaY } = event;
     const { selectedElementIds, previousSelectedElementIds } = this.state;
+    const shouldCacheIgnoreZoom =
+      globalSceneState.getElements().length > ELEMENT_SIZE_FOR_WHEEL_DEBOUNCE;
 
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
@@ -3322,14 +3325,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       this.setState(({ zoom }) => ({
         zoom: getNormalizedZoom(zoom - delta / 100),
-        shouldCacheIgnoreZoom: true,
+        shouldCacheIgnoreZoom,
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
             ? selectedElementIds
             : previousSelectedElementIds,
       }));
-      this.resetShouldCacheIgnoreZoomDebounced();
+      if (shouldCacheIgnoreZoom) {
+        this.resetShouldCacheIgnoreZoomDebounced();
+      }
       return;
     }
 
