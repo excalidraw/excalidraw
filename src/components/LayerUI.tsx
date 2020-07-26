@@ -9,12 +9,8 @@ import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
-import { AppState, LibraryItems } from "../types";
-import {
-  NonDeletedExcalidrawElement,
-  ExcalidrawElement,
-  NonDeleted,
-} from "../element/types";
+import { AppState, LibraryItems, LibraryItem } from "../types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -57,7 +53,7 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
@@ -100,11 +96,11 @@ const LibraryMenuItems = ({
   setAppState,
 }: {
   library: LibraryItems;
-  pendingElements: NonDeleted<ExcalidrawElement>[];
+  pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
   onRemoveFromLibrary: (index: number) => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
-  onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
+  onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: any;
 }) => {
   const isMobile = useIsMobile();
@@ -192,9 +188,9 @@ const LibraryMenu = ({
   onAddToLibrary,
   setAppState,
 }: {
-  pendingElements: NonDeleted<ExcalidrawElement>[];
+  pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   setAppState: any;
 }) => {
@@ -238,7 +234,7 @@ const LibraryMenu = ({
   }, []);
 
   const addToLibrary = useCallback(
-    async (elements: NonDeleted<ExcalidrawElement>[]) => {
+    async (elements: LibraryItem) => {
       const items = await loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();

@@ -3,7 +3,12 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData, LibraryItems } from "../types";
+import {
+  FlooredNumber,
+  SocketUpdateData,
+  LibraryItems,
+  LibraryItem,
+} from "../types";
 
 import {
   newElement,
