@@ -54,8 +54,8 @@
 
 .color-picker-swatch {
   position: relative;
-  height: 1.875rem;
-  width: 1.875rem;
+  height: var(--button-height);
+  width: var(--button-width);
   cursor: pointer;
   border-radius: 4px;
   margin: 0;
@@ -87,8 +87,8 @@
 
 .color-picker-hash {
   background: $oc-gray-3;
-  height: 1.875rem;
-  width: 1.875rem;
+  height: var(--button-height);
+  width: var(--button-width);
   :root[dir="ltr"] & {
     border-radius: 4px 0px 0px 4px;
   }
@@ -133,6 +133,7 @@
 
 .color-input-container {
   display: flex;
+  padding: 0.5rem;
 }
 
 .color-picker-input {
@@ -142,7 +143,7 @@
   color: $oc-gray-8;
   border: 0px;
   outline: none;
-  height: 1.75em;
+  height: 1.85rem; // a rem value needed here since var(--button-height) is too large
   box-shadow: $oc-gray-3 0px 0px 0px 1px inset;
   :root[dir="ltr"] & {
     border-radius: 0px 4px 4px 0px;
@@ -157,8 +158,8 @@
 }
 
 .color-picker-label-swatch {
-  height: 1.875rem;
-  width: 1.875rem;
+  height: var(--button-height);
+  width: var(--button-width);
   margin-inline-end: 0.25rem;
   border: 1px solid $oc-gray-3;
   position: relative;

@@ -180,6 +180,13 @@ const Picker = ({
           />
         )}
       </div>
+      <ColorInput
+        color={color}
+        label={label}
+        onChange={(color) => {
+          onChange(color);
+        }}
+      />
     </div>
   );
 };
@@ -262,13 +269,6 @@ export const ColorPicker = ({
           }
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
-        />
-        <ColorInput
-          color={color}
-          label={label}
-          onChange={(color) => {
-            onChange(color);
-          }}
         />
       </div>
       <React.Suspense fallback="">

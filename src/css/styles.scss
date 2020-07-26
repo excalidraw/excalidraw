@@ -11,12 +11,16 @@
   --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
   --border-radius-m: 4px;
   --space-factor: 0.25rem;
+  --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+html {
+  font-family: var(--ui-font);
 }
 
 body {
   margin: 0;
-  --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
-    Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
   color: var(--text-color-primary);
   -webkit-text-size-adjust: 100%;

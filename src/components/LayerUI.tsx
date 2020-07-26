@@ -313,9 +313,9 @@ const LayerUI = ({
     >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-      <Island padding={4} style={{ zIndex: 1 }}>
+      <Island padding={1} style={{ zIndex: 1, width: "fit-content" }}>
         <Stack.Col gap={4}>
-          <Stack.Row gap={1} justifyContent="space-between">
+          <Stack.Col gap={1} justifyContent="space-between">
             {actionManager.renderAction("loadScene")}
             {actionManager.renderAction("saveScene")}
             {actionManager.renderAction("saveAsScene")}
@@ -329,7 +329,7 @@ const LayerUI = ({
               onRoomCreate={onRoomCreate}
               onRoomDestroy={onRoomDestroy}
             />
-          </Stack.Row>
+          </Stack.Col>
           {actionManager.renderAction("changeViewBackgroundColor")}
         </Stack.Col>
       </Island>

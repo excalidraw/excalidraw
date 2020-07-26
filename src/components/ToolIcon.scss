@@ -19,8 +19,9 @@
 }
 
 .ToolIcon__icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: var(--button-width);
+  height: var(--button-height);
+  border: 1px solid var(--button-gray-1);
 
   display: flex;
   justify-content: center;
@@ -30,7 +31,7 @@
 
   svg {
     position: relative;
-    height: 1em;
+    height: 0.8em;
   }
 
   & + .ToolIcon__label {
