@@ -3150,7 +3150,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
     const libraryShapes = event.dataTransfer.getData(
-      "application/vnd.excalidraw.json",
+      "application/vnd.excalidrawlib+json",
     );
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
@@ -3182,7 +3182,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.setState({ isLoading: false, errorMessage: error.message });
         });
     } else if (
-      file?.type === "application/excalidrawlib.json" ||
+      file?.type === "application/vnd.excalidrawlib+json" ||
       file?.name.endsWith(".excalidrawlib")
     ) {
       loadLibraryFromBlob(file)

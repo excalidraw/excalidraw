@@ -65,7 +65,7 @@ export const saveLibraryAsJSON = async () => {
   );
   const fileName = `library.excalidrawlib`;
   const blob = new Blob([serialized], {
-    type: "application/excalidrawlib.json",
+    type: "application/vnd.excalidrawlib+json",
   });
   await fileSave(blob, {
     fileName,
