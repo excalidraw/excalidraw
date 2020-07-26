@@ -744,7 +744,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
-        renderOptimizations: true,
+        renderOptimizations: "batched",
       },
     );
     if (scrollBars) {

@@ -35,7 +35,78 @@ export interface ExcalidrawElementWithCanvas {
   canvasZoom: number;
   canvasOffsetX: number;
   canvasOffsetY: number;
+  nextCanvasZoom?: number; // for scheduleBatchedGenerateElementCanvas
 }
+
+const GENERATE_ELEMENT_CANVAS_BATCH_SIZE = 100;
+
+const lastRerenderScene = new WeakMap<CanvasRenderingContext2D, () => void>();
+
+export const scheduleBatchedGenerateElementCanvas = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  rerenderScene: () => void,
+) => {
+  lastRerenderScene.set(context, rerenderScene);
+  const zoom = sceneState ? sceneState.zoom : 1;
+  const elementsToRegenerate: NonDeletedExcalidrawElement[] = [];
+  elements.forEach((element) => {
+    const prevElementWithCanvas = elementWithCanvasCache.get(element);
+    if (
+      prevElementWithCanvas &&
+      prevElementWithCanvas.canvasZoom !== zoom &&
+      prevElementWithCanvas.nextCanvasZoom !== zoom
+    ) {
+      elementWithCanvasCache.set(element, {
+        ...prevElementWithCanvas,
+        nextCanvasZoom: zoom,
+      });
+      elementsToRegenerate.push(element);
+    }
+  });
+  if (!elementsToRegenerate.length) {
+    return;
+  }
+  const loop = (index: number) => {
+    let i = 0;
+    while (
+      index + i < elementsToRegenerate.length &&
+      i < GENERATE_ELEMENT_CANVAS_BATCH_SIZE
+    ) {
+      const element = elementsToRegenerate[index + i];
+      const prevElementWithCanvas = elementWithCanvasCache.get(element);
+      if (prevElementWithCanvas?.nextCanvasZoom === zoom) {
+        const elementWithCanvas = generateElementCanvas(element, zoom);
+        elementWithCanvasCache.set(element, elementWithCanvas);
+      }
+      i += 1;
+    }
+    if (index + i < elementsToRegenerate.length) {
+      setTimeout(() => {
+        loop(index + i);
+      }, 0);
+      return;
+    }
+    const shouldRerender =
+      index !== 0 &&
+      elementsToRegenerate.every((element) => {
+        const elementWithCanvas = elementWithCanvasCache.get(element);
+        return (
+          elementWithCanvas &&
+          !elementWithCanvas.nextCanvasZoom &&
+          elementWithCanvas.canvasZoom === zoom
+        );
+      });
+    if (shouldRerender) {
+      const rerender = lastRerenderScene.get(context);
+      if (rerender) {
+        rerender();
+      }
+    }
+  };
+  loop(0);
+};
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
@@ -330,6 +401,7 @@ const generateElementWithCanvas = (
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
+    !prevElementWithCanvas.nextCanvasZoom &&
     prevElementWithCanvas.canvasZoom !== zoom &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
