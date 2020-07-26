@@ -18,7 +18,6 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   s: true,
   n: true,
   w: true,
-  rotation: true,
 };
 
 const OMIT_SIDES_FOR_TEXT_ELEMENT = {
