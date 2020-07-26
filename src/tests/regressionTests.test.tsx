@@ -10,6 +10,8 @@ import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
 import { handlerRectangles } from "../element";
+import { queryByText } from "@testing-library/react";
+import { copiedStyles } from "../actions/actionStyles";
 
 const { h } = window;
 
@@ -857,9 +859,6 @@ describe("regression tests", () => {
   });
 
   it("shows context menu for canvas", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
     fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
@@ -871,12 +870,10 @@ describe("regression tests", () => {
   });
 
   it("shows context menu for element", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
     clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(20, 20);
+
     fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
@@ -900,10 +897,6 @@ describe("regression tests", () => {
   });
 
   it("shows 'Group selection' in context menu for multiple selected elements", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
-
     clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(10, 10);
@@ -943,10 +936,6 @@ describe("regression tests", () => {
   });
 
   it("shows 'Ungroup selection' in context menu for group inside selected elements", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
-
     clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(10, 10);
@@ -987,5 +976,238 @@ describe("regression tests", () => {
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
+  });
+
+  it("selecting 'Copy styles' in context menu copies styles", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    expect(copiedStyles).toBe("{}");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
+    expect(copiedStyles).not.toBe("{}");
+    const element = JSON.parse(copiedStyles);
+    expect(element).toEqual(getSelectedElement());
+  });
+
+  it("selecting 'Paste styles' in context menu pastes styles", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    // Change some styles of second rectangle
+    clickLabeledElement("Stroke");
+    clickLabeledElement("#c92a2a");
+    clickLabeledElement("Background");
+    clickLabeledElement("#e64980");
+    // Fill style
+    fireEvent.click(screen.getByLabelText("Cross-hatch"));
+    // Stroke width
+    fireEvent.click(screen.getByLabelText("Bold"));
+    // Stroke style
+    fireEvent.click(screen.getByLabelText("Dotted"));
+    // Roughness
+    fireEvent.click(screen.getByLabelText("Cartoonist"));
+    // Opacity
+    fireEvent.change(screen.getByLabelText("Opacity"), {
+      target: { value: "60" },
+    });
+
+    mouse.reset();
+    // Copy styles of second rectangle
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    let contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
+    const secondRect = JSON.parse(copiedStyles);
+    expect(secondRect.id).toBe(h.elements[1].id);
+
+    mouse.reset();
+    // Paste styles to first rectangle
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Paste styles")!);
+
+    const firstRect = getSelectedElement();
+    expect(firstRect.id).toBe(h.elements[0].id);
+    expect(firstRect.strokeColor).toBe("#c92a2a");
+    expect(firstRect.backgroundColor).toBe("#e64980");
+    expect(firstRect.fillStyle).toBe("cross-hatch");
+    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
+    expect(firstRect.strokeStyle).toBe("dotted");
+    expect(firstRect.roughness).toBe(2); // Cartoonist: 2
+    expect(firstRect.opacity).toBe(60);
+  });
+
+  it("selecting 'Delete' in context menu deletes element", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Delete")!);
+    expect(getSelectedElements()).toHaveLength(0);
+    expect(h.elements[0].isDeleted).toBe(true);
+  });
+
+  it("selecting 'Add to library' in context menu adds element to library", async () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Add to library")!);
+
+    await waitFor(() => {
+      const library = localStorage.getItem("excalidraw-library");
+      expect(library).not.toBeNull();
+      const addedElement = JSON.parse(library!)[0][0];
+      expect(addedElement).toEqual(h.elements[0]);
+    });
+  });
+
+  it("selecting 'Duplicate' in context menu duplicates element", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Duplicate")!);
+    expect(h.elements).toHaveLength(2);
+    const { id: _id0, seed: _seed0, x: _x0, y: _y0, ...rect1 } = h.elements[0];
+    const { id: _id1, seed: _seed1, x: _x1, y: _y1, ...rect2 } = h.elements[1];
+    expect(rect1).toEqual(rect2);
+  });
+
+  it("selecting 'Send backward' in context menu sends element backward", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Send backward")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Bring forward' in context menu brings element forward", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Bring forward")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Send to back' in context menu sends element to back", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Send to back")!);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Bring to front' in context menu brings element to front", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Bring to front")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+  });
+
+  it("selecting 'Group selection' in context menu groups selected elements", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(10, 10);
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(
+      queryByText(contextMenu as HTMLElement, "Group selection")!,
+    );
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(h.elements[0].groupIds).toEqual(selectedGroupIds);
+    expect(h.elements[1].groupIds).toEqual(selectedGroupIds);
+  });
+
+  it("selecting 'Ungroup selection' in context menu ungroups selected group", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(10, 10);
+    });
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(
+      queryByText(contextMenu as HTMLElement, "Ungroup selection")!,
+    );
+
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(selectedGroupIds).toHaveLength(0);
+    expect(h.elements[0].groupIds).toHaveLength(0);
+    expect(h.elements[1].groupIds).toHaveLength(0);
   });
 });
