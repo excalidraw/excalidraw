@@ -1746,6 +1746,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (this.state.multiElement) {
       return;
     }
+    // we should only be able to double click when mode is selection
+    if (this.state.elementType !== "selection") {
+      return;
+    }
 
     const selectedElements = getSelectedElements(
       globalSceneState.getElements(),
