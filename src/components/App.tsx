@@ -281,6 +281,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
+      offsetTop,
+      offsetLeft,
     } = this.state;
 
     const canvasScale = window.devicePixelRatio;
@@ -295,8 +297,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
-          top: this.state.offsetTop,
-          left: this.state.offsetLeft,
+          top: offsetTop,
+          left: offsetLeft,
         }}
       >
         <LayerUI
@@ -3398,9 +3400,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
     if (elementClickedInside) {
       const elementCenterX =
-        elementClickedInside.x + elementClickedInside.width / 2;
+        elementClickedInside.x +
+        elementClickedInside.width / 2 +
+        appState.offsetLeft;
       const elementCenterY =
-        elementClickedInside.y + elementClickedInside.height / 2;
+        elementClickedInside.y +
+        elementClickedInside.height / 2 +
+        appState.offsetTop;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
