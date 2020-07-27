@@ -144,3 +144,13 @@ export function removeFromSelectedGroups(
 ) {
   return groupIds.filter((groupId) => !selectedGroupIds[groupId]);
 }
+
+export function getGroupIdsFromElements(
+  elements: readonly ExcalidrawElement[],
+) {
+  const groupIds = new Set<string>();
+  elements.forEach((element) => {
+    element.groupIds.forEach((groupId) => groupIds.add(groupId));
+  });
+  return [...groupIds];
+}

@@ -152,6 +152,7 @@ import {
   selectGroupsForSelectedElements,
   isElementInGroup,
   getSelectedGroupIdForElement,
+  getGroupIdsFromElements,
 } from "../groups";
 
 /**
@@ -927,7 +928,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         y: element.y + dy - minY,
       }),
     );
-
+    const selectedGroupIds = getGroupIdsFromElements(newElements).reduce(
+      (acc, groupId) => {
+        acc[groupId] = true;
+        return acc;
+      },
+      {} as any,
+    );
     globalSceneState.replaceAllElements([
       ...globalSceneState.getElementsIncludingDeleted(),
       ...newElements,
@@ -939,6 +946,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         map[element.id] = true;
         return map;
       }, {} as any),
+      selectedGroupIds: selectedGroupIds,
     });
   };
 
