@@ -2,17 +2,11 @@ import { getDefaultAppState, cleanAppStateForExport } from "../appState";
 import { restore } from "./restore";
 import { t } from "../i18n";
 import { AppState } from "../types";
+import { LibraryData } from "./types";
 import { calculateScrollCenter } from "../scene";
 
-/**
- * @param blob
- * @param appState if provided, used for centering scroll to restored scene
- */
-export const loadFromBlob = async (blob: any, appState?: AppState) => {
-  if (blob.handle) {
-    (window as any).handle = blob.handle;
-  }
-  let contents;
+const loadFileContents = async (blob: any) => {
+  let contents: string;
   if ("text" in Blob) {
     contents = await blob.text();
   } else {
@@ -26,7 +20,19 @@ export const loadFromBlob = async (blob: any, appState?: AppState) => {
       };
     });
   }
+  return contents;
+};
 
+/**
+ * @param blob
+ * @param appState if provided, used for centering scroll to restored scene
+ */
+export const loadFromBlob = async (blob: any, appState?: AppState) => {
+  if (blob.handle) {
+    (window as any).handle = blob.handle;
+  }
+
+  const contents = await loadFileContents(blob);
   const defaultAppState = getDefaultAppState();
   let elements = [];
   let _appState = appState || defaultAppState;
@@ -46,4 +52,13 @@ export const loadFromBlob = async (blob: any, appState?: AppState) => {
   }
 
   return restore(elements, _appState);
+};
+
+export const loadLibraryFromBlob = async (blob: any) => {
+  const contents = await loadFileContents(blob);
+  const data: LibraryData = JSON.parse(contents);
+  if (data.type !== "excalidrawlib") {
+    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+  }
+  return data;
 };

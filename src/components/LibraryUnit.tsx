@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { exportToSvg } from "../scene/export";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { close } from "../components/icons";
 
 import "./LibraryUnit.scss";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
+import { LibraryItem } from "../types";
 
 // fa-plus
 const PLUS_ICON = (
@@ -20,8 +20,8 @@ export const LibraryUnit = ({
   onRemoveFromLibrary,
   onClick,
 }: {
-  elements?: NonDeleted<ExcalidrawElement>[];
-  pendingElements?: NonDeleted<ExcalidrawElement>[];
+  elements?: LibraryItem;
+  pendingElements?: LibraryItem;
   onRemoveFromLibrary: () => void;
   onClick: () => void;
 }) => {
@@ -75,7 +75,7 @@ export const LibraryUnit = ({
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
-            "application/vnd.excalidraw.json",
+            "application/vnd.excalidrawlib+json",
             JSON.stringify(elements),
           );
         }}

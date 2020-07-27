@@ -143,6 +143,7 @@ import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  loadLibrary,
 } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
@@ -153,6 +154,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
 } from "../groups";
+import { Library } from "../data/library";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3206,7 +3208,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
     const libraryShapes = event.dataTransfer.getData(
-      "application/vnd.excalidraw.json",
+      "application/vnd.excalidrawlib+json",
     );
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
@@ -3237,6 +3239,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         .catch((error) => {
           this.setState({ isLoading: false, errorMessage: error.message });
         });
+    } else if (
+      file?.type === "application/vnd.excalidrawlib+json" ||
+      file?.name.endsWith(".excalidrawlib")
+    ) {
+      Library.importLibrary(file)
+        .then(() => {
+          this.setState({ isLibraryOpen: false });
+        })
+        .catch((error) =>
+          this.setState({ isLoading: false, errorMessage: error.message }),
+        );
     } else {
       this.setState({
         isLoading: false,
@@ -3484,6 +3497,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
+      library: ReturnType<typeof loadLibrary>;
     };
   }
 }
@@ -3505,6 +3519,9 @@ if (
     },
     history: {
       get: () => history,
+    },
+    library: {
+      get: () => loadLibrary(),
     },
   });
 }
