@@ -3,7 +3,7 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { FlooredNumber, SocketUpdateData } from "../types";
+import { SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -244,6 +244,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   removeSceneCallback: SceneStateCallbackRemover | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
+  private excalidrawRef: any;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -260,8 +261,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isLoading: true,
       width,
       height,
+      ...this.getCanvasOffsets(),
     };
 
+    this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -278,6 +281,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
+      offsetTop,
+      offsetLeft,
     } = this.state;
 
     const canvasScale = window.devicePixelRatio;
@@ -286,7 +291,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const canvasHeight = canvasDOMHeight * canvasScale;
 
     return (
-      <div className="excalidraw">
+      <div
+        className="excalidraw"
+        ref={this.excalidrawRef}
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+          top: offsetTop,
+          left: offsetLeft,
+        }}
+      >
         <LayerUI
           canvas={this.canvas}
           appState={this.state}
@@ -369,6 +383,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               editingElement || actionResult.appState?.editingElement || null,
             isCollaborating: state.isCollaborating,
             collaborators: state.collaborators,
+            width: state.width,
+            height: state.height,
+            offsetTop: state.offsetTop,
+            offsetLeft: state.offsetLeft,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -498,6 +516,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isCollaborationScene) {
       this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
+      if (scene.appState) {
+        scene.appState = {
+          ...scene.appState,
+          ...calculateScrollCenter(
+            scene.elements,
+            {
+              ...scene.appState,
+              offsetTop: this.state.offsetTop,
+              offsetLeft: this.state.offsetLeft,
+            },
+            null,
+          ),
+        };
+      }
       this.syncActionResult(scene);
     }
   };
@@ -533,7 +565,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     this.addEventListeners();
-    this.initializeScene();
+    this.setState(this.getCanvasOffsets(), () => {
+      this.initializeScene();
+    });
   }
 
   public componentWillUnmount() {
@@ -667,6 +701,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         width: currentWidth,
         height: currentHeight,
+        ...this.getCanvasOffsets(),
       });
     }
 
@@ -1548,10 +1583,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     textWysiwyg({
       id: element.id,
-      zoom: this.state.zoom,
+      appState: this.state,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          { sceneX: x, sceneY: y },
+          {
+            sceneX: x,
+            sceneY: y,
+          },
           this.state,
           this.canvas,
           window.devicePixelRatio,
@@ -3185,7 +3223,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
-      loadFromBlob(file)
+      loadFromBlob(file, this.state)
         .then(({ elements, appState }) =>
           this.syncActionResult({
             elements,
@@ -3349,11 +3387,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private getTextWysiwygSnappedToCenterPosition(
     x: number,
     y: number,
-    state: {
-      scrollX: FlooredNumber;
-      scrollY: FlooredNumber;
-      zoom: number;
-    },
+    appState: AppState,
     canvas: HTMLCanvasElement | null,
     scale: number,
   ) {
@@ -3378,7 +3412,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (isSnappedToCenter) {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           { sceneX: elementCenterX, sceneY: elementCenterY },
-          state,
+          appState,
           canvas,
           scale,
         );
@@ -3421,6 +3455,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
     );
   }, 300);
+
+  private getCanvasOffsets() {
+    if (this.excalidrawRef?.current) {
+      const parentElement = this.excalidrawRef.current.parentElement;
+      const { left, top } = parentElement.getBoundingClientRect();
+      return {
+        offsetLeft: left,
+        offsetTop: top,
+      };
+    }
+    return {
+      offsetLeft: 0,
+      offsetTop: 0,
+    };
+  }
 }
 
 // -----------------------------------------------------------------------------

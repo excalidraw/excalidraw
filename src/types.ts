@@ -81,6 +81,8 @@ export type AppState = {
   editingGroupId: GroupId | null;
   width: number;
   height: number;
+  offsetTop: number;
+  offsetLeft: number;
 
   isLibraryOpen: boolean;
 };

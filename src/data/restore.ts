@@ -6,7 +6,6 @@ import {
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
-import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -110,8 +109,7 @@ const migrateElement = (
 
 export const restore = (
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState | null,
-  opts?: { scrollToContent: boolean },
+  savedState: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null,
 ): DataState => {
   const elements = savedElements.reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
@@ -124,13 +122,6 @@ export const restore = (
     }
     return elements;
   }, [] as ExcalidrawElement[]);
-
-  if (opts?.scrollToContent && savedState) {
-    savedState = {
-      ...savedState,
-      ...calculateScrollCenter(elements, savedState, null),
-    };
-  }
 
   return {
     elements: elements,

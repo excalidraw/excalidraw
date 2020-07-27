@@ -237,7 +237,7 @@ export const importFromBackend = async (
   privateKey: string | undefined,
 ) => {
   let elements: readonly ExcalidrawElement[] = [];
-  let appState: AppState = getDefaultAppState();
+  let appState = getDefaultAppState();
 
   try {
     const response = await fetch(
@@ -245,7 +245,7 @@ export const importFromBackend = async (
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return restore(elements, appState, { scrollToContent: true });
+      return restore(elements, appState);
     }
     let data;
     if (privateKey) {
@@ -276,7 +276,7 @@ export const importFromBackend = async (
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
   } finally {
-    return restore(elements, appState, { scrollToContent: true });
+    return restore(elements, appState);
   }
 };
 
