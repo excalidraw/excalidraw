@@ -59,7 +59,11 @@ registerFont("./public/Cascadia.ttf", { family: "Cascadia" });
 
 const canvas = exportToCanvas(
   elements as any,
-  getDefaultAppState(),
+  {
+    ...getDefaultAppState(),
+    offsetTop: 0,
+    offsetLeft: 0,
+  },
   {
     exportBackground: true,
     viewBackgroundColor: "#ffffff",

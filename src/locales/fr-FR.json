@@ -66,7 +66,7 @@
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
     "toggleGridMode": "Basculer le mode grille",
-    "addToLibrary": "Ajouter à la bibliotèque",
+    "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
     "libraryLoadingMessage": "Chargement de la bibliothèque..."
   },
@@ -107,7 +107,7 @@
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
-    "loadSceneOverridePrompt": "Si vous chargez ce dessin externe, il remplacera celui que vous avez. Voulez-vous continuer?"
+    "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?"
   },
   "toolBar": {
     "selection": "Sélection",

@@ -104,7 +104,9 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!("chooseFileSystemEntries" in window)}
+      hidden={
+        !("chooseFileSystemEntries" in window || "showOpenFilePicker" in window)
+      }
       onClick={() => updateData(null)}
     />
   ),
@@ -126,7 +128,7 @@ export const actionLoadScene = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       icon={load}
@@ -134,7 +136,7 @@ export const actionLoadScene = register({
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
       onClick={() => {
-        loadFromJSON()
+        loadFromJSON(appState)
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })

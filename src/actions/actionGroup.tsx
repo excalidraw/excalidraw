@@ -1,7 +1,11 @@
+import React from "react";
 import { KEYS } from "../keys";
+import { t } from "../i18n";
+import { getShortcutKey } from "../utils";
 import { register } from "./register";
+import { group, ungroup } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
-import { getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import {
   getSelectedGroupIds,
   selectGroup,
@@ -13,6 +17,39 @@ import {
 } from "../groups";
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
+import { ToolButton } from "../components/ToolButton";
+import { ExcalidrawElement } from "../element/types";
+import { AppState } from "../types";
+
+const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
+  if (elements.length >= 2) {
+    const groupIds = elements[0].groupIds;
+    for (const groupId of groupIds) {
+      if (
+        elements.reduce(
+          (acc, element) => acc && isElementInGroup(element, groupId),
+          true,
+        )
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const enableActionGroup = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  return (
+    selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
+  );
+};
 
 export const actionGroup = register({
   name: "group",
@@ -91,7 +128,7 @@ export const actionGroup = register({
   contextMenuOrder: 4,
   contextItemLabel: "labels.group",
   contextItemPredicate: (elements, appState) =>
-    getSelectedElements(getNonDeletedElements(elements), appState).length > 1,
+    enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
       !event.shiftKey &&
@@ -99,6 +136,17 @@ export const actionGroup = register({
       event.keyCode === KEYS.G_KEY_CODE
     );
   },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      hidden={!enableActionGroup(elements, appState)}
+      type="button"
+      icon={group}
+      onClick={() => updateData(null)}
+      title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
+      aria-label={t("labels.group")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+    ></ToolButton>
+  ),
 });
 
 export const actionUngroup = register({
@@ -140,4 +188,16 @@ export const actionUngroup = register({
   contextItemLabel: "labels.ungroup",
   contextItemPredicate: (elements, appState) =>
     getSelectedGroupIds(appState).length > 0,
+
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      hidden={getSelectedGroupIds(appState).length === 0}
+      icon={ungroup}
+      onClick={() => updateData(null)}
+      title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
+      aria-label={t("labels.ungroup")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+    ></ToolButton>
+  ),
 });

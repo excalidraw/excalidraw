@@ -47,6 +47,7 @@ export const calculateScrollCenter = (
   }
   const scale = window.devicePixelRatio;
   let [x1, y1, x2, y2] = getCommonBounds(elements);
+
   if (isOutsideViewPort(appState, canvas, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
