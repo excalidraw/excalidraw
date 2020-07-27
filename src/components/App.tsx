@@ -1583,7 +1583,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     textWysiwyg({
       id: element.id,
-      zoom: this.state.zoom,
+      appState: this.state,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           {
@@ -3400,13 +3400,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
     if (elementClickedInside) {
       const elementCenterX =
-        elementClickedInside.x +
-        elementClickedInside.width / 2 +
-        appState.offsetLeft;
+        elementClickedInside.x + elementClickedInside.width / 2;
       const elementCenterY =
-        elementClickedInside.y +
-        elementClickedInside.height / 2 +
-        appState.offsetTop;
+        elementClickedInside.y + elementClickedInside.height / 2;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
