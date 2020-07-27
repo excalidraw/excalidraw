@@ -246,3 +246,11 @@ export function tupleToCoors(
   const [x, y] = xyTuple;
   return { x, y };
 }
+
+/** use as a rejectionHandler to mute filesystem Abort errors */
+export const muteFSAbortError = (error?: Error) => {
+  if (error?.name === "AbortError") {
+    return;
+  }
+  throw error;
+};

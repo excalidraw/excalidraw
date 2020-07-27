@@ -7,14 +7,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
-
-const muteFSAbortError = (error?: Error) => {
-  // if user cancels, ignore the error
-  if (error?.name === "AbortError") {
-    return;
-  }
-  throw error;
-};
+import { muteFSAbortError } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
