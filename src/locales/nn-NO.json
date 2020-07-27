@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Vel alt",
-    "multiSelect": "",
+    "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til utklippstavla som PNG",
@@ -66,9 +66,9 @@
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
     "toggleGridMode": "Sla på/av rutenett",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "Legg til i bibliotek",
+    "removeFromLibrary": "Fjern fra bibliotek",
+    "libraryLoadingMessage": "Laster bibliotek..."
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -107,7 +107,7 @@
     "couldNotCopyToClipboard": "Kunne ikkje kopiere til utklippstavla. Prøv med nettlesaren Chrome.",
     "decryptFailed": "Kunne ikkje dekryptere data.",
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterende innhold. Ynskjer du å fortsette?"
   },
   "toolBar": {
     "selection": "Vel",
@@ -118,7 +118,7 @@
     "arrow": "Pil",
     "line": "Linje",
     "text": "Tekst",
-    "library": "",
+    "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy"
   },
   "headings": {
