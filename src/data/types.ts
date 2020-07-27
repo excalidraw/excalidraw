@@ -6,5 +6,5 @@ export interface DataState {
   version?: string;
   source?: string;
   elements: readonly ExcalidrawElement[];
-  appState: AppState | null;
+  appState: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null;
 }

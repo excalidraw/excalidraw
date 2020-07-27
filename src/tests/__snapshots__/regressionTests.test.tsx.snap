@@ -34,6 +34,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -399,7 +401,7 @@ Object {
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `19`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
@@ -435,6 +437,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -609,7 +613,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `9`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -645,6 +649,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -736,7 +742,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `12`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -772,6 +778,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -999,7 +1007,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `10`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -1035,6 +1043,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -1164,7 +1174,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `9`;
+exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `10`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -1200,6 +1210,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -1367,7 +1379,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `12`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -1403,6 +1415,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -1576,7 +1590,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `12`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -1612,6 +1626,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id2": true,
@@ -1886,7 +1902,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `18`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
@@ -1922,6 +1938,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -2282,7 +2300,7 @@ Object {
 
 exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `17`;
+exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -2318,6 +2336,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4071,7 +4091,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `46`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `47`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -4107,6 +4127,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4198,7 +4220,7 @@ Object {
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -4234,6 +4256,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4325,7 +4349,7 @@ Object {
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -4361,6 +4385,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4452,7 +4478,7 @@ Object {
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -4488,6 +4514,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4601,7 +4629,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -4637,6 +4665,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4750,7 +4780,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -4786,6 +4816,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4899,7 +4931,7 @@ Object {
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -4935,6 +4967,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5048,7 +5082,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -5084,6 +5118,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5175,7 +5211,7 @@ Object {
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -5211,6 +5247,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5302,7 +5340,7 @@ Object {
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -5338,6 +5376,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5451,7 +5491,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -5487,6 +5527,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5578,7 +5620,7 @@ Object {
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -5614,6 +5656,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5727,7 +5771,7 @@ Object {
 
 exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -5763,6 +5807,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -6368,7 +6414,7 @@ Object {
 
 exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `21`;
+exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `22`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
@@ -6404,6 +6450,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -6578,7 +6626,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `18`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -6614,6 +6662,8 @@ Object {
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -6646,7 +6696,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `8`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
@@ -6682,6 +6732,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -6712,7 +6764,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `5`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
@@ -6748,6 +6800,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -7535,7 +7589,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `54`;
+exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `55`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -7571,6 +7625,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -7935,7 +7991,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `27`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `28`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -7971,6 +8027,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8252,7 +8310,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `21`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `22`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -8288,6 +8346,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8490,7 +8550,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `15`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `16`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -8526,6 +8586,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8653,7 +8715,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `9`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `10`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -8689,6 +8751,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -9425,7 +9489,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `51`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `52`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -9461,6 +9525,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10098,7 +10164,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `45`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `46`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -10134,6 +10200,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10676,7 +10744,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `39`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `40`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -10712,6 +10780,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11163,7 +11233,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `33`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `34`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -11199,6 +11269,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11606,7 +11678,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `30`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `31`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -11642,6 +11714,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11964,7 +12038,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `24`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `25`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -12000,6 +12074,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -12241,7 +12317,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `18`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `19`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -12277,6 +12353,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -12441,7 +12519,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `12`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `13`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -12477,6 +12555,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -13264,7 +13344,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `54`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `55`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -13300,6 +13380,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -13986,7 +14068,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `48`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `49`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -14022,6 +14104,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -14611,7 +14695,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `42`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `43`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -14647,6 +14731,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15143,7 +15229,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `36`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `37`;
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
@@ -15179,6 +15265,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15270,7 +15358,7 @@ Object {
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `6`;
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
@@ -15306,6 +15394,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15531,7 +15621,7 @@ Object {
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `12`;
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
@@ -15567,6 +15657,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15792,7 +15884,7 @@ Object {
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `12`;
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
@@ -15828,6 +15920,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15919,7 +16013,7 @@ Object {
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `6`;
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
@@ -15955,6 +16049,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16076,7 +16172,7 @@ Object {
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `7`;
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
@@ -16112,6 +16208,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16282,7 +16380,7 @@ Object {
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `7`;
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
@@ -16318,6 +16416,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -16559,7 +16659,7 @@ Object {
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `13`;
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
@@ -16595,6 +16695,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17315,7 +17417,7 @@ Object {
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `21`;
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `22`;
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
@@ -17351,6 +17453,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17576,7 +17680,7 @@ Object {
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `11`;
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
@@ -17612,6 +17716,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17837,7 +17943,7 @@ Object {
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `11`;
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
@@ -17873,6 +17979,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -18165,7 +18273,7 @@ Object {
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `14`;
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
@@ -18201,6 +18309,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -18439,7 +18549,7 @@ Object {
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `17`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
@@ -18475,6 +18585,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -18651,7 +18763,7 @@ Object {
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `14`;
+exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
@@ -18687,6 +18799,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -18931,7 +19045,7 @@ Object {
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `15`;
+exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests shows context menu for canvas: [end of test] appState 1`] = `
 Object {
@@ -18967,6 +19081,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -18997,7 +19113,7 @@ Object {
 
 exports[`regression tests shows context menu for canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests shows context menu for canvas: [end of test] number of renders 1`] = `2`;
+exports[`regression tests shows context menu for canvas: [end of test] number of renders 1`] = `3`;
 
 exports[`regression tests shows context menu for element: [end of test] appState 1`] = `
 Object {
@@ -19033,6 +19149,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -19124,7 +19242,7 @@ Object {
 
 exports[`regression tests shows context menu for element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests shows context menu for element: [end of test] number of renders 1`] = `6`;
+exports[`regression tests shows context menu for element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
@@ -19160,6 +19278,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -19190,7 +19310,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `5`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
@@ -19226,6 +19346,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -19845,7 +19967,7 @@ Object {
 
 exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `30`;
+exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -19881,6 +20003,8 @@ Object {
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -19913,7 +20037,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `10`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -19949,6 +20073,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -20342,7 +20468,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `24`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `25`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
@@ -20378,6 +20504,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -20419,7 +20547,7 @@ Object {
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `4`;
+exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -20455,6 +20583,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -20485,4 +20615,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `4`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `5`;
