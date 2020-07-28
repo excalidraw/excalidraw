@@ -8,12 +8,14 @@ import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
-      const { element } = appState.editingLinearElement;
+      const { elementId } = appState.editingLinearElement;
+      const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
         return {

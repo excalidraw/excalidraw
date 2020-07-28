@@ -163,8 +163,8 @@ export class SceneHistory {
     for (key in nextEntry.appState) {
       if (key === "editingLinearElement") {
         if (
-          nextEntry.appState[key]?.element.id ===
-          lastEntry.appState[key]?.element.id
+          nextEntry.appState[key]?.elementId ===
+          lastEntry.appState[key]?.elementId
         ) {
           continue;
         }

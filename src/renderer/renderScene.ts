@@ -222,7 +222,9 @@ export const renderScene = (
   });
 
   if (appState.editingLinearElement) {
-    const { element } = appState.editingLinearElement
+    const element = LinearElementEditor.getElement(
+      appState.editingLinearElement.elementId,
+    );
     if (element) {
       renderLinearPointHandles(context, appState, sceneState, element);
     }

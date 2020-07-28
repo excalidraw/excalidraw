@@ -714,7 +714,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (
       this.state.editingLinearElement &&
-      !this.state.selectedElementIds[this.state.editingLinearElement.element.id]
+      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
@@ -1461,9 +1461,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         if (
           !this.state.editingLinearElement ||
-          this.state.editingLinearElement.element.id !== selectedElements[0].id
+          this.state.editingLinearElement.elementId !== selectedElements[0].id
         ) {
           history.resumeRecording();
+          localSceneMap.set(selectedElements[0], this.localScene);
           this.setState({
             editingLinearElement: new LinearElementEditor(selectedElements[0]),
           });
@@ -1764,9 +1765,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         !this.state.editingLinearElement ||
-        this.state.editingLinearElement.element.id !== selectedElements[0].id
+        this.state.editingLinearElement.elementId !== selectedElements[0].id
       ) {
         history.resumeRecording();
+        localSceneMap.set(selectedElements[0], this.localScene);
         this.setState({
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
@@ -2652,7 +2654,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     localSceneMap.set(element, this.localScene);
 
-
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
@@ -3419,7 +3420,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     scale: number,
   ) {
     const elementClickedInside = getElementContainingPosition(
-      this.localScene.getElementsIncludingDeleted()
+      this.localScene
+        .getElementsIncludingDeleted()
         .filter((element) => !isTextElement(element)),
       x,
       y,

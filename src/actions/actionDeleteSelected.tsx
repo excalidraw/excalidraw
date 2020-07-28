@@ -53,8 +53,8 @@ export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
-      const { activePointIndex } = appState.editingLinearElement;
-      const { element } = appState.editingLinearElement;
+      const { elementId, activePointIndex } = appState.editingLinearElement;
+      const element = LinearElementEditor.getElement(elementId);
       if (!element) {
         return false;
       }
