@@ -24,8 +24,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 };
 
 function migrateElementWithProperties<T extends ExcalidrawElement>(
-  element: T,
-  extra: Omit<T, keyof ExcalidrawElement>,
+  element: Required<T>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement>,
 ): T {
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: element.type,
@@ -93,6 +93,7 @@ const migrateElement = (
                 [element.width, element.height],
               ]
             : element.points,
+        lastCommittedPoint: null,
       });
     }
     // generic elements
