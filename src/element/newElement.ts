@@ -210,13 +210,12 @@ export const updateTextElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
-    lastCommittedPoint: opts.lastCommittedPoint || null,
+    lastCommittedPoint: null,
   };
 };
 
