@@ -37,7 +37,7 @@ export const textWysiwyg = ({
   onChange,
   onSubmit,
   getViewportCoords,
-  element
+  element,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;

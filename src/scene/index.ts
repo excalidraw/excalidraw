@@ -15,4 +15,4 @@ export {
   hasText,
 } from "./comparisons";
 export { getZoomOrigin, getNormalizedZoom } from "./zoom";
-export { GlobalScene, localSceneMap } from "./globalScene";
+export { LocalScene, localSceneMap } from "./globalScene";

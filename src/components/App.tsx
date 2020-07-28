@@ -39,7 +39,7 @@ import {
   getElementContainingPosition,
   getNormalizedZoom,
   getSelectedElements,
-  GlobalScene,
+  LocalScene,
   localSceneMap,
   isSomeElementSelected,
   calculateScrollCenter,
@@ -248,7 +248,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
-  private localScene: GlobalScene;
+  private localScene: LocalScene;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -268,7 +268,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...this.getCanvasOffsets(),
     };
 
-    this.localScene = new GlobalScene();
+    this.localScene = new LocalScene();
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,

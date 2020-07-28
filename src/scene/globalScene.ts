@@ -17,9 +17,9 @@ export interface SceneStateCallbackRemover {
   (): void;
 }
 
-const localSceneMap = new WeakMap<ExcalidrawElement, GlobalScene>();
+const localSceneMap = new WeakMap<ExcalidrawElement, LocalScene>();
 
-class GlobalScene {
+class LocalScene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
@@ -79,4 +79,4 @@ class GlobalScene {
   }
 }
 
-export { GlobalScene, localSceneMap };
+export { LocalScene, localSceneMap };
