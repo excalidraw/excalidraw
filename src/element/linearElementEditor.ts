@@ -21,12 +21,11 @@ export class LinearElementEditor {
   public lastUncommittedPoint: Point | null;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
-    LinearElementEditor.normalizePoints(element);
-    Scene.cacheElement(element.id, scene);
-
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
+    Scene.cacheElement(this.elementId, scene);
+    LinearElementEditor.normalizePoints(element);
 
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;

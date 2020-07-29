@@ -8,11 +8,22 @@ import {
   isNonDeletedElement,
   getElementMap,
 } from "../element";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
-type ElementKey = ExcalidrawElement | string;
+type ElementStringKey = InstanceType<typeof LinearElementEditor>["elementId"];
+type ElementKey = ExcalidrawElement | ElementStringKey;
 
 export type SceneStateCallback = () => void;
 export type SceneStateCallbackRemover = () => void;
+
+const isStringKey = (
+  elementKey: ElementKey,
+): elementKey is ElementStringKey => {
+  if (typeof elementKey === "string") {
+    return true;
+  }
+  return false;
+};
 
 class Scene {
   // ---------------------------------------------------------------------------
@@ -23,7 +34,7 @@ class Scene {
   private static sceneMapWithId = new Map<string, Scene>();
 
   static cacheElement(elementKey: ElementKey, scene: Scene) {
-    if (typeof elementKey === "string") {
+    if (isStringKey(elementKey)) {
       this.sceneMapWithId.set(elementKey, scene);
     } else {
       this.sceneMapWithElement.set(elementKey, scene);
@@ -31,7 +42,7 @@ class Scene {
   }
 
   static getScene(elementKey: ElementKey): Scene | null {
-    if (typeof elementKey === "string") {
+    if (isStringKey(elementKey)) {
       return this.sceneMapWithId.get(elementKey) || null;
     }
     return this.sceneMapWithElement.get(elementKey) || null;
