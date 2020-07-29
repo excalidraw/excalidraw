@@ -4,14 +4,11 @@ import { ExcalidrawElement } from "../element/types";
 type SceneKey = ExcalidrawElement | string;
 
 class Scene {
-  private static sceneMapWithElement: WeakMap<
+  private static sceneMapWithElement = new WeakMap<
     ExcalidrawElement,
     LocalScene
-  > = new WeakMap<ExcalidrawElement, LocalScene>();
-  private static sceneMapWithId: Map<string, LocalScene> = new Map<
-    string,
-    LocalScene
   >();
+  private static sceneMapWithId = new Map<string, LocalScene>();
   private static sceneId: number = 1;
   private static scene: Map<number, LocalScene> = new Map<number, LocalScene>();
 
