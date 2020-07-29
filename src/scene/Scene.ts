@@ -10,15 +10,13 @@ import {
 } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
-type ElementStringKey = InstanceType<typeof LinearElementEditor>["elementId"];
-type ElementKey = ExcalidrawElement | ElementStringKey;
+type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
+type ElementKey = ExcalidrawElement | ElementIdKey;
 
 export type SceneStateCallback = () => void;
 export type SceneStateCallbackRemover = () => void;
 
-const isStringKey = (
-  elementKey: ElementKey,
-): elementKey is ElementStringKey => {
+const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
   if (typeof elementKey === "string") {
     return true;
   }
@@ -30,22 +28,22 @@ class Scene {
   // static methods/props
   // ---------------------------------------------------------------------------
 
-  private static sceneMapWithElement = new WeakMap<ExcalidrawElement, Scene>();
-  private static sceneMapWithId = new Map<string, Scene>();
+  private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
+  private static sceneMapById = new Map<string, Scene>();
 
-  static cacheElement(elementKey: ElementKey, scene: Scene) {
-    if (isStringKey(elementKey)) {
-      this.sceneMapWithId.set(elementKey, scene);
+  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
+    if (isIdKey(elementKey)) {
+      this.sceneMapById.set(elementKey, scene);
     } else {
-      this.sceneMapWithElement.set(elementKey, scene);
+      this.sceneMapByElement.set(elementKey, scene);
     }
   }
 
   static getScene(elementKey: ElementKey): Scene | null {
-    if (isStringKey(elementKey)) {
-      return this.sceneMapWithId.get(elementKey) || null;
+    if (isIdKey(elementKey)) {
+      return this.sceneMapById.get(elementKey) || null;
     }
-    return this.sceneMapWithElement.get(elementKey) || null;
+    return this.sceneMapByElement.get(elementKey) || null;
   }
 
   // ---------------------------------------------------------------------------
@@ -86,7 +84,7 @@ class Scene {
     this.elements = nextElements;
     this.elementsMap = getElementMap(nextElements);
     nextElements.forEach((element) => {
-      Scene.cacheElement(element, this);
+      Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();
@@ -114,9 +112,9 @@ class Scene {
   }
 
   destroy() {
-    Scene.sceneMapWithId.forEach((scene, elementKey) => {
+    Scene.sceneMapById.forEach((scene, elementKey) => {
       if (scene === this) {
-        Scene.sceneMapWithId.delete(elementKey);
+        Scene.sceneMapById.delete(elementKey);
       }
     });
   }

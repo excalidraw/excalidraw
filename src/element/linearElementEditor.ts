@@ -24,7 +24,7 @@ export class LinearElementEditor {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
-    Scene.cacheElement(this.elementId, scene);
+    Scene.mapElementToScene(this.elementId, scene);
     LinearElementEditor.normalizePoints(element);
 
     this.activePointIndex = null;
