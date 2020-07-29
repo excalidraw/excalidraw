@@ -8,6 +8,7 @@ import {
   isNonDeletedElement,
   getElementMap,
 } from "../element";
+import { Scene } from "./Scene";
 
 export interface SceneStateCallback {
   (): void;
@@ -51,6 +52,9 @@ class LocalScene {
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this.elements = nextElements;
     this.elementsMap = getElementMap(nextElements);
+    nextElements.forEach((element) => {
+      Scene.set(element, this);
+    });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();
   }
