@@ -9,23 +9,16 @@ class Scene {
     LocalScene
   >();
   private static sceneMapWithId = new Map<string, LocalScene>();
-  private static sceneId: number = 1;
-  private static scene: Map<number, LocalScene> = new Map<number, LocalScene>();
 
   static create() {
-    const scene = new LocalScene();
-    const currentSceneId = this.sceneId;
-    this.scene!.set(this.sceneId, scene);
-    this.sceneId++;
-    return { scene, sceneId: currentSceneId };
+    return new LocalScene();
   }
 
-  static set(sceneKey: SceneKey, sceneId: number) {
-    const scene = this.scene.get(sceneId);
+  static set(sceneKey: SceneKey, scene: LocalScene) {
     if (typeof sceneKey === "string") {
-      this.sceneMapWithId.set(sceneKey, scene!);
+      this.sceneMapWithId.set(sceneKey, scene);
     } else {
-      this.sceneMapWithElement.set(sceneKey, scene!);
+      this.sceneMapWithElement.set(sceneKey, scene);
     }
   }
 
@@ -36,8 +29,8 @@ class Scene {
     return this.sceneMapWithElement.get(sceneKey);
   }
 
-  static destory(sceneId: number) {
-    this.scene.delete(sceneId);
+  static destory(scene: LocalScene) {
+    // TODO
   }
 }
 

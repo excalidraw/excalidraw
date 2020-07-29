@@ -253,7 +253,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: LocalScene;
-  private sceneId: number;
 
   constructor(props: ExcalidrawProps) {
     super(props);
@@ -268,9 +267,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...this.getCanvasOffsets(),
     };
 
-    const { scene, sceneId } = Scene.create();
-    this.scene = scene;
-    this.sceneId = sceneId;
+    this.scene = Scene.create();
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -579,7 +576,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.unmounted = true;
     this.removeSceneCallback!();
     this.removeEventListeners();
-    Scene.destory(this.sceneId);
+    Scene.destory(this.scene);
     clearTimeout(touchTimeout);
   }
 
@@ -957,7 +954,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const groupIdMap = new Map();
 
     const newElements = clipboardElements.map((element) => {
-      Scene.set(element, this.sceneId);
+      Scene.set(element, this.scene);
       return duplicateElement(this.state.editingGroupId, groupIdMap, element, {
         x: element.x + dx - minX,
         y: element.y + dy - minY,
@@ -1003,7 +1000,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
     });
 
-    Scene.set(element, this.sceneId);
+    Scene.set(element, this.scene);
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       element,
@@ -1461,7 +1458,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.editingLinearElement.elementId !== selectedElements[0].id
         ) {
           history.resumeRecording();
-          Scene.set(selectedElements[0], this.sceneId);
+          Scene.set(selectedElements[0], this.scene);
           this.setState({
             editingLinearElement: new LinearElementEditor(selectedElements[0]),
           });
@@ -1570,7 +1567,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    Scene.set(element, this.sceneId);
+    Scene.set(element, this.scene);
     const updateElement = (text: string, isDeleted = false) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -1765,7 +1762,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state.editingLinearElement.elementId !== selectedElements[0].id
       ) {
         history.resumeRecording();
-        Scene.set(selectedElements[0], this.sceneId);
+        Scene.set(selectedElements[0], this.scene);
         this.setState({
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
@@ -2605,7 +2602,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
       });
-      Scene.set(element, this.sceneId);
+      Scene.set(element, this.scene);
 
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -2649,7 +2646,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       opacity: this.state.currentItemOpacity,
     });
 
-    Scene.set(element, this.sceneId);
+    Scene.set(element, this.scene);
 
     if (element.type === "selection") {
       this.setState({
