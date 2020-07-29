@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
-import { localSceneMap } from "../scene";
+import { Scene } from "../scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement } from "./types";
@@ -47,7 +47,7 @@ export const textWysiwyg = ({
   element: ExcalidrawElement;
 }) => {
   function updateWysiwygStyle() {
-    const updatedElement = localSceneMap.get(element)!.getElement(id);
+    const updatedElement = Scene.get(element)!.getElement(id);
     if (isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
         updatedElement.x,
@@ -185,7 +185,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = localSceneMap.get(element)!.addCallback(() => {
+  const unbindUpdate = Scene.get(element)!.addCallback(() => {
     updateWysiwygStyle();
     editable.focus();
   });

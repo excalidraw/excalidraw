@@ -17,8 +17,6 @@ export interface SceneStateCallbackRemover {
   (): void;
 }
 
-const localSceneMap = new WeakMap<ExcalidrawElement, LocalScene>();
-
 class LocalScene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
@@ -79,4 +77,4 @@ class LocalScene {
   }
 }
 
-export { LocalScene, localSceneMap };
+export default LocalScene;
