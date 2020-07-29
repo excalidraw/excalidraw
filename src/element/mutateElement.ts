@@ -81,7 +81,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   element.version++;
   element.versionNonce = randomInteger();
-  Scene.get(element)?.informMutation();
+  Scene.getScene(element)?.informMutation();
 };
 
 export const newElementWith = <TElement extends ExcalidrawElement>(

@@ -575,7 +575,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.unmounted = true;
     this.removeSceneCallback!();
     this.removeEventListeners();
-    Scene.destory(this.scene);
+    Scene.destroy(this.scene);
     clearTimeout(touchTimeout);
   }
 

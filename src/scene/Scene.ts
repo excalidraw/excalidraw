@@ -9,7 +9,7 @@ import {
   getElementMap,
 } from "../element";
 
-type SceneKey = ExcalidrawElement | string;
+type ElementKey = ExcalidrawElement | string;
 
 export type SceneStateCallback = () => void;
 export type SceneStateCallbackRemover = () => void;
@@ -22,22 +22,22 @@ class Scene {
   private static sceneMapWithElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapWithId = new Map<string, Scene>();
 
-  static set(sceneKey: SceneKey, scene: Scene) {
-    if (typeof sceneKey === "string") {
-      this.sceneMapWithId.set(sceneKey, scene);
+  static cacheElement(elementKey: ElementKey, scene: Scene) {
+    if (typeof elementKey === "string") {
+      this.sceneMapWithId.set(elementKey, scene);
     } else {
-      this.sceneMapWithElement.set(sceneKey, scene);
+      this.sceneMapWithElement.set(elementKey, scene);
     }
   }
 
-  static get(sceneKey: SceneKey): Scene | null {
-    if (typeof sceneKey === "string") {
-      return this.sceneMapWithId.get(sceneKey) || null;
+  static getScene(elementKey: ElementKey): Scene | null {
+    if (typeof elementKey === "string") {
+      return this.sceneMapWithId.get(elementKey) || null;
     }
-    return this.sceneMapWithElement.get(sceneKey) || null;
+    return this.sceneMapWithElement.get(elementKey) || null;
   }
 
-  static destory(scene: Scene) {
+  static destroy(scene: Scene) {
     // TODO
   }
 
@@ -79,7 +79,7 @@ class Scene {
     this.elements = nextElements;
     this.elementsMap = getElementMap(nextElements);
     nextElements.forEach((element) => {
-      Scene.set(element, this);
+      Scene.cacheElement(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();

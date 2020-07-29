@@ -22,7 +22,7 @@ export class LinearElementEditor {
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     LinearElementEditor.normalizePoints(element);
-    Scene.set(element.id, scene);
+    Scene.cacheElement(element.id, scene);
 
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
@@ -44,7 +44,7 @@ export class LinearElementEditor {
    *  statically guarantee this method returns an ExcalidrawLinearElement)
    */
   static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
-    const element = Scene.get(id)?.getNonDeletedElement(id);
+    const element = Scene.getScene(id)?.getNonDeletedElement(id);
     if (element) {
       return element as NonDeleted<ExcalidrawLinearElement>;
     }

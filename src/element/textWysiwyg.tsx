@@ -47,7 +47,7 @@ export const textWysiwyg = ({
   element: ExcalidrawElement;
 }) => {
   function updateWysiwygStyle() {
-    const updatedElement = Scene.get(element)?.getElement(id);
+    const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
         updatedElement.x,
@@ -185,7 +185,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.get(element)!.addCallback(() => {
+  const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
     editable.focus();
   });
