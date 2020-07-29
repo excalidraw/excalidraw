@@ -153,7 +153,7 @@ import {
   getSelectedGroupIdForElement,
 } from "../groups";
 import { Library } from "../data/library";
-import { SceneStateCallbackRemover, Scene } from "../scene/Scene";
+import { Scene } from "../scene/Scene";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -242,7 +242,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   portal: Portal = new Portal(this);
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   broadcastedElementVersions: Map<string, number> = new Map();
-  removeSceneCallback: SceneStateCallbackRemover | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
@@ -563,7 +562,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    this.removeSceneCallback = this.scene.addCallback(this.onSceneUpdated);
+    this.scene.addCallback(this.onSceneUpdated);
 
     this.addEventListeners();
     this.setState(this.getCanvasOffsets(), () => {
@@ -573,7 +572,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public componentWillUnmount() {
     this.unmounted = true;
-    this.removeSceneCallback!();
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);

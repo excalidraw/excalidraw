@@ -9,8 +9,8 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
 
-export type SceneStateCallback = () => void;
-export type SceneStateCallbackRemover = () => void;
+type SceneStateCallback = () => void;
+type SceneStateCallbackRemover = () => void;
 
 const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
   if (typeof elementKey === "string") {
@@ -112,6 +112,9 @@ class Scene {
         Scene.sceneMapById.delete(elementKey);
       }
     });
+    // done not for memory leaks, but to guard against possible late fires
+    //  (I guess?)
+    this.callbacks.clear();
   }
 }
 
