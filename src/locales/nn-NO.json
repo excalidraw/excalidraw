@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Lim inn",
     "selectAll": "Vel alt",
-    "multiSelect": "",
+    "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
     "copy": "Kopier",
     "copyAsPng": "Kopier til utklippstavla som PNG",
@@ -66,9 +66,9 @@
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
     "toggleGridMode": "Sla på/av rutenett",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "Legg til i bibliotek",
+    "removeFromLibrary": "Fjern frå bibliotek",
+    "libraryLoadingMessage": "Laster bibliotek..."
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -107,7 +107,7 @@
     "couldNotCopyToClipboard": "Kunne ikkje kopiere til utklippstavla. Prøv med nettlesaren Chrome.",
     "decryptFailed": "Kunne ikkje dekryptere data.",
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?"
   },
   "toolBar": {
     "selection": "Vel",
@@ -118,7 +118,7 @@
     "arrow": "Pil",
     "line": "Linje",
     "text": "Tekst",
-    "library": "",
+    "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy"
   },
   "headings": {
@@ -133,7 +133,7 @@
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, CtrlOrCmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Vel eit punkt å flytte eller fjerne, eller hald Alt og klikk for å legge til nye punkt"
   },
   "errorSplash": {

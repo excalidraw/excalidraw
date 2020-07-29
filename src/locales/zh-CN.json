@@ -2,7 +2,7 @@
   "labels": {
     "paste": "粘贴",
     "selectAll": "选择所有",
-    "multiSelect": "",
+    "multiSelect": "将元素添加至选区",
     "moveCanvas": "移动画布",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
@@ -66,9 +66,9 @@
     "ungroup": "取消组选",
     "collaborators": "协作者",
     "toggleGridMode": "切换网格模式",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "addToLibrary": "添加到库中",
+    "removeFromLibrary": "从库中移除",
+    "libraryLoadingMessage": "正在加载库..."
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -107,7 +107,7 @@
     "couldNotCopyToClipboard": "无法复制到剪贴板。请尝试使用 Chrome 浏览器。",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着Excalidraw 的服务器和第三方都无法读取内容。",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？"
   },
   "toolBar": {
     "selection": "选择",
@@ -118,7 +118,7 @@
     "arrow": "箭头",
     "line": "线条",
     "text": "文字",
-    "library": "",
+    "library": "库",
     "lock": "绘制后保持所选的工具栏状态"
   },
   "headings": {
@@ -133,7 +133,7 @@
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl或Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住Alt并点击添加新点"
   },
   "errorSplash": {
