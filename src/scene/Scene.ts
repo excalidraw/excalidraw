@@ -3,11 +3,7 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "../element/types";
-import {
-  getNonDeletedElements,
-  isNonDeletedElement,
-  getElementMap,
-} from "../element";
+import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
@@ -54,9 +50,7 @@ class Scene {
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
-  private elementsMap: {
-    [id: string]: ExcalidrawElement;
-  } = {};
+  private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -67,7 +61,7 @@ class Scene {
   }
 
   getElement(id: ExcalidrawElement["id"]): ExcalidrawElement | null {
-    return this.elementsMap[id] || null;
+    return this.elementsMap.get(id) || null;
   }
 
   getNonDeletedElement(
@@ -82,8 +76,9 @@ class Scene {
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this.elements = nextElements;
-    this.elementsMap = getElementMap(nextElements);
+    this.elementsMap.clear();
     nextElements.forEach((element) => {
+      this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
