@@ -3513,10 +3513,10 @@ if (
   Object.defineProperties(window.h, {
     elements: {
       get() {
-        return this.scene.getElementsIncludingDeleted();
+        return this.app.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.scene.replaceAllElements(elements);
+        return this.app.scene.replaceAllElements(elements);
       },
     },
     history: {
