@@ -10,8 +10,7 @@ import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { SceneHistory } from "../history";
 
-import { Scene } from "../scene";
-import LocalScene from "../scene/LocalScene";
+import { Scene } from "../scene/Scene";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
@@ -21,7 +20,7 @@ export class LinearElementEditor {
   public draggingElementPointIndex: number | null;
   public lastUncommittedPoint: Point | null;
 
-  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: LocalScene) {
+  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     LinearElementEditor.normalizePoints(element);
     Scene.set(element.id, scene);
 

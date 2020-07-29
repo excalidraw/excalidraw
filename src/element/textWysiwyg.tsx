@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
-import { Scene } from "../scene";
+import { Scene } from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement } from "./types";
@@ -47,8 +47,8 @@ export const textWysiwyg = ({
   element: ExcalidrawElement;
 }) => {
   function updateWysiwygStyle() {
-    const updatedElement = Scene.get(element)!.getElement(id);
-    if (isTextElement(updatedElement)) {
+    const updatedElement = Scene.get(element)?.getElement(id);
+    if (updatedElement && isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
         updatedElement.x,
         updatedElement.y,

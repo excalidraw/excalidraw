@@ -39,7 +39,6 @@ import {
   getElementContainingPosition,
   getNormalizedZoom,
   getSelectedElements,
-  Scene,
   isSomeElementSelected,
   calculateScrollCenter,
 } from "../scene";
@@ -137,7 +136,6 @@ import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
-import LocalScene, { SceneStateCallbackRemover } from "../scene/LocalScene";
 import { isLinearElement } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
@@ -155,6 +153,7 @@ import {
   getSelectedGroupIdForElement,
 } from "../groups";
 import { Library } from "../data/library";
+import { SceneStateCallbackRemover, Scene } from "../scene/Scene";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -252,7 +251,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     width: window.innerWidth,
     height: window.innerHeight,
   };
-  private scene: LocalScene;
+  private scene: Scene;
 
   constructor(props: ExcalidrawProps) {
     super(props);
@@ -267,7 +266,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...this.getCanvasOffsets(),
     };
 
-    this.scene = Scene.create();
+    this.scene = new Scene();
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,

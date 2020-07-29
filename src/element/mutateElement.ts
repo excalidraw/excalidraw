@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "./types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
-import { Scene } from "../scene";
+import { Scene } from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
