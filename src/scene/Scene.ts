@@ -37,10 +37,6 @@ class Scene {
     return this.sceneMapWithElement.get(elementKey) || null;
   }
 
-  static destroy(scene: Scene) {
-    // TODO
-  }
-
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -104,6 +100,14 @@ class Scene {
       }
       this.callbacks.delete(cb);
     };
+  }
+
+  destroy() {
+    Scene.sceneMapWithId.forEach((scene, elementKey) => {
+      if (scene === this) {
+        Scene.sceneMapWithId.delete(elementKey);
+      }
+    });
   }
 }
 
