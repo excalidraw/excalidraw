@@ -153,7 +153,7 @@ import {
   getSelectedGroupIdForElement,
 } from "../groups";
 import { Library } from "../data/library";
-import { Scene } from "../scene/Scene";
+import Scene from "../scene/Scene";
 
 /**
  * @param func handler taking at most single parameter (event).

@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
-import { Scene } from "../scene/Scene";
+import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement } from "./types";

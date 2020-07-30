@@ -10,7 +10,7 @@ import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { SceneHistory } from "../history";
 
-import { Scene } from "../scene/Scene";
+import Scene from "../scene/Scene";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
