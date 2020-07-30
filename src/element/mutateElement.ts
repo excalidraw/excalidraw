@@ -7,7 +7,7 @@ import { Point } from "../types";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
-  "id" | "seed" | "version" | "versionNonce"
+  "id" | "version" | "versionNonce"
 >;
 
 // This function tracks updates of text elements for the purposes for collaboration.
