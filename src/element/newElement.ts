@@ -125,7 +125,6 @@ export const newTextElement = (
     },
     {},
   );
-
   return textElement;
 };
 
