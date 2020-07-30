@@ -22,6 +22,8 @@ export function intersect(line1: Line, line2: Line): Point {
   return GA.normalized(GA.meet(line1, line2));
 }
 
+// Projects `point` onto the `line`.
+// The returned point is the closest point on the `line` to the `point`.
 export function project(point: Point, line: Line): Point {
   return intersect(GALine.orthogonal(line, point), line);
 }

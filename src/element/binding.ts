@@ -6,21 +6,20 @@ import {
   PointBinding,
   ExcalidrawElement,
 } from "./types";
-import { AppState, Point } from "../types";
 import { getElementAtPosition } from "../scene";
+import { AppState } from "../types";
 import { isBindableElement, isLinearElement } from "./typeChecks";
 import {
   bindingBorderTest,
-  intersectElementWithLine,
   distanceToBindableElement,
-  pointInAbsoluteCoords,
   maxBindingGap,
+  determineFocusDistance,
+  intersectElementWithLine,
+  determineFocusPoint,
 } from "./collision";
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
-import { centerPoint } from "../math";
 import { LinearElementEditor } from "./linearElementEditor";
-import { pointRelativeTo } from "./bounds";
 import { tupleToCoors } from "../utils";
 
 export const bindOrUnbindLinearElement = (
@@ -81,7 +80,7 @@ const bindLinearElement = (
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
       elementId: hoveredElement.id,
-      ...calculateFocusPointAndGap(linearElement, hoveredElement, startOrEnd),
+      ...calculateFocusAndGap(linearElement, hoveredElement, startOrEnd),
     },
   });
   mutateElement(hoveredElement, {
@@ -130,11 +129,11 @@ export const getHoveredElementForBinding = (
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
 
-const calculateFocusPointAndGap = (
+const calculateFocusAndGap = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
-): { focusPoint: Point; gap: number } => {
+): { focus: number; gap: number } => {
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
@@ -146,24 +145,8 @@ const calculateFocusPointAndGap = (
     linearElement,
     adjacentPointIndex,
   );
-  const intersections = intersectElementWithLine(
-    hoveredElement,
-    adjacentPoint,
-    edgePoint,
-  );
-  if (intersections.length === 0) {
-    // The linear element is not pointing at the shape, just bind to
-    // the position of the edge point
-    return { focusPoint: pointRelativeTo(hoveredElement, edgePoint), gap: 0 };
-  }
-
-  const [intersectionNear, intersectionFar] = intersections;
-
   return {
-    focusPoint: pointRelativeTo(
-      hoveredElement,
-      centerPoint(intersectionNear, intersectionFar),
-    ),
+    focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
     gap: distanceToBindableElement(hoveredElement, edgePoint),
   };
 };
@@ -195,12 +178,12 @@ export const updateBoundElements = (
     if (!doesNeedUpdate(linearElement, bindingElement)) {
       return;
     }
-    const startBinding = maybeCalculateFocusPointAndGapWhenScaling(
+    const startBinding = maybeCalculateNewGapWhenScaling(
       bindingElement,
       linearElement.startBinding,
       newSize,
     );
-    const endBinding = maybeCalculateFocusPointAndGapWhenScaling(
+    const endBinding = maybeCalculateNewGapWhenScaling(
       bindingElement,
       linearElement.endBinding,
       newSize,
@@ -270,32 +253,35 @@ const updateBoundPoint = (
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
-  const draggedFocusPointAbsolute = pointInAbsoluteCoords(
+  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    adjacentPointIndex,
+  );
+  const focusPointAbsolute = determineFocusPoint(
     bindingElement,
-    binding.focusPoint,
+    binding.focus,
+    adjacentPoint,
   );
   let newEdgePoint;
   // The linear element was not originally pointing inside the bound shape,
-  // we use simple binding without focus points
+  // we can point directly at the focus point
   if (binding.gap === 0) {
-    newEdgePoint = draggedFocusPointAbsolute;
+    newEdgePoint = focusPointAbsolute;
   } else {
-    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      adjacentPointIndex,
-    );
     const intersections = intersectElementWithLine(
       bindingElement,
       adjacentPoint,
-      draggedFocusPointAbsolute,
+      focusPointAbsolute,
       binding.gap,
     );
     if (intersections.length === 0) {
-      // TODO: This should never happen, but it does due to scaling/rotating
-      return;
+      // This should never happen, since focusPoint should always be
+      // inside the element, but just in case, bail out
+      newEdgePoint = focusPointAbsolute;
+    } else {
+      // Guaranteed to intersect because focusPoint is always inside the shape
+      newEdgePoint = intersections[0];
     }
-    // Guaranteed to intersect because focusPoint is always inside the shape
-    newEdgePoint = intersections[0];
   }
   LinearElementEditor.movePoint(
     linearElement,
@@ -305,7 +291,7 @@ const updateBoundPoint = (
   );
 };
 
-const maybeCalculateFocusPointAndGapWhenScaling = (
+const maybeCalculateNewGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
   currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
@@ -313,20 +299,14 @@ const maybeCalculateFocusPointAndGapWhenScaling = (
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focusPoint, elementId } = currentBinding;
+  const { gap, focus, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.min(
     maxBindingGap(newWidth, newHeight),
     gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
   );
-
-  const [x, y] = focusPoint;
-  const newFocusPoint: Point = [
-    x * (newWidth / width),
-    y * (newHeight / height),
-  ];
-  return { elementId, gap: newGap, focusPoint: newFocusPoint };
+  return { elementId, gap: newGap, focus };
 };
 
 export const getEligibleElementsForBinding = (
