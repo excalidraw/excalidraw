@@ -16,6 +16,7 @@ export class LinearElementEditor {
     _brand: "excalidrawLinearElementId";
   };
   public activePointIndex: number | null;
+  /** whether you're dragging a point */
   public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
 
