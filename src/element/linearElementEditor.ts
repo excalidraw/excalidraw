@@ -3,7 +3,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawElement,
 } from "./types";
-import { distance2d, rotate, isPathALoop } from "../math";
+import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
@@ -20,6 +20,7 @@ export class LinearElementEditor {
   /** whether you're dragging a point */
   public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
+  public pointerOffset: { x: number; y: number };
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -31,6 +32,7 @@ export class LinearElementEditor {
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
     this.isDragging = false;
+    this.pointerOffset = { x: 0, y: 0 };
   }
 
   // ---------------------------------------------------------------------------
@@ -57,8 +59,6 @@ export class LinearElementEditor {
     setState: React.Component<any, AppState>["setState"],
     scenePointerX: number,
     scenePointerY: number,
-    lastX: number,
-    lastY: number,
   ): boolean {
     if (!appState.editingLinearElement) {
       return false;
@@ -80,18 +80,14 @@ export class LinearElementEditor {
           },
         });
       }
-      const [deltaX, deltaY] = rotate(
-        scenePointerX - lastX,
-        scenePointerY - lastY,
-        0,
-        0,
-        -element.angle,
+
+      const newPoint = LinearElementEditor.createPointAt(
+        element,
+        scenePointerX - editingLinearElement.pointerOffset.x,
+        scenePointerY - editingLinearElement.pointerOffset.y,
+        appState.gridSize,
       );
-      const targetPoint = element.points[activePointIndex];
-      LinearElementEditor.movePoint(element, activePointIndex, [
-        targetPoint[0] + deltaX,
-        targetPoint[1] + deltaY,
-      ]);
+      LinearElementEditor.movePoint(element, activePointIndex, newPoint);
       return true;
     }
     return false;
@@ -120,13 +116,11 @@ export class LinearElementEditor {
           : element.points[0],
       );
     }
-    if (isDragging) {
-      return {
-        ...editingLinearElement,
-        isDragging: false,
-      };
-    }
-    return editingLinearElement;
+    return {
+      ...editingLinearElement,
+      isDragging: false,
+      pointerOffset: { x: 0, y: 0 },
+    };
   }
 
   static handlePointerDown(
@@ -165,6 +159,7 @@ export class LinearElementEditor {
               element,
               scenePointerX,
               scenePointerY,
+              appState.gridSize,
             ),
           ],
         });
@@ -194,10 +189,29 @@ export class LinearElementEditor {
       ret.hitElement = element;
     }
 
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const targetPoint =
+      clickedPointIndex > -1 &&
+      rotate(
+        element.x + element.points[clickedPointIndex][0],
+        element.y + element.points[clickedPointIndex][1],
+        cx,
+        cy,
+        element.angle,
+      );
+
     setState({
       editingLinearElement: {
         ...appState.editingLinearElement,
         activePointIndex: clickedPointIndex > -1 ? clickedPointIndex : null,
+        pointerOffset: targetPoint
+          ? {
+              x: scenePointerX - targetPoint[0],
+              y: scenePointerY - targetPoint[1],
+            }
+          : { x: 0, y: 0 },
       },
     });
     return ret;
@@ -208,6 +222,7 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     editingLinearElement: LinearElementEditor,
+    gridSize: number | null,
   ): LinearElementEditor {
     const { elementId, lastUncommittedPoint } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
@@ -227,8 +242,9 @@ export class LinearElementEditor {
 
     const newPoint = LinearElementEditor.createPointAt(
       element,
-      scenePointerX,
-      scenePointerY,
+      scenePointerX - editingLinearElement.pointerOffset.x,
+      scenePointerY - editingLinearElement.pointerOffset.y,
+      gridSize,
     );
 
     if (lastPoint === lastUncommittedPoint) {
@@ -288,13 +304,15 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     scenePointerX: number,
     scenePointerY: number,
+    gridSize: number | null,
   ): Point {
+    const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     const [rotatedX, rotatedY] = rotate(
-      scenePointerX,
-      scenePointerY,
+      pointerOnGrid[0],
+      pointerOnGrid[1],
       cx,
       cy,
       -element.angle,
