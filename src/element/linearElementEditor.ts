@@ -16,7 +16,7 @@ export class LinearElementEditor {
     _brand: "excalidrawLinearElementId";
   };
   public activePointIndex: number | null;
-  public draggingElementPointIndex: number | null;
+  public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
@@ -27,7 +27,7 @@ export class LinearElementEditor {
     };
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
-    this.draggingElementPointIndex = null;
+    this.isDragging = false;
   }
 
   // ---------------------------------------------------------------------------
@@ -61,38 +61,22 @@ export class LinearElementEditor {
       return false;
     }
     const { editingLinearElement } = appState;
-    let { draggingElementPointIndex, elementId } = editingLinearElement;
+    const { activePointIndex, elementId, isDragging } = editingLinearElement;
 
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return false;
     }
 
-    const clickedPointIndex =
-      draggingElementPointIndex ??
-      LinearElementEditor.getPointIndexUnderCursor(
-        element,
-        appState.zoom,
-        scenePointerX,
-        scenePointerY,
-      );
-
-    draggingElementPointIndex = draggingElementPointIndex ?? clickedPointIndex;
-    if (draggingElementPointIndex > -1) {
-      if (
-        editingLinearElement.draggingElementPointIndex !==
-          draggingElementPointIndex ||
-        editingLinearElement.activePointIndex !== clickedPointIndex
-      ) {
+    if (activePointIndex != null && activePointIndex > -1) {
+      if (isDragging === false) {
         setState({
           editingLinearElement: {
             ...editingLinearElement,
-            draggingElementPointIndex,
-            activePointIndex: clickedPointIndex,
+            isDragging: true,
           },
         });
       }
-
       const [deltaX, deltaY] = rotate(
         scenePointerX - lastX,
         scenePointerY - lastY,
@@ -100,8 +84,8 @@ export class LinearElementEditor {
         0,
         -element.angle,
       );
-      const targetPoint = element.points[clickedPointIndex];
-      LinearElementEditor.movePoint(element, clickedPointIndex, [
+      const targetPoint = element.points[activePointIndex];
+      LinearElementEditor.movePoint(element, activePointIndex, [
         targetPoint[0] + deltaX,
         targetPoint[1] + deltaY,
       ]);
@@ -113,30 +97,30 @@ export class LinearElementEditor {
   static handlePointerUp(
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { elementId, draggingElementPointIndex } = editingLinearElement;
+    const { elementId, activePointIndex, isDragging } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return editingLinearElement;
     }
 
     if (
-      draggingElementPointIndex !== null &&
-      (draggingElementPointIndex === 0 ||
-        draggingElementPointIndex === element.points.length - 1) &&
+      isDragging &&
+      (activePointIndex === 0 ||
+        activePointIndex === element.points.length - 1) &&
       isPathALoop(element.points)
     ) {
       LinearElementEditor.movePoint(
         element,
-        draggingElementPointIndex,
-        draggingElementPointIndex === 0
+        activePointIndex,
+        activePointIndex === 0
           ? element.points[element.points.length - 1]
           : element.points[0],
       );
     }
-    if (draggingElementPointIndex !== null) {
+    if (isDragging) {
       return {
         ...editingLinearElement,
-        draggingElementPointIndex: null,
+        isDragging: false,
       };
     }
     return editingLinearElement;

@@ -1877,7 +1877,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (
       this.state.editingLinearElement &&
-      this.state.editingLinearElement.draggingElementPointIndex === null
+      !this.state.editingLinearElement.isDragging
     ) {
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
