@@ -1883,6 +1883,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         scenePointerX,
         scenePointerY,
         this.state.editingLinearElement,
+        this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
         this.setState({ editingLinearElement });
@@ -2778,8 +2779,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           (appState) => this.setState(appState),
           x,
           y,
-          pointerDownState.lastCoords.x,
-          pointerDownState.lastCoords.y,
         );
 
         if (didDrag) {
