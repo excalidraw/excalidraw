@@ -1364,6 +1364,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }
 
+  setCurrentItemColor({
+    background,
+    stroke,
+  }: {
+    background: string;
+    stroke: string;
+  }) {
+    this.setState({
+      currentItemBackgroundColor: background,
+      currentItemStrokeColor: stroke,
+    });
+  }
+
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
