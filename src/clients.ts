@@ -1,4 +1,6 @@
 import colors from "./colors";
+import { t } from "./i18n";
+import { Collaborator } from "./types";
 
 export const getClientColors = (clientId: string) => {
   // Naive way of getting an integer out of the clientId
@@ -27,4 +29,19 @@ export const getClientInitials = (username?: string | null) => {
   const lastName = names[names.length - 1];
 
   return (firstName[0] + lastName[0]).toUpperCase();
+};
+
+export const getClientFullName = (client: Collaborator) => {
+  if (client.self) {
+    if (client.username) {
+      return `${client.username} (${t(
+        "userList.tooltipForMyself",
+      ).toLocaleLowerCase()})`;
+    }
+    return t("userList.tooltipForMyself");
+  }
+  if (client.username) {
+    return client.username;
+  }
+  return t("userList.tooltipForUnknownUser");
 };

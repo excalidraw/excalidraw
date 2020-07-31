@@ -121,6 +121,10 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing"
   },
+  "userList": {
+    "tooltipForMyself": "Me",
+    "tooltipForUnknownUser": "Unknown user"
+  },
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",

@@ -3,7 +3,6 @@ import { encryptAESGEM } from "../data";
 import { SocketUpdateData } from "../types";
 import { BROADCAST, SCENE } from "../constants";
 import App from "./App";
-import { getClientColors } from "../clients";
 
 class Portal {
   app: App;
@@ -27,7 +26,7 @@ class Portal {
         this.socket.emit("join-room", this.roomID);
 
         this.app.restoreUserName();
-        this.app.setCurrentItemColor(getClientColors(this.socket.id));
+        this.app.setCurrentCollaborator(this.socket.id);
       }
     });
     this.socket.on("new-user", async (_socketID: string) => {
@@ -55,6 +54,12 @@ class Portal {
       this.roomID &&
       this.roomKey
     );
+  }
+
+  reset() {
+    if (this.socket) {
+      this.app.setCurrentCollaborator(this.socket.id);
+    }
   }
 
   async _broadcastSocketData(

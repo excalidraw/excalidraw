@@ -154,6 +154,7 @@ import {
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
+import { getClientColors } from "../clients";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -278,6 +279,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.registerAction(createRedoAction(history));
   }
 
+  private changeUsername(username: string) {
+    saveUsernameToLocalStorage(username);
+    this.setState({
+      username,
+    });
+    this.portal.reset();
+  }
+
   public render() {
     const {
       zenModeEnabled,
@@ -311,12 +320,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           elements={this.scene.getElements()}
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
-          onUsernameChange={(username) => {
-            saveUsernameToLocalStorage(username);
-            this.setState({
-              username,
-            });
-          }}
+          onUsernameChange={(username) => this.changeUsername(username)}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
             this.addElementsFromPasteOrLibrary(elements)
@@ -1240,6 +1244,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 user.button = button;
                 user.selectedElementIds = selectedElementIds;
                 user.username = username;
+                user.self = false;
                 state.collaborators.set(socketID, user);
                 return state;
               });
@@ -1278,6 +1283,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         collaborators,
       };
     });
+  }
+
+  setCurrentCollaborator(socketId: string) {
+    const color = getClientColors(socketId);
+
+    this.setState((state) => ({
+      ...state,
+      currentItemBackgroundColor: color.background,
+      currentItemStrokeColor: color.stroke,
+      collaborators: new Map([
+        ...state.collaborators,
+        [
+          socketId,
+          {
+            username: state.username,
+            self: true,
+          },
+        ],
+      ]),
+    }));
   }
 
   private broadcastMouseLocation = (payload: {
@@ -1362,19 +1387,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         username,
       });
     }
-  }
-
-  setCurrentItemColor({
-    background,
-    stroke,
-  }: {
-    background: string;
-    stroke: string;
-  }) {
-    this.setState({
-      currentItemBackgroundColor: background,
-      currentItemStrokeColor: stroke,
-    });
   }
 
   // Input handling

@@ -24,6 +24,7 @@ export type Collaborator = {
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
+  self?: boolean;
 };
 
 export type AppState = {

@@ -43,6 +43,7 @@ import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
+import { getClientFullName } from "../clients";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -465,17 +466,11 @@ const LayerUI = ({
               zenModeEnabled && "transition-right"
             }`}
           >
-            {Array.from(appState.collaborators)
-              // Collaborator is either not initialized or is actually the current user.
-              .filter(([_, client]) => Object.keys(client).length !== 0)
-              .map(([clientId, client]) => (
-                <Tooltip
-                  label={client.username || "Unknown user"}
-                  key={clientId}
-                >
-                  {actionManager.renderAction("goToCollaborator", clientId)}
-                </Tooltip>
-              ))}
+            {Array.from(appState.collaborators).map(([clientId, client]) => (
+              <Tooltip label={getClientFullName(client)} key={clientId}>
+                {actionManager.renderAction("goToCollaborator", clientId)}
+              </Tooltip>
+            ))}
           </UserList>
         </div>
       </FixedSideContainer>
