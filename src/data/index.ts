@@ -52,8 +52,8 @@ export type SocketUpdateDataSource = {
   MOUSE_LOCATION: {
     type: "MOUSE_LOCATION";
     payload: {
-      socketID: string;
-      pointerCoords: { x: number; y: number };
+      socketId: string;
+      pointer: { x: number; y: number };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
