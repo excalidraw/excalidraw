@@ -1235,19 +1235,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
-              this.setState((state) => {
-                if (!state.collaborators.has(socketID)) {
-                  state.collaborators.set(socketID, {});
-                }
-                const user = state.collaborators.get(socketID)!;
-                user.pointer = pointerCoords;
-                user.button = button;
-                user.selectedElementIds = selectedElementIds;
-                user.username = username;
-                user.self = false;
-                state.collaborators.set(socketID, user);
-                return state;
-              });
+              this.setState((state) => ({
+                ...state,
+                collaborators: new Map([
+                  ...state.collaborators,
+                  [
+                    socketID,
+                    {
+                      ...state.collaborators.get(socketID),
+                      pointer: pointerCoords,
+                      button,
+                      selectedElementIds,
+                      username,
+                      self: false,
+                    },
+                  ],
+                ]),
+              }));
               break;
             }
           }
