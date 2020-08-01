@@ -13,7 +13,7 @@ import {
   bindingBorderTest,
   distanceToBindableElement,
   maxBindingGap,
-  determineFocusDistance,
+  determineFocus,
   intersectElementWithLine,
   determineFocusPoint,
 } from "./collision";
@@ -81,7 +81,7 @@ const bindLinearElement = (
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
       elementId: hoveredElement.id,
       ...calculateFocusAndGap(linearElement, hoveredElement, startOrEnd),
-    },
+    } as PointBinding,
   });
   mutateElement(hoveredElement, {
     boundElementIds: [
@@ -133,7 +133,7 @@ const calculateFocusAndGap = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
-): { focus: number; gap: number } => {
+): { focusDistance: number; focusAngle: number; gap: number } => {
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
   const adjacentPointIndex = edgePointIndex - direction;
@@ -146,7 +146,7 @@ const calculateFocusAndGap = (
     adjacentPointIndex,
   );
   return {
-    focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
+    ...determineFocus(hoveredElement, adjacentPoint, edgePoint),
     gap: distanceToBindableElement(hoveredElement, edgePoint),
   };
 };
@@ -259,7 +259,8 @@ const updateBoundPoint = (
   );
   const focusPointAbsolute = determineFocusPoint(
     bindingElement,
-    binding.focus,
+    binding.focusDistance,
+    binding.focusAngle,
     adjacentPoint,
   );
   let newEdgePoint;
@@ -299,14 +300,20 @@ const maybeCalculateNewGapWhenScaling = (
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focus, elementId } = currentBinding;
+
+  // `focusDistance` is already relative to the size of the element
+  // so it doesn't need scaling.
+  const { gap, focusDistance, focusAngle, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.min(
     maxBindingGap(newWidth, newHeight),
     gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
   );
-  return { elementId, gap: newGap, focus };
+  const scaleRatio = newWidth / width / (newHeight / height);
+  const newFocusAngle = Math.atan(scaleRatio * Math.tan(focusAngle));
+
+  return { elementId, gap: newGap, focusDistance, focusAngle: newFocusAngle };
 };
 
 export const getEligibleElementsForBinding = (

@@ -85,7 +85,8 @@ export type ExcalidrawBindableElement =
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
-  focus: number;
+  focusDistance: number;
+  focusAngle: number;
   gap: number;
 };
 
