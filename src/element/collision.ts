@@ -302,31 +302,21 @@ const coordsCenter = ([ax, ay, bx, by]: Bounds): GA.Point => {
   return GA.point((ax + bx) / 2, (ay + by) / 2);
 };
 
-// Given points A, B, finds a focus point and returns the focus distance and
-// angle.
-//
-// The focus point lies half way between the two intersections of the
-// the line AB and the `element`.
-//
-// The focus distance is the distance of the `element` center to the
-// the focus point, relative to the size of the `element`, so it's a number
-// between -1 and 1.
-//
-// The focus angle is the angle between line AB and the line going through
-// the element center and the focus point.
-export const determineFocus = (
+// The focus distance is the oriented distance of the `element` center to the
+// the line going through `a` and `b`, relative to the size of the `element`,
+// so it's a number between -1 and 1.
+export const determineFocusDistance = (
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
   // Another point on the line, in absolute coordinates (closer to element)
   b: Point,
-): { focusDistance: number; focusAngle: number } => {
+): number => {
   const relateToCenter = relativizationToElementCenter(element);
   const aRel = GATransform.apply(relateToCenter, GAPoint.from(a));
   const bRel = GATransform.apply(relateToCenter, GAPoint.from(b));
   const line = GALine.through(aRel, bRel);
-  const [i1, i2] = getSortedElementLineIntersections(element, line, bRel, 0);
-  const focusPoint = GAPoint.center(i1, i2);
+  const focusPoint = GAPoint.project(GA.origin(), line);
   const focusLine = GALine.through(GA.origin(), focusPoint);
   const focusVertex = getSortedElementLineIntersections(
     element,
@@ -334,64 +324,39 @@ export const determineFocus = (
     focusPoint,
     0,
   )[0];
-  const focusDistance =
-    GAPoint.distanceToLine(GA.origin(), line) / GA.inorm(focusVertex);
-  const focusAngle = -Math.sign(focusDistance) * GALine.angle(line, focusLine);
-  return { focusDistance: Math.abs(focusDistance), focusAngle };
+
+  return -GAPoint.distanceToLine(GA.origin(), line) / GA.inorm(focusVertex);
 };
 
 export const determineFocusPoint = (
   element: ExcalidrawBindableElement,
-  // The relative distance from the center of `element` of the returned point
-  focusDistance: number,
-  // The oriented angle between the lines going through the `element` center
-  // and the `adjacentPoint` and the returned point
-  focusAngle: number,
+  // The oriented, relative distance from the center of `element` of the
+  // returned focusPoint
+  focus: number,
   adjecentPoint: Point,
 ): Point => {
-  // TODO:
-  // if (focus === 0) {
-  //   const elementCoords = getElementAbsoluteCoords(element);
-  //   const center = coordsCenter(elementCoords);
-  //   return GAPoint.toTuple(center);
-  // }
+  if (focus === 0) {
+    const elementCoords = getElementAbsoluteCoords(element);
+    const center = coordsCenter(elementCoords);
+    return GAPoint.toTuple(center);
+  }
   const relateToCenter = relativizationToElementCenter(element);
   const adjecentPointRel = GATransform.apply(
     relateToCenter,
     GAPoint.from(adjecentPoint),
   );
-
-  const rawCenter = GA.mul(adjecentPointRel, 0.5);
-  const focusCenter = GA.add(
-    rawCenter,
-    GA.mul(
-      GADirection.orthogonal(rawCenter),
-      GA.inorm(rawCenter) / Math.tan(focusAngle),
-    ),
-  );
-
+  const reverseRelateToCenter = GA.reverse(relateToCenter);
   let point;
   switch (element.type) {
     case "rectangle":
     case "text":
     case "diamond":
-      point = findFocusPointForRectangulars(
-        element,
-        focusDistance,
-        focusAngle,
-        focusCenter,
-      );
+      point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
       break;
     case "ellipse":
-      point = findFocusPointForEllipse(
-        element,
-        focusDistance,
-        focusAngle,
-        focusCenter,
-      );
+      point = findFocusPointForEllipse(element, focus, adjecentPointRel);
       break;
   }
-  const reverseRelateToCenter = GA.reverse(relateToCenter);
   return GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point));
 };
 
@@ -588,17 +553,18 @@ export const findFocusPointForEllipse = (
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the ellipse. Sign determines orientation.
   relativeDistance: number,
-  // The sign determines the orientation.
-  focusAngle: number,
-  // The center of the focus circle (circle on which the focus point must lie)
+  // The point for which we're trying to find the focus point, relative
+  // to the ellipse center.
   point: GA.Point,
 ): GA.Point => {
-  const a = (ellipse.width * relativeDistance) / 2;
-  const b = (ellipse.height * relativeDistance) / 2;
-  const orientation = Math.sign(focusAngle);
+  const relativeDistanceAbs = Math.abs(relativeDistance);
+  const a = (ellipse.width * relativeDistanceAbs) / 2;
+  const b = (ellipse.height * relativeDistanceAbs) / 2;
+  const orientation = Math.sign(relativeDistance);
 
-  // P is the center of the circle on which the focus point will lie
-  const [px, py] = GAPoint.toTuple(point);
+  // P is the center of the circle with diamater over the segment from
+  // `ellipse` center to `point`
+  const [px, py] = GAPoint.toTuple(GA.mul(point, 0.5));
   // r(P) is its radius
   const rp = Math.hypot(px, py);
 
@@ -663,33 +629,29 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawRectangleElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
-  // Between 0 and 1 for how far away should the focus point be relative
-  // to the size of the element.
+  // Between -1 and 1 for how far away should the focus point be relative
+  // to the size of the element. Sign determines orientation.
   relativeDistance: number,
-  // The sign determines the orientation.
-  focusAngle: number,
-  // The center of the focus circle (circle on which the focus point must lie)
+  // The point for which we're trying to find the focus point, relative
+  // to the element center.
   point: GA.Point,
 ): GA.Point => {
-  const side = focusAngle > 0 ? 0 : 1;
+  const relativeDistanceAbs = Math.abs(relativeDistance);
+  const side = relativeDistance > 0 ? 0 : 1;
 
-  const p = point;
+  // P is the center of the circle with diamater over the segment from
+  // `ellipse` center to `point`
+  const p = GA.mul(point, 0.5);
   // r(P) is its radius
   const rp = GA.inorm(p);
 
-  const corners = getCorners(element, relativeDistance);
+  const corners = getCorners(element, relativeDistanceAbs);
   return corners.flatMap((point, i) => {
     const a = point;
     const b = corners[(i + 1) % 4];
-    const isAIn = GAPoint.distance(a, p) < rp;
-    const isBIn = GAPoint.distance(b, p) < rp;
-    // This wouldn't work in general for segment x circle intersection,
-    // but works fine here because we know that the circle goes through
-    // element center and outside the element.
-    if (isAIn === isBIn) {
+    if (GAPoint.distance(a, p) > rp && GAPoint.distance(b, p) > rp) {
       return [];
     }
-
     return [getCircleIntersections(p, rp, GALine.through(a, b))[side]];
   })[0];
 };

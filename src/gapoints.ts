@@ -28,19 +28,6 @@ export function project(point: Point, line: Line): Point {
   return intersect(GALine.orthogonal(line, point), line);
 }
 
-export function center(point1: Point, point2: Point): Point {
-  return [
-    0,
-    0,
-    0,
-    0,
-    (point1[4] + point2[4]) / 2,
-    (point1[5] + point2[5]) / 2,
-    1,
-    0,
-  ];
-}
-
 export function distance(point1: Point, point2: Point): number {
   return GA.norm(join(point1, point2));
 }

@@ -191,6 +191,10 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   return Math.hypot(xd, yd);
 };
 
+export const centerPoint = (a: Point, b: Point): Point => {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+};
+
 // Checks if the first and last point are close enough
 // to be considered a loop
 export const isPathALoop = (
