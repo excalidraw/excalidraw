@@ -302,9 +302,11 @@ const coordsCenter = ([ax, ay, bx, by]: Bounds): GA.Point => {
   return GA.point((ax + bx) / 2, (ay + by) / 2);
 };
 
-// The focus distance is the oriented distance of the `element` center to the
-// the line going through `a` and `b`, relative to the size of the `element`,
-// so it's a number between -1 and 1.
+// The focus distance is the oriented ratio between the size of
+// the `element` and the "focus image" of the element on which
+// all focus points lie, so it's a number between -1 and 1.
+// The line going through `a` and `b` is a tangent to the "focus image"
+// of the element.
 export const determineFocusDistance = (
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
@@ -316,16 +318,23 @@ export const determineFocusDistance = (
   const aRel = GATransform.apply(relateToCenter, GAPoint.from(a));
   const bRel = GATransform.apply(relateToCenter, GAPoint.from(b));
   const line = GALine.through(aRel, bRel);
-  const focusPoint = GAPoint.project(GA.origin(), line);
-  const focusLine = GALine.through(GA.origin(), focusPoint);
-  const focusVertex = getSortedElementLineIntersections(
-    element,
-    focusLine,
-    focusPoint,
-    0,
-  )[0];
-
-  return -GAPoint.distanceToLine(GA.origin(), line) / GA.inorm(focusVertex);
+  const q = element.height / element.width;
+  const hwidth = element.width / 2;
+  const hheight = element.height / 2;
+  const n = line[2];
+  const m = line[3];
+  const c = line[1];
+  const mabs = Math.abs(m);
+  const nabs = Math.abs(n);
+  switch (element.type) {
+    case "rectangle":
+    case "text":
+      return c / (hwidth * (nabs + q * mabs));
+    case "diamond":
+      return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+    case "ellipse":
+      return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+  }
 };
 
 export const determineFocusPoint = (
@@ -543,15 +552,12 @@ export const getCircleIntersections = (
   ];
 };
 
-// The focus point sits at the intersection of the resized ellipse by
-// abs(relativeDistance) and a circle with diameter over the segment from
-// `ellipse` center to `point`. The traingle [`point`, focus point,
-// center of the ellipse] is hence a right triangle, with the right angle at
-// focus point.
+// The focus point is the tangent point of the "focus image" of the
+// `element`, where the tangent goes through `point`.
 export const findFocusPointForEllipse = (
   ellipse: ExcalidrawEllipseElement,
-  // Between -1 and 1 for how far away should the focus point be relative
-  // to the size of the ellipse. Sign determines orientation.
+  // Between -1 and 1 (not 0) the relative size of the "focus image" of
+  // the element on which the focus point lies
   relativeDistance: number,
   // The point for which we're trying to find the focus point, relative
   // to the ellipse center.
@@ -560,68 +566,21 @@ export const findFocusPointForEllipse = (
   const relativeDistanceAbs = Math.abs(relativeDistance);
   const a = (ellipse.width * relativeDistanceAbs) / 2;
   const b = (ellipse.height * relativeDistanceAbs) / 2;
+
   const orientation = Math.sign(relativeDistance);
+  const [px, pyo] = GAPoint.toTuple(point);
+  // The calculation below can't handle py = 0
+  const py = pyo === 0 ? 0.0001 : pyo;
 
-  // P is the center of the circle with diamater over the segment from
-  // `ellipse` center to `point`
-  const [px, py] = GAPoint.toTuple(GA.mul(point, 0.5));
-  // r(P) is its radius
-  const rp = Math.hypot(px, py);
+  const squares = px ** 2 * b ** 2 + py ** 2 * a ** 2;
+  // Tangent mx + ny + 1 = 0
+  const m =
+    (-px * b ** 2 + orientation * py * Math.sqrt(squares - a ** 2 * b ** 2)) /
+    squares;
+  const n = (-m * px - 1) / py;
 
-  // We need to start with a point on the ellipse
-  // we want a point close to P, not in the extremes as it might not
-  // intersect
-  let tx = a > b ? 0 : px > 0 ? 0.707 : -0.707;
-  let ty = a < b ? 0 : py > 0 ? 0.707 : -0.707;
-
-  [0, 1, 2, 3].forEach((_) => {
-    // Approximate the ellipse with a circle using the evolute
-    // C is the center of the approximation
-    const cx = ((a * a - b * b) * tx ** 3) / a;
-    const cy = ((b * b - a * a) * ty ** 3) / b;
-    // r(C) is its radius
-    const rc =
-      a * a * b * b * ((tx * tx) / (a * a) + (ty * ty) / (b * b)) ** (3 / 2);
-
-    // Find the intersection between the approximation and circle around P
-    // PP is P relative to the approximation
-    const ppx = px - cx;
-    const ppy = py - cy;
-
-    const d = Math.hypot(ppx, ppy);
-    if (d === 0) {
-      // Bail out
-      return GA.origin();
-    }
-    const l = (0.5 * (rc * rc - rp * rp + d * d)) / d;
-    if (rc * rc - l * l < 0) {
-      // Bail out
-      return GA.origin();
-    }
-    const h = Math.sqrt(rc * rc - l * l);
-    // Q is the intersection between the approximation and the circle around P, // relative to approximation center C
-    const qx = (ppx * l + orientation * ppy * h) / d;
-    const qy = (ppy * l - orientation * ppx * h) / d;
-
-    const xx = a * tx;
-    const yy = b * ty;
-
-    // R is the current guess relative to C
-    const rx = xx - cx;
-    const ry = yy - cy;
-
-    const r = Math.hypot(ry, rx);
-    const q = Math.hypot(qy, qx);
-
-    // New guess by extending the approximation intersection to the ellipse
-    tx = ((qx * r) / q + cx) / a;
-    ty = ((qy * r) / q + cy) / b;
-    const t = Math.hypot(ty, tx);
-    tx /= t;
-    ty /= t;
-  });
-
-  return GA.point(tx * a, ty * b);
+  const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
+  return GA.point(x, (-m * x - 1) / n);
 };
 
 export const findFocusPointForRectangulars = (
@@ -637,23 +596,19 @@ export const findFocusPointForRectangulars = (
   point: GA.Point,
 ): GA.Point => {
   const relativeDistanceAbs = Math.abs(relativeDistance);
-  const side = relativeDistance > 0 ? 0 : 1;
-
-  // P is the center of the circle with diamater over the segment from
-  // `ellipse` center to `point`
-  const p = GA.mul(point, 0.5);
-  // r(P) is its radius
-  const rp = GA.inorm(p);
-
+  const orientation = Math.sign(relativeDistance);
   const corners = getCorners(element, relativeDistanceAbs);
-  return corners.flatMap((point, i) => {
-    const a = point;
-    const b = corners[(i + 1) % 4];
-    if (GAPoint.distance(a, p) > rp && GAPoint.distance(b, p) > rp) {
-      return [];
+
+  let maxDistance = 0;
+  let tangentPoint: null | GA.Point = null;
+  corners.forEach((corner) => {
+    const distance = orientation * GALine.through(point, corner)[1];
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      tangentPoint = corner;
     }
-    return [getCircleIntersections(p, rp, GALine.through(a, b))[side]];
-  })[0];
+  });
+  return tangentPoint!;
 };
 
 const pointInBezierEquation = (
