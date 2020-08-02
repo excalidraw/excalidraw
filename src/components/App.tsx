@@ -138,7 +138,12 @@ import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
-import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+import {
+  isLinearElement,
+  isLinearElementType,
+  isBindingElement,
+  isBindingElementType,
+} from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
@@ -1900,7 +1905,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    if (isLinearElementType(this.state.elementType)) {
+    if (isBindingElementType(this.state.elementType)) {
       this.maybeSuggestBinding(scenePointer);
     }
 
@@ -2763,7 +2768,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           pointerCoords.x,
           pointerCoords.y,
         );
-        this.maybeSuggestBinding(pointerCoords);
+        if (
+          isBindingElement(
+            LinearElementEditor.getElement(
+              this.state.editingLinearElement.elementId,
+            ),
+          )
+        ) {
+          this.maybeSuggestBinding(pointerCoords);
+        }
 
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -2882,7 +2895,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             });
           }
         }
-        this.maybeSuggestBinding(pointerCoords);
+        if (isBindingElement(draggingElement)) {
+          this.maybeSuggestBinding(pointerCoords);
+        }
       } else if (draggingElement.type === "selection") {
         dragNewElement(
           draggingElement,

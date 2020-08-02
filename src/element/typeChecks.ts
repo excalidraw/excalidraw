@@ -25,6 +25,18 @@ export const isLinearElementType = (
   );
 };
 
+export const isBindingElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLinearElement => {
+  return element != null && isBindingElementType(element.type);
+};
+
+export const isBindingElementType = (
+  elementType: ExcalidrawElement["type"],
+): boolean => {
+  return elementType === "arrow" || elementType === "line";
+};
+
 export const isBindableElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawBindableElement => {

@@ -8,7 +8,11 @@ import {
 } from "./types";
 import { getElementAtPosition } from "../scene";
 import { AppState } from "../types";
-import { isBindableElement, isLinearElement } from "./typeChecks";
+import {
+  isBindableElement,
+  isLinearElement,
+  isBindingElement,
+} from "./typeChecks";
 import {
   bindingBorderTest,
   distanceToBindableElement,
@@ -316,7 +320,7 @@ export const getEligibleElementsForBinding = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   return elements
-    .filter((element) => isLinearElement(element))
+    .filter((element) => isBindingElement(element))
     .flatMap((linearElement) =>
       getElligibleElementsForBindingElement(
         linearElement as NonDeleted<ExcalidrawLinearElement>,
