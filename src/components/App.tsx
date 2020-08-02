@@ -2816,7 +2816,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             const elementsToAppend = [];
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
-            const duplicatedElements = [];
             for (const element of this.scene.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
@@ -2841,7 +2840,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
-                duplicatedElements.push(duplicatedElement);
                 oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
               } else {
                 nextElements.push(element);
@@ -2853,7 +2851,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             ]);
             fixBindingsAfterDuplication(
               this.scene,
-              duplicatedElements,
               elementsToAppend,
               oldIdToDuplicatedId,
             );
