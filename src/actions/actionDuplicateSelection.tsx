@@ -11,6 +11,9 @@ import { getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement } from "../element/mutateElement";
 import { selectGroupsForSelectedElements } from "../groups";
+import { AppState } from "../types";
+import { fixBindingsAfterDuplication } from "../element/binding";
+import { ActionResult } from "./types";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -50,40 +53,8 @@ export const actionDuplicateSelection = register({
       };
     }
 
-    const groupIdMap = new Map();
-    const newElements: ExcalidrawElement[] = [];
-    const finalElements = elements.reduce(
-      (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
-        if (appState.selectedElementIds[element.id]) {
-          const newElement = duplicateElement(
-            appState.editingGroupId,
-            groupIdMap,
-            element,
-            {
-              x: element.x + 10,
-              y: element.y + 10,
-            },
-          );
-          newElements.push(newElement);
-          return acc.concat([element, newElement]);
-        }
-        return acc.concat(element);
-      },
-      [],
-    );
     return {
-      appState: selectGroupsForSelectedElements(
-        {
-          ...appState,
-          selectedGroupIds: {},
-          selectedElementIds: newElements.reduce((acc, element) => {
-            acc[element.id] = true;
-            return acc;
-          }, {} as any),
-        },
-        getNonDeletedElements(finalElements),
-      ),
-      elements: finalElements,
+      ...duplicateElements(elements, appState),
       commitToHistory: true,
     };
   },
@@ -102,3 +73,49 @@ export const actionDuplicateSelection = register({
     />
   ),
 });
+
+const duplicateElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+): Partial<ActionResult> => {
+  const groupIdMap = new Map();
+  const newElements: ExcalidrawElement[] = [];
+  const oldElements: ExcalidrawElement[] = [];
+  const oldIdToDuplicatedId = new Map();
+  const finalElements = elements.reduce(
+    (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
+      if (appState.selectedElementIds[element.id]) {
+        const newElement = duplicateElement(
+          appState.editingGroupId,
+          groupIdMap,
+          element,
+          {
+            x: element.x + 10,
+            y: element.y + 10,
+          },
+        );
+        oldIdToDuplicatedId.set(element.id, newElement.id);
+        oldElements.push(element);
+        newElements.push(newElement);
+        return acc.concat([element, newElement]);
+      }
+      return acc.concat(element);
+    },
+    [],
+  );
+  fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
+  return {
+    elements: finalElements,
+    appState: selectGroupsForSelectedElements(
+      {
+        ...appState,
+        selectedGroupIds: {},
+        selectedElementIds: newElements.reduce((acc, element) => {
+          acc[element.id] = true;
+          return acc;
+        }, {} as any),
+      },
+      getNonDeletedElements(finalElements),
+    ),
+  };
+};

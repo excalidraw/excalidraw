@@ -2845,15 +2845,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 nextElements.push(element);
               }
             }
-            this.scene.replaceAllElements([
-              ...nextElements,
-              ...elementsToAppend,
-            ]);
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
             fixBindingsAfterDuplication(
-              this.scene,
+              nextSceneElements,
               elementsToAppend,
               oldIdToDuplicatedId,
             );
+            this.scene.replaceAllElements(nextSceneElements);
           }
           return;
         }

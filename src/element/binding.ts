@@ -354,7 +354,7 @@ const getElligibleElementForBindingElement = (
 // 1: Update elements not selected to point to duplicated elements
 // 2: Update duplicated elements to point to other duplicated elements
 export const fixBindingsAfterDuplication = (
-  scene: Scene,
+  sceneElements: ExcalidrawElement[],
   oldElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ): void => {
@@ -374,10 +374,16 @@ export const fixBindingsAfterDuplication = (
     }
     if (isBindingElement(oldElement)) {
       if (oldElement.startBinding != null) {
-        allBindableElementIds.add(oldElement.startBinding.elementId);
+        const { elementId } = oldElement.startBinding;
+        if (!oldIdToDuplicatedId.has(elementId)) {
+          allBindableElementIds.add(elementId);
+        }
       }
       if (oldElement.endBinding != null) {
-        allBindableElementIds.add(oldElement.endBinding.elementId);
+        const { elementId } = oldElement.endBinding;
+        if (!oldIdToDuplicatedId.has(elementId)) {
+          allBindableElementIds.add(elementId);
+        }
       }
       if (oldElement.startBinding != null || oldElement.endBinding != null) {
         allBoundElementIds.add(oldIdToDuplicatedId.get(oldElement.id)!);
@@ -386,27 +392,22 @@ export const fixBindingsAfterDuplication = (
   });
 
   // Update the linear elements
-  (scene.getNonDeletedElements(
-    Array.from(allBoundElementIds),
+  (sceneElements.filter(({ id }) =>
+    allBoundElementIds.has(id),
   ) as ExcalidrawLinearElement[]).forEach((element) => {
     const { startBinding, endBinding } = element;
     mutateElement(element, {
-      startBinding: updateBindingAfterDuplication(
-        scene,
+      startBinding: newBindingAfterDuplication(
         startBinding,
         oldIdToDuplicatedId,
       ),
-      endBinding: updateBindingAfterDuplication(
-        scene,
-        endBinding,
-        oldIdToDuplicatedId,
-      ),
+      endBinding: newBindingAfterDuplication(endBinding, oldIdToDuplicatedId),
     });
   });
 
   // Update the bindable shapes
-  scene
-    .getNonDeletedElements(Array.from(allBindableElementIds))
+  sceneElements
+    .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
       const { boundElementIds } = bindableElement;
       if (boundElementIds != null && boundElementIds.length > 0) {
@@ -420,8 +421,7 @@ export const fixBindingsAfterDuplication = (
     });
 };
 
-const updateBindingAfterDuplication = (
-  scene: Scene,
+const newBindingAfterDuplication = (
   binding: PointBinding | null,
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ): PointBinding | null => {
