@@ -4280,7 +4280,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `54`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `53`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -5156,7 +5156,7 @@ Object {
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -6032,7 +6032,7 @@ Object {
 
 exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {

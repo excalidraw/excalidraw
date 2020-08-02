@@ -964,16 +964,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const dy = y - elementsCenterY;
     const groupIdMap = new Map();
 
+    const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
-      return duplicateElement(this.state.editingGroupId, groupIdMap, element, {
-        x: element.x + dx - minX,
-        y: element.y + dy - minY,
-      });
+      const newElement = duplicateElement(
+        this.state.editingGroupId,
+        groupIdMap,
+        element,
+        {
+          x: element.x + dx - minX,
+          y: element.y + dy - minY,
+        },
+      );
+      oldIdToDuplicatedId.set(element.id, newElement.id);
+      return newElement;
     });
-    this.scene.replaceAllElements([
+    const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
-    ]);
+    ];
+    fixBindingsAfterDuplication(
+      nextElements,
+      clipboardElements,
+      oldIdToDuplicatedId,
+    );
+
+    this.scene.replaceAllElements(nextElements);
     history.resumeRecording();
     this.setState(
       selectGroupsForSelectedElements(
@@ -2850,6 +2865,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               nextSceneElements,
               elementsToAppend,
               oldIdToDuplicatedId,
+              "duplicatesServeAsOld",
             );
             this.scene.replaceAllElements(nextSceneElements);
           }

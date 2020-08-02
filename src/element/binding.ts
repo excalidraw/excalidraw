@@ -354,19 +354,25 @@ const getElligibleElementForBindingElement = (
 // 1: Update elements not selected to point to duplicated elements
 // 2: Update duplicated elements to point to other duplicated elements
 export const fixBindingsAfterDuplication = (
-  sceneElements: ExcalidrawElement[],
-  oldElements: ExcalidrawElement[],
+  sceneElements: readonly ExcalidrawElement[],
+  oldElements: readonly ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+  // There are three copying mechanisms: Copy-paste, duplication and alt-drag.
+  // Only when alt-dragging the new "duplicates" act as the "old", while
+  // the "old" elements act as the "new copy" - essentially working reverse
+  // to the other two.
+  duplicatesServeAsOld?: "duplicatesServeAsOld" | undefined,
 ): void => {
   // First collect all the binding/bindable elements, so we only update
   // each once, regardless of whether they were duplicated or not.
   const allBoundElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const allBindableElementIds: Set<ExcalidrawElement["id"]> = new Set();
+  const shouldReverseRoles = duplicatesServeAsOld === "duplicatesServeAsOld";
   oldElements.forEach((oldElement) => {
     const { boundElementIds } = oldElement;
     if (boundElementIds != null && boundElementIds.length > 0) {
       boundElementIds.forEach((boundElementId) => {
-        if (!oldIdToDuplicatedId.has(boundElementId)) {
+        if (shouldReverseRoles && !oldIdToDuplicatedId.has(boundElementId)) {
           allBoundElementIds.add(boundElementId);
         }
       });
@@ -375,13 +381,13 @@ export const fixBindingsAfterDuplication = (
     if (isBindingElement(oldElement)) {
       if (oldElement.startBinding != null) {
         const { elementId } = oldElement.startBinding;
-        if (!oldIdToDuplicatedId.has(elementId)) {
+        if (shouldReverseRoles && !oldIdToDuplicatedId.has(elementId)) {
           allBindableElementIds.add(elementId);
         }
       }
       if (oldElement.endBinding != null) {
         const { elementId } = oldElement.endBinding;
-        if (!oldIdToDuplicatedId.has(elementId)) {
+        if (shouldReverseRoles && !oldIdToDuplicatedId.has(elementId)) {
           allBindableElementIds.add(elementId);
         }
       }
