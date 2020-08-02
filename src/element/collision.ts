@@ -568,14 +568,17 @@ export const findFocusPointForEllipse = (
 
   const orientation = Math.sign(relativeDistance);
   const [px, pyo] = GAPoint.toTuple(point);
+
   // The calculation below can't handle py = 0
   const py = pyo === 0 ? 0.0001 : pyo;
 
   const squares = px ** 2 * b ** 2 + py ** 2 * a ** 2;
   // Tangent mx + ny + 1 = 0
   const m =
-    (-px * b ** 2 + orientation * py * Math.sqrt(squares - a ** 2 * b ** 2)) /
+    (-px * b ** 2 +
+      orientation * py * Math.sqrt(Math.max(0, squares - a ** 2 * b ** 2))) /
     squares;
+
   const n = (-m * px - 1) / py;
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
