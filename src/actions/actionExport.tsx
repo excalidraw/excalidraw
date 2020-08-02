@@ -7,14 +7,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
-
-const muteFSAbortError = (error?: Error) => {
-  // if user cancels, ignore the error
-  if (error?.name === "AbortError") {
-    return;
-  }
-  throw error;
-};
+import { muteFSAbortError } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -135,7 +128,7 @@ export const actionLoadScene = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       icon={load}
@@ -143,7 +136,7 @@ export const actionLoadScene = register({
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
       onClick={() => {
-        loadFromJSON()
+        loadFromJSON(appState)
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })

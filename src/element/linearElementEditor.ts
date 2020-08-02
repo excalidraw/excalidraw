@@ -3,27 +3,36 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawElement,
 } from "./types";
-import { distance2d, rotate, isPathALoop } from "../math";
+import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
 import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { SceneHistory } from "../history";
-import { globalSceneState } from "../scene";
+
+import Scene from "../scene/Scene";
 
 export class LinearElementEditor {
-  public elementId: ExcalidrawElement["id"];
+  public elementId: ExcalidrawElement["id"] & {
+    _brand: "excalidrawLinearElementId";
+  };
   public activePointIndex: number | null;
-  public draggingElementPointIndex: number | null;
+  /** whether you're dragging a point */
+  public isDragging: boolean;
   public lastUncommittedPoint: Point | null;
+  public pointerOffset: { x: number; y: number };
 
-  constructor(element: NonDeleted<ExcalidrawLinearElement>) {
+  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
+    this.elementId = element.id as string & {
+      _brand: "excalidrawLinearElementId";
+    };
+    Scene.mapElementToScene(this.elementId, scene);
     LinearElementEditor.normalizePoints(element);
 
-    this.elementId = element.id;
     this.activePointIndex = null;
     this.lastUncommittedPoint = null;
-    this.draggingElementPointIndex = null;
+    this.isDragging = false;
+    this.pointerOffset = { x: 0, y: 0 };
   }
 
   // ---------------------------------------------------------------------------
@@ -32,8 +41,12 @@ export class LinearElementEditor {
 
   static POINT_HANDLE_SIZE = 20;
 
-  static getElement(id: ExcalidrawElement["id"]) {
-    const element = globalSceneState.getNonDeletedElement(id);
+  /**
+   * @param id the `elementId` from the instance of this class (so that we can
+   *  statically guarantee this method returns an ExcalidrawLinearElement)
+   */
+  static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
+    const element = Scene.getScene(id)?.getNonDeletedElement(id);
     if (element) {
       return element as NonDeleted<ExcalidrawLinearElement>;
     }
@@ -46,57 +59,35 @@ export class LinearElementEditor {
     setState: React.Component<any, AppState>["setState"],
     scenePointerX: number,
     scenePointerY: number,
-    lastX: number,
-    lastY: number,
   ): boolean {
     if (!appState.editingLinearElement) {
       return false;
     }
     const { editingLinearElement } = appState;
-    let { draggingElementPointIndex, elementId } = editingLinearElement;
+    const { activePointIndex, elementId, isDragging } = editingLinearElement;
 
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return false;
     }
 
-    const clickedPointIndex =
-      draggingElementPointIndex ??
-      LinearElementEditor.getPointIndexUnderCursor(
-        element,
-        appState.zoom,
-        scenePointerX,
-        scenePointerY,
-      );
-
-    draggingElementPointIndex = draggingElementPointIndex ?? clickedPointIndex;
-    if (draggingElementPointIndex > -1) {
-      if (
-        editingLinearElement.draggingElementPointIndex !==
-          draggingElementPointIndex ||
-        editingLinearElement.activePointIndex !== clickedPointIndex
-      ) {
+    if (activePointIndex != null && activePointIndex > -1) {
+      if (isDragging === false) {
         setState({
           editingLinearElement: {
             ...editingLinearElement,
-            draggingElementPointIndex,
-            activePointIndex: clickedPointIndex,
+            isDragging: true,
           },
         });
       }
 
-      const [deltaX, deltaY] = rotate(
-        scenePointerX - lastX,
-        scenePointerY - lastY,
-        0,
-        0,
-        -element.angle,
+      const newPoint = LinearElementEditor.createPointAt(
+        element,
+        scenePointerX - editingLinearElement.pointerOffset.x,
+        scenePointerY - editingLinearElement.pointerOffset.y,
+        appState.gridSize,
       );
-      const targetPoint = element.points[clickedPointIndex];
-      LinearElementEditor.movePoint(element, clickedPointIndex, [
-        targetPoint[0] + deltaX,
-        targetPoint[1] + deltaY,
-      ]);
+      LinearElementEditor.movePoint(element, activePointIndex, newPoint);
       return true;
     }
     return false;
@@ -105,33 +96,31 @@ export class LinearElementEditor {
   static handlePointerUp(
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
-    const { elementId, draggingElementPointIndex } = editingLinearElement;
+    const { elementId, activePointIndex, isDragging } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return editingLinearElement;
     }
 
     if (
-      draggingElementPointIndex !== null &&
-      (draggingElementPointIndex === 0 ||
-        draggingElementPointIndex === element.points.length - 1) &&
+      isDragging &&
+      (activePointIndex === 0 ||
+        activePointIndex === element.points.length - 1) &&
       isPathALoop(element.points)
     ) {
       LinearElementEditor.movePoint(
         element,
-        draggingElementPointIndex,
-        draggingElementPointIndex === 0
+        activePointIndex,
+        activePointIndex === 0
           ? element.points[element.points.length - 1]
           : element.points[0],
       );
     }
-    if (draggingElementPointIndex !== null) {
-      return {
-        ...editingLinearElement,
-        draggingElementPointIndex: null,
-      };
-    }
-    return editingLinearElement;
+    return {
+      ...editingLinearElement,
+      isDragging: false,
+      pointerOffset: { x: 0, y: 0 },
+    };
   }
 
   static handlePointerDown(
@@ -170,6 +159,7 @@ export class LinearElementEditor {
               element,
               scenePointerX,
               scenePointerY,
+              appState.gridSize,
             ),
           ],
         });
@@ -199,10 +189,29 @@ export class LinearElementEditor {
       ret.hitElement = element;
     }
 
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const targetPoint =
+      clickedPointIndex > -1 &&
+      rotate(
+        element.x + element.points[clickedPointIndex][0],
+        element.y + element.points[clickedPointIndex][1],
+        cx,
+        cy,
+        element.angle,
+      );
+
     setState({
       editingLinearElement: {
         ...appState.editingLinearElement,
         activePointIndex: clickedPointIndex > -1 ? clickedPointIndex : null,
+        pointerOffset: targetPoint
+          ? {
+              x: scenePointerX - targetPoint[0],
+              y: scenePointerY - targetPoint[1],
+            }
+          : { x: 0, y: 0 },
       },
     });
     return ret;
@@ -213,6 +222,7 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     editingLinearElement: LinearElementEditor,
+    gridSize: number | null,
   ): LinearElementEditor {
     const { elementId, lastUncommittedPoint } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
@@ -232,8 +242,9 @@ export class LinearElementEditor {
 
     const newPoint = LinearElementEditor.createPointAt(
       element,
-      scenePointerX,
-      scenePointerY,
+      scenePointerX - editingLinearElement.pointerOffset.x,
+      scenePointerY - editingLinearElement.pointerOffset.y,
+      gridSize,
     );
 
     if (lastPoint === lastUncommittedPoint) {
@@ -293,13 +304,15 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     scenePointerX: number,
     scenePointerY: number,
+    gridSize: number | null,
   ): Point {
+    const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     const [rotatedX, rotatedY] = rotate(
-      scenePointerX,
-      scenePointerY,
+      pointerOnGrid[0],
+      pointerOnGrid[1],
       cx,
       cy,
       -element.angle,

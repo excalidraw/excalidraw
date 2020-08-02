@@ -30,7 +30,6 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import { getClientColors } from "../clients";
-import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   isSelectedViaGroup,
@@ -220,14 +219,16 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
-    if (
-      isLinearElement(element) &&
-      appState.editingLinearElement &&
-      appState.editingLinearElement.elementId === element.id
-    ) {
+  });
+
+  if (appState.editingLinearElement) {
+    const element = LinearElementEditor.getElement(
+      appState.editingLinearElement.elementId,
+    );
+    if (element) {
       renderLinearPointHandles(context, appState, sceneState, element);
     }
-  });
+  }
 
   // Paint selection element
   if (selectionElement) {

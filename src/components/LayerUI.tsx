@@ -9,12 +9,8 @@ import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
-import { AppState, LibraryItems } from "../types";
-import {
-  NonDeletedExcalidrawElement,
-  ExcalidrawElement,
-  NonDeleted,
-} from "../element/types";
+import { AppState, LibraryItems, LibraryItem } from "../types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
 import { Island } from "./Island";
@@ -37,13 +33,16 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
 import { CLASSES } from "../constants";
-import { shield } from "./icons";
+import { shield, exportFile, load } from "./icons";
 import { GitHubCorner } from "./GitHubCorner";
 import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { loadLibrary, saveLibrary } from "../data/localStorage";
+import { ToolButton } from "./ToolButton";
+import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
+import { muteFSAbortError } from "../utils";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -55,7 +54,7 @@ interface LayerUIProps {
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
   onLockToggle: () => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
@@ -95,13 +94,15 @@ const LibraryMenuItems = ({
   onAddToLibrary,
   onInsertShape,
   pendingElements,
+  setAppState,
 }: {
   library: LibraryItems;
-  pendingElements: NonDeleted<ExcalidrawElement>[];
+  pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
   onRemoveFromLibrary: (index: number) => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
-  onAddToLibrary: (elements: NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
+  onAddToLibrary: (elements: LibraryItem) => void;
+  setAppState: any;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -109,6 +110,44 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
+
+  rows.push(
+    <Stack.Row align="center" gap={1} key={"actions"}>
+      <ToolButton
+        key="import"
+        type="button"
+        title={t("buttons.load")}
+        aria-label={t("buttons.load")}
+        icon={load}
+        onClick={() => {
+          importLibraryFromJSON()
+            .then(() => {
+              // Maybe we should close and open the menu so that the items get updated.
+              // But for now we just close the menu.
+              setAppState({ isLibraryOpen: false });
+            })
+            .catch(muteFSAbortError)
+            .catch((error) => {
+              setAppState({ errorMessage: error.message });
+            });
+        }}
+      />
+      <ToolButton
+        key="export"
+        type="button"
+        title={t("buttons.export")}
+        aria-label={t("buttons.export")}
+        icon={exportFile}
+        onClick={() => {
+          saveLibraryAsJSON()
+            .catch(muteFSAbortError)
+            .catch((error) => {
+              setAppState({ errorMessage: error.message });
+            });
+        }}
+      />
+    </Stack.Row>,
+  );
 
   for (let row = 0; row < numRows; row++) {
     const i = CELLS_PER_ROW * row;
@@ -156,11 +195,13 @@ const LibraryMenu = ({
   onInsertShape,
   pendingElements,
   onAddToLibrary,
+  setAppState,
 }: {
-  pendingElements: NonDeleted<ExcalidrawElement>[];
+  pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
-  onInsertShape: (elements: readonly NonDeleted<ExcalidrawElement>[]) => void;
+  onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
+  setAppState: any;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, onClickOutside);
@@ -202,7 +243,7 @@ const LibraryMenu = ({
   }, []);
 
   const addToLibrary = useCallback(
-    async (elements: NonDeleted<ExcalidrawElement>[]) => {
+    async (elements: LibraryItem) => {
       const items = await loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
@@ -226,6 +267,7 @@ const LibraryMenu = ({
           onAddToLibrary={addToLibrary}
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
+          setAppState={setAppState}
         />
       )}
     </Island>
@@ -372,6 +414,7 @@ const LayerUI = ({
       onClickOutside={closeLibrary}
       onInsertShape={onInsertShape}
       onAddToLibrary={deselectItems}
+      setAppState={setAppState}
     />
   ) : null;
 

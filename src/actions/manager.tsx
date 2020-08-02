@@ -9,7 +9,6 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { globalSceneState } from "../scene";
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -23,9 +22,7 @@ export class ActionManager implements ActionsManagerInterface {
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElementsIncludingDeleted: () => ReturnType<
-      typeof globalSceneState["getElementsIncludingDeleted"]
-    >,
+    getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
   ) {
     this.updater = updater;
     this.getAppState = getAppState;
