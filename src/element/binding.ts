@@ -355,3 +355,64 @@ const getElligibleElementForBindingElement = (
     Scene.getScene(linearElement)!,
   );
 };
+
+// We need to:
+// 1: Update elements not selected to point to duplicated elements
+// 2: Update duplicated elements to point to other duplicated elements
+export const fixBindingsAfterDuplication = (
+  scene: Scene,
+  duplicatedElements: ExcalidrawElement[],
+  oldElements: ExcalidrawElement[],
+  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+): void => {
+  // Updates all the linear elements whether they are being copied or not
+  const allBoundElementIds: ExcalidrawLinearElement["id"][] = [];
+  oldElements.forEach((oldElement) => {
+    oldElement.boundElementIds?.forEach((boundElementId) => {
+      allBoundElementIds.push(
+        oldIdToDuplicatedId.get(boundElementId) ?? boundElementId,
+      );
+    });
+  });
+
+  (scene.getNonDeletedElements(
+    allBoundElementIds,
+  ) as ExcalidrawLinearElement[]).forEach((element) => {
+    const { startBinding, endBinding } = element;
+    mutateElement(element, {
+      startBinding: newBindingAfterDuplication(
+        startBinding,
+        oldIdToDuplicatedId,
+      ),
+      endBinding: newBindingAfterDuplication(endBinding, oldIdToDuplicatedId),
+    });
+  });
+
+  // Updates the copied shapes to reflect the updated linear elements
+  duplicatedElements.forEach((duplicatedElement) => {
+    const { boundElementIds } = duplicatedElement;
+    if (boundElementIds != null && boundElementIds.length > 0) {
+      mutateElement(duplicatedElement, {
+        boundElementIds: boundElementIds.map(
+          (boundElementId) =>
+            oldIdToDuplicatedId.get(boundElementId) ?? boundElementId,
+        ),
+      });
+    }
+  });
+};
+
+const newBindingAfterDuplication = (
+  binding: PointBinding | null,
+  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+): PointBinding | null => {
+  if (binding == null) {
+    return null;
+  }
+  const { elementId, focus, gap } = binding;
+  return {
+    focus,
+    gap,
+    elementId: oldIdToDuplicatedId.get(elementId) ?? elementId,
+  };
+};
