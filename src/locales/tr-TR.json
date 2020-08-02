@@ -180,7 +180,7 @@
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır"
   },
   "encrypted": {
-    "tooltip": "Çizimleriniz sonuna kadar şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
+    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
   "charts": {
     "noNumericColumn": "Sayısal sütunu olmayan bir tablo yapıştırdın.",
