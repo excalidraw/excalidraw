@@ -302,9 +302,12 @@ const maybeCalculateNewGapWhenScaling = (
   const { gap, focus, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
-  const newGap = Math.min(
-    maxBindingGap(newWidth, newHeight),
-    gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
+  const newGap = Math.max(
+    1,
+    Math.min(
+      maxBindingGap(newWidth, newHeight),
+      gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
+    ),
   );
   return { elementId, gap: newGap, focus };
 };
