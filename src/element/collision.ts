@@ -57,8 +57,7 @@ export const hitTest = (
 
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
-  x: number,
-  y: number,
+  { x, y }: { x: number; y: number },
 ): boolean => {
   const threshold = maxBindingGap(element.width, element.height);
   const check = isOutsideCheck;

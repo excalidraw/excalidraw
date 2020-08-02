@@ -143,6 +143,7 @@ import {
   isLinearElementType,
   isBindingElement,
   isBindingElementType,
+  isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
@@ -167,6 +168,7 @@ import {
   getEligibleElementsForBinding,
   bindOrUnbindSelectedElements,
   fixBindingsAfterDuplication,
+  maybeBindBindableElement,
 } from "../element/binding";
 
 /**
@@ -2946,6 +2948,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
+        this.maybeSuggestBindingForAll([draggingElement]);
       }
 
       if (this.state.elementType === "selection") {
@@ -3144,6 +3147,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
+        if (isBindableElement(draggingElement)) {
+          maybeBindBindableElement(draggingElement);
+        }
       }
 
       if (resizingElement) {
