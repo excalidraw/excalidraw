@@ -677,6 +677,7 @@ const renderBindingHighlightForBindableElement = (
 
   switch (element.type) {
     case "rectangle":
+    case "text":
       strokeRectWithRotation(
         context,
         x1 - padding,
