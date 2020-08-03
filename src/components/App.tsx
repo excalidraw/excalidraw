@@ -62,6 +62,7 @@ import {
   NonDeleted,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawBindableElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -171,6 +172,7 @@ import {
   maybeBindBindableElement,
   getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
+  isLinearElementSimpleAndAlreadyBound,
 } from "../element/binding";
 
 /**
@@ -1930,7 +1932,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isBindingElementType(this.state.elementType)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
-      this.maybeSuggestBindingAtCursor(scenePointer);
+      const { draggingElement } = this.state;
+      if (isBindingElement(draggingElement)) {
+        this.maybeSuggestBindingForLinearElementAtCursor(
+          draggingElement,
+          "end",
+          scenePointer,
+          this.state.boundElement,
+        );
+      } else {
+        this.maybeSuggestBindingAtCursor(scenePointer);
+      }
     }
 
     if (this.state.multiElement) {
@@ -2925,7 +2937,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
         if (isBindingElement(draggingElement)) {
           // When creating a linear element by dragging
-          this.maybeSuggestBindingAtCursor(pointerCoords);
+          this.maybeSuggestBindingForLinearElementAtCursor(
+            draggingElement,
+            "end",
+            pointerCoords,
+            this.state.boundElement,
+          );
         }
       } else if (draggingElement.type === "selection") {
         dragNewElement(
@@ -3267,6 +3284,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       x: number;
       y: number;
     },
+    // During line creation the start binding hasn't been written yet
+    // into `linearElement`
+    oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
     const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
       linearElement,
@@ -3275,7 +3295,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
     this.setState({
       suggestedBindings:
-        hoveredBindableElement != null ? [hoveredBindableElement] : [],
+        hoveredBindableElement != null &&
+        !isLinearElementSimpleAndAlreadyBound(
+          linearElement,
+          oppositeBindingBoundElement?.id,
+          hoveredBindableElement,
+        )
+          ? [hoveredBindableElement]
+          : [],
     });
   };
 

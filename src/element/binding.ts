@@ -108,7 +108,7 @@ const bindLinearElement = (
   startOrEnd: "start" | "end",
 ): void => {
   if (
-    isLinearElementSimpleAndAlreadyBound(
+    isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
       linearElement,
       hoveredElement,
       startOrEnd,
@@ -130,16 +130,27 @@ const bindLinearElement = (
 };
 
 // Don't bind both ends of a simple segment
-const isLinearElementSimpleAndAlreadyBound = (
+const isLinearElementSimpleAndAlreadyBoundOnOppositeEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
 ): boolean => {
   const otherBinding =
     linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"];
+  return isLinearElementSimpleAndAlreadyBound(
+    linearElement,
+    otherBinding?.elementId,
+    bindableElement,
+  );
+};
+
+export const isLinearElementSimpleAndAlreadyBound = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  alreadyBoundToId: ExcalidrawBindableElement["id"] | undefined,
+  bindableElement: ExcalidrawBindableElement,
+): boolean => {
   return (
-    otherBinding?.elementId === bindableElement.id &&
-    linearElement.points.length < 3
+    alreadyBoundToId === bindableElement.id && linearElement.points.length < 3
   );
 };
 
@@ -413,7 +424,7 @@ export const getElligibleElementForBindingElementAtCoors = (
   // Note: We could push this check inside a version of
   // `getHoveredElementForBinding`, but it's unlikely this is needed.
   if (
-    isLinearElementSimpleAndAlreadyBound(
+    isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
       linearElement,
       bindableElement,
       startOrEnd,
@@ -474,7 +485,7 @@ const isLinearElementEligibleForNewBindingByBindable = (
     linearElement[startOrEnd === "start" ? "startBinding" : "endBinding"];
   return (
     existingBinding == null &&
-    !isLinearElementSimpleAndAlreadyBound(
+    !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
       linearElement,
       bindableElement,
       startOrEnd,
