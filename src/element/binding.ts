@@ -441,15 +441,15 @@ const getElligibleElementsForBindableElementAndWhere = (
       if (!isBindingElement(element)) {
         return null;
       }
-      const canBindStart = areElligibleForNewBinding(
-        bindableElement,
+      const canBindStart = isLinearElementEligibleForNewBindingByBindable(
         element,
         "start",
-      );
-      const canBindEnd = areElligibleForNewBinding(
         bindableElement,
+      );
+      const canBindEnd = isLinearElementEligibleForNewBindingByBindable(
         element,
         "end",
+        bindableElement,
       );
       if (!canBindStart && !canBindEnd) {
         return null;
@@ -465,15 +465,15 @@ const getElligibleElementsForBindableElementAndWhere = (
   ][];
 };
 
-const areElligibleForNewBinding = (
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+const isLinearElementEligibleForNewBindingByBindable = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
 ): boolean => {
   const existingBinding =
     linearElement[startOrEnd === "start" ? "startBinding" : "endBinding"];
   return (
-    existingBinding?.elementId !== bindableElement.id &&
+    existingBinding == null &&
     !isLinearElementSimpleAndAlreadyBound(
       linearElement,
       bindableElement,
