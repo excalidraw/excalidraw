@@ -36,6 +36,7 @@ import {
   getSelectedGroupIds,
   getElementsInGroup,
 } from "../groups";
+import { maxBindingGap } from "../element/collision";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -48,7 +49,7 @@ const strokeRectWithRotation = (
   cx: number,
   cy: number,
   angle: number,
-  fill?: boolean,
+  fill: boolean = false,
 ) => {
   context.translate(cx, cy);
   context.rotate(angle);
@@ -58,6 +59,40 @@ const strokeRectWithRotation = (
   context.strokeRect(x - cx, y - cy, width, height);
   context.rotate(-angle);
   context.translate(-cx, -cy);
+};
+
+const strokeDiamondWithRotation = (
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+) => {
+  context.translate(cx, cy);
+  context.rotate(angle);
+  context.beginPath();
+  context.moveTo(0, height / 2);
+  context.lineTo(width / 2, 0);
+  context.lineTo(0, -height / 2);
+  context.lineTo(-width / 2, 0);
+  context.closePath();
+  context.stroke();
+  context.rotate(-angle);
+  context.translate(-cx, -cy);
+};
+
+const strokeEllipseWithRotation = (
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+) => {
+  context.beginPath();
+  context.ellipse(cx, cy, width / 2, height / 2, angle, 0, Math.PI * 2);
+  context.stroke();
 };
 
 const strokeCircle = (
@@ -244,20 +279,7 @@ export const renderScene = (
   [...appState.suggestedBindableElements, appState.boundElement]
     .filter((element) => element != null)
     .forEach((element) => {
-      const [
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-      ] = getElementAbsoluteCoords(element!);
-      renderSelectionBorder(context, sceneState, {
-        angle: element!.angle,
-        elementX1,
-        elementY1,
-        elementX2,
-        elementY2,
-        selectionColors: [oc.black],
-      });
+      renderBindingHighlight(context, sceneState, element!);
     });
 
   // Paint selected elements
@@ -628,6 +650,83 @@ const renderSelectionBorder = (
   context.strokeStyle = strokeStyle;
   context.lineWidth = lineWidth;
   context.setLineDash(initialLineDash);
+  context.translate(-sceneState.scrollX, -sceneState.scrollY);
+};
+
+const renderBindingHighlight = (
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  targetElement: NonDeletedExcalidrawElement,
+) => {
+  // preserve context settings to restore later
+  const originalStrokeStyle = context.strokeStyle;
+  const originalLineWidth = context.lineWidth;
+
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(targetElement);
+  const width = x2 - x1;
+  const height = y2 - y1;
+  const threshold = maxBindingGap(width, height);
+
+  context.strokeStyle = "rgba(0,0,0,.05)";
+  context.lineWidth = threshold / sceneState.zoom;
+  context.translate(sceneState.scrollX, sceneState.scrollY);
+
+  // Because the stroking is done via lines we need a larger offset to not
+  // overlap the element.
+  const lineOffset = targetElement.type === "diamond" ? 20 : 4;
+  const padding = (lineOffset + threshold / 2) / sceneState.zoom;
+
+  switch (targetElement.type) {
+    case "rectangle":
+      strokeRectWithRotation(
+        context,
+        x1 - padding,
+        y1 - padding,
+        width + padding * 2,
+        height + padding * 2,
+        x1 + width / 2,
+        y1 + height / 2,
+        targetElement.angle,
+      );
+      break;
+    case "diamond":
+      strokeDiamondWithRotation(
+        context,
+        width + padding * 2,
+        height + padding * 2,
+        x1 + width / 2,
+        y1 + height / 2,
+        targetElement.angle,
+      );
+      break;
+    case "ellipse":
+      strokeEllipseWithRotation(
+        context,
+        width + padding * 2,
+        height + padding * 2,
+        x1 + width / 2,
+        y1 + height / 2,
+        targetElement.angle,
+      );
+      break;
+    default:
+      // TODO: This will be improved
+      strokeRectWithRotation(
+        context,
+        x1 - padding,
+        y1 - padding,
+        width + padding * 2,
+        height + padding * 2,
+        x1 + width / 2,
+        y1 + height / 2,
+        targetElement.angle,
+      );
+      break;
+  }
+
+  // restore context settings
+  context.strokeStyle = originalStrokeStyle;
+  context.lineWidth = originalLineWidth;
   context.translate(-sceneState.scrollX, -sceneState.scrollY);
 };
 
