@@ -169,6 +169,7 @@ import {
   bindOrUnbindSelectedElements,
   fixBindingsAfterDuplication,
   maybeBindBindableElement,
+  getElligibleElementForBindingElementAtCoors,
 } from "../element/binding";
 
 /**
@@ -1924,7 +1925,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (isBindingElementType(this.state.elementType)) {
-      this.maybeSuggestBinding(scenePointer);
+      // Hovering with a selected tool or creating new linear element via click
+      // and point
+      this.maybeSuggestBindingAtCursor(scenePointer);
     }
 
     if (this.state.multiElement) {
@@ -2785,16 +2788,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           (appState) => this.setState(appState),
           pointerCoords.x,
           pointerCoords.y,
+          (element, startOrEnd) => {
+            this.maybeSuggestBindingForLinearElementAtCursor(
+              element,
+              startOrEnd,
+              pointerCoords,
+            );
+          },
         );
-        if (
-          isBindingElement(
-            LinearElementEditor.getElement(
-              this.state.editingLinearElement.elementId,
-            ),
-          )
-        ) {
-          this.maybeSuggestBinding(pointerCoords);
-        }
 
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -2920,7 +2921,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
         }
         if (isBindingElement(draggingElement)) {
-          this.maybeSuggestBinding(pointerCoords);
+          // When creating a linear element by dragging
+          this.maybeSuggestBindingAtCursor(pointerCoords);
         }
       } else if (draggingElement.type === "selection") {
         dragNewElement(
@@ -3241,13 +3243,32 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   }
 
-  private maybeSuggestBinding = (pointerCoords: {
+  private maybeSuggestBindingAtCursor = (pointerCoords: {
     x: number;
     y: number;
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
       this.scene,
+    );
+    this.setState({
+      suggestedBindableElements:
+        hoveredBindableElement != null ? [hoveredBindableElement] : [],
+    });
+  };
+
+  private maybeSuggestBindingForLinearElementAtCursor = (
+    linearElement: NonDeleted<ExcalidrawLinearElement>,
+    startOrEnd: "start" | "end",
+    pointerCoords: {
+      x: number;
+      y: number;
+    },
+  ): void => {
+    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
+      linearElement,
+      startOrEnd,
+      pointerCoords,
     );
     this.setState({
       suggestedBindableElements:

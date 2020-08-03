@@ -378,10 +378,40 @@ const getElligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  return getHoveredElementForBinding(
+  return getElligibleElementForBindingElementAtCoors(
+    linearElement,
+    startOrEnd,
     getLinearElementEdgeCoors(linearElement, startOrEnd),
+  );
+};
+
+export const getElligibleElementForBindingElementAtCoors = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  pointerCoords: {
+    x: number;
+    y: number;
+  },
+): NonDeleted<ExcalidrawBindableElement> | null => {
+  const bindableElement = getHoveredElementForBinding(
+    pointerCoords,
     Scene.getScene(linearElement)!,
   );
+  if (bindableElement == null) {
+    return null;
+  }
+  // Note: We could push this check inside a version of
+  // `getHoveredElementForBinding`, but it's unlikely this is needed.
+  if (
+    isLinearElementSimpleAndAlreadyBound(
+      linearElement,
+      bindableElement,
+      startOrEnd,
+    )
+  ) {
+    return null;
+  }
+  return bindableElement;
 };
 
 const getLinearElementEdgeCoors = (

@@ -18,6 +18,7 @@ import {
   getHoveredElementForBinding,
 } from "./binding";
 import { tupleToCoors } from "../utils";
+import { isBindingElement } from "./typeChecks";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
@@ -70,6 +71,10 @@ export class LinearElementEditor {
     setState: React.Component<any, AppState>["setState"],
     scenePointerX: number,
     scenePointerY: number,
+    maybeSuggestBinding: (
+      element: NonDeleted<ExcalidrawLinearElement>,
+      startOrEnd: "start" | "end",
+    ) => void,
   ): boolean {
     if (!appState.editingLinearElement) {
       return false;
@@ -99,6 +104,9 @@ export class LinearElementEditor {
         appState.gridSize,
       );
       LinearElementEditor.movePoint(element, activePointIndex, newPoint);
+      if (isBindingElement(element)) {
+        maybeSuggestBinding(element, activePointIndex === 0 ? "start" : "end");
+      }
       return true;
     }
     return false;
