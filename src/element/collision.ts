@@ -59,17 +59,20 @@ export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
 ): boolean => {
-  const threshold = maxBindingGap(element.width, element.height);
+  const threshold = maxBindingGap(element, element.width, element.height);
   const check = isOutsideCheck;
   const point: Point = [x, y];
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
 export const maxBindingGap = (
+  element: ExcalidrawElement,
   elementWidth: number,
   elementHeight: number,
 ): number => {
-  const smallerDimension = Math.min(elementWidth, elementHeight);
+  // Aligns diamonds with rectangles
+  const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
+  const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
   // We make the bindable boundary bigger for bigger elements
   return Math.max(15, Math.min(0.25 * smallerDimension, 80));
 };

@@ -341,7 +341,7 @@ const maybeCalculateNewGapWhenScaling = (
   const newGap = Math.max(
     1,
     Math.min(
-      maxBindingGap(newWidth, newHeight),
+      maxBindingGap(changedElement, newWidth, newHeight),
       gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
     ),
   );

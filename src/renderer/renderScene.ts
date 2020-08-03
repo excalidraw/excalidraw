@@ -665,16 +665,16 @@ const renderBindingHighlight = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(targetElement);
   const width = x2 - x1;
   const height = y2 - y1;
-  const threshold = maxBindingGap(width, height);
+  const threshold = maxBindingGap(targetElement, width, height);
+
+  // So that we don't overlap the element itself
+  const strokeOffset = 4;
 
   context.strokeStyle = "rgba(0,0,0,.05)";
-  context.lineWidth = threshold / sceneState.zoom;
+  context.lineWidth = (threshold - strokeOffset) / sceneState.zoom;
   context.translate(sceneState.scrollX, sceneState.scrollY);
 
-  // Because the stroking is done via lines we need a larger offset to not
-  // overlap the element.
-  const lineOffset = targetElement.type === "diamond" ? 20 : 4;
-  const padding = (lineOffset + threshold / 2) / sceneState.zoom;
+  const padding = (strokeOffset + threshold / 2) / sceneState.zoom;
 
   switch (targetElement.type) {
     case "rectangle":
@@ -690,10 +690,13 @@ const renderBindingHighlight = (
       );
       break;
     case "diamond":
+      const side = Math.hypot(width, height);
+      const wPadding = (padding * side) / height;
+      const hPadding = (padding * side) / width;
       strokeDiamondWithRotation(
         context,
-        width + padding * 2,
-        height + padding * 2,
+        width + wPadding * 2,
+        height + hPadding * 2,
         x1 + width / 2,
         y1 + height / 2,
         targetElement.angle,
