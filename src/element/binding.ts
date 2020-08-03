@@ -577,3 +577,44 @@ const newBindingAfterDuplication = (
     elementId: oldIdToDuplicatedId.get(elementId) ?? elementId,
   };
 };
+
+export const fixBindingsAfterDeletion = (
+  sceneElements: readonly ExcalidrawElement[],
+  deletedElements: readonly ExcalidrawElement[],
+): void => {
+  const deletedElementIds = new Set(
+    deletedElements.map((element) => element.id),
+  );
+  // Non deleted and need an update
+  const boundElementIds: Set<ExcalidrawElement["id"]> = new Set();
+  deletedElements.forEach((deletedElement) => {
+    if (isBindableElement(deletedElement)) {
+      deletedElement.boundElementIds?.forEach((id) => {
+        if (!deletedElementIds.has(id)) {
+          boundElementIds.add(id);
+        }
+      });
+    }
+  });
+  (sceneElements.filter(({ id }) =>
+    boundElementIds.has(id),
+  ) as ExcalidrawLinearElement[]).forEach(
+    (element: ExcalidrawLinearElement) => {
+      const { startBinding, endBinding } = element;
+      mutateElement(element, {
+        startBinding: newBindingAfterDeletion(startBinding, deletedElementIds),
+        endBinding: newBindingAfterDeletion(endBinding, deletedElementIds),
+      });
+    },
+  );
+};
+
+const newBindingAfterDeletion = (
+  binding: PointBinding | null,
+  deletedElementIds: Set<ExcalidrawElement["id"]>,
+): PointBinding | null => {
+  if (binding == null || deletedElementIds.has(binding.elementId)) {
+    return null;
+  }
+  return binding;
+};

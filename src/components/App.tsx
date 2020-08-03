@@ -170,6 +170,7 @@ import {
   fixBindingsAfterDuplication,
   maybeBindBindableElement,
   getElligibleElementForBindingElementAtCoors,
+  fixBindingsAfterDeletion,
 } from "../element/binding";
 
 /**
@@ -1643,6 +1644,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               [element.id]: true,
             },
           }));
+        } else {
+          fixBindingsAfterDeletion(this.scene.getElements(), [element]);
         }
         if (!isDeleted || isExistingElement) {
           history.resumeRecording();

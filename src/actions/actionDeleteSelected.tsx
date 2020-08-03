@@ -11,6 +11,7 @@ import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { fixBindingsAfterDeletion } from "../element/binding";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -97,6 +98,10 @@ export const actionDeleteSelected = register({
       elements: nextElements,
       appState: nextAppState,
     } = deleteSelectedElements(elements, appState);
+    fixBindingsAfterDeletion(
+      nextElements,
+      elements.filter(({ id }) => appState.selectedElementIds[id]),
+    );
 
     nextAppState = handleGroupEditingState(nextAppState, nextElements);
 
