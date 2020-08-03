@@ -277,7 +277,7 @@ export const renderScene = (
     );
   }
 
-  [...appState.suggestedBindings, appState.boundElement]
+  appState.suggestedBindings
     .filter((binding) => binding != null)
     .forEach((suggestedBinding) => {
       renderBindingHighlight(context, sceneState, suggestedBinding!);
