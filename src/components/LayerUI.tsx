@@ -593,7 +593,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     const {
       cursorX,
       cursorY,
-      suggestedBindableElements,
+      suggestedBindings,
       boundElement,
       ...ret
     } = appState;

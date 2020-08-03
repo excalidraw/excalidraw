@@ -1553,7 +1553,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       document.activeElement.blur();
     }
     if (!isLinearElementType(elementType)) {
-      this.setState({ suggestedBindableElements: [] });
+      this.setState({ suggestedBindings: [] });
     }
     if (elementType !== "selection") {
       this.setState({
@@ -2636,7 +2636,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         draggingElement: element,
         editingElement: element,
         boundElement,
-        suggestedBindableElements: [],
+        suggestedBindings: [],
       });
     }
   };
@@ -3050,7 +3050,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (editingLinearElement !== this.state.editingLinearElement) {
           this.setState({
             editingLinearElement,
-            suggestedBindableElements: [],
+            suggestedBindings: [],
           });
         }
       }
@@ -3105,7 +3105,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.scene,
             pointerCoords,
           );
-          this.setState({ suggestedBindableElements: [], boundElement: null });
+          this.setState({ suggestedBindings: [], boundElement: null });
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -3231,13 +3231,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         resetCursor();
         this.setState({
           draggingElement: null,
-          suggestedBindableElements: [],
+          suggestedBindings: [],
           elementType: "selection",
         });
       } else {
         this.setState({
           draggingElement: null,
-          suggestedBindableElements: [],
+          suggestedBindings: [],
         });
       }
     });
@@ -3252,7 +3252,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.scene,
     );
     this.setState({
-      suggestedBindableElements:
+      suggestedBindings:
         hoveredBindableElement != null ? [hoveredBindableElement] : [],
     });
   };
@@ -3271,7 +3271,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       pointerCoords,
     );
     this.setState({
-      suggestedBindableElements:
+      suggestedBindings:
         hoveredBindableElement != null ? [hoveredBindableElement] : [],
     });
   };
@@ -3279,10 +3279,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private maybeSuggestBindingForAll(
     selectedElements: NonDeleted<ExcalidrawElement>[],
   ): void {
-    const suggestedBindableElements = getEligibleElementsForBinding(
-      selectedElements,
-    );
-    this.setState({ suggestedBindableElements });
+    const suggestedBindings = getEligibleElementsForBinding(selectedElements);
+    this.setState({ suggestedBindings });
   }
 
   private maybeClearSelectionWhenHittingElement(

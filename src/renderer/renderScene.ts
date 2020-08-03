@@ -9,6 +9,7 @@ import {
   ExcalidrawLinearElement,
   NonDeleted,
   GroupId,
+  ExcalidrawBindableElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -37,6 +38,8 @@ import {
   getElementsInGroup,
 } from "../groups";
 import { maxBindingGap } from "../element/collision";
+import { SuggestedBinding, SuggestedPointBinding } from "../element/binding";
+import { Handlers } from "../element/handlerRectangles";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
 
@@ -95,15 +98,14 @@ const strokeEllipseWithRotation = (
   context.stroke();
 };
 
-const strokeCircle = (
+const fillCircle = (
   context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  cx: number,
+  cy: number,
+  radius: number,
 ) => {
   context.beginPath();
-  context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
+  context.arc(cx, cy, radius, 0, Math.PI * 2);
   context.fill();
   context.stroke();
 };
@@ -151,12 +153,11 @@ const renderLinearPointHandles = (
           ? "rgba(255, 127, 127, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
-      strokeCircle(
+      fillCircle(
         context,
-        point[0] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
-        point[1] - POINT_HANDLE_SIZE / 2 / sceneState.zoom,
-        POINT_HANDLE_SIZE / sceneState.zoom,
-        POINT_HANDLE_SIZE / sceneState.zoom,
+        point[0] / sceneState.zoom,
+        point[1] / sceneState.zoom,
+        POINT_HANDLE_SIZE / 2 / sceneState.zoom,
       );
     },
   );
@@ -276,10 +277,10 @@ export const renderScene = (
     );
   }
 
-  [...appState.suggestedBindableElements, appState.boundElement]
-    .filter((element) => element != null)
-    .forEach((element) => {
-      renderBindingHighlight(context, sceneState, element!);
+  [...appState.suggestedBindings, appState.boundElement]
+    .filter((binding) => binding != null)
+    .forEach((suggestedBinding) => {
+      renderBindingHighlight(context, sceneState, suggestedBinding!);
     });
 
   // Paint selected elements
@@ -356,46 +357,21 @@ export const renderScene = (
     const locallySelectedElements = getSelectedElements(elements, appState);
 
     // Paint resize handlers
+    context.translate(sceneState.scrollX, sceneState.scrollY);
     if (locallySelectedElements.length === 1) {
-      context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = oc.white;
       const handlers = handlerRectangles(
         locallySelectedElements[0],
         sceneState.zoom,
       );
-      Object.keys(handlers).forEach((key) => {
-        const handler = handlers[key as HandlerRectanglesRet];
-        if (handler !== undefined) {
-          const lineWidth = context.lineWidth;
-          context.lineWidth = 1 / sceneState.zoom;
-          if (key === "rotation") {
-            strokeCircle(
-              context,
-              handler[0],
-              handler[1],
-              handler[2],
-              handler[3],
-            );
-          } else {
-            strokeRectWithRotation(
-              context,
-              handler[0],
-              handler[1],
-              handler[2],
-              handler[3],
-              handler[0] + handler[2] / 2,
-              handler[1] + handler[3] / 2,
-              locallySelectedElements[0].angle,
-              true, // fill before stroke
-            );
-          }
-          context.lineWidth = lineWidth;
-        }
-      });
-      context.translate(-sceneState.scrollX, -sceneState.scrollY);
+      renderHandlers(
+        context,
+        sceneState,
+        handlers,
+        locallySelectedElements[0].angle,
+      );
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom;
-      context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
       const initialLineDash = context.getLineDash();
@@ -421,37 +397,9 @@ export const renderScene = (
         undefined,
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      Object.keys(handlers).forEach((key) => {
-        const handler = handlers[key as HandlerRectanglesRet];
-        if (handler !== undefined) {
-          const lineWidth = context.lineWidth;
-          context.lineWidth = 1 / sceneState.zoom;
-          if (key === "rotation") {
-            strokeCircle(
-              context,
-              handler[0],
-              handler[1],
-              handler[2],
-              handler[3],
-            );
-          } else {
-            strokeRectWithRotation(
-              context,
-              handler[0],
-              handler[1],
-              handler[2],
-              handler[3],
-              handler[0] + handler[2] / 2,
-              handler[1] + handler[3] / 2,
-              0,
-              true, // fill before stroke
-            );
-          }
-          context.lineWidth = lineWidth;
-        }
-      });
-      context.translate(-sceneState.scrollX, -sceneState.scrollY);
+      renderHandlers(context, sceneState, handlers, 0);
     }
+    context.translate(-sceneState.scrollX, -sceneState.scrollY);
   }
 
   // Reset zoom
@@ -591,6 +539,42 @@ export const renderScene = (
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
 
+const renderHandlers = (
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  handlers: Handlers,
+  angle: number,
+): void => {
+  Object.keys(handlers).forEach((key) => {
+    const handler = handlers[key as HandlerRectanglesRet];
+    if (handler !== undefined) {
+      const lineWidth = context.lineWidth;
+      context.lineWidth = 1 / sceneState.zoom;
+      if (key === "rotation") {
+        fillCircle(
+          context,
+          handler[0] + handler[2] / 2,
+          handler[1] + handler[3] / 2,
+          handler[2] / 2,
+        );
+      } else {
+        strokeRectWithRotation(
+          context,
+          handler[0],
+          handler[1],
+          handler[2],
+          handler[3],
+          handler[0] + handler[2] / 2,
+          handler[1] + handler[3] / 2,
+          angle,
+          true, // fill before stroke
+        );
+      }
+      context.lineWidth = lineWidth;
+    }
+  });
+};
+
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
@@ -656,27 +640,42 @@ const renderSelectionBorder = (
 const renderBindingHighlight = (
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
-  targetElement: NonDeletedExcalidrawElement,
+  suggestedBinding: SuggestedBinding,
 ) => {
   // preserve context settings to restore later
   const originalStrokeStyle = context.strokeStyle;
   const originalLineWidth = context.lineWidth;
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(targetElement);
+  const renderHighlight = Array.isArray(suggestedBinding)
+    ? renderBindingHighlightForSuggestedPointBinding
+    : renderBindingHighlightForBindableElement;
+
+  context.translate(sceneState.scrollX, sceneState.scrollY);
+  renderHighlight(context, sceneState, suggestedBinding as any);
+
+  // restore context settings
+  context.strokeStyle = originalStrokeStyle;
+  context.lineWidth = originalLineWidth;
+  context.translate(-sceneState.scrollX, -sceneState.scrollY);
+};
+
+const renderBindingHighlightForBindableElement = (
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  element: ExcalidrawBindableElement,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const width = x2 - x1;
   const height = y2 - y1;
-  const threshold = maxBindingGap(targetElement, width, height);
+  const threshold = maxBindingGap(element, width, height);
 
   // So that we don't overlap the element itself
   const strokeOffset = 4;
-
   context.strokeStyle = "rgba(0,0,0,.05)";
   context.lineWidth = (threshold - strokeOffset) / sceneState.zoom;
-  context.translate(sceneState.scrollX, sceneState.scrollY);
-
   const padding = (strokeOffset + threshold / 2) / sceneState.zoom;
 
-  switch (targetElement.type) {
+  switch (element.type) {
     case "rectangle":
       strokeRectWithRotation(
         context,
@@ -686,7 +685,7 @@ const renderBindingHighlight = (
         height + padding * 2,
         x1 + width / 2,
         y1 + height / 2,
-        targetElement.angle,
+        element.angle,
       );
       break;
     case "diamond":
@@ -699,7 +698,7 @@ const renderBindingHighlight = (
         height + hPadding * 2,
         x1 + width / 2,
         y1 + height / 2,
-        targetElement.angle,
+        element.angle,
       );
       break;
     case "ellipse":
@@ -709,28 +708,37 @@ const renderBindingHighlight = (
         height + padding * 2,
         x1 + width / 2,
         y1 + height / 2,
-        targetElement.angle,
-      );
-      break;
-    default:
-      // TODO: This will be improved
-      strokeRectWithRotation(
-        context,
-        x1 - padding,
-        y1 - padding,
-        width + padding * 2,
-        height + padding * 2,
-        x1 + width / 2,
-        y1 + height / 2,
-        targetElement.angle,
+        element.angle,
       );
       break;
   }
+};
 
-  // restore context settings
-  context.strokeStyle = originalStrokeStyle;
-  context.lineWidth = originalLineWidth;
-  context.translate(-sceneState.scrollX, -sceneState.scrollY);
+const renderBindingHighlightForSuggestedPointBinding = (
+  context: CanvasRenderingContext2D,
+  sceneState: SceneState,
+  suggestedBinding: SuggestedPointBinding,
+) => {
+  const [element, startOrEnd, bindableElement] = suggestedBinding;
+
+  const threshold = maxBindingGap(
+    bindableElement,
+    bindableElement.width,
+    bindableElement.height,
+  );
+
+  context.strokeStyle = "rgba(0,0,0,0)";
+  context.fillStyle = "rgba(0,0,0,.05)";
+
+  const pointIndices =
+    startOrEnd === "both" ? [0, -1] : startOrEnd === "start" ? [0] : [-1];
+  pointIndices.forEach((index) => {
+    const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      element,
+      index,
+    );
+    fillCircle(context, x, y, threshold);
+  });
 };
 
 const isVisibleElement = (

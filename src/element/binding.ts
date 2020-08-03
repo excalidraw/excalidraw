@@ -26,6 +26,16 @@ import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { tupleToCoors } from "../utils";
 
+export type SuggestedBinding =
+  | NonDeleted<ExcalidrawBindableElement>
+  | SuggestedPointBinding;
+
+export type SuggestedPointBinding = [
+  NonDeleted<ExcalidrawLinearElement>,
+  "start" | "end" | "both",
+  NonDeleted<ExcalidrawBindableElement>,
+];
+
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startBindingElement: ExcalidrawBindableElement | null | "keep",
@@ -350,14 +360,14 @@ const maybeCalculateNewGapWhenScaling = (
 
 export const getEligibleElementsForBinding = (
   elements: NonDeleted<ExcalidrawElement>[],
-): NonDeleted<ExcalidrawElement>[] => {
+): SuggestedBinding[] => {
   return elements.flatMap((element) =>
     isBindingElement(element)
-      ? getElligibleElementsForBindingElement(
+      ? (getElligibleElementsForBindingElement(
           element as NonDeleted<ExcalidrawLinearElement>,
-        )
+        ) as SuggestedBinding[])
       : isBindableElement(element)
-      ? getElligibleElementsForBindableElement(element)
+      ? getElligibleElementsForBindableElementAndWhere(element)
       : [],
   );
 };
@@ -424,17 +434,9 @@ const getLinearElementEdgeCoors = (
   );
 };
 
-const getElligibleElementsForBindableElement = (
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
-): NonDeleted<ExcalidrawElement>[] => {
-  return getElligibleElementsForBindableElementAndWhere(bindableElement).map(
-    ([element]) => element,
-  );
-};
-
 const getElligibleElementsForBindableElementAndWhere = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
-): [NonDeleted<ExcalidrawLinearElement>, "start" | "end" | "both"][] => {
+): SuggestedPointBinding[] => {
   return Scene.getScene(bindableElement)!
     .getElements()
     .map((element) => {
@@ -457,12 +459,10 @@ const getElligibleElementsForBindableElementAndWhere = (
       return [
         element,
         canBindStart && canBindEnd ? "both" : canBindStart ? "start" : "end",
+        bindableElement,
       ];
     })
-    .filter((maybeElement) => maybeElement != null) as [
-    NonDeleted<ExcalidrawLinearElement>,
-    "start" | "end",
-  ][];
+    .filter((maybeElement) => maybeElement != null) as SuggestedPointBinding[];
 };
 
 const isLinearElementEligibleForNewBindingByBindable = (

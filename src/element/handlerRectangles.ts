@@ -5,6 +5,10 @@ import { rotate } from "../math";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
 
+export type Handlers = Partial<
+  { [T in Sides]: [number, number, number, number] }
+>;
+
 const handleSizes: { [k in PointerType]: number } = {
   mouse: 8,
   pen: 16,
@@ -66,7 +70,7 @@ export const handlerRectanglesFromCoords = (
   zoom: number,
   pointerType: PointerType = "mouse",
   omitSides: { [T in Sides]?: boolean } = {},
-): Partial<{ [T in Sides]: [number, number, number, number] }> => {
+): Handlers => {
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;

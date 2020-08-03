@@ -13,6 +13,7 @@ import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
+import { SuggestedBinding } from "./element/binding";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -35,7 +36,7 @@ export type AppState = {
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
   selectionElement: NonDeletedExcalidrawElement | null;
   boundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBindableElements: NonDeleted<ExcalidrawElement>[];
+  suggestedBindings: SuggestedBinding[];
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
