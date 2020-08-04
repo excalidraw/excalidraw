@@ -348,7 +348,17 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     absoluteCoords: Point,
   ): Point {
-    return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const [x, y] = rotate(
+      absoluteCoords[0],
+      absoluteCoords[1],
+      cx,
+      cy,
+      -element.angle,
+    );
+    return [x - element.x, y - element.y];
   }
 
   static getPointIndexUnderCursor(

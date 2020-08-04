@@ -237,17 +237,18 @@ export const updateBoundElements = (
   (Scene.getScene(changedElement)!.getNonDeletedElements(
     boundElementIds,
   ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((linearElement) => {
-    const bindingElement = changedElement as ExcalidrawBindableElement;
-    if (!doesNeedUpdate(linearElement, bindingElement)) {
+    const bindableElement = changedElement as ExcalidrawBindableElement;
+    // In case the boundElementIds are stale
+    if (!doesNeedUpdate(linearElement, bindableElement)) {
       return;
     }
     const startBinding = maybeCalculateNewGapWhenScaling(
-      bindingElement,
+      bindableElement,
       linearElement.startBinding,
       newSize,
     );
     const endBinding = maybeCalculateNewGapWhenScaling(
-      bindingElement,
+      bindableElement,
       linearElement.endBinding,
       newSize,
     );
