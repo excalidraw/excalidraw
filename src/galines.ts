@@ -55,3 +55,8 @@ export function distance(line1: Line, line2: Line): number {
 export function angle(line1: Line, line2: Line): number {
   return Math.acos(GA.dot(line1, line2)[0]);
 }
+
+// The orientation of the line
+export function sign(line: Line): number {
+  return Math.sign(line[1]);
+}

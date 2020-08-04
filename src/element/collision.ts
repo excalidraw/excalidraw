@@ -157,7 +157,7 @@ const distanceToEllipse = (
   point: Point,
 ): number => {
   const [pointRel, tangent] = ellipseParamsForTest(element, point);
-  return GAPoint.distanceToLine(pointRel, tangent);
+  return -GALine.sign(tangent) * GAPoint.distanceToLine(pointRel, tangent);
 };
 
 const ellipseParamsForTest = (
