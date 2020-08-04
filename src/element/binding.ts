@@ -41,18 +41,55 @@ export const bindOrUnbindLinearElement = (
   startBindingElement: ExcalidrawBindableElement | null | "keep",
   endBindingElement: ExcalidrawBindableElement | null | "keep",
 ): void => {
-  if (startBindingElement !== "keep") {
-    if (startBindingElement != null) {
-      bindLinearElement(linearElement, startBindingElement, "start");
+  const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
+  const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
+  bindOrUnbindLinearElementEdge(
+    linearElement,
+    startBindingElement,
+    "start",
+    boundToElementIds,
+    unboundFromElementIds,
+  );
+  bindOrUnbindLinearElementEdge(
+    linearElement,
+    endBindingElement,
+    "end",
+    boundToElementIds,
+    unboundFromElementIds,
+  );
+
+  const onlyUnbound = Array.from(unboundFromElementIds).filter(
+    (id) => !boundToElementIds.has(id),
+  );
+  Scene.getScene(linearElement)!
+    .getNonDeletedElements(onlyUnbound)
+    .forEach((element) => {
+      mutateElement(element, {
+        boundElementIds: element.boundElementIds?.filter(
+          (id) => id !== linearElement.id,
+        ),
+      });
+    });
+};
+
+const bindOrUnbindLinearElementEdge = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  bindableElement: ExcalidrawBindableElement | null | "keep",
+  startOrEnd: "start" | "end",
+  // Is mutated
+  boundToElementIds: Set<ExcalidrawBindableElement["id"]>,
+  // Is mutated
+  unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
+): void => {
+  if (bindableElement !== "keep") {
+    if (bindableElement != null) {
+      bindLinearElement(linearElement, bindableElement, startOrEnd);
+      boundToElementIds.add(bindableElement.id);
     } else {
-      unbindLinearElement(linearElement, "start");
-    }
-  }
-  if (endBindingElement !== "keep") {
-    if (endBindingElement != null) {
-      bindLinearElement(linearElement, endBindingElement, "end");
-    } else {
-      unbindLinearElement(linearElement, "end");
+      const unbound = unbindLinearElement(linearElement, startOrEnd);
+      if (unbound != null) {
+        unboundFromElementIds.add(unbound);
+      }
     }
   }
 };
@@ -157,24 +194,14 @@ export const isLinearElementSimpleAndAlreadyBound = (
 const unbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
-): void => {
+): ExcalidrawBindableElement["id"] | null => {
   const field = startOrEnd === "start" ? "startBinding" : "endBinding";
   const binding = linearElement[field];
   if (binding == null) {
-    return;
+    return null;
   }
-  const bindingElement = Scene.getScene(linearElement)!.getNonDeletedElement(
-    binding.elementId,
-  );
   mutateElement(linearElement, { [field]: null });
-  if (bindingElement == null) {
-    return;
-  }
-  mutateElement(bindingElement, {
-    boundElementIds: bindingElement.boundElementIds?.filter(
-      (id) => id !== linearElement.id,
-    ),
-  });
+  return binding.elementId;
 };
 
 export const getHoveredElementForBinding = (
