@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
-import { globalSceneState } from "../scene";
+import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement } from "./types";
@@ -37,16 +37,18 @@ export const textWysiwyg = ({
   onChange,
   onSubmit,
   getViewportCoords,
+  element,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
   onChange?: (text: string) => void;
   onSubmit: (text: string) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
+  element: ExcalidrawElement;
 }) => {
   function updateWysiwygStyle() {
-    const updatedElement = globalSceneState.getElement(id);
-    if (isTextElement(updatedElement)) {
+    const updatedElement = Scene.getScene(element)?.getElement(id);
+    if (updatedElement && isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
         updatedElement.x,
         updatedElement.y,
@@ -183,7 +185,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = globalSceneState.addCallback(() => {
+  const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
     editable.focus();
   });
