@@ -710,7 +710,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  componentDidUpdate(prevProps: ExcalidrawProps) {
+  componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
     const { width: prevWidth, height: prevHeight } = prevProps;
     const { width: currentWidth, height: currentHeight } = this.props;
     if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
@@ -733,6 +733,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       setTimeout(() => {
         this.actionManager.executeAction(actionFinalize);
       });
+    }
+    const { multiElement } = prevState;
+    if (
+      prevState.elementType !== this.state.elementType &&
+      multiElement != null
+    ) {
+      maybeBindLinearElement(
+        multiElement,
+        this.state,
+        this.scene,
+        tupleToCoors(
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            multiElement,
+            -1,
+          ),
+        ),
+      );
     }
 
     const cursorButton: {
