@@ -25,6 +25,7 @@ import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { tupleToCoors } from "../utils";
+import { KEYS } from "../keys";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -35,6 +36,12 @@ export type SuggestedPointBinding = [
   "start" | "end" | "both",
   NonDeleted<ExcalidrawBindableElement>,
 ];
+
+export const isBindingEnabled = (
+  event: React.PointerEvent | PointerEvent,
+): boolean => {
+  return !(event as any)[KEYS.CTRL_OR_CMD];
+};
 
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
@@ -189,6 +196,16 @@ export const isLinearElementSimpleAndAlreadyBound = (
   return (
     alreadyBoundToId === bindableElement.id && linearElement.points.length < 3
   );
+};
+
+export const unbindLinearElements = (
+  elements: NonDeleted<ExcalidrawElement>[],
+): void => {
+  elements.forEach((element) => {
+    if (isLinearElement(element)) {
+      bindOrUnbindLinearElement(element, null, null);
+    }
+  });
 };
 
 const unbindLinearElement = (

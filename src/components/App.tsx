@@ -168,11 +168,13 @@ import {
   maybeBindLinearElement,
   getEligibleElementsForBinding,
   bindOrUnbindSelectedElements,
+  unbindLinearElements,
   fixBindingsAfterDuplication,
   maybeBindBindableElement,
   getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
+  isBindingEnabled,
 } from "../element/binding";
 
 /**
@@ -1454,6 +1456,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
       this.toggleGridMode();
+    } else if (event[KEYS.CTRL_OR_CMD]) {
+      this.setState({ suggestedBindings: [] });
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
@@ -1944,14 +1948,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (editingLinearElement !== this.state.editingLinearElement) {
         this.setState({ editingLinearElement });
       }
-      if (editingLinearElement.lastUncommittedPoint != null) {
-        this.maybeSuggestBindingAtCursor(scenePointer);
-      } else {
-        this.setState({ suggestedBindings: [] });
+      if (isBindingEnabled(event)) {
+        if (editingLinearElement.lastUncommittedPoint != null) {
+          this.maybeSuggestBindingAtCursor(scenePointer);
+        } else {
+          this.setState({ suggestedBindings: [] });
+        }
       }
     }
 
-    if (isBindingElementType(this.state.elementType)) {
+    if (
+      isBindingEnabled(event) &&
+      isBindingElementType(this.state.elementType)
+    ) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { draggingElement } = this.state;
@@ -2814,7 +2823,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.resize.originalElements,
           )
         ) {
-          this.maybeSuggestBindingForAll(selectedElements);
+          if (isBindingEnabled(event)) {
+            this.maybeSuggestBindingForAll(selectedElements);
+          }
           return;
         }
       }
@@ -2826,11 +2837,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           pointerCoords.x,
           pointerCoords.y,
           (element, startOrEnd) => {
-            this.maybeSuggestBindingForLinearElementAtCursor(
-              element,
-              startOrEnd,
-              pointerCoords,
-            );
+            if (isBindingEnabled(event)) {
+              this.maybeSuggestBindingForLinearElementAtCursor(
+                element,
+                startOrEnd,
+                pointerCoords,
+              );
+            }
           },
         );
 
@@ -2857,7 +2870,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state.gridSize,
           );
           dragSelectedElements(selectedElements, dragX, dragY, this.scene);
-          this.maybeSuggestBindingForAll(selectedElements);
+          if (isBindingEnabled(event)) {
+            this.maybeSuggestBindingForAll(selectedElements);
+          }
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -2957,7 +2972,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             });
           }
         }
-        if (isBindingElement(draggingElement)) {
+        if (isBindingEnabled(event) && isBindingElement(draggingElement)) {
           // When creating a linear element by dragging
           this.maybeSuggestBindingForLinearElementAtCursor(
             draggingElement,
@@ -2992,7 +3007,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
-        this.maybeSuggestBindingForAll([draggingElement]);
+        if (isBindingEnabled(event)) {
+          this.maybeSuggestBindingForAll([draggingElement]);
+        }
       }
 
       if (this.state.elementType === "selection") {
@@ -3087,6 +3104,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // and sets binding element
       if (this.state.editingLinearElement) {
         const editingLinearElement = LinearElementEditor.handlePointerUp(
+          childEvent,
           this.state.editingLinearElement,
         );
         if (editingLinearElement !== this.state.editingLinearElement) {
@@ -3191,7 +3209,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
-        if (isBindableElement(draggingElement)) {
+
+        if (
+          isBindingEnabled(childEvent) &&
+          isBindableElement(draggingElement)
+        ) {
           maybeBindBindableElement(draggingElement);
         }
       }
@@ -3264,7 +3286,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing) {
-        bindOrUnbindSelectedElements(
+        (isBindingEnabled(childEvent)
+          ? bindOrUnbindSelectedElements
+          : unbindLinearElements)(
           getSelectedElements(this.scene.getElements(), this.state),
         );
       }

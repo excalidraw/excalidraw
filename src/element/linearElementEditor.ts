@@ -16,6 +16,7 @@ import Scene from "../scene/Scene";
 import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
+  isBindingEnabled,
 } from "./binding";
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
@@ -113,6 +114,7 @@ export class LinearElementEditor {
   }
 
   static handlePointerUp(
+    event: PointerEvent,
     editingLinearElement: LinearElementEditor,
   ): LinearElementEditor {
     const { elementId, activePointIndex, isDragging } = editingLinearElement;
@@ -135,15 +137,17 @@ export class LinearElementEditor {
             : element.points[0],
         );
       }
-      const bindingElement = getHoveredElementForBinding(
-        tupleToCoors(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            element,
-            activePointIndex!,
-          ),
-        ),
-        Scene.getScene(element)!,
-      );
+      const bindingElement = isBindingEnabled(event)
+        ? getHoveredElementForBinding(
+            tupleToCoors(
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                activePointIndex!,
+              ),
+            ),
+            Scene.getScene(element)!,
+          )
+        : null;
       binding = {
         [activePointIndex === 0
           ? "startBindingElement"
@@ -235,11 +239,13 @@ export class LinearElementEditor {
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      bindOrUnbindLinearElement(
-        element,
-        startBindingElement,
-        endBindingElement,
-      );
+      if (isBindingEnabled(event)) {
+        bindOrUnbindLinearElement(
+          element,
+          startBindingElement,
+          endBindingElement,
+        );
+      }
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
