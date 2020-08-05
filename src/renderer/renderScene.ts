@@ -651,7 +651,7 @@ const renderBindingHighlight = (
     : renderBindingHighlightForBindableElement;
 
   context.translate(sceneState.scrollX, sceneState.scrollY);
-  renderHighlight(context, sceneState, suggestedBinding as any);
+  renderHighlight(context, suggestedBinding as any);
 
   // restore context settings
   context.strokeStyle = originalStrokeStyle;
@@ -661,7 +661,6 @@ const renderBindingHighlight = (
 
 const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
   element: ExcalidrawBindableElement,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -672,8 +671,8 @@ const renderBindingHighlightForBindableElement = (
   // So that we don't overlap the element itself
   const strokeOffset = 4;
   context.strokeStyle = "rgba(0,0,0,.05)";
-  context.lineWidth = (threshold - strokeOffset) / sceneState.zoom;
-  const padding = (strokeOffset + threshold / 2) / sceneState.zoom;
+  context.lineWidth = threshold - strokeOffset;
+  const padding = strokeOffset + threshold / 2;
 
   switch (element.type) {
     case "rectangle":
@@ -717,7 +716,6 @@ const renderBindingHighlightForBindableElement = (
 
 const renderBindingHighlightForSuggestedPointBinding = (
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
   suggestedBinding: SuggestedPointBinding,
 ) => {
   const [element, startOrEnd, bindableElement] = suggestedBinding;
