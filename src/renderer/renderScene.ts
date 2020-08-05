@@ -155,8 +155,8 @@ const renderLinearPointHandles = (
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
       fillCircle(
         context,
-        point[0] / sceneState.zoom,
-        point[1] / sceneState.zoom,
+        point[0],
+        point[1],
         POINT_HANDLE_SIZE / 2 / sceneState.zoom,
       );
     },
