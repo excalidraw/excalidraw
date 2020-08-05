@@ -288,7 +288,7 @@ export class LinearElementEditor {
       if (lastPoint === lastUncommittedPoint) {
         LinearElementEditor.movePoint(element, points.length - 1, "delete");
       }
-      return editingLinearElement;
+      return { ...editingLinearElement, lastUncommittedPoint: null };
     }
 
     const newPoint = LinearElementEditor.createPointAt(

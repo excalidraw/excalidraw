@@ -1944,6 +1944,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (editingLinearElement !== this.state.editingLinearElement) {
         this.setState({ editingLinearElement });
       }
+      if (editingLinearElement.lastUncommittedPoint != null) {
+        this.maybeSuggestBindingAtCursor(scenePointer);
+      } else {
+        this.setState({ suggestedBindings: [] });
+      }
     }
 
     if (isBindingElementType(this.state.elementType)) {
