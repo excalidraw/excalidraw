@@ -35,7 +35,7 @@ export type AppState = {
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
   selectionElement: NonDeletedExcalidrawElement | null;
-  boundElement: NonDeleted<ExcalidrawBindableElement> | null;
+  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   // element being edited, but not necessarily added to elements array yet
   //  (e.g. text element when typing into the input)

@@ -130,8 +130,8 @@ export const maybeBindLinearElement = (
   scene: Scene,
   pointerCoords: { x: number; y: number },
 ): void => {
-  if (appState.boundElement != null) {
-    bindLinearElement(linearElement, appState.boundElement, "start");
+  if (appState.startBoundElement != null) {
+    bindLinearElement(linearElement, appState.startBoundElement, "start");
   }
   const hoveredElement = getHoveredElementForBinding(pointerCoords, scene);
   if (hoveredElement != null) {

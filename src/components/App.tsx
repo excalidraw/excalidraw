@@ -1955,7 +1955,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           "end",
           scenePointer,
-          this.state.boundElement,
+          this.state.startBoundElement,
         );
       } else {
         this.maybeSuggestBindingAtCursor(scenePointer);
@@ -2667,7 +2667,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         draggingElement: element,
         editingElement: element,
-        boundElement,
+        startBoundElement: boundElement,
         suggestedBindings: [],
       });
     }
@@ -2958,7 +2958,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             draggingElement,
             "end",
             pointerCoords,
-            this.state.boundElement,
+            this.state.startBoundElement,
           );
         }
       } else if (draggingElement.type === "selection") {
@@ -3142,7 +3142,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.scene,
             pointerCoords,
           );
-          this.setState({ suggestedBindings: [], boundElement: null });
+          this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
