@@ -2885,8 +2885,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
           if (draggingElement.type === "draw") {
+            /**
+             * The constant .7 is fairly arbitrary but was chosen to maintain
+             * the same distance at zoom 100%
+             **/
             mutateElement(draggingElement, {
-              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+              points: simplify(
+                [...(points as Point[]), [dx, dy]],
+                0.7 / this.state.zoom,
+              ),
             });
           } else {
             mutateElement(draggingElement, {
