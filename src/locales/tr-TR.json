@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
-    "multiSelect": "Seçime öğe ekle",
+    "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
@@ -173,7 +173,7 @@
     "editor": "Düzenleyici",
     "view": "Görüntüle",
     "blog": "Blog'umuzu okuyun",
-    "howto": "Rehberimizi takip edin",
+    "howto": "Rehberlerimizi takip edin",
     "github": "Bir hata mı buldun? Bildir",
     "textNewLine": "Yeni satır ekle (yazı)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
