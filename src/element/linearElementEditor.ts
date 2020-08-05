@@ -121,22 +121,20 @@ export class LinearElementEditor {
       return editingLinearElement;
     }
 
+    let binding = {};
     if (
       isDragging &&
-      (activePointIndex === 0 ||
-        activePointIndex === element.points.length - 1) &&
-      isPathALoop(element.points)
+      (activePointIndex === 0 || activePointIndex === element.points.length - 1)
     ) {
-      LinearElementEditor.movePoint(
-        element,
-        activePointIndex,
-        activePointIndex === 0
-          ? element.points[element.points.length - 1]
-          : element.points[0],
-      );
-    }
-    let binding = {};
-    if (isDragging) {
+      if (isPathALoop(element.points)) {
+        LinearElementEditor.movePoint(
+          element,
+          activePointIndex,
+          activePointIndex === 0
+            ? element.points[element.points.length - 1]
+            : element.points[0],
+        );
+      }
       const bindingElement = getHoveredElementForBinding(
         tupleToCoors(
           LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -187,7 +185,7 @@ export class LinearElementEditor {
     }
 
     if (event.altKey) {
-      if (!appState.editingLinearElement.lastUncommittedPoint) {
+      if (appState.editingLinearElement.lastUncommittedPoint == null) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -206,6 +204,10 @@ export class LinearElementEditor {
           ...appState.editingLinearElement,
           activePointIndex: element.points.length - 1,
           lastUncommittedPoint: null,
+          endBindingElement: getHoveredElementForBinding(
+            scenePointer,
+            Scene.getScene(element)!,
+          ),
         },
       });
       ret.didAddPoint = true;
